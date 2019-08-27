@@ -278,7 +278,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify if any object is a Core Object must be a double
      * greater than 0.0
@@ -304,8 +304,8 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     protected int k = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(M_ID, 1.0)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> m = x);
@@ -315,7 +315,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
 
     @Override
-    protected INFLO<O> makeInstance() {
+    public INFLO<O> make() {
       return new INFLO<>(distanceFunction, m, k);
     }
   }

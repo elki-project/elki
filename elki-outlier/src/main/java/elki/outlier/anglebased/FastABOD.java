@@ -272,7 +272,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends ABOD.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends ABOD.Par<V> {
     /**
      * Parameter for the nearest neighbors.
      */
@@ -284,15 +284,15 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(new GreaterEqualConstraint(3)) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected FastABOD<V> makeInstance() {
+    public FastABOD<V> make() {
       return new FastABOD<>(kernelFunction, k);
     }
   }

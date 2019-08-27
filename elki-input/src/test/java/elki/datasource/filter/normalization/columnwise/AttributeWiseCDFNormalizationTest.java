@@ -49,7 +49,7 @@ public class AttributeWiseCDFNormalizationTest extends AbstractDataSourceTest {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
     AttributeWiseCDFNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseCDFNormalization<DoubleVector>>(AttributeWiseCDFNormalization.class) //
         // Avoid cross-testing too many estimators.
-        .with(AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID, //
+        .with(AttributeWiseCDFNormalization.Par.DISTRIBUTIONS_ID, //
             Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC)) //
         .build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);

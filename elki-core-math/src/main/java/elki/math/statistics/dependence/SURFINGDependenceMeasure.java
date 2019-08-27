@@ -24,7 +24,7 @@ import elki.utilities.Priority;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -133,9 +133,9 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SURFINGDependenceMeasure makeInstance() {
+    public SURFINGDependenceMeasure make() {
       return STATIC;
     }
   }

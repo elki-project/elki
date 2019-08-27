@@ -24,11 +24,11 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -204,7 +204,7 @@ public class LogNormalDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * LogMean parameter
      */
@@ -224,8 +224,7 @@ public class LogNormalDistribution implements Distribution {
     double shift, logmean, logsigma;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOGMEAN_ID) //
           .grab(config, x -> logmean = x);
       new DoubleParameter(LOGSTDDEV_ID) //
@@ -236,7 +235,7 @@ public class LogNormalDistribution implements Distribution {
     }
 
     @Override
-    protected LogNormalDistribution makeInstance() {
+    public LogNormalDistribution make() {
       return new LogNormalDistribution(logmean, logsigma, shift);
     }
   }

@@ -42,7 +42,7 @@ import elki.logging.statistics.Duration;
 import elki.math.linearalgebra.pca.PCAFilteredResult;
 import elki.math.linearalgebra.pca.PCAResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -272,19 +272,19 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * ERiC settings.
      */
     protected ERiC.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(ERiC.Settings.class);
     }
 
     @Override
-    protected ERiCNeighborPredicate<V> makeInstance() {
+    public ERiCNeighborPredicate<V> make() {
       return new ERiCNeighborPredicate<>(settings);
     }
   }

@@ -25,7 +25,7 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.relation.Relation;
 import elki.math.linearalgebra.EigenvalueDecomposition;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -130,7 +130,7 @@ public class PCARunner {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the PCA variant to use.
      */
@@ -148,14 +148,13 @@ public class PCARunner {
     protected CovarianceMatrixBuilder covarianceMatrixBuilder;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<CovarianceMatrixBuilder>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class) //
           .grab(config, x -> covarianceMatrixBuilder = x);
     }
 
     @Override
-    protected PCARunner makeInstance() {
+    public PCARunner make() {
       return new PCARunner(covarianceMatrixBuilder);
     }
   }

@@ -31,7 +31,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -124,7 +124,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
      * 
      * @param <O> Object type
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * Parameter k
        */
@@ -146,8 +146,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
       Distance<? super O> distFunc;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new IntParameter(K_ID) //
             .grab(config, x -> k = x);
         new ObjectParameter<Distance<? super O>>(DISTANCEFUNCTION_ID, Distance.class) //
@@ -155,7 +154,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
       }
 
       @Override
-      protected PrecomputedKNearestNeighborNeighborhood.Factory<O> makeInstance() {
+      public PrecomputedKNearestNeighborNeighborhood.Factory<O> make() {
         return new PrecomputedKNearestNeighborNeighborhood.Factory<>(k, distFunc);
       }
     }

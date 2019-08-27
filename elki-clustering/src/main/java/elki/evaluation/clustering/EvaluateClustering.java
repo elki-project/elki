@@ -41,7 +41,7 @@ import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -269,7 +269,7 @@ public class EvaluateClustering implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to obtain the reference clustering. Defaults to a flat label
      * clustering.
@@ -302,8 +302,7 @@ public class EvaluateClustering implements Evaluator {
     private boolean selfPairing;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<ClusteringAlgorithm<?>>(REFERENCE_ID, ClusteringAlgorithm.class, ByLabelOrAllInOneClustering.class) //
           .grab(config, x -> referencealg = x);
       new Flag(NOISE_ID).grab(config, x -> noiseSpecialHandling = x);
@@ -311,7 +310,7 @@ public class EvaluateClustering implements Evaluator {
     }
 
     @Override
-    protected EvaluateClustering makeInstance() {
+    public EvaluateClustering make() {
       return new EvaluateClustering(referencealg, noiseSpecialHandling, !selfPairing);
     }
   }

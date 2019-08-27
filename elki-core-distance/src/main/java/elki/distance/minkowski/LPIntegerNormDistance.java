@@ -23,7 +23,7 @@ package elki.distance.minkowski;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -219,22 +219,21 @@ public class LPIntegerNormDistance extends LPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The value of p.
      */
     protected int p;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(LPNormDistance.Parameterizer.P_ID) //
+    public void configure(Parameterization config) {
+      new IntParameter(LPNormDistance.Par.P_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> p = x);
     }
 
     @Override
-    protected LPIntegerNormDistance makeInstance() {
+    public LPIntegerNormDistance make() {
       return p == 1 ? ManhattanDistance.STATIC : //
           p == 2 ? EuclideanDistance.STATIC : // F
               new LPIntegerNormDistance(p);

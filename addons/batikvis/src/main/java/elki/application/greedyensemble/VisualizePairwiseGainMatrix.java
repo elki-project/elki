@@ -278,7 +278,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Data source.
      */
@@ -300,23 +300,23 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     private EnsembleVoting voting;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Visualization options
       vispar = config.tryInstantiate(VisualizerParameterizer.class);
 
       // Prescaling
-      new ObjectParameter<ScalingFunction>(GreedyEnsembleExperiment.Parameterizer.PRESCALING_ID, ScalingFunction.class) //
+      new ObjectParameter<ScalingFunction>(GreedyEnsembleExperiment.Par.PRESCALING_ID, ScalingFunction.class) //
           .setOptional(true) //
           .grab(config, x -> prescaling = x);
-      new ObjectParameter<EnsembleVoting>(GreedyEnsembleExperiment.Parameterizer.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class) //
+      new ObjectParameter<EnsembleVoting>(GreedyEnsembleExperiment.Par.VOTING_ID, EnsembleVoting.class, EnsembleVotingMean.class) //
           .grab(config, x -> voting = x);
     }
 
     @Override
-    protected VisualizePairwiseGainMatrix makeInstance() {
+    public VisualizePairwiseGainMatrix make() {
       return new VisualizePairwiseGainMatrix(inputstep, prescaling, voting, vispar);
     }
   }

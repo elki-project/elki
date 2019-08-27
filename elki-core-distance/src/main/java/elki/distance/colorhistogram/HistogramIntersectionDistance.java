@@ -25,7 +25,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Intersection distance for color histograms.
@@ -110,9 +110,9 @@ public class HistogramIntersectionDistance extends AbstractNumberVectorDistance 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HistogramIntersectionDistance makeInstance() {
+    public HistogramIntersectionDistance make() {
       return HistogramIntersectionDistance.STATIC;
     }
   }

@@ -166,9 +166,9 @@ public class DTWDistance extends AbstractEditDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractEditDistance.Parameterizer {
+  public static class Par extends AbstractEditDistance.Par {
     @Override
-    protected DTWDistance makeInstance() {
+    public DTWDistance make() {
       return new DTWDistance(bandSize);
     }
   }

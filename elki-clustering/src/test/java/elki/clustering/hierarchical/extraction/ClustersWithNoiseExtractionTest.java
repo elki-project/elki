@@ -40,8 +40,8 @@ public class ClustersWithNoiseExtractionTest extends AbstractClusterAlgorithmTes
   public void testClustering() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(ClustersWithNoiseExtraction.class) //
-        .with(ClustersWithNoiseExtraction.Parameterizer.K_ID, 3) //
-        .with(ClustersWithNoiseExtraction.Parameterizer.MINCLUSTERSIZE_ID, 5) //
+        .with(ClustersWithNoiseExtraction.Par.K_ID, 3) //
+        .with(ClustersWithNoiseExtraction.Par.MINCLUSTERSIZE_ID, 5) //
         .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9242);

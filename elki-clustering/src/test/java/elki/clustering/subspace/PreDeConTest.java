@@ -52,16 +52,16 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   public void testPreDeConResults() {
     // Additional input parameters
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, ClassLabelFilter.class);
-    inp.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 1);
+    inp.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, ClassLabelFilter.class);
+    inp.addParameter(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 1);
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
 
     Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 60) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 40) //
-        .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 400) //
-        .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 20.) //
-        .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 4) //
+        .with(DBSCAN.Par.EPSILON_ID, 60) //
+        .with(DBSCAN.Par.MINPTS_ID, 40) //
+        .with(PreDeCon.Settings.Par.DELTA_ID, 400) //
+        .with(PreDeCon.Settings.Par.KAPPA_ID, 20.) //
+        .with(PreDeCon.Settings.Par.LAMBDA_ID, 4) //
         .build().run(db);
 
     // FIXME: find better working parameters?
@@ -77,11 +77,11 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
   public void testPreDeConSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
     Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.3) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 10) //
-        .with(PreDeCon.Settings.Parameterizer.DELTA_ID, 0.012) //
-        .with(PreDeCon.Settings.Parameterizer.KAPPA_ID, 10.) //
-        .with(PreDeCon.Settings.Parameterizer.LAMBDA_ID, 2) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.3) //
+        .with(DBSCAN.Par.MINPTS_ID, 10) //
+        .with(PreDeCon.Settings.Par.DELTA_ID, 0.012) //
+        .with(PreDeCon.Settings.Par.KAPPA_ID, 10.) //
+        .with(PreDeCon.Settings.Par.LAMBDA_ID, 2) //
         .build().run(db);
     testFMeasure(db, result, 0.74982899);
     testClusterSizes(result, new int[] { 356, 494 });

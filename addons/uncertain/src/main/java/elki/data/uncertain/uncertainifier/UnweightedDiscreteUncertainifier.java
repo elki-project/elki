@@ -73,9 +73,9 @@ public class UnweightedDiscreteUncertainifier extends AbstractDiscreteUncertaini
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDiscreteUncertainifier.Parameterizer {
+  public static class Par extends AbstractDiscreteUncertainifier.Par {
     @Override
-    protected UnweightedDiscreteUncertainifier makeInstance() {
+    public UnweightedDiscreteUncertainifier make() {
       return new UnweightedDiscreteUncertainifier(inner, minQuant, maxQuant);
     }
   }

@@ -354,9 +354,9 @@ public class FastPAM1<V> extends PAM<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends PAM.Parameterizer<V> {
+  public static class Par<V> extends PAM.Par<V> {
     @Override
-    protected FastPAM1<V> makeInstance() {
+    public FastPAM1<V> make() {
       return new FastPAM1<>(distanceFunction, k, maxiter, initializer);
     }
   }

@@ -45,7 +45,7 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.math.Mean;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -383,7 +383,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Parameter for setting the widows size multiplicator.
        */
@@ -425,8 +425,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
       RandomFactory random;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new DoubleParameter(WINDOW_ID, 10.0)
             .grab(config, x -> window = x);
         new IntParameter(PROJECTIONS_ID) //
@@ -440,7 +439,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
       }
 
       @Override
-      protected Factory<?> makeInstance() {
+      public Factory<?> make() {
         return new Factory<DoubleVector>(window, projections, proj, random);
       }
     }

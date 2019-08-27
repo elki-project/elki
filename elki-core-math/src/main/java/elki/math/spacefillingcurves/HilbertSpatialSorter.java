@@ -27,7 +27,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Sort object along the Hilbert Space Filling curve by mapping them to their
@@ -365,9 +365,9 @@ public class HilbertSpatialSorter implements SpatialSorter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HilbertSpatialSorter makeInstance() {
+    public HilbertSpatialSorter make() {
       return STATIC;
     }
   }

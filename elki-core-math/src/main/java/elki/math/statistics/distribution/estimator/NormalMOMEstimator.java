@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.NormalDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Naive maximum-likelihood estimations for the normal distribution using mean
@@ -69,9 +69,9 @@ public class NormalMOMEstimator implements MeanVarianceDistributionEstimator<Nor
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NormalMOMEstimator makeInstance() {
+    public NormalMOMEstimator make() {
       return STATIC;
     }
   }

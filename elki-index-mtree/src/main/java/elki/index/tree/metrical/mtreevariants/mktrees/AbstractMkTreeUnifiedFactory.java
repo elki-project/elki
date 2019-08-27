@@ -58,7 +58,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory.Parameterizer<O, N, E, S> {
+  public abstract static class Par<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, N, E>> extends AbstractMTreeFactory.Par<O, N, E, S> {
     /**
      * Parameter specifying the maximal number k of reverse k nearest neighbors
      * to be supported, must be an integer greater than 0.
@@ -66,14 +66,14 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
     public static final OptionID K_MAX_ID = new OptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_MAX_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.kmax = x);
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, N, E, S> makeInstance();
+    public abstract AbstractMkTreeUnifiedFactory<O, N, E, S> make();
   }
 }

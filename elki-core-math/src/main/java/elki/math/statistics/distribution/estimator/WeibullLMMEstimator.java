@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.math.statistics.distribution.WeibullDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -148,9 +148,9 @@ public class WeibullLMMEstimator implements LMMDistributionEstimator<WeibullDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WeibullLMMEstimator makeInstance() {
+    public WeibullLMMEstimator make() {
       return STATIC;
     }
   }

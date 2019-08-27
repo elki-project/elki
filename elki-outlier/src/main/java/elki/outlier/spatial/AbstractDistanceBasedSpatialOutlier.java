@@ -75,7 +75,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
    * @param <N> Object type for neighborhood
    * @param <O> Non-spatial object type
    */
-  public abstract static class Parameterizer<N, O> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public abstract static class Par<N, O> extends AbstractNeighborhoodOutlier.Par<N> {
     /**
      * Parameter to specify the non spatial distance function to use
      */
@@ -87,9 +87,9 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     protected PrimitiveDistance<O> distanceFunction = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<PrimitiveDistance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new ObjectParameter<PrimitiveDistance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distanceFunction = x);
     }
   }

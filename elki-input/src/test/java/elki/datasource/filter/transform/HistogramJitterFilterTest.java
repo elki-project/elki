@@ -47,8 +47,8 @@ public class HistogramJitterFilterTest extends AbstractDataSourceTest {
     final double s = 0.;
     final double j = .01;
     HistogramJitterFilter<DoubleVector> filter = new ELKIBuilder<>(HistogramJitterFilter.class) //
-        .with(HistogramJitterFilter.Parameterizer.SEED_ID, s) //
-        .with(HistogramJitterFilter.Parameterizer.JITTER_ID, j) //
+        .with(HistogramJitterFilter.Par.SEED_ID, s) //
+        .with(HistogramJitterFilter.Par.JITTER_ID, j) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

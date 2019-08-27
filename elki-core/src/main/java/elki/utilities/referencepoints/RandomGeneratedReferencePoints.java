@@ -28,7 +28,7 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -103,7 +103,7 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of requested reference points.
      */
@@ -136,8 +136,7 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(N_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> samplesize = x);
@@ -148,7 +147,7 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
     }
 
     @Override
-    protected RandomGeneratedReferencePoints makeInstance() {
+    public RandomGeneratedReferencePoints make() {
       return new RandomGeneratedReferencePoints(samplesize, scale, rnd);
     }
   }

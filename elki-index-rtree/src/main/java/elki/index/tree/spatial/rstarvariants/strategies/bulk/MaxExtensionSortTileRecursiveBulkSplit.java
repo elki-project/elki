@@ -26,7 +26,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialSingleMeanComparator;
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -123,9 +123,9 @@ public class MaxExtensionSortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MaxExtensionSortTileRecursiveBulkSplit makeInstance() {
+    public MaxExtensionSortTileRecursiveBulkSplit make() {
       return STATIC;
     }
   }

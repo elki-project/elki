@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -94,9 +94,9 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HellingerHistogramNormalization<NumberVector> makeInstance() {
+    public HellingerHistogramNormalization<NumberVector> make() {
       return STATIC;
     }
   }

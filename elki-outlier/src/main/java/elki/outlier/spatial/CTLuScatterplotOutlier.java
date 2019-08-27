@@ -186,9 +186,9 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @param <N> Neighborhood object type
    */
-  public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N> extends AbstractNeighborhoodOutlier.Par<N> {
     @Override
-    protected CTLuScatterplotOutlier<N> makeInstance() {
+    public CTLuScatterplotOutlier<N> make() {
       return new CTLuScatterplotOutlier<>(npredf);
     }
   }

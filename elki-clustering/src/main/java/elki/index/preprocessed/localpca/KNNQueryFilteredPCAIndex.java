@@ -153,7 +153,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, KNNQueryFilteredPCAIndex<NV>> {
+    public static class Par<NV extends NumberVector> extends AbstractFilteredPCAIndex.Factory.Par<NV, KNNQueryFilteredPCAIndex<NV>> {
       /**
        * Optional parameter to specify the number of nearest neighbors
        * considered in the PCA, must be an integer greater than 0. If this
@@ -168,15 +168,15 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
       protected int k = 0;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         new IntParameter(K_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
             .grab(config, x -> k = x);
       }
 
       @Override
-      protected Factory<NV> makeInstance() {
+      public Factory<NV> make() {
         return new Factory<>(pcaDistance, pca, filter, k);
       }
     }

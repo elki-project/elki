@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a Gamma Distribution, using the methods of
@@ -108,9 +108,9 @@ public class GammaLMMEstimator implements LMMDistributionEstimator<GammaDistribu
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GammaLMMEstimator makeInstance() {
+    public GammaLMMEstimator make() {
       return STATIC;
     }
   }

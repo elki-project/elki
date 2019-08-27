@@ -73,9 +73,9 @@ public class GeoIndexing {
     // and additional constraint checks.
     RStarTreeFactory<?> indexfactory = new ELKIBuilder<>(RStarTreeFactory.class) //
         // If you have large query results, a larger page size can be better.
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 512) //
         // Use bulk loading, for better performance.
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();
     // Create the database, and initialize it.
     Database db = new StaticArrayDatabase(dbc, Arrays.asList(indexfactory));

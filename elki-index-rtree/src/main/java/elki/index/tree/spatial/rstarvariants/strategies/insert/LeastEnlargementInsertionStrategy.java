@@ -24,7 +24,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * The default R-Tree insertion strategy: find rectangle with least volume
@@ -80,9 +80,9 @@ public class LeastEnlargementInsertionStrategy implements InsertionStrategy {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LeastEnlargementInsertionStrategy makeInstance() {
+    public LeastEnlargementInsertionStrategy make() {
       return LeastEnlargementInsertionStrategy.STATIC;
     }
   }

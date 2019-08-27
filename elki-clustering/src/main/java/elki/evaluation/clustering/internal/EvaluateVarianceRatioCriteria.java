@@ -44,7 +44,7 @@ import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -233,7 +233,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    *
    * @author Stephan Baier
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for the option, how noise should be treated.
      */
@@ -255,8 +255,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     private boolean penalize = true;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
@@ -265,7 +264,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateVarianceRatioCriteria<? extends NumberVector> makeInstance() {
+    public EvaluateVarianceRatioCriteria<? extends NumberVector> make() {
       return new EvaluateVarianceRatioCriteria<>(noiseOption, penalize);
     }
   }

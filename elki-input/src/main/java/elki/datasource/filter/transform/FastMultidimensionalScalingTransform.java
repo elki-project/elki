@@ -39,7 +39,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -317,7 +317,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<I, O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<I, O extends NumberVector> implements Parameterizer {
     /**
      * Random seed generator.
      */
@@ -344,19 +344,18 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
     NumberVector.Factory<O> factory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID) //
+    public void configure(Parameterization config) {
+      new IntParameter(ClassicMultidimensionalScalingTransform.Par.DIM_ID) //
           .grab(config, x -> tdim = x);
-      new ObjectParameter<PrimitiveDistance<? super I>>(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+      new ObjectParameter<PrimitiveDistance<? super I>>(ClassicMultidimensionalScalingTransform.Par.DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> dist = x);
       new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
-      new ObjectParameter<NumberVector.Factory<O>>(ClassicMultidimensionalScalingTransform.Parameterizer.VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class) //
+      new ObjectParameter<NumberVector.Factory<O>>(ClassicMultidimensionalScalingTransform.Par.VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class) //
           .grab(config, x -> factory = x);
     }
 
     @Override
-    protected FastMultidimensionalScalingTransform<I, O> makeInstance() {
+    public FastMultidimensionalScalingTransform<I, O> make() {
       return new FastMultidimensionalScalingTransform<>(tdim, dist, factory, random);
     }
   }

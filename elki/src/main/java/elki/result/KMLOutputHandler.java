@@ -65,7 +65,7 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -630,7 +630,7 @@ public class KMLOutputHandler implements ResultHandler {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for scaling functions
      */
@@ -667,9 +667,8 @@ public class KMLOutputHandler implements ResultHandler {
     boolean autoopen = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      OptionID opt = new OptionID(OutputStep.Parameterizer.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
+    public void configure(Parameterization config) {
+      OptionID opt = new OptionID(OutputStep.Par.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
       new FileParameter(opt, FileParameter.FileType.OUTPUT_FILE) //
           .grab(config, x -> filename = x);
       new ObjectParameter<OutlierScaling>(SCALING_ID, OutlierScaling.class, OutlierLinearScaling.class) //
@@ -679,7 +678,7 @@ public class KMLOutputHandler implements ResultHandler {
     }
 
     @Override
-    protected KMLOutputHandler makeInstance() {
+    public KMLOutputHandler make() {
       return new KMLOutputHandler(filename, scaling, compat, autoopen);
     }
   }

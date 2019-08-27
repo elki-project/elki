@@ -159,10 +159,10 @@ public class KappaDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("kappa.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(KappaDistribution.Parameterizer.LOCATION_ID, .1);
-    params.addParameter(KappaDistribution.Parameterizer.SCALE_ID, .2);
-    params.addParameter(KappaDistribution.Parameterizer.SHAPE1_ID, .3);
-    params.addParameter(KappaDistribution.Parameterizer.SHAPE2_ID, .4);
+    params.addParameter(KappaDistribution.Par.LOCATION_ID, .1);
+    params.addParameter(KappaDistribution.Par.SCALE_ID, .2);
+    params.addParameter(KappaDistribution.Par.SHAPE1_ID, .3);
+    params.addParameter(KappaDistribution.Par.SHAPE2_ID, .4);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(KappaDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01_02_03_04", 1e-14);
   }

@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -183,13 +183,12 @@ public class RayleighDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /** Parameters. */
     double mean, scale;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID, 0.) //
           .grab(config, x -> mean = x);
       new DoubleParameter(SCALE_ID) //
@@ -197,7 +196,7 @@ public class RayleighDistribution implements Distribution {
     }
 
     @Override
-    protected RayleighDistribution makeInstance() {
+    public RayleighDistribution make() {
       return new RayleighDistribution(mean, scale);
     }
   }

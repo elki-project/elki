@@ -32,7 +32,7 @@ import elki.datasource.filter.AbstractStreamFilter;
 import elki.logging.Logging;
 import elki.math.statistics.distribution.Distribution;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -196,7 +196,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the distribution to sample replacement values from.
      */
@@ -218,15 +218,14 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Distribution>(REPLACEMENT_DISTRIBUTION, Distribution.class) //
           .grab(config, x -> dist = x);
       new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected ReplaceNaNWithRandomFilter makeInstance() {
+    public ReplaceNaNWithRandomFilter make() {
       return new ReplaceNaNWithRandomFilter(dist, rnd);
     }
   }

@@ -21,7 +21,7 @@
 package elki.math.geodesy;
 
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * The WGS72 spheroid earth model, without height model.
@@ -67,9 +67,9 @@ public class WGS72SpheroidEarthModel extends AbstractEarthModel {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WGS72SpheroidEarthModel makeInstance() {
+    public WGS72SpheroidEarthModel make() {
       return STATIC;
     }
   }

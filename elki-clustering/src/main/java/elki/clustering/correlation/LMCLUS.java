@@ -52,7 +52,7 @@ import elki.utilities.datastructures.histogram.DoubleHistogram.Iter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.TooManyRetriesException;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -505,7 +505,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter with the maximum dimension to search for
      */
@@ -557,8 +557,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(MAXDIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .setOptional(true) //
@@ -572,7 +571,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
     }
 
     @Override
-    protected LMCLUS makeInstance() {
+    public LMCLUS make() {
       return new LMCLUS(maxdim, minsize, samplingLevel, threshold, rnd);
     }
   }

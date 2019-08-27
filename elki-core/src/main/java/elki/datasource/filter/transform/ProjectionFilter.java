@@ -24,7 +24,7 @@ import elki.data.projection.Projection;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.datasource.filter.AbstractStreamConversionFilter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -82,7 +82,7 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
    * @param <I> Input type
    * @param <O> Output type
    */
-  public static class Parameterizer<I, O> extends AbstractParameterizer {
+  public static class Par<I, O> implements Parameterizer {
     /**
      * Parameter to specify the projection to use
      */
@@ -94,14 +94,13 @@ public class ProjectionFilter<I, O> extends AbstractStreamConversionFilter<I, O>
     Projection<I, O> projection;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Projection<I, O>>(PROJ_ID, Projection.class) //
           .grab(config, x -> projection = x);
     }
 
     @Override
-    protected ProjectionFilter<I, O> makeInstance() {
+    public ProjectionFilter<I, O> make() {
       return new ProjectionFilter<>(projection);
     }
   }

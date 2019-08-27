@@ -176,7 +176,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its COP_SCORE, must be an integer greater
@@ -205,8 +205,8 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     private EigenPairFilter filter;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -217,7 +217,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     }
 
     @Override
-    protected SimpleCOP<V> makeInstance() {
+    public SimpleCOP<V> make() {
       return new SimpleCOP<>(distanceFunction, k, pca, filter);
     }
   }

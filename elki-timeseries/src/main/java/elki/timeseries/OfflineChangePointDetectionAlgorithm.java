@@ -36,7 +36,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -353,7 +353,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number of samples for bootstrap significance.
      */
@@ -388,8 +388,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(BOOTSTRAP_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .setDefaultValue(1000) //
@@ -403,7 +402,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     @Override
-    protected OfflineChangePointDetectionAlgorithm makeInstance() {
+    public OfflineChangePointDetectionAlgorithm make() {
       return new OfflineChangePointDetectionAlgorithm(minConfidence, bootstrapSamples, rnd);
     }
   }

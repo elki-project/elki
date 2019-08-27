@@ -23,7 +23,7 @@ package elki.distance.correlation;
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.math.PearsonCorrelation;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Absolute Pearson correlation distance function for feature vectors.
@@ -93,9 +93,9 @@ public class AbsolutePearsonCorrelationDistance extends AbstractNumberVectorDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected AbsolutePearsonCorrelationDistance makeInstance() {
+    public AbsolutePearsonCorrelationDistance make() {
       return AbsolutePearsonCorrelationDistance.STATIC;
     }
   }

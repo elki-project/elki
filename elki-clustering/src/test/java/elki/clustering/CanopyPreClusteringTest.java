@@ -38,8 +38,8 @@ public class CanopyPreClusteringTest extends AbstractClusterAlgorithmTest {
   public void testCanopyPreClusteringResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> result = new ELKIBuilder<CanopyPreClustering<DoubleVector>>(CanopyPreClustering.class) //
-        .with(CanopyPreClustering.Parameterizer.T1_ID, 0.2) //
-        .with(CanopyPreClustering.Parameterizer.T2_ID, 0.2) //
+        .with(CanopyPreClustering.Par.T1_ID, 0.2) //
+        .with(CanopyPreClustering.Par.T2_ID, 0.2) //
         .build().run(db);
     testFMeasure(db, result, 0.96691368);
     testClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 4, 5, 55, 104, 151 });
@@ -49,8 +49,8 @@ public class CanopyPreClusteringTest extends AbstractClusterAlgorithmTest {
   public void testCanopyPreClusteringOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> result = new ELKIBuilder<CanopyPreClustering<DoubleVector>>(CanopyPreClustering.class) //
-        .with(CanopyPreClustering.Parameterizer.T1_ID, 25) //
-        .with(CanopyPreClustering.Parameterizer.T2_ID, 25) //
+        .with(CanopyPreClustering.Par.T1_ID, 25) //
+        .with(CanopyPreClustering.Par.T2_ID, 25) //
         .build().run(db);
     testFMeasure(db, result, 0.97089);
     testClusterSizes(result, new int[] { 22, 200, 208, 208 });

@@ -76,12 +76,12 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingMaterializeKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingMaterializeKNNPreprocessor.Factory<DoubleVector>>(SpacefillingMaterializeKNNPreprocessor.Factory.class) //
-            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList( //
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
             .with(SpacefillingMaterializeKNNPreprocessor.Factory.K_ID, k) //
-            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 1.) //
-            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Par.WINDOW_ID, 1.) //
+            .with(SpacefillingMaterializeKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
             .build().instantiate(relation);
     preproc.initialize();
     // add as index

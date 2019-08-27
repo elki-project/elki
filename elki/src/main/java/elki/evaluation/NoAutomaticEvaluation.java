@@ -20,7 +20,7 @@
  */
 package elki.evaluation;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * No-operation evaluator, that only serves the purpose of explicitely disabling
@@ -41,9 +41,9 @@ public class NoAutomaticEvaluation implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NoAutomaticEvaluation makeInstance() {
+    public NoAutomaticEvaluation make() {
       return new NoAutomaticEvaluation();
     }
   }

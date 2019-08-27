@@ -160,14 +160,14 @@ public class SortMeans<V extends NumberVector> extends CompareMeans<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     protected boolean needsMetric() {
       return true;
     }
 
     @Override
-    protected SortMeans<V> makeInstance() {
+    public SortMeans<V> make() {
       return new SortMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

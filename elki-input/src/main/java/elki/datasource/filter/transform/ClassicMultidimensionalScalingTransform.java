@@ -35,7 +35,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.linearalgebra.SingularValueDecomposition;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -230,7 +230,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
    * @param <I> Input vector type
    * @param <O> Output vector type
    */
-  public static class Parameterizer<I, O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<I, O extends NumberVector> implements Parameterizer {
     /**
      * Desired dimensionality.
      */
@@ -262,8 +262,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
     NumberVector.Factory<O> factory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIM_ID) //
           .grab(config, x -> tdim = x);
       new ObjectParameter<PrimitiveDistance<? super I>>(DISTANCE_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
@@ -273,7 +272,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
     }
 
     @Override
-    protected ClassicMultidimensionalScalingTransform<I, O> makeInstance() {
+    public ClassicMultidimensionalScalingTransform<I, O> make() {
       return new ClassicMultidimensionalScalingTransform<>(tdim, dist, factory);
     }
   }

@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.StatisticalMoments;
 import elki.math.statistics.distribution.LogGammaDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Simple parameter estimation for the LogGamma distribution.
@@ -81,9 +81,9 @@ public class LogGammaLogMOMEstimator implements LogMOMDistributionEstimator<LogG
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogGammaLogMOMEstimator makeInstance() {
+    public LogGammaLogMOMEstimator make() {
       return STATIC;
     }
   }

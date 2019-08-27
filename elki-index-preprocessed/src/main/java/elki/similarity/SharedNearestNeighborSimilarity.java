@@ -135,15 +135,15 @@ public class SharedNearestNeighborSimilarity<O> extends AbstractIndexBasedSimila
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractIndexBasedSimilarity.Parameterizer<SharedNearestNeighborIndex.Factory<O>> {
+  public static class Par<O> extends AbstractIndexBasedSimilarity.Par<SharedNearestNeighborIndex.Factory<O>> {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       configIndexFactory(config, SharedNearestNeighborIndex.Factory.class, SharedNearestNeighborPreprocessor.Factory.class);
     }
 
     @Override
-    protected SharedNearestNeighborSimilarity<O> makeInstance() {
+    public SharedNearestNeighborSimilarity<O> make() {
       return new SharedNearestNeighborSimilarity<>(factory);
     }
   }

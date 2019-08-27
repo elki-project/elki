@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 import elki.similarity.kernel.LinearKernel;
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -109,7 +109,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for the similarity function.
      */
@@ -126,8 +126,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     double quantile;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Similarity<? super O>>(SIMILARITY_ID, Similarity.class, LinearKernel.class) //
           .grab(config, x -> similarity = x);
       new DoubleParameter(QUANTILE_ID, .5) //
@@ -135,7 +134,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     }
 
     @Override
-    protected SimilarityBasedInitializationWithMedian<O> makeInstance() {
+    public SimilarityBasedInitializationWithMedian<O> make() {
       return new SimilarityBasedInitializationWithMedian<>(similarity, quantile);
     }
   }

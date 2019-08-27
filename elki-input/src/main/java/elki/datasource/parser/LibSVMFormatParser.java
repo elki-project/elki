@@ -125,7 +125,7 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Par<V extends SparseNumberVector> extends NumberVectorLabelParser.Par<V> {
     @Override
     protected void getFactory(Parameterization config) {
       new ObjectParameter<SparseNumberVector.Factory<V>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class) //
@@ -133,13 +133,13 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      // Avoid additional options: super.makeOptions(config);
+    public void configure(Parameterization config) {
+      // Avoid additional options: super.configure(config);
       getFactory(config);
     }
 
     @Override
-    protected LibSVMFormatParser<V> makeInstance() {
+    public LibSVMFormatParser<V> make() {
       return new LibSVMFormatParser<>((SparseNumberVector.Factory<V>) factory);
     }
   }

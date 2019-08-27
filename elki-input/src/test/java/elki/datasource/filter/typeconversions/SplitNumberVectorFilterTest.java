@@ -48,7 +48,7 @@ public class SplitNumberVectorFilterTest extends AbstractDataSourceTest {
     int s_int = 5;
     String filename = UNITTEST + "dimensionality-test-1.csv";
     SplitNumberVectorFilter<DoubleVector> filter = new ELKIBuilder<>(SplitNumberVectorFilter.class) //
-        .with(SplitNumberVectorFilter.Parameterizer.SELECTED_ATTRIBUTES_ID, s).build();
+        .with(SplitNumberVectorFilter.Par.SELECTED_ATTRIBUTES_ID, s).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

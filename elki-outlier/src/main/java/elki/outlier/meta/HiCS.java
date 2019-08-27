@@ -67,7 +67,7 @@ import elki.utilities.datastructures.heap.TopBoundedHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -505,7 +505,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * 
    * @param <V> vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces.
@@ -571,8 +571,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(M_ID, 50) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> m = x);
@@ -590,7 +589,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     }
 
     @Override
-    protected HiCS<V> makeInstance() {
+    public HiCS<V> make() {
       return new HiCS<>(m, alpha, outlierAlgorithm, statTest, cutoff, rnd);
     }
   }

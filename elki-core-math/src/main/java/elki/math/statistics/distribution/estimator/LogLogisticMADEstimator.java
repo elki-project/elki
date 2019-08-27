@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.LogLogisticDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -78,9 +78,9 @@ public class LogLogisticMADEstimator implements LogMADDistributionEstimator<LogL
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogLogisticMADEstimator makeInstance() {
+    public LogLogisticMADEstimator make() {
       return STATIC;
     }
   }

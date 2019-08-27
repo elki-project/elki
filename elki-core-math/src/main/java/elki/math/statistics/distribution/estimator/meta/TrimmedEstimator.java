@@ -25,7 +25,7 @@ import elki.math.statistics.distribution.estimator.DistributionEstimator;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -129,7 +129,7 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
    * 
    * @param <D> Distribution type
    */
-  public static class Parameterizer<D extends Distribution> extends AbstractParameterizer {
+  public static class Par<D extends Distribution> implements Parameterizer {
     /**
      * Option for the class to use on the trimmed sample.
      */
@@ -151,8 +151,7 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     private double trim;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<DistributionEstimator<D>>(INNER_ID, DistributionEstimator.class) //
           .grab(config, x -> inner = x);
       new DoubleParameter(TRIM_ID) //
@@ -162,7 +161,7 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
     }
 
     @Override
-    protected TrimmedEstimator<D> makeInstance() {
+    public TrimmedEstimator<D> make() {
       return new TrimmedEstimator<>(inner, trim);
     }
   }

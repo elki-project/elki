@@ -94,7 +94,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * The static option ID
      */
@@ -106,15 +106,15 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
     protected List<? extends DatabaseConnection> sources;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       super.configFilters(config);
       new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class) //
           .grab(config, x -> sources = x);
     }
 
     @Override
-    protected PresortedBlindJoinDatabaseConnection makeInstance() {
+    public PresortedBlindJoinDatabaseConnection make() {
       return new PresortedBlindJoinDatabaseConnection(filters, sources);
     }
   }

@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.LogNormalDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Naive distribution estimation using mean and sample variance.
@@ -67,9 +67,9 @@ public class LogNormalLogMOMEstimator implements LogMeanVarianceEstimator<LogNor
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogNormalLogMOMEstimator makeInstance() {
+    public LogNormalLogMOMEstimator make() {
       return STATIC;
     }
   }

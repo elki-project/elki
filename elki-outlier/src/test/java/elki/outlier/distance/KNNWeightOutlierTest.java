@@ -39,7 +39,7 @@ public class KNNWeightOutlierTest extends AbstractOutlierAlgorithmTest {
   public void testKNNWeightOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<KNNWeightOutlier<DoubleVector>>(KNNWeightOutlier.class) //
-        .with(KNNWeightOutlier.Parameterizer.K_ID, 4).build().run(db);
+        .with(KNNWeightOutlier.Par.K_ID, 4).build().run(db);
     testSingleScore(result, 945, 2.384117261027324);
     testAUC(db, "Noise", result, 0.9912777777777778);
   }

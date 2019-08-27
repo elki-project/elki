@@ -26,7 +26,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialSingleMeanComparator;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Simple bulk loading strategy by sorting the data along the first dimension.
@@ -70,9 +70,9 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected OneDimSortBulkSplit makeInstance() {
+    public OneDimSortBulkSplit make() {
       return OneDimSortBulkSplit.STATIC;
     }
   }

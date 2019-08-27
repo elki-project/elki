@@ -33,7 +33,7 @@ import elki.math.scales.LinearScale;
 import elki.result.ResultUtil;
 import elki.result.ScalesResult;
 import elki.utilities.documentation.Description;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -124,7 +124,7 @@ public class AddSingleScale implements Algorithm {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Minimum and maximum values.
      */
@@ -136,8 +136,7 @@ public class AddSingleScale implements Algorithm {
     double[] minmax = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleListParameter(MINMAX_ID) //
           .setOptional(true) //
           .addConstraint(new ListSizeConstraint(2)) //
@@ -145,7 +144,7 @@ public class AddSingleScale implements Algorithm {
     }
 
     @Override
-    protected AddSingleScale makeInstance() {
+    public AddSingleScale make() {
       return new AddSingleScale(minmax);
     }
   }

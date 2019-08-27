@@ -31,7 +31,7 @@ import elki.result.textwriter.StreamFactory;
 import elki.result.textwriter.TextWriter;
 import elki.utilities.Priority;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -131,7 +131,7 @@ public class ResultWriter implements ResultHandler {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag to control GZIP compression.
      */
@@ -168,9 +168,8 @@ public class ResultWriter implements ResultHandler {
     private Pattern filter = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
+    public void configure(Parameterization config) {
+      new FileParameter(OutputStep.Par.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
           .setOptional(true) //
           .grab(config, x -> out = x);
       new Flag(GZIP_OUTPUT_ID).grab(config, x -> gzip = x);
@@ -181,7 +180,7 @@ public class ResultWriter implements ResultHandler {
     }
 
     @Override
-    protected ResultWriter makeInstance() {
+    public ResultWriter make() {
       return new ResultWriter(out, gzip, warnoverwrite, filter);
     }
   }

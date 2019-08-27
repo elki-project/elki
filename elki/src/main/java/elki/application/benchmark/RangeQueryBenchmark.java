@@ -255,7 +255,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<O> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedApplication.Par<O> {
     /**
      * Parameter for the query data set.
      */
@@ -287,8 +287,8 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     protected RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
           .setOptional(true) //
           .grab(config, x -> queries = x);
@@ -300,7 +300,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     }
 
     @Override
-    protected RangeQueryBenchmark<O> makeInstance() {
+    public RangeQueryBenchmark<O> make() {
       return new RangeQueryBenchmark<>(inputstep, distance, queries, sampling, random);
     }
   }

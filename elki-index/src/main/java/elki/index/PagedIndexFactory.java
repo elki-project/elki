@@ -26,7 +26,7 @@ import elki.persistent.MemoryPageFileFactory;
 import elki.persistent.Page;
 import elki.persistent.PageFile;
 import elki.persistent.PageFileFactory;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -79,7 +79,7 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Par<O> implements Parameterizer {
     /**
      * Optional parameter that specifies the factory type of pagefile to use
      * for the index.
@@ -92,13 +92,12 @@ public abstract class PagedIndexFactory<O> implements IndexFactory<O> {
     protected PageFileFactory<?> pageFileFactory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<PageFileFactory<?>>(PAGEFILE_ID, PageFileFactory.class, MemoryPageFileFactory.class) //
           .grab(config, x -> pageFileFactory = x);
     }
 
     @Override
-    protected abstract PagedIndexFactory<O> makeInstance();
+    public abstract PagedIndexFactory<O> make();
   }
 }

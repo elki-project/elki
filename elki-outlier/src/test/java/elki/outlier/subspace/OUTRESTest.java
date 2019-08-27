@@ -38,7 +38,7 @@ public class OUTRESTest extends AbstractOutlierAlgorithmTest {
   public void testOUTRES() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
     OutlierResult result = new ELKIBuilder<OUTRES>(OUTRES.class) //
-        .with(OUTRES.Parameterizer.D_ID, 1.) //
+        .with(OUTRES.Par.D_ID, 1.) //
         .build().run(db);
     testSingleScore(result, 406, 0.3659126362146687);
     testAUC(db, "Noise$", result, 0.7919);

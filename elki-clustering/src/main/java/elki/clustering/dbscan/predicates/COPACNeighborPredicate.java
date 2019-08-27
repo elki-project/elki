@@ -43,7 +43,7 @@ import elki.logging.statistics.Duration;
 import elki.math.linearalgebra.pca.PCAFilteredResult;
 import elki.math.linearalgebra.pca.PCAResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -271,19 +271,19 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * COPAC settings.
      */
     protected COPAC.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(COPAC.Settings.class);
     }
 
     @Override
-    protected COPACNeighborPredicate<V> makeInstance() {
+    public COPACNeighborPredicate<V> make() {
       return new COPACNeighborPredicate<>(settings);
     }
   }

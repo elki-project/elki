@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.similarity.NormalizedSimilarity;
 import elki.evaluation.clustering.ClusterContingencyTable;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the Fowlkes-Mallows Index.
@@ -94,9 +94,9 @@ public class ClusteringFowlkesMallowsSimilarity implements ClusteringDistanceSim
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClusteringFowlkesMallowsSimilarity makeInstance() {
+    public ClusteringFowlkesMallowsSimilarity make() {
       return STATIC;
     }
   }

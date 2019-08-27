@@ -404,9 +404,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends MaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O> extends MaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(k, distanceFunction);
       }
     }

@@ -26,7 +26,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Canberra distance function, a variation of Manhattan distance.
@@ -151,9 +151,9 @@ public class CanberraDistance implements SpatialPrimitiveDistance<NumberVector>,
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CanberraDistance makeInstance() {
+    public CanberraDistance make() {
       return CanberraDistance.STATIC;
     }
   }

@@ -47,7 +47,7 @@ public class ExternalIDFilterTest extends AbstractDataSourceTest {
     final int c = 2;
     String filename = UNITTEST + "external-id-test-1.csv";
     ExternalIDFilter filter = new ELKIBuilder<>(ExternalIDFilter.class) //
-        .with(ExternalIDFilter.Parameterizer.EXTERNALID_INDEX_ID, c).build();
+        .with(ExternalIDFilter.Par.EXTERNALID_INDEX_ID, c).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
 
     // Ensure that the filter has correctly formed the bundle.

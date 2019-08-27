@@ -27,7 +27,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Normalize vectors such that the smallest value of each instance is 0, the
@@ -88,9 +88,9 @@ public class InstanceRankNormalization<V extends NumberVector> extends AbstractV
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected InstanceRankNormalization<NumberVector> makeInstance() {
+    public InstanceRankNormalization<NumberVector> make() {
       return new InstanceRankNormalization<>();
     }
   }

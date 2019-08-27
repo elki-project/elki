@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Bray-Curtis distance function / Sørensen–Dice coefficient for continuous
@@ -135,9 +135,9 @@ public class BrayCurtisDistance extends AbstractNumberVectorDistance implements 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected BrayCurtisDistance makeInstance() {
+    public BrayCurtisDistance make() {
       return BrayCurtisDistance.STATIC_CONTINUOUS;
     }
   }

@@ -24,7 +24,7 @@ import elki.clustering.hierarchical.CLINK;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Complete-linkage ("maximum linkage") clustering method.
@@ -122,9 +122,9 @@ public class CompleteLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CompleteLinkage makeInstance() {
+    public CompleteLinkage make() {
       return STATIC;
     }
   }

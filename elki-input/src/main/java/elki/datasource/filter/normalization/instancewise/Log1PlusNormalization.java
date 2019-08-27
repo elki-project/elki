@@ -25,7 +25,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -93,7 +93,7 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractVecto
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Boosting factor parameter.
      */
@@ -105,15 +105,14 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractVecto
     protected double boost;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(BOOST_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> boost = x);
     }
 
     @Override
-    protected Log1PlusNormalization<V> makeInstance() {
+    public Log1PlusNormalization<V> make() {
       return new Log1PlusNormalization<>(boost);
     }
   }

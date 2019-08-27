@@ -22,7 +22,7 @@ package elki.math.statistics.intrinsicdimensionality;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Methods of moments estimator, using the first moment (i.e. average).
@@ -75,9 +75,9 @@ public class MOMEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MOMEstimator makeInstance() {
+    public MOMEstimator make() {
       return STATIC;
     }
   }

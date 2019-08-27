@@ -142,7 +142,7 @@ public class EDRDistance extends DTWDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractEditDistance.Parameterizer {
+  public static class Par extends AbstractEditDistance.Par {
     /**
      * DELTA parameter
      */
@@ -154,8 +154,8 @@ public class EDRDistance extends DTWDistance {
     protected double delta = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(DELTA_ID, 1.0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
@@ -172,7 +172,7 @@ public class EDRDistance extends DTWDistance {
     }
 
     @Override
-    protected EDRDistance makeInstance() {
+    public EDRDistance make() {
       return new EDRDistance(bandSize, delta);
     }
   }

@@ -39,7 +39,7 @@ import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
 import elki.utilities.datastructures.histogram.ObjHistogram;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -209,7 +209,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The object pattern to identify positive classes
      */
@@ -251,8 +251,7 @@ public class ComputeOutlierHistogram implements Evaluator {
     protected boolean splitfreq = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(POSITIVE_CLASS_NAME_ID) //
           .setOptional(true) //
           .grab(config, x -> positiveClassName = x);
@@ -265,7 +264,7 @@ public class ComputeOutlierHistogram implements Evaluator {
     }
 
     @Override
-    protected ComputeOutlierHistogram makeInstance() {
+    public ComputeOutlierHistogram make() {
       return new ComputeOutlierHistogram(positiveClassName, bins, scaling, splitfreq);
     }
   }

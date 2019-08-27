@@ -48,8 +48,8 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
-        .with(SUBCLU.Parameterizer.EPSILON_ID, 0.001) //
-        .with(SUBCLU.Parameterizer.MINPTS_ID, 100) //
+        .with(SUBCLU.Par.EPSILON_ID, 0.001) //
+        .with(SUBCLU.Par.MINPTS_ID, 100) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     testClusterSizes(result, new int[] { 6, 191, 194, 395 });
@@ -59,8 +59,8 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
-        .with(SUBCLU.Parameterizer.EPSILON_ID, 0.04) //
-        .with(SUBCLU.Parameterizer.MINPTS_ID, 70) //
+        .with(SUBCLU.Par.EPSILON_ID, 0.04) //
+        .with(SUBCLU.Par.MINPTS_ID, 70) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     testClusterSizes(result, new int[] { 74, 99, 114, 136, 247, 303, 323 });
@@ -69,14 +69,14 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSUBCLUSubspaceAxisParallel() {
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, RandomSamplingStreamFilter.class);
-    inp.addParameter(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .25);
-    inp.addParameter(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0);
+    inp.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, RandomSamplingStreamFilter.class);
+    inp.addParameter(RandomSamplingStreamFilter.Par.PROB_ID, .25);
+    inp.addParameter(RandomSamplingStreamFilter.Par.SEED_ID, 0);
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 601, inp);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
-        .with(SUBCLU.Parameterizer.EPSILON_ID, 5) //
-        .with(SUBCLU.Parameterizer.MINPTS_ID, 50) //
-        .with(SUBCLU.Parameterizer.MINDIM_ID, 2) //
+        .with(SUBCLU.Par.EPSILON_ID, 5) //
+        .with(SUBCLU.Par.MINPTS_ID, 50) //
+        .with(SUBCLU.Par.MINDIM_ID, 2) //
         .build().run(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     testClusterSizes(result, new int[] { 72, 135, 145, 157, 161});

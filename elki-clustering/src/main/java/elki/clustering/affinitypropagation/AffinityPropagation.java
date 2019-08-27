@@ -38,7 +38,7 @@ import elki.logging.progress.MutableProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -332,7 +332,7 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
    *
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for the similarity matrix initialization
      */
@@ -374,8 +374,7 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
     int maxiter;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<AffinityPropagationInitialization<O>>(INITIALIZATION_ID, AffinityPropagationInitialization.class, DistanceBasedInitializationWithMedian.class) //
           .grab(config, x -> initialization = x);
       new DoubleParameter(LAMBDA_ID, .5) //
@@ -390,7 +389,7 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
     }
 
     @Override
-    protected AffinityPropagation<O> makeInstance() {
+    public AffinityPropagation<O> make() {
       return new AffinityPropagation<>(initialization, lambda, convergence, maxiter);
     }
   }

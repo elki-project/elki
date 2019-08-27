@@ -41,8 +41,8 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionGridBased() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
-        .with(GridBasedReferencePoints.Parameterizer.GRID_ID, 3)//
+        .with(ReferenceBasedOutlierDetection.Par.K_ID, 11) //
+        .with(GridBasedReferencePoints.Par.GRID_ID, 3)//
         .build().run(db);
     testAUC(db, "Noise", result, 0.9693703703703);
     testSingleScore(result, 945, 0.933574455);
@@ -52,8 +52,8 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionStar() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, StarBasedReferencePoints.class) //
+        .with(ReferenceBasedOutlierDetection.Par.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Par.REFP_ID, StarBasedReferencePoints.class) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.910722222);
     testSingleScore(result, 945, 0.920950222);
@@ -63,8 +63,8 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionAxis() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, AxisBasedReferencePoints.class) //
+        .with(ReferenceBasedOutlierDetection.Par.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Par.REFP_ID, AxisBasedReferencePoints.class) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.858953703);
     testSingleScore(result, 945, 0.9193032738);
@@ -74,10 +74,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionGenerated() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomGeneratedReferencePoints.class)//
-        .with(RandomGeneratedReferencePoints.Parameterizer.N_ID, 15)//
-        .with(RandomGeneratedReferencePoints.Parameterizer.RANDOM_ID, 0)//
+        .with(ReferenceBasedOutlierDetection.Par.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Par.REFP_ID, RandomGeneratedReferencePoints.class)//
+        .with(RandomGeneratedReferencePoints.Par.N_ID, 15)//
+        .with(RandomGeneratedReferencePoints.Par.RANDOM_ID, 0)//
         .build().run(db);
     testAUC(db, "Noise", result, 0.878203703);
     testSingleScore(result, 945, 0.910430564);
@@ -87,10 +87,10 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
   public void testReferenceBasedOutlierDetectionSample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(ReferenceBasedOutlierDetection.class) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11) //
-        .with(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomSampleReferencePoints.class) //
-        .with(RandomSampleReferencePoints.Parameterizer.N_ID, 15)//
-        .with(RandomSampleReferencePoints.Parameterizer.RANDOM_ID, 0)//
+        .with(ReferenceBasedOutlierDetection.Par.K_ID, 11) //
+        .with(ReferenceBasedOutlierDetection.Par.REFP_ID, RandomSampleReferencePoints.class) //
+        .with(RandomSampleReferencePoints.Par.N_ID, 15)//
+        .with(RandomSampleReferencePoints.Par.RANDOM_ID, 0)//
         .build().run(db);
     testAUC(db, "Noise", result, 0.829814814);
     testSingleScore(result, 945, 0.846881387);

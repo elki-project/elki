@@ -27,7 +27,7 @@ import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Vector using {@code byte[]} storage.
@@ -183,9 +183,9 @@ public class ByteVector implements NumberVector {
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected ByteVector.Factory makeInstance() {
+      public ByteVector.Factory make() {
         return STATIC;
       }
     }

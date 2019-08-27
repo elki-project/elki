@@ -424,7 +424,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Initial neighborhood size.
      */
@@ -481,8 +481,8 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(STARTK_ID, 3) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> startk = x);
@@ -503,7 +503,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     }
 
     @Override
-    protected EvaluateIntrinsicDimensionalityEstimators makeInstance() {
+    public EvaluateIntrinsicDimensionalityEstimators make() {
       return new EvaluateIntrinsicDimensionalityEstimators(startk, maxk, samples, dim, agg, format, rnd);
     }
   }

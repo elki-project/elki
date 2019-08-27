@@ -67,9 +67,9 @@ public class EuclideanHashFunctionFamily extends AbstractProjectedHashFunctionFa
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractProjectedHashFunctionFamily.Parameterizer {
+  public static class Par extends AbstractProjectedHashFunctionFamily.Par {
     @Override
-    protected EuclideanHashFunctionFamily makeInstance() {
+    public EuclideanHashFunctionFamily make() {
       return new EuclideanHashFunctionFamily(random, width, k);
     }
   }

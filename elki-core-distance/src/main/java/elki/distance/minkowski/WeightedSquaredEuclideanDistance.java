@@ -28,7 +28,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.Norm;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.WeightedNumberVectorDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -144,21 +144,20 @@ public class WeightedSquaredEuclideanDistance extends AbstractNumberVectorDistan
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Weight array
      */
     protected double[] weights;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleListParameter(WEIGHTS_ID) //
           .grab(config, x -> weights = x.clone());
     }
 
     @Override
-    protected WeightedSquaredEuclideanDistance makeInstance() {
+    public WeightedSquaredEuclideanDistance make() {
       return new WeightedSquaredEuclideanDistance(weights);
     }
   }

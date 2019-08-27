@@ -184,21 +184,21 @@ public class WeightedLPNormDistance extends LPNormDistance implements WeightedNu
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends LPNormDistance.Parameterizer {
+  public static class Par extends LPNormDistance.Par {
     /**
      * Weight array
      */
     protected double[] weights;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleListParameter(WEIGHTS_ID) //
           .grab(config, x -> weights = x.clone());
     }
 
     @Override
-    protected WeightedLPNormDistance makeInstance() {
+    public WeightedLPNormDistance make() {
       return p == 1. ? new WeightedManhattanDistance(weights) //
           : p == 2. ? new WeightedEuclideanDistance(weights) //
               : p == Double.POSITIVE_INFINITY ? new WeightedMaximumDistance(weights) //

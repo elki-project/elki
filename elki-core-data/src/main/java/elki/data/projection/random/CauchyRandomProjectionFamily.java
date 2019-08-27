@@ -68,9 +68,9 @@ public class CauchyRandomProjectionFamily extends AbstractRandomProjectionFamily
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
+  public static class Par extends AbstractRandomProjectionFamily.Par {
     @Override
-    protected CauchyRandomProjectionFamily makeInstance() {
+    public CauchyRandomProjectionFamily make() {
       return new CauchyRandomProjectionFamily(random);
     }
   }

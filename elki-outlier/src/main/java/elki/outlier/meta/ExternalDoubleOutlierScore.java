@@ -52,7 +52,7 @@ import elki.utilities.io.FileUtil;
 import elki.utilities.io.ParseUtil;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -229,7 +229,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the file to be re-parsed.
      */
@@ -281,8 +281,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     private boolean inverted = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> file = x);
       new PatternParameter(ID_ID, ID_PATTERN_DEFAULT).grab(config, x -> idpattern = x);
@@ -293,7 +292,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
 
     @Override
-    protected ExternalDoubleOutlierScore makeInstance() {
+    public ExternalDoubleOutlierScore make() {
       return new ExternalDoubleOutlierScore(file, idpattern, scorepattern, inverted, scaling);
     }
   }

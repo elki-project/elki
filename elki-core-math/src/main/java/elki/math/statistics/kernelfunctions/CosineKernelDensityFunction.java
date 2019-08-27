@@ -21,7 +21,7 @@
 package elki.math.statistics.kernelfunctions;
 
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -87,9 +87,9 @@ public final class CosineKernelDensityFunction implements KernelDensityFunction 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CosineKernelDensityFunction makeInstance() {
+    public CosineKernelDensityFunction make() {
       return KERNEL;
     }
   }

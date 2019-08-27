@@ -42,9 +42,9 @@ public class PhiCorrelationCoefficientTest extends AbstractFrequentItemsetAlgori
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/subsets3.txt", 7);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, -0.1) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, PhiCorrelationCoefficient.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, -0.1) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, PhiCorrelationCoefficient.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 6, res.getRules().size());
   }

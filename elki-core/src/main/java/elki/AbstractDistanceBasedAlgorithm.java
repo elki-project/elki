@@ -22,7 +22,7 @@ package elki;
 
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -70,7 +70,7 @@ public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> e
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<D extends Distance<?>> extends AbstractParameterizer {
+  public abstract static class Par<D extends Distance<?>> implements Parameterizer {
     /**
      * OptionID for the distance function.
      */
@@ -82,7 +82,7 @@ public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> e
     protected D distanceFunction;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new ObjectParameter<D>(DISTANCE_FUNCTION_ID, getDistanceRestriction(), getDefaultDistance()) //
           .grab(config, x -> distanceFunction = x);
     }

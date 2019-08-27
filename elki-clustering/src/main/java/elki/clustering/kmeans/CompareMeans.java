@@ -187,14 +187,14 @@ public class CompareMeans<V extends NumberVector> extends AbstractKMeans<V, KMea
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     protected boolean needsMetric() {
       return true;
     }
 
     @Override
-    protected CompareMeans<V> makeInstance() {
+    public CompareMeans<V> make() {
       return new CompareMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

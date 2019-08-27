@@ -69,9 +69,9 @@ public class GeneralizedParetoDistributionTest extends AbstractDistributionTest 
   public void testParameterizer() throws ClassInstantiationException {
     load("gpd.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(GeneralizedParetoDistribution.Parameterizer.LOCATION_ID, .1);
-    params.addParameter(GeneralizedParetoDistribution.Parameterizer.SCALE_ID, .5);
-    params.addParameter(GeneralizedParetoDistribution.Parameterizer.SHAPE_ID, .1);
+    params.addParameter(GeneralizedParetoDistribution.Par.LOCATION_ID, .1);
+    params.addParameter(GeneralizedParetoDistribution.Par.SCALE_ID, .5);
+    params.addParameter(GeneralizedParetoDistribution.Par.SHAPE_ID, .1);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedParetoDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01_05_01", 1e-15);
   }

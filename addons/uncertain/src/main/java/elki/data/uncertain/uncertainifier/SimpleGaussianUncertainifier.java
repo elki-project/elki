@@ -26,7 +26,7 @@ import elki.data.HyperBoundingBox;
 import elki.data.FeatureVector.Factory;
 import elki.data.uncertain.SimpleGaussianContinuousUncertainObject;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -100,7 +100,7 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for minimum 3-sigma deviation.
      */
@@ -122,15 +122,14 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
     protected boolean symmetric;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(DEV_MIN_ID, 0.).grab(config, x -> minDev = x);
       new DoubleParameter(DEV_MAX_ID).grab(config, x -> maxDev = x);
       new Flag(SYMMETRIC_ID).grab(config, x -> symmetric = x);
     }
 
     @Override
-    protected SimpleGaussianUncertainifier makeInstance() {
+    public SimpleGaussianUncertainifier make() {
       return new SimpleGaussianUncertainifier(minDev, maxDev, symmetric);
     }
   }

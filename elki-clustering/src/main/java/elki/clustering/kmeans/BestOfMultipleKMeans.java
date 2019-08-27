@@ -32,7 +32,7 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -153,7 +153,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
    * @param <V> Vector type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector, M extends MeanModel> implements Parameterizer {
     /**
      * Parameter to specify the iterations of the bisecting step.
      */
@@ -185,7 +185,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     protected KMeansQualityMeasure<? super V> qualityMeasure;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new IntParameter(TRIALS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> trials = x);
@@ -196,7 +196,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     }
 
     @Override
-    protected BestOfMultipleKMeans<V, M> makeInstance() {
+    public BestOfMultipleKMeans<V, M> make() {
       return new BestOfMultipleKMeans<>(trials, kMeansVariant, qualityMeasure);
     }
   }

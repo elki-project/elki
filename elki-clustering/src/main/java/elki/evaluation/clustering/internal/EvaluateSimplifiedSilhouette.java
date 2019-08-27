@@ -43,7 +43,7 @@ import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -253,7 +253,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Distance function to use.
      */
@@ -270,19 +270,18 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     private boolean penalize = true;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<NumberVectorDistance<?>>(EvaluateSilhouette.Parameterizer.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<NumberVectorDistance<?>>(EvaluateSilhouette.Par.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
-      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        new Flag(EvaluateSilhouette.Parameterizer.NO_PENALIZE_ID).grab(config, x -> penalize = !x);
+        new Flag(EvaluateSilhouette.Par.NO_PENALIZE_ID).grab(config, x -> penalize = !x);
       }
     }
 
     @Override
-    protected EvaluateSimplifiedSilhouette makeInstance() {
+    public EvaluateSimplifiedSilhouette make() {
       return new EvaluateSimplifiedSilhouette(distance, noiseOption, penalize);
     }
   }

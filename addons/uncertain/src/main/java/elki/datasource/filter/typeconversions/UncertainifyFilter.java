@@ -35,7 +35,7 @@ import elki.datasource.filter.ObjectFilter;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -137,7 +137,7 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
    *
    * @author Alexander Koos
    */
-  public static class Parameterizer<UO extends UncertainObject> extends AbstractParameterizer {
+  public static class Par<UO extends UncertainObject> implements Parameterizer {
     /**
      * Parameter to specify the uncertainityModel used for the
      * uncertainification.
@@ -173,8 +173,7 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
     protected RandomFactory rand;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Uncertainifier<UO>>(UNCERTAINITY_MODEL_ID, Uncertainifier.class) //
           .grab(config, x -> generator = x);
       new Flag(KEEP_ID).grab(config, x -> keep = x);
@@ -182,7 +181,7 @@ public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFil
     }
 
     @Override
-    protected UncertainifyFilter<UO> makeInstance() {
+    public UncertainifyFilter<UO> make() {
       return new UncertainifyFilter<UO>(generator, keep, rand);
     }
   }

@@ -252,7 +252,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedApplication.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedApplication.Par<O> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -314,8 +314,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     protected Pattern pattern;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -336,7 +336,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     }
 
     @Override
-    protected ValidateApproximativeKNNIndex<O> makeInstance() {
+    public ValidateApproximativeKNNIndex<O> make() {
       return new ValidateApproximativeKNNIndex<>(inputstep, distance, k, queries, sampling, forcelinear, random, pattern);
     }
   }

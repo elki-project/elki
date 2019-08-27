@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.linkage;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -127,9 +127,9 @@ public class WardLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WardLinkage makeInstance() {
+    public WardLinkage make() {
       return STATIC;
     }
   }

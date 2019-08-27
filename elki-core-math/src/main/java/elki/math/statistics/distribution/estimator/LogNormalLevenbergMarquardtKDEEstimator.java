@@ -29,7 +29,7 @@ import elki.math.statistics.KernelDensityEstimator;
 import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -111,9 +111,9 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogNormalLevenbergMarquardtKDEEstimator makeInstance() {
+    public LogNormalLevenbergMarquardtKDEEstimator make() {
       return STATIC;
     }
   }

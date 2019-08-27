@@ -163,9 +163,9 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * @param <N> Neighborhood type
    * @param <O> Attribute object type
    */
-  public static class Parameterizer<N, O> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O> {
+  public static class Par<N, O> extends AbstractDistanceBasedSpatialOutlier.Par<N, O> {
     @Override
-    protected SOF<N, O> makeInstance() {
+    public SOF<N, O> make() {
       return new SOF<>(npredf, distanceFunction);
     }
   }

@@ -32,7 +32,7 @@ import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -135,7 +135,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * The default value for delta.
        */
@@ -162,19 +162,19 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
       Settings settings;
 
       @Override
-      protected void makeOptions(Parameterization config) {
+      public void configure(Parameterization config) {
         settings = new Settings();
-        new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+        new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
             .grab(config, x -> settings.epsilon = x);
-        new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+        new IntParameter(DBSCAN.Par.MINPTS_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> settings.minpts = x);
         // Flag for using absolute variances
-        new Flag(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_ABSOLUTE) //
+        new Flag(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_ABSOLUTE) //
             .grab(config, x -> settings.absolute = x);
         // Parameter delta
-        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA) //
+        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(!settings.absolute) {
           deltaP.setDefaultValue(DEFAULT_DELTA);
@@ -194,7 +194,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
       }
 
       @Override
-      protected Object makeInstance() {
+      public Object make() {
         return settings;
       }
     }
@@ -205,20 +205,19 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Settings storage.
      */
     Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(FourC.Settings.class);
     }
 
     @Override
-    protected FourC<O> makeInstance() {
+    public FourC<O> make() {
       return new FourC<>(settings);
     }
   }

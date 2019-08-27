@@ -109,7 +109,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
    * 
    * @param <O> Object type
    */
-  public static abstract class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static abstract class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -133,8 +133,8 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
     protected int minpts = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(EPSILON_ID) //
           .setOptional(true) //
           .grab(config, x -> epsilon = x);

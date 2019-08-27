@@ -25,10 +25,10 @@ import java.util.Random;
 import elki.logging.LoggingUtil;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -919,7 +919,7 @@ public class GammaDistribution implements Distribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * K parameter.
      */
@@ -934,8 +934,7 @@ public class GammaDistribution implements Distribution {
     double k, theta;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(K_ID) //
           .grab(config, x -> k = x);
       new DoubleParameter(THETA_ID) //
@@ -943,7 +942,7 @@ public class GammaDistribution implements Distribution {
     }
 
     @Override
-    protected GammaDistribution makeInstance() {
+    public GammaDistribution make() {
       return new GammaDistribution(k, theta);
     }
   }

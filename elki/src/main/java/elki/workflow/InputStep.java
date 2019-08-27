@@ -23,7 +23,7 @@ package elki.workflow;
 import elki.application.AbstractApplication;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -67,7 +67,7 @@ public class InputStep implements WorkflowStep {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Holds the database to have the algorithms run on.
      */
@@ -76,17 +76,16 @@ public class InputStep implements WorkflowStep {
     /**
      * Option ID to specify the database type
      */
-    public static final OptionID DATABASE_ID = AbstractApplication.Parameterizer.DATABASE_ID;
+    public static final OptionID DATABASE_ID = AbstractApplication.Par.DATABASE_ID;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
           .grab(config, x -> database = x);
     }
 
     @Override
-    protected InputStep makeInstance() {
+    public InputStep make() {
       return new InputStep(database);
     }
   }

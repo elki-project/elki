@@ -185,9 +185,9 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
+  public static class Par extends AbstractStreamingParser.Par {
     @Override
-    protected SimpleTransactionParser makeInstance() {
+    public SimpleTransactionParser make() {
       return new SimpleTransactionParser(format);
     }
   }

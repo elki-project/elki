@@ -151,9 +151,9 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
    *
    * @author Angela Peng
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter.Par<V> {
     @Override
-    protected LinearDiscriminantAnalysisFilter<V> makeInstance() {
+    public LinearDiscriminantAnalysisFilter<V> make() {
       return new LinearDiscriminantAnalysisFilter<>(tdim);
     }
   }

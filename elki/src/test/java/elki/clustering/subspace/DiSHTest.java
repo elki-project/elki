@@ -49,8 +49,8 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
   public void testDiSHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
     Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
-        .with(DiSH.Parameterizer.EPSILON_ID, 0.005) //
-        .with(DiSH.Parameterizer.MU_ID, 50) //
+        .with(DiSH.Par.EPSILON_ID, 0.005) //
+        .with(DiSH.Par.MU_ID, 50) //
         .build().run(db);
     testFMeasure(db, result, .99516369);
     testClusterSizes(result, new int[] { 50, 199, 201 });
@@ -63,8 +63,8 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
   public void testDiSHSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
     Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
-        .with(DiSH.Parameterizer.EPSILON_ID, 0.1) //
-        .with(DiSH.Parameterizer.MU_ID, 40) //
+        .with(DiSH.Par.EPSILON_ID, 0.1) //
+        .with(DiSH.Par.MU_ID, 40) //
         .with(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI) //
         .build().run(db);
     testFMeasure(db, result, 0.656432);

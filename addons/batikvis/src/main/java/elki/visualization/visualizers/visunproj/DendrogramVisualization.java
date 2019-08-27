@@ -35,7 +35,7 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.logging.LoggingUtil;
 import elki.math.scales.LinearScale;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -598,7 +598,7 @@ public class DendrogramVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Dendrogram drawing style.
      */
@@ -620,8 +620,7 @@ public class DendrogramVisualization implements VisFactory {
     private PositionStyle style2 = PositionStyle.HALF_POS;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new EnumParameter<DrawingStyle>(STYLE_ID, DrawingStyle.class, DrawingStyle.RECTANGULAR) //
           .grab(config, x -> style = x);
       new EnumParameter<PositionStyle>(LAYOUT_ID, PositionStyle.class, PositionStyle.HALF_POS) //
@@ -629,7 +628,7 @@ public class DendrogramVisualization implements VisFactory {
     }
 
     @Override
-    protected DendrogramVisualization makeInstance() {
+    public DendrogramVisualization make() {
       return new DendrogramVisualization(style, style2);
     }
   }

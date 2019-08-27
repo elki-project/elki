@@ -23,7 +23,7 @@ package elki.index.tree.spatial.rstarvariants.strategies.insert;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ClassParameter;
@@ -84,7 +84,7 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Insertion strategy for directory nodes.
      */
@@ -106,8 +106,7 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
     InsertionStrategy leafStrategy;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ClassParameter<InsertionStrategy>(DIR_STRATEGY_ID, InsertionStrategy.class, LeastEnlargementWithAreaInsertionStrategy.class) //
           .grab(config, x -> dirStrategy = x);
       new ClassParameter<InsertionStrategy>(LEAF_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class) //
@@ -115,7 +114,7 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
     }
 
     @Override
-    protected CombinedInsertionStrategy makeInstance() {
+    public CombinedInsertionStrategy make() {
       return new CombinedInsertionStrategy(dirStrategy, leafStrategy);
     }
   }

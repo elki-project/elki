@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -104,7 +104,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for the distance function.
      */
@@ -121,8 +121,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     double quantile;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(QUANTILE_ID, .5) //
@@ -130,7 +129,7 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     }
 
     @Override
-    protected DistanceBasedInitializationWithMedian<O> makeInstance() {
+    public DistanceBasedInitializationWithMedian<O> make() {
       return new DistanceBasedInitializationWithMedian<>(distance, quantile);
     }
   }

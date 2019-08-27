@@ -26,7 +26,7 @@ import java.util.List;
 import elki.database.Database;
 import elki.result.ResultHandler;
 import elki.result.ResultWriter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -102,7 +102,7 @@ public class OutputStep implements WorkflowStep {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Output handlers.
      */
@@ -121,15 +121,14 @@ public class OutputStep implements WorkflowStep {
             "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectListParameter<ResultHandler>(RESULT_HANDLER_ID, ResultHandler.class) //
           .setDefaultValue(defaultHandlers) //
           .grab(config, x -> resulthandlers = x);
     }
 
     @Override
-    protected OutputStep makeInstance() {
+    public OutputStep make() {
       return new OutputStep(resulthandlers);
     }
   }

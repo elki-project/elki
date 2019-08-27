@@ -26,7 +26,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.*;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Squared Euclidean distance, optimized for {@link SparseNumberVector}s. This
@@ -216,9 +216,9 @@ public class SquaredEuclideanDistance extends AbstractNumberVectorDistance imple
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SquaredEuclideanDistance makeInstance() {
+    public SquaredEuclideanDistance make() {
       return SquaredEuclideanDistance.STATIC;
     }
   }

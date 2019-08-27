@@ -113,7 +113,7 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    */
-  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Parameterizer<E, N> {
+  public static class Par<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Par<E, N> {
     /**
      * Option ID for the random generator.
      */
@@ -125,13 +125,13 @@ public class RandomSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N,
     RandomFactory rnd = RandomFactory.DEFAULT;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected RandomSplit<E, N> makeInstance() {
+    public RandomSplit<E, N> make() {
       return new RandomSplit<>(distributor, rnd);
     }
   }

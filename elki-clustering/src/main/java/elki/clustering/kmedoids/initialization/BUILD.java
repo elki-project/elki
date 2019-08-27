@@ -35,7 +35,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * PAM initialization for k-means (and of course, for PAM).
@@ -175,9 +175,9 @@ public class BUILD<O> implements KMeansInitialization, KMedoidsInitialization<O>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractParameterizer {
+  public static class Par<V> implements Parameterizer {
     @Override
-    protected BUILD<V> makeInstance() {
+    public BUILD<V> make() {
       return new BUILD<>();
     }
   }

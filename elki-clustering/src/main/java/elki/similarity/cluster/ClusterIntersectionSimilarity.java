@@ -28,7 +28,7 @@ import elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
 import elki.similarity.PrimitiveSimilarity;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the intersection size.
@@ -85,9 +85,9 @@ public class ClusterIntersectionSimilarity implements PrimitiveDistance<Cluster<
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClusterIntersectionSimilarity makeInstance() {
+    public ClusterIntersectionSimilarity make() {
       return STATIC;
     }
   }

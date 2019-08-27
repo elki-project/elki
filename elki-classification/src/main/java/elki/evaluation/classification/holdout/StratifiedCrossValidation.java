@@ -26,7 +26,7 @@ import java.util.Collections;
 import elki.data.ClassLabel;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -124,7 +124,7 @@ public class StratifiedCrossValidation extends AbstractHoldout {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Default number of folds.
      */
@@ -141,15 +141,14 @@ public class StratifiedCrossValidation extends AbstractHoldout {
     protected int nfold;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(NFOLD_ID, N_DEFAULT)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> nfold = x);
     }
 
     @Override
-    protected StratifiedCrossValidation makeInstance() {
+    public StratifiedCrossValidation make() {
       return new StratifiedCrossValidation(nfold);
     }
   }

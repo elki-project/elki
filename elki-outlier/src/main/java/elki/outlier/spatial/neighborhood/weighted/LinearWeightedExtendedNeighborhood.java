@@ -29,7 +29,7 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -158,7 +158,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * Parameter to specify the neighborhood predicate to use.
        */
@@ -180,8 +180,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
       private NeighborSetPredicate.Factory<O> inner;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class) //
             .grab(config, x -> inner = x);
         new IntParameter(STEPS_ID, 1) //
@@ -190,7 +189,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
       }
 
       @Override
-      protected LinearWeightedExtendedNeighborhood.Factory<O> makeInstance() {
+      public LinearWeightedExtendedNeighborhood.Factory<O> make() {
         return new LinearWeightedExtendedNeighborhood.Factory<>(inner, steps);
       }
     }

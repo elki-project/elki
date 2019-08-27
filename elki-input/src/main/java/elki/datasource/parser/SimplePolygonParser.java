@@ -244,9 +244,9 @@ public class SimplePolygonParser extends AbstractStreamingParser {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
+  public static class Par extends AbstractStreamingParser.Par {
     @Override
-    protected SimplePolygonParser makeInstance() {
+    public SimplePolygonParser make() {
       return new SimplePolygonParser(format);
     }
   }

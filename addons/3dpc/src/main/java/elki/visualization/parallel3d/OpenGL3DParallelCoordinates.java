@@ -55,7 +55,7 @@ import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -638,7 +638,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Option for layouting method
      */
@@ -650,14 +650,13 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     Layouter3DPC<O> layout;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Layouter3DPC<O>>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class) //
           .grab(config, x -> layout = x);
     }
 
     @Override
-    protected OpenGL3DParallelCoordinates<O> makeInstance() {
+    public OpenGL3DParallelCoordinates<O> make() {
       return new OpenGL3DParallelCoordinates<>(layout);
     }
   }

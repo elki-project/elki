@@ -300,9 +300,9 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends PerplexityAffinityMatrixBuilder.Parameterizer<O> {
+  public static class Par<O> extends PerplexityAffinityMatrixBuilder.Par<O> {
     @Override
-    protected NearestNeighborAffinityMatrixBuilder<O> makeInstance() {
+    public NearestNeighborAffinityMatrixBuilder<O> make() {
       return new NearestNeighborAffinityMatrixBuilder<>(distanceFunction, perplexity);
     }
   }

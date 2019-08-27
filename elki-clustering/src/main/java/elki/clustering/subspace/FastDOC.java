@@ -167,7 +167,7 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
    * 
    * @author Florian Nuecke
    */
-  public static class Parameterizer<V extends NumberVector> extends DOC.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends DOC.Par<V> {
     /**
      * Stopping threshold for FastDOC.
      */
@@ -179,15 +179,15 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
     protected int d_zero;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(D_ZERO_ID, 5) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> d_zero = x);
     }
 
     @Override
-    protected FastDOC<V> makeInstance() {
+    public FastDOC<V> make() {
       return new FastDOC<>(alpha, beta, w, d_zero, random);
     }
   }

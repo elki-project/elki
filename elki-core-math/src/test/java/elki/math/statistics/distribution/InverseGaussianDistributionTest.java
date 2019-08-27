@@ -77,8 +77,8 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("invgauss.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(InverseGaussianDistribution.Parameterizer.LOCATION_ID, .5);
-    params.addParameter(InverseGaussianDistribution.Parameterizer.SHAPE_ID, 1.);
+    params.addParameter(InverseGaussianDistribution.Par.LOCATION_ID, .5);
+    params.addParameter(InverseGaussianDistribution.Par.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(InverseGaussianDistribution.class, params);
     checkPDF(dist, "pdf_scipy_05_1", 1e-15);
   }

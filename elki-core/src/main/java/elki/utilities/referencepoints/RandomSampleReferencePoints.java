@@ -30,7 +30,7 @@ import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.LoggingUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -87,7 +87,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the sample size.
      */
@@ -109,8 +109,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(N_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> samplesize = x);
@@ -118,7 +117,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
     }
 
     @Override
-    protected RandomSampleReferencePoints makeInstance() {
+    public RandomSampleReferencePoints make() {
       return new RandomSampleReferencePoints(samplesize, rnd);
     }
   }

@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.GeneralizedParetoDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a Generalized Pareto Distribution (GPD), using the
@@ -90,9 +90,9 @@ public class GeneralizedParetoLMMEstimator implements LMMDistributionEstimator<G
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GeneralizedParetoLMMEstimator makeInstance() {
+    public GeneralizedParetoLMMEstimator make() {
       return STATIC;
     }
   }

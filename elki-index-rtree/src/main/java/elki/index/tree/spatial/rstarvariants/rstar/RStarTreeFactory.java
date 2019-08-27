@@ -71,9 +71,9 @@ public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
+  public static class Par<O extends NumberVector> extends AbstractRStarTreeFactory.Par<O, RTreeSettings> {
     @Override
-    protected RStarTreeFactory<O> makeInstance() {
+    public RStarTreeFactory<O> make() {
       return new RStarTreeFactory<>(pageFileFactory, settings);
     }
 

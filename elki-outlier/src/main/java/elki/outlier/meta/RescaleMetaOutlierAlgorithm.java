@@ -38,7 +38,7 @@ import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -142,7 +142,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Holds the algorithm to run.
      */
@@ -154,8 +154,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     private ScalingFunction scaling;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Algorithm>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
@@ -163,7 +162,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     @Override
-    protected RescaleMetaOutlierAlgorithm makeInstance() {
+    public RescaleMetaOutlierAlgorithm make() {
       return new RescaleMetaOutlierAlgorithm(algorithm, scaling);
     }
   }

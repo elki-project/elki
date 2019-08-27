@@ -32,7 +32,7 @@ import elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -136,7 +136,7 @@ public class COPOutlierScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Phi parameter.
      */
@@ -148,14 +148,13 @@ public class COPOutlierScaling implements OutlierScaling {
     private double phi = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(PHI_ID) //
           .grab(config, x -> phi = x);
     }
 
     @Override
-    protected COPOutlierScaling makeInstance() {
+    public COPOutlierScaling make() {
       return new COPOutlierScaling(phi);
     }
   }

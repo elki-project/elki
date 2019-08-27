@@ -42,7 +42,7 @@ import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -230,7 +230,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag to indicate that multiple cluster assignment is possible. If an
      * assignment to multiple clusters is desired, the labels indicating the
@@ -254,8 +254,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     protected Pattern noisepat;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(MULTIPLE_ID).grab(config, x -> multiple = x);
       new PatternParameter(NOISE_ID) //
           .setOptional(true) //
@@ -263,7 +262,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     }
 
     @Override
-    protected ByLabelClustering makeInstance() {
+    public ByLabelClustering make() {
       return new ByLabelClustering(multiple, noisepat);
     }
   }

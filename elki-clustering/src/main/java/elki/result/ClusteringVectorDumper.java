@@ -41,7 +41,7 @@ import elki.database.relation.Relation;
 import elki.datasource.parser.ClusteringVectorParser;
 import elki.logging.Logging;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -197,7 +197,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Output file name parameter.
      */
@@ -229,8 +229,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     private boolean append;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(OUT_ID, FileParameter.FileType.OUTPUT_FILE) //
           .setOptional(true) //
           .grab(config, x -> outputFile = x);
@@ -241,7 +240,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     }
 
     @Override
-    protected ClusteringVectorDumper makeInstance() {
+    public ClusteringVectorDumper make() {
       return new ClusteringVectorDumper(outputFile, append, forceLabel);
     }
   }

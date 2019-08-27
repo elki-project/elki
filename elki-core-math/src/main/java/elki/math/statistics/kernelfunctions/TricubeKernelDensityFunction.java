@@ -20,7 +20,7 @@
  */
 package elki.math.statistics.kernelfunctions;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Tricube kernel density estimator.
@@ -92,9 +92,9 @@ public final class TricubeKernelDensityFunction implements KernelDensityFunction
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected TricubeKernelDensityFunction makeInstance() {
+    public TricubeKernelDensityFunction make() {
       return KERNEL;
     }
   }

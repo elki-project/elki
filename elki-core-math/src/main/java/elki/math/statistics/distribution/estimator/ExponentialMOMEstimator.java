@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.ExponentialDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Exponential distribution parameters using the mean, which is the
@@ -70,9 +70,9 @@ public class ExponentialMOMEstimator implements MeanVarianceDistributionEstimato
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ExponentialMOMEstimator makeInstance() {
+    public ExponentialMOMEstimator make() {
       return STATIC;
     }
   }

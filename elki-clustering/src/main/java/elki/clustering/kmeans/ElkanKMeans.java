@@ -174,9 +174,9 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends SimplifiedElkanKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends SimplifiedElkanKMeans.Par<V> {
     @Override
-    protected ElkanKMeans<V> makeInstance() {
+    public ElkanKMeans<V> make() {
       return new ElkanKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }

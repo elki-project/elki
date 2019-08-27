@@ -218,9 +218,9 @@ public class NNChain<O> extends AGNES<O> {
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AGNES.Parameterizer<O> {
+  public static class Par<O> extends AGNES.Par<O> {
     @Override
-    protected NNChain<O> makeInstance() {
+    public NNChain<O> make() {
       return new NNChain<>(distanceFunction, linkage);
     }
   }

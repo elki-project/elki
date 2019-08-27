@@ -71,9 +71,9 @@ public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTree
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
+  public static class Par<O> extends AbstractMTreeFactory.Par<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
     @Override
-    protected MTreeFactory<O> makeInstance() {
+    public MTreeFactory<O> make() {
       return new MTreeFactory<>(pageFileFactory, settings);
     }
 

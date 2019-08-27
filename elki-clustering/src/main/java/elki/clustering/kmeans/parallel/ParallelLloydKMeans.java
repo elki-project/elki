@@ -125,9 +125,9 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    protected ParallelLloydKMeans<V> makeInstance() {
+    public ParallelLloydKMeans<V> make() {
       return new ParallelLloydKMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

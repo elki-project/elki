@@ -189,16 +189,16 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     // Warn for some known slow methods and large k:
     int maxksq = Math.min(maxk, ksquarestop);
     if(!isDisabled("FastABOD") && maxksq > 1000) {
-      LOG.warning("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
+      LOG.warning("Note: FastABOD needs quadratic memory. Use -" + Par.DISABLE_ID.getName() + " FastABOD to disable.");
     }
     if(!isDisabled("LDOF") && maxksq > 1000) {
-      LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
+      LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Par.DISABLE_ID.getName() + " LDOF to disable.");
     }
     if(!isDisabled("DWOF") && maxksq > 1000) {
-      LOG.warning("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
+      LOG.warning("Note: DWOF needs O(k^2) distance computations. Use -" + Par.DISABLE_ID.getName() + " DWOF to disable.");
     }
     if(!isDisabled("COF") && maxksq > 1000) {
-      LOG.warning("Note: COF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " COF to disable.");
+      LOG.warning("Note: COF needs O(k^2) distance computations. Use -" + Par.DISABLE_ID.getName() + " COF to disable.");
     }
 
     final DBIDs ids = relation.getDBIDs();
@@ -379,7 +379,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<O> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedApplication.Par<O> {
     /**
      * Option ID for k parameter range
      */
@@ -431,8 +431,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     int ksquarestop = 100;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntGeneratorParameter(KRANGE_ID) //
           .grab(config, x -> krange = x);
       bylabel = config.tryInstantiate(ByLabelOutlier.class);
@@ -449,7 +449,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     }
 
     @Override
-    protected ComputeKNNOutlierScores<O> makeInstance() {
+    public ComputeKNNOutlierScores<O> make() {
       return new ComputeKNNOutlierScores<>(inputstep, distance, krange, bylabel, outfile, scaling, disable, ksquarestop);
     }
   }

@@ -48,7 +48,7 @@ public class SparseNumberVectorLabelParserTest extends AbstractDataSourceTest {
   public void parameters() throws IOException {
     String filename = UNITTEST + "parsertest.sparse";
     Parser parser = new ELKIBuilder<>(SparseNumberVectorLabelParser.class) //
-        .with(NumberVectorLabelParser.Parameterizer.VECTOR_TYPE_ID, SparseDoubleVector.Factory.class)//
+        .with(NumberVectorLabelParser.Par.VECTOR_TYPE_ID, SparseDoubleVector.Factory.class)//
         .build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);

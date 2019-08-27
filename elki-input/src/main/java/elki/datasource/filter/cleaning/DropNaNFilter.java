@@ -30,7 +30,7 @@ import elki.datasource.filter.AbstractStreamFilter;
 import elki.logging.Logging;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * A filter to drop all records that contain NaN values.
@@ -169,9 +169,9 @@ public class DropNaNFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected DropNaNFilter makeInstance() {
+    public DropNaNFilter make() {
       return new DropNaNFilter();
     }
   }

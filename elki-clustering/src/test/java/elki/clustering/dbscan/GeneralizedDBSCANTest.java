@@ -46,8 +46,8 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<>(GeneralizedDBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
@@ -57,8 +57,8 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<Model> result = new ELKIBuilder<>(GeneralizedDBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
+        .with(DBSCAN.Par.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Par.MINPTS_ID, 120) //
         .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });
@@ -71,10 +71,10 @@ public class GeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testSimilarityDBSCAN() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<>(GeneralizedDBSCAN.class) //
-        .with(GeneralizedDBSCAN.Parameterizer.NEIGHBORHOODPRED_ID, SimilarityNeighborPredicate.class) //
-        .with(SimilarityNeighborPredicate.Parameterizer.SIMILARITY_FUNCTION_ID, RadialBasisFunctionKernel.class) //
-        .with(SimilarityNeighborPredicate.Parameterizer.EPSILON_ID, 0.999) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(GeneralizedDBSCAN.Par.NEIGHBORHOODPRED_ID, SimilarityNeighborPredicate.class) //
+        .with(SimilarityNeighborPredicate.Par.SIMILARITY_FUNCTION_ID, RadialBasisFunctionKernel.class) //
+        .with(SimilarityNeighborPredicate.Par.EPSILON_ID, 0.999) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, result, 0.992897);
     testClusterSizes(result, new int[] { 28, 50, 102, 150 });

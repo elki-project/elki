@@ -33,7 +33,7 @@ import elki.math.statistics.distribution.estimator.*;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -360,9 +360,9 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected BestFitEstimator makeInstance() {
+    public BestFitEstimator make() {
       return STATIC;
     }
   }

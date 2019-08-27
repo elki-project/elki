@@ -264,7 +264,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    *
    * @param <V> Input vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * Holds the alpha value - significance niveau
      */
@@ -286,14 +286,14 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     private int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       getParameterAlpha(config);
       getParameterK(config);
     }
 
     @Override
-    protected CTLuGLSBackwardSearchAlgorithm<V> makeInstance() {
+    public CTLuGLSBackwardSearchAlgorithm<V> make() {
       return new CTLuGLSBackwardSearchAlgorithm<>(distanceFunction, k, alpha);
     }
 

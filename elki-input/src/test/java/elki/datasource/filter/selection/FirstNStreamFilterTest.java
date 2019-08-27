@@ -40,7 +40,7 @@ public class FirstNStreamFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     FirstNStreamFilter filter = new ELKIBuilder<>(FirstNStreamFilter.class) //
-        .with(FirstNStreamFilter.Parameterizer.SIZE_ID, 42) //
+        .with(FirstNStreamFilter.Par.SIZE_ID, 42) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

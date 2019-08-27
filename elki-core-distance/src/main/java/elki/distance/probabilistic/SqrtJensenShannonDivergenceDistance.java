@@ -23,7 +23,7 @@ package elki.distance.probabilistic;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -96,9 +96,9 @@ public class SqrtJensenShannonDivergenceDistance extends JensenShannonDivergence
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SqrtJensenShannonDivergenceDistance makeInstance() {
+    public SqrtJensenShannonDivergenceDistance make() {
       return STATIC;
     }
   }

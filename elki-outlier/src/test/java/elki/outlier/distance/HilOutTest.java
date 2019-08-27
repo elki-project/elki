@@ -39,8 +39,8 @@ public class HilOutTest extends AbstractOutlierAlgorithmTest {
   public void testHilOut() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
-        .with(HilOut.Parameterizer.K_ID, 4) //
-        .with(HilOut.Parameterizer.N_ID, 200) //
+        .with(HilOut.Par.K_ID, 4) //
+        .with(HilOut.Par.N_ID, 200) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.985398148);
     testSingleScore(result, 945, 1.70927657);
@@ -50,9 +50,9 @@ public class HilOutTest extends AbstractOutlierAlgorithmTest {
   public void testHilOutH16() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
-        .with(HilOut.Parameterizer.K_ID, 4) //
-        .with(HilOut.Parameterizer.N_ID, 200) //
-        .with(HilOut.Parameterizer.H_ID, 16) //
+        .with(HilOut.Par.K_ID, 4) //
+        .with(HilOut.Par.N_ID, 200) //
+        .with(HilOut.Par.H_ID, 16) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.985398148);
     testSingleScore(result, 945, 1.70927657);
@@ -62,9 +62,9 @@ public class HilOutTest extends AbstractOutlierAlgorithmTest {
   public void testHilOutH8() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
-        .with(HilOut.Parameterizer.K_ID, 4) //
-        .with(HilOut.Parameterizer.N_ID, 200) //
-        .with(HilOut.Parameterizer.H_ID, 8) //
+        .with(HilOut.Par.K_ID, 4) //
+        .with(HilOut.Par.N_ID, 200) //
+        .with(HilOut.Par.H_ID, 8) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.985398148);
     testSingleScore(result, 945, 1.70927657);
@@ -75,9 +75,9 @@ public class HilOutTest extends AbstractOutlierAlgorithmTest {
   public void testHilOutH2() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<HilOut<DoubleVector>>(HilOut.class) //
-        .with(HilOut.Parameterizer.K_ID, 4) //
-        .with(HilOut.Parameterizer.N_ID, 200) //
-        .with(HilOut.Parameterizer.H_ID, 2) //
+        .with(HilOut.Par.K_ID, 4) //
+        .with(HilOut.Par.N_ID, 200) //
+        .with(HilOut.Par.H_ID, 2) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.8246);
     testSingleScore(result, 945, 0.);

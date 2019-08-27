@@ -61,9 +61,9 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
   public void testParameterizer() throws ClassInstantiationException {
     load("emg.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.LOCATION_ID, 1.);
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.SCALE_ID, 3);
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Parameterizer.RATE_ID, .5);
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.LOCATION_ID, 1.);
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.SCALE_ID, 3);
+    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.RATE_ID, .5);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentiallyModifiedGaussianDistribution.class, params);
     checkPDF(dist, "pdf_gnur_1_3_05", 1e-15);
   }

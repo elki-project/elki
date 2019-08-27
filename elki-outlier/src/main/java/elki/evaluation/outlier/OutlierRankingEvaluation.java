@@ -38,7 +38,7 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.result.*;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -213,7 +213,7 @@ public class OutlierRankingEvaluation implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The pattern to identify positive classes.
      */
@@ -225,14 +225,13 @@ public class OutlierRankingEvaluation implements Evaluator {
     protected Pattern positiveClassName = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(POSITIVE_CLASS_NAME_ID) //
           .grab(config, x -> positiveClassName = x);
     }
 
     @Override
-    protected OutlierRankingEvaluation makeInstance() {
+    public OutlierRankingEvaluation make() {
       return new OutlierRankingEvaluation(positiveClassName);
     }
   }

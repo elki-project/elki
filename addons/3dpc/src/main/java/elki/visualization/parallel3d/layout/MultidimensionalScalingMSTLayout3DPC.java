@@ -149,9 +149,9 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
+  public static class Par extends AbstractLayout3DPC.Par {
     @Override
-    protected MultidimensionalScalingMSTLayout3DPC makeInstance() {
+    public MultidimensionalScalingMSTLayout3DPC make() {
       return new MultidimensionalScalingMSTLayout3DPC(sim);
     }
   }

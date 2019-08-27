@@ -294,9 +294,9 @@ public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements K
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<V> extends AbstractKMeansInitialization.Par {
     @Override
-    protected KMeansPlusPlus<V> makeInstance() {
+    public KMeansPlusPlus<V> make() {
       return new KMeansPlusPlus<>(rnd);
     }
   }

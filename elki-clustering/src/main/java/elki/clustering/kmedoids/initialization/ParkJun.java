@@ -35,7 +35,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Initialization method proposed by Park and Jun.
@@ -136,9 +136,9 @@ public class ParkJun<O> implements KMeansInitialization, KMedoidsInitialization<
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractParameterizer {
+  public static class Par<V> implements Parameterizer {
     @Override
-    protected ParkJun<V> makeInstance() {
+    public ParkJun<V> make() {
       return new ParkJun<>();
     }
   }

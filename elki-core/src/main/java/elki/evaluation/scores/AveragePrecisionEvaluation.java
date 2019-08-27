@@ -20,7 +20,7 @@
  */
 package elki.evaluation.scores;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Evaluate using average precision.
@@ -69,9 +69,9 @@ public class AveragePrecisionEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected AveragePrecisionEvaluation makeInstance() {
+    public AveragePrecisionEvaluation make() {
       return STATIC;
     }
   }

@@ -46,7 +46,7 @@ import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -445,7 +445,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * k Parameter.
      */
@@ -467,8 +467,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     protected NumberVectorDistance<? super V> distanceFunction;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
             distanceFunction = x;
@@ -488,7 +487,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     }
 
     @Override
-    protected SameSizeKMeansAlgorithm<V> makeInstance() {
+    public SameSizeKMeansAlgorithm<V> make() {
       return new SameSizeKMeansAlgorithm<>(distanceFunction, k, maxiter, initializer);
     }
   }

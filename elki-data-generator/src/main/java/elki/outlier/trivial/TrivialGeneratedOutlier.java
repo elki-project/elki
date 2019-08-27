@@ -47,7 +47,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -192,7 +192,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Expected share of outliers
      */
@@ -204,8 +204,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     double expect;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(EXPECT_ID, 0.01) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -213,7 +212,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     }
 
     @Override
-    protected TrivialGeneratedOutlier makeInstance() {
+    public TrivialGeneratedOutlier make() {
       return new TrivialGeneratedOutlier(expect);
     }
   }

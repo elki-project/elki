@@ -28,7 +28,7 @@ import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -96,9 +96,9 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected InstanceLogRankNormalization<NumberVector> makeInstance() {
+    public InstanceLogRankNormalization<NumberVector> make() {
       return new InstanceLogRankNormalization<>();
     }
   }

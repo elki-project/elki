@@ -38,7 +38,7 @@ import elki.math.statistics.distribution.Distribution;
 import elki.math.statistics.distribution.estimator.DistributionEstimator;
 import elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -155,11 +155,11 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for distribution estimators.
      */
-    public static final OptionID DISTRIBUTIONS_ID = AttributeWiseCDFNormalization.Parameterizer.DISTRIBUTIONS_ID;
+    public static final OptionID DISTRIBUTIONS_ID = AttributeWiseCDFNormalization.Par.DISTRIBUTIONS_ID;
 
     /**
      * Shape parameter.
@@ -177,8 +177,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
     private double alpha;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectListParameter<DistributionEstimator<?>>(DISTRIBUTIONS_ID, DistributionEstimator.class) //
           .setDefaultValue(Arrays.asList(BestFitEstimator.class)) //
           .grab(config, x -> estimators = x);
@@ -187,7 +186,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
     }
 
     @Override
-    protected AttributeWiseBetaNormalization<V> makeInstance() {
+    public AttributeWiseBetaNormalization<V> make() {
       return new AttributeWiseBetaNormalization<>(estimators, alpha);
     }
   }

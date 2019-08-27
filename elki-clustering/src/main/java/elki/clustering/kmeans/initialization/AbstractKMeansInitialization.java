@@ -24,7 +24,7 @@ import java.util.List;
 
 import elki.clustering.kmeans.KMeans;
 import elki.data.NumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
@@ -69,14 +69,14 @@ public abstract class AbstractKMeansInitialization implements KMeansInitializati
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Random generator
      */
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new RandomParameter(KMeans.SEED_ID).grab(config, x -> rnd = x);
     }
   }

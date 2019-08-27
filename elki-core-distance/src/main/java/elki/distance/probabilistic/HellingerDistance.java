@@ -31,7 +31,7 @@ import elki.similarity.NormalizedPrimitiveSimilarity;
 import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -231,9 +231,9 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HellingerDistance makeInstance() {
+    public HellingerDistance make() {
       return HellingerDistance.STATIC;
     }
   }

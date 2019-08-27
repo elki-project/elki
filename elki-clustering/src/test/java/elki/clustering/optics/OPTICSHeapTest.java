@@ -42,10 +42,10 @@ public class OPTICSHeapTest extends AbstractClusterAlgorithmTest {
   public void testOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
-        .with(OPTICSHeap.Parameterizer.MINPTS_ID, 20) //
-        .with(OPTICSHeap.Parameterizer.EPSILON_ID, 0.15) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.05) //
-        .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSHeap.class) //
+        .with(OPTICSHeap.Par.MINPTS_ID, 20) //
+        .with(OPTICSHeap.Par.EPSILON_ID, 0.15) //
+        .with(OPTICSXi.Par.XI_ID, 0.05) //
+        .with(OPTICSXi.Par.XIALG_ID, OPTICSHeap.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.893865);
     testClusterSizes(clustering, new int[] { 8, 35, 72, 115, 209, 271 });

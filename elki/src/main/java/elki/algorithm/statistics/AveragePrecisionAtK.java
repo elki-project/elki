@@ -208,7 +208,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter k to compute the average precision at.
      */
@@ -250,8 +250,8 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
     protected boolean includeSelf;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
@@ -265,7 +265,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
     }
 
     @Override
-    protected AveragePrecisionAtK<O> makeInstance() {
+    public AveragePrecisionAtK<O> make() {
       return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed, includeSelf);
     }
   }

@@ -28,7 +28,7 @@ import elki.utilities.datastructures.arraylike.DoubleArray;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Vector type using {@code double[]} storage for real numbers.
@@ -189,9 +189,9 @@ public class DoubleVector implements NumberVector {
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected DoubleVector.Factory makeInstance() {
+      public DoubleVector.Factory make() {
         return FACTORY;
       }
     }

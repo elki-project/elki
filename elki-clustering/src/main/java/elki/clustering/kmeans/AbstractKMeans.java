@@ -671,7 +671,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
+  public abstract static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super V>> {
     /**
      * k Parameter.
      */
@@ -693,7 +693,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     protected boolean varstat = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       getParameterK(config);
       getParameterInitialization(config);
       getParameterDistance(config);
@@ -776,6 +776,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     }
 
     @Override
-    abstract protected AbstractKMeans<V, ?> makeInstance();
+    abstract public AbstractKMeans<V, ?> make();
   }
 }

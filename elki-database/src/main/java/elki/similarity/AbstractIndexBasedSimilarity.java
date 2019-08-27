@@ -24,7 +24,7 @@ import elki.data.type.TypeInformation;
 import elki.database.relation.Relation;
 import elki.index.Index;
 import elki.index.IndexFactory;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -119,7 +119,7 @@ public abstract class AbstractIndexBasedSimilarity<O, F extends IndexFactory<O>>
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
+  public abstract static class Par<F extends IndexFactory<?>> implements Parameterizer {
     /**
      * Parameter to specify the preprocessor to be used.
      */

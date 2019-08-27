@@ -449,7 +449,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<SpatialPrimitiveDistance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<SpatialPrimitiveDistance<? super V>> {
     /**
      * Parameter to specify the threshold for minimum number of points within a
      * cluster, must be an integer greater than 0.
@@ -472,8 +472,8 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minpts = x);
@@ -482,7 +482,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
 
     @Override
-    protected DeLiClu<V> makeInstance() {
+    public DeLiClu<V> make() {
       return new DeLiClu<>(indexer, distanceFunction, minpts);
     }
   }

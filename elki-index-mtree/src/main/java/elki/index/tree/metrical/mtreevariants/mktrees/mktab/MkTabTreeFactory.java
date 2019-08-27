@@ -64,9 +64,9 @@ public class MkTabTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkTabTr
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
+  public static class Par<O> extends AbstractMkTreeUnifiedFactory.Par<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
     @Override
-    protected MkTabTreeFactory<O> makeInstance() {
+    public MkTabTreeFactory<O> make() {
       return new MkTabTreeFactory<>(pageFileFactory, settings);
     }
 

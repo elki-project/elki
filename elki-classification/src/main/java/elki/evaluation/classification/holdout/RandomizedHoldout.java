@@ -20,7 +20,7 @@
  */
 package elki.evaluation.classification.holdout;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
@@ -51,7 +51,7 @@ public abstract class RandomizedHoldout extends AbstractHoldout {
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Random seeding for holdout evaluation.
      */
@@ -63,8 +63,7 @@ public abstract class RandomizedHoldout extends AbstractHoldout {
     protected RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(SEED_ID).grab(config, x -> random = x);
     }
   }

@@ -129,9 +129,9 @@ public class LloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMean
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    protected LloydKMeans<V> makeInstance() {
+    public LloydKMeans<V> make() {
       return new LloydKMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

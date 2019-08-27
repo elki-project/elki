@@ -38,7 +38,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -169,7 +169,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
    * 
    * @param <O> object type
    */
-  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Par<O> implements Parameterizer {
     /**
      * Range to query with
      */
@@ -181,8 +181,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
     Distance<O> distfun = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       configDistance(config);
       configEpsilon(config);
     }
@@ -194,7 +193,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configDistance(Parameterization config) {
       // Get a distance function.
-      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distfun = x);
     }
 
@@ -205,7 +204,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configEpsilon(Parameterization config) {
       // Get the epsilon parameter
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .grab(config, x -> epsilon = x);
     }
   }

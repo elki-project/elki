@@ -29,7 +29,7 @@ import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -125,21 +125,20 @@ public class LatLngDistance implements SpatialPrimitiveDistance<NumberVector>, N
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Earth model used.
      */
     EarthModel model;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
           .grab(config, x -> model = x);
     }
 
     @Override
-    protected LatLngDistance makeInstance() {
+    public LatLngDistance make() {
       return new LatLngDistance(model);
     }
   }

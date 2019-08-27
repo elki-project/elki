@@ -20,7 +20,7 @@
  */
 package elki.evaluation.scores;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -97,7 +97,7 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the k parameter.
      */
@@ -110,8 +110,7 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(K_ID) //
       .setDefaultValue(0) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
@@ -119,7 +118,7 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
     }
 
     @Override
-    protected PrecisionAtKEvaluation makeInstance() {
+    public PrecisionAtKEvaluation make() {
       return k > 0 ? new PrecisionAtKEvaluation(k) : RPRECISION;
     }
   }

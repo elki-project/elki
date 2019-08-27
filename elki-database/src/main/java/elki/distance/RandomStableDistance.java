@@ -32,7 +32,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.utilities.Priority;
 import elki.utilities.Util;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * This is a dummy distance providing random values (obviously not metrical),
@@ -144,9 +144,9 @@ public class RandomStableDistance extends AbstractDatabaseDistance<DBID> impleme
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RandomStableDistance makeInstance() {
+    public RandomStableDistance make() {
       return RandomStableDistance.STATIC;
     }
   }

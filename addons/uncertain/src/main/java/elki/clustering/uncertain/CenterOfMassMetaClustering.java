@@ -44,7 +44,7 @@ import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -149,15 +149,14 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<C extends Clustering<?>> extends AbstractParameterizer {
+  public static class Par<C extends Clustering<?>> implements Parameterizer {
     /**
      * Field to store the algorithm.
      */
     protected ClusteringAlgorithm<C> inner;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       ObjectParameter<ClusteringAlgorithm<C>> palgorithm = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
         inner = palgorithm.instantiateClass(config);
@@ -169,7 +168,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
     }
 
     @Override
-    protected CenterOfMassMetaClustering<C> makeInstance() {
+    public CenterOfMassMetaClustering<C> make() {
       return new CenterOfMassMetaClustering<C>(inner);
     }
   }

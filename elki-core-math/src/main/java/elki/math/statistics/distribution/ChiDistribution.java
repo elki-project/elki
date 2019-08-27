@@ -24,10 +24,10 @@ import java.util.Random;
 
 import elki.math.MathUtil;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -138,25 +138,24 @@ public class ChiDistribution implements Distribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Degrees of freedom parameter - same as
      * {@link ChiSquaredDistribution.Parameterizer#DOF_ID}.
      */
-    public static final OptionID DOF_ID = ChiSquaredDistribution.Parameterizer.DOF_ID;
+    public static final OptionID DOF_ID = ChiSquaredDistribution.Par.DOF_ID;
 
     /** Parameters. */
     double dof;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(DOF_ID) //
           .grab(config, x -> dof = x);
     }
 
     @Override
-    protected ChiDistribution makeInstance() {
+    public ChiDistribution make() {
       return new ChiDistribution(dof);
     }
   }

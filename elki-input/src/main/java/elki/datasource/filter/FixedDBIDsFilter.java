@@ -24,7 +24,7 @@ import elki.database.ids.DBIDFactory;
 import elki.database.ids.DBIDRange;
 import elki.datasource.bundle.BundleMeta;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -73,7 +73,7 @@ public class FixedDBIDsFilter implements ObjectFilter {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Optional parameter to specify the first object ID to use.
      */
@@ -85,15 +85,14 @@ public class FixedDBIDsFilter implements ObjectFilter {
     int startid = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(IDSTART_ID, 0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> startid = x);
     }
 
     @Override
-    protected FixedDBIDsFilter makeInstance() {
+    public FixedDBIDsFilter make() {
       return new FixedDBIDsFilter(startid);
     }
   }

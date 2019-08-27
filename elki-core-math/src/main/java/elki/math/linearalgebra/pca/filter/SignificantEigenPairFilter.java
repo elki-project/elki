@@ -22,7 +22,7 @@ package elki.math.linearalgebra.pca.filter;
 
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -102,19 +102,18 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     private double walpha;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(WeakEigenPairFilter.Par.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> walpha = x);
     }
 
     @Override
-    protected SignificantEigenPairFilter makeInstance() {
+    public SignificantEigenPairFilter make() {
       return new SignificantEigenPairFilter(walpha);
     }
   }

@@ -87,10 +87,10 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings> {
+  public static class Par<O extends NumberVector> extends AbstractRStarTreeFactory.Par<O, RdkNNSettings> {
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.k_max = x);
@@ -99,7 +99,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
     }
 
     @Override
-    protected RdKNNTreeFactory<O> makeInstance() {
+    public RdKNNTreeFactory<O> make() {
       return new RdKNNTreeFactory<>(pageFileFactory, settings);
     }
 

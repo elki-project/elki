@@ -202,7 +202,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   }
 
   /**
-   * Parameterizer.
+   * Par.
    * 
    * @author Ahmed Hettab
    * 
@@ -210,7 +210,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @param <N> Neighborhood object type
    */
-  public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N> extends AbstractNeighborhoodOutlier.Par<N> {
     /**
      * Parameter for the percentile value p.
      */
@@ -222,8 +222,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     protected double p = 0.2;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
@@ -231,7 +231,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     }
 
     @Override
-    protected TrimmedMeanApproach<N> makeInstance() {
+    public TrimmedMeanApproach<N> make() {
       return new TrimmedMeanApproach<>(npredf, p);
     }
   }

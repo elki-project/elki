@@ -24,7 +24,7 @@ import elki.math.MathUtil;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.math.statistics.distribution.GeneralizedExtremeValueDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -164,9 +164,9 @@ public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstim
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GeneralizedExtremeValueLMMEstimator makeInstance() {
+    public GeneralizedExtremeValueLMMEstimator make() {
       return STATIC;
     }
   }

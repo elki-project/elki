@@ -46,7 +46,7 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
   /**
    * OptionID for the distance function.
    */
-  OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID;
+  OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID;
 
   /**
    * Parameter to specify the initialization method

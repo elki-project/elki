@@ -79,7 +79,7 @@ public class Log1PlusNormalizationTest extends AbstractDataSourceTest {
     // Use the value of b as the boost value.
     double b = 15.;
     ListParameterization config = new ListParameterization();
-    config.addParameter(Log1PlusNormalization.Parameterizer.BOOST_ID, b);
+    config.addParameter(Log1PlusNormalization.Par.BOOST_ID, b);
     Log1PlusNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(Log1PlusNormalization.class, config);
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

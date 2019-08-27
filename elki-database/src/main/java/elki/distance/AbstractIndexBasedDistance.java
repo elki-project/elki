@@ -24,7 +24,7 @@ import elki.data.type.TypeInformation;
 import elki.database.relation.Relation;
 import elki.index.Index;
 import elki.index.IndexFactory;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -135,7 +135,7 @@ public abstract class AbstractIndexBasedDistance<O, F extends IndexFactory<O>> e
    * 
    * @param <F> Factory type
    */
-  public abstract static class Parameterizer<F extends IndexFactory<?>> extends AbstractParameterizer {
+  public abstract static class Par<F extends IndexFactory<?>> implements Parameterizer {
     /**
      * The index factory we use.
      */

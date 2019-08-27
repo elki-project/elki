@@ -47,9 +47,9 @@ public class BisectingKMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<MeanModel> result = new ELKIBuilder<BisectingKMeans<DoubleVector, MeanModel>>(BisectingKMeans.class) //
         .with(KMeans.K_ID, 3) //
         .with(KMeans.SEED_ID, 0) //
-        .with(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5) //
-        .with(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, LloydKMeans.class) //
-        .with(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVariance.class) //
+        .with(BestOfMultipleKMeans.Par.TRIALS_ID, 5) //
+        .with(BestOfMultipleKMeans.Par.KMEANS_ID, LloydKMeans.class) //
+        .with(BestOfMultipleKMeans.Par.QUALITYMEASURE_ID, WithinClusterVariance.class) //
         .build().run(db);
     testClusterSizes(result, new int[] { 103, 97, 100 });
   }
@@ -65,9 +65,9 @@ public class BisectingKMeansTest extends AbstractClusterAlgorithmTest {
     BisectingKMeans<DoubleVector, MeanModel> kmeans = new ELKIBuilder<BisectingKMeans<DoubleVector, MeanModel>>(BisectingKMeans.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.SEED_ID, 0) //
-        .with(BestOfMultipleKMeans.Parameterizer.TRIALS_ID, 5) //
-        .with(BestOfMultipleKMeans.Parameterizer.KMEANS_ID, LloydKMeans.class) //
-        .with(BestOfMultipleKMeans.Parameterizer.QUALITYMEASURE_ID, WithinClusterVariance.class) //
+        .with(BestOfMultipleKMeans.Par.TRIALS_ID, 5) //
+        .with(BestOfMultipleKMeans.Par.KMEANS_ID, LloydKMeans.class) //
+        .with(BestOfMultipleKMeans.Par.QUALITYMEASURE_ID, WithinClusterVariance.class) //
         .build();
 
     // run KMedians on database

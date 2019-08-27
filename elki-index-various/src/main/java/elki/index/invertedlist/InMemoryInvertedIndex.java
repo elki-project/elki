@@ -43,7 +43,7 @@ import elki.index.KNNIndex;
 import elki.index.RangeIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -433,9 +433,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
      * 
      * @param <V> Vector type
      */
-    public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    public static class Par<V extends NumberVector> implements Parameterizer {
       @Override
-      protected Factory<V> makeInstance() {
+      public Factory<V> make() {
         return new Factory<>();
       }
     }

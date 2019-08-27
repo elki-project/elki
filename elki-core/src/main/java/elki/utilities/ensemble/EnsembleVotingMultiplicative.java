@@ -20,7 +20,7 @@
  */
 package elki.utilities.ensemble;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Inverse multiplicative voting:
@@ -61,9 +61,9 @@ public class EnsembleVotingMultiplicative implements EnsembleVoting {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected EnsembleVotingMultiplicative makeInstance() {
+    public EnsembleVotingMultiplicative make() {
       return STATIC;
     }
   }

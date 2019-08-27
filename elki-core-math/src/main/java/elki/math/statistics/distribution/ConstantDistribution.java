@@ -22,7 +22,6 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -89,7 +88,7 @@ public class ConstantDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Constant value parameter
      */
@@ -99,14 +98,13 @@ public class ConstantDistribution implements Distribution {
     double constant;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(CONSTANT_ID) //
           .grab(config, x -> constant = x);
     }
 
     @Override
-    protected ConstantDistribution makeInstance() {
+    public ConstantDistribution make() {
       return new ConstantDistribution(constant);
     }
   }

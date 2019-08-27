@@ -28,7 +28,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -119,9 +119,9 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ALIDEstimator makeInstance() {
+    public ALIDEstimator make() {
       return STATIC;
     }
   }

@@ -52,16 +52,16 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
   public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
     Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 30) //
+        .with(DBSCAN.Par.MINPTS_ID, 30) //
         // ERiC Distance function in DBSCAN:
-        .with(ERiC.Parameterizer.DELTA_ID, 0.20) //
-        .with(ERiC.Parameterizer.TAU_ID, 0.04) //
-        .with(ERiC.Parameterizer.K_ID, 50) //
+        .with(ERiC.Par.DELTA_ID, 0.20) //
+        .with(ERiC.Par.TAU_ID, 0.04) //
+        .with(ERiC.Par.K_ID, 50) //
         // PCA options:
-        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
-        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(PCARunner.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class) //
-        .with(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60) //
+        .with(RelativeEigenPairFilter.Par.EIGENPAIR_FILTER_RALPHA, 1.60) //
         .build().run(db);
     testFMeasure(db, result, 0.728074); // Hierarchical pairs scored: 0.9204825
     testClusterSizes(result, new int[] { 109, 188, 303 });
@@ -72,16 +72,16 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
     Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
         // ERiC
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 15) //
+        .with(DBSCAN.Par.MINPTS_ID, 15) //
         // ERiC Distance function in DBSCAN:
-        .with(ERiC.Parameterizer.DELTA_ID, 1.0) //
-        .with(ERiC.Parameterizer.TAU_ID, 1.0) //
-        .with(ERiC.Parameterizer.K_ID, 45) //
+        .with(ERiC.Par.DELTA_ID, 1.0) //
+        .with(ERiC.Par.TAU_ID, 1.0) //
+        .with(ERiC.Par.K_ID, 45) //
         // PCA options:
-        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
-        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(PCARunner.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
-        .with(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6) //
+        .with(PercentageEigenPairFilter.Par.ALPHA_ID, 0.6) //
         .build().run(db);
     testFMeasure(db, result, 0.831136946);
     testClusterSizes(result, new int[] { 29, 189, 207, 225 });
@@ -92,14 +92,14 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
     Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
         // ERiC
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
         // ERiC Distance function in DBSCAN:
-        .with(ERiC.Parameterizer.DELTA_ID, 1.0) //
-        .with(ERiC.Parameterizer.TAU_ID, 1.0) //
-        .with(ERiC.Parameterizer.K_ID, 100) //
+        .with(ERiC.Par.DELTA_ID, 1.0) //
+        .with(ERiC.Par.TAU_ID, 1.0) //
+        .with(ERiC.Par.K_ID, 100) //
         // PCA options:
-        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
-        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(PCARunner.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, ProgressiveEigenPairFilter.class) //
         .build().run(db);
     testFMeasure(db, result, 0.732609);

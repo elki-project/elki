@@ -28,7 +28,7 @@ import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -132,20 +132,19 @@ public class AsciiDistanceParser implements DistanceParser {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Reader format.
      */
     protected CSVReaderFormat format;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       format = config.tryInstantiate(CSVReaderFormat.class);
     }
 
     @Override
-    protected AsciiDistanceParser makeInstance() {
+    public AsciiDistanceParser make() {
       return new AsciiDistanceParser(format);
     }
   }

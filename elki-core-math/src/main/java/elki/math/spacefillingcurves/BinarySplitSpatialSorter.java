@@ -26,7 +26,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Spatially sort the data set by repetitive binary splitting, circulating
@@ -142,9 +142,9 @@ public class BinarySplitSpatialSorter implements SpatialSorter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected BinarySplitSpatialSorter makeInstance() {
+    public BinarySplitSpatialSorter make() {
       return STATIC;
     }
   }

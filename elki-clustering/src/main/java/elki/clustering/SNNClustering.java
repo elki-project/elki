@@ -44,7 +44,7 @@ import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -295,7 +295,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    *
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the minimum SNN density, must be an integer greater
      * than 0.
@@ -315,8 +315,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     private SharedNearestNeighborSimilarity<O> similarityFunction;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       Class<SharedNearestNeighborSimilarity<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarity.class);
       similarityFunction = config.tryInstantiate(cls);
 
@@ -328,7 +327,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     }
 
     @Override
-    protected SNNClustering<O> makeInstance() {
+    public SNNClustering<O> make() {
       return new SNNClustering<>(similarityFunction, epsilon, minpts);
     }
   }

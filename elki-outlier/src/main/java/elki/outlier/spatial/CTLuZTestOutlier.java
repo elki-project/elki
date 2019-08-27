@@ -161,9 +161,9 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @param <N> Neighborhood object type
    */
-  public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N> extends AbstractNeighborhoodOutlier.Par<N> {
     @Override
-    protected CTLuZTestOutlier<N> makeInstance() {
+    public CTLuZTestOutlier<N> make() {
       return new CTLuZTestOutlier<>(npredf);
     }
   }

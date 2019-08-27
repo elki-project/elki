@@ -48,7 +48,7 @@ public class TermFrequencyParserTest extends AbstractDataSourceTest {
   public void parameters() throws IOException {
     String filename = UNITTEST + "parsertest.tf";
     Parser parser = new ELKIBuilder<>(TermFrequencyParser.class)//
-        .with(TermFrequencyParser.Parameterizer.NORMALIZE_FLAG) //
+        .with(TermFrequencyParser.Par.NORMALIZE_FLAG) //
         .build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);

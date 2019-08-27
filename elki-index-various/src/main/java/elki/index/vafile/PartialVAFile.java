@@ -47,7 +47,7 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.ByteArrayUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -814,7 +814,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Page size.
        */
@@ -826,9 +826,8 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       int numpart = 2;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024) //
+      public void configure(Parameterization config) {
+        new IntParameter(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 1024) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> pagesize = x);
         new IntParameter(Factory.PARTITIONS_ID) //
@@ -837,7 +836,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       }
 
       @Override
-      protected Factory<?> makeInstance() {
+      public Factory<?> make() {
         return new Factory<>(pagesize, numpart);
       }
     }

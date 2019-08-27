@@ -245,7 +245,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Number of steps in the distance map.
      */
@@ -287,8 +287,8 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     protected EarthModel model;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       out = super.getParameterOutputFile(config, "Output image file name.");
       new IntParameter(STEPS_ID) //
           .setOptional(true) //
@@ -302,7 +302,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     }
 
     @Override
-    protected VisualizeGeodesicDistances makeInstance() {
+    public VisualizeGeodesicDistances make() {
       return new VisualizeGeodesicDistances(out, resolution, steps, mode, model);
     }
   }

@@ -23,7 +23,7 @@ package elki.similarity.kernel;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -66,9 +66,9 @@ public class LinearKernel extends PolynomialKernel {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LinearKernel makeInstance() {
+    public LinearKernel make() {
       return LinearKernel.STATIC;
     }
   }

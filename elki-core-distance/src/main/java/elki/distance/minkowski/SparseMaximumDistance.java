@@ -21,7 +21,7 @@
 package elki.distance.minkowski;
 
 import elki.data.SparseNumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Maximum distance, optimized for {@link SparseNumberVector}s.
@@ -120,9 +120,9 @@ public class SparseMaximumDistance extends SparseLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SparseMaximumDistance makeInstance() {
+    public SparseMaximumDistance make() {
       return SparseMaximumDistance.STATIC;
     }
   }

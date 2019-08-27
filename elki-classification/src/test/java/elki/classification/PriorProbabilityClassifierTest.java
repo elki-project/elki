@@ -45,8 +45,8 @@ public class PriorProbabilityClassifierTest extends AbstractSimpleAlgorithmTest 
   @Test
   public void testPriorResults() {
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, ClassLabelFilter.class);
-    params.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 0);
+    params.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, ClassLabelFilter.class);
+    params.addParameter(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0);
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330, params);
     PriorProbabilityClassifier prior = new ELKIBuilder<>(PriorProbabilityClassifier.class).build();
     // Run:

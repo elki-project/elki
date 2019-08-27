@@ -107,7 +107,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public abstract static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the size of the D-neighborhood
      */
@@ -119,8 +119,8 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
     protected double d;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config); // Distance function
+    public void configure(Parameterization config) {
+      super.configure(config); // Distance function
       configD(config, distanceFunction);
     }
 

@@ -38,7 +38,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -344,7 +344,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     /**
-     * Parameterizer.
+     * Par.
      *
      * @author Erich Schubert
      *
@@ -352,7 +352,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
      *
      * @param <O> Object type
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * Option parameter for the precomputed distance matrix.
        */
@@ -364,14 +364,13 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
       protected Distance<? super O> distanceFunction;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class) //
             .grab(config, x -> distanceFunction = x);
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(distanceFunction);
       }
     }

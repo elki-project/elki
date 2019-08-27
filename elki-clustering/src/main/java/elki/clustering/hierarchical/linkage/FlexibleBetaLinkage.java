@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.linkage;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -88,7 +88,7 @@ public class FlexibleBetaLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Lance-Williams flexible beta parameter.
      */
@@ -100,7 +100,7 @@ public class FlexibleBetaLinkage implements Linkage {
     double beta;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new DoubleParameter(BETA_ID, -0.25)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .addConstraint(new GreaterConstraint(-1.)) // Better even < 0
@@ -108,7 +108,7 @@ public class FlexibleBetaLinkage implements Linkage {
     }
 
     @Override
-    protected FlexibleBetaLinkage makeInstance() {
+    public FlexibleBetaLinkage make() {
       return new FlexibleBetaLinkage(beta);
     }
   }

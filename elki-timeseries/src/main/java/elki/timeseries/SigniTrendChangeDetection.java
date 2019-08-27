@@ -44,7 +44,7 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -250,7 +250,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for half-life aging.
      */
@@ -285,8 +285,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
     private double minsigma;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(HALFLIFE_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> halflife = x);
@@ -299,7 +298,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
     }
 
     @Override
-    protected SigniTrendChangeDetection makeInstance() {
+    public SigniTrendChangeDetection make() {
       return new SigniTrendChangeDetection(halflife, bias, minsigma);
     }
   }

@@ -213,9 +213,9 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<Distance<?
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
-    protected MiniMaxNNChain<O> makeInstance() {
+    public MiniMaxNNChain<O> make() {
       return new MiniMaxNNChain<>(distanceFunction);
     }
   }

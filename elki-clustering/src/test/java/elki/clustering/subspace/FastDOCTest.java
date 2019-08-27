@@ -45,10 +45,10 @@ public class FastDOCTest extends AbstractClusterAlgorithmTest {
   public void testDOCSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
     Clustering<?> result = new ELKIBuilder<FastDOC<DoubleVector>>(FastDOC.class) //
-        .with(DOC.Parameterizer.RANDOM_ID, 0) //
-        .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
-        .with(DOC.Parameterizer.BETA_ID, 0.85) //
-        .with(FastDOC.Parameterizer.D_ZERO_ID, 1) //
+        .with(DOC.Par.RANDOM_ID, 0) //
+        .with(DOC.Par.ALPHA_ID, 0.4) //
+        .with(DOC.Par.BETA_ID, 0.85) //
+        .with(FastDOC.Par.D_ZERO_ID, 1) //
         .build().run(db);
     testFMeasure(db, result, 1.0);
     testClusterSizes(result, new int[] { 200, 400 });
@@ -62,10 +62,10 @@ public class FastDOCTest extends AbstractClusterAlgorithmTest {
   public void testDOCOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
     Clustering<?> result = new ELKIBuilder<FastDOC<DoubleVector>>(FastDOC.class) //
-        .with(DOC.Parameterizer.RANDOM_ID, 2) //
-        .with(DOC.Parameterizer.ALPHA_ID, 0.4) //
-        .with(DOC.Parameterizer.BETA_ID, 0.95) //
-        .with(FastDOC.Parameterizer.D_ZERO_ID, 2) //
+        .with(DOC.Par.RANDOM_ID, 2) //
+        .with(DOC.Par.ALPHA_ID, 0.4) //
+        .with(DOC.Par.BETA_ID, 0.95) //
+        .with(FastDOC.Par.D_ZERO_ID, 2) //
         .build().run(db);
     // Haven't found any working parameters for FastDOC on this data yet.
     testFMeasure(db, result, .5477386);

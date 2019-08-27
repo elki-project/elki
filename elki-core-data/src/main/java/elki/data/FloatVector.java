@@ -27,7 +27,7 @@ import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Vector type using {@code float[]} storage, thus needing approximately half as
@@ -171,9 +171,9 @@ public class FloatVector implements NumberVector {
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected FloatVector.Factory makeInstance() {
+      public FloatVector.Factory make() {
         return FACTORY;
       }
     }

@@ -48,7 +48,7 @@ import elki.math.Mean;
 import elki.math.spacefillingcurves.SpatialSorter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -476,7 +476,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Parameter for choosing the space filling curves to use.
        */
@@ -538,8 +538,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       RandomFactory random;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class) //
             .grab(config, x -> curvegen = x);
         new DoubleParameter(WINDOW_ID, 10.0) //
@@ -558,7 +557,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       }
 
       @Override
-      protected Factory<?> makeInstance() {
+      public Factory<?> make() {
         return new Factory<DoubleVector>(curvegen, window, variants, odim, proj, random);
       }
     }

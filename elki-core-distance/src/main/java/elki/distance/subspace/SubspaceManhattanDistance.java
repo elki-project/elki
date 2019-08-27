@@ -125,9 +125,9 @@ public class SubspaceManhattanDistance extends SubspaceLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDistance.Parameterizer {
+  public static class Par extends AbstractDimensionsSelectingDistance.Par {
     @Override
-    protected SubspaceManhattanDistance makeInstance() {
+    public SubspaceManhattanDistance make() {
       return new SubspaceManhattanDistance(dimensions);
     }
   }

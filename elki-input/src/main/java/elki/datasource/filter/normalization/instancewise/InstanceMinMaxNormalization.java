@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorTypeInformation;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -142,7 +142,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Option ID for minimum value.
      */
@@ -159,8 +159,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
     private double min, max;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       DoubleParameter minP = new DoubleParameter(MIN_ID, 0.);
       minP.grab(config, x -> min = x);
       DoubleParameter maxP = new DoubleParameter(MAX_ID, 1.);
@@ -172,7 +171,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
     }
 
     @Override
-    protected InstanceMinMaxNormalization<V> makeInstance() {
+    public InstanceMinMaxNormalization<V> make() {
       return new InstanceMinMaxNormalization<>(min, max);
     }
   }

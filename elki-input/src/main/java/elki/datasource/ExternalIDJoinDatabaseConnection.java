@@ -200,7 +200,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * The static option ID
      */
@@ -212,15 +212,15 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
     protected List<? extends DatabaseConnection> sources;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       super.configFilters(config);
       new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class) //
           .grab(config, x -> sources = x);
     }
 
     @Override
-    protected ExternalIDJoinDatabaseConnection makeInstance() {
+    public ExternalIDJoinDatabaseConnection make() {
       return new ExternalIDJoinDatabaseConnection(filters, sources);
     }
   }

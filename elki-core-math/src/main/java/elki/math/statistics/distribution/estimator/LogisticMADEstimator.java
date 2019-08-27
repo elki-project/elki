@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.LogisticDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Logistic distribution parameters using Median and MAD.
@@ -74,9 +74,9 @@ public class LogisticMADEstimator implements MADDistributionEstimator<LogisticDi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogisticMADEstimator makeInstance() {
+    public LogisticMADEstimator make() {
       return STATIC;
     }
   }

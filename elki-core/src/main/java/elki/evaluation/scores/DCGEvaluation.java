@@ -22,7 +22,7 @@ package elki.evaluation.scores;
 
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -133,9 +133,9 @@ public class DCGEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected DCGEvaluation makeInstance() {
+    public DCGEvaluation make() {
       return STATIC;
     }
   }

@@ -23,7 +23,7 @@ package elki.index.tree.spatial.rstarvariants.strategies.bulk;
 import java.util.List;
 
 import elki.data.spatial.SpatialComparable;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Trivial bulk loading - assumes that the file has been appropriately sorted
@@ -55,9 +55,9 @@ public class FileOrderBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected FileOrderBulkSplit makeInstance() {
+    public FileOrderBulkSplit make() {
       return FileOrderBulkSplit.STATIC;
     }
   }

@@ -22,7 +22,7 @@ package elki.math.statistics.tests;
 
 import java.util.Arrays;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Kolmogorov-Smirnov test.
@@ -104,9 +104,9 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected KolmogorovSmirnovTest makeInstance() {
+    public KolmogorovSmirnovTest make() {
       return STATIC;
     }
   }

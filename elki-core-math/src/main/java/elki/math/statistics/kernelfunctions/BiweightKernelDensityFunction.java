@@ -22,7 +22,7 @@ package elki.math.statistics.kernelfunctions;
 
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Biweight (Quartic) kernel density estimator.
@@ -93,9 +93,9 @@ public final class BiweightKernelDensityFunction implements KernelDensityFunctio
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected BiweightKernelDensityFunction makeInstance() {
+    public BiweightKernelDensityFunction make() {
       return KERNEL;
     }
   }

@@ -141,9 +141,9 @@ public class SubspaceEuclideanDistance extends SubspaceLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDistance.Parameterizer {
+  public static class Par extends AbstractDimensionsSelectingDistance.Par {
     @Override
-    protected SubspaceEuclideanDistance makeInstance() {
+    public SubspaceEuclideanDistance make() {
       return new SubspaceEuclideanDistance(dimensions);
     }
   }

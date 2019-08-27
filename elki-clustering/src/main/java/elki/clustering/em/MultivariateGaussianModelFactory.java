@@ -84,9 +84,9 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractEMModelFactory.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractEMModelFactory.Par<V> {
     @Override
-    protected MultivariateGaussianModelFactory<V> makeInstance() {
+    public MultivariateGaussianModelFactory<V> make() {
       return new MultivariateGaussianModelFactory<>(initializer);
     }
   }

@@ -671,7 +671,7 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     /**
      * Option ID for the splitting strategy.
      */
@@ -693,8 +693,8 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
     protected int leafsize;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new EnumParameter<Split>(SPLIT_ID, Split.class, Split.MIDPOINT) //
           .grab(config, x -> split = x);
       new IntParameter(LEAFSIZE_ID, 5) //
@@ -703,7 +703,7 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
     }
 
     @Override
-    protected KDTreePruningKMeans<V> makeInstance() {
+    public KDTreePruningKMeans<V> make() {
       return new KDTreePruningKMeans<>(distanceFunction, k, maxiter, initializer, split, leafsize);
     }
   }

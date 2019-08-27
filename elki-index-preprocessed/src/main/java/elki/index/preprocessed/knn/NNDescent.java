@@ -552,7 +552,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
      *
      * @param <O> Object type
      */
-    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       /**
        * Random number generator seed.
        */
@@ -604,8 +604,8 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       private int iterations;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
         new DoubleParameter(DELTA_ID, 0.001) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
@@ -620,7 +620,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       }
 
       @Override
-      protected NNDescent.Factory<O> makeInstance() {
+      public NNDescent.Factory<O> make() {
         return new NNDescent.Factory<>(k, distanceFunction, rnd, delta, rho, noInitialNeighbors, iterations);
       }
     }

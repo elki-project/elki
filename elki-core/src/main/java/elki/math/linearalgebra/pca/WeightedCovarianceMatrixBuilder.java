@@ -36,7 +36,7 @@ import elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -185,7 +185,7 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the weight function to use in weighted PCA.
      */
@@ -197,14 +197,13 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
     protected WeightFunction weightfunction = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class) //
           .grab(config, x -> weightfunction = x);
     }
 
     @Override
-    protected WeightedCovarianceMatrixBuilder makeInstance() {
+    public WeightedCovarianceMatrixBuilder make() {
       return new WeightedCovarianceMatrixBuilder(weightfunction);
     }
   }

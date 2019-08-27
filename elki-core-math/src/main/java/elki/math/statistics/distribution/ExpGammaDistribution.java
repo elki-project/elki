@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -218,17 +218,17 @@ public class ExpGammaDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Theta parameter, same as
      * {@link GammaDistribution.Parameterizer#THETA_ID}.
      */
-    public static final OptionID THETA_ID = GammaDistribution.Parameterizer.THETA_ID;
+    public static final OptionID THETA_ID = GammaDistribution.Par.THETA_ID;
 
     /**
      * k parameter, same as {@link GammaDistribution.Parameterizer#K_ID}.
      */
-    public static final OptionID K_ID = GammaDistribution.Parameterizer.K_ID;
+    public static final OptionID K_ID = GammaDistribution.Par.K_ID;
 
     /**
      * Shifting offset parameter.
@@ -251,8 +251,7 @@ public class ExpGammaDistribution implements Distribution {
     double shift;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(K_ID) //
           .grab(config, x -> k = x);
       new DoubleParameter(THETA_ID) //
@@ -263,7 +262,7 @@ public class ExpGammaDistribution implements Distribution {
     }
 
     @Override
-    protected ExpGammaDistribution makeInstance() {
+    public ExpGammaDistribution make() {
       return new ExpGammaDistribution(k, theta, shift);
     }
   }

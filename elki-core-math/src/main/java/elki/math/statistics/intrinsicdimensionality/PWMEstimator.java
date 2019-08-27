@@ -22,7 +22,7 @@ package elki.math.statistics.intrinsicdimensionality;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Probability weighted moments based estimator.
@@ -95,9 +95,9 @@ public class PWMEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected PWMEstimator makeInstance() {
+    public PWMEstimator make() {
       return STATIC;
     }
   }

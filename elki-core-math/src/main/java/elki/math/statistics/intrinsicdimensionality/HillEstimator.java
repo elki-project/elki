@@ -22,7 +22,7 @@ package elki.math.statistics.intrinsicdimensionality;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -79,9 +79,9 @@ public class HillEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HillEstimator makeInstance() {
+    public HillEstimator make() {
       return STATIC;
     }
   }

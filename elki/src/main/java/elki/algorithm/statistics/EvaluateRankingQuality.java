@@ -181,7 +181,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * Option to configure the number of bins to use.
      */
@@ -193,15 +193,15 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     protected int numbins = 20;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbins = x);
     }
 
     @Override
-    protected EvaluateRankingQuality<V> makeInstance() {
+    public EvaluateRankingQuality<V> make() {
       return new EvaluateRankingQuality<>(distanceFunction, numbins);
     }
   }

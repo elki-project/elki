@@ -22,7 +22,7 @@ package elki.itemsetmining;
 
 import elki.AbstractAlgorithm;
 import elki.result.FrequentItemsetsResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -88,7 +88,7 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter to specify the minimum support, in absolute or relative terms.
      */
@@ -119,8 +119,7 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
     protected int minlength = 0, maxlength = Integer.MAX_VALUE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MINSUPP_ID) //
       .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> minsupp = x);

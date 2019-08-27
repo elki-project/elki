@@ -145,7 +145,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -167,8 +167,8 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
     protected IntrinsicDimensionalityEstimator estimator;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -177,7 +177,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
     }
 
     @Override
-    protected IntrinsicDimensionalityOutlier<O> makeInstance() {
+    public IntrinsicDimensionalityOutlier<O> make() {
       return new IntrinsicDimensionalityOutlier<>(distanceFunction, k, estimator);
     }
   }

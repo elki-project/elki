@@ -28,7 +28,7 @@ import elki.data.spatial.SpatialSingleMeanComparator;
 import elki.utilities.Alias;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -107,9 +107,9 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SortTileRecursiveBulkSplit makeInstance() {
+    public SortTileRecursiveBulkSplit make() {
       return STATIC;
     }
   }

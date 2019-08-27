@@ -21,7 +21,7 @@
 package elki.distance.minkowski;
 
 import elki.data.SparseNumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Manhattan distance, optimized for {@link SparseNumberVector}s.
@@ -105,9 +105,9 @@ public class SparseManhattanDistance extends SparseLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SparseManhattanDistance makeInstance() {
+    public SparseManhattanDistance make() {
       return SparseManhattanDistance.STATIC;
     }
   }

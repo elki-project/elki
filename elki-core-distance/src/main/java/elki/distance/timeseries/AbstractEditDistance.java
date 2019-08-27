@@ -23,7 +23,7 @@ package elki.distance.timeseries;
 import elki.data.NumberVector;
 import elki.data.type.VectorTypeInformation;
 import elki.distance.AbstractNumberVectorDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -90,7 +90,7 @@ public abstract class AbstractEditDistance extends AbstractNumberVectorDistance 
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Bandsize parameter.
      */
@@ -105,8 +105,7 @@ public abstract class AbstractEditDistance extends AbstractNumberVectorDistance 
     protected double bandSize = Double.POSITIVE_INFINITY;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(BANDSIZE_ID) //
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

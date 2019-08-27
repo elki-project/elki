@@ -174,9 +174,9 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<V> extends AbstractKMeansInitialization.Par {
     @Override
-    protected Ostrovsky<V> makeInstance() {
+    public Ostrovsky<V> make() {
       return new Ostrovsky<>(rnd);
     }
   }

@@ -145,7 +145,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID of threshold parameter.
      */
@@ -157,15 +157,15 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     private double threshold;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(THRESHOLD_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> threshold = x);
     }
 
     @Override
-    protected Leader<O> makeInstance() {
+    public Leader<O> make() {
       return new Leader<O>(distanceFunction, threshold);
     }
   }

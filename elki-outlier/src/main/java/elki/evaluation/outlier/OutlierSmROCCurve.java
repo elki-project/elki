@@ -36,7 +36,7 @@ import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
@@ -225,21 +225,20 @@ public class OutlierSmROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Pattern for positive class.
      */
     protected Pattern positiveClassName = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new PatternParameter(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID) //
+    public void configure(Parameterization config) {
+      new PatternParameter(OutlierROCCurve.Par.POSITIVE_CLASS_NAME_ID) //
           .grab(config, x -> positiveClassName = x);
     }
 
     @Override
-    protected OutlierSmROCCurve makeInstance() {
+    public OutlierSmROCCurve make() {
       return new OutlierSmROCCurve(positiveClassName);
     }
   }

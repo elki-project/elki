@@ -325,14 +325,14 @@ public class FastCLARANS<V> extends CLARANS<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends CLARANS.Parameterizer<V> {
+  public static class Par<V> extends CLARANS.Par<V> {
     @Override
     protected double defaultRate() {
       return 2 * super.defaultRate();
     }
 
     @Override
-    protected FastCLARANS<V> makeInstance() {
+    public FastCLARANS<V> make() {
       return new FastCLARANS<>(distanceFunction, k, numlocal, maxneighbor, random);
     }
   }

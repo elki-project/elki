@@ -31,7 +31,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -75,14 +75,14 @@ public class TreeMBRVisualization implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public TreeMBRVisualization(Parameterizer settings) {
+  public TreeMBRVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -215,7 +215,7 @@ public class TreeMBRVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
      */
@@ -224,13 +224,12 @@ public class TreeMBRVisualization implements VisFactory {
     protected boolean fill = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(FILL_ID).grab(config, x -> fill = x);
     }
 
     @Override
-    protected TreeMBRVisualization makeInstance() {
+    public TreeMBRVisualization make() {
       return new TreeMBRVisualization(this);
     }
   }

@@ -104,7 +104,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * Random generator seed.
      */
@@ -136,8 +136,8 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       configFilters(config);
       new IntParameter(DIM_ID).grab(config, x -> dim = x);
       new IntParameter(SIZE_ID).grab(config, x -> size = x);
@@ -145,7 +145,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     }
 
     @Override
-    protected RandomDoubleVectorDatabaseConnection makeInstance() {
+    public RandomDoubleVectorDatabaseConnection make() {
       return new RandomDoubleVectorDatabaseConnection(dim, size, rnd, filters);
     }
   }

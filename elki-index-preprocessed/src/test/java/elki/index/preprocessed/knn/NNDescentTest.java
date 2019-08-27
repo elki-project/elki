@@ -71,9 +71,9 @@ public class NNDescentTest {
     NNDescent<DoubleVector> preproc = new ELKIBuilder<NNDescent.Factory<DoubleVector>>(NNDescent.Factory.class) //
         .with(NNDescent.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
         .with(NNDescent.Factory.K_ID, k) //
-        .with(NNDescent.Factory.Parameterizer.SEED_ID, 0) //
-        .with(NNDescent.Factory.Parameterizer.DELTA_ID, 0.1) //
-        .with(NNDescent.Factory.Parameterizer.RHO_ID, 0.5) //
+        .with(NNDescent.Factory.Par.SEED_ID, 0) //
+        .with(NNDescent.Factory.Par.DELTA_ID, 0.1) //
+        .with(NNDescent.Factory.Par.RHO_ID, 0.5) //
         .build().instantiate(relation);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index

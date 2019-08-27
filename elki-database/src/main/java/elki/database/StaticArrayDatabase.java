@@ -190,7 +190,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabase.Parameterizer {
+  public static class Par extends AbstractDatabase.Par {
     /**
      * Holds the database connection to get the initial data from.
      */
@@ -202,8 +202,8 @@ public class StaticArrayDatabase extends AbstractDatabase {
     private Collection<? extends IndexFactory<?>> indexFactories;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Get database connection.
       new ObjectParameter<DatabaseConnection>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
           .grab(config, x -> databaseConnection = x);
@@ -214,7 +214,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
     }
 
     @Override
-    protected StaticArrayDatabase makeInstance() {
+    public StaticArrayDatabase make() {
       return new StaticArrayDatabase(databaseConnection, indexFactories);
     }
   }

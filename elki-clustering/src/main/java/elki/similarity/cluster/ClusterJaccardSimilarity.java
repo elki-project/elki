@@ -29,7 +29,7 @@ import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
 import elki.similarity.PrimitiveSimilarity;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the Jaccard coefficient.
@@ -101,9 +101,9 @@ public class ClusterJaccardSimilarity implements PrimitiveDistance<Cluster<?>>, 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClusterJaccardSimilarity makeInstance() {
+    public ClusterJaccardSimilarity make() {
       return STATIC;
     }
   }

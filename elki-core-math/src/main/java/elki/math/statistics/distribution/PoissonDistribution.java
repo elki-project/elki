@@ -25,12 +25,12 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -466,7 +466,7 @@ public class PoissonDistribution implements Distribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number of trials.
      */
@@ -488,8 +488,7 @@ public class PoissonDistribution implements Distribution {
     double p;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(N_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> n = x);
@@ -500,7 +499,7 @@ public class PoissonDistribution implements Distribution {
     }
 
     @Override
-    protected PoissonDistribution makeInstance() {
+    public PoissonDistribution make() {
       return new PoissonDistribution(n, p);
     }
   }

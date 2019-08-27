@@ -20,7 +20,7 @@
  */
 package elki.evaluation.scores;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Evaluate using the maximum F1 score.
@@ -69,9 +69,9 @@ public class MaximumF1Evaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MaximumF1Evaluation makeInstance() {
+    public MaximumF1Evaluation make() {
       return STATIC;
     }
   }

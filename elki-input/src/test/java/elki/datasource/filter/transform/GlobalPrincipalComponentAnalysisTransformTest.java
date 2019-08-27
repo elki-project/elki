@@ -73,7 +73,7 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
   public void rotateOnly() {
     String filename = UNITTEST + "transformation-test-1.csv";
     GlobalPrincipalComponentAnalysisTransform<DoubleVector> filter = new ELKIBuilder<GlobalPrincipalComponentAnalysisTransform<DoubleVector>>(GlobalPrincipalComponentAnalysisTransform.class) //
-        .with(GlobalPrincipalComponentAnalysisTransform.Parameterizer.MODE_ID, GlobalPrincipalComponentAnalysisTransform.Mode.CENTER_ROTATE).build();
+        .with(GlobalPrincipalComponentAnalysisTransform.Par.MODE_ID, GlobalPrincipalComponentAnalysisTransform.Mode.CENTER_ROTATE).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     int dim = getFieldDimensionality(bundle, 0, TypeUtil.NUMBER_VECTOR_FIELD);
 

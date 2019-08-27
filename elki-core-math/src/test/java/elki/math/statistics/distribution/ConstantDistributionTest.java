@@ -88,7 +88,7 @@ public class ConstantDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     ListParameterization params = new ListParameterization();
-    params.addParameter(ConstantDistribution.Parameterizer.CONSTANT_ID, 2.);
+    params.addParameter(ConstantDistribution.Par.CONSTANT_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ConstantDistribution.class, params);
     assertEquals(dist.nextRandom(new Random(0L)), 2, 0.);
   }

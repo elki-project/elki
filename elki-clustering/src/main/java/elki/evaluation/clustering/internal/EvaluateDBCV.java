@@ -45,7 +45,7 @@ import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -271,7 +271,7 @@ public class EvaluateDBCV<O> implements Evaluator {
    *
    * @author Stephan Baier
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -283,13 +283,13 @@ public class EvaluateDBCV<O> implements Evaluator {
     private Distance<? super O> distance;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
     }
 
     @Override
-    protected EvaluateDBCV<O> makeInstance() {
+    public EvaluateDBCV<O> make() {
       return new EvaluateDBCV<>(distance);
     }
   }

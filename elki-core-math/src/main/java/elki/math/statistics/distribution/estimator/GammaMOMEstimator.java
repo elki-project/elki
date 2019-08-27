@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Simple parameter estimation for the Gamma distribution.
@@ -89,9 +89,9 @@ public class GammaMOMEstimator implements MeanVarianceDistributionEstimator<Gamm
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GammaMOMEstimator makeInstance() {
+    public GammaMOMEstimator make() {
       return STATIC;
     }
   }

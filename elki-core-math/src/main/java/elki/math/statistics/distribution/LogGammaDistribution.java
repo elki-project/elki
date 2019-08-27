@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -206,7 +206,7 @@ public class LogGammaDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Shifting offset parameter.
      */
@@ -216,18 +216,17 @@ public class LogGammaDistribution implements Distribution {
     double k, theta, shift;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(GammaDistribution.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(GammaDistribution.Par.K_ID) //
           .grab(config, x -> k = x);
-      new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID) //
+      new DoubleParameter(GammaDistribution.Par.THETA_ID) //
           .grab(config, x -> theta = x);
       new DoubleParameter(SHIFT_ID) //
           .grab(config, x -> shift = x);
     }
 
     @Override
-    protected LogGammaDistribution makeInstance() {
+    public LogGammaDistribution make() {
       return new LogGammaDistribution(k, theta, shift);
     }
   }

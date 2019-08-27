@@ -50,9 +50,9 @@ public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFacto
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
+  public static class Par extends AbstractPageFileFactory.Par<Page> {
     @Override
-    protected MemoryPageFileFactory<Page> makeInstance() {
+    public MemoryPageFileFactory<Page> make() {
       return new MemoryPageFileFactory<>(pageSize);
     }    
   }

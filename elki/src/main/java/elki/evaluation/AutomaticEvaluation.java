@@ -37,7 +37,7 @@ import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.scaling.LinearScaling;
 
 /**
@@ -157,9 +157,9 @@ public class AutomaticEvaluation implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected AutomaticEvaluation makeInstance() {
+    public AutomaticEvaluation make() {
       return new AutomaticEvaluation();
     }
   }

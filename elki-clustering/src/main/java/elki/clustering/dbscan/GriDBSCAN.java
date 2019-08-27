@@ -689,7 +689,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    *
    * @param <O> Vector type to use
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to control the grid width.
      *
@@ -718,13 +718,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
 
-      new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+      new IntParameter(DBSCAN.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> {
             minpts = x;
@@ -741,7 +741,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     }
 
     @Override
-    protected GriDBSCAN<O> makeInstance() {
+    public GriDBSCAN<O> make() {
       return new GriDBSCAN<>(distanceFunction, epsilon, minpts, gridwidth);
     }
   }

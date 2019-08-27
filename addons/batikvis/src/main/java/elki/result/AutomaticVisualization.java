@@ -26,7 +26,7 @@ import elki.gui.GUIUtil;
 import elki.logging.Logging;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -126,7 +126,7 @@ public class AutomaticVisualization implements ResultHandler {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the window title
      */
@@ -153,8 +153,7 @@ public class AutomaticVisualization implements ResultHandler {
     boolean single = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new StringParameter(WINDOW_TITLE_ID) //
           .setOptional(true) //
           .grab(config, x -> title = x);
@@ -163,7 +162,7 @@ public class AutomaticVisualization implements ResultHandler {
     }
 
     @Override
-    protected AutomaticVisualization makeInstance() {
+    public AutomaticVisualization make() {
       return new AutomaticVisualization(title, manager, single);
     }
   }

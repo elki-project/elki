@@ -219,7 +219,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
   }
 
   /**
-   * Parameterizer.
+   * Par.
    * 
    * @author Erich Schubert
    * 
@@ -227,7 +227,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super V>> {
     /**
      * Parameter for kernel function.
      */
@@ -254,8 +254,8 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
           .grab(config, x -> kernel = x);
       new DoubleParameter(RANGE_ID) //
@@ -263,7 +263,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     }
 
     @Override
-    protected NaiveMeanShiftClustering<V> makeInstance() {
+    public NaiveMeanShiftClustering<V> make() {
       return new NaiveMeanShiftClustering<>(distanceFunction, kernel, range);
     }
   }

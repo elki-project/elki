@@ -22,7 +22,7 @@ package elki.math.statistics.kernelfunctions;
 
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Epanechnikov kernel density estimator.
@@ -89,9 +89,9 @@ public final class EpanechnikovKernelDensityFunction implements KernelDensityFun
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected EpanechnikovKernelDensityFunction makeInstance() {
+    public EpanechnikovKernelDensityFunction make() {
       return KERNEL;
     }
   }

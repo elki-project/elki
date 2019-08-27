@@ -30,7 +30,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -172,7 +172,7 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Statistical test to use
      */
@@ -194,21 +194,20 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(HiCS.Parameterizer.M_ID, 50) //
+    public void configure(Parameterization config) {
+      new IntParameter(HiCS.Par.M_ID, 50) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> m = x);
-      new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1) //
+      new DoubleParameter(HiCS.Par.ALPHA_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> alpha = x);
-      new ObjectParameter<GoodnessOfFitTest>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class) //
+      new ObjectParameter<GoodnessOfFitTest>(HiCS.Par.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class) //
           .grab(config, x -> statTest = x);
-      new RandomParameter(HiCS.Parameterizer.SEED_ID).grab(config, x -> rnd = x);
+      new RandomParameter(HiCS.Par.SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected HiCSDependenceMeasure makeInstance() {
+    public HiCSDependenceMeasure make() {
       return new HiCSDependenceMeasure(statTest, m, alpha, rnd);
     }
   }

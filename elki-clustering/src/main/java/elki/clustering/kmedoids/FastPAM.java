@@ -314,7 +314,7 @@ public class FastPAM<V> extends FastPAM1<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends FastPAM1.Parameterizer<V> {
+  public static class Par<V> extends FastPAM1.Par<V> {
     /**
      * Tolerance for performing additional swaps.
      */
@@ -332,8 +332,8 @@ public class FastPAM<V> extends FastPAM1<V> {
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(FASTTOL_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -341,7 +341,7 @@ public class FastPAM<V> extends FastPAM1<V> {
     }
 
     @Override
-    protected FastPAM<V> makeInstance() {
+    public FastPAM<V> make() {
       return new FastPAM<>(distanceFunction, k, maxiter, initializer, fasttol);
     }
   }

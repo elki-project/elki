@@ -47,10 +47,10 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
   public void testCASHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
     Clustering<Model> result = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
-        .with(CASH.Parameterizer.JITTER_ID, 0.7) //
-        .with(CASH.Parameterizer.MINPTS_ID, 50) //
-        .with(CASH.Parameterizer.MAXLEVEL_ID, 25) //
-        .with(CASH.Parameterizer.ADJUST_ID) //
+        .with(CASH.Par.JITTER_ID, 0.7) //
+        .with(CASH.Par.MINPTS_ID, 50) //
+        .with(CASH.Par.MAXLEVEL_ID, 25) //
+        .with(CASH.Par.ADJUST_ID) //
         .build().run(db);
     testFMeasure(db, result, 0.50074); // with hierarchical pairs: 0.64102
     testClusterSizes(result, new int[] { 18, 80, 252, 468 });
@@ -63,9 +63,9 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
   public void testCASHEmbedded() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600);
     Clustering<Model> result = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
-        .with(CASH.Parameterizer.JITTER_ID, 0.7) //
-        .with(CASH.Parameterizer.MINPTS_ID, 160) //
-        .with(CASH.Parameterizer.MAXLEVEL_ID, 40) //
+        .with(CASH.Par.JITTER_ID, 0.7) //
+        .with(CASH.Par.MINPTS_ID, 160) //
+        .with(CASH.Par.MAXLEVEL_ID, 40) //
         .build().run(db);
     testFMeasure(db, result, 0.443246);
     testClusterSizes(result, new int[] { 169, 196, 235 });

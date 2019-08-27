@@ -42,10 +42,10 @@ public class OPTICSListTest extends AbstractClusterAlgorithmTest {
   public void testOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
-        .with(OPTICSList.Parameterizer.MINPTS_ID, 20) //
-        .with(OPTICSList.Parameterizer.EPSILON_ID, 0.15) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.05) //
-        .with(OPTICSXi.Parameterizer.XIALG_ID, OPTICSList.class) //
+        .with(OPTICSList.Par.MINPTS_ID, 20) //
+        .with(OPTICSList.Par.EPSILON_ID, 0.15) //
+        .with(OPTICSXi.Par.XI_ID, 0.05) //
+        .with(OPTICSXi.Par.XIALG_ID, OPTICSList.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.893865);
     testClusterSizes(clustering, new int[] { 8, 35, 72, 115, 209, 271 });

@@ -190,9 +190,9 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends HamerlyKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends HamerlyKMeans.Par<V> {
     @Override
-    protected ExponionKMeans<V> makeInstance() {
+    public ExponionKMeans<V> make() {
       return new ExponionKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }

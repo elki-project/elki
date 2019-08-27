@@ -42,7 +42,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -497,7 +497,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The minimum size of clusters to extract.
      */
@@ -524,8 +524,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     boolean hierarchical = true;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new IntParameter(MINCLUSTERSIZE_ID, 1) //
@@ -535,7 +534,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     }
 
     @Override
-    protected HDBSCANHierarchyExtraction makeInstance() {
+    public HDBSCANHierarchyExtraction make() {
       return new HDBSCANHierarchyExtraction(algorithm, minClSize, hierarchical);
     }
   }

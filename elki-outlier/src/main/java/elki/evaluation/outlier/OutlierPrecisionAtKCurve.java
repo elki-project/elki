@@ -34,7 +34,7 @@ import elki.logging.Logging;
 import elki.math.geometry.XYCurve;
 import elki.result.*;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -146,7 +146,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The pattern to identify positive classes.
      */
@@ -168,8 +168,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     private int maxk = Integer.MAX_VALUE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(POSITIVE_CLASS_NAME_ID) //
           .grab(config, x -> positiveClassName = x);
       new IntParameter(MAX_K_ID) //
@@ -178,7 +177,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     }
 
     @Override
-    protected OutlierPrecisionAtKCurve makeInstance() {
+    public OutlierPrecisionAtKCurve make() {
       return new OutlierPrecisionAtKCurve(positiveClassName, maxk);
     }
   }

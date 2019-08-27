@@ -106,9 +106,9 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
+  public static class Par<O> extends AbstractDBOutlier.Par<O> {
     @Override
-    protected DBOutlierScore<O> makeInstance() {
+    public DBOutlierScore<O> make() {
       return new DBOutlierScore<>(distanceFunction, d);
     }
   }

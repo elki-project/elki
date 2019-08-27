@@ -67,7 +67,7 @@ public abstract class AbstractFrequentItemsetAlgorithmTest extends AbstractSimpl
 
       // We want to allow the use of indexes via "params"
       Database db = new ELKIBuilder<>(StaticArrayDatabase.class) //
-          .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc).build();
+          .with(AbstractDatabase.Par.DATABASE_CONNECTION_ID, dbc).build();
 
       db.initialize();
       Relation<?> rel = db.getRelation(TypeUtil.ANY);

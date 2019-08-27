@@ -82,9 +82,9 @@ public class FarReinsert extends AbstractPartialReinsert {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
+  public static class Par extends AbstractPartialReinsert.Par {
     @Override
-    protected FarReinsert makeInstance() {
+    public FarReinsert make() {
       return new FarReinsert(reinsertAmount, distanceFunction);
     }
   }

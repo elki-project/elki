@@ -68,9 +68,9 @@ public class ManhattanHashFunctionFamily extends AbstractProjectedHashFunctionFa
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractProjectedHashFunctionFamily.Parameterizer {
+  public static class Par extends AbstractProjectedHashFunctionFamily.Par {
     @Override
-    protected ManhattanHashFunctionFamily makeInstance() {
+    public ManhattanHashFunctionFamily make() {
       return new ManhattanHashFunctionFamily(random, width, k);
     }
   }

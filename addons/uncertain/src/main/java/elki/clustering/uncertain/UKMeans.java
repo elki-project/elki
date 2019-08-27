@@ -56,7 +56,7 @@ import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -314,7 +314,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
    *
    * @author Alexander Koos
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number of cluster centers to initialize.
      */
@@ -331,8 +331,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
     protected RandomFactory rnd;
 
     @Override
-    public void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -343,7 +342,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
     }
 
     @Override
-    protected UKMeans makeInstance() {
+    public UKMeans make() {
       return new UKMeans(k, maxiter, rnd);
     }
   }

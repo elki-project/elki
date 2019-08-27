@@ -40,7 +40,7 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -183,7 +183,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the number of neighbors to take into account for
      * classification, must be an integer greater than 0.
@@ -201,9 +201,8 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distanceFunction = x);
       new IntParameter(K_ID, 1)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -211,7 +210,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
     }
 
     @Override
-    protected KNNClassifier<O> makeInstance() {
+    public KNNClassifier<O> make() {
       return new KNNClassifier<>(distanceFunction, k);
     }
   }

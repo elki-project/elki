@@ -26,7 +26,7 @@ import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -82,7 +82,7 @@ public class FDBSCAN extends GeneralizedDBSCAN {
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Epsilon radius
      */
@@ -110,26 +110,25 @@ public class FDBSCAN extends GeneralizedDBSCAN {
     protected int minPts;
 
     @Override
-    public void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
-      new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+      new IntParameter(DBSCAN.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minPts = x);
-      new IntParameter(FDBSCANNeighborPredicate.Parameterizer.SAMPLE_SIZE_ID) //
+      new IntParameter(FDBSCANNeighborPredicate.Par.SAMPLE_SIZE_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> sampleSize = x);
-      new DoubleParameter(FDBSCANNeighborPredicate.Parameterizer.THRESHOLD_ID, 0.5) //
+      new DoubleParameter(FDBSCANNeighborPredicate.Par.THRESHOLD_ID, 0.5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
           .grab(config, x -> threshold = x);
-      new RandomParameter(FDBSCANNeighborPredicate.Parameterizer.SEED_ID).grab(config, x -> seed = x);
+      new RandomParameter(FDBSCANNeighborPredicate.Par.SEED_ID).grab(config, x -> seed = x);
     }
 
     @Override
-    protected FDBSCAN makeInstance() {
+    public FDBSCAN make() {
       return new FDBSCAN(epsilon, sampleSize, threshold, seed, minPts);
     }
   }

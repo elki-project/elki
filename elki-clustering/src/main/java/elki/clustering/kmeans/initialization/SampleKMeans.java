@@ -133,7 +133,7 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractKMeansInitialization.Par {
     /**
      * Parameter to specify the kMeans variant.
      */
@@ -155,8 +155,8 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
     protected double rate;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       ObjectParameter<KMeans<V, ?>> kMeansVariantP = new ObjectParameter<>(KMEANS_ID, KMeans.class);
       if(config.grab(kMeansVariantP)) {
         ListParameterization kMeansVariantParameters = new ListParameterization();
@@ -175,7 +175,7 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
     }
 
     @Override
-    protected SampleKMeans<V> makeInstance() {
+    public SampleKMeans<V> make() {
       return new SampleKMeans<>(rnd, innerkMeans, rate);
     }
   }

@@ -43,8 +43,8 @@ public class RandomSamplingStreamFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     RandomSamplingStreamFilter filter = new ELKIBuilder<>(RandomSamplingStreamFilter.class) //
-        .with(RandomSamplingStreamFilter.Parameterizer.PROB_ID, .5) //
-        .with(RandomSamplingStreamFilter.Parameterizer.SEED_ID, 0) //
+        .with(RandomSamplingStreamFilter.Par.PROB_ID, .5) //
+        .with(RandomSamplingStreamFilter.Par.SEED_ID, 0) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

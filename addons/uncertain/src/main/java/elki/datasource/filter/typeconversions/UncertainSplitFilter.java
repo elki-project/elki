@@ -29,7 +29,7 @@ import elki.data.uncertain.UnweightedDiscreteUncertainObject;
 import elki.datasource.filter.AbstractConversionFilter;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -105,7 +105,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for specifying the number of dimensions of the sample.
      */
@@ -117,15 +117,14 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     protected int dims;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIM_ID) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> dims = x);
     }
 
     @Override
-    protected UncertainSplitFilter makeInstance() {
+    public UncertainSplitFilter make() {
       return new UncertainSplitFilter(dims);
     }
   }

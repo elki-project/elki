@@ -367,7 +367,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractStreamingParser.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractStreamingParser.Par {
     /**
      * A comma separated list of the indices of labels (may be numeric),
      * counting whitespace separated entries in a line starting with 0. The
@@ -391,8 +391,8 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     protected NumberVector.Factory<V> factory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       getLabelIndices(config);
       getFactory(config);
     }
@@ -419,7 +419,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     }
 
     @Override
-    protected NumberVectorLabelParser<V> makeInstance() {
+    public NumberVectorLabelParser<V> make() {
       return new NumberVectorLabelParser<>(format, labelIndices, factory);
     }
   }

@@ -28,7 +28,7 @@ import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.evaluation.Evaluator;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -72,15 +72,14 @@ public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Inner algorithm to extract a clustering.
      */
     CutDendrogramByNumberOfClusters inner;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       ListParameterization overrides = new ListParameterization();
       overrides.addParameter(AbstractAlgorithm.ALGORITHM_ID, CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
@@ -89,7 +88,7 @@ public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
     }
 
     @Override
-    protected CutDendrogramByNumberOfClustersExtractor makeInstance() {
+    public CutDendrogramByNumberOfClustersExtractor make() {
       return new CutDendrogramByNumberOfClustersExtractor(inner);
     }
   }

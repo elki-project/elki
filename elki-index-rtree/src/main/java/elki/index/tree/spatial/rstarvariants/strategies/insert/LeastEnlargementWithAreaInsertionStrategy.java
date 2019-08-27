@@ -24,7 +24,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * A slight modification of the default R-Tree insertion strategy: find
@@ -92,9 +92,9 @@ public class LeastEnlargementWithAreaInsertionStrategy implements InsertionStrat
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LeastEnlargementWithAreaInsertionStrategy makeInstance() {
+    public LeastEnlargementWithAreaInsertionStrategy make() {
       return LeastEnlargementWithAreaInsertionStrategy.STATIC;
     }
   }

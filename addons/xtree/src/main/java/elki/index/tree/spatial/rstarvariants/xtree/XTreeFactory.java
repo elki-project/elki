@@ -47,9 +47,9 @@ public class XTreeFactory<O extends NumberVector> extends AbstractXTreeFactory<O
     return XTreeNode.class;
   }
 
-  public static class Parameterizer<O extends NumberVector> extends AbstractXTreeFactory.Parameterizer<O> {
+  public static class Par<O extends NumberVector> extends AbstractXTreeFactory.Par<O> {
     @Override
-    protected XTreeFactory<O> makeInstance() {
+    public XTreeFactory<O> make() {
       return new XTreeFactory<>(pageFileFactory, settings);
     }
   }

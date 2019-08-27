@@ -28,7 +28,7 @@ import elki.distance.NumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -252,7 +252,7 @@ public class LPNormDistance implements SpatialPrimitiveDistance<NumberVector>, N
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * OptionID for the "p" parameter
      */
@@ -264,15 +264,14 @@ public class LPNormDistance implements SpatialPrimitiveDistance<NumberVector>, N
     protected double p;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> p = x);
     }
 
     @Override
-    protected LPNormDistance makeInstance() {
+    public LPNormDistance make() {
       return p == (double) (int) p ? // Integer test
           (p == 1. ? ManhattanDistance.STATIC : //
               p == 2. ? EuclideanDistance.STATIC : //

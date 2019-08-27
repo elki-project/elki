@@ -72,22 +72,22 @@ public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
+  public static class Par<O> extends AbstractMTreeFactory.Par<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
     /**
      * Parameter for k
      */
     public static final OptionID K_ID = new OptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.kmax = x);
     }
 
     @Override
-    protected MkCopTreeFactory<O> makeInstance() {
+    public MkCopTreeFactory<O> make() {
       return new MkCopTreeFactory<>(pageFileFactory, settings);
     }
 

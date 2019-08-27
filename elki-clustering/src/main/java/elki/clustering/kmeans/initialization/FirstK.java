@@ -30,7 +30,7 @@ import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Initialize K-means by using the first k objects as initial means.
@@ -84,9 +84,9 @@ public class FirstK<O> implements KMeansInitialization, KMedoidsInitialization<O
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     @Override
-    protected FirstK<V> makeInstance() {
+    public FirstK<V> make() {
       return new FirstK<>();
     }
   }

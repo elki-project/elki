@@ -48,8 +48,8 @@ public class ClassicMultidimensionalScalingTransformTest extends AbstractDataSou
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
     ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<ClassicMultidimensionalScalingTransform<DoubleVector, DoubleVector>>(ClassicMultidimensionalScalingTransform.class) //
-        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
-        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistance.class) //
+        .with(ClassicMultidimensionalScalingTransform.Par.DIM_ID, pdim) //
+        .with(ClassicMultidimensionalScalingTransform.Par.DISTANCE_ID, EuclideanDistance.class) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

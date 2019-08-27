@@ -174,7 +174,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Quantile to compute.
      */
@@ -216,8 +216,8 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
     private RandomFactory rand;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(QUANTILE_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -230,7 +230,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
     }
 
     @Override
-    protected DistanceQuantileSampler<O> makeInstance() {
+    public DistanceQuantileSampler<O> make() {
       return new DistanceQuantileSampler<O>(distanceFunction, quantile, sampling, nozeros, rand);
     }
   }

@@ -40,7 +40,7 @@ import elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.EmptyDataException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -185,7 +185,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      *
      * @author Erich Schubert
      */
-    public abstract static class Parameterizer<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
+    public abstract static class Par<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> implements Parameterizer {
       /**
        * Parameter to specify the distance function used for running PCA.
        *
@@ -210,12 +210,11 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
       protected EigenPairFilter filter;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Distance<NV>>(PCA_DISTANCE_ID, Distance.class, EuclideanDistance.class) //
 
             .grab(config, x -> pcaDistance = x);
-        new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+        new ObjectParameter<PCARunner>(PCARunner.Par.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
             .grab(config, x -> pca = x);
         new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
             .grab(config, x -> filter = x);

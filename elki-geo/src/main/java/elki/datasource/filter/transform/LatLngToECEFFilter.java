@@ -28,7 +28,7 @@ import elki.datasource.filter.AbstractStreamConversionFilter;
 import elki.datasource.filter.FilterUtil;
 import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -90,21 +90,20 @@ public class LatLngToECEFFilter<V extends NumberVector> extends AbstractStreamCo
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Earth model to use.
      */
     private EarthModel model;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
           .grab(config, x -> model = x);
     }
 
     @Override
-    protected LatLngToECEFFilter<V> makeInstance() {
+    public LatLngToECEFFilter<V> make() {
       return new LatLngToECEFFilter<>(model);
     }
   }

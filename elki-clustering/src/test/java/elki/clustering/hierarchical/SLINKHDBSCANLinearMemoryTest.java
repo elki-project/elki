@@ -46,9 +46,9 @@ public class SLINKHDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
   public void testHDBSCAN() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
-        .with(SLINKHDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .with(SLINKHDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, clustering, 0.686953412);
     testClusterSizes(clustering, new int[] { 1, 200, 437 });

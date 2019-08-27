@@ -33,7 +33,7 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -251,19 +251,19 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * PreDeCon settings.
      */
     protected PreDeCon.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(PreDeCon.Settings.class);
     }
 
     @Override
-    protected PreDeConNeighborPredicate<V> makeInstance() {
+    public PreDeConNeighborPredicate<V> make() {
       return new PreDeConNeighborPredicate<>(settings);
     }
   }

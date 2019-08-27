@@ -119,9 +119,9 @@ public abstract class AbstractIndexStructureTest {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
-        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
     if(factory != null) {
-      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+      inputparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
@@ -176,9 +176,9 @@ public abstract class AbstractIndexStructureTest {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
-        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
     if(factory != null) {
-      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+      inputparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
@@ -261,9 +261,9 @@ public abstract class AbstractIndexStructureTest {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
-        .addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
     if(factory != null) {
-      inputparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, factory);
+      inputparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);

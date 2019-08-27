@@ -34,7 +34,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -225,7 +225,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * Holds the number of nearest neighbors to be used.
        */
@@ -237,8 +237,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       protected Distance<O> distanceFunction;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new IntParameter(NUMBER_OF_NEIGHBORS_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> numberOfNeighbors = x);
@@ -247,7 +246,7 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(numberOfNeighbors, distanceFunction);
       }
     }

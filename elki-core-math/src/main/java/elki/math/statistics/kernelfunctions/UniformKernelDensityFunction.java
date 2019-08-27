@@ -21,7 +21,7 @@
 package elki.math.statistics.kernelfunctions;
 
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Uniform / Rectangular kernel density estimator.
@@ -87,9 +87,9 @@ public final class UniformKernelDensityFunction implements KernelDensityFunction
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected UniformKernelDensityFunction makeInstance() {
+    public UniformKernelDensityFunction make() {
       return KERNEL;
     }
   }

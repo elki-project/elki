@@ -304,7 +304,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @param <V> Vector type
    * @param <M> Model type of inner algorithm
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector, M extends MeanModel> extends AbstractKMeans.Par<V> {
     /**
      * Parameter to specify the kMeans variant.
      */
@@ -346,7 +346,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     private RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       // Do NOT invoke super.makeOptions to hide the "k" parameter.
       IntParameter kMinP = new IntParameter(K_MIN_ID, 2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
@@ -383,7 +383,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     @Override
-    protected XMeans<V, M> makeInstance() {
+    public XMeans<V, M> make() {
       return new XMeans<V, M>(distanceFunction, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }
   }

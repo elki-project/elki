@@ -68,7 +68,7 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -878,7 +878,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * 
    * @author Florian Nuecke
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for the chi squared test threshold.
      */
@@ -935,8 +935,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     protected int minClusterSize;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(ALPHA_THRESHOLD_ID, .001) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
@@ -957,7 +956,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     @Override
-    protected P3C<V> makeInstance() {
+    public P3C<V> make() {
       return new P3C<>(alpha, poissonThreshold, maxEmIterations, emDelta, minClusterSize);
     }
   }

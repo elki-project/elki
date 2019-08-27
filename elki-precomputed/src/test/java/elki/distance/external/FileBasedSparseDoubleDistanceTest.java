@@ -50,8 +50,8 @@ public class FileBasedSparseDoubleDistanceTest extends AbstractClusterAlgorithmT
   @Test
   public void testExternalDistance() throws IOException {
     Database db = new ELKIBuilder<>(StaticArrayDatabase.class) //
-        .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DBIDRangeDatabaseConnection.class) //
-        .with(DBIDRangeDatabaseConnection.Parameterizer.COUNT_ID, 4) //
+        .with(AbstractDatabase.Par.DATABASE_CONNECTION_ID, DBIDRangeDatabaseConnection.class) //
+        .with(DBIDRangeDatabaseConnection.Par.COUNT_ID, 4) //
         .build();
     db.initialize();
 

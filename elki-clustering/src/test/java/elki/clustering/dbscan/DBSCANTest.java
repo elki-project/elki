@@ -49,8 +49,8 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
@@ -64,8 +64,8 @@ public class DBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<Model> result = new ELKIBuilder<DBSCAN<DoubleVector>>(DBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
+        .with(DBSCAN.Par.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Par.MINPTS_ID, 120) //
         .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });

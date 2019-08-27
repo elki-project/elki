@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.result.Metadata;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -109,7 +109,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the maximum number of dimensions.
      */
@@ -121,15 +121,14 @@ public class ScatterPlotFactory implements ProjectorFactory {
     private int maxdim = MAX_DIMENSIONS_DEFAULT;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(MAXDIM_ID, MAX_DIMENSIONS_DEFAULT) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> maxdim = x);
     }
 
     @Override
-    protected ScatterPlotFactory makeInstance() {
+    public ScatterPlotFactory make() {
       return new ScatterPlotFactory(maxdim);
     }
   }

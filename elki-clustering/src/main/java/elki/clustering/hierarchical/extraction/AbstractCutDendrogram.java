@@ -51,7 +51,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.DoubleArray;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -423,7 +423,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    *
    * @author Erich Schubert
    */
-  abstract public static class Parameterizer extends AbstractParameterizer {
+  abstract public static class Par implements Parameterizer {
     /**
      * Parameter to configure the output mode (nested or truncated clusters).
      */
@@ -440,8 +440,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     HierarchicalClusteringAlgorithm algorithm;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new Flag(HIERARCHICAL_ID).grab(config, x -> hierarchical = x);

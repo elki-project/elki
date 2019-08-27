@@ -297,20 +297,20 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     protected boolean needsMetric() {
       return true;
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       super.getParameterVarstat(config);
     }
 
     @Override
-    protected HamerlyKMeans<V> makeInstance() {
+    public HamerlyKMeans<V> make() {
       return new HamerlyKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }

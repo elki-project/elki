@@ -400,7 +400,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -433,8 +433,8 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     protected double alpha = 0.5;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(RMAX_ID) //
           .grab(config, x -> rmax = x);
       new IntParameter(NMIN_ID, 20) //
@@ -444,7 +444,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     }
 
     @Override
-    protected LOCI<O> makeInstance() {
+    public LOCI<O> make() {
       return new LOCI<>(distanceFunction, rmax, nmin, alpha);
     }
   }

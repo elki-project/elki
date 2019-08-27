@@ -22,7 +22,7 @@ package elki.data.uncertain.uncertainifier;
 
 import elki.data.uncertain.UncertainObject;
 import elki.logging.LoggingUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -62,11 +62,11 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
   }
 
   /**
-   * Parameterizer.
+   * Par.
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Default sample size for generating finite representations.
      */
@@ -98,8 +98,7 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
     protected int minQuant, maxQuant;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Uncertainifier<?>>(INNER_ID, Uncertainifier.class) //
           .grab(config, x -> inner = x);
       if(inner instanceof AbstractDiscreteUncertainifier) {

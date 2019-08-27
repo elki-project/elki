@@ -28,7 +28,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -110,7 +110,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the desired cardinality of the subset of attributes
      * selected for projection.
@@ -134,8 +134,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -143,7 +142,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
     }
 
     @Override
-    protected NumberVectorRandomFeatureSelectionFilter<DoubleVector> makeInstance() {
+    public NumberVectorRandomFeatureSelectionFilter<DoubleVector> make() {
       return new NumberVectorRandomFeatureSelectionFilter<>(k, rnd);
     }
   }

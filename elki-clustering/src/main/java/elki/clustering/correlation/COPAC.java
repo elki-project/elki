@@ -45,7 +45,7 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -175,7 +175,7 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Size for the kNN neighborhood used in the PCA step of COPAC.
      */
@@ -187,25 +187,25 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
     protected COPAC.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       settings = new Settings();
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.k = x);
-      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+      new ObjectParameter<PCARunner>(PCARunner.Par.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
           .grab(config, x -> settings.pca = x);
       new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
           .grab(config, x -> settings.filter = x);
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> settings.epsilon = x);
-      new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+      new IntParameter(DBSCAN.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.minpts = x);
     }
 
     @Override
-    protected COPAC<V> makeInstance() {
+    public COPAC<V> make() {
       return new COPAC<>(settings);
     }
   }

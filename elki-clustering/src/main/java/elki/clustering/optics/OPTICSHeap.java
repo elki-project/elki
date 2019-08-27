@@ -194,9 +194,9 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
+  public static class Par<O> extends AbstractOPTICS.Par<O> {
     @Override
-    protected OPTICSHeap<O> makeInstance() {
+    public OPTICSHeap<O> make() {
       return new OPTICSHeap<>(distanceFunction, epsilon, minpts);
     }
   }

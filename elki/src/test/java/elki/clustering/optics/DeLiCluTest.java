@@ -53,10 +53,10 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
 
     Clustering<?> clustering = new ELKIBuilder<>(OPTICSXi.class) //
-        .with(DeLiClu.Parameterizer.MINPTS_ID, 20) //
-        .with(OPTICSXi.Parameterizer.XI_ID, 0.05) //
-        .with(OPTICSXi.Parameterizer.XIALG_ID, DeLiClu.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000) //
+        .with(DeLiClu.Par.MINPTS_ID, 20) //
+        .with(OPTICSXi.Par.XI_ID, 0.05) //
+        .with(OPTICSXi.Par.XIALG_ID, DeLiClu.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 1000) //
         .build().run(db);
     // Test F-Measure
     Clustering<Model> rbl = new ByLabelClustering().run(db);

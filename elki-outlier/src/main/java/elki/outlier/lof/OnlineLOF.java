@@ -395,9 +395,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends FlexibleLOF.Parameterizer<O> {
+  public static class Par<O> extends FlexibleLOF.Par<O> {
     @Override
-    protected OnlineLOF<O> makeInstance() {
+    public OnlineLOF<O> make() {
       return new OnlineLOF<>(kreach, krefer, distanceFunction, reachabilityDistance);
     }
   }

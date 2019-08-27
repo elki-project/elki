@@ -219,7 +219,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @author Jonathan von Brünken
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * The class used for estimating the intrinsic dimensionality.
      */
@@ -252,8 +252,8 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     protected int k_r = 20;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class) //
           .grab(config, x -> estimator = x);
       new IntParameter(KC_ID) //
@@ -265,7 +265,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     }
 
     @Override
-    protected IDOS<O> makeInstance() {
+    public IDOS<O> make() {
       return new IDOS<>(distanceFunction, estimator, k_c, k_r);
     }
   }

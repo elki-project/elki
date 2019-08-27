@@ -39,9 +39,9 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   public void testFeatureBaggingSum() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
-        .with(LOF.Parameterizer.K_ID, 10) //
-        .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
-        .with(FeatureBagging.Parameterizer.SEED_ID, 1) //
+        .with(LOF.Par.K_ID, 10) //
+        .with(FeatureBagging.Par.NUM_ID, 10) //
+        .with(FeatureBagging.Par.SEED_ID, 1) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.94758434);
     testSingleScore(result, 1293, 12.816102);
@@ -51,10 +51,10 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
   public void testFeatureBaggingBreadth() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
-        .with(LOF.Parameterizer.K_ID, 10) //
-        .with(FeatureBagging.Parameterizer.NUM_ID, 10) //
-        .with(FeatureBagging.Parameterizer.SEED_ID, 5) //
-        .with(FeatureBagging.Parameterizer.BREADTH_ID) //
+        .with(LOF.Par.K_ID, 10) //
+        .with(FeatureBagging.Par.NUM_ID, 10) //
+        .with(FeatureBagging.Par.SEED_ID, 5) //
+        .with(FeatureBagging.Par.BREADTH_ID) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.92470588);
     testSingleScore(result, 1293, 1.2047264);

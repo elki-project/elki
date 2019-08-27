@@ -102,9 +102,9 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       // Do NOT invoke super.makeOptions, as we don't want to have the maxiter
       // parameter, nor a warning for other distance functions.
       getParameterDistance(config);
@@ -113,7 +113,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     }
 
     @Override
-    protected SingleAssignmentKMeans<V> makeInstance() {
+    public SingleAssignmentKMeans<V> make() {
       return new SingleAssignmentKMeans<>(distanceFunction, k, initializer);
     }
   }

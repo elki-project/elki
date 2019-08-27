@@ -147,9 +147,9 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractHDBSCAN.Parameterizer<O> {
+  public static class Par<O> extends AbstractHDBSCAN.Par<O> {
     @Override
-    protected HDBSCANLinearMemory<O> makeInstance() {
+    public HDBSCANLinearMemory<O> make() {
       return new HDBSCANLinearMemory<>(distanceFunction, minPts);
     }
   }

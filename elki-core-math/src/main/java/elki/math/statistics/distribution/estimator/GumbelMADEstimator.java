@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.GumbelDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Parameter estimation via median and median absolute deviation from median
@@ -77,9 +77,9 @@ public class GumbelMADEstimator implements MADDistributionEstimator<GumbelDistri
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GumbelMADEstimator makeInstance() {
+    public GumbelMADEstimator make() {
       return STATIC;
     }
   }

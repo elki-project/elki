@@ -537,7 +537,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends TSNE.Parameterizer<O> {
+  public static class Par<O> extends TSNE.Par<O> {
     /**
      * Parameter for the approximation quality.
      */
@@ -549,8 +549,8 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     public double theta;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(THETA_ID) //
           .setDefaultValue(0.5) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
@@ -563,7 +563,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     }
 
     @Override
-    protected BarnesHutTSNE<O> makeInstance() {
+    public BarnesHutTSNE<O> make() {
       return new BarnesHutTSNE<>(affinity, dim, finalMomentum, learningRate, iterations, random, keep, theta);
     }
   }

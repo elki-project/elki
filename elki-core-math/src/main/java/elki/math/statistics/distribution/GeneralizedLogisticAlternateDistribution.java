@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -200,13 +200,12 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /** Parameters. */
     double location, scale, shape;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID) //
           .grab(config, x -> location = x);
       new DoubleParameter(SCALE_ID) //
@@ -216,7 +215,7 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
     }
 
     @Override
-    protected GeneralizedLogisticAlternateDistribution makeInstance() {
+    public GeneralizedLogisticAlternateDistribution make() {
       return new GeneralizedLogisticAlternateDistribution(location, scale, shape);
     }
   }

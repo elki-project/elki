@@ -292,7 +292,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
    *
    * @author Lisa Reichert
    */
-  public static class Parameterizer extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super NumberVector>> {
+  public static class Par extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super NumberVector>> {
     /**
      * Sample size.
      */
@@ -360,8 +360,8 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(REP_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> rep = x);
@@ -385,7 +385,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     }
 
     @Override
-    protected HopkinsStatisticClusteringTendency makeInstance() {
+    public HopkinsStatisticClusteringTendency make() {
       return new HopkinsStatisticClusteringTendency(distanceFunction, sampleSize, random, rep, k, minima, maxima);
     }
   }

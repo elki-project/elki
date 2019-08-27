@@ -30,7 +30,7 @@ import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -121,7 +121,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     // TODO: add "grid sampling" option.
 
     /**
@@ -146,8 +146,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
     protected double gridscale;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(GRID_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> gridres = x);
@@ -157,7 +156,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
     }
 
     @Override
-    protected GridBasedReferencePoints makeInstance() {
+    public GridBasedReferencePoints make() {
       return new GridBasedReferencePoints(gridres, gridscale);
     }
   }

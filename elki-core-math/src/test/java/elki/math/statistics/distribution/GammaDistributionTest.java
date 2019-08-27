@@ -129,8 +129,8 @@ public class GammaDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("gamma.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(GammaDistribution.Parameterizer.K_ID, 2.);
-    params.addParameter(GammaDistribution.Parameterizer.THETA_ID, 1.);
+    params.addParameter(GammaDistribution.Par.K_ID, 2.);
+    params.addParameter(GammaDistribution.Par.THETA_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GammaDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }

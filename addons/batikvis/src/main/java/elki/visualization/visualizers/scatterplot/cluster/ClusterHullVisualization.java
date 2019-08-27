@@ -42,7 +42,7 @@ import elki.math.geometry.FilteredConvexHull2D;
 import elki.utilities.datastructures.hierarchy.Hierarchy;
 import elki.utilities.datastructures.iterator.ArrayListIter;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -86,14 +86,14 @@ public class ClusterHullVisualization implements VisFactory {
   /**
    * Settings
    */
-  Parameterizer settings;
+  Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public ClusterHullVisualization(Parameterizer settings) {
+  public ClusterHullVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -352,7 +352,7 @@ public class ClusterHullVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Alpha-Value for alpha-shapes
      */
@@ -364,14 +364,13 @@ public class ClusterHullVisualization implements VisFactory {
     double alpha = Double.POSITIVE_INFINITY;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY) //
           .grab(config, x -> alpha = x);
     }
 
     @Override
-    protected ClusterHullVisualization makeInstance() {
+    public ClusterHullVisualization make() {
       return new ClusterHullVisualization(this);
     }
   }

@@ -151,11 +151,11 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * Parameter that specifies the name of the input files to be parsed.
      */
-    public static final OptionID INPUT_ID = FileBasedDatabaseConnection.Parameterizer.INPUT_ID;
+    public static final OptionID INPUT_ID = FileBasedDatabaseConnection.Par.INPUT_ID;
 
     /**
      * The input files.
@@ -163,8 +163,8 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     private List<File> files;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new FileListParameter(INPUT_ID, FilesType.INPUT_FILES) //
           .grab(config, x -> files = x);
       configFilters(config);
@@ -172,7 +172,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     }
 
     @Override
-    protected ConcatenateFilesDatabaseConnection makeInstance() {
+    public ConcatenateFilesDatabaseConnection make() {
       return new ConcatenateFilesDatabaseConnection(files, parser, filters);
     }
   }

@@ -39,8 +39,8 @@ public class IDOSTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<IDOS<DoubleVector>>(IDOS.class) //
-        .with(IDOS.Parameterizer.KC_ID, 100) //
-        .with(IDOS.Parameterizer.KR_ID, 20) //
+        .with(IDOS.Par.KC_ID, 100) //
+        .with(IDOS.Par.KR_ID, 20) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.9194814);
     testSingleScore(result, 945, 1.130819);

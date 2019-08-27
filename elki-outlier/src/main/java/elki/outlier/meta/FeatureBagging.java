@@ -48,7 +48,7 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -251,7 +251,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of instances to use in the ensemble.
      */
@@ -288,9 +288,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(LOF.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
       new IntParameter(NUM_ID) //
@@ -301,7 +300,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     }
 
     @Override
-    protected FeatureBagging makeInstance() {
+    public FeatureBagging make() {
       // Default is to re-use the same distance
       return new FeatureBagging(k, num, breadth, rnd);
     }

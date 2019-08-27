@@ -357,7 +357,7 @@ public class CLARA<V> extends PAM<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends PAM.Parameterizer<V> {
+  public static class Par<V> extends PAM.Par<V> {
     /**
      * The number of samples to run.
      */
@@ -399,8 +399,8 @@ public class CLARA<V> extends PAM<V> {
     RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(NUMSAMPLES_ID, 5) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numsamples = x);
@@ -415,7 +415,7 @@ public class CLARA<V> extends PAM<V> {
     }
 
     @Override
-    protected CLARA<V> makeInstance() {
+    public CLARA<V> make() {
       return new CLARA<>(distanceFunction, k, maxiter, initializer, numsamples, sampling, keepmed, random);
     }
   }

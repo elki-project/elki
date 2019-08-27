@@ -668,7 +668,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractAggarwalYuOutlier.Par {
     /**
      * Parameter to specify the number of solutions must be an integer greater
      * than 1.
@@ -685,8 +685,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(M_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> m = x);
@@ -694,7 +694,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     }
 
     @Override
-    protected AggarwalYuEvolutionary<V> makeInstance() {
+    public AggarwalYuEvolutionary<V> make() {
       return new AggarwalYuEvolutionary<>(k, phi, m, rnd);
     }
   }

@@ -28,7 +28,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -155,7 +155,7 @@ public class OutlierGammaScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Normalization flag.
      */
@@ -167,13 +167,12 @@ public class OutlierGammaScaling implements OutlierScaling {
     protected boolean normalize = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(NORMALIZE_ID).grab(config, x -> normalize = x);
     }
 
     @Override
-    protected OutlierGammaScaling makeInstance() {
+    public OutlierGammaScaling make() {
       return new OutlierGammaScaling(normalize);
     }
   }

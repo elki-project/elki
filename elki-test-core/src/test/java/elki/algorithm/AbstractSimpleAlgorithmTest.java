@@ -60,7 +60,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     ListParameterization params = new ListParameterization();
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
-    params.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, new FixedDBIDsFilter(1));
+    params.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
     return makeSimpleDatabase(filename, expectedSize, params);
   }
 
@@ -76,8 +76,8 @@ public abstract class AbstractSimpleAlgorithmTest {
     assertNotNull("Params, if given, must not be null.", params);
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
-      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class);
-      params.addParameter(InputStreamDatabaseConnection.Parameterizer.STREAM_ID, is);
+      params.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class);
+      params.addParameter(InputStreamDatabaseConnection.Par.STREAM_ID, is);
       Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
 
       // Ensure we have no unused parameters:

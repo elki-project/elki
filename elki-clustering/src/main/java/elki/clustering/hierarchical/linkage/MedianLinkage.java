@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.linkage;
 
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Median-linkage &mdash; weighted pair group method using centroids (WPGMC).
@@ -77,9 +77,9 @@ public class MedianLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MedianLinkage makeInstance() {
+    public MedianLinkage make() {
       return STATIC;
     }
   }

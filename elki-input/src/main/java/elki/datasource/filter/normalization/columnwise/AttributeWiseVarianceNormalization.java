@@ -32,7 +32,7 @@ import elki.math.linearalgebra.LinearEquationSystem;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -232,7 +232,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for means.
      */
@@ -254,8 +254,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     private double[] stddev = new double[0];
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       DoubleListParameter meanP = new DoubleListParameter(MEAN_ID) //
           .setOptional(true);
       if(config.grab(meanP)) {
@@ -279,7 +278,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     }
 
     @Override
-    protected AttributeWiseVarianceNormalization<V> makeInstance() {
+    public AttributeWiseVarianceNormalization<V> make() {
       return new AttributeWiseVarianceNormalization<>(mean, stddev);
     }
   }

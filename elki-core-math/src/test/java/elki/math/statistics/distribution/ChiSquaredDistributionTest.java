@@ -104,7 +104,7 @@ public class ChiSquaredDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("chisq.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(ChiSquaredDistribution.Parameterizer.DOF_ID, 2.);
+    params.addParameter(ChiSquaredDistribution.Par.DOF_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ChiSquaredDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2", 1e-15);
   }

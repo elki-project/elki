@@ -243,7 +243,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the number of neighbors.
      */
@@ -275,8 +275,8 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -287,7 +287,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
     }
 
     @Override
-    protected CTLuRandomWalkEC<O> makeInstance() {
+    public CTLuRandomWalkEC<O> make() {
       return new CTLuRandomWalkEC<>(distanceFunction, alpha, c, k);
     }
   }

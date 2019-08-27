@@ -41,7 +41,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.) //
+        .with(KMeansMinusMinus.Par.RATE_ID, 0.) //
         .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
@@ -53,7 +53,7 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
+        .with(KMeansMinusMinus.Par.RATE_ID, 0.1) //
         .build().run(db);
     testFMeasure(db, result, 0.998);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
@@ -65,8 +65,8 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .with(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1) //
-        .with(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID) //
+        .with(KMeansMinusMinus.Par.RATE_ID, 0.1) //
+        .with(KMeansMinusMinus.Par.NOISE_FLAG_ID) //
         .build().run(db);
     testFMeasure(db, result, 0.925621);
     testClusterSizes(result, new int[] { 100, 116, 184, 200, 200, 200 });

@@ -30,7 +30,7 @@ import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.math.statistics.distribution.Distribution;
 import elki.math.statistics.distribution.ExponentialDistribution;
 import elki.utilities.documentation.Description;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -128,7 +128,7 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the jitter strength.
      */
@@ -150,8 +150,7 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(JITTER_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> jitter = x);
@@ -159,7 +158,7 @@ public class HistogramJitterFilter<V extends NumberVector> extends AbstractVecto
     }
 
     @Override
-    protected HistogramJitterFilter<DoubleVector> makeInstance() {
+    public HistogramJitterFilter<DoubleVector> make() {
       return new HistogramJitterFilter<>(jitter, rnd);
     }
   }

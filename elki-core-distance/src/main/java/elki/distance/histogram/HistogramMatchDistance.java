@@ -26,7 +26,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.minkowski.ManhattanDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Distance function based on histogram matching, i.e., Manhattan distance on
@@ -143,9 +143,9 @@ public class HistogramMatchDistance extends AbstractNumberVectorDistance impleme
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HistogramMatchDistance makeInstance() {
+    public HistogramMatchDistance make() {
       return STATIC;
     }
   }

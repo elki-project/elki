@@ -24,7 +24,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -167,7 +167,7 @@ public class OutlierLinearScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify a fixed minimum to use.
      */
@@ -209,8 +209,7 @@ public class OutlierLinearScaling implements OutlierScaling {
     boolean nozeros = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MIN_ID).setOptional(true) //
           .grab(config, x -> min = x);
       new DoubleParameter(MAX_ID).setOptional(true) //
@@ -222,7 +221,7 @@ public class OutlierLinearScaling implements OutlierScaling {
     }
 
     @Override
-    protected OutlierLinearScaling makeInstance() {
+    public OutlierLinearScaling make() {
       return new OutlierLinearScaling(min, max, usemean, nozeros);
     }
   }

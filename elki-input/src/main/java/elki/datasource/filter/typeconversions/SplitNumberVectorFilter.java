@@ -31,7 +31,7 @@ import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.FilterUtil;
 import elki.datasource.filter.ObjectFilter;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -151,7 +151,7 @@ public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * The parameter listing the split dimensions.
      */
@@ -163,15 +163,14 @@ public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFi
     protected int[] dims;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntListParameter(SELECTED_ATTRIBUTES_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .grab(config, x -> dims = x.clone());
     }
 
     @Override
-    protected SplitNumberVectorFilter<V> makeInstance() {
+    public SplitNumberVectorFilter<V> make() {
       return new SplitNumberVectorFilter<>(dims);
     }
   }

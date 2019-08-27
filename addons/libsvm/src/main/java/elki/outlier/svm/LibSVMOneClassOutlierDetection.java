@@ -42,7 +42,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -261,7 +261,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for kernel function.
      */
@@ -283,8 +283,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     protected double nu = 0.05;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new EnumParameter<SVMKernel>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF) //
           .grab(config, x -> kernel = x);
       new DoubleParameter(NU_ID, 0.05) //
@@ -292,7 +291,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     }
 
     @Override
-    protected LibSVMOneClassOutlierDetection<V> makeInstance() {
+    public LibSVMOneClassOutlierDetection<V> make() {
       return new LibSVMOneClassOutlierDetection<>(kernel, nu);
     }
   }

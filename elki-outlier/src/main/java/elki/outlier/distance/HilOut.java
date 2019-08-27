@@ -55,7 +55,7 @@ import elki.utilities.datastructures.heap.ObjectHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -899,7 +899,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * 
    * @param <O> Vector type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify how many next neighbors should be used in the
      * computation
@@ -953,22 +953,21 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     protected Enum<ScoreType> tn;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(K_ID, 5) //
           .grab(config, x -> k = x);
       new IntParameter(N_ID, 10) //
           .grab(config, x -> n = x);
       new IntParameter(H_ID, 32) //
           .grab(config, x -> h = x);
-      new ObjectParameter<LPNormDistance>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<LPNormDistance>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distfunc = x);
       new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN) //
           .grab(config, x -> tn = x);
     }
 
     @Override
-    protected HilOut<O> makeInstance() {
+    public HilOut<O> make() {
       return new HilOut<>(distfunc, k, n, h, tn);
     }
   }

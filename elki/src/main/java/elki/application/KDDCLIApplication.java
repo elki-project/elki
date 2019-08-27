@@ -63,20 +63,20 @@ public class KDDCLIApplication extends AbstractApplication {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * The KDD Task to perform.
      */
     protected KDDTask task;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       task = config.tryInstantiate(KDDTask.class);
     }
 
     @Override
-    protected KDDCLIApplication makeInstance() {
+    public KDDCLIApplication make() {
       return new KDDCLIApplication(task);
     }
   }

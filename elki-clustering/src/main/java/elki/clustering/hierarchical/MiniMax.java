@@ -409,9 +409,9 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
-    protected MiniMax<O> makeInstance() {
+    public MiniMax<O> make() {
       return new MiniMax<>(distanceFunction);
     }
   }

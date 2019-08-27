@@ -28,7 +28,7 @@ import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.logging.Logging;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -112,19 +112,18 @@ public abstract class AbstractStreamingParser implements StreamingParser {
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Reader format.
      */
     protected CSVReaderFormat format;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       format = config.tryInstantiate(CSVReaderFormat.class);
     }
 
     @Override
-    protected abstract AbstractStreamingParser makeInstance();
+    public abstract AbstractStreamingParser make();
   }
 }

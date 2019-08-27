@@ -34,7 +34,7 @@ import elki.database.relation.RelationUtil;
 import elki.math.MathUtil;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -203,7 +203,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * OptionID for the grid size.
      */
@@ -225,8 +225,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(K_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

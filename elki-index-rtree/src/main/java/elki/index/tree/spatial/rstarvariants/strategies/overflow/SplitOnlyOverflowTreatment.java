@@ -24,7 +24,7 @@ import elki.index.tree.IndexTreePath;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Always split, as in the original R-Tree
@@ -60,9 +60,9 @@ public class SplitOnlyOverflowTreatment implements OverflowTreatment {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SplitOnlyOverflowTreatment makeInstance() {
+    public SplitOnlyOverflowTreatment make() {
       return SplitOnlyOverflowTreatment.STATIC;
     }
   }

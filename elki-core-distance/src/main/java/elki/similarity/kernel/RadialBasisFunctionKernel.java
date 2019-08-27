@@ -25,7 +25,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.similarity.AbstractVectorSimilarity;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -72,7 +72,7 @@ public class RadialBasisFunctionKernel extends AbstractVectorSimilarity {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Sigma parameter: standard deviation.
      */
@@ -84,15 +84,14 @@ public class RadialBasisFunctionKernel extends AbstractVectorSimilarity {
     protected double sigma = 1.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(SIGMA_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> sigma = x);
     }
 
     @Override
-    protected RadialBasisFunctionKernel makeInstance() {
+    public RadialBasisFunctionKernel make() {
       return new RadialBasisFunctionKernel(sigma);
     }
   }

@@ -90,13 +90,13 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("weibull.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(RayleighDistribution.Parameterizer.SCALE_ID, MathUtil.SQRTHALF);
+    params.addParameter(RayleighDistribution.Par.SCALE_ID, MathUtil.SQRTHALF);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(RayleighDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
 
     load("ray.ascii.gz");
     params = new ListParameterization();
-    params.addParameter(RayleighDistribution.Parameterizer.SCALE_ID, 2);
+    params.addParameter(RayleighDistribution.Par.SCALE_ID, 2);
     dist = ClassGenericsUtil.parameterizeOrAbort(RayleighDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2", 1e-15);
   }

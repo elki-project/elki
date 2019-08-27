@@ -27,7 +27,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorTypeInformation;
 import elki.datasource.filter.AbstractStreamConversionFilter;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -85,7 +85,7 @@ public class MultivariateTimeSeriesFilter<V extends FeatureVector<?>> extends Ab
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends FeatureVector<?>> extends AbstractParameterizer {
+  public static class Par<V extends FeatureVector<?>> implements Parameterizer {
     /**
      * Parameter for specifying the number of variates of this series.
      */
@@ -97,14 +97,14 @@ public class MultivariateTimeSeriesFilter<V extends FeatureVector<?>> extends Ab
     int variates;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new IntParameter(VARIATES_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> variates = x);
     }
 
     @Override
-    protected MultivariateTimeSeriesFilter<V> makeInstance() {
+    public MultivariateTimeSeriesFilter<V> make() {
       return new MultivariateTimeSeriesFilter<>(variates);
     }
   }

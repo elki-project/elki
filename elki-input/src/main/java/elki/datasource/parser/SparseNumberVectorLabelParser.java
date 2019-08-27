@@ -206,7 +206,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Par<V extends SparseNumberVector> extends NumberVectorLabelParser.Par<V> {
     @Override
     protected void getFactory(Parameterization config) {
       new ObjectParameter<SparseNumberVector.Factory<V>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class) //
@@ -214,7 +214,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
     }
 
     @Override
-    protected SparseNumberVectorLabelParser<V> makeInstance() {
+    public SparseNumberVectorLabelParser<V> make() {
       return new SparseNumberVectorLabelParser<>(format, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }

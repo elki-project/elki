@@ -592,9 +592,9 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
+  public static class Par extends AbstractFrequentItemsetAlgorithm.Par {
     @Override
-    protected APRIORI makeInstance() {
+    public APRIORI make() {
       return new APRIORI(minsupp, minlength, maxlength);
     }
   }

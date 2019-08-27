@@ -28,7 +28,7 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -118,16 +118,15 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Minpts value
      */
     protected int minpts;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      if(new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+    public void configure(Parameterization config) {
+      if(new IntParameter(DBSCAN.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minpts = x) && minpts <= 2) {
         LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
@@ -135,7 +134,7 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
     }
 
     @Override
-    protected MinPtsCorePredicate makeInstance() {
+    public MinPtsCorePredicate make() {
       return new MinPtsCorePredicate(minpts);
     }
   }

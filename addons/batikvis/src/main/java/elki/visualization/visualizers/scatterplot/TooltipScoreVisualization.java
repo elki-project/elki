@@ -31,7 +31,7 @@ import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -75,14 +75,14 @@ public class TooltipScoreVisualization implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public TooltipScoreVisualization(Parameterizer settings) {
+  public TooltipScoreVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -218,7 +218,7 @@ public class TooltipScoreVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number formatter used for visualization
      */
@@ -230,8 +230,7 @@ public class TooltipScoreVisualization implements VisFactory {
     public static final OptionID DIGITS_ID = new OptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIGITS_ID, 4) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> {
@@ -242,7 +241,7 @@ public class TooltipScoreVisualization implements VisFactory {
     }
 
     @Override
-    protected TooltipScoreVisualization makeInstance() {
+    public TooltipScoreVisualization make() {
       return new TooltipScoreVisualization(this);
     }
   }

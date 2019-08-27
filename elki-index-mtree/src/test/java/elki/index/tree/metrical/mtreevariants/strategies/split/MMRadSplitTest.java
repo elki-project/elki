@@ -40,8 +40,8 @@ public class MMRadSplitTest extends AbstractIndexStructureTest {
   @Test
   public void testEuclidean() {
     MTreeFactory<DoubleVector> factory = new ELKIBuilder<>(MTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(MTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, MMRadSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(MTreeFactory.Par.SPLIT_STRATEGY_ID, MMRadSplit.class) //
         .build();
     testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
     testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);

@@ -22,7 +22,7 @@ package elki.math.linearalgebra.pca.filter;
 
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -88,7 +88,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * "absolute" Flag
      */
@@ -110,8 +110,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     private boolean absolute;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(EIGENPAIR_FILTER_ABSOLUTE).grab(config, x -> absolute = x);
       DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
@@ -126,7 +125,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     }
 
     @Override
-    protected LimitEigenPairFilter makeInstance() {
+    public LimitEigenPairFilter make() {
       return new LimitEigenPairFilter(delta, absolute);
     }
   }

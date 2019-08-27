@@ -158,7 +158,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option to configure the number of bins to use.
      */
@@ -170,15 +170,15 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
     protected int numbins = 20;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(HISTOGRAM_BINS_ID, 100) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbins = x);
     }
 
     @Override
-    protected RankingQualityHistogram<O> makeInstance() {
+    public RankingQualityHistogram<O> make() {
       return new RankingQualityHistogram<>(distanceFunction, numbins);
     }
   }

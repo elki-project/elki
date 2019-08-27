@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -92,21 +92,20 @@ public class LngLatToECEFProjection<V extends NumberVector> implements Projectio
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Earth model to use.
      */
     EarthModel model;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
           .grab(config, x -> model = x);
     }
 
     @Override
-    protected LngLatToECEFProjection<NumberVector> makeInstance() {
+    public LngLatToECEFProjection<NumberVector> make() {
       return new LngLatToECEFProjection<>(model);
     }
   }

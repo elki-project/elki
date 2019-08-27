@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
 import elki.similarity.AbstractVectorSimilarity;
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -110,7 +110,7 @@ public class PolynomialKernel extends AbstractVectorSimilarity implements Primit
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Degree parameter.
      */
@@ -132,8 +132,7 @@ public class PolynomialKernel extends AbstractVectorSimilarity implements Primit
     protected double bias = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DEGREE_ID, DEFAULT_DEGREE) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> degree = x);
@@ -143,7 +142,7 @@ public class PolynomialKernel extends AbstractVectorSimilarity implements Primit
     }
 
     @Override
-    protected PolynomialKernel makeInstance() {
+    public PolynomialKernel make() {
       if(degree == 1 && (bias == 0.)) {
         return LinearKernel.STATIC;
       }

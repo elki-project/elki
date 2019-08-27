@@ -322,7 +322,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for the number of neighbors.
      */
@@ -344,8 +344,8 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     protected double delta = 1.1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config); // Distance
+    public void configure(Parameterization config) {
+      super.configure(config); // Distance
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
@@ -356,7 +356,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     }
 
     @Override
-    protected DWOF<O> makeInstance() {
+    public DWOF<O> make() {
       return new DWOF<>(distanceFunction, k, delta);
     }
   }

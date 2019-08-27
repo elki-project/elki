@@ -26,7 +26,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.Norm;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Minimum distance for {@link NumberVector}s.
@@ -128,9 +128,9 @@ public class MinimumDistance extends AbstractNumberVectorDistance implements Spa
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MinimumDistance makeInstance() {
+    public MinimumDistance make() {
       return MinimumDistance.STATIC;
     }
   }

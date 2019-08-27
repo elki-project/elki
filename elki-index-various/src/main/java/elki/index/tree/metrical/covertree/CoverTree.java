@@ -651,9 +651,9 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractCoverTree.Factory.Par<O> {
       @Override
-      protected CoverTree.Factory<O> makeInstance() {
+      public CoverTree.Factory<O> make() {
         return new CoverTree.Factory<>(distanceFunction, expansion, truncate);
       }
     }

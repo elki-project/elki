@@ -22,7 +22,7 @@ package elki.distance.colorhistogram;
 
 import elki.distance.MatrixWeightedQuadraticDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -92,7 +92,7 @@ public class RGBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the kernel dimensionality.
      */
@@ -104,14 +104,13 @@ public class RGBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
     int bpp = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(BPP_ID) //
           .grab(config, x -> bpp = x);
     }
 
     @Override
-    protected RGBHistogramQuadraticDistance makeInstance() {
+    public RGBHistogramQuadraticDistance make() {
       return new RGBHistogramQuadraticDistance(bpp);
     }
   }

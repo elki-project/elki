@@ -24,7 +24,7 @@ import elki.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -77,15 +77,14 @@ public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<O
    * 
    * @param <O> Object type
    */
-  public abstract static class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Par<O> implements Parameterizer {
     /**
      * The predicate to obtain the neighbors.
      */
     protected NeighborSetPredicate.Factory<O> npredf = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class) //
           .grab(config, x -> npredf = x);
     }

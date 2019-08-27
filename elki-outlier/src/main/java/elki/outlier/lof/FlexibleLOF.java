@@ -452,7 +452,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * The distance function to determine the reachability distance between
      * database objects.
@@ -493,8 +493,8 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     protected Distance<? super O> reachabilityDistance = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KREF_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> krefer = x);
@@ -510,7 +510,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     }
 
     @Override
-    protected FlexibleLOF<O> makeInstance() {
+    public FlexibleLOF<O> make() {
       return new FlexibleLOF<>(kreach, krefer, distanceFunction, reachabilityDistance);
     }
   }

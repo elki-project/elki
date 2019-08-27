@@ -40,7 +40,7 @@ import elki.distance.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -496,7 +496,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * @param <O> Outer object type.
      * @param <I> Inner object type.
      */
-    public static class Parameterizer<O, I> extends AbstractParameterizer {
+    public static class Par<O, I> implements Parameterizer {
       /**
        * Option ID for the projection to use.
        */
@@ -548,8 +548,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       double kmulti = 1.0;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Projection<O, I>>(PROJ_ID, Projection.class) //
             .grab(config, x -> proj = x);
         new ObjectParameter<IndexFactory<I>>(INDEX_ID, IndexFactory.class) //
@@ -565,7 +564,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       }
 
       @Override
-      protected Factory<O, I> makeInstance() {
+      public Factory<O, I> make() {
         return new Factory<>(proj, inner, materialize, norefine, kmulti);
       }
     }

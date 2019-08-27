@@ -81,9 +81,9 @@ public class CloseReinsert extends AbstractPartialReinsert {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPartialReinsert.Parameterizer {
+  public static class Par extends AbstractPartialReinsert.Par {
     @Override
-    protected CloseReinsert makeInstance() {
+    public CloseReinsert make() {
       return new CloseReinsert(reinsertAmount, distanceFunction);
     }
   }

@@ -207,9 +207,9 @@ public class KDTreeFilteringKMeans<V extends NumberVector> extends KDTreePruning
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends KDTreePruningKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends KDTreePruningKMeans.Par<V> {
     @Override
-    protected KDTreeFilteringKMeans<V> makeInstance() {
+    public KDTreeFilteringKMeans<V> make() {
       return new KDTreeFilteringKMeans<>(distanceFunction, k, maxiter, initializer, split, leafsize);
     }
   }

@@ -92,9 +92,9 @@ public class RandomUniformGenerated extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par extends AbstractKMeansInitialization.Par {
     @Override
-    protected RandomUniformGenerated makeInstance() {
+    public RandomUniformGenerated make() {
       return new RandomUniformGenerated(rnd);
     }
   }

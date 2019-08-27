@@ -41,7 +41,7 @@ import elki.math.statistics.distribution.UniformDistribution;
 import elki.result.Metadata;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -811,7 +811,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the distribution of replacement values when masking
      * a cluster.
@@ -868,8 +868,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(DELTA_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
@@ -885,7 +884,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     }
 
     @Override
-    protected ChengAndChurch<V> makeInstance() {
+    public ChengAndChurch<V> make() {
       return new ChengAndChurch<>(delta, alpha, n, dist, rnd);
     }
   }

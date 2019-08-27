@@ -169,7 +169,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       /**
        * Option ID for the kNN file.
        */
@@ -181,15 +181,15 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
       private File filename;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         // Input file parameter
         new FileParameter(CACHE_ID, FileParameter.FileType.INPUT_FILE) //
             .grab(config, x -> filename = x);
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(k, distanceFunction, filename);
       }
     }

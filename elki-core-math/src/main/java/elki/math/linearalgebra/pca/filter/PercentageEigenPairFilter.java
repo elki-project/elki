@@ -22,7 +22,7 @@ package elki.math.linearalgebra.pca.filter;
 
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -85,7 +85,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors
      * explain a portion of at least alpha of the total variance.
@@ -99,8 +99,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     private double alpha;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -108,7 +107,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     }
 
     @Override
-    protected PercentageEigenPairFilter makeInstance() {
+    public PercentageEigenPairFilter make() {
       return new PercentageEigenPairFilter(alpha);
     }
   }

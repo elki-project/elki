@@ -207,9 +207,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector> {
+    public static class Par<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Par<NumberVector> {
       @Override
-      protected Factory<N, E> makeInstance() {
+      public Factory<N, E> make() {
         return new Factory<>(k, distanceFunction);
       }
     }

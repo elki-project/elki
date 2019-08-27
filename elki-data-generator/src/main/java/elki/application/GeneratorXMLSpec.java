@@ -203,7 +203,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Output file.
      */
@@ -215,15 +215,15 @@ public class GeneratorXMLSpec extends AbstractApplication {
     private GeneratorXMLDatabaseConnection generator = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       generator = config.tryInstantiate(GeneratorXMLDatabaseConnection.class);
       // Output file
       outputFile = getParameterOutputFile(config, "The file to write the generated data set into, if the file already exists, the generated points will be appended to this file.");
     }
 
     @Override
-    protected GeneratorXMLSpec makeInstance() {
+    public GeneratorXMLSpec make() {
       return new GeneratorXMLSpec(outputFile, generator);
     }
   }

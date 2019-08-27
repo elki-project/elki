@@ -67,7 +67,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -857,7 +857,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter that specifies the maximum radius of the neighborhood to be
      * considered in each dimension for determination of the preference vector,
@@ -885,8 +885,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     protected DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(EPSILON_ID, 0.001) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
@@ -909,7 +908,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     }
 
     @Override
-    protected DiSH<V> makeInstance() {
+    public DiSH<V> make() {
       return new DiSH<>(epsilon, mu, dishPreprocessor);
     }
   }

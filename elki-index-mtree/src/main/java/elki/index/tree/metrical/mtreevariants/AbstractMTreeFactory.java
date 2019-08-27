@@ -73,7 +73,7 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Par<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, N, E>> extends PagedIndexFactory.Par<O> {
     /**
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend
@@ -97,8 +97,8 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     protected S settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       settings = makeSettings();
       new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> settings.distanceFunction = x);
@@ -111,6 +111,6 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
     abstract protected S makeSettings();
 
     @Override
-    protected abstract AbstractMTreeFactory<O, N, E, ?> makeInstance();
+    public abstract AbstractMTreeFactory<O, N, E, ?> make();
   }
 }

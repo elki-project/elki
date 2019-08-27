@@ -72,7 +72,7 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractMTreeFactory.Parameterizer<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
+  public static class Par<O> extends AbstractMTreeFactory.Par<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
     /**
      * Parameter for nolog
      */
@@ -89,8 +89,8 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
     public static final OptionID P_ID = new OptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.kmax = x);
@@ -101,7 +101,7 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
     }
 
     @Override
-    protected MkAppTreeFactory<O> makeInstance() {
+    public MkAppTreeFactory<O> make() {
       return new MkAppTreeFactory<>(pageFileFactory, settings);
     }
 

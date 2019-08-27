@@ -23,7 +23,7 @@ package elki.data;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Specialized class implementing a one-dimensional double vector without using
@@ -111,9 +111,9 @@ public class OneDimensionalDoubleVector implements NumberVector {
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected OneDimensionalDoubleVector.Factory makeInstance() {
+      public OneDimensionalDoubleVector.Factory make() {
         return STATIC;
       }
     }

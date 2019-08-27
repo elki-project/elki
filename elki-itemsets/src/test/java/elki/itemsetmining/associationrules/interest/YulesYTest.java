@@ -42,9 +42,9 @@ public class YulesYTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/subsets3.txt", 7);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, -0.11) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, YulesY.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, -0.11) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, YulesY.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 6, res.getRules().size());
   }

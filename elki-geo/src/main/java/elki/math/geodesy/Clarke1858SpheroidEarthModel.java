@@ -21,7 +21,7 @@
 package elki.math.geodesy;
 
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * The Clarke 1858 spheroid earth model.
@@ -67,9 +67,9 @@ public class Clarke1858SpheroidEarthModel extends AbstractEarthModel {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected Clarke1858SpheroidEarthModel makeInstance() {
+    public Clarke1858SpheroidEarthModel make() {
       return STATIC;
     }
   }

@@ -86,7 +86,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
+  public static class Par extends AbstractRandomProjectionFamily.Par {
     /**
      * Parameter for the projection sparsity.
      */
@@ -98,8 +98,8 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     private double sparsity = 3.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(SPARSITY_ID) //
           .setDefaultValue(3.) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
@@ -107,7 +107,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     }
 
     @Override
-    protected AchlioptasRandomProjectionFamily makeInstance() {
+    public AchlioptasRandomProjectionFamily make() {
       return new AchlioptasRandomProjectionFamily(sparsity, random);
     }
   }

@@ -106,9 +106,9 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
+  public static class Par extends AbstractStreamingParser.Par {
     @Override
-    protected BitVectorLabelParser makeInstance() {
+    public BitVectorLabelParser make() {
       return new BitVectorLabelParser(format);
     }
   }

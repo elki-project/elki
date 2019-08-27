@@ -42,9 +42,9 @@ public class JMeasureTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 2) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.1) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, JMeasure.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 2) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.1) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, JMeasure.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 9, res.getRules().size());
   }

@@ -28,7 +28,7 @@ import elki.database.relation.Relation;
 import elki.similarity.NormalizedSimilarity;
 import elki.evaluation.clustering.ClusterContingencyTable;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the BCubed F1 Index.
@@ -94,9 +94,9 @@ public class ClusteringBCubedF1Similarity implements ClusteringDistanceSimilarit
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClusteringBCubedF1Similarity makeInstance() {
+    public ClusteringBCubedF1Similarity make() {
       return STATIC;
     }
   }

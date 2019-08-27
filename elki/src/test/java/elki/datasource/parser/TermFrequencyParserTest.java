@@ -65,7 +65,7 @@ public class TermFrequencyParserTest {
     InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser);
 
     ListParameterization config = new ListParameterization();
-    config.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
+    config.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, dbc);
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
 
     if(config.hasUnusedParameters()) {

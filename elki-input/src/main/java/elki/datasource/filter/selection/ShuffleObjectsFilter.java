@@ -27,7 +27,7 @@ import java.util.Random;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
@@ -99,7 +99,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Optional parameter to specify a seed for randomly shuffling the rows of
      * the database. If not set, a random seed will be used. Shuffling takes
@@ -113,13 +113,12 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected ShuffleObjectsFilter makeInstance() {
+    public ShuffleObjectsFilter make() {
       return new ShuffleObjectsFilter(rnd);
     }
   }

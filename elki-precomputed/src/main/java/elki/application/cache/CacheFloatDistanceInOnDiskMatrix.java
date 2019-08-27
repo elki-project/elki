@@ -138,7 +138,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
+  public static class Par<O> extends AbstractApplication.Par {
     /**
      * Data source to process.
      */
@@ -155,20 +155,20 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
     private File out = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
           .grab(config, x -> database = x);
       // Distance function parameter
-      new ObjectParameter<Distance<? super O>>(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.DISTANCE_ID, Distance.class) //
+      new ObjectParameter<Distance<? super O>>(CacheDoubleDistanceInOnDiskMatrix.Par.DISTANCE_ID, Distance.class) //
           .grab(config, x -> distance = x);
       // Output file parameter
-      new FileParameter(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.CACHE_ID, FileParameter.FileType.OUTPUT_FILE) //
+      new FileParameter(CacheDoubleDistanceInOnDiskMatrix.Par.CACHE_ID, FileParameter.FileType.OUTPUT_FILE) //
           .grab(config, x -> out = x);
     }
 
     @Override
-    protected CacheFloatDistanceInOnDiskMatrix<O> makeInstance() {
+    public CacheFloatDistanceInOnDiskMatrix<O> make() {
       return new CacheFloatDistanceInOnDiskMatrix<>(database, distance, out);
     }
   }

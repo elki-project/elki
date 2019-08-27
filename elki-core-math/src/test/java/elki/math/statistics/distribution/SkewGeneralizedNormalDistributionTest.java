@@ -72,9 +72,9 @@ public class SkewGeneralizedNormalDistributionTest extends AbstractDistributionT
   public void testParameterizer() throws ClassInstantiationException {
     load("skewnorm.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(SkewGeneralizedNormalDistribution.Parameterizer.LOCATION_ID, 1.);
-    params.addParameter(SkewGeneralizedNormalDistribution.Parameterizer.SCALE_ID, 2.);
-    params.addParameter(SkewGeneralizedNormalDistribution.Parameterizer.SKEW_ID, 3.);
+    params.addParameter(SkewGeneralizedNormalDistribution.Par.LOCATION_ID, 1.);
+    params.addParameter(SkewGeneralizedNormalDistribution.Par.SCALE_ID, 2.);
+    params.addParameter(SkewGeneralizedNormalDistribution.Par.SKEW_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(SkewGeneralizedNormalDistribution.class, params);
     checkPDF(dist, "pdf_gnur_1_2_3", 1e-15);
   }

@@ -57,7 +57,7 @@ import elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity;
 import elki.similarity.cluster.ClusteringDistanceSimilarity;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -353,7 +353,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Default number of clusterings to run.
      */
@@ -436,14 +436,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     protected boolean keep;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       distance = ClusteringAdjustedRandIndexSimilarity.STATIC;
       new ObjectParameter<ClusteringDistanceSimilarity>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarity.class, ClusteringAdjustedRandIndexSimilarity.class) //
           .grab(config, x -> distance = x);
       // Configure Distance function
       ListParameterization predef = new ListParameterization() //
-          .addParameter(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, distance);
+          .addParameter(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);
@@ -473,7 +472,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     }
 
     @Override
-    protected RepresentativeUncertainClustering makeInstance() {
+    public RepresentativeUncertainClustering make() {
       return new RepresentativeUncertainClustering(distance, metaAlgorithm, samplesAlgorithm, numsamples, random, alpha, keep);
     }
   }

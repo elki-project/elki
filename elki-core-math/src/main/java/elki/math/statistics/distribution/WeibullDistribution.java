@@ -22,9 +22,9 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -208,13 +208,12 @@ public class WeibullDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /** Parameters. */
     double theta, k, lambda;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID, 0.) //
           .grab(config, x -> theta = x);
       new DoubleParameter(SCALE_ID) //
@@ -224,7 +223,7 @@ public class WeibullDistribution implements Distribution {
     }
 
     @Override
-    protected WeibullDistribution makeInstance() {
+    public WeibullDistribution make() {
       return new WeibullDistribution(k, lambda, theta);
     }
   }

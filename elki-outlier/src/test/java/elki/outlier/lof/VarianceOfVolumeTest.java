@@ -39,7 +39,7 @@ public class VarianceOfVolumeTest extends AbstractOutlierAlgorithmTest {
   public void testVOV() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<VarianceOfVolume<DoubleVector>>(VarianceOfVolume.class) //
-        .with(VarianceOfVolume.Parameterizer.K_ID, 10) //
+        .with(VarianceOfVolume.Par.K_ID, 10) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.9306946778);
     testSingleScore(result, 1293, 37.1063484);

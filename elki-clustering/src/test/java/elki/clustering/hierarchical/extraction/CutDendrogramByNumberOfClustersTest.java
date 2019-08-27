@@ -40,7 +40,7 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9474250948);
@@ -51,8 +51,8 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
   public void testSLINKHierarchical() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 10) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.HIERARCHICAL_ID) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
+        .with(CutDendrogramByNumberOfClusters.Par.HIERARCHICAL_ID) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9474250948);

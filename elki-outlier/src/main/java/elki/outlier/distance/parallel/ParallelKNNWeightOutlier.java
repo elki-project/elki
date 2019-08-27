@@ -156,21 +156,21 @@ public class ParallelKNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * K parameter
      */
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(KNNWeightOutlier.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(KNNWeightOutlier.Par.K_ID) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected ParallelKNNWeightOutlier<O> makeInstance() {
+    public ParallelKNNWeightOutlier<O> make() {
       return new ParallelKNNWeightOutlier<>(distanceFunction, k);
     }
   }

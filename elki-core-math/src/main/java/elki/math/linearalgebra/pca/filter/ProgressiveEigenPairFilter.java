@@ -22,7 +22,7 @@ package elki.math.linearalgebra.pca.filter;
 
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -145,7 +145,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter progressive alpha.
      */
@@ -163,19 +163,18 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     private double walpha;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(EIGENPAIR_FILTER_PALPHA, DEFAULT_PALPHA) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .grab(config, x -> palpha = x);
-      new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA) //
+      new DoubleParameter(WeakEigenPairFilter.Par.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> walpha = x);
     }
 
     @Override
-    protected ProgressiveEigenPairFilter makeInstance() {
+    public ProgressiveEigenPairFilter make() {
       return new ProgressiveEigenPairFilter(palpha, walpha);
     }
   }

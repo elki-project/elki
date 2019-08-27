@@ -39,8 +39,8 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * {@code
  * RStarTreeFactory<DoubleVector> indexfactory =
  *   new ELKIBuilder<RStarTreeFactory<DoubleVector>>(RStarTreeFactory.class)
- *       .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512)
- *       .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
+ *       .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 512)
+ *       .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
  *       .build();
  * }
  * with {@code new ELKIBuilder<RStarTreeFactory<DoubleVector>>} this code is
@@ -82,8 +82,8 @@ public final class ELKIBuilder<T> {
    * {@code
    * RStarTreeFactory<DoubleVector> indexfactory =
    *   new ELKIBuilder<RStarTreeFactory<DoubleVector>>(RStarTreeFactory.class)
-   *       .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512)
-   *       .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
+   *       .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 512)
+   *       .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class)
    *       .build();
    * }
    * with {@code new ELKIBuilder<RStarTreeFactory<DoubleVector>>} this code is

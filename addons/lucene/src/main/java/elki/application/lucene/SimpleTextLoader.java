@@ -87,7 +87,7 @@ public class SimpleTextLoader extends AbstractApplication {
     }
   }
 
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Parameter for the index to build.
      */
@@ -101,8 +101,8 @@ public class SimpleTextLoader extends AbstractApplication {
     File index, source;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new FileParameter(SOURCE_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> source = x);
       new FileParameter(INDEX_ID, FileParameter.FileType.OUTPUT_FILE) //
@@ -110,7 +110,7 @@ public class SimpleTextLoader extends AbstractApplication {
     }
 
     @Override
-    protected SimpleTextLoader makeInstance() {
+    public SimpleTextLoader make() {
       return new SimpleTextLoader(index, source);
     }
   }

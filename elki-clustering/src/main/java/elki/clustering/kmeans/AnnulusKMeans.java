@@ -271,9 +271,9 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends HamerlyKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends HamerlyKMeans.Par<V> {
     @Override
-    protected AnnulusKMeans<V> makeInstance() {
+    public AnnulusKMeans<V> make() {
       return new AnnulusKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }

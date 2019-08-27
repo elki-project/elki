@@ -21,7 +21,7 @@
 package elki.distance.minkowski;
 
 import elki.data.SparseNumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -108,9 +108,9 @@ public class SparseEuclideanDistance extends SparseLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SparseEuclideanDistance makeInstance() {
+    public SparseEuclideanDistance make() {
       return SparseEuclideanDistance.STATIC;
     }
   }

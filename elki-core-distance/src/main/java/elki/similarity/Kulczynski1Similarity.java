@@ -27,7 +27,7 @@ import elki.database.relation.Relation;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Kulczynski similarity 1.
@@ -125,9 +125,9 @@ public class Kulczynski1Similarity extends AbstractNumberVectorDistance implemen
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected Kulczynski1Similarity makeInstance() {
+    public Kulczynski1Similarity make() {
       return Kulczynski1Similarity.STATIC;
     }
   }

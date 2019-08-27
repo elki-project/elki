@@ -215,22 +215,22 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * The neighborhood size to use.
      */
     protected int k = 2;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(LOF.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected SimplifiedLOF<O> makeInstance() {
+    public SimplifiedLOF<O> make() {
       return new SimplifiedLOF<>(k, distanceFunction);
     }
   }

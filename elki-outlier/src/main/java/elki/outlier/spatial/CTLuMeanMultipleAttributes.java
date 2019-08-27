@@ -156,9 +156,9 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
    * @param <N> Neighborhood type
    * @param <O> Attribute object type
    */
-  public static class Parameterizer<N, O extends NumberVector> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N, O extends NumberVector> extends AbstractNeighborhoodOutlier.Par<N> {
     @Override
-    protected CTLuMeanMultipleAttributes<N, O> makeInstance() {
+    public CTLuMeanMultipleAttributes<N, O> make() {
       return new CTLuMeanMultipleAttributes<>(npredf);
     }
   }

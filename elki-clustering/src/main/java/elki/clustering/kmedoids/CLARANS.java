@@ -444,7 +444,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * The number of restarts to run.
      */
@@ -491,8 +491,8 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -506,7 +506,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     }
 
     @Override
-    protected CLARANS<V> makeInstance() {
+    public CLARANS<V> make() {
       return new CLARANS<>(distanceFunction, k, numlocal, maxneighbor, random);
     }
   }

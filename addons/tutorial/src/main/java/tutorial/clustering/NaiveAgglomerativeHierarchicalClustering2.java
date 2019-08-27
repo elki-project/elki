@@ -243,22 +243,22 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Desired number of clusters.
      */
     int numclusters = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numclusters = x);
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering2<O> makeInstance() {
+    public NaiveAgglomerativeHierarchicalClustering2<O> make() {
       return new NaiveAgglomerativeHierarchicalClustering2<>(distanceFunction, numclusters);
     }
   }

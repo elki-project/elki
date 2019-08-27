@@ -46,7 +46,7 @@ public class VectorDimensionalityFilterTest extends AbstractDataSourceTest {
     final int dim_keep = 10;
     String filename = UNITTEST + "dimensionality-test-2.csv";
     VectorDimensionalityFilter<DoubleVector> filter = new ELKIBuilder<VectorDimensionalityFilter<DoubleVector>>(VectorDimensionalityFilter.class) //
-        .with(VectorDimensionalityFilter.Parameterizer.DIM_P, dim_keep).build();
+        .with(VectorDimensionalityFilter.Par.DIM_P, dim_keep).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

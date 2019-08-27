@@ -23,7 +23,7 @@ package elki.distance.minkowski;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Manhattan distance for {@link NumberVector}s.
@@ -174,9 +174,9 @@ public class ManhattanDistance extends LPIntegerNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ManhattanDistance makeInstance() {
+    public ManhattanDistance make() {
       return ManhattanDistance.STATIC;
     }
   }

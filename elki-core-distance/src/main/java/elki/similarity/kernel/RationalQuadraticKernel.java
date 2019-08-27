@@ -23,7 +23,7 @@ package elki.similarity.kernel;
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.similarity.AbstractVectorSimilarity;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -68,7 +68,7 @@ public class RationalQuadraticKernel extends AbstractVectorSimilarity {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * C parameter
      */
@@ -80,15 +80,14 @@ public class RationalQuadraticKernel extends AbstractVectorSimilarity {
     protected double c = 1.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(C_ID, 1.) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> c = x);
     }
 
     @Override
-    protected RationalQuadraticKernel makeInstance() {
+    public RationalQuadraticKernel make() {
       return new RationalQuadraticKernel(c);
     }
   }

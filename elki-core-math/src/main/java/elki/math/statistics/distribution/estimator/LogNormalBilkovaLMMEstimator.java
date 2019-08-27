@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -101,9 +101,9 @@ public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<Lo
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogNormalBilkovaLMMEstimator makeInstance() {
+    public LogNormalBilkovaLMMEstimator make() {
       return STATIC;
     }
   }

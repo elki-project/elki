@@ -26,7 +26,7 @@ import elki.data.projection.random.AchlioptasRandomProjectionFamily;
 import elki.index.IndexFactory;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -83,7 +83,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
    * 
    * @param <O> Outer object type.
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Target dimensionality.
      */
@@ -130,9 +130,8 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Par.INDEX_ID, IndexFactory.class) //
           .grab(config, x -> inner = x);
       new IntParameter(T_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -147,7 +146,7 @@ public class PINN<O extends NumberVector> extends ProjectedIndex.Factory<O, O> {
     }
 
     @Override
-    protected PINN<O> makeInstance() {
+    public PINN<O> make() {
       return new PINN<>(inner, t, s, h, random);
     }
   }

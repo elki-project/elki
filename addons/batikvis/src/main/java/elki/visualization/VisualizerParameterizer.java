@@ -39,7 +39,7 @@ import elki.result.SettingsResult.SettingInformation;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -156,13 +156,13 @@ public class VisualizerParameterizer {
     String dataset = null;
 
     for(SettingInformation setting : settings) {
-      if(setting.name.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID.getName())) {
+      if(setting.name.equals(AlgorithmStep.Par.ALGORITHM_ID.getName())) {
         algorithm = setting.value;
       }
-      if(setting.name.equals(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID.getName())) {
+      if(setting.name.equals(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID.getName())) {
         distance = setting.value;
       }
-      if(setting.name.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID.getName())) {
+      if(setting.name.equals(FileBasedDatabaseConnection.Par.INPUT_ID.getName())) {
         dataset = setting.value;
       }
     }
@@ -205,7 +205,7 @@ public class VisualizerParameterizer {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to get the style properties file.
      * <p>
@@ -254,8 +254,7 @@ public class VisualizerParameterizer {
     protected int samplesize = -1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(SAMPLING_ID, DEFAULT_SAMPLE_SIZE) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT) //
           .grab(config, x -> samplesize = x);
@@ -307,7 +306,7 @@ public class VisualizerParameterizer {
     }
 
     @Override
-    protected VisualizerParameterizer makeInstance() {
+    public VisualizerParameterizer make() {
       return new VisualizerParameterizer(samplesize, stylelib, factories);
     }
   }

@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.UniformDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Uniform distribution parameters using Median and MAD.
@@ -75,9 +75,9 @@ public class UniformMADEstimator implements MADDistributionEstimator<UniformDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected UniformMADEstimator makeInstance() {
+    public UniformMADEstimator make() {
       return STATIC;
     }
   }

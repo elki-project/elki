@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.RayleighDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the scale parameter of a (non-shifted) RayleighDistribution using a
@@ -72,9 +72,9 @@ public class RayleighMLEEstimator implements DistributionEstimator<RayleighDistr
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RayleighMLEEstimator makeInstance() {
+    public RayleighMLEEstimator make() {
       return STATIC;
     }
   }

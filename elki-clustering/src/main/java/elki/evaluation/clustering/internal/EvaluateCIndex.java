@@ -45,7 +45,7 @@ import elki.utilities.datastructures.heap.DoubleHeap;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.datastructures.heap.DoubleMinHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -266,7 +266,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @author Stephan Baier
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -288,8 +288,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     private NoiseHandling noiseOption;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
@@ -297,7 +296,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateCIndex<O> makeInstance() {
+    public EvaluateCIndex<O> make() {
       return new EvaluateCIndex<>(distance, noiseOption);
     }
   }

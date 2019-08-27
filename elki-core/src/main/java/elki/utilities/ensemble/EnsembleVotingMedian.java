@@ -21,7 +21,7 @@
 package elki.utilities.ensemble;
 
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -65,7 +65,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the quantile
      */
@@ -77,8 +77,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
     private double quantile = 0.5;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(QUANTILE_ID, .5) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -86,7 +85,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
     }
 
     @Override
-    protected EnsembleVotingMedian makeInstance() {
+    public EnsembleVotingMedian make() {
       return new EnsembleVotingMedian(quantile);
     }
   }

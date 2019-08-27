@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.birch;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Centroid Euclidean distance.
@@ -78,9 +78,9 @@ public class CentroidEuclideanDistance implements BIRCHDistance {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CentroidEuclideanDistance makeInstance() {
+    public CentroidEuclideanDistance make() {
       return STATIC;
     }
   }

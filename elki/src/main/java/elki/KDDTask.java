@@ -26,7 +26,7 @@ import elki.application.KDDCLIApplication;
 import elki.database.Database;
 import elki.result.Metadata;
 import elki.result.SettingsResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameterization.TrackParameters;
 import elki.utilities.optionhandling.parameterization.TrackedParameter;
@@ -117,7 +117,7 @@ public class KDDTask {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     InputStep inputStep = null;
 
     AlgorithmStep algorithmStep = null;
@@ -129,9 +129,7 @@ public class KDDTask {
     OutputStep outputStep = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      // Track the key parameters for reporting the settings.
+    public void configure(Parameterization config) {
       TrackParameters track = new TrackParameters(config);
 
       inputStep = track.tryInstantiate(InputStep.class);
@@ -145,7 +143,7 @@ public class KDDTask {
     }
 
     @Override
-    protected KDDTask makeInstance() {
+    public KDDTask make() {
       return new KDDTask(inputStep, algorithmStep, evaluationStep, outputStep, settings);
     }
   }

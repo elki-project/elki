@@ -45,7 +45,7 @@ public class ShuffleObjectsFilterTest extends AbstractDataSourceTest {
   public void defaultParameters() {
     String filename = UNITTEST + "sorted-data-1.csv";
     ShuffleObjectsFilter filter = new ELKIBuilder<>(ShuffleObjectsFilter.class)//
-        .with(ShuffleObjectsFilter.Parameterizer.SEED_ID, 0)//
+        .with(ShuffleObjectsFilter.Par.SEED_ID, 0)//
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

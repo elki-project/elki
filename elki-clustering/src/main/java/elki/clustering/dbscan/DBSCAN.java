@@ -299,7 +299,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -323,8 +323,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     protected int minpts;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
@@ -336,7 +336,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     }
 
     @Override
-    protected DBSCAN<O> makeInstance() {
+    public DBSCAN<O> make() {
       return new DBSCAN<>(distanceFunction, epsilon, minpts);
     }
   }

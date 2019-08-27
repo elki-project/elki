@@ -23,7 +23,7 @@ package elki.math.statistics.intrinsicdimensionality;
 import elki.math.statistics.ProbabilityWeightedMoments;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Probability weighted moments based estimator using L-Moments.
@@ -160,9 +160,9 @@ public class LMomentsEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LMomentsEstimator makeInstance() {
+    public LMomentsEstimator make() {
       return STATIC;
     }
   }

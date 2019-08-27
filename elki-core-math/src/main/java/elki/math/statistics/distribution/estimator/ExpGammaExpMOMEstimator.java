@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.ExpGammaDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -92,9 +92,9 @@ public class ExpGammaExpMOMEstimator implements DistributionEstimator<ExpGammaDi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ExpGammaExpMOMEstimator makeInstance() {
+    public ExpGammaExpMOMEstimator make() {
       return STATIC;
     }
   }

@@ -39,7 +39,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -304,7 +304,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The number of clusters to extract.
      */
@@ -331,8 +331,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
     HierarchicalClusteringAlgorithm algorithm;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new IntParameter(K_ID) //
@@ -344,7 +343,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
     }
 
     @Override
-    protected ClustersWithNoiseExtraction makeInstance() {
+    public ClustersWithNoiseExtraction make() {
       return new ClustersWithNoiseExtraction(algorithm, numCl, minClSize);
     }
   }

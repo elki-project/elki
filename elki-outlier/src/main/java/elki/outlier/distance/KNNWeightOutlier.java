@@ -167,7 +167,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the k nearest neighbor.
      */
@@ -181,15 +181,15 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected KNNWeightOutlier<O> makeInstance() {
+    public KNNWeightOutlier<O> make() {
       return new KNNWeightOutlier<>(distanceFunction, k);
     }
   }

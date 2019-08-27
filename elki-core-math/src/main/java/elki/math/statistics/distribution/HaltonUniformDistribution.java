@@ -25,12 +25,12 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.math.Primes;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -315,7 +315,7 @@ public class HaltonUniformDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Generator for random distribution parameters
      */
@@ -330,15 +330,14 @@ public class HaltonUniformDistribution implements Distribution {
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(UniformDistribution.Parameterizer.MIN_ID).grab(config, x -> min = x);
-      new DoubleParameter(UniformDistribution.Parameterizer.MAX_ID).grab(config, x -> max = x);
+    public void configure(Parameterization config) {
+      new DoubleParameter(UniformDistribution.Par.MIN_ID).grab(config, x -> min = x);
+      new DoubleParameter(UniformDistribution.Par.MAX_ID).grab(config, x -> max = x);
       new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected HaltonUniformDistribution makeInstance() {
+    public HaltonUniformDistribution make() {
       return new HaltonUniformDistribution(min, max, rnd.getSingleThreadedRandom());
     }
   }

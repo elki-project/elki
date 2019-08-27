@@ -118,9 +118,9 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
      *
      * @param <O> Object type
      */
-    public static class Parameterizer<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
-      protected KNNJoinMaterializeKNNPreprocessor.Factory<O> makeInstance() {
+      public KNNJoinMaterializeKNNPreprocessor.Factory<O> make() {
         return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distanceFunction);
       }
     }

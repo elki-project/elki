@@ -28,7 +28,7 @@ import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -120,7 +120,7 @@ public class WinsorizingEstimator<D extends Distribution> implements Distributio
    * 
    * @param <D> Distribution type
    */
-  public static class Parameterizer<D extends Distribution> extends AbstractParameterizer {
+  public static class Par<D extends Distribution> implements Parameterizer {
     /**
      * Option for the class to use on the winsorized sample.
      */
@@ -142,8 +142,7 @@ public class WinsorizingEstimator<D extends Distribution> implements Distributio
     private double winsorize;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<DistributionEstimator<D>>(INNER_ID, DistributionEstimator.class) //
           .grab(config, x -> inner = x);
       new DoubleParameter(WINSORIZE_ID)//
@@ -153,7 +152,7 @@ public class WinsorizingEstimator<D extends Distribution> implements Distributio
     }
 
     @Override
-    protected WinsorizingEstimator<D> makeInstance() {
+    public WinsorizingEstimator<D> make() {
       return new WinsorizingEstimator<>(inner, winsorize);
     }
   }

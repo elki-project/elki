@@ -189,26 +189,26 @@ public class FastCLARA<V> extends FastPAM<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends FastPAM.Parameterizer<V> {
+  public static class Par<V> extends FastPAM.Par<V> {
     /**
      * The number of samples to run.
      */
-    public static final OptionID NUMSAMPLES_ID = CLARA.Parameterizer.NUMSAMPLES_ID;
+    public static final OptionID NUMSAMPLES_ID = CLARA.Par.NUMSAMPLES_ID;
 
     /**
      * The sample size.
      */
-    public static final OptionID SAMPLESIZE_ID = CLARA.Parameterizer.SAMPLESIZE_ID;
+    public static final OptionID SAMPLESIZE_ID = CLARA.Par.SAMPLESIZE_ID;
 
     /**
      * Draw independent samples.
      */
-    public static final OptionID NOKEEPMED_ID = CLARA.Parameterizer.NOKEEPMED_ID;
+    public static final OptionID NOKEEPMED_ID = CLARA.Par.NOKEEPMED_ID;
 
     /**
      * Random generator.
      */
-    public static final OptionID RANDOM_ID = CLARA.Parameterizer.RANDOM_ID;
+    public static final OptionID RANDOM_ID = CLARA.Par.RANDOM_ID;
 
     /**
      * Sampling rate. If less than 1, it is considered to be a relative value.
@@ -231,8 +231,8 @@ public class FastCLARA<V> extends FastPAM<V> {
     RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(NUMSAMPLES_ID, 5) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numsamples = x);
@@ -247,7 +247,7 @@ public class FastCLARA<V> extends FastPAM<V> {
     }
 
     @Override
-    protected FastCLARA<V> makeInstance() {
+    public FastCLARA<V> make() {
       return new FastCLARA<>(distanceFunction, k, maxiter, initializer, fasttol, numsamples, sampling, keepmed, random);
     }
   }

@@ -46,7 +46,7 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   public void testMiniMax() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMax.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.938662648);
@@ -61,7 +61,7 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   public void testMiniMax2() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, MiniMax.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.914592130);

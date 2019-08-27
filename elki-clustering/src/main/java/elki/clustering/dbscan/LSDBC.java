@@ -304,7 +304,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for neighborhood size.
      */
@@ -326,8 +326,8 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     protected double alpha;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -337,7 +337,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     }
 
     @Override
-    protected LSDBC<O> makeInstance() {
+    public LSDBC<O> make() {
       return new LSDBC<>(distanceFunction, k, alpha);
     }
   }

@@ -25,10 +25,10 @@ import java.util.Random;
 import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -207,19 +207,18 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /**
      * Rate option, same as
      * {@link ExponentialDistribution.Parameterizer#RATE_ID}.
      */
-    public static final OptionID RATE_ID = ExponentialDistribution.Parameterizer.RATE_ID;
+    public static final OptionID RATE_ID = ExponentialDistribution.Par.RATE_ID;
 
     /** Parameters. */
     double mean, stddev, lambda;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID) //
           .setDefaultValue(0.) //
           .grab(config, x -> mean = x);
@@ -230,7 +229,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
     }
 
     @Override
-    protected ExponentiallyModifiedGaussianDistribution makeInstance() {
+    public ExponentiallyModifiedGaussianDistribution make() {
       return new ExponentiallyModifiedGaussianDistribution(mean, stddev, lambda);
     }
   }

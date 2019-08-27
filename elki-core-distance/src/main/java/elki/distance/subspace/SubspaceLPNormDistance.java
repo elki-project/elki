@@ -161,22 +161,22 @@ public class SubspaceLPNormDistance extends AbstractDimensionsSelectingDistance<
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDistance.Parameterizer {
+  public static class Par extends AbstractDimensionsSelectingDistance.Par {
     /**
      * Value of p.
      */
     private double p;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      new DoubleParameter(LPNormDistance.Parameterizer.P_ID) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(LPNormDistance.Par.P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> p = x);
-      super.makeOptions(config);
+      super.configure(config);
     }
 
     @Override
-    protected SubspaceLPNormDistance makeInstance() {
+    public SubspaceLPNormDistance make() {
       return p == 2. ? new SubspaceEuclideanDistance(dimensions) : //
           p == 1. ? new SubspaceManhattanDistance(dimensions) : //
               new SubspaceLPNormDistance(p, dimensions);

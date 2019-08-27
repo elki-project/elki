@@ -37,7 +37,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -184,7 +184,7 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
    * @param <V> Vector type
    * @param <M> Model type
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector, M extends MeanModel> implements Parameterizer {
     /**
      * Parameter to specify the kMeans variant.
      */
@@ -201,8 +201,7 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
@@ -220,7 +219,7 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     }
 
     @Override
-    protected BisectingKMeans<V, M> makeInstance() {
+    public BisectingKMeans<V, M> make() {
       return new BisectingKMeans<>(k, kMeansVariant);
     }
   }

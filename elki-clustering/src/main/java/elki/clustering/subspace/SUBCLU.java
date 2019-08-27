@@ -49,7 +49,7 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -445,7 +445,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * The distance function to determine the distance between objects.
      */
@@ -488,8 +488,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     protected int mindim = 1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<DimensionSelectingSubspaceDistance<V>>(DISTANCE_FUNCTION_ID, DimensionSelectingSubspaceDistance.class, SubspaceEuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(EPSILON_ID) //
@@ -504,7 +503,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     }
 
     @Override
-    protected SUBCLU<V> makeInstance() {
+    public SUBCLU<V> make() {
       return new SUBCLU<>(distance, epsilon, minpts, mindim);
     }
   }

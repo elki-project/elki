@@ -227,7 +227,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Perplexity parameter, the number of neighbors to preserve.
      */
@@ -244,8 +244,8 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(PERPLEXITY_ID)//
           .setDefaultValue(40.0) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
@@ -253,7 +253,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     }
 
     @Override
-    protected PerplexityAffinityMatrixBuilder<O> makeInstance() {
+    public PerplexityAffinityMatrixBuilder<O> make() {
       return new PerplexityAffinityMatrixBuilder<>(distanceFunction, perplexity);
     }
   }

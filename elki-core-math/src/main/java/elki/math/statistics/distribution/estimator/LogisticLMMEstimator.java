@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.LogisticDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a Logistic Distribution, using the methods of
@@ -84,9 +84,9 @@ public class LogisticLMMEstimator implements LMMDistributionEstimator<LogisticDi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogisticLMMEstimator makeInstance() {
+    public LogisticLMMEstimator make() {
       return STATIC;
     }
   }

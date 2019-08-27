@@ -244,9 +244,9 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
+  public static class Par<O> extends AbstractOPTICS.Par<O> {
     @Override
-    protected OPTICSList<O> makeInstance() {
+    public OPTICSList<O> make() {
       return new OPTICSList<>(distanceFunction, epsilon, minpts);
     }
   }

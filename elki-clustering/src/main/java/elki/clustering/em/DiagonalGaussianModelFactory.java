@@ -92,9 +92,9 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractEMModelFactory.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractEMModelFactory.Par<V> {
     @Override
-    protected DiagonalGaussianModelFactory<V> makeInstance() {
+    public DiagonalGaussianModelFactory<V> make() {
       return new DiagonalGaussianModelFactory<>(initializer);
     }
   }

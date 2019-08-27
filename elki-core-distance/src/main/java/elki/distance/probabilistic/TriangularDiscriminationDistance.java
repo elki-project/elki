@@ -25,7 +25,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Triangular Discrimination has relatively tight upper and lower bounds to the
@@ -134,9 +134,9 @@ public class TriangularDiscriminationDistance extends AbstractNumberVectorDistan
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected TriangularDiscriminationDistance makeInstance() {
+    public TriangularDiscriminationDistance make() {
       return STATIC;
     }
   }

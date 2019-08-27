@@ -25,7 +25,7 @@ import java.util.Random;
 
 import elki.data.NumberVector;
 import elki.data.SparseNumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
@@ -148,7 +148,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter for the random generator.
      */
@@ -160,8 +160,7 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
     protected RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
     }
   }

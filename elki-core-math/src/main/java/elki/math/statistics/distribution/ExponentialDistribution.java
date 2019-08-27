@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -171,7 +171,7 @@ public class ExponentialDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /**
      * Shape parameter gamma.
      */
@@ -181,8 +181,7 @@ public class ExponentialDistribution implements Distribution {
     double location, rate;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID, 0.) //
           .grab(config, x -> location = x);
       new DoubleParameter(RATE_ID) //
@@ -190,7 +189,7 @@ public class ExponentialDistribution implements Distribution {
     }
 
     @Override
-    protected ExponentialDistribution makeInstance() {
+    public ExponentialDistribution make() {
       return new ExponentialDistribution(rate, location);
     }
   }

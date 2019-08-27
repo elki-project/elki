@@ -32,7 +32,7 @@ import elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.Dummy
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.ClassGenericsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -76,15 +76,14 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Inner algorithm to extract a clustering.
      */
     HDBSCANHierarchyExtraction inner;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       ListParameterization overrides = new ListParameterization();
       overrides.addParameter(AbstractAlgorithm.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
@@ -92,7 +91,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
     }
 
     @Override
-    protected HDBSCANHierarchyExtractionEvaluator makeInstance() {
+    public HDBSCANHierarchyExtractionEvaluator make() {
       return new HDBSCANHierarchyExtractionEvaluator(inner);
     }
   }

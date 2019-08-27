@@ -43,7 +43,7 @@ public class WeightedLPNormDistanceTest extends AbstractDistanceTest {
   public void testSpatialConsistency() {
     // Also test the builder
     WeightedLPNormDistance dist = new ELKIBuilder<>(WeightedLPNormDistance.class) //
-        .with(LPNormDistance.Parameterizer.P_ID, .5)//
+        .with(LPNormDistance.Par.P_ID, .5)//
         .with(WeightedNumberVectorDistance.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertFalse("Not metric", dist.isMetric());
@@ -51,7 +51,7 @@ public class WeightedLPNormDistanceTest extends AbstractDistanceTest {
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(WeightedLPNormDistance.class) //
-        .with(LPNormDistance.Parameterizer.P_ID, 3)//
+        .with(LPNormDistance.Par.P_ID, 3)//
         .with(WeightedNumberVectorDistance.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertTrue("Not metric", dist.isMetric());

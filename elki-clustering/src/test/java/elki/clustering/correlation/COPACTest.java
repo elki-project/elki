@@ -55,9 +55,9 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
     // these parameters are not picked too well - room for improvement.
     Clustering<DimensionModel> result = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.02) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
-        .with(COPAC.Parameterizer.K_ID, 15) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.02) //
+        .with(DBSCAN.Par.MINPTS_ID, 50) //
+        .with(COPAC.Par.K_ID, 15) //
         .build().run(db);
     testFMeasure(db, result, 0.8484056);
     testClusterSizes(result, new int[] { 54, 196, 200 });
@@ -71,14 +71,14 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
   public void testCOPACOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
     Clustering<DimensionModel> result = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.5) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
-        .with(COPAC.Parameterizer.K_ID, 45) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.5) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
+        .with(COPAC.Par.K_ID, 45) //
         // PCA Options:
-        .with(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
-        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(PCARunner.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
-        .with(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.8) //
+        .with(PercentageEigenPairFilter.Par.ALPHA_ID, 0.8) //
         .build().run(db);
     testFMeasure(db, result, 0.86505092);
     testClusterSizes(result, new int[] { 32, 172, 197, 249 });

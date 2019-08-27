@@ -29,7 +29,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -117,7 +117,7 @@ public class ExternalIDFilter implements ObjectFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the index of the label to be used as external
      * Id, starting at 0. Negative numbers are counted from the end.
@@ -127,14 +127,13 @@ public class ExternalIDFilter implements ObjectFilter {
     int externalIdIndex = -1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(EXTERNALID_INDEX_ID) //
           .grab(config, x -> externalIdIndex = x);
     }
 
     @Override
-    protected ExternalIDFilter makeInstance() {
+    public ExternalIDFilter make() {
       return new ExternalIDFilter(externalIdIndex);
     }
   }

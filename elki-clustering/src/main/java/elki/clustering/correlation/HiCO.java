@@ -51,7 +51,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -391,7 +391,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the smoothing factor, must be an integer greater
      * than 0. The {link {@link #MU_ID}-nearest neighbor is used to compute the
@@ -435,8 +435,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     private KNNQueryFilteredPCAIndex.Factory<V> indexfactory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(MU_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> mu = x);
@@ -455,7 +454,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       // Configure Distance function
       ListParameterization params = new ListParameterization();
       // preprocessor
-      params.addParameter(KNNQueryFilteredPCAIndex.Factory.Parameterizer.K_ID, k);
+      params.addParameter(KNNQueryFilteredPCAIndex.Factory.Par.K_ID, k);
       params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, new PercentageEigenPairFilter(alpha));
 
       ChainedParameterization chain = new ChainedParameterization(params, config);
@@ -465,7 +464,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     }
 
     @Override
-    protected HiCO<V> makeInstance() {
+    public HiCO<V> make() {
       return new HiCO<>(indexfactory, mu, delta);
     }
   }

@@ -22,7 +22,7 @@ package elki.math.linearalgebra.pca.filter;
 
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -64,7 +64,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter n
      */
@@ -76,15 +76,14 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
     protected int n = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(EIGENPAIR_FILTER_N) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> n = x);
     }
 
     @Override
-    protected FirstNEigenPairFilter makeInstance() {
+    public FirstNEigenPairFilter make() {
       return new FirstNEigenPairFilter(n);
     }
   }

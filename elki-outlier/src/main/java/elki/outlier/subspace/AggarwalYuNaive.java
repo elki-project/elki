@@ -181,9 +181,9 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractAggarwalYuOutlier.Par {
     @Override
-    protected AggarwalYuNaive<V> makeInstance() {
+    public AggarwalYuNaive<V> make() {
       return new AggarwalYuNaive<>(k, phi);
     }
   }

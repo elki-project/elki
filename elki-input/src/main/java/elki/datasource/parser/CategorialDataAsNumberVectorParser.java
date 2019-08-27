@@ -148,9 +148,9 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends NumberVectorLabelParser.Par<V> {
     @Override
-    protected CategorialDataAsNumberVectorParser<V> makeInstance() {
+    public CategorialDataAsNumberVectorParser<V> make() {
       return new CategorialDataAsNumberVectorParser<>(format, labelIndices, factory);
     }
   }

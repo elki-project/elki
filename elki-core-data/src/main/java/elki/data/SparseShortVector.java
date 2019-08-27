@@ -28,7 +28,7 @@ import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
@@ -334,9 +334,9 @@ public class SparseShortVector implements SparseNumberVector {
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected SparseShortVector.Factory makeInstance() {
+      public SparseShortVector.Factory make() {
         return FACTORY;
       }
     }

@@ -189,7 +189,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
      *
      * @param <O> Object type
      */
-    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       /**
        * Share of objects to consider for computing the kNN.
        */
@@ -211,8 +211,8 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
       private RandomFactory rnd;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         new DoubleParameter(SHARE_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
             .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -221,7 +221,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
       }
 
       @Override
-      protected RandomSampleKNNPreprocessor.Factory<O> makeInstance() {
+      public RandomSampleKNNPreprocessor.Factory<O> make() {
         return new RandomSampleKNNPreprocessor.Factory<>(k, distanceFunction, share, rnd);
       }
     }

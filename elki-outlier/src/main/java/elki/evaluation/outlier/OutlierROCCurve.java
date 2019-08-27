@@ -41,7 +41,7 @@ import elki.result.Metadata;
 import elki.result.OrderingResult;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -191,7 +191,7 @@ public class OutlierROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The pattern to identify positive classes.
      */
@@ -203,14 +203,13 @@ public class OutlierROCCurve implements Evaluator {
     protected Pattern positiveClassName = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(POSITIVE_CLASS_NAME_ID) //
           .grab(config, x -> positiveClassName = x);
     }
 
     @Override
-    protected OutlierROCCurve makeInstance() {
+    public OutlierROCCurve make() {
       return new OutlierROCCurve(positiveClassName);
     }
   }

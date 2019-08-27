@@ -44,7 +44,7 @@ import elki.logging.Logging;
 import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -525,7 +525,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+    public static class Par<O extends NumberVector> implements Parameterizer {
       /**
        * Option for setting the maximum leaf size.
        */
@@ -537,15 +537,14 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
       int leafsize;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new IntParameter(LEAFSIZE_P, 1) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> leafsize = x);
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(leafsize);
       }
     }

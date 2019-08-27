@@ -25,7 +25,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.math.spacefillingcurves.SpatialSorter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -77,7 +77,7 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for spatial sorting
      */
@@ -89,14 +89,13 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
     SpatialSorter sorter;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<SpatialSorter>(SORTER_ID, SpatialSorter.class) //
           .grab(config, x -> sorter = x);
     }
 
     @Override
-    protected SpatialSortBulkSplit makeInstance() {
+    public SpatialSortBulkSplit make() {
       return new SpatialSortBulkSplit(sorter);
     }
   }

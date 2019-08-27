@@ -33,7 +33,7 @@ import elki.math.geometry.PrimsMinimumSpanningTree;
 import elki.math.statistics.dependence.CorrelationDependenceMeasure;
 import elki.math.statistics.dependence.DependenceMeasure;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.visualization.parallel3d.layout.Layout.Edge;
@@ -311,15 +311,14 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Similarity measure
      */
     DependenceMeasure sim;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<DependenceMeasure>(SIM_ID, DependenceMeasure.class, CorrelationDependenceMeasure.class) //
           .grab(config, x -> sim = x);
     }

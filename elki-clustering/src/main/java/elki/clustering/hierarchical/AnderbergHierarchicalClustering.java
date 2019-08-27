@@ -371,7 +371,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Current linkage in use.
      */
@@ -383,15 +383,15 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      new ObjectParameter<Linkage>(AGNES.Parameterizer.LINKAGE_ID, Linkage.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<Linkage>(AGNES.Par.LINKAGE_ID, Linkage.class) //
           .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> linkage = x);
-      super.makeOptions(config);
+      super.configure(config);
     }
 
     @Override
-    protected AnderbergHierarchicalClustering<O> makeInstance() {
+    public AnderbergHierarchicalClustering<O> make() {
       return new AnderbergHierarchicalClustering<>(distanceFunction, linkage);
     }
   }

@@ -34,7 +34,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.similarity.Similarity;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -304,7 +304,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
     }
 
     /**
-     * Parameterizer.
+     * Par.
      *
      * @author Erich Schubert
      *
@@ -312,7 +312,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
      *
      * @param <O> Object type
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * Option parameter for the precomputed similarity matrix.
        */
@@ -324,14 +324,13 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
       protected Similarity<? super O> similarityFunction;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Similarity<? super O>>(DISTANCE_ID, Similarity.class) //
             .grab(config, x -> similarityFunction = x);
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(similarityFunction);
       }
     }

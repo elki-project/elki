@@ -39,7 +39,7 @@ public class LPIntegerNormDistanceTest extends AbstractDistanceTest {
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     LPIntegerNormDistance dist = new ELKIBuilder<>(LPIntegerNormDistance.class) //
-        .with(LPNormDistance.Parameterizer.P_ID, 3) //
+        .with(LPNormDistance.Par.P_ID, 3) //
         .build();
     assertSame("Subtyped", LPIntegerNormDistance.class, dist.getClass());
     basicChecks(dist);

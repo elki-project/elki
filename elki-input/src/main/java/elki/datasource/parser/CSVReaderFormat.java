@@ -23,7 +23,7 @@ package elki.datasource.parser;
 import java.util.regex.Pattern;
 
 import elki.utilities.io.TokenizedReader;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -121,7 +121,7 @@ public class CSVReaderFormat {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * OptionID for the column separator parameter (defaults to whitespace as in
      * {@link #DEFAULT_SEPARATOR}.
@@ -155,8 +155,7 @@ public class CSVReaderFormat {
     protected Pattern comment = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR) //
           .grab(config, x -> colSep = x);
       new StringParameter(QUOTE_ID, QUOTE_CHARS) //
@@ -166,7 +165,7 @@ public class CSVReaderFormat {
     }
 
     @Override
-    protected CSVReaderFormat makeInstance() {
+    public CSVReaderFormat make() {
       return new CSVReaderFormat(colSep, quoteChars, comment);
     }
   }

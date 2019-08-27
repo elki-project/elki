@@ -231,7 +231,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Sigma parameter, the Gaussian bandwidth
      */
@@ -248,15 +248,15 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(SIGMA_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> sigma = x);
     }
 
     @Override
-    protected GaussianAffinityMatrixBuilder<O> makeInstance() {
+    public GaussianAffinityMatrixBuilder<O> make() {
       return new GaussianAffinityMatrixBuilder<>(distanceFunction, sigma);
     }
   }

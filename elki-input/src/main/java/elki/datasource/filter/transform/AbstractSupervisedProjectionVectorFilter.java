@@ -36,7 +36,7 @@ import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
 import elki.datasource.filter.typeconversions.ClassLabelFilter;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -201,7 +201,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
    *
    * @param <V> Vector type
    */
-  public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public abstract static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * The number of dimensions to keep.
      */
@@ -213,8 +213,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
     protected int tdim;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(P_ID, 2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
 

@@ -122,8 +122,8 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("gumbel.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(GumbelDistribution.Parameterizer.LOCATION_ID, 2.);
-    params.addParameter(GumbelDistribution.Parameterizer.SHAPE_ID, 1.);
+    params.addParameter(GumbelDistribution.Par.LOCATION_ID, 2.);
+    params.addParameter(GumbelDistribution.Par.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GumbelDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }

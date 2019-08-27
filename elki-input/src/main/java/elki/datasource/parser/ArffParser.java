@@ -45,7 +45,7 @@ import elki.logging.Logging;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.ParseUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -637,7 +637,7 @@ public class ArffParser implements Parser {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Pattern for recognizing external ID attributes.
      */
@@ -659,8 +659,7 @@ public class ArffParser implements Parser {
     Pattern magic_class;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(MAGIC_EID_ID, DEFAULT_ARFF_MAGIC_EID) //
           .grab(config, x -> magic_eid = x);
       new PatternParameter(MAGIC_CLASS_ID, DEFAULT_ARFF_MAGIC_CLASS) //
@@ -668,7 +667,7 @@ public class ArffParser implements Parser {
     }
 
     @Override
-    protected ArffParser makeInstance() {
+    public ArffParser make() {
       return new ArffParser(magic_eid, magic_class);
     }
   }

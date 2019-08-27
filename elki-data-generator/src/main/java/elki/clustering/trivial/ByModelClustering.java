@@ -41,7 +41,7 @@ import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -138,7 +138,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the pattern to recognize noise clusters with.
      */
@@ -150,15 +150,14 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     protected Pattern noisepat;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(NOISE_ID) //
           .setOptional(true) //
           .grab(config, x -> noisepat = x);
     }
 
     @Override
-    protected ByModelClustering makeInstance() {
+    public ByModelClustering make() {
       return new ByModelClustering(noisepat);
     }
   }

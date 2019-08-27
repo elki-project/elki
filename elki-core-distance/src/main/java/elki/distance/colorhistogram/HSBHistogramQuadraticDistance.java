@@ -23,7 +23,7 @@ package elki.distance.colorhistogram;
 import elki.distance.MatrixWeightedQuadraticDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.ListSizeConstraint;
@@ -104,7 +104,7 @@ public class HSBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the kernel dimensionality.
      */
@@ -116,8 +116,7 @@ public class HSBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
     int quanth = 0, quants = 0, quantb = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntListParameter(BPP_ID) //
           .addConstraint(new ListSizeConstraint(3)) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST) //
@@ -130,7 +129,7 @@ public class HSBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
     }
 
     @Override
-    protected HSBHistogramQuadraticDistance makeInstance() {
+    public HSBHistogramQuadraticDistance make() {
       return new HSBHistogramQuadraticDistance(quanth, quants, quantb);
     }
   }

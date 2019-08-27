@@ -36,7 +36,7 @@ import elki.math.DoubleMinMax;
 import elki.math.scales.LinearScale;
 import elki.result.SamplingResult;
 import elki.utilities.datastructures.histogram.ObjHistogram;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -82,7 +82,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Number of bins to use in histogram.
@@ -94,7 +94,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
    *
    * @param settings Settings
    */
-  public ColoredHistogramVisualizer(Parameterizer settings) {
+  public ColoredHistogramVisualizer(Par settings) {
     super();
     this.settings = settings;
   }
@@ -336,7 +336,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag to specify the "curves" rendering style.
      */
@@ -358,8 +358,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
     protected int bins = DEFAULT_BINS;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(STYLE_CURVES_ID).grab(config, x -> curves = x);
       new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
@@ -367,7 +366,7 @@ public class ColoredHistogramVisualizer implements VisFactory {
     }
 
     @Override
-    protected ColoredHistogramVisualizer makeInstance() {
+    public ColoredHistogramVisualizer make() {
       return new ColoredHistogramVisualizer(this);
     }
   }

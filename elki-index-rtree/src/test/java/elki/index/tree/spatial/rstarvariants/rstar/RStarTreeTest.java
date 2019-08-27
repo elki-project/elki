@@ -54,7 +54,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRStarTree() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -70,9 +70,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRStarTreeFast() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class) //
-        .with(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(AbstractRStarTreeFactory.Par.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class) //
+        .with(ApproximativeLeastOverlapInsertionStrategy.Par.INSERTION_CANDIDATES_ID, 1) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -86,8 +86,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeLinearSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -101,8 +101,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeQuadraticSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -116,8 +116,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeGreeneSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, GreeneSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, GreeneSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -131,8 +131,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeAngTanLinearSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -146,8 +146,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testFileOrderBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -161,8 +161,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testMaxExtensionBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -176,8 +176,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testOneDimSortBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -192,9 +192,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testZCurveSpatialSortBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, ZCurveSpatialSorter.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Par.SORTER_ID, ZCurveSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -209,9 +209,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testHilbertSpatialSortBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, HilbertSpatialSorter.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Par.SORTER_ID, HilbertSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -226,9 +226,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testPeanoSpatialSortBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, PeanoSpatialSorter.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Par.SORTER_ID, PeanoSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -243,9 +243,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testBinarySplitSpatialSortBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Parameterizer.SORTER_ID, BinarySplitSpatialSorter.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
+        .with(SpatialSortBulkSplit.Par.SORTER_ID, BinarySplitSpatialSorter.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -259,8 +259,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testSortTileRecursiveBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -275,8 +275,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testMaxExtensionSortTileRecursiveBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
@@ -291,8 +291,8 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testAdaptiveSortTileRecursiveBulkSplit() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
         .build();
     testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
     testPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);

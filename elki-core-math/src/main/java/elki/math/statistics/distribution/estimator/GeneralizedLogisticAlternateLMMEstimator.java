@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.GeneralizedLogisticAlternateDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -93,9 +93,9 @@ public class GeneralizedLogisticAlternateLMMEstimator implements LMMDistribution
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GeneralizedLogisticAlternateLMMEstimator makeInstance() {
+    public GeneralizedLogisticAlternateLMMEstimator make() {
       return STATIC;
     }
   }

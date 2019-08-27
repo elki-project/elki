@@ -204,7 +204,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       /**
        * Parameter to specify the number of partitions to use for materializing
        * the kNN. Must be an integer greater than 1.
@@ -227,8 +227,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
       private RandomFactory rnd;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         new IntParameter(PARTITIONS_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
             .grab(config, x -> partitions = x);
@@ -236,7 +236,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(k, distanceFunction, partitions, rnd);
       }
     }

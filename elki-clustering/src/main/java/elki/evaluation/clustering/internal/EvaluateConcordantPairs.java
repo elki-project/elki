@@ -43,7 +43,7 @@ import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -306,7 +306,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    *
    * @author Stephan Baier
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -328,8 +328,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     private NoiseHandling noiseHandling;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<PrimitiveDistance<NumberVector>>(DISTANCE_ID, PrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
@@ -337,7 +336,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     }
 
     @Override
-    protected EvaluateConcordantPairs<O> makeInstance() {
+    public EvaluateConcordantPairs<O> make() {
       return new EvaluateConcordantPairs<>(distance, noiseHandling);
     }
   }

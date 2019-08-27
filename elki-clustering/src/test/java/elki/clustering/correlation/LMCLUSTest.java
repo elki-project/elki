@@ -42,9 +42,9 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   public void testLMCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
     Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
-        .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
-        .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
-        .with(LMCLUS.Parameterizer.RANDOM_ID, 6) //
+        .with(LMCLUS.Par.MINSIZE_ID, 100) //
+        .with(LMCLUS.Par.THRESHOLD_ID, 10) //
+        .with(LMCLUS.Par.RANDOM_ID, 6) //
         .build().run(db);
     testFMeasure(db, result, 0.487716464);
     testClusterSizes(result, new int[] { 30, 570 });
@@ -57,9 +57,9 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
   public void testLMCLUSOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
     Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
-        .with(LMCLUS.Parameterizer.MINSIZE_ID, 100) //
-        .with(LMCLUS.Parameterizer.THRESHOLD_ID, 10) //
-        .with(LMCLUS.Parameterizer.RANDOM_ID, 0) //
+        .with(LMCLUS.Par.MINSIZE_ID, 100) //
+        .with(LMCLUS.Par.THRESHOLD_ID, 10) //
+        .with(LMCLUS.Par.RANDOM_ID, 0) //
         .build().run(db);
     testClusterSizes(result, new int[] { 200, 201, 249 });
     testFMeasure(db, result, 0.921865);

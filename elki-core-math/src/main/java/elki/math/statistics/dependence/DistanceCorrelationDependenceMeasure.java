@@ -24,7 +24,7 @@ import java.util.List;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -194,9 +194,9 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
    * 
    * @author Marie Kiermeier
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected DistanceCorrelationDependenceMeasure makeInstance() {
+    public DistanceCorrelationDependenceMeasure make() {
       return STATIC;
     }
   }

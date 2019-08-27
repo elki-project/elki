@@ -324,7 +324,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
      *
      * @param <V> Vector type
      */
-    public static class Parameterizer<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V> {
+    public static class Par<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Par<V> {
       /**
        * Parameter for choosing the space filling curves to use.
        */
@@ -366,8 +366,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       RandomFactory random;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
+        super.configure(config);
         new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class) //
             .grab(config, x -> curvegen = x);
         new DoubleParameter(WINDOW_ID, 10.0) //
@@ -379,7 +379,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
       }
 
       @Override
-      protected Factory<V> makeInstance() {
+      public Factory<V> make() {
         return new Factory<>(k, distanceFunction, curvegen, window, variants, random);
       }
     }

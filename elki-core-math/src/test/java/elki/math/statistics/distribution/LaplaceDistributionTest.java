@@ -78,8 +78,8 @@ public class LaplaceDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("lap.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(LaplaceDistribution.Parameterizer.RATE_ID, 1);
-    params.addParameter(LaplaceDistribution.Parameterizer.LOCATION_ID, 3);
+    params.addParameter(LaplaceDistribution.Par.RATE_ID, 1);
+    params.addParameter(LaplaceDistribution.Par.LOCATION_ID, 3);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LaplaceDistribution.class, params);
     checkPDF(dist, "pdf_scipy_1_3", 1e-15);
   }

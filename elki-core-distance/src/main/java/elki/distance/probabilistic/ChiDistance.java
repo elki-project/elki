@@ -25,7 +25,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -109,9 +109,9 @@ public class ChiDistance extends ChiSquaredDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ChiDistance makeInstance() {
+    public ChiDistance make() {
       return STATIC;
     }
   }

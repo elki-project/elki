@@ -218,7 +218,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
   }
 
   /**
-   * Parameterizer.
+   * Par.
    * 
    * @author Erich Schubert
    * 
@@ -226,7 +226,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for choosing the clustering algorithm
      */
@@ -244,16 +244,16 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
     private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<ClusteringAlgorithm<?>>(CLUSTERING_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> clusterer = x);
-      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Parameterizer.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
     }
 
     @Override
-    protected SilhouetteOutlierDetection<O> makeInstance() {
+    public SilhouetteOutlierDetection<O> make() {
       return new SilhouetteOutlierDetection<>(distanceFunction, clusterer, noiseOption);
     }
   }

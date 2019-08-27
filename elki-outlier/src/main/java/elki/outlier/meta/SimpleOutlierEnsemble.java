@@ -46,7 +46,7 @@ import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.ensemble.EnsembleVoting;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -169,7 +169,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Voting strategy to use in the ensemble.
      */
@@ -186,8 +186,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     private EnsembleVoting voting;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class);
       if(config.grab(algP)) {
         ListParameterization subconfig = new ListParameterization();
@@ -201,7 +200,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     }
 
     @Override
-    protected SimpleOutlierEnsemble makeInstance() {
+    public SimpleOutlierEnsemble make() {
       return new SimpleOutlierEnsemble(algorithms, voting);
     }
   }

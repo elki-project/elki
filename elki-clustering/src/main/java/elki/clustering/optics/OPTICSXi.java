@@ -39,7 +39,7 @@ import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -712,7 +712,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the actual OPTICS algorithm to use.
      */
@@ -740,8 +740,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     protected boolean nocorrect = false, keepsteep = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(XI_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -753,7 +752,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     }
 
     @Override
-    protected OPTICSXi makeInstance() {
+    public OPTICSXi make() {
       return new OPTICSXi(optics, xi, nocorrect, keepsteep);
     }
   }

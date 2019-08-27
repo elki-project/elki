@@ -108,7 +108,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractCutDendrogram.Parameterizer {
+  public static class Par extends AbstractCutDendrogram.Par {
     /**
      * The threshold level for which to extract the clustering.
      */
@@ -120,14 +120,14 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
     double threshold = Double.NaN;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(THRESHOLD_ID) //
           .grab(config, x -> threshold = x);
     }
 
     @Override
-    protected CutDendrogramByHeight makeInstance() {
+    public CutDendrogramByHeight make() {
       return new CutDendrogramByHeight(algorithm, threshold, hierarchical);
     }
   }

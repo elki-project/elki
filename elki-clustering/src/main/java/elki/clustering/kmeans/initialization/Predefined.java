@@ -28,7 +28,7 @@ import elki.data.model.MeanModel;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleArrayListParameter;
@@ -107,7 +107,7 @@ public class Predefined extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option to specify the initial means to use.
      */
@@ -119,8 +119,7 @@ public class Predefined extends AbstractKMeansInitialization {
     protected double[][] initialMeans;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       DoubleArrayListParameter meansP = new DoubleArrayListParameter(INITIAL_MEANS);
       if(config.grab(meansP)) {
         initialMeans = meansP.getValue().toArray(new double[0][]);
@@ -128,7 +127,7 @@ public class Predefined extends AbstractKMeansInitialization {
     }
 
     @Override
-    protected Predefined makeInstance() {
+    public Predefined make() {
       return new Predefined(initialMeans);
     }
   }

@@ -106,9 +106,9 @@ public class RandomlyChosen<O> extends AbstractKMeansInitialization implements K
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<V> extends AbstractKMeansInitialization.Par {
     @Override
-    protected RandomlyChosen<V> makeInstance() {
+    public RandomlyChosen<V> make() {
       return new RandomlyChosen<>(rnd);
     }
   }

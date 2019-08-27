@@ -26,7 +26,7 @@ import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -121,7 +121,7 @@ public class TopKOutlierScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of outliers to keep
      */
@@ -143,8 +143,7 @@ public class TopKOutlierScaling implements OutlierScaling {
     private boolean binary = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
@@ -152,7 +151,7 @@ public class TopKOutlierScaling implements OutlierScaling {
     }
 
     @Override
-    protected TopKOutlierScaling makeInstance() {
+    public TopKOutlierScaling make() {
       return new TopKOutlierScaling(k, binary);
     }
   }

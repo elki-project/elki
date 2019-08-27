@@ -22,7 +22,7 @@ package elki.datasource.filter.selection;
 
 import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -84,7 +84,7 @@ public class FirstNStreamFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the sample size
      */
@@ -96,15 +96,14 @@ public class FirstNStreamFilter extends AbstractStreamFilter {
     protected int n;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(SIZE_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> n = x);
     }
 
     @Override
-    protected FirstNStreamFilter makeInstance() {
+    public FirstNStreamFilter make() {
       return new FirstNStreamFilter(n);
     }
   }

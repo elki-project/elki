@@ -678,9 +678,9 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
+  public static class Par extends AbstractFrequentItemsetAlgorithm.Par {
     @Override
-    protected FPGrowth makeInstance() {
+    public FPGrowth make() {
       return new FPGrowth(minsupp, minlength, maxlength);
     }
   }

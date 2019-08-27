@@ -24,7 +24,7 @@ import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.Distribution;
 import elki.math.statistics.distribution.UniformDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the uniform distribution by computing min and max.
@@ -96,9 +96,9 @@ public class UniformMinMaxEstimator implements DistributionEstimator<UniformDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected UniformMinMaxEstimator makeInstance() {
+    public UniformMinMaxEstimator make() {
       return STATIC;
     }
   }

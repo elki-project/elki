@@ -41,7 +41,7 @@ public class LPNormDistanceTest extends AbstractDistanceTest {
   public void testSpatialConsistency() {
     // Also test the builder - we could have just used .STATIC
     LPNormDistance dist = new ELKIBuilder<>(LPNormDistance.class) //
-        .with(LPNormDistance.Parameterizer.P_ID, .5) //
+        .with(LPNormDistance.Par.P_ID, .5) //
         .build();
     assertSame("Subtyped", LPNormDistance.class, dist.getClass());
     assertFalse("Not metric", dist.isMetric());
@@ -50,7 +50,7 @@ public class LPNormDistanceTest extends AbstractDistanceTest {
     spatialConsistency(dist);
     nonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(LPNormDistance.class) //
-        .with(LPNormDistance.Parameterizer.P_ID, 3) //
+        .with(LPNormDistance.Par.P_ID, 3) //
         .build();
     assertSame("Not optimized", LPIntegerNormDistance.class, dist.getClass());
     assertTrue("Not metric", dist.isMetric());

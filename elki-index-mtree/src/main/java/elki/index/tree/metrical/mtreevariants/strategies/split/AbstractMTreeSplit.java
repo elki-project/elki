@@ -25,7 +25,7 @@ import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import elki.index.tree.metrical.mtreevariants.strategies.split.distribution.DistributionStrategy;
 import elki.index.tree.metrical.mtreevariants.strategies.split.distribution.GeneralizedHyperplaneDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -87,7 +87,7 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    */
-  public static abstract class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractParameterizer {
+  public static abstract class Par<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> implements Parameterizer {
     /**
      * Distribution strategy parameter.
      */
@@ -99,13 +99,12 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
     protected DistributionStrategy distributor;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<DistributionStrategy>(DISTRIBUTOR_ID, DistributionStrategy.class, GeneralizedHyperplaneDistribution.class) //
           .grab(config, x -> distributor = x);
     }
 
     @Override
-    abstract protected MTreeSplit<E, N> makeInstance();
+    abstract public MTreeSplit<E, N> make();
   }
 }

@@ -193,7 +193,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedApplication.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedApplication.Par<O> {
     /**
      * Parameter for the number of neighbors.
      */
@@ -235,12 +235,12 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     protected RandomFactory random;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -256,7 +256,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     }
 
     @Override
-    protected KNNBenchmark<O> makeInstance() {
+    public KNNBenchmark<O> make() {
       return new KNNBenchmark<>(inputstep, distance, k, queries, sampling, random);
     }
   }

@@ -60,7 +60,7 @@ public abstract class AbstractXTreeFactory<O extends NumberVector, N extends Abs
    * 
    * @param <O> object type
    */
-  public abstract static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, XTreeSettings> {
+  public abstract static class Par<O extends NumberVector> extends AbstractRStarTreeFactory.Par<O, XTreeSettings> {
     /**
      * Parameter for minimum number of entries per directory page when going for
      * a minimum overlap split; defaults to <code>.3</code> times the number of
@@ -101,8 +101,8 @@ public abstract class AbstractXTreeFactory<O extends NumberVector, N extends Abs
     public static final OptionID OVERLAP_TYPE_ID = new OptionID("xtree.overlap_type", "How to calculate the maximum overlap? Options: \"DataOverlap\" = {ratio of data objects in the overlapping region}, \"VolumeOverlap\" = {(overlap volume) / (volume 1 + volume 2)}");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Bulk loads are not supported yet:
       // super.configBulkLoad(config);
       new DoubleParameter(MIN_FANOUT_ID, 0.3) //

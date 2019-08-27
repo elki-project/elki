@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.ExponentialDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Exponential distribution parameters using Median and MAD.
@@ -80,9 +80,9 @@ public class ExponentialMADEstimator implements MADDistributionEstimator<Exponen
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ExponentialMADEstimator makeInstance() {
+    public ExponentialMADEstimator make() {
       return STATIC;
     }
   }

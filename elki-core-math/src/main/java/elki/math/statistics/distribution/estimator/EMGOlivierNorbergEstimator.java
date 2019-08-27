@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.StatisticalMoments;
 import elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -86,9 +86,9 @@ public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<Expo
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected EMGOlivierNorbergEstimator makeInstance() {
+    public EMGOlivierNorbergEstimator make() {
       return STATIC;
     }
   }

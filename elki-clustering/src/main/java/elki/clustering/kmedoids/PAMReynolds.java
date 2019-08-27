@@ -232,9 +232,9 @@ public class PAMReynolds<V> extends PAM<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends PAM.Parameterizer<V> {
+  public static class Par<V> extends PAM.Par<V> {
     @Override
-    protected PAMReynolds<V> makeInstance() {
+    public PAMReynolds<V> make() {
       return new PAMReynolds<>(distanceFunction, k, maxiter, initializer);
     }
   }

@@ -31,7 +31,7 @@ import elki.index.tree.spatial.rstarvariants.strategies.reinsert.ReinsertStrateg
 import elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -117,7 +117,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Fast-insertion parameter. Optional.
      */
@@ -129,14 +129,13 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
     ReinsertStrategy reinsertStrategy = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<ReinsertStrategy>(REINSERT_STRATEGY_ID, ReinsertStrategy.class, CloseReinsert.class) //
           .grab(config, x -> reinsertStrategy = x);
     }
 
     @Override
-    protected LimitedReinsertOverflowTreatment makeInstance() {
+    public LimitedReinsertOverflowTreatment make() {
       return new LimitedReinsertOverflowTreatment(reinsertStrategy);
     }
   }

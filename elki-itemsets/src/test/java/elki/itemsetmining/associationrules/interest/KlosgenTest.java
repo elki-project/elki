@@ -42,9 +42,9 @@ public class KlosgenTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.26) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Klosgen.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.26) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Klosgen.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 27, res.getRules().size());
   }

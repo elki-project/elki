@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.linkage;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Single-linkage ("minimum") clustering method.
@@ -83,9 +83,9 @@ public class SingleLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SingleLinkage makeInstance() {
+    public SingleLinkage make() {
       return STATIC;
     }
   }

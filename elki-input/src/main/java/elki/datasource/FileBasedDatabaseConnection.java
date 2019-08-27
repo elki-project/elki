@@ -96,7 +96,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends InputStreamDatabaseConnection.Parameterizer {
+  public static class Par extends InputStreamDatabaseConnection.Par {
     /**
      * Parameter that specifies the name of the input file to be parsed.
      */
@@ -108,7 +108,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
     protected File infile;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
       // Add the input file first, for usability reasons.
       FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
@@ -124,7 +124,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
     }
 
     @Override
-    protected FileBasedDatabaseConnection makeInstance() {
+    public FileBasedDatabaseConnection make() {
       return new FileBasedDatabaseConnection(filters, parser, infile);
     }
   }

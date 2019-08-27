@@ -332,7 +332,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the kernel density function.
      */
@@ -394,8 +394,8 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     int idim = -1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class) //
           .grab(config, x -> kernel = x);
       IntParameter kminP = new IntParameter(KMIN_ID) //
@@ -426,7 +426,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
 
     @Override
-    protected KDEOS<O> makeInstance() {
+    public KDEOS<O> make() {
       return new KDEOS<>(distanceFunction, kmin, kmax, kernel, minBandwidth, scale, idim);
     }
   }

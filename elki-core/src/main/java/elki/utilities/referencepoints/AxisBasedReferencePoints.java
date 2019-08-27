@@ -27,7 +27,7 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -104,7 +104,7 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the extra scaling of the space, to allow
      * out-of-data-space reference points.
@@ -117,15 +117,14 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
     protected double spacescale = 0.0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(SPACE_SCALE_ID, 1.0)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> spacescale = x);
     }
 
     @Override
-    protected AxisBasedReferencePoints makeInstance() {
+    public AxisBasedReferencePoints make() {
       return new AxisBasedReferencePoints(spacescale);
     }
   }

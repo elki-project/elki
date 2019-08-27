@@ -213,9 +213,9 @@ public class CLINK<O> extends SLINK<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
-    protected CLINK<O> makeInstance() {
+    public CLINK<O> make() {
       return new CLINK<>(distanceFunction);
     }
   }

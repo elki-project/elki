@@ -88,7 +88,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, new ArrayList<>(), parser);
 
       // We want to allow the use of indexes via "params"
-      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
+      params.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, dbc);
       db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
       db.initialize();
     }

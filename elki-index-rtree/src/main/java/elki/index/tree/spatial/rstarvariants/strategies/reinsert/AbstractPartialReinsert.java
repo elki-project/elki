@@ -22,7 +22,7 @@ package elki.index.tree.spatial.rstarvariants.strategies.reinsert;
 
 import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -64,7 +64,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Reinsertion share
      */
@@ -86,8 +86,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     SpatialPrimitiveDistance<?> distanceFunction;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(REINSERT_AMOUNT_ID, 0.3) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //

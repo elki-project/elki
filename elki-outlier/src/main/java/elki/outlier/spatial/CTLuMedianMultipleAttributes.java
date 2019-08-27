@@ -173,9 +173,9 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
    * @param <N> Neighborhood type
    * @param <O> Attributes vector type
    */
-  public static class Parameterizer<N, O extends NumberVector> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N, O extends NumberVector> extends AbstractNeighborhoodOutlier.Par<N> {
     @Override
-    protected CTLuMedianMultipleAttributes<N, O> makeInstance() {
+    public CTLuMedianMultipleAttributes<N, O> make() {
       return new CTLuMedianMultipleAttributes<>(npredf);
     }
   }

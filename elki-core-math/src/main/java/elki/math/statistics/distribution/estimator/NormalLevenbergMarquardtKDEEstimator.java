@@ -29,7 +29,7 @@ import elki.math.statistics.KernelDensityEstimator;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Distribution parameter estimation using Levenberg-Marquardt iterative
@@ -106,9 +106,9 @@ public class NormalLevenbergMarquardtKDEEstimator implements DistributionEstimat
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NormalLevenbergMarquardtKDEEstimator makeInstance() {
+    public NormalLevenbergMarquardtKDEEstimator make() {
       return STATIC;
     }
   }

@@ -48,7 +48,7 @@ import elki.similarity.kernel.PolynomialKernel;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -193,7 +193,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for the kernel function.
      */
@@ -205,14 +205,13 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     protected Similarity<V> kernelFunction = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Similarity<V>>(KERNEL_FUNCTION_ID, Similarity.class, PolynomialKernel.class) //
           .grab(config, x -> kernelFunction = x);
     }
 
     @Override
-    protected ABOD<V> makeInstance() {
+    public ABOD<V> make() {
       return new ABOD<>(kernelFunction);
     }
   }

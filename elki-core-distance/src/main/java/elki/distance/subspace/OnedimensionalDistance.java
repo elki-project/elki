@@ -28,7 +28,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.Norm;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -139,7 +139,7 @@ public class OnedimensionalDistance extends AbstractNumberVectorDistance impleme
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for dimensionality.
      */
@@ -151,15 +151,14 @@ public class OnedimensionalDistance extends AbstractNumberVectorDistance impleme
     protected int dim = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> dim = x);
     }
 
     @Override
-    protected OnedimensionalDistance makeInstance() {
+    public OnedimensionalDistance make() {
       return new OnedimensionalDistance(dim);
     }
   }

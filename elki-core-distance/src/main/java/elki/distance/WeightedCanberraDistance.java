@@ -22,7 +22,7 @@ package elki.distance;
 
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -96,21 +96,20 @@ public class WeightedCanberraDistance extends AbstractNumberVectorDistance imple
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Weight array
      */
     protected double[] weights;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleListParameter(WEIGHTS_ID) //
           .grab(config, x -> weights = x.clone());
     }
 
     @Override
-    protected WeightedCanberraDistance makeInstance() {
+    public WeightedCanberraDistance make() {
       return new WeightedCanberraDistance(weights);
     }
   }

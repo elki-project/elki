@@ -27,7 +27,7 @@ import elki.math.MeanVariance;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -106,9 +106,9 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MinusLogGammaScaling makeInstance() {
+    public MinusLogGammaScaling make() {
       return new MinusLogGammaScaling();
     }
   }

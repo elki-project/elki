@@ -321,7 +321,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     protected int k;
 
     protected int maxiter;
@@ -329,8 +329,8 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
     protected KMedoidsInitialization<V> initializer;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -342,7 +342,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
     }
 
     @Override
-    protected KMedoidsPark<V> makeInstance() {
+    public KMedoidsPark<V> make() {
       return new KMedoidsPark<>(distanceFunction, k, maxiter, initializer);
     }
   }

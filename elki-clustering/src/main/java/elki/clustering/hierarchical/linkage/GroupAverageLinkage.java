@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.linkage;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Group-average linkage clustering method (UPGMA).
@@ -96,9 +96,9 @@ public class GroupAverageLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GroupAverageLinkage makeInstance() {
+    public GroupAverageLinkage make() {
       return STATIC;
     }
   }

@@ -34,7 +34,7 @@ import elki.data.type.TypeUtil;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -112,7 +112,7 @@ public class StringParser implements Parser {
    * @author Felix Stahlberg
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag to trim whitespace.
      */
@@ -129,15 +129,14 @@ public class StringParser implements Parser {
     boolean trimWhitespace = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new PatternParameter(CSVReaderFormat.Parameterizer.COMMENT_ID, "^\\s*#.*$") //
+    public void configure(Parameterization config) {
+      new PatternParameter(CSVReaderFormat.Par.COMMENT_ID, "^\\s*#.*$") //
           .grab(config, x -> comment = x);
       new Flag(TRIM_ID).grab(config, x -> trimWhitespace = x);
     }
 
     @Override
-    protected StringParser makeInstance() {
+    public StringParser make() {
       return new StringParser(comment, trimWhitespace);
     }
   }

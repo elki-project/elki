@@ -49,7 +49,7 @@ import elki.result.OrderingResult;
 import elki.result.PixmapResult;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -312,7 +312,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * OptionID for the scaling function to use
      */
@@ -339,9 +339,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     private boolean skipzero = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distanceFunction = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
           .setOptional(true) //
@@ -350,7 +349,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     }
 
     @Override
-    protected ComputeSimilarityMatrixImage<O> makeInstance() {
+    public ComputeSimilarityMatrixImage<O> make() {
       return new ComputeSimilarityMatrixImage<>(distanceFunction, scaling, skipzero);
     }
   }

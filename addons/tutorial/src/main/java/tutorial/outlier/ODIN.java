@@ -157,7 +157,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for the number of nearest neighbors:
      *
@@ -173,8 +173,8 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID)//
           // Since in a database context, the 1 nearest neighbor
           // will usually be the query object itself, we require
@@ -184,7 +184,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     }
 
     @Override
-    protected ODIN<O> makeInstance() {
+    public ODIN<O> make() {
       return new ODIN<>(distanceFunction, k);
     }
   }

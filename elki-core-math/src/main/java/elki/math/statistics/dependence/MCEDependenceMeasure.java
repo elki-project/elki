@@ -27,7 +27,7 @@ import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -257,9 +257,9 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MCEDependenceMeasure makeInstance() {
+    public MCEDependenceMeasure make() {
       return STATIC;
     }
   }

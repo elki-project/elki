@@ -65,9 +65,9 @@ public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTre
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
+  public static class Par<O extends NumberVector> extends AbstractRStarTreeFactory.Par<O, RTreeSettings> {
     @Override
-    protected DeLiCluTreeFactory<O> makeInstance() {
+    public DeLiCluTreeFactory<O> make() {
       return new DeLiCluTreeFactory<>(pageFileFactory, settings);
     }
 

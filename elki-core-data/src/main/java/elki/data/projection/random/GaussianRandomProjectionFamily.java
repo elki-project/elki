@@ -67,9 +67,9 @@ public class GaussianRandomProjectionFamily extends AbstractRandomProjectionFami
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
+  public static class Par extends AbstractRandomProjectionFamily.Par {
     @Override
-    protected GaussianRandomProjectionFamily makeInstance() {
+    public GaussianRandomProjectionFamily make() {
       return new GaussianRandomProjectionFamily(random);
     }
   }

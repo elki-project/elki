@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.linkage;
 
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Centroid linkage &mdash; Unweighted Pair-Group Method using Centroids
@@ -98,9 +98,9 @@ public class CentroidLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CentroidLinkage makeInstance() {
+    public CentroidLinkage make() {
       return STATIC;
     }
   }

@@ -23,7 +23,7 @@ package elki.workflow;
 import elki.application.AbstractApplication;
 import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -44,7 +44,7 @@ public class LoggingStep implements WorkflowStep {
   public LoggingStep(java.util.logging.Level verbose, String[][] levels) {
     super();
     LoggingConfiguration.setVerbose(verbose);
-    AbstractApplication.Parameterizer.applyLoggingLevels(levels);
+    AbstractApplication.Par.applyLoggingLevels(levels);
   }
 
   /**
@@ -52,7 +52,7 @@ public class LoggingStep implements WorkflowStep {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Verbose mode.
      */
@@ -64,14 +64,13 @@ public class LoggingStep implements WorkflowStep {
     protected String[][] levels = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      verbose = AbstractApplication.Parameterizer.parseVerbose(config);
-      levels = AbstractApplication.Parameterizer.parseDebugParameter(config);
+    public void configure(Parameterization config) {
+      verbose = AbstractApplication.Par.parseVerbose(config);
+      levels = AbstractApplication.Par.parseDebugParameter(config);
     }
 
     @Override
-    protected LoggingStep makeInstance() {
+    public LoggingStep make() {
       return new LoggingStep(verbose, levels);
     }
   }

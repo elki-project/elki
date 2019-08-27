@@ -247,7 +247,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super V>> {
     /**
      * Flag to use random sample (use knn query around centroid, if flag is not
      * set).
@@ -297,8 +297,8 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(OUTPUT_ACCURACY_ID, 4) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> outputAccuracy = x);
@@ -307,14 +307,14 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> sampleSize = x);
       new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE_ID).grab(config, x -> randomSample = x);
-      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+      new ObjectParameter<PCARunner>(PCARunner.Par.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
           .grab(config, x -> pca = x);
       new ObjectParameter<EigenPairFilter>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class) //
           .grab(config, x -> filter = x);
     }
 
     @Override
-    protected DependencyDerivator<V> makeInstance() {
+    public DependencyDerivator<V> make() {
       NumberFormat nf = NumberFormat.getInstance(Locale.US);
       nf.setMaximumFractionDigits(outputAccuracy);
       nf.setMinimumFractionDigits(outputAccuracy);

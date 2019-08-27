@@ -158,7 +158,7 @@ public class ERPDistance extends DTWDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractEditDistance.Parameterizer {
+  public static class Par extends AbstractEditDistance.Par {
     /**
      * G parameter
      */
@@ -170,14 +170,14 @@ public class ERPDistance extends DTWDistance {
     protected double g = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(G_ID, 0.) //
           .grab(config, x -> g = x);
     }
 
     @Override
-    protected ERPDistance makeInstance() {
+    public ERPDistance make() {
       return new ERPDistance(bandSize, g);
     }
   }

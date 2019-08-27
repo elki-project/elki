@@ -153,7 +153,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
+  public static class Par<O> extends AbstractApplication.Par {
     /**
      * Parameter to specify the holdout for evaluation, must extend
      * {@link elki.evaluation.classification.holdout.Holdout}.
@@ -181,13 +181,13 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     protected Holdout holdout;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Get database connection.
-      new ObjectParameter<DatabaseConnection>(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
+      new ObjectParameter<DatabaseConnection>(AbstractDatabase.Par.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
           .grab(config, x -> databaseConnection = x);
       // Get indexes.
-      new ObjectListParameter<IndexFactory<?>>(AbstractDatabase.Parameterizer.INDEX_ID, IndexFactory.class) //
+      new ObjectListParameter<IndexFactory<?>>(AbstractDatabase.Par.INDEX_ID, IndexFactory.class) //
           .setOptional(true) //
           .grab(config, x -> indexFactories = x);
       new ObjectParameter<Classifier<O>>(AbstractAlgorithm.ALGORITHM_ID, Classifier.class) //
@@ -197,7 +197,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     }
 
     @Override
-    protected ClassifierHoldoutEvaluationTask<O> makeInstance() {
+    public ClassifierHoldoutEvaluationTask<O> make() {
       return new ClassifierHoldoutEvaluationTask<O>(databaseConnection, indexFactories, algorithm, holdout);
     }
   }

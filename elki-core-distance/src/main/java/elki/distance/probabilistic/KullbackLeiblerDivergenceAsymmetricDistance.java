@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -107,9 +107,9 @@ public class KullbackLeiblerDivergenceAsymmetricDistance extends AbstractNumberV
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected KullbackLeiblerDivergenceAsymmetricDistance makeInstance() {
+    public KullbackLeiblerDivergenceAsymmetricDistance make() {
       return STATIC;
     }
   }

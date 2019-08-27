@@ -40,7 +40,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
@@ -453,7 +453,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Random seed parameter.
      */
@@ -465,13 +465,12 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(RANDOM_ID).grab(config, x -> rnd = x);
     }
 
     @Override
-    protected RandomProjectedNeighborsAndDensities<NumberVector> makeInstance() {
+    public RandomProjectedNeighborsAndDensities<NumberVector> make() {
       return new RandomProjectedNeighborsAndDensities<>(rnd);
     }
   }

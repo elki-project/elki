@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.RayleighDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a RayleighDistribution using the MAD.
@@ -80,9 +80,9 @@ public class RayleighMADEstimator implements MADDistributionEstimator<RayleighDi
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RayleighMADEstimator makeInstance() {
+    public RayleighMADEstimator make() {
       return STATIC;
     }
   }

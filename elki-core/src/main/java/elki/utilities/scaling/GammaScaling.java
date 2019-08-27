@@ -20,7 +20,7 @@
  */
 package elki.utilities.scaling;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -75,7 +75,7 @@ public class GammaScaling implements StaticScalingFunction {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * OptionID for the gamma value.
      */
@@ -84,14 +84,13 @@ public class GammaScaling implements StaticScalingFunction {
     double gamma = 1.0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(GAMMA_ID) //
           .grab(config, x -> gamma = x);
     }
 
     @Override
-    protected GammaScaling makeInstance() {
+    public GammaScaling make() {
       return new GammaScaling(gamma);
     }
   }

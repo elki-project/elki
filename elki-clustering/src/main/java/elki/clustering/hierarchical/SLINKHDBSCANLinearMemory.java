@@ -245,9 +245,9 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractHDBSCAN.Parameterizer<O> {
+  public static class Par<O> extends AbstractHDBSCAN.Par<O> {
     @Override
-    protected SLINKHDBSCANLinearMemory<O> makeInstance() {
+    public SLINKHDBSCANLinearMemory<O> make() {
       return new SLINKHDBSCANLinearMemory<>(distanceFunction, minPts);
     }
   }

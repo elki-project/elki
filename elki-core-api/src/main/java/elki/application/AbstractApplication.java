@@ -121,12 +121,12 @@ public abstract class AbstractApplication {
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
     SerializedParameterization params = new SerializedParameterization(args);
-    Flag helpF = new Flag(Parameterizer.HELP_ID);
+    Flag helpF = new Flag(Par.HELP_ID);
     params.grab(helpF);
-    Flag helpLongF = new Flag(Parameterizer.HELP_LONG_ID);
+    Flag helpLongF = new Flag(Par.HELP_LONG_ID);
     params.grab(helpLongF);
     try {
-      ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class) //
+      ClassParameter<Object> descriptionP = new ClassParameter<>(Par.DESCRIPTION_ID, Object.class) //
           .setOptional(true);
       if(params.grab(descriptionP)) {
         params.clearErrors();
@@ -134,7 +134,7 @@ public abstract class AbstractApplication {
         System.exit(1);
       }
       // Parse debug parameter
-      Parameterizer.applyLoggingLevels(Parameterizer.parseDebugParameter(params));
+      Par.applyLoggingLevels(Par.parseDebugParameter(params));
       if(params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
         System.exit(1);
@@ -146,7 +146,7 @@ public abstract class AbstractApplication {
     }
     try {
       TrackParameters config = new TrackParameters(params);
-      LoggingConfiguration.setVerbose(Parameterizer.parseVerbose(config));
+      LoggingConfiguration.setVerbose(Par.parseVerbose(config));
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
       if((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
@@ -240,7 +240,7 @@ public abstract class AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the output file.
      */
@@ -287,10 +287,10 @@ public abstract class AbstractApplication {
      * @param config Parameterization
      */
     public static java.util.logging.Level parseVerbose(Parameterization config) {
-      Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
+      Flag verboseF = new Flag(Par.VERBOSE_ID);
       if(config.grab(verboseF) && verboseF.isTrue()) {
         // Extra verbosity by repeating the flag:
-        Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
+        Flag verbose2F = new Flag(Par.VERBOSE_ID);
         return (config.grab(verbose2F) && verbose2F.isTrue()) ? Level.VERYVERBOSE : Level.VERBOSE;
       }
       return Level.WARNING;
@@ -303,7 +303,7 @@ public abstract class AbstractApplication {
      * @return Levels to set, or {@code null}
      */
     public static String[][] parseDebugParameter(Parameterization config) {
-      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
+      StringParameter debugP = new StringParameter(Par.DEBUG_ID).setOptional(true);
       if(!config.grab(debugP) && !debugP.isDefined()) {
         return null;
       }
@@ -408,6 +408,6 @@ public abstract class AbstractApplication {
     }
 
     @Override
-    protected abstract AbstractApplication makeInstance();
+    public abstract AbstractApplication make();
   }
 }

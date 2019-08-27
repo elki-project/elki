@@ -25,7 +25,7 @@ import java.util.Arrays;
 import elki.data.FeatureVector;
 import elki.distance.PrimitiveDistance;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -88,7 +88,7 @@ public abstract class AbstractDimensionsSelectingDistance<V extends FeatureVecto
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Dimensions parameter.
      */
@@ -100,8 +100,7 @@ public abstract class AbstractDimensionsSelectingDistance<V extends FeatureVecto
     protected long[] dimensions = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntListParameter(DIMS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .setOptional(true) //

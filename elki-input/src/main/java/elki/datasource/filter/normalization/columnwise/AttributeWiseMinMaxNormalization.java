@@ -31,7 +31,7 @@ import elki.math.linearalgebra.LinearEquationSystem;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -208,7 +208,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for minimum.
      */
@@ -230,8 +230,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     private double[] minima = EMPTY_ARRAY;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
           .setOptional(true);
       if(config.grab(minimaP)) {
@@ -249,7 +248,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     }
 
     @Override
-    protected AttributeWiseMinMaxNormalization<V> makeInstance() {
+    public AttributeWiseMinMaxNormalization<V> make() {
       return new AttributeWiseMinMaxNormalization<>(minima, maxima);
     }
   }

@@ -41,7 +41,7 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -285,7 +285,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the maximum distance between two vectors with equal
      * preference vectors before considering them as parallel, must be a double
@@ -317,14 +317,13 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public static final OptionID K_ID = new OptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
       indexfactory = config.tryInstantiate(cls);
     }
 
     @Override
-    protected HiSC<V> makeInstance() {
+    public HiSC<V> make() {
       return new HiSC<>(indexfactory);
     }
   }

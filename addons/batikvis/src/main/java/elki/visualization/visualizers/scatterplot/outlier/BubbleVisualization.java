@@ -32,7 +32,7 @@ import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -97,14 +97,14 @@ public class BubbleVisualization implements VisFactory {
   /**
    * Current settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public BubbleVisualization(Parameterizer settings) {
+  public BubbleVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -283,7 +283,7 @@ public class BubbleVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
      */
@@ -305,15 +305,14 @@ public class BubbleVisualization implements VisFactory {
     protected ScalingFunction scaling;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(FILL_ID).grab(config, x -> fill = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, OutlierLinearScaling.class) //
           .grab(config, x -> scaling = x);
     }
 
     @Override
-    protected BubbleVisualization makeInstance() {
+    public BubbleVisualization make() {
       return new BubbleVisualization(this);
     }
   }

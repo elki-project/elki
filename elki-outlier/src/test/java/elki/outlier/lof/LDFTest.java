@@ -39,8 +39,8 @@ public class LDFTest extends AbstractOutlierAlgorithmTest {
   public void testLDF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<LDF<DoubleVector>>(LDF.class) //
-        .with(LDF.Parameterizer.K_ID, 10) //
-        .with(LDF.Parameterizer.H_ID, 1) //
+        .with(LDF.Par.K_ID, 10) //
+        .with(LDF.Par.H_ID, 1) //
         .build().run(db);
     testSingleScore(result, 1293, 3.158819);
     testAUC(db, "Noise", result, 0.9127619);

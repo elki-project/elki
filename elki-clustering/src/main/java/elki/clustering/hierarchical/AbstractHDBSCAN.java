@@ -287,7 +287,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
    *
    * @param <O> Object type
    */
-  public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public abstract static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -299,8 +299,8 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
     protected int minPts;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(MIN_PTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> minPts = x);

@@ -80,7 +80,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -747,7 +747,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the threshold for minimum number of points in a
      * cluster, must be an integer greater than 0.
@@ -804,8 +804,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     protected boolean adjust;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minPts = x);
@@ -822,7 +821,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     }
 
     @Override
-    protected CASH<NumberVector> makeInstance() {
+    public CASH<NumberVector> make() {
       return new CASH<>(minPts, maxLevel, minDim, jitter, adjust);
     }
   }

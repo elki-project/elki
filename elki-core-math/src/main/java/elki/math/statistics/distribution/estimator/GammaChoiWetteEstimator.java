@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -110,9 +110,9 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GammaChoiWetteEstimator makeInstance() {
+    public GammaChoiWetteEstimator make() {
       return STATIC;
     }
   }

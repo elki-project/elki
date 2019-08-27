@@ -266,20 +266,20 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     protected boolean needsMetric() {
       return true;
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       super.getParameterVarstat(config);
     }
 
     @Override
-    protected SimplifiedElkanKMeans<V> makeInstance() {
+    public SimplifiedElkanKMeans<V> make() {
       return new SimplifiedElkanKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }

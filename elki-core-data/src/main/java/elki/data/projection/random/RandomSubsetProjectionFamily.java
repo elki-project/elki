@@ -161,9 +161,9 @@ public class RandomSubsetProjectionFamily extends AbstractRandomProjectionFamily
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
+  public static class Par extends AbstractRandomProjectionFamily.Par {
     @Override
-    protected RandomSubsetProjectionFamily makeInstance() {
+    public RandomSubsetProjectionFamily make() {
       return new RandomSubsetProjectionFamily(random);
     }
   }

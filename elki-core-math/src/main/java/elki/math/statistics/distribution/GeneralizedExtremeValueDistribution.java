@@ -20,9 +20,9 @@
  */
 package elki.math.statistics.distribution;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -215,13 +215,12 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /** Parameters. */
     double mu, sigma, k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID) //
           .grab(config, x -> mu = x);
       new DoubleParameter(SCALE_ID) //
@@ -231,7 +230,7 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
     }
 
     @Override
-    protected GeneralizedExtremeValueDistribution makeInstance() {
+    public GeneralizedExtremeValueDistribution make() {
       return new GeneralizedExtremeValueDistribution(mu, sigma, k);
     }
   }

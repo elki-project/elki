@@ -28,7 +28,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -158,7 +158,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Pattern for recognizing positive objects.
      */
@@ -185,8 +185,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
     String positive, negative;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(PATTERN_ID) //
           .grab(config, x -> pattern = x);
       new StringParameter(POSITIVE_ID, "positive") //
@@ -196,7 +195,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
     }
 
     @Override
-    protected ClassLabelFromPatternFilter makeInstance() {
+    public ClassLabelFromPatternFilter make() {
       return new ClassLabelFromPatternFilter(pattern, positive, negative);
     }
   }

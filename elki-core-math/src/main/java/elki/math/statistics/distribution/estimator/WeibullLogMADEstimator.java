@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.WeibullDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -81,9 +81,9 @@ public class WeibullLogMADEstimator implements LogMADDistributionEstimator<Weibu
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WeibullLogMADEstimator makeInstance() {
+    public WeibullLogMADEstimator make() {
       return STATIC;
     }
   }

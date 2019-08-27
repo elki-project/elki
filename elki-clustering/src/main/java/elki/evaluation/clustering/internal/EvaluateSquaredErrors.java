@@ -38,7 +38,7 @@ import elki.result.EvaluationResult;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -169,7 +169,7 @@ public class EvaluateSquaredErrors implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -191,8 +191,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     private NoiseHandling noiseOption;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<?>>(DISTANCE_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
@@ -200,7 +199,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     }
 
     @Override
-    protected EvaluateSquaredErrors makeInstance() {
+    public EvaluateSquaredErrors make() {
       return new EvaluateSquaredErrors(distance, noiseOption);
     }
   }

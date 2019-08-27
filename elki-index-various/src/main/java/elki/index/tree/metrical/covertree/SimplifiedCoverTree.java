@@ -612,9 +612,9 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<O> extends AbstractCoverTree.Factory.Parameterizer<O> {
+    public static class Par<O> extends AbstractCoverTree.Factory.Par<O> {
       @Override
-      protected SimplifiedCoverTree.Factory<O> makeInstance() {
+      public SimplifiedCoverTree.Factory<O> make() {
         return new SimplifiedCoverTree.Factory<>(distanceFunction, expansion, truncate);
       }
     }

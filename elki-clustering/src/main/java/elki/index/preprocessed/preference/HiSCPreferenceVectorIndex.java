@@ -39,7 +39,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.EmptyDataException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -227,7 +227,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    public static class Par<V extends NumberVector> implements Parameterizer {
       /**
        * The maximum absolute variance along a coordinate axis.
        */
@@ -240,20 +240,19 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       protected int k = 0;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        new DoubleParameter(HiSC.Parameterizer.ALPHA_ID, HiSC.Parameterizer.DEFAULT_ALPHA) //
+      public void configure(Parameterization config) {
+        new DoubleParameter(HiSC.Par.ALPHA_ID, HiSC.Par.DEFAULT_ALPHA) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
             .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
             .grab(config, x -> alpha = x);
-        new IntParameter(HiSC.Parameterizer.K_ID) //
+        new IntParameter(HiSC.Par.K_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .setOptional(true) //
             .grab(config, x -> k = x);
       }
 
       @Override
-      protected Factory<V> makeInstance() {
+      public Factory<V> make() {
         return new Factory<>(alpha, k);
       }
     }

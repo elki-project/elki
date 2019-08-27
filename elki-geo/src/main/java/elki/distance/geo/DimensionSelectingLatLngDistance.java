@@ -30,7 +30,7 @@ import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -151,7 +151,7 @@ public class DimensionSelectingLatLngDistance implements SpatialPrimitiveDistanc
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Latitude dimension parameter.
      */
@@ -178,8 +178,7 @@ public class DimensionSelectingLatLngDistance implements SpatialPrimitiveDistanc
     EarthModel model;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       IntParameter dimlatP = new IntParameter(LATDIM_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       dimlatP.grab(config, x -> dimlat = x);
@@ -195,7 +194,7 @@ public class DimensionSelectingLatLngDistance implements SpatialPrimitiveDistanc
     }
 
     @Override
-    protected DimensionSelectingLatLngDistance makeInstance() {
+    public DimensionSelectingLatLngDistance make() {
       return new DimensionSelectingLatLngDistance(dimlat, dimlng, model);
     }
   }

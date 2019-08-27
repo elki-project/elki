@@ -26,7 +26,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.database.Database;
 import elki.database.ids.DBIDRef;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -107,20 +107,19 @@ public class PreDeConCorePredicate implements CorePredicate<PreDeConModel> {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The PreDeCon settings class.
      */
     protected PreDeCon.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(PreDeCon.Settings.class);
     }
 
     @Override
-    protected PreDeConCorePredicate makeInstance() {
+    public PreDeConCorePredicate make() {
       return new PreDeConCorePredicate(settings);
     }
   }

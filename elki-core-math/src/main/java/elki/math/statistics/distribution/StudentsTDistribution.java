@@ -23,10 +23,10 @@ package elki.math.statistics.distribution;
 import java.util.Random;
 
 import elki.utilities.exceptions.NotImplementedException;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -126,7 +126,7 @@ public class StudentsTDistribution implements Distribution {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Degrees of freedom.
      */
@@ -136,14 +136,13 @@ public class StudentsTDistribution implements Distribution {
     int nu;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(NU_ID) //
           .grab(config, x -> nu = x);
     }
 
     @Override
-    protected StudentsTDistribution makeInstance() {
+    public StudentsTDistribution make() {
       return new StudentsTDistribution(nu);
     }
   }

@@ -25,7 +25,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.type.SimpleTypeInformation;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -149,9 +149,9 @@ public class ClarkDistance implements SpatialPrimitiveDistance<NumberVector>, Nu
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClarkDistance makeInstance() {
+    public ClarkDistance make() {
       return ClarkDistance.STATIC;
     }
   }

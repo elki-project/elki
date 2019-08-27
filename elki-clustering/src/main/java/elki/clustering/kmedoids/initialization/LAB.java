@@ -245,9 +245,9 @@ public class LAB<O> implements KMeansInitialization, KMedoidsInitialization<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<V> extends AbstractKMeansInitialization.Par {
     @Override
-    protected LAB<V> makeInstance() {
+    public LAB<V> make() {
       return new LAB<>(rnd);
     }
   }

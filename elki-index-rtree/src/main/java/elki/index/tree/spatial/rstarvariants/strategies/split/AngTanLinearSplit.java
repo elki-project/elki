@@ -30,7 +30,7 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Line-time complexity split proposed by Ang and Tan.
@@ -179,9 +179,9 @@ public class AngTanLinearSplit implements SplitStrategy {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected AngTanLinearSplit makeInstance() {
+    public AngTanLinearSplit make() {
       return AngTanLinearSplit.STATIC;
     }
   }

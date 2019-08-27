@@ -160,7 +160,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
+  public static class Par<O> extends AbstractDBOutlier.Par<O> {
     /**
      * Parameter to specify the minimum fraction of objects that must be outside
      * the D- neighborhood of an outlier
@@ -173,8 +173,8 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     protected double p = 0.0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -182,7 +182,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     }
 
     @Override
-    protected DBOutlierDetection<O> makeInstance() {
+    public DBOutlierDetection<O> make() {
       return new DBOutlierDetection<>(distanceFunction, d, p);
     }
   }

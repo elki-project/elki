@@ -285,7 +285,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Row name.
      */
@@ -327,8 +327,8 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     String name;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Data input
       infile = super.getParameterInputFile(config, "Input file containing the outlier score vectors.");
       new ObjectParameter<StreamingParser>(PARSER_ID, StreamingParser.class, NumberVectorLabelParser.class) //
@@ -344,7 +344,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     }
 
     @Override
-    protected EvaluatePrecomputedOutlierScores makeInstance() {
+    public EvaluatePrecomputedOutlierScores make() {
       return new EvaluatePrecomputedOutlierScores(infile, parser, reverse, outfile, name);
     }
   }

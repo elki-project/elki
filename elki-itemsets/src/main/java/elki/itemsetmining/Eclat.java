@@ -236,9 +236,9 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {
+  public static class Par extends AbstractFrequentItemsetAlgorithm.Par {
     @Override
-    protected Eclat makeInstance() {
+    public Eclat make() {
       return new Eclat(minsupp, minlength, maxlength);
     }
   }

@@ -30,7 +30,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -132,7 +132,7 @@ public class ClassLabelFilter implements ObjectFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Optional parameter that specifies the index of the label to be used as
      * class label, must be an integer equal to or greater than 0.
@@ -156,8 +156,7 @@ public class ClassLabelFilter implements ObjectFilter {
     private ClassLabel.Factory<?> classLabelFactory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(CLASS_LABEL_INDEX_ID) //
           .grab(config, x -> classLabelIndex = x);
       new ObjectParameter<ClassLabel.Factory<?>>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class) //
@@ -165,7 +164,7 @@ public class ClassLabelFilter implements ObjectFilter {
     }
 
     @Override
-    protected ClassLabelFilter makeInstance() {
+    public ClassLabelFilter make() {
       return new ClassLabelFilter(classLabelIndex, classLabelFactory);
     }
   }

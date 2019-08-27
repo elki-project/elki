@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a normal distribution using the method of
@@ -82,9 +82,9 @@ public class NormalLMMEstimator implements LMMDistributionEstimator<NormalDistri
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NormalLMMEstimator makeInstance() {
+    public NormalLMMEstimator make() {
       return STATIC;
     }
   }

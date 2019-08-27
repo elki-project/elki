@@ -32,7 +32,7 @@ import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -162,7 +162,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
    *
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Similarity function parameter.
      */
@@ -184,9 +184,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
     protected Similarity<O> distfun = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      // Get the similarity function.
+    public void configure(Parameterization config) {
       new ObjectParameter<Similarity<O>>(SIMILARITY_FUNCTION_ID, Similarity.class) //
           .grab(config, x -> distfun = x);
       // Get the epsilon parameter
@@ -196,7 +194,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
     }
 
     @Override
-    protected SimilarityNeighborPredicate<O> makeInstance() {
+    public SimilarityNeighborPredicate<O> make() {
       return new SimilarityNeighborPredicate<>(epsilon, distfun);
     }
   }

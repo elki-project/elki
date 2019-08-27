@@ -24,7 +24,7 @@ import elki.math.MathUtil;
 import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -127,9 +127,9 @@ public class LogNormalLMMEstimator implements LMMDistributionEstimator<LogNormal
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogNormalLMMEstimator makeInstance() {
+    public LogNormalLMMEstimator make() {
       return STATIC;
     }
   }

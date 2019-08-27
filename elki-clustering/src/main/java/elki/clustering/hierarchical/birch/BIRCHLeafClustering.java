@@ -39,7 +39,7 @@ import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -141,19 +141,19 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * CFTree factory.
      */
     CFTree.Factory cffactory;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
     }
 
     @Override
-    protected BIRCHLeafClustering makeInstance() {
+    public BIRCHLeafClustering make() {
       return new BIRCHLeafClustering(cffactory);
     }
   }

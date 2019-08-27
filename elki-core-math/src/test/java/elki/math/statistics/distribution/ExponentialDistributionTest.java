@@ -105,8 +105,8 @@ public class ExponentialDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("exp.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExponentialDistribution.Parameterizer.LOCATION_ID, 0.);
-    params.addParameter(ExponentialDistribution.Parameterizer.RATE_ID, .1);
+    params.addParameter(ExponentialDistribution.Par.LOCATION_ID, 0.);
+    params.addParameter(ExponentialDistribution.Par.RATE_ID, .1);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentialDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01", 1e-15);
   }

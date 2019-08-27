@@ -50,9 +50,9 @@ public class AttributeWiseBetaNormalizationTest extends AbstractDataSourceTest {
     final double p = .88;
     String filename = UNITTEST + "normally-distributed-data-1.csv";
     AttributeWiseBetaNormalization<DoubleVector> filter = new ELKIBuilder<AttributeWiseBetaNormalization<DoubleVector>>(AttributeWiseBetaNormalization.class) //
-        .with(AttributeWiseBetaNormalization.Parameterizer.ALPHA_ID, p) //
+        .with(AttributeWiseBetaNormalization.Par.ALPHA_ID, p) //
         // Avoid cross-testing too many estimators.
-        .with(AttributeWiseBetaNormalization.Parameterizer.DISTRIBUTIONS_ID, //
+        .with(AttributeWiseBetaNormalization.Par.DISTRIBUTIONS_ID, //
             Arrays.asList(NormalMOMEstimator.STATIC, UniformMinMaxEstimator.STATIC)) //
         .build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);

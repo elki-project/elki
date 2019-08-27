@@ -49,8 +49,8 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   public void testDBOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
-        .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
-        .with(DBOutlierDetection.Parameterizer.P_ID, 0.98) //
+        .with(DBOutlierDetection.Par.D_ID, 0.175) //
+        .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().run(db);
     testSingleScore(result, 1025, 0.0);
     testAUC(db, "Noise", result, 0.97487179);
@@ -67,8 +67,8 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Metadata.hierarchyOf(rel).addChild(preproc);
     preproc.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
-        .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
-        .with(DBOutlierDetection.Parameterizer.P_ID, 0.98) //
+        .with(DBOutlierDetection.Par.D_ID, 0.175) //
+        .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().run(db);
     testSingleScore(result, 1025, 0.0);
     testAUC(db, "Noise", result, 0.97487179);
@@ -91,8 +91,8 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Metadata.hierarchyOf(rel).addChild(idx);
     idx.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
-        .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
-        .with(DBOutlierDetection.Parameterizer.P_ID, 0.98) //
+        .with(DBOutlierDetection.Par.D_ID, 0.175) //
+        .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().run(db);
     testSingleScore(result, 1025, 0.0);
     testAUC(db, "Noise", result, 0.97487179);

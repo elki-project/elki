@@ -64,9 +64,9 @@ public class BUILDTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, BUILD.class) //
         .with(KMeans.MAXITER_ID, 1) //
-        .with(CLARA.Parameterizer.NOKEEPMED_ID) //
-        .with(CLARA.Parameterizer.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Parameterizer.RANDOM_ID, 0) //
+        .with(CLARA.Par.NOKEEPMED_ID) //
+        .with(CLARA.Par.SAMPLESIZE_ID, 10) //
+        .with(CLARA.Par.RANDOM_ID, 0) //
         .build().run(db);
     testFMeasure(db, result, 0.99602);
     testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });

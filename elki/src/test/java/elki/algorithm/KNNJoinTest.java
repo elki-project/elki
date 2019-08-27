@@ -107,8 +107,8 @@ public class KNNJoinTest {
   @Test
   public void testKNNJoinRtreeMini() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
+    spatparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 200);
     doKNNJoin(spatparams);
   }
 
@@ -118,8 +118,8 @@ public class KNNJoinTest {
   @Test
   public void testKNNJoinRtreeMaxi() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 2000);
+    spatparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, RStarTreeFactory.class);
+    spatparams.addParameter(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 2000);
     doKNNJoin(spatparams);
   }
 
@@ -129,8 +129,8 @@ public class KNNJoinTest {
   @Test
   public void testKNNJoinDeLiCluTreeMini() {
     ListParameterization spatparams = new ListParameterization();
-    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, DeLiCluTreeFactory.class);
-    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
+    spatparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, DeLiCluTreeFactory.class);
+    spatparams.addParameter(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 200);
     doKNNJoin(spatparams);
   }
 

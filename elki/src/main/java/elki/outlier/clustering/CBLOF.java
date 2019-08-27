@@ -55,7 +55,7 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -275,7 +275,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the algorithm to be used for clustering.
      */
@@ -320,9 +320,8 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     protected NumberVectorDistance<? super O> distance;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new ObjectParameter<NumberVectorDistance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<NumberVectorDistance<? super O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(ALPHPA_ID)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE)//
@@ -336,7 +335,7 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     }
 
     @Override
-    protected CBLOF<O> makeInstance() {
+    public CBLOF<O> make() {
       return new CBLOF<>(distance, clusteringAlgorithm, alpha, beta);
     }
   }

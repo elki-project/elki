@@ -30,7 +30,7 @@ import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;
 import elki.logging.statistics.LongStatistic;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -278,7 +278,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
      * 
      * @author Erich Schubert
      */
-    public abstract static class Parameterizer<O> extends AbstractParameterizer {
+    public abstract static class Par<O> implements Parameterizer {
       /**
        * Parameter to specify the distance function to determine the distance
        * between database objects, must extend
@@ -312,8 +312,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       protected double expansion = 1.3;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class) //
             .grab(config, x -> {
               distanceFunction = x;

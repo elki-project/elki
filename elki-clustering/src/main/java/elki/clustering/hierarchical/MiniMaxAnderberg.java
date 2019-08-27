@@ -364,9 +364,9 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
-    protected MiniMaxAnderberg<O> makeInstance() {
+    public MiniMaxAnderberg<O> make() {
       return new MiniMaxAnderberg<>(distanceFunction);
     }
   }

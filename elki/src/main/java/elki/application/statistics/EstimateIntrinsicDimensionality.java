@@ -119,7 +119,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedApplication.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedApplication.Par<O> {
     /**
      * Estimation method
      */
@@ -151,8 +151,8 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     protected double samples;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class) //
           .grab(config, x -> estimator = x);
       new DoubleParameter(KRATE_ID, 50) //
@@ -164,7 +164,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     }
 
     @Override
-    protected EstimateIntrinsicDimensionality<O> makeInstance() {
+    public EstimateIntrinsicDimensionality<O> make() {
       return new EstimateIntrinsicDimensionality<>(inputstep, distance, estimator, krate, samples);
     }
   }

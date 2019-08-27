@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimator using Medians. More robust to outliers, and just slightly more
@@ -83,9 +83,9 @@ public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<Log
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LogNormalLogMADEstimator makeInstance() {
+    public LogNormalLogMADEstimator make() {
       return STATIC;
     }
   }

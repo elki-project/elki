@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.InverseGaussianDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate parameter of the inverse Gaussian (Wald) distribution.
@@ -73,9 +73,9 @@ public class InverseGaussianMLEstimator implements DistributionEstimator<Inverse
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected InverseGaussianMLEstimator makeInstance() {
+    public InverseGaussianMLEstimator make() {
       return STATIC;
     }
   }

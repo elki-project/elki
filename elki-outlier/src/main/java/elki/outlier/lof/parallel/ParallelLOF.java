@@ -181,21 +181,21 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * K parameter
      */
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(LOF.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(LOF.Par.K_ID) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected ParallelLOF<O> makeInstance() {
+    public ParallelLOF<O> make() {
       return new ParallelLOF<>(distanceFunction, k);
     }
   }

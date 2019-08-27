@@ -31,7 +31,7 @@ import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.visualization.VisualizationTask;
@@ -74,14 +74,14 @@ public class RTreeParallelVisualization implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public RTreeParallelVisualization(Parameterizer settings) {
+  public RTreeParallelVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -220,19 +220,18 @@ public class RTreeParallelVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     protected boolean fill = true;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new Flag(TreeMBRVisualization.Parameterizer.FILL_ID) //
+    public void configure(Parameterization config) {
+      new Flag(TreeMBRVisualization.Par.FILL_ID) //
           .setDefaultValue(Boolean.TRUE) //
           .grab(config, x -> fill = x);
     }
 
     @Override
-    protected RTreeParallelVisualization makeInstance() {
+    public RTreeParallelVisualization make() {
       return new RTreeParallelVisualization(this);
     }
   }

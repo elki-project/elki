@@ -40,7 +40,7 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -293,7 +293,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number of samples per uncertain object.
      */
@@ -334,9 +334,8 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
     protected RandomFactory seed;
 
     @Override
-    public void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
       new IntParameter(SAMPLE_SIZE_ID) //
@@ -350,7 +349,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
     }
 
     @Override
-    protected FDBSCANNeighborPredicate makeInstance() {
+    public FDBSCANNeighborPredicate make() {
       return new FDBSCANNeighborPredicate(epsilon, sampleSize, threshold, seed);
     }
   }

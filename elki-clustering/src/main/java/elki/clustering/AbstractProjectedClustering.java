@@ -24,7 +24,7 @@ import elki.AbstractAlgorithm;
 import elki.clustering.subspace.PROCLUS;
 import elki.data.Clustering;
 import elki.data.NumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 
 /**
@@ -72,7 +72,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of clusters to find, must be an integer
      * greater than 0.

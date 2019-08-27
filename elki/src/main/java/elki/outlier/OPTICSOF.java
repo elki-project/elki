@@ -174,22 +174,22 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the threshold MinPts.
      */
     protected int minpts = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(AbstractOPTICS.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> minpts = x);
     }
 
     @Override
-    protected OPTICSOF<O> makeInstance() {
+    public OPTICSOF<O> make() {
       return new OPTICSOF<>(distanceFunction, minpts);
     }
   }

@@ -309,7 +309,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its score, must be an integer greater than 0.
@@ -362,8 +362,8 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     boolean models = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(new GreaterConstraint(5)) //
           .grab(config, x -> k = x);
@@ -379,7 +379,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     @Override
-    protected COP<V> makeInstance() {
+    public COP<V> make() {
       return new COP<>(distanceFunction, k, pca, expect, dist, models);
     }
   }

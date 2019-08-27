@@ -48,9 +48,9 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
     int pdim = 2;
     String filename = UNITTEST + "transformation-test-1.csv";
     FastMultidimensionalScalingTransform<DoubleVector, DoubleVector> filter = new ELKIBuilder<FastMultidimensionalScalingTransform<DoubleVector, DoubleVector>>(FastMultidimensionalScalingTransform.class) //
-        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DIM_ID, pdim) //
-        .with(FastMultidimensionalScalingTransform.Parameterizer.RANDOM_ID, 0L) //
-        .with(ClassicMultidimensionalScalingTransform.Parameterizer.DISTANCE_ID, EuclideanDistance.class) //
+        .with(ClassicMultidimensionalScalingTransform.Par.DIM_ID, pdim) //
+        .with(FastMultidimensionalScalingTransform.Par.RANDOM_ID, 0L) //
+        .with(ClassicMultidimensionalScalingTransform.Par.DISTANCE_ID, EuclideanDistance.class) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

@@ -92,8 +92,8 @@ public class NormalDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("norm.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(NormalDistribution.Parameterizer.LOCATION_ID, 1.);
-    params.addParameter(NormalDistribution.Parameterizer.SCALE_ID, 3.);
+    params.addParameter(NormalDistribution.Par.LOCATION_ID, 1.);
+    params.addParameter(NormalDistribution.Par.SCALE_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(NormalDistribution.class, params);
     checkPDF(dist, "pdf_scipy_1_3", 1e-15);
   }

@@ -25,7 +25,7 @@ import elki.data.type.VectorTypeInformation;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -156,7 +156,7 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * PDELTA parameter
      */
@@ -178,8 +178,7 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
     private double pEpsilon;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(PDELTA_ID, 0.1)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -191,7 +190,7 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
     }
 
     @Override
-    protected LCSSDistance makeInstance() {
+    public LCSSDistance make() {
       return new LCSSDistance(pDelta, pEpsilon);
     }
   }

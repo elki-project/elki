@@ -249,7 +249,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends NearestNeighborAffinityMatrixBuilder.Parameterizer<O> {
+  public static class Par<O> extends NearestNeighborAffinityMatrixBuilder.Par<O> {
     /**
      * Parameter for ID estimation.
      */
@@ -261,14 +261,14 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
           .grab(config, x -> estimator = x);
     }
 
     @Override
-    protected IntrinsicNearestNeighborAffinityMatrixBuilder<O> makeInstance() {
+    public IntrinsicNearestNeighborAffinityMatrixBuilder<O> make() {
       return new IntrinsicNearestNeighborAffinityMatrixBuilder<>(distanceFunction, perplexity, estimator);
     }
   }

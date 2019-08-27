@@ -28,7 +28,7 @@ import elki.datasource.filter.ObjectFilter;
 import elki.datasource.filter.StreamFilter;
 import elki.datasource.parser.Parser;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -129,7 +129,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Filters to apply to the input data.
      */

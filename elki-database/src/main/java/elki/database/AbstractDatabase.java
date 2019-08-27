@@ -33,7 +33,7 @@ import elki.database.relation.Relation;
 import elki.datasource.bundle.SingleObjectBundle;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 
 /**
@@ -156,7 +156,7 @@ public abstract class AbstractDatabase implements Database {
    *
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Option to specify the data source for the database.
      */
@@ -168,6 +168,6 @@ public abstract class AbstractDatabase implements Database {
     public static final OptionID INDEX_ID = new OptionID("db.index", "Database indexes to add.");
 
     @Override
-    protected abstract Database makeInstance();
+    public abstract Database make();
   }
 }

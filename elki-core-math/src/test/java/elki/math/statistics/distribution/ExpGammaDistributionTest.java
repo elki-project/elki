@@ -97,9 +97,9 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("expgamma.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExpGammaDistribution.Parameterizer.K_ID, 2.);
-    params.addParameter(ExpGammaDistribution.Parameterizer.THETA_ID, 1.);
-    params.addParameter(ExpGammaDistribution.Parameterizer.SHIFT_ID, 0.);
+    params.addParameter(ExpGammaDistribution.Par.K_ID, 2.);
+    params.addParameter(ExpGammaDistribution.Par.THETA_ID, 1.);
+    params.addParameter(ExpGammaDistribution.Par.SHIFT_ID, 0.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExpGammaDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }

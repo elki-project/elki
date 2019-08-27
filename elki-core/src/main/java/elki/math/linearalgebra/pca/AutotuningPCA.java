@@ -257,7 +257,7 @@ public class AutotuningPCA extends PCARunner {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends PCARunner.Parameterizer {
+  public static class Par extends PCARunner.Par {
     /**
      * Parameter for filtering eigenvectors.
      */
@@ -269,14 +269,14 @@ public class AutotuningPCA extends PCARunner {
     private EigenPairFilter filter;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, SignificantEigenPairFilter.class) //
           .grab(config, x -> filter = x);
     }
 
     @Override
-    protected AutotuningPCA makeInstance() {
+    public AutotuningPCA make() {
       return new AutotuningPCA(covarianceMatrixBuilder, filter);
     }
   }

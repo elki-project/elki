@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.birch;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Average Radius (R) criterion.
@@ -92,9 +92,9 @@ public class RadiusCriterion implements BIRCHAbsorptionCriterion {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RadiusCriterion makeInstance() {
+    public RadiusCriterion make() {
       return STATIC;
     }
   }

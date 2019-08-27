@@ -28,7 +28,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -121,7 +121,7 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the projection family.
      */
@@ -143,8 +143,7 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
     private RandomProjectionFamily family;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<RandomProjectionFamily>(FAMILY_ID, RandomProjectionFamily.class) //
           .setDefaultValue(AchlioptasRandomProjectionFamily.class) //
           .grab(config, x -> family = x);
@@ -154,7 +153,7 @@ public class RandomProjection<V extends NumberVector> implements Projection<V, V
     }
 
     @Override
-    protected RandomProjection<NumberVector> makeInstance() {
+    public RandomProjection<NumberVector> make() {
       return new RandomProjection<>(dimensionality, family);
     }
   }

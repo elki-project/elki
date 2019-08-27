@@ -40,7 +40,7 @@ import elki.database.datastore.ObjectNotFoundException;
 import elki.database.ids.DBID;
 import elki.math.geometry.SweepHullDelaunay2D;
 import elki.math.geometry.SweepHullDelaunay2D.Triangle;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -323,7 +323,7 @@ public class VoronoiVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Mode for drawing: Voronoi, Delaunay, both.
      */
@@ -335,14 +335,13 @@ public class VoronoiVisualization implements VisFactory {
     protected Mode mode;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.VORONOI) //
           .grab(config, x -> mode = x);
     }
 
     @Override
-    protected VoronoiVisualization makeInstance() {
+    public VoronoiVisualization make() {
       return new VoronoiVisualization(mode);
     }
   }

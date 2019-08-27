@@ -360,7 +360,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<SpatialPrimitiveDistance<? super V>> {
+  public static class Par<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Par<SpatialPrimitiveDistance<? super V>> {
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned, must be
      * an integer greater than 0. Default value: 1.
@@ -378,15 +378,15 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected KNNJoin<V, N, E> makeInstance() {
+    public KNNJoin<V, N, E> make() {
       return new KNNJoin<>(distanceFunction, k);
     }
   }

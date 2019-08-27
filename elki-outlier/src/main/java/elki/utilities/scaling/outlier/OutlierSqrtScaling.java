@@ -25,7 +25,7 @@ import elki.database.relation.DoubleRelation;
 import elki.math.DoubleMinMax;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -124,7 +124,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the fixed minimum to use.
      */
@@ -146,8 +146,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
     protected double max;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MIN_ID) //
           .setOptional(true) //
           .grab(config, x -> min = x);
@@ -157,7 +156,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
     }
 
     @Override
-    protected OutlierSqrtScaling makeInstance() {
+    public OutlierSqrtScaling make() {
       return new OutlierSqrtScaling(min, max);
     }
   }

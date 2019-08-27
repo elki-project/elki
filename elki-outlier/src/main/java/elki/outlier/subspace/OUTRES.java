@@ -49,7 +49,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -381,7 +381,7 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
    * 
    * @author Viktoria Pleintinger
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for Epsilon parameter
      */
@@ -393,14 +393,13 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
     protected double eps;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(D_ID) //
           .grab(config, x -> eps = x);
     }
 
     @Override
-    protected OUTRES makeInstance() {
+    public OUTRES make() {
       return new OUTRES(eps);
     }
   }

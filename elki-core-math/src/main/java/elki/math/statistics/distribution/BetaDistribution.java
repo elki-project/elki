@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -435,7 +435,7 @@ public class BetaDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Alpha parameter.
      */
@@ -450,7 +450,7 @@ public class BetaDistribution implements Distribution {
     double alpha, beta;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new DoubleParameter(ALPHA_ID) //
           .grab(config, x -> alpha = x);
       new DoubleParameter(BETA_ID) //
@@ -458,7 +458,7 @@ public class BetaDistribution implements Distribution {
     }
 
     @Override
-    protected BetaDistribution makeInstance() {
+    public BetaDistribution make() {
       return new BetaDistribution(alpha, beta);
     }
   }

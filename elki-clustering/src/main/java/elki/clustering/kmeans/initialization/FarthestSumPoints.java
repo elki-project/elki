@@ -158,14 +158,14 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends FarthestPoints.Parameterizer<V> {
+  public static class Par<V> extends FarthestPoints.Par<V> {
     /**
      * Flag for discarding the first object chosen.
      */
     protected boolean keepfirst = false;
 
     @Override
-    protected FarthestSumPoints<V> makeInstance() {
+    public FarthestSumPoints<V> make() {
       return new FarthestSumPoints<>(rnd, !keepfirst);
     }
   }

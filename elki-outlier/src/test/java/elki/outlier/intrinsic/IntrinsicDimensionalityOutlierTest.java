@@ -39,7 +39,7 @@ public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithm
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<IntrinsicDimensionalityOutlier<DoubleVector>>(IntrinsicDimensionalityOutlier.class) //
-        .with(IntrinsicDimensionalityOutlier.Parameterizer.K_ID, 100).build().run(db);
+        .with(IntrinsicDimensionalityOutlier.Par.K_ID, 100).build().run(db);
     testAUC(db, "Noise", result, 0.9167222);
     testSingleScore(result, 945, 2.5368047);
   }

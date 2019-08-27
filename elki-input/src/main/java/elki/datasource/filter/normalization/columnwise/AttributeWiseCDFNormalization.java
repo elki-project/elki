@@ -38,7 +38,7 @@ import elki.math.statistics.distribution.estimator.DistributionEstimator;
 import elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -267,7 +267,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for distribution estimators.
      */
@@ -279,15 +279,14 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
     private List<? extends DistributionEstimator<?>> estimators;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectListParameter<DistributionEstimator<?>>(DISTRIBUTIONS_ID, DistributionEstimator.class) //
           .setDefaultValue(Arrays.asList(BestFitEstimator.class)) //
           .grab(config, x -> estimators = x);
     }
 
     @Override
-    protected AttributeWiseCDFNormalization<V> makeInstance() {
+    public AttributeWiseCDFNormalization<V> make() {
       return new AttributeWiseCDFNormalization<>(estimators);
     }
   }

@@ -71,8 +71,8 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
   public void testAffinityPropagationSimilarity() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<MedoidModel> result = new ELKIBuilder<AffinityPropagation<DoubleVector>>(AffinityPropagation.class) //
-        .with(AffinityPropagation.Parameterizer.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class) //
-        .with(SimilarityBasedInitializationWithMedian.Parameterizer.SIMILARITY_ID, PolynomialKernel.class) //
+        .with(AffinityPropagation.Par.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class) //
+        .with(SimilarityBasedInitializationWithMedian.Par.SIMILARITY_ID, PolynomialKernel.class) //
         .build().run(db);
     testFMeasure(db, result, 0.352103);
     testClusterSizes(result, new int[] { 20, 30, 32, 33, 34, 35, 36, 39, 39, 40, 43, 45, 45, 49, 49, 69 });

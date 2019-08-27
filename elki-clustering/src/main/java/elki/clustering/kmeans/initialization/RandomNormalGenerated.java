@@ -107,9 +107,9 @@ public class RandomNormalGenerated extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par extends AbstractKMeansInitialization.Par {
     @Override
-    protected RandomNormalGenerated makeInstance() {
+    public RandomNormalGenerated make() {
       return new RandomNormalGenerated(rnd);
     }
   }

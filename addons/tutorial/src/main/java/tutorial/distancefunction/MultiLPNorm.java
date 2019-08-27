@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.distance.AbstractNumberVectorDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -95,7 +95,7 @@ public class MultiLPNorm extends AbstractNumberVectorDistance {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the exponents
      */
@@ -107,13 +107,12 @@ public class MultiLPNorm extends AbstractNumberVectorDistance {
     double[] ps;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleListParameter(EXPONENTS_ID).grab(config, x -> ps = x);
     }
 
     @Override
-    protected MultiLPNorm makeInstance() {
+    public MultiLPNorm make() {
       return new MultiLPNorm(ps);
     }
   }

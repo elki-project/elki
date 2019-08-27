@@ -58,8 +58,8 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
 
   private LocalitySensitiveHashFunction<? super NumberVector> createCosineHashFunction(int numberOfProjections) {
     ListParameterization params = new ListParameterization();
-    params.addParameter(CosineHashFunctionFamily.Parameterizer.RANDOM_ID, 0L);
-    params.addParameter(CosineHashFunctionFamily.Parameterizer.NUMPROJ_ID, numberOfProjections);
+    params.addParameter(CosineHashFunctionFamily.Par.RANDOM_ID, 0L);
+    params.addParameter(CosineHashFunctionFamily.Par.NUMPROJ_ID, numberOfProjections);
     CosineHashFunctionFamily cosineFamily = ClassGenericsUtil.parameterizeOrAbort(CosineHashFunctionFamily.class, params);
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = cosineFamily.generateHashFunctions(mockRelation(5), numberOfProjections).get(0);
     return hashFunction;

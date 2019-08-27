@@ -117,7 +117,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedApplication.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractDistanceBasedApplication.Par<V> {
     /**
      * Parameter to specify the query radius.
      */
@@ -149,8 +149,8 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     protected RandomFactory random = RandomFactory.DEFAULT;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(RADIUS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> radius = x);
@@ -163,7 +163,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
     }
 
     @Override
-    protected RangeQuerySelectivity<V> makeInstance() {
+    public RangeQuerySelectivity<V> make() {
       return new RangeQuerySelectivity<>(inputstep, distance, radius, sampling, random);
     }
   }

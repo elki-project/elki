@@ -23,7 +23,7 @@ package elki.math.statistics.dependence;
 import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -197,9 +197,9 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HoeffdingsDDependenceMeasure makeInstance() {
+    public HoeffdingsDDependenceMeasure make() {
       return STATIC;
     }
   }

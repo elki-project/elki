@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -129,7 +129,7 @@ public class UniformDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Minimum value
      */
@@ -144,8 +144,7 @@ public class UniformDistribution implements Distribution {
     double min, max;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MIN_ID) //
           .grab(config, x -> min = x);
       new DoubleParameter(MAX_ID) //
@@ -153,7 +152,7 @@ public class UniformDistribution implements Distribution {
     }
 
     @Override
-    protected UniformDistribution makeInstance() {
+    public UniformDistribution make() {
       return new UniformDistribution(min, max);
     }
   }

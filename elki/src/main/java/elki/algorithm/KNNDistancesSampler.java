@@ -185,7 +185,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the distance of the k-distant object to be assessed,
      * must be an integer greater than 0.
@@ -220,8 +220,8 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
     private RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -232,7 +232,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
     }
 
     @Override
-    protected KNNDistancesSampler<O> makeInstance() {
+    public KNNDistancesSampler<O> make() {
       return new KNNDistancesSampler<>(distanceFunction, k, percentage, rnd);
     }
   }

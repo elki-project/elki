@@ -46,7 +46,7 @@ import elki.utilities.io.FileUtil;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -201,7 +201,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the file to be re-parsed.
      */
@@ -213,14 +213,13 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
     private File file;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(FILE_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> file = x);
     }
 
     @Override
-    protected ExternalClustering makeInstance() {
+    public ExternalClustering make() {
       return new ExternalClustering(file);
     }
   }

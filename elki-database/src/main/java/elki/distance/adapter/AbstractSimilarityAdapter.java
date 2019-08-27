@@ -30,7 +30,7 @@ import elki.distance.Distance;
 import elki.similarity.NormalizedSimilarity;
 import elki.similarity.Similarity;
 import elki.utilities.ClassGenericsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -140,7 +140,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer<O, S extends Similarity<? super O>> extends AbstractParameterizer {
+  public abstract static class Par<O, S extends Similarity<? super O>> implements Parameterizer {
     /**
      * Parameter to specify the similarity function to derive the distance
      * between database objects from. Must extend
@@ -166,8 +166,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     protected Class<NormalizedSimilarity<? super O>> NORMALIZED_SIMILARITY = ClassGenericsUtil.uglyCastIntoSubclass(NormalizedSimilarity.class);
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<S>(SIMILARITY_FUNCTION_ID, getSimilarityRestriction()) //
           .grab(config, x -> similarityFunction = x);
     }

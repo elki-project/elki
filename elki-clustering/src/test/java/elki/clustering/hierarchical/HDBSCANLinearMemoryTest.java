@@ -48,9 +48,9 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
   public void testHDBSCAN() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
-        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, clustering, 0.686953412);
     testClusterSizes(clustering, new int[] { 1, 200, 437 });
@@ -64,16 +64,16 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
     Database db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 1, 0 }, { 0, 1 } }), null);
     db.initialize();
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
-        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 0 } }), null);
     db.initialize();
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
-        .with(HDBSCANLinearMemory.Parameterizer.MIN_PTS_ID, 20) //
+        .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
   }
 }

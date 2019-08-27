@@ -34,7 +34,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
 import elki.index.preprocessed.AbstractPreprocessorIndex;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -225,7 +225,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
      *
      * @param <O> Object type
      */
-    public abstract static class Parameterizer<O> extends AbstractParameterizer {
+    public abstract static class Par<O> implements Parameterizer {
       /**
        * Holds the value of {@link #K_ID}.
        */
@@ -237,9 +237,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
       protected Distance<? super O> distanceFunction;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        // number of neighbors
+      public void configure(Parameterization config) {
         new IntParameter(K_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
             .grab(config, x -> k = x);
@@ -249,7 +247,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
       }
 
       @Override
-      protected abstract Factory<O> makeInstance();
+      public abstract Factory<O> make();
     }
   }
 }

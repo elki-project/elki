@@ -347,7 +347,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -364,15 +364,15 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new ObjectParameter<Linkage>(LINKAGE_ID, Linkage.class) //
           .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> linkage = x);
-      super.makeOptions(config);
+      super.configure(config);
     }
 
     @Override
-    protected AGNES<O> makeInstance() {
+    public AGNES<O> make() {
       return new AGNES<>(distanceFunction, linkage);
     }
   }

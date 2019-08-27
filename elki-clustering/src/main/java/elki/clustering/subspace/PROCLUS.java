@@ -793,7 +793,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractProjectedClustering.Par {
     /**
      * Parameter to specify the multiplier for the initial number of medoids,
      * must be an integer greater than 0.
@@ -816,8 +816,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -834,7 +834,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
 
     @Override
-    protected PROCLUS<V> makeInstance() {
+    public PROCLUS<V> make() {
       return new PROCLUS<>(k, k_i, l, m_i, rnd);
     }
   }

@@ -21,7 +21,7 @@
 package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.UniformDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a normal distribution using the method of
@@ -70,9 +70,9 @@ public class UniformLMMEstimator implements LMMDistributionEstimator<UniformDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected UniformLMMEstimator makeInstance() {
+    public UniformLMMEstimator make() {
       return STATIC;
     }
   }

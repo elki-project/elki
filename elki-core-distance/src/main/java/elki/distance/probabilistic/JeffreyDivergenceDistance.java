@@ -26,7 +26,7 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -161,9 +161,9 @@ public class JeffreyDivergenceDistance extends AbstractNumberVectorDistance impl
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected JeffreyDivergenceDistance makeInstance() {
+    public JeffreyDivergenceDistance make() {
       return STATIC;
     }
   }

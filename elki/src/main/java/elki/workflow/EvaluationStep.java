@@ -28,7 +28,7 @@ import elki.evaluation.AutomaticEvaluation;
 import elki.evaluation.Evaluator;
 import elki.result.Metadata;
 import elki.result.ResultListener;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -120,7 +120,7 @@ public class EvaluationStep implements WorkflowStep {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Evaluators to run
      */
@@ -132,15 +132,14 @@ public class EvaluationStep implements WorkflowStep {
     public static final OptionID EVALUATOR_ID = new OptionID("evaluator", "Class to evaluate the results with.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectListParameter<Evaluator>(EVALUATOR_ID, Evaluator.class) //
           .setDefaultValue(Arrays.asList(AutomaticEvaluation.class)) //
           .grab(config, x -> evaluators = x);
     }
 
     @Override
-    protected EvaluationStep makeInstance() {
+    public EvaluationStep make() {
       return new EvaluationStep(evaluators);
     }
   }

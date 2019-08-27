@@ -42,9 +42,9 @@ public class JaccardTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.6) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Jaccard.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.6) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Jaccard.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 30, res.getRules().size());
   }

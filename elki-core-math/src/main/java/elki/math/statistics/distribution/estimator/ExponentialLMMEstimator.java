@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.ExponentialDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a Gamma Distribution, using the methods of
@@ -87,9 +87,9 @@ public class ExponentialLMMEstimator implements LMMDistributionEstimator<Exponen
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ExponentialLMMEstimator makeInstance() {
+    public ExponentialLMMEstimator make() {
       return STATIC;
     }
   }

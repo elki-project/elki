@@ -233,7 +233,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its VOV score, must be an integer greater than
@@ -247,15 +247,15 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     protected int k = 2;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected VarianceOfVolume<O> makeInstance() {
+    public VarianceOfVolume<O> make() {
       return new VarianceOfVolume<>(k, distanceFunction);
     }
   }

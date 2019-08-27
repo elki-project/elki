@@ -28,7 +28,7 @@ import elki.data.NumberVector;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -115,7 +115,7 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the grid resolution.
      */
@@ -138,8 +138,7 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
     protected double scale;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(NOCENTER_ID).grab(config, x -> nocenter = x);
       new DoubleParameter(SCALE_ID, 1.0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
@@ -147,7 +146,7 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
     }
 
     @Override
-    protected StarBasedReferencePoints makeInstance() {
+    public StarBasedReferencePoints make() {
       return new StarBasedReferencePoints(nocenter, scale);
     }
   }

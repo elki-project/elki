@@ -42,7 +42,7 @@ import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -378,7 +378,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Affinity matrix builder.
      */
@@ -445,8 +445,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
     protected boolean keep;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config); // Distance function
+    public void configure(Parameterization config) {
 
       new ObjectParameter<AffinityMatrixBuilder<? super O>>(AFFINITY_ID, AffinityMatrixBuilder.class, getDefaultAffinity()) //
           .grab(config, x -> affinity = x);
@@ -482,7 +481,7 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
     }
 
     @Override
-    protected TSNE<O> makeInstance() {
+    public TSNE<O> make() {
       return new TSNE<>(affinity, dim, finalMomentum, learningRate, iterations, random, keep);
     }
   }

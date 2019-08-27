@@ -68,9 +68,9 @@ public class MkMaxTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkMaxTr
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, MkMaxTreeNode<O>, MkMaxEntry, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
+  public static class Par<O> extends AbstractMkTreeUnifiedFactory.Par<O, MkMaxTreeNode<O>, MkMaxEntry, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
     @Override
-    protected MkMaxTreeFactory<O> makeInstance() {
+    public MkMaxTreeFactory<O> make() {
       return new MkMaxTreeFactory<>(pageFileFactory, settings);
     }
 

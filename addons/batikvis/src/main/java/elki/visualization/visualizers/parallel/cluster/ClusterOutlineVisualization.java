@@ -34,7 +34,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.math.DoubleMinMax;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -77,14 +77,14 @@ public class ClusterOutlineVisualization implements VisFactory {
   /**
    * Settings
    */
-  Parameterizer settings;
+  Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public ClusterOutlineVisualization(Parameterizer settings) {
+  public ClusterOutlineVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -259,7 +259,7 @@ public class ClusterOutlineVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option string to draw straight lines for hull.
      */
@@ -276,15 +276,14 @@ public class ClusterOutlineVisualization implements VisFactory {
     private boolean bend = true;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(ClusterHullVisualization.Parameterizer.ALPHA_ID, Double.POSITIVE_INFINITY) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(ClusterHullVisualization.Par.ALPHA_ID, Double.POSITIVE_INFINITY) //
           .grab(config, x -> alpha = x);
       new Flag(STRAIGHT_ID).grab(config, x -> bend = !x);
     }
 
     @Override
-    protected ClusterOutlineVisualization makeInstance() {
+    public ClusterOutlineVisualization make() {
       return new ClusterOutlineVisualization(this);
     }
   }

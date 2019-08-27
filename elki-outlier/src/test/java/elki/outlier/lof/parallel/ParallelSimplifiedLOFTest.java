@@ -40,7 +40,7 @@ public class ParallelSimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
   public void testParallelSimplifiedLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<ParallelSimplifiedLOF<DoubleVector>>(ParallelSimplifiedLOF.class) //
-        .with(LOF.Parameterizer.K_ID, 10).build().run(db);
+        .with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.8892549019);
     testSingleScore(result, 1293, 1.3025894);
   }

@@ -414,7 +414,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Flag to compute exact value range for binning.
      */
@@ -446,8 +446,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     protected boolean exact = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbin = x);
@@ -458,7 +458,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     }
 
     @Override
-    protected DistanceStatisticsWithClasses<O> makeInstance() {
+    public DistanceStatisticsWithClasses<O> make() {
       return new DistanceStatisticsWithClasses<>(distanceFunction, numbin, exact, sampling);
     }
   }

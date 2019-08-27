@@ -39,10 +39,10 @@ public class AggarwalYuEvolutionaryTest extends AbstractOutlierAlgorithmTest {
   public void testAggarwalYuEvolutionary() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<AggarwalYuEvolutionary<DoubleVector>>(AggarwalYuEvolutionary.class) //
-        .with(AggarwalYuEvolutionary.Parameterizer.K_ID, 2) //
-        .with(AggarwalYuEvolutionary.Parameterizer.PHI_ID, 8) //
-        .with(AggarwalYuEvolutionary.Parameterizer.M_ID, 20) //
-        .with(AggarwalYuEvolutionary.Parameterizer.SEED_ID, 0) //
+        .with(AggarwalYuEvolutionary.Par.K_ID, 2) //
+        .with(AggarwalYuEvolutionary.Par.PHI_ID, 8) //
+        .with(AggarwalYuEvolutionary.Par.M_ID, 20) //
+        .with(AggarwalYuEvolutionary.Par.SEED_ID, 0) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.653888888888);
     testSingleScore(result, 945, 0.0);

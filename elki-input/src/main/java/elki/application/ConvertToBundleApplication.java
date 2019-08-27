@@ -96,7 +96,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Option to specify the data source for the database.
      */
@@ -113,15 +113,15 @@ public class ConvertToBundleApplication extends AbstractApplication {
     private File outfile;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<DatabaseConnection>(DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class) //
           .grab(config, x -> input = x);
       outfile = super.getParameterOutputFile(config, "File name to serialize the bundle to.");
     }
 
     @Override
-    protected ConvertToBundleApplication makeInstance() {
+    public ConvertToBundleApplication make() {
       return new ConvertToBundleApplication(input, outfile);
     }
   }

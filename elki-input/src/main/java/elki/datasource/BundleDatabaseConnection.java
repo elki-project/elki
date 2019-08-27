@@ -94,7 +94,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * Option ID for the bundle parameter.
      */
@@ -106,15 +106,15 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
     private File infile;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       configFilters(config);
       new FileParameter(BUNDLE_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> infile = x);
     }
 
     @Override
-    protected BundleDatabaseConnection makeInstance() {
+    public BundleDatabaseConnection make() {
       return new BundleDatabaseConnection(filters, infile);
     }
   }

@@ -41,7 +41,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -133,7 +133,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The pattern to match outliers with.
      */
@@ -145,14 +145,13 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
     private Pattern pattern;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(OUTLIER_PATTERN_ID, DEFAULT_PATTERN) //
           .grab(config, x -> pattern = x);
     }
 
     @Override
-    protected ByLabelOutlier makeInstance() {
+    public ByLabelOutlier make() {
       return new ByLabelOutlier(pattern);
     }
   }

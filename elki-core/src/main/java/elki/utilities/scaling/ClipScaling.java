@@ -20,7 +20,7 @@
  */
 package elki.utilities.scaling;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -92,14 +92,13 @@ public class ClipScaling implements StaticScalingFunction {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     protected Double min = null;
 
     protected Double max = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MIN_ID) //
           .setOptional(true) //
           .grab(config, x -> min = x);
@@ -109,7 +108,7 @@ public class ClipScaling implements StaticScalingFunction {
     }
 
     @Override
-    protected ClipScaling makeInstance() {
+    public ClipScaling make() {
       return new ClipScaling(min, max);
     }
   }

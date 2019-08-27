@@ -293,7 +293,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    *
    * @author Jonas Steinke
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     /**
      * Parameter to specify the number of neighbors to ignore.
      */
@@ -316,8 +316,8 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     private boolean noiseFlag;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new DoubleParameter(RATE_ID, 0.05) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> rate = x);
@@ -325,7 +325,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     }
 
     @Override
-    protected KMeansMinusMinus<V> makeInstance() {
+    public KMeansMinusMinus<V> make() {
       return new KMeansMinusMinus<V>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
     }
   }

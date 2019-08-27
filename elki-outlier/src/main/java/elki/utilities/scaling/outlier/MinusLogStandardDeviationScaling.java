@@ -105,9 +105,9 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends StandardDeviationScaling.Parameterizer {
+  public static class Par extends StandardDeviationScaling.Par {
     @Override
-    protected MinusLogStandardDeviationScaling makeInstance() {
+    public MinusLogStandardDeviationScaling make() {
       return new MinusLogStandardDeviationScaling(fixedmean, lambda);
     }
   }

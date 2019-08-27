@@ -22,7 +22,7 @@ package elki.distance.histogram;
 
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Distance function based on the Kolmogorov-Smirnov goodness of fit test.
@@ -98,9 +98,9 @@ public class KolmogorovSmirnovDistance extends AbstractNumberVectorDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected KolmogorovSmirnovDistance makeInstance() {
+    public KolmogorovSmirnovDistance make() {
       return STATIC;
     }
   }

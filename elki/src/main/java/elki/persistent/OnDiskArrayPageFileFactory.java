@@ -68,7 +68,7 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
+  public static class Par extends AbstractPageFileFactory.Par<Page> {
     /**
      * File name.
      */
@@ -80,14 +80,14 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
     public static final OptionID FILE_ID = new OptionID("pagefile.file", "The name of the file storing the page file.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE) //
           .grab(config, x -> fileName = x.getPath());
     }
 
     @Override
-    protected OnDiskArrayPageFileFactory<Page> makeInstance() {
+    public OnDiskArrayPageFileFactory<Page> make() {
       return new OnDiskArrayPageFileFactory<>(pageSize, fileName);
     }
   }

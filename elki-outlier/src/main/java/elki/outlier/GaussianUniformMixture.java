@@ -46,7 +46,7 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -225,7 +225,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the fraction of expected outliers.
      */
@@ -241,8 +241,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     protected double c = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(C_ID, 1E-7) //
           .grab(config, x -> l = x);
       new DoubleParameter(C_ID, 1E-7) //
@@ -250,7 +249,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     }
 
     @Override
-    protected GaussianUniformMixture<V> makeInstance() {
+    public GaussianUniformMixture<V> make() {
       return new GaussianUniformMixture<>(l, c);
     }
   }

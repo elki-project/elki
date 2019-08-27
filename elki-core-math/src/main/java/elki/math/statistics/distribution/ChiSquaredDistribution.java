@@ -22,10 +22,10 @@ package elki.math.statistics.distribution;
 
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -126,7 +126,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Degrees of freedom parameter.
      */
@@ -136,14 +136,13 @@ public class ChiSquaredDistribution extends GammaDistribution {
     double dof;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(DOF_ID) //
           .grab(config, x -> dof = x);
     }
 
     @Override
-    protected ChiSquaredDistribution makeInstance() {
+    public ChiSquaredDistribution make() {
       return new ChiSquaredDistribution(dof);
     }
   }

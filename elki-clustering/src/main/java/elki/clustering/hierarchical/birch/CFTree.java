@@ -32,7 +32,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.utilities.datastructures.iterator.Iter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -670,7 +670,7 @@ public class CFTree {
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Distance function parameter.
        */
@@ -722,7 +722,7 @@ public class CFTree {
       double maxleaves;
 
       @Override
-      protected void makeOptions(Parameterization config) {
+      public void configure(Parameterization config) {
         new ObjectParameter<BIRCHDistance>(DISTANCE_ID, BIRCHDistance.class, VarianceIncreaseDistance.class) //
             .grab(config, x -> distance = x);
         new ObjectParameter<BIRCHAbsorptionCriterion>(ABSORPTION_ID, BIRCHAbsorptionCriterion.class, DiameterCriterion.class) //
@@ -742,7 +742,7 @@ public class CFTree {
       }
 
       @Override
-      protected CFTree.Factory makeInstance() {
+      public CFTree.Factory make() {
         return new CFTree.Factory(distance, absorption, threshold, branchingFactor, maxleaves);
       }
     }

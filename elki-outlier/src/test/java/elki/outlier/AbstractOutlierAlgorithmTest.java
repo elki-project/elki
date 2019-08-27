@@ -54,7 +54,7 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
    */
   protected void testAUC(Database db, String positive, OutlierResult result, double expected) {
     OutlierROCCurve rocCurve = new ELKIBuilder<>(OutlierROCCurve.class)//
-        .with(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive).build();
+        .with(OutlierROCCurve.Par.POSITIVE_CLASS_NAME_ID, positive).build();
 
     // Ensure the result has been added to the hierarchy:
     Metadata.hierarchyOf(db).addChild(result);

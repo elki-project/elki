@@ -35,7 +35,7 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -164,7 +164,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
    *
    * @param <O> object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Range to query with
      */
@@ -176,19 +176,17 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
     protected Distance<O> distfun = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      // Get a distance function.
-      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distfun = x);
       // Get the epsilon parameter
-      new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+      new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
     }
 
     @Override
-    protected EpsilonNeighborPredicate<O> makeInstance() {
+    public EpsilonNeighborPredicate<O> make() {
       return new EpsilonNeighborPredicate<>(epsilon, distfun);
     }
   }

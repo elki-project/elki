@@ -83,9 +83,9 @@ public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O, NormalizedSimilarity<? super O>> {
+  public static class Par<O> extends AbstractSimilarityAdapter.Par<O, NormalizedSimilarity<? super O>> {
     @Override
-    protected ArccosSimilarityAdapter<O> makeInstance() {
+    public ArccosSimilarityAdapter<O> make() {
       return new ArccosSimilarityAdapter<>(similarityFunction);
     }
 

@@ -46,8 +46,8 @@ public class TrimmedEstimatorTest {
     // We could instantiate directly, but we also want to cover the
     // parameterizer class.
     ListParameterization config = new ListParameterization();
-    config.addParameter(TrimmedEstimator.Parameterizer.INNER_ID, mom);
-    config.addParameter(TrimmedEstimator.Parameterizer.TRIM_ID, trim);
+    config.addParameter(TrimmedEstimator.Par.INNER_ID, mom);
+    config.addParameter(TrimmedEstimator.Par.TRIM_ID, trim);
     TrimmedEstimator<NormalDistribution> est = ClassGenericsUtil.parameterizeOrAbort(TrimmedEstimator.class, config);
 
     Random r = new Random(0L);

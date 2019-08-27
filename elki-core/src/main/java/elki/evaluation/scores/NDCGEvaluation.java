@@ -21,7 +21,7 @@
 package elki.evaluation.scores;
 
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -110,9 +110,9 @@ public class NDCGEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NDCGEvaluation makeInstance() {
+    public NDCGEvaluation make() {
       return STATIC;
     }
   }

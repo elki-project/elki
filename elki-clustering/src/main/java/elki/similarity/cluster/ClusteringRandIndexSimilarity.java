@@ -27,7 +27,7 @@ import elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.evaluation.clustering.ClusterContingencyTable;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the Rand Index.
@@ -93,9 +93,9 @@ public class ClusteringRandIndexSimilarity implements ClusteringDistanceSimilari
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ClusteringRandIndexSimilarity makeInstance() {
+    public ClusteringRandIndexSimilarity make() {
       return STATIC;
     }
   }

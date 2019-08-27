@@ -24,7 +24,7 @@ import elki.math.statistics.distribution.LaplaceDistribution;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Laplace distribution parameters using Median and mean deviation from
@@ -89,9 +89,9 @@ public class LaplaceMLEEstimator implements DistributionEstimator<LaplaceDistrib
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LaplaceMLEEstimator makeInstance() {
+    public LaplaceMLEEstimator make() {
       return STATIC;
     }
   }

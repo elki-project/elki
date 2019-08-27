@@ -99,9 +99,9 @@ public class MMRadSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, 
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    */
-  public static class Parameterizer<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Parameterizer<E, N> {
+  public static class Par<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> extends AbstractMTreeSplit.Par<E, N> {
     @Override
-    protected MMRadSplit<E, N> makeInstance() {
+    public MMRadSplit<E, N> make() {
       return new MMRadSplit<>(distributor);
     }
   }

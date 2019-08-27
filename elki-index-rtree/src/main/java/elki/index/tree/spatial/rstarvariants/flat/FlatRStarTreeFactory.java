@@ -66,9 +66,9 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
+  public static class Par<O extends NumberVector> extends AbstractRStarTreeFactory.Par<O, RTreeSettings> {
     @Override
-    protected FlatRStarTreeFactory<O> makeInstance() {
+    public FlatRStarTreeFactory<O> make() {
       return new FlatRStarTreeFactory<>(pageFileFactory, settings);
     }
 

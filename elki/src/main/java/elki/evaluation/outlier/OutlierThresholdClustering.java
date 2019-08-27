@@ -35,7 +35,7 @@ import elki.evaluation.Evaluator;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -120,7 +120,7 @@ public class OutlierThresholdClustering implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify a scaling function to use.
      */
@@ -142,8 +142,7 @@ public class OutlierThresholdClustering implements Evaluator {
     double[] threshold;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class) //
           .grab(config, x -> scaling = x);
       new DoubleListParameter(THRESHOLD_ID) //
@@ -151,7 +150,7 @@ public class OutlierThresholdClustering implements Evaluator {
     }
 
     @Override
-    protected OutlierThresholdClustering makeInstance() {
+    public OutlierThresholdClustering make() {
       return new OutlierThresholdClustering(scaling, threshold);
     }
   }

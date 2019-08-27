@@ -166,7 +166,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for the inclusion threshold of canopy clustering.
      * <p>
@@ -192,8 +192,8 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
     private double t2;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       DoubleParameter t1P = new DoubleParameter(T1_ID);
       t1P.grab(config, x -> t1 = x);
       DoubleParameter t2P = new DoubleParameter(T2_ID);
@@ -205,7 +205,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
     }
 
     @Override
-    protected CanopyPreClustering<O> makeInstance() {
+    public CanopyPreClustering<O> make() {
       return new CanopyPreClustering<>(distanceFunction, t1, t2);
     }
   }

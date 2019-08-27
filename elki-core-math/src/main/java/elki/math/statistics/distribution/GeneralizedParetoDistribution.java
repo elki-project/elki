@@ -20,9 +20,9 @@
  */
 package elki.math.statistics.distribution;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -187,13 +187,12 @@ public class GeneralizedParetoDistribution implements Distribution {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer implements Distribution.Parameterizer {
+  public static class Par implements Distribution.Parameterizer {
     /** Parameters. */
     double mu, sigma, xi;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(LOCATION_ID) //
           .grab(config, x -> mu = x);
       new DoubleParameter(SCALE_ID) //
@@ -203,7 +202,7 @@ public class GeneralizedParetoDistribution implements Distribution {
     }
 
     @Override
-    protected GeneralizedParetoDistribution makeInstance() {
+    public GeneralizedParetoDistribution make() {
       return new GeneralizedParetoDistribution(mu, sigma, xi);
     }
   }

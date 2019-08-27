@@ -399,7 +399,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super V>> {
+  public static class Par<V> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
     /**
      * The number of clusters to produce.
      */
@@ -416,8 +416,8 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
     protected KMedoidsInitialization<V> initializer;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -439,7 +439,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
     }
 
     @Override
-    protected PAM<V> makeInstance() {
+    public PAM<V> make() {
       return new PAM<>(distanceFunction, k, maxiter, initializer);
     }
   }

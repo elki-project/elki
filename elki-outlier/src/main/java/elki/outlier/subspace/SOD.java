@@ -57,7 +57,7 @@ import elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -307,7 +307,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the number of shared nearest neighbors to be
      * considered for learning the subspace properties., must be an integer
@@ -352,8 +352,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     private boolean models = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Similarity<V>>(SIM_ID, Similarity.class, SharedNearestNeighborSimilarity.class) //
           .grab(config, x -> similarityFunction = x);
       new IntParameter(KNN_ID) //
@@ -366,7 +365,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     }
 
     @Override
-    protected SOD<V> makeInstance() {
+    public SOD<V> make() {
       return new SOD<>(knn, alpha, similarityFunction, models);
     }
   }

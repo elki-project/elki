@@ -163,9 +163,9 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
    * 
    * @param <N> Neighborhood object type
    */
-  public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Par<N> extends AbstractNeighborhoodOutlier.Par<N> {
     @Override
-    protected CTLuMedianAlgorithm<N> makeInstance() {
+    public CTLuMedianAlgorithm<N> make() {
       return new CTLuMedianAlgorithm<>(npredf);
     }
   }

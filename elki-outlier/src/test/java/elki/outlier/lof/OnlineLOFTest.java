@@ -64,8 +64,8 @@ public class OnlineLOFTest extends AbstractOutlierAlgorithmTest {
     // Allow loading test data from resources.
     try (InputStream is = open(UNITTEST + "3clusters-and-noise-2d.csv")) {
       UpdatableDatabase db = new ELKIBuilder<>(HashmapDatabase.class) //
-          .with(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class) //
-          .with(InputStreamDatabaseConnection.Parameterizer.STREAM_ID, is) //
+          .with(AbstractDatabase.Par.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class) //
+          .with(InputStreamDatabaseConnection.Par.STREAM_ID, is) //
           .build();
       // Initialize database.
       db.initialize();

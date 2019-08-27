@@ -23,7 +23,7 @@ package elki.distance.minkowski;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Maximum distance for {@link NumberVector}s.
@@ -174,9 +174,9 @@ public class MaximumDistance extends LPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MaximumDistance makeInstance() {
+    public MaximumDistance make() {
       return MaximumDistance.STATIC;
     }
   }

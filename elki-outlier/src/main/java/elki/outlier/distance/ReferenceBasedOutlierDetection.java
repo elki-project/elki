@@ -270,7 +270,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super NumberVector>> {
+  public static class Par extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super NumberVector>> {
     /**
      * Parameter for the reference points heuristic.
      */
@@ -294,8 +294,8 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
     private ReferencePointsHeuristic refp;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
@@ -304,7 +304,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
     }
 
     @Override
-    protected ReferenceBasedOutlierDetection makeInstance() {
+    public ReferenceBasedOutlierDetection make() {
       return new ReferenceBasedOutlierDetection(k, distanceFunction, refp);
     }
   }

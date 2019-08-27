@@ -28,7 +28,7 @@ import elki.data.type.TypeUtil;
 import elki.database.relation.Relation;
 import elki.result.DBIDSelection;
 import elki.result.RangeSelection;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -69,14 +69,14 @@ public class SelectionCubeVisualization implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public SelectionCubeVisualization(Parameterizer settings) {
+  public SelectionCubeVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -216,7 +216,7 @@ public class SelectionCubeVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Flag for half-transparent filling of selection cubes.
      */
@@ -228,13 +228,12 @@ public class SelectionCubeVisualization implements VisFactory {
     protected boolean nofill;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(NOFILL_ID).grab(config, x -> nofill = x);
     }
 
     @Override
-    protected SelectionCubeVisualization makeInstance() {
+    public SelectionCubeVisualization make() {
       return new SelectionCubeVisualization(this);
     }
   }

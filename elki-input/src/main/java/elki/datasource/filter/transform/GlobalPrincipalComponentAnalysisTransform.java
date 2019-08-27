@@ -37,7 +37,7 @@ import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -207,7 +207,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * To specify the eigenvectors to keep.
      */
@@ -229,8 +229,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     Mode mode;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class) //
           .setOptional(true) //
           .grab(config, x -> filter = x);
@@ -239,7 +238,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     }
 
     @Override
-    protected GlobalPrincipalComponentAnalysisTransform<O> makeInstance() {
+    public GlobalPrincipalComponentAnalysisTransform<O> make() {
       return new GlobalPrincipalComponentAnalysisTransform<>(filter, mode);
     }
   }

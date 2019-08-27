@@ -45,7 +45,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.K_ID, 6) //
+        .with(EM.Par.K_ID, 6) //
         .build().run(db);
     testFMeasure(db, result, 0.967410486);
     testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
@@ -56,8 +56,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.PRIOR_ID, 10) //
-        .with(EM.Parameterizer.K_ID, 5) //
+        .with(EM.Par.PRIOR_ID, 10) //
+        .with(EM.Par.K_ID, 5) //
         .build().run(db);
     testFMeasure(db, result, 0.958843);
     testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
@@ -68,8 +68,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.K_ID, 6) //
-        .with(EM.Parameterizer.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
+        .with(EM.Par.K_ID, 6) //
+        .with(EM.Par.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.967410486);
     testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
@@ -80,9 +80,9 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.PRIOR_ID, 10) //
-        .with(EM.Parameterizer.K_ID, 5) //
-        .with(EM.Parameterizer.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
+        .with(EM.Par.PRIOR_ID, 10) //
+        .with(EM.Par.K_ID, 5) //
+        .with(EM.Par.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.958843);
     testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
@@ -93,8 +93,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.K_ID, 6) //
-        .with(EM.Parameterizer.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .with(EM.Par.K_ID, 6) //
+        .with(EM.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.967410486);
     testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
@@ -105,9 +105,9 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
-        .with(EM.Parameterizer.PRIOR_ID, 10) //
-        .with(EM.Parameterizer.K_ID, 5) //
-        .with(EM.Parameterizer.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .with(EM.Par.PRIOR_ID, 10) //
+        .with(EM.Par.K_ID, 5) //
+        .with(EM.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.958843);
     testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
@@ -118,8 +118,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 3) //
-        .with(EM.Parameterizer.K_ID, 5) //
-        .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.K_ID, 5) //
+        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.9681384);
     testClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
@@ -130,9 +130,9 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 3) //
-        .with(EM.Parameterizer.K_ID, 5) //
-        .with(EM.Parameterizer.INIT_ID, DiagonalGaussianModelFactory.class) //
-        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .with(EM.Par.K_ID, 5) //
+        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.PRIOR_ID, 10) //
         .build().run(db);
     testFMeasure(db, result, 0.949566);
     testClusterSizes(result, new int[] { 6, 97, 98, 202, 307 });
@@ -143,8 +143,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
-        .with(EM.Parameterizer.K_ID, 4) //
-        .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.K_ID, 4) //
+        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
         .build().run(db);
     testFMeasure(db, result, 0.811247176);
     testClusterSizes(result, new int[] { 8, 95, 198, 409 });
@@ -155,9 +155,9 @@ public class EMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
-        .with(EM.Parameterizer.K_ID, 4) //
-        .with(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class) //
-        .with(EM.Parameterizer.PRIOR_ID, 10) //
+        .with(EM.Par.K_ID, 4) //
+        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.PRIOR_ID, 10) //
         .build().run(db);
     testFMeasure(db, result, 0.9357286);
     testClusterSizes(result, new int[] { 103, 104, 208, 295 });

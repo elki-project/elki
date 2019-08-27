@@ -85,8 +85,8 @@ public class LogNormalDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("lognorm.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(LogNormalDistribution.Parameterizer.LOGMEAN_ID, 1.);
-    params.addParameter(LogNormalDistribution.Parameterizer.LOGSTDDEV_ID, 3.);
+    params.addParameter(LogNormalDistribution.Par.LOGMEAN_ID, 1.);
+    params.addParameter(LogNormalDistribution.Par.LOGSTDDEV_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogNormalDistribution.class, params);
     checkPDF(dist, "pdf_scipy_1_3", 1e-15);
   }

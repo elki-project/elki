@@ -39,7 +39,7 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MeanVarianceMinMax;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -496,7 +496,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
      * 
      * @param <V> object type.
      */
-    public static class Parameterizer<V> extends AbstractParameterizer {
+    public static class Par<V> implements Parameterizer {
       /**
        * Parameter for the distance function
        */
@@ -528,8 +528,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       int k;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<Distance<? super V>>(DISTANCE_ID, Distance.class) //
             .grab(config, x -> distance = x);
         new ObjectParameter<KMedoidsInitialization<V>>(REFERENCE_ID, KMedoidsInitialization.class) //
@@ -540,7 +539,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
       }
 
       @Override
-      protected InMemoryIDistanceIndex.Factory<V> makeInstance() {
+      public InMemoryIDistanceIndex.Factory<V> make() {
         return new InMemoryIDistanceIndex.Factory<>(distance, initialization, k);
       }
     }

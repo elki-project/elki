@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.UniformDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Slightly improved estimation, that takes sample size into account and
@@ -88,9 +88,9 @@ public class UniformEnhancedMinMaxEstimator implements DistributionEstimator<Uni
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected UniformEnhancedMinMaxEstimator makeInstance() {
+    public UniformEnhancedMinMaxEstimator make() {
       return STATIC;
     }
   }

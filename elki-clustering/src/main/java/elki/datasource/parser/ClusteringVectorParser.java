@@ -247,9 +247,9 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractStreamingParser.Parameterizer {
+  public static class Par extends AbstractStreamingParser.Par {
     @Override
-    protected ClusteringVectorParser makeInstance() {
+    public ClusteringVectorParser make() {
       return new ClusteringVectorParser(format);
     }
   }

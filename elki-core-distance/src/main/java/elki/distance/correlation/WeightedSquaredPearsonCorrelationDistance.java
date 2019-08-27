@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.WeightedNumberVectorDistance;
 import elki.math.PearsonCorrelation;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -86,21 +86,20 @@ public class WeightedSquaredPearsonCorrelationDistance extends AbstractNumberVec
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Weight array
      */
     protected double[] weights;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleListParameter(WEIGHTS_ID) //
           .grab(config, x -> weights = x.clone());
     }
 
     @Override
-    protected WeightedSquaredPearsonCorrelationDistance makeInstance() {
+    public WeightedSquaredPearsonCorrelationDistance make() {
       return new WeightedSquaredPearsonCorrelationDistance(weights);
     }
   }

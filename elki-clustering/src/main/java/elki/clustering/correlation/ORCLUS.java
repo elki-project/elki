@@ -483,7 +483,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {
+  public static class Par<V extends NumberVector> extends AbstractProjectedClustering.Par {
     /**
      * Parameter to specify the factor for reducing the number of current
      * clusters in each iteration, must be an integer greater than 0 and less
@@ -512,8 +512,8 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     protected PCARunner pca;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -528,12 +528,12 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
           .grab(config, x -> alpha = x);
       new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
-      new ObjectParameter<PCARunner>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+      new ObjectParameter<PCARunner>(PCARunner.Par.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
           .grab(config, x -> pca = x);
     }
 
     @Override
-    protected ORCLUS<V> makeInstance() {
+    public ORCLUS<V> make() {
       return new ORCLUS<>(k, k_i, l, alpha, rnd, pca);
     }
   }

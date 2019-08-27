@@ -39,7 +39,7 @@ import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -338,7 +338,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V> extends AbstractParameterizer {
+  public static class Par<V> implements Parameterizer {
     /**
      * Hash function family parameter.
      */
@@ -370,8 +370,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     int numberOfBuckets;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<LocalitySensitiveHashFunctionFamily<? super V>>(FAMILY_ID, LocalitySensitiveHashFunctionFamily.class) //
           .grab(config, x -> family = x);
       new IntParameter(L_ID) //
@@ -384,7 +383,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     }
 
     @Override
-    protected InMemoryLSHIndex<V> makeInstance() {
+    public InMemoryLSHIndex<V> make() {
       return new InMemoryLSHIndex<>(family, l, numberOfBuckets);
     }
   }

@@ -29,7 +29,7 @@ import elki.logging.Logging;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -103,7 +103,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
     /**
      * The kappa penality factor for deviations in preferred dimensions.
      */
-    public double kappa = Parameterizer.KAPPA_DEFAULT;
+    public double kappa = Par.KAPPA_DEFAULT;
 
     /**
      * DBSCAN Minpts parameter, aka "mu".
@@ -120,7 +120,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Parameter Delta: maximum variance allowed
        */
@@ -147,7 +147,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
       Settings settings;
 
       @Override
-      public void makeOptions(Parameterization config) {
+      public void configure(Parameterization config) {
         settings = new Settings();
         configEpsilon(config);
         configMinPts(config);
@@ -162,7 +162,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configEpsilon(Parameterization config) {
-        new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+        new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
             .grab(config, x -> settings.epsilon = x);
       }
@@ -173,7 +173,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
        * @param config Parameter source
        */
       protected void configMinPts(Parameterization config) {
-        new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+        new IntParameter(DBSCAN.Par.MINPTS_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> settings.minpts = x);
       }
@@ -214,7 +214,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
       }
 
       @Override
-      public Settings makeInstance() {
+      public Settings make() {
         return settings;
       }
     }
@@ -225,19 +225,19 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * PreDeConSettings.
      */
     protected PreDeCon.Settings settings;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       settings = config.tryInstantiate(PreDeCon.Settings.class);
     }
 
     @Override
-    protected PreDeCon<V> makeInstance() {
+    public PreDeCon<V> make() {
       return new PreDeCon<>(settings);
     }
   }

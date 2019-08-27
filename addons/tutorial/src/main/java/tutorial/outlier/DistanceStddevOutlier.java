@@ -134,7 +134,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for parameterization.
      */
@@ -146,16 +146,16 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       // The super class has the distance function parameter!
-      super.makeOptions(config);
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected DistanceStddevOutlier<O> makeInstance() {
+    public DistanceStddevOutlier<O> make() {
       return new DistanceStddevOutlier<>(distanceFunction, k);
     }
   }

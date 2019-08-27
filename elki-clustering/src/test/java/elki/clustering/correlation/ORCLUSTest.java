@@ -48,9 +48,9 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   public void testORCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
     Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
-        .with(ORCLUS.Parameterizer.K_ID, 3) //
-        .with(ORCLUS.Parameterizer.L_ID, 1) //
-        .with(ORCLUS.Parameterizer.SEED_ID, 1) //
+        .with(ORCLUS.Par.K_ID, 3) //
+        .with(ORCLUS.Par.L_ID, 1) //
+        .with(ORCLUS.Par.SEED_ID, 1) //
         .build().run(db);
     testFMeasure(db, result, 0.62504);
     testClusterSizes(result, new int[] { 28, 33, 389 });
@@ -64,9 +64,9 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
   public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
     Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
-        .with(ORCLUS.Parameterizer.K_ID, 3) //
-        .with(ORCLUS.Parameterizer.L_ID, 4) //
-        .with(ORCLUS.Parameterizer.SEED_ID, 0) //
+        .with(ORCLUS.Par.K_ID, 3) //
+        .with(ORCLUS.Par.L_ID, 4) //
+        .with(ORCLUS.Par.SEED_ID, 0) //
         .build().run(db);
     testFMeasure(db, result, 0.848054);
     testClusterSizes(result, new int[] { 189, 200, 212 });

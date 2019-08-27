@@ -31,7 +31,7 @@ import elki.logging.LoggingConfiguration;
 import elki.logging.statistics.Duration;
 import elki.result.Metadata;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -132,7 +132,7 @@ public class AlgorithmStep implements WorkflowStep {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Enable logging of performance data
      */
@@ -154,9 +154,7 @@ public class AlgorithmStep implements WorkflowStep {
     public static final OptionID ALGORITHM_ID = AbstractAlgorithm.ALGORITHM_ID;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      // Time parameter
+    public void configure(Parameterization config) {
       new Flag(TIME_ID).grab(config, x -> time = x);
       // parameter algorithm
       new ObjectListParameter<Algorithm>(ALGORITHM_ID, Algorithm.class) //
@@ -164,7 +162,7 @@ public class AlgorithmStep implements WorkflowStep {
     }
 
     @Override
-    protected AlgorithmStep makeInstance() {
+    public AlgorithmStep make() {
       if(time) {
         LoggingConfiguration.setStatistics();
       }

@@ -23,7 +23,7 @@ package elki.math.spacefillingcurves;
 import java.util.List;
 
 import elki.data.spatial.SpatialComparable;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Class to sort the data set by their Z-index, without doing a full
@@ -173,9 +173,9 @@ public class ZCurveSpatialSorter implements SpatialSorter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ZCurveSpatialSorter makeInstance() {
+    public ZCurveSpatialSorter make() {
       return STATIC;
     }
   }

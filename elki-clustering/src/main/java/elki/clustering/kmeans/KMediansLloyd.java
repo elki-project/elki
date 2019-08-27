@@ -166,9 +166,9 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    protected KMediansLloyd<V> makeInstance() {
+    public KMediansLloyd<V> make() {
       return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
     }
   }

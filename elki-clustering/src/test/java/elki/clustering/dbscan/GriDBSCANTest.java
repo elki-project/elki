@@ -44,9 +44,9 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testGriDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
-        .with(GriDBSCAN.Parameterizer.GRID_ID, 0.08) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
+        .with(GriDBSCAN.Par.GRID_ID, 0.08) //
         .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
@@ -60,9 +60,9 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testGriDBSCANWide() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<Model> result = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.04) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 20) //
-        .with(GriDBSCAN.Parameterizer.GRID_ID, 0.4) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.04) //
+        .with(DBSCAN.Par.MINPTS_ID, 20) //
+        .with(GriDBSCAN.Par.GRID_ID, 0.4) //
         .build().run(db);
     testFMeasure(db, result, 0.996413);
     testClusterSizes(result, new int[] { 29, 50, 101, 150 });
@@ -76,9 +76,9 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<Model> result = new ELKIBuilder<GriDBSCAN<DoubleVector>>(GriDBSCAN.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 11.5) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 120) //
-        .with(GriDBSCAN.Parameterizer.GRID_ID, 25.) //
+        .with(DBSCAN.Par.EPSILON_ID, 11.5) //
+        .with(DBSCAN.Par.MINPTS_ID, 120) //
+        .with(GriDBSCAN.Par.GRID_ID, 25.) //
         .build().run(db);
     testFMeasure(db, result, 0.954382);
     testClusterSizes(result, new int[] { 11, 200, 203, 224 });

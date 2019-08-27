@@ -53,8 +53,8 @@ public class ReplaceNaNWithRandomFilterTest extends AbstractDataSourceTest {
   public void parameters() {
     String filename = UNITTEST + "nan-test-1.csv";
     ReplaceNaNWithRandomFilter filter = new ELKIBuilder<>(ReplaceNaNWithRandomFilter.class) //
-        .with(ReplaceNaNWithRandomFilter.Parameterizer.REPLACEMENT_DISTRIBUTION, new NormalDistribution(0, 1)) //
-        .with(ReplaceNaNWithRandomFilter.Parameterizer.RANDOM_ID, 0L).build();
+        .with(ReplaceNaNWithRandomFilter.Par.REPLACEMENT_DISTRIBUTION, new NormalDistribution(0, 1)) //
+        .with(ReplaceNaNWithRandomFilter.Par.RANDOM_ID, 0L).build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.
     MultipleObjectsBundle unfilteredBundle = readBundle(filename);

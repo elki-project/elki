@@ -25,7 +25,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * The choose subtree method proposed by the R*-Tree for leaf nodes.
@@ -112,9 +112,9 @@ public class LeastOverlapInsertionStrategy implements InsertionStrategy {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LeastOverlapInsertionStrategy makeInstance() {
+    public LeastOverlapInsertionStrategy make() {
       return LeastOverlapInsertionStrategy.STATIC;
     }
   }

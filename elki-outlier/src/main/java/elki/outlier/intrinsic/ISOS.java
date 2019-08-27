@@ -260,7 +260,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the number of neighbors
      */
@@ -282,8 +282,8 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KNN_ID, 100) //
           .addConstraint(new GreaterEqualConstraint(5)) //
           .grab(config, x -> k = x);
@@ -292,7 +292,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     }
 
     @Override
-    protected ISOS<O> makeInstance() {
+    public ISOS<O> make() {
       return new ISOS<O>(distanceFunction, k, estimator);
     }
   }

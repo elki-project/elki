@@ -23,7 +23,7 @@ package elki.similarity;
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Kulczynski similarity 2.
@@ -81,9 +81,9 @@ public class Kulczynski2Similarity extends AbstractVectorSimilarity {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected Kulczynski2Similarity makeInstance() {
+    public Kulczynski2Similarity make() {
       return Kulczynski2Similarity.STATIC_CONTINUOUS;
     }
   }

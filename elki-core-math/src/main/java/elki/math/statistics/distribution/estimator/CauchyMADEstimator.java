@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.CauchyDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Cauchy distribution parameters using Median and MAD.
@@ -75,9 +75,9 @@ public class CauchyMADEstimator implements MADDistributionEstimator<CauchyDistri
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CauchyMADEstimator makeInstance() {
+    public CauchyMADEstimator make() {
       return STATIC;
     }
   }

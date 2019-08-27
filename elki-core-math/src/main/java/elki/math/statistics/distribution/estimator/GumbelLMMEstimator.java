@@ -23,7 +23,7 @@ package elki.math.statistics.distribution.estimator;
 import elki.math.MathUtil;
 import elki.math.statistics.distribution.GumbelDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate the parameters of a Gumbel Distribution, using the methods of
@@ -84,9 +84,9 @@ public class GumbelLMMEstimator implements LMMDistributionEstimator<GumbelDistri
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GumbelLMMEstimator makeInstance() {
+    public GumbelLMMEstimator make() {
       return STATIC;
     }
   }

@@ -73,9 +73,9 @@ public class LogLogisticDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("loglogistic.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(LogLogisticDistribution.Parameterizer.SHAPE_ID, 2.);
-    params.addParameter(LogLogisticDistribution.Parameterizer.LOCATION_ID, 0.);
-    params.addParameter(LogLogisticDistribution.Parameterizer.SCALE_ID, .5);
+    params.addParameter(LogLogisticDistribution.Par.SHAPE_ID, 2.);
+    params.addParameter(LogLogisticDistribution.Par.LOCATION_ID, 0.);
+    params.addParameter(LogLogisticDistribution.Par.SCALE_ID, .5);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogLogisticDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_05", 1e-15);
   }

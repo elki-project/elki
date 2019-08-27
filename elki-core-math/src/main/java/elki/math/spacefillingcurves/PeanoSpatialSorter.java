@@ -27,7 +27,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
@@ -166,9 +166,9 @@ public class PeanoSpatialSorter implements SpatialSorter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected PeanoSpatialSorter makeInstance() {
+    public PeanoSpatialSorter make() {
       return STATIC;
     }
   }

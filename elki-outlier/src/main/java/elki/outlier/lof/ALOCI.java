@@ -636,7 +636,7 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<NumberVectorDistance<? super O>> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super O>> {
     /**
      * Parameter to specify the minimum neighborhood size
      */
@@ -683,8 +683,8 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
     }
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(NMIN_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> this.nmin = x);
@@ -698,7 +698,7 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
     }
 
     @Override
-    protected ALOCI<O> makeInstance() {
+    public ALOCI<O> make() {
       return new ALOCI<>(distanceFunction, nmin, alpha, g, rnd);
     }
   }

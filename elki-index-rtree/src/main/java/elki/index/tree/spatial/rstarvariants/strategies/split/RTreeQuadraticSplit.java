@@ -26,7 +26,7 @@ import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Quadratic-time complexity greedy split as used by the original R-Tree.
@@ -172,9 +172,9 @@ public class RTreeQuadraticSplit implements SplitStrategy {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RTreeQuadraticSplit makeInstance() {
+    public RTreeQuadraticSplit make() {
       return RTreeQuadraticSplit.STATIC;
     }
   }

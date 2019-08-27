@@ -39,7 +39,7 @@ public class ODINTest extends AbstractOutlierAlgorithmTest {
   public void testODIN() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<ODIN<DoubleVector>>(ODIN.class) //
-        .with(ODIN.Parameterizer.K_ID, 10).build().run(db);
+        .with(ODIN.Par.K_ID, 10).build().run(db);
     testSingleScore(result, 945, 0.7);
     testAUC(db, "Noise", result, 0.9142037037);
   }

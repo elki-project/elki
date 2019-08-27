@@ -28,7 +28,7 @@ import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.persistent.OnDiskUpperTriangleMatrix;
 import elki.utilities.io.ByteArrayUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -114,7 +114,7 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the distance matrix file.
      */
@@ -127,8 +127,7 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
     protected OnDiskUpperTriangleMatrix cache = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(param)) {
         File matrixfile = param.getValue();
@@ -142,7 +141,7 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
     }
 
     @Override
-    protected DiskCacheBasedDoubleDistance makeInstance() {
+    public DiskCacheBasedDoubleDistance make() {
       return new DiskCacheBasedDoubleDistance(cache);
     }
   }

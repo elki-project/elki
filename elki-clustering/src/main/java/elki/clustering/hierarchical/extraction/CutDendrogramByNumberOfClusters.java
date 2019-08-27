@@ -112,7 +112,7 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractCutDendrogram.Parameterizer {
+  public static class Par extends AbstractCutDendrogram.Par {
     /**
      * The minimum number of clusters to extract.
      */
@@ -124,15 +124,15 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
     int minclusters = -1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> minclusters = x);
     }
 
     @Override
-    protected CutDendrogramByNumberOfClusters makeInstance() {
+    public CutDendrogramByNumberOfClusters make() {
       return new CutDendrogramByNumberOfClusters(algorithm, minclusters, hierarchical);
     }
   }

@@ -146,7 +146,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the k nearest neighbor.
      */
@@ -160,15 +160,15 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
     protected int k = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected LocalIsolationCoefficient<O> makeInstance() {
+    public LocalIsolationCoefficient<O> make() {
       return new LocalIsolationCoefficient<>(distanceFunction, k);
     }
   }

@@ -42,9 +42,9 @@ public class SebagSchonauerTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/subsets3.txt", 7);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 1) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.5) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, SebagSchonauer.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 1) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.5) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, SebagSchonauer.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 9, res.getRules().size());
   }

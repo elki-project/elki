@@ -249,7 +249,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends FastABOD.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends FastABOD.Par<V> {
     /**
      * Parameter to specify the number of outliers to compute exactly.
      */
@@ -261,15 +261,15 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
     protected int l = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(L_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> l = x);
     }
 
     @Override
-    protected LBABOD<V> makeInstance() {
+    public LBABOD<V> make() {
       return new LBABOD<>(kernelFunction, k, l);
     }
   }

@@ -40,7 +40,7 @@ import elki.result.Metadata;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.datastructures.heap.UpdatableHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -223,7 +223,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Minimum number of neighbors for density estimation.
      */
@@ -235,9 +235,8 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     RandomProjectedNeighborsAndDensities<V> index;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
+    public void configure(Parameterization config) {
+      new IntParameter(AbstractOPTICS.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minpts = x);
       Class<RandomProjectedNeighborsAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandomProjectedNeighborsAndDensities.class);
@@ -245,7 +244,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     }
 
     @Override
-    protected FastOPTICS<V> makeInstance() {
+    public FastOPTICS<V> make() {
       return new FastOPTICS<V>(minpts, index);
     }
   }

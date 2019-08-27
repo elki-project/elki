@@ -26,7 +26,7 @@ import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Computes the Hamming distance of arbitrary vectors - i.e. counting, on how
@@ -171,9 +171,9 @@ public class HammingDistance extends AbstractSetDistance<FeatureVector<?>> imple
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected HammingDistance makeInstance() {
+    public HammingDistance make() {
       return STATIC;
     }
   }

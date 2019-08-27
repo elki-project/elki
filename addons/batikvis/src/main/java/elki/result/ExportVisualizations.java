@@ -33,7 +33,7 @@ import elki.logging.Logging;
 import elki.utilities.datastructures.hierarchy.Hierarchy;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -287,7 +287,7 @@ public class ExportVisualizations implements ResultHandler {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the canvas ratio
      */
@@ -334,8 +334,7 @@ public class ExportVisualizations implements ResultHandler {
     int iwidth = 1000;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(FOLDER_ID, FileType.OUTPUT_FILE) //
           .grab(config, x -> output = x);
       new DoubleParameter(RATIO_ID, 1.33) //
@@ -352,7 +351,7 @@ public class ExportVisualizations implements ResultHandler {
     }
 
     @Override
-    protected ExportVisualizations makeInstance() {
+    public ExportVisualizations make() {
       return new ExportVisualizations(output, manager, ratio, format, iwidth);
     }
   }

@@ -21,7 +21,7 @@
 package elki.clustering.hierarchical.birch;
 
 import elki.data.NumberVector;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Distance criterion.
@@ -71,9 +71,9 @@ public class EuclideanDistanceCriterion implements BIRCHAbsorptionCriterion {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected EuclideanDistanceCriterion makeInstance() {
+    public EuclideanDistanceCriterion make() {
       return STATIC;
     }
   }

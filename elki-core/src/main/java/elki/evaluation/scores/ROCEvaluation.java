@@ -21,7 +21,7 @@
 package elki.evaluation.scores;
 
 import elki.math.geometry.XYCurve;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
@@ -140,9 +140,9 @@ public class ROCEvaluation implements ScoreEvaluation {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ROCEvaluation makeInstance() {
+    public ROCEvaluation make() {
       return STATIC;
     }
   }

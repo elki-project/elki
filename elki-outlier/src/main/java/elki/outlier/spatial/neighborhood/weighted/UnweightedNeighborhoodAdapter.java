@@ -32,7 +32,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDPair;
 import elki.database.relation.Relation;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -115,7 +115,7 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
      * 
      * @param <O> Input object type
      */
-    public static class Parameterizer<O> extends AbstractParameterizer {
+    public static class Par<O> implements Parameterizer {
       /**
        * The parameter to give the non-weighted neighborhood to use.
        */
@@ -127,14 +127,13 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
       NeighborSetPredicate.Factory<O> inner;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<NeighborSetPredicate.Factory<O>>(INNER_ID, NeighborSetPredicate.Factory.class) //
             .grab(config, x -> inner = x);
       }
 
       @Override
-      protected UnweightedNeighborhoodAdapter.Factory<O> makeInstance() {
+      public UnweightedNeighborhoodAdapter.Factory<O> make() {
         return new UnweightedNeighborhoodAdapter.Factory<>(inner);
       }
     }

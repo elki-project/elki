@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.linkage;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Weighted average linkage clustering method (WPGMA).
@@ -87,9 +87,9 @@ public class WeightedAverageLinkage implements Linkage {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WeightedAverageLinkage makeInstance() {
+    public WeightedAverageLinkage make() {
       return STATIC;
     }
   }

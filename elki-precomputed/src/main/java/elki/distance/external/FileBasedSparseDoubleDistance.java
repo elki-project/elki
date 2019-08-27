@@ -30,7 +30,7 @@ import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -192,7 +192,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the distance matrix file.
      */
@@ -230,8 +230,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
     protected double defaultDistance = Double.POSITIVE_INFINITY;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> matrixfile = x);
       new ObjectParameter<DistanceParser>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class) //
@@ -241,7 +240,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
     }
 
     @Override
-    protected FileBasedSparseDoubleDistance makeInstance() {
+    public FileBasedSparseDoubleDistance make() {
       return new FileBasedSparseDoubleDistance(parser, matrixfile, defaultDistance);
     }
   }

@@ -50,7 +50,7 @@ public class SLINKTest extends AbstractClusterAlgorithmTest {
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-        .with(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.6829722);

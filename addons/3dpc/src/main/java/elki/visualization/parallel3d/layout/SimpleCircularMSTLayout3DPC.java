@@ -134,9 +134,9 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractLayout3DPC.Parameterizer {
+  public static class Par extends AbstractLayout3DPC.Par {
     @Override
-    protected SimpleCircularMSTLayout3DPC makeInstance() {
+    public SimpleCircularMSTLayout3DPC make() {
       return new SimpleCircularMSTLayout3DPC(sim);
     }
   }

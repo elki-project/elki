@@ -298,7 +298,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -310,15 +310,15 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     protected Linkage linkage = Linkage.SINGLE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
           .setDefaultValue(Linkage.WARD) //
           .grab(config, x -> linkage = x);
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering4<O> makeInstance() {
+    public NaiveAgglomerativeHierarchicalClustering4<O> make() {
       return new NaiveAgglomerativeHierarchicalClustering4<>(distanceFunction, linkage);
     }
   }

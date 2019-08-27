@@ -38,7 +38,7 @@ import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -185,7 +185,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
      * 
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       /**
        * Parameter to specify the neighborhood file
        */
@@ -197,14 +197,13 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       File file;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new FileParameter(NEIGHBORHOOD_FILE_ID, FileParameter.FileType.INPUT_FILE) //
             .grab(config, x -> file = x);
       }
 
       @Override
-      protected ExternalNeighborhood.Factory makeInstance() {
+      public ExternalNeighborhood.Factory make() {
         return new ExternalNeighborhood.Factory(file);
       }
     }

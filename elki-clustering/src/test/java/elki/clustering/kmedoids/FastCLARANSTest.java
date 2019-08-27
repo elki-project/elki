@@ -42,9 +42,9 @@ public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 5) //
-        .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
-        .with(CLARANS.Parameterizer.NEIGHBORS_ID, 3) //
-        .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
+        .with(CLARANS.Par.RANDOM_ID, 0) //
+        .with(CLARANS.Par.NEIGHBORS_ID, 3) //
+        .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().run(db);
     // FastCLARANS finds better solution than CLARANS in this unit test!
     testFMeasure(db, result, .998);
@@ -56,9 +56,9 @@ public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 3) //
-        .with(CLARANS.Parameterizer.RANDOM_ID, 0) //
-        .with(CLARANS.Parameterizer.NEIGHBORS_ID, .1) //
-        .with(CLARANS.Parameterizer.RESTARTS_ID, 5) //
+        .with(CLARANS.Par.RANDOM_ID, 0) //
+        .with(CLARANS.Par.NEIGHBORS_ID, .1) //
+        .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().run(db);
     testFMeasure(db, result, 0.913858);
     testClusterSizes(result, new int[] { 57, 115, 158 });

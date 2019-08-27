@@ -26,7 +26,7 @@ import elki.data.FeatureVector.Factory;
 import elki.data.HyperBoundingBox;
 import elki.data.uncertain.UniformContinuousUncertainObject;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -98,7 +98,7 @@ public class UniformUncertainifier implements Uncertainifier<UniformContinuousUn
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public final static class Parameterizer extends AbstractParameterizer {
+  public final static class Par implements Parameterizer {
     /**
      * Minimum deviation of the generated bounding box.
      */
@@ -120,15 +120,14 @@ public class UniformUncertainifier implements Uncertainifier<UniformContinuousUn
     protected boolean symmetric;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(DEV_MIN_ID, 0.).grab(config, x -> minDev = x);
       new DoubleParameter(DEV_MAX_ID).grab(config, x -> maxDev = x);
       new Flag(SYMMETRIC_ID).grab(config, x -> symmetric = x);
     }
 
     @Override
-    protected UniformUncertainifier makeInstance() {
+    public UniformUncertainifier make() {
       return new UniformUncertainifier(minDev, maxDev, symmetric);
     }
   }

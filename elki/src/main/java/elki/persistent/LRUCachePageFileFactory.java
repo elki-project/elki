@@ -20,7 +20,7 @@
  */
 package elki.persistent;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,7 +77,7 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the size of the cache in bytes, must be an integer
      * equal to or greater than 0.
@@ -100,8 +100,7 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     protected int cacheSize;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<PageFileFactory<Page>>(PAGEFILE_ID, PageFileFactory.class, PersistentPageFileFactory.class) //
           .grab(config, x -> pageFileFactory = x);
       new IntParameter(CACHE_SIZE_ID) //
@@ -110,7 +109,7 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     }
 
     @Override
-    protected LRUCachePageFileFactory<Page> makeInstance() {
+    public LRUCachePageFileFactory<Page> make() {
       return new LRUCachePageFileFactory<>(pageFileFactory, cacheSize);
     }
   }

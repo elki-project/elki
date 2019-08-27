@@ -24,7 +24,7 @@ import java.util.Random;
 
 import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -94,7 +94,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for sampling probability
      */
@@ -116,8 +116,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     protected RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(PROB_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -126,7 +125,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     }
 
     @Override
-    protected RandomSamplingStreamFilter makeInstance() {
+    public RandomSamplingStreamFilter make() {
       return new RandomSamplingStreamFilter(prob, rnd);
     }
   }

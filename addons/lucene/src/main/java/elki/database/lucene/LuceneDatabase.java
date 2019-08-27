@@ -35,7 +35,7 @@ import elki.database.relation.DBIDView;
 import elki.logging.Logging;
 import elki.result.ResultUtil;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -113,7 +113,7 @@ public class LuceneDatabase extends AbstractDatabase {
    *
    * @author Erich Schubert
    */
-  public static final class Parameterizer extends AbstractParameterizer {
+  public static final class Par implements Parameterizer {
     /**
      * Option ID for the index folder.
      */
@@ -125,14 +125,13 @@ public class LuceneDatabase extends AbstractDatabase {
     File idir;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(INDEX_DIR_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> idir = x);
     }
 
     @Override
-    protected LuceneDatabase makeInstance() {
+    public LuceneDatabase make() {
       try {
         return new LuceneDatabase(FSDirectory.open(idir));
       }

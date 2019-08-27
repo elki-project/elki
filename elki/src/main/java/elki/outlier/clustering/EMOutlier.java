@@ -44,7 +44,7 @@ import elki.utilities.ClassGenericsUtil;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -140,21 +140,20 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * EM clustering algorithm to run.
      */
     protected EM<V, ?> em;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       Class<EM<V, ?>> cls = ClassGenericsUtil.uglyCastIntoSubclass(EM.class);
       em = config.tryInstantiate(cls);
     }
 
     @Override
-    protected EMOutlier<V> makeInstance() {
+    public EMOutlier<V> make() {
       return new EMOutlier<>(em);
     }
   }

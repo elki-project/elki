@@ -53,7 +53,7 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -406,7 +406,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector, M extends MeanModel> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector, M extends MeanModel> implements Parameterizer {
     /**
      * Parameter to specify the number of clusters to find, must be an integer
      * greater than 0.
@@ -459,8 +459,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     double prior = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
@@ -480,7 +479,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     }
 
     @Override
-    protected EM<V, M> makeInstance() {
+    public EM<V, M> make() {
       return new EM<>(k, delta, initializer, maxiter, prior, false);
     }
   }

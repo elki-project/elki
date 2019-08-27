@@ -179,9 +179,9 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
   public void testParameterizer() throws ClassInstantiationException {
     load("gev.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.SHAPE_ID, .8);
-    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.LOCATION_ID, .2);
-    params.addParameter(GeneralizedExtremeValueDistribution.Parameterizer.SCALE_ID, 1.);
+    params.addParameter(GeneralizedExtremeValueDistribution.Par.SHAPE_ID, .8);
+    params.addParameter(GeneralizedExtremeValueDistribution.Par.LOCATION_ID, .2);
+    params.addParameter(GeneralizedExtremeValueDistribution.Par.SCALE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedExtremeValueDistribution.class, params);
     checkPDF(dist, "pdf_scipy_08_02_1", 1e-15);
   }

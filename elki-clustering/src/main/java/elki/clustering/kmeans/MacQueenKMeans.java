@@ -171,9 +171,9 @@ public class MacQueenKMeans<V extends NumberVector> extends AbstractKMeans<V, KM
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    protected MacQueenKMeans<V> makeInstance() {
+    public MacQueenKMeans<V> make() {
       return new MacQueenKMeans<>(distanceFunction, k, maxiter, initializer);
     }
   }

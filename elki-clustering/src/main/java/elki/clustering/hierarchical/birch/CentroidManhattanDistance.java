@@ -23,7 +23,7 @@ package elki.clustering.hierarchical.birch;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Centroid Manhattan Distance
@@ -78,9 +78,9 @@ public class CentroidManhattanDistance implements BIRCHDistance {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CentroidManhattanDistance makeInstance() {
+    public CentroidManhattanDistance make() {
       return STATIC;
     }
   }

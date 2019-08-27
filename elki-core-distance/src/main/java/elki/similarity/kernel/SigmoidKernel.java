@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.similarity.AbstractVectorSimilarity;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -72,7 +72,7 @@ public class SigmoidKernel extends AbstractVectorSimilarity {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * C parameter: scaling
      */
@@ -89,8 +89,7 @@ public class SigmoidKernel extends AbstractVectorSimilarity {
     protected double c = 1., theta = 0.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(C_ID, 1.) //
           .grab(config, x -> c = x);
       new DoubleParameter(THETA_ID, 0.) //
@@ -98,7 +97,7 @@ public class SigmoidKernel extends AbstractVectorSimilarity {
     }
 
     @Override
-    protected SigmoidKernel makeInstance() {
+    public SigmoidKernel make() {
       return new SigmoidKernel(c, theta);
     }
   }

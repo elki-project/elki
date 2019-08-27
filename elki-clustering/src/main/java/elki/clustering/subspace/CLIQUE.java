@@ -45,7 +45,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -513,7 +513,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of intervals (units) in each dimension,
      * must be an integer greater than 0.
@@ -550,8 +550,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     protected boolean prune;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(XSI_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> xsi = x);
@@ -563,7 +562,7 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     }
 
     @Override
-    protected CLIQUE makeInstance() {
+    public CLIQUE make() {
       return new CLIQUE(xsi, tau, prune);
     }
   }

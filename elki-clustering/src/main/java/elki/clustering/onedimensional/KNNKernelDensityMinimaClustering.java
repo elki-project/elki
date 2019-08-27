@@ -43,7 +43,7 @@ import elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import elki.result.Metadata;
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -283,7 +283,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Dimension to use for clustering.
      */
@@ -335,8 +335,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     protected int minwindow;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIM_ID, 0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> dim = x);
@@ -353,7 +352,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     }
 
     @Override
-    protected KNNKernelDensityMinimaClustering<V> makeInstance() {
+    public KNNKernelDensityMinimaClustering<V> make() {
       return new KNNKernelDensityMinimaClustering<>(dim, kernel, mode, k, minwindow);
     }
   }

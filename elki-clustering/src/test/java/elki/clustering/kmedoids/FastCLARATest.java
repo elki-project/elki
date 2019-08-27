@@ -42,9 +42,9 @@ public class FastCLARATest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARA<DoubleVector>>(FastCLARA.class) //
         .with(KMeans.K_ID, 5) //
-        .with(CLARA.Parameterizer.RANDOM_ID, 1) //
-        .with(CLARA.Parameterizer.NUMSAMPLES_ID, 2) //
-        .with(CLARA.Parameterizer.SAMPLESIZE_ID, 50) //
+        .with(CLARA.Par.RANDOM_ID, 1) //
+        .with(CLARA.Par.NUMSAMPLES_ID, 2) //
+        .with(CLARA.Par.SAMPLESIZE_ID, 50) //
         .build().run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });

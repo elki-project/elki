@@ -124,9 +124,9 @@ public class SubspaceMaximumDistance extends SubspaceLPNormDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDimensionsSelectingDistance.Parameterizer {
+  public static class Par extends AbstractDimensionsSelectingDistance.Par {
     @Override
-    protected SubspaceMaximumDistance makeInstance() {
+    public SubspaceMaximumDistance make() {
       return new SubspaceMaximumDistance(dimensions);
     }
   }

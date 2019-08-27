@@ -31,7 +31,7 @@ import elki.data.model.KMeansModel;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -101,21 +101,20 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * K-means instance to use.
      */
     private KMeans<?, KMeansModel> kmeans;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<KMeans<?, KMeansModel>>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class) //
           .grab(config, x -> kmeans = x);
     }
 
     @Override
-    protected CKMeans makeInstance() {
+    public CKMeans make() {
       return new CKMeans(kmeans);
     }
   }

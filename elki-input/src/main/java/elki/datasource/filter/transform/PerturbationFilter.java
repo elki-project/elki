@@ -31,7 +31,7 @@ import elki.math.MeanVarianceMinMax;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -288,7 +288,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * 
    * @author Arthur Zimek
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for minimum.
      */
@@ -357,8 +357,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
     protected NoiseDistribution noisedistribution;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new EnumParameter<ScalingReference>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE) //
           .grab(config, x -> scalingreference = x);
       new EnumParameter<NoiseDistribution>(NOISEDISTRIBUTION_ID, NoiseDistribution.class, NoiseDistribution.UNIFORM) //
@@ -387,7 +386,7 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
     }
 
     @Override
-    protected PerturbationFilter<V> makeInstance() {
+    public PerturbationFilter<V> make() {
       return new PerturbationFilter<>(seed, percentage, scalingreference, minima, maxima, noisedistribution);
     }
   }

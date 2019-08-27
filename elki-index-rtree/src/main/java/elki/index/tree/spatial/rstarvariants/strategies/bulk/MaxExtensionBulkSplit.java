@@ -28,7 +28,7 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialSingleMinComparator;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Split strategy for bulk-loading a spatial tree where the split axes are the
@@ -156,9 +156,9 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected MaxExtensionBulkSplit makeInstance() {
+    public MaxExtensionBulkSplit make() {
       return MaxExtensionBulkSplit.STATIC;
     }
   }

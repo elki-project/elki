@@ -176,9 +176,9 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
    *
    * @author Evgeniy Faerman
    */
-  public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
+  public static class Par extends AbstractRandomProjectionFamily.Par {
     @Override
-    protected SimplifiedRandomHyperplaneProjectionFamily makeInstance() {
+    public SimplifiedRandomHyperplaneProjectionFamily make() {
       return new SimplifiedRandomHyperplaneProjectionFamily(random);
     }
   }

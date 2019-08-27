@@ -149,7 +149,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for the number of nearest neighbors:
      *
@@ -165,15 +165,15 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected ODIN<O> makeInstance() {
+    public ODIN<O> make() {
       return new ODIN<>(distanceFunction, k);
     }
   }

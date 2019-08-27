@@ -103,7 +103,7 @@ public class RandomizedCrossValidation extends RandomizedHoldout {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends RandomizedHoldout.Parameterizer {
+  public static class Par extends RandomizedHoldout.Par {
     /**
      * Parameter for number of folds.
      */
@@ -120,8 +120,8 @@ public class RandomizedCrossValidation extends RandomizedHoldout {
     protected int nfold;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(NFOLD_ID)//
           .setDefaultValue(N_DEFAULT) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -129,7 +129,7 @@ public class RandomizedCrossValidation extends RandomizedHoldout {
     }
 
     @Override
-    protected RandomizedCrossValidation makeInstance() {
+    public RandomizedCrossValidation make() {
       return new RandomizedCrossValidation(random, nfold);
     }
   }

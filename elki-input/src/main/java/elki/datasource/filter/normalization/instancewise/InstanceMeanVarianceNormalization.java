@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorTypeInformation;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 import net.jafama.FastMath;
 
@@ -158,9 +158,9 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     @Override
-    protected InstanceMeanVarianceNormalization<V> makeInstance() {
+    public InstanceMeanVarianceNormalization<V> make() {
       return new InstanceMeanVarianceNormalization<>();
     }
   }

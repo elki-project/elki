@@ -45,8 +45,8 @@ public class KNNClassifierTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testKNNResults() {
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, ClassLabelFilter.class);
-    params.addParameter(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, 0);
+    params.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, ClassLabelFilter.class);
+    params.addParameter(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0);
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330, params);
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<ClassLabel> labels = db.getRelation(TypeUtil.CLASSLABEL);
@@ -63,7 +63,7 @@ public class KNNClassifierTest extends AbstractSimpleAlgorithmTest {
 
     // Build with k=1 with no train-test split, hence completely overfitting
     knn = new ELKIBuilder<KNNClassifier<NumberVector>>(KNNClassifier.class) //
-        .with(KNNClassifier.Parameterizer.K_ID, 5) //
+        .with(KNNClassifier.Par.K_ID, 5) //
         .build();
     knn.buildClassifier(db, labels);
     correct = 0;

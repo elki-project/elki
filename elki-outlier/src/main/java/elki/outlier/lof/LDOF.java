@@ -182,7 +182,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its LDOF_SCORE, must be an integer greater than
@@ -196,15 +196,15 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     protected int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected LDOF<O> makeInstance() {
+    public LDOF<O> make() {
       return new LDOF<>(distanceFunction, k);
     }
   }

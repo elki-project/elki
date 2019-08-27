@@ -584,7 +584,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractApplication.Parameterizer {
+  public static class Par extends AbstractApplication.Par {
     /**
      * Expected rate of outliers
      */
@@ -641,8 +641,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     double rate = 0.01;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Voting method
@@ -665,7 +665,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
 
     @Override
-    protected GreedyEnsembleExperiment makeInstance() {
+    public GreedyEnsembleExperiment make() {
       return new GreedyEnsembleExperiment(inputstep, voting, distance, prescaling, scaling, rate);
     }
   }

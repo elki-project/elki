@@ -51,7 +51,7 @@ import elki.result.FrequentItemsetsResult;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.exceptions.EmptyDataException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -489,7 +489,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+    public static class Par<V extends NumberVector> implements Parameterizer {
       /**
        * The epsilon value for each dimension.
        */
@@ -506,8 +506,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       protected Strategy strategy;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new IntParameter(MINPTS_ID) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> minpts = x);
@@ -520,7 +519,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
       }
 
       @Override
-      protected Factory<V> makeInstance() {
+      public Factory<V> make() {
         return new Factory<>(epsilon, minpts, strategy);
       }
     }

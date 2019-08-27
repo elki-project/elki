@@ -63,7 +63,7 @@ public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplic
    *
    * @param <O> Object type
    */
-  public abstract static class Parameterizer<O> extends AbstractApplication.Parameterizer {
+  public abstract static class Par<O> extends AbstractApplication.Par {
     /**
      * Data input step
      */
@@ -75,12 +75,12 @@ public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplic
     protected Distance<? super O> distance;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Parameterizer.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
     }
   }

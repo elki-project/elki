@@ -215,9 +215,9 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    * @param <N> Neighborhood type
    * @param <O> Data Object type
    */
-  public static class Parameterizer<N, O> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O> {
+  public static class Par<N, O> extends AbstractDistanceBasedSpatialOutlier.Par<N, O> {
     @Override
-    protected SLOM<N, O> makeInstance() {
+    public SLOM<N, O> make() {
       return new SLOM<>(npredf, distanceFunction);
     }
   }

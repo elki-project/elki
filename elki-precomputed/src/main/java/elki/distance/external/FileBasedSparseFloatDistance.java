@@ -30,7 +30,7 @@ import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -191,24 +191,24 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the name of the distance matrix file.
      */
-    public static final OptionID MATRIX_ID = FileBasedSparseDoubleDistance.Parameterizer.MATRIX_ID;
+    public static final OptionID MATRIX_ID = FileBasedSparseDoubleDistance.Par.MATRIX_ID;
 
     /**
      * Optional parameter to specify the parsers to provide a database, must
      * extend {@link DistanceParser}. If this parameter is not set,
      * {@link AsciiDistanceParser} is used as parser for all input files.
      */
-    public static final OptionID PARSER_ID = FileBasedSparseDoubleDistance.Parameterizer.PARSER_ID;
+    public static final OptionID PARSER_ID = FileBasedSparseDoubleDistance.Par.PARSER_ID;
 
     /**
      * Optional parameter to specify the distance to return when no distance was
      * given in the file. Defaults to infinity.
      */
-    public static final OptionID DEFAULTDIST_ID = FileBasedSparseDoubleDistance.Parameterizer.DEFAULTDIST_ID;
+    public static final OptionID DEFAULTDIST_ID = FileBasedSparseDoubleDistance.Par.DEFAULTDIST_ID;
 
     /**
      * Input file.
@@ -226,8 +226,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     protected float defaultDistance = Float.POSITIVE_INFINITY;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> matrixfile = x);
       new ObjectParameter<DistanceParser>(PARSER_ID, DistanceParser.class, AsciiDistanceParser.class) //
@@ -237,7 +236,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     }
 
     @Override
-    protected FileBasedSparseFloatDistance makeInstance() {
+    public FileBasedSparseFloatDistance make() {
       return new FileBasedSparseFloatDistance(parser, matrixfile, defaultDistance);
     }
   }

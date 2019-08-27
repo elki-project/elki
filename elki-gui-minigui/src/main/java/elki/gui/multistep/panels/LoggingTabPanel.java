@@ -45,8 +45,8 @@ public class LoggingTabPanel extends ParameterTabPanel {
 
   @Override
   protected synchronized void configureStep(Parameterization config) {
-    LoggingConfiguration.setVerbose(AbstractApplication.Parameterizer.parseVerbose(config));
-    AbstractApplication.Parameterizer.applyLoggingLevels(AbstractApplication.Parameterizer.parseDebugParameter(config));
+    LoggingConfiguration.setVerbose(AbstractApplication.Par.parseVerbose(config));
+    AbstractApplication.Par.applyLoggingLevels(AbstractApplication.Par.parseDebugParameter(config));
   }
 
   @Override

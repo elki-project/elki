@@ -29,7 +29,7 @@ import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
 import elki.datasource.filter.FilterUtil;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -175,7 +175,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
    *
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for specifying the dimensionality.
      */
@@ -187,8 +187,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     int dim = -1;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(DIM_P)//
           .setOptional(true)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -196,7 +195,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
     }
 
     @Override
-    protected VectorDimensionalityFilter<V> makeInstance() {
+    public VectorDimensionalityFilter<V> make() {
       return new VectorDimensionalityFilter<>(dim);
     }
   }

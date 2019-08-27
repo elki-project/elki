@@ -172,7 +172,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter to specify the number of neighbors
      */
@@ -184,15 +184,15 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     int k = 15;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new IntParameter(KNN_ID, 15) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
     }
 
     @Override
-    protected KNNSOS<O> makeInstance() {
+    public KNNSOS<O> make() {
       return new KNNSOS<O>(distanceFunction, k);
     }
   }

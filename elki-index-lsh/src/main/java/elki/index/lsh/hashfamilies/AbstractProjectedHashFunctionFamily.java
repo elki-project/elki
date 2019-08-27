@@ -31,7 +31,7 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import elki.index.lsh.hashfunctions.MultipleProjectionsLocalitySensitiveHashFunction;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -108,7 +108,7 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
    * 
    * @author Erich Schubert
    */
-  public abstract static class Parameterizer extends AbstractParameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter for fixing the random seed.
      */
@@ -140,8 +140,7 @@ public abstract class AbstractProjectedHashFunctionFamily implements LocalitySen
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT).grab(config, x -> random = x);
       new DoubleParameter(WIDTH_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

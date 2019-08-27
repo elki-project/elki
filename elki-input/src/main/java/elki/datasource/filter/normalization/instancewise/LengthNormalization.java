@@ -28,7 +28,7 @@ import elki.datasource.filter.normalization.Normalization;
 import elki.distance.Norm;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -80,7 +80,7 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Option ID for normalization norm.
      */
@@ -92,14 +92,13 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
     Norm<? super V> norm;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<Norm<? super V>>(NORM_ID, Norm.class, EuclideanDistance.class) //
           .grab(config, x -> norm = x);
     }
 
     @Override
-    protected LengthNormalization<V> makeInstance() {
+    public LengthNormalization<V> make() {
       return new LengthNormalization<>(norm);
     }
   }

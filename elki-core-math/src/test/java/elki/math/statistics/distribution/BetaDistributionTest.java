@@ -267,8 +267,8 @@ public class BetaDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("beta.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(BetaDistribution.Parameterizer.ALPHA_ID, 2.);
-    params.addParameter(BetaDistribution.Parameterizer.BETA_ID, 1.);
+    params.addParameter(BetaDistribution.Par.ALPHA_ID, 2.);
+    params.addParameter(BetaDistribution.Par.BETA_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(BetaDistribution.class, params);
     checkPDF(dist, "pdf_scipy_2_1", 1e-15);
   }

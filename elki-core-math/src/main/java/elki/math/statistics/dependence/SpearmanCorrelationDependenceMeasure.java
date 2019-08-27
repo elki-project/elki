@@ -21,7 +21,7 @@
 package elki.math.statistics.dependence;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -66,9 +66,9 @@ public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeas
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SpearmanCorrelationDependenceMeasure makeInstance() {
+    public SpearmanCorrelationDependenceMeasure make() {
       return STATIC;
     }
   }

@@ -157,7 +157,7 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractKMeansInitialization.Parameterizer {
+  public static class Par<O> extends AbstractKMeansInitialization.Par {
     /**
      * Option ID to control the handling of the first object chosen.
      */
@@ -169,13 +169,13 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
     protected boolean keepfirst = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new Flag(KEEPFIRST_ID).grab(config, x -> keepfirst = x);
     }
 
     @Override
-    protected FarthestPoints<O> makeInstance() {
+    public FarthestPoints<O> make() {
       return new FarthestPoints<>(rnd, !keepfirst);
     }
   }

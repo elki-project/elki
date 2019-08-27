@@ -20,7 +20,7 @@
  */
 package elki.math.statistics.kernelfunctions;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Triangular kernel density estimator.
@@ -83,9 +83,9 @@ public final class TriangularKernelDensityFunction implements KernelDensityFunct
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected TriangularKernelDensityFunction makeInstance() {
+    public TriangularKernelDensityFunction make() {
       return KERNEL;
     }
   }

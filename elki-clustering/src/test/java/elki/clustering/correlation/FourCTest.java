@@ -49,10 +49,10 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
   public void testFourCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
     Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 0.30) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
-        .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
-        .with(FourC.Settings.Parameterizer.LAMBDA_ID, 1) //
+        .with(DBSCAN.Par.EPSILON_ID, 0.30) //
+        .with(DBSCAN.Par.MINPTS_ID, 50) //
+        .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //
+        .with(FourC.Settings.Par.LAMBDA_ID, 1) //
         .build().run(db);
     testFMeasure(db, result, 0.7052);
     testClusterSizes(result, new int[] { 218, 382 });
@@ -65,10 +65,10 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
   public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
     Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
-        .with(DBSCAN.Parameterizer.EPSILON_ID, 3) //
-        .with(DBSCAN.Parameterizer.MINPTS_ID, 50) //
-        .with(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5) //
-        .with(FourC.Settings.Parameterizer.LAMBDA_ID, 3) //
+        .with(DBSCAN.Par.EPSILON_ID, 3) //
+        .with(DBSCAN.Par.MINPTS_ID, 50) //
+        .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //
+        .with(FourC.Settings.Par.LAMBDA_ID, 3) //
         .build().run(db);
     testFMeasure(db, result, 0.9073744);
     testClusterSizes(result, new int[] { 200, 202, 248 });

@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.LaplaceDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Laplace distribution parameters using Median and MAD.
@@ -77,9 +77,9 @@ public class LaplaceMADEstimator implements MADDistributionEstimator<LaplaceDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LaplaceMADEstimator makeInstance() {
+    public LaplaceMADEstimator make() {
       return STATIC;
     }
   }

@@ -171,7 +171,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * Input stream to read.
      * <p>
@@ -187,7 +187,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
     protected InputStream instream;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       new ObjectParameter<InputStream>(STREAM_ID, InputStream.class, System.in) //
           .grab(config, x -> instream = x);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
@@ -195,7 +195,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
     }
 
     @Override
-    protected InputStreamDatabaseConnection makeInstance() {
+    public InputStreamDatabaseConnection make() {
       return new InputStreamDatabaseConnection(instream, filters, parser);
     }
   }

@@ -24,7 +24,7 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -63,7 +63,7 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
    *
    * @param <V> vector type
    */
-  public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public abstract static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the cluster center initialization.
      */
@@ -76,8 +76,7 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
     protected KMeansInitialization initializer;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class) //
           .grab(config, x -> initializer = x);
     }

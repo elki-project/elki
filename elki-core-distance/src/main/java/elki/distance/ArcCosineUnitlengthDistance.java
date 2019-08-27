@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.spatial.SpatialComparable;
 import elki.data.type.SimpleTypeInformation;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Arcus cosine distance function for feature vectors.
@@ -111,9 +111,9 @@ public class ArcCosineUnitlengthDistance implements SpatialPrimitiveDistance<Num
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ArcCosineUnitlengthDistance makeInstance() {
+    public ArcCosineUnitlengthDistance make() {
       return ArcCosineUnitlengthDistance.STATIC;
     }
   }

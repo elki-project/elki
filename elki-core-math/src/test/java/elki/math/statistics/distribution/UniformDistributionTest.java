@@ -75,8 +75,8 @@ public class UniformDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("unif.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(UniformDistribution.Parameterizer.MIN_ID, 0.);
-    params.addParameter(UniformDistribution.Parameterizer.MAX_ID, 1.);
+    params.addParameter(UniformDistribution.Par.MIN_ID, 0.);
+    params.addParameter(UniformDistribution.Par.MAX_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(UniformDistribution.class, params);
     checkPDF(dist, "pdf_scipy_0_1", 1e-15);
   }

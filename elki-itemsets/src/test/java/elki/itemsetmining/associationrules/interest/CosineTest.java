@@ -42,9 +42,9 @@ public class CosineTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 2) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 0.86) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Cosine.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 2) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.86) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Cosine.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 8, res.getRules().size());
   }

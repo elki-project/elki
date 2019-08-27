@@ -39,7 +39,7 @@ import elki.result.FrequentItemsetsResult;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -475,7 +475,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    *
    * @author Frederic Sautter
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the frequentItemsetAlgorithm to be used.
      */
@@ -523,8 +523,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
     protected double maxmeasure = Double.MAX_VALUE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<AbstractFrequentItemsetAlgorithm>(FREQUENTITEMALGO_ID, AbstractFrequentItemsetAlgorithm.class, FPGrowth.class) //
           .grab(config, x -> frequentItemAlgo = x);
       new ObjectParameter<InterestingnessMeasure>(INTERESTMEASURE_ID, InterestingnessMeasure.class, Confidence.class) //
@@ -537,7 +536,7 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
     }
 
     @Override
-    protected AssociationRuleGeneration makeInstance() {
+    public AssociationRuleGeneration make() {
       return new AssociationRuleGeneration(frequentItemAlgo, interestMeasure, minmeasure, maxmeasure);
     }
   }

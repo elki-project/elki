@@ -38,9 +38,9 @@ public class IDistanceTest extends AbstractIndexStructureTest {
   @Test
   public void testIDistance() {
     InMemoryIDistanceIndex.Factory<NumberVector> factory = new ELKIBuilder<>(InMemoryIDistanceIndex.Factory.class) //
-        .with(InMemoryIDistanceIndex.Factory.Parameterizer.K_ID, 4) //
-        .with(InMemoryIDistanceIndex.Factory.Parameterizer.DISTANCE_ID, EuclideanDistance.class) //
-        .with(InMemoryIDistanceIndex.Factory.Parameterizer.REFERENCE_ID, FarthestPoints.class) //
+        .with(InMemoryIDistanceIndex.Factory.Par.K_ID, 4) //
+        .with(InMemoryIDistanceIndex.Factory.Par.DISTANCE_ID, EuclideanDistance.class) //
+        .with(InMemoryIDistanceIndex.Factory.Par.REFERENCE_ID, FarthestPoints.class) //
         .build();
     testExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
     testSinglePoint(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);

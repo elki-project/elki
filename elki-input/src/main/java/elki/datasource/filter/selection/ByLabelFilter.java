@@ -28,7 +28,7 @@ import elki.datasource.bundle.BundleMeta;
 import elki.datasource.filter.AbstractStreamFilter;
 import elki.datasource.filter.FilterUtil;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -144,7 +144,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the filter pattern (regular expression).
      */
@@ -166,14 +166,13 @@ public class ByLabelFilter extends AbstractStreamFilter {
     private boolean inverted = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new PatternParameter(LABELFILTER_PATTERN_ID).grab(config, x -> pattern = x);
       new Flag(LABELFILTER_PATTERN_INVERT_ID).grab(config, x -> inverted = x);
     }
 
     @Override
-    protected ByLabelFilter makeInstance() {
+    public ByLabelFilter make() {
       return new ByLabelFilter(pattern, inverted);
     }
   }

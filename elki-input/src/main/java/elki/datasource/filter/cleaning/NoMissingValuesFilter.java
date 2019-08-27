@@ -26,7 +26,7 @@ import elki.datasource.bundle.BundleMeta;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.AbstractStreamFilter;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * A filter to remove entries that have missing values.
@@ -118,9 +118,9 @@ public class NoMissingValuesFilter extends AbstractStreamFilter {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NoMissingValuesFilter makeInstance() {
+    public NoMissingValuesFilter make() {
       return new NoMissingValuesFilter();
     }
   }

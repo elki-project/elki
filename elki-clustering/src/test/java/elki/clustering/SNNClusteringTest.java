@@ -48,8 +48,8 @@ public class SNNClusteringTest extends AbstractClusterAlgorithmTest {
   public void testSNNClusteringResults() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d.ascii", 1200);
     Clustering<Model> result = new ELKIBuilder<SNNClustering<DoubleVector>>(SNNClustering.class) //
-        .with(SNNClustering.Parameterizer.EPSILON_ID, 77) //
-        .with(SNNClustering.Parameterizer.MINPTS_ID, 28) //
+        .with(SNNClustering.Par.EPSILON_ID, 77) //
+        .with(SNNClustering.Par.MINPTS_ID, 28) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100) //
         .build().run(db);
     testFMeasure(db, result, 0.832371422);

@@ -45,7 +45,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -148,7 +148,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * OptionID for inversion flag.
      */
@@ -157,13 +157,12 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     protected boolean invert = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new Flag(INVERT_ID).grab(config, x -> invert = x);
     }
 
     @Override
-    protected GaussianModel<V> makeInstance() {
+    public GaussianModel<V> make() {
       return new GaussianModel<>(invert);
     }
   }

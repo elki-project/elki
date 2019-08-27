@@ -22,7 +22,7 @@ package elki.math.statistics.intrinsicdimensionality;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -74,9 +74,9 @@ public class RVEstimator implements IntrinsicDimensionalityEstimator {
    *
    * @author Oussama Chelly
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected RVEstimator makeInstance() {
+    public RVEstimator make() {
       return STATIC;
     }
   }

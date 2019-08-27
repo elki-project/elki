@@ -59,7 +59,7 @@ public class P3CTest extends AbstractClusterAlgorithmTest {
   public void testP3COverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
     Clustering<?> result = new ELKIBuilder<P3C<DoubleVector>>(P3C.class) //
-        .with(P3C.Parameterizer.ALPHA_THRESHOLD_ID, 0.01)//
+        .with(P3C.Par.ALPHA_THRESHOLD_ID, 0.01)//
         .build().run(db);
     testFMeasure(db, result, .99596185);
     testClusterSizes(result, new int[] { 4, 148, 300, 398 });

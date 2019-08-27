@@ -28,7 +28,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.data.type.VectorTypeInformation;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntListParameter;
@@ -126,22 +126,21 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Dimensions to select.
      */
     int[] dims;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntListParameter(FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID) //
+    public void configure(Parameterization config) {
+      new IntListParameter(FeatureSelection.Par.SELECTED_ATTRIBUTES_ID) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .grab(config, x -> dims = x);
     }
 
     @Override
-    protected NumericalFeatureSelection<V> makeInstance() {
+    public NumericalFeatureSelection<V> make() {
       return new NumericalFeatureSelection<>(dims);
     }
   }

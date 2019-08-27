@@ -46,8 +46,8 @@ public class WinsorizingEstimatorTest {
     // We could instantiate directly, but we also want to cover the
     // parameterizer class.
     ListParameterization config = new ListParameterization();
-    config.addParameter(WinsorizingEstimator.Parameterizer.INNER_ID, mom);
-    config.addParameter(WinsorizingEstimator.Parameterizer.WINSORIZE_ID, trim);
+    config.addParameter(WinsorizingEstimator.Par.INNER_ID, mom);
+    config.addParameter(WinsorizingEstimator.Par.WINSORIZE_ID, trim);
     WinsorizingEstimator<NormalDistribution> est = ClassGenericsUtil.parameterizeOrAbort(WinsorizingEstimator.class, config);
 
     Random r = new Random(0L);

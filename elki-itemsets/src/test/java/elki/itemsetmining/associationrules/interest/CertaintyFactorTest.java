@@ -42,9 +42,9 @@ public class CertaintyFactorTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testToyExample() {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-        .with(FPGrowth.Parameterizer.MINSUPP_ID, 2) //
-        .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 1.) //
-        .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, CertaintyFactor.class) //
+        .with(FPGrowth.Par.MINSUPP_ID, 2) //
+        .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.) //
+        .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, CertaintyFactor.class) //
         .build().run(db);
     assertEquals("Size not as expected.", 18, res.getRules().size());
   }

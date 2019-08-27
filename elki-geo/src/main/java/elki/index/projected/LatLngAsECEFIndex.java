@@ -42,7 +42,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.index.*;
 import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -233,7 +233,7 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
      * 
      * @param <O> Outer object type.
      */
-    public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+    public static class Par<O extends NumberVector> implements Parameterizer {
       /**
        * Inner index factory.
        */
@@ -255,18 +255,17 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
       EarthModel model;
 
       @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
+      public void configure(Parameterization config) {
         new ObjectParameter<EarthModel>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class) //
             .grab(config, x -> model = x);
-        new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class) //
+        new ObjectParameter<IndexFactory<O>>(ProjectedIndex.Factory.Par.INDEX_ID, IndexFactory.class) //
             .grab(config, x -> inner = x);
-        new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG).grab(config, x -> materialize = x);
-        new Flag(ProjectedIndex.Factory.Parameterizer.DISABLE_REFINE_FLAG).grab(config, x -> norefine = x);
+        new Flag(ProjectedIndex.Factory.Par.MATERIALIZE_FLAG).grab(config, x -> materialize = x);
+        new Flag(ProjectedIndex.Factory.Par.DISABLE_REFINE_FLAG).grab(config, x -> norefine = x);
       }
 
       @Override
-      protected Factory<O> makeInstance() {
+      public Factory<O> make() {
         return new Factory<>(inner, materialize, norefine, model);
       }
     }

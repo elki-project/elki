@@ -24,7 +24,7 @@ import elki.math.MathUtil;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.math.statistics.distribution.SkewGeneralizedNormalDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -115,9 +115,9 @@ public class SkewGNormalLMMEstimator implements LMMDistributionEstimator<SkewGen
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SkewGNormalLMMEstimator makeInstance() {
+    public SkewGNormalLMMEstimator make() {
       return STATIC;
     }
   }

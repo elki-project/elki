@@ -24,7 +24,7 @@ import elki.data.SparseNumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.Norm;
 import elki.distance.PrimitiveDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Squared Euclidean distance function, optimized for
@@ -126,9 +126,9 @@ public class SparseSquaredEuclideanDistance implements PrimitiveDistance<SparseN
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SparseSquaredEuclideanDistance makeInstance() {
+    public SparseSquaredEuclideanDistance make() {
       return SparseSquaredEuclideanDistance.STATIC;
     }
   }

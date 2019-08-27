@@ -350,7 +350,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -367,9 +367,9 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     protected Linkage linkage = Linkage.SINGLE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numclusters = x);
       new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
@@ -378,7 +378,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering3<O> makeInstance() {
+    public NaiveAgglomerativeHierarchicalClustering3<O> make() {
       return new NaiveAgglomerativeHierarchicalClustering3<>(distanceFunction, numclusters, linkage);
     }
   }

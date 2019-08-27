@@ -22,7 +22,7 @@ package elki.math.statistics.tests;
 
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.StudentsTDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Calculates a test statistic according to Welch's t test for two samples
@@ -111,9 +111,9 @@ public class WelchTTest implements GoodnessOfFitTest {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected WelchTTest makeInstance() {
+    public WelchTTest make() {
       return STATIC;
     }
   }

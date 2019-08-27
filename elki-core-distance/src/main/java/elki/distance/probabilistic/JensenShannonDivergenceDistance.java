@@ -23,7 +23,7 @@ package elki.distance.probabilistic;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Jensen-Shannon Divergence for {@link NumberVector}s is a symmetric,
@@ -109,9 +109,9 @@ public class JensenShannonDivergenceDistance extends JeffreyDivergenceDistance {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected JensenShannonDivergenceDistance makeInstance() {
+    public JensenShannonDivergenceDistance make() {
       return STATIC;
     }
   }

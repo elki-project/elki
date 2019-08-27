@@ -36,7 +36,7 @@ import elki.database.relation.RelationUtil;
 import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.statistics.distribution.ChiSquaredDistribution;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -153,7 +153,7 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Number of iterations.
      */
@@ -175,8 +175,7 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
     RandomFactory rnd;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(ITER_ID, 1000) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> iterations = x);
@@ -184,7 +183,7 @@ public class RANSACCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
     }
 
     @Override
-    protected RANSACCovarianceMatrixBuilder makeInstance() {
+    public RANSACCovarianceMatrixBuilder make() {
       return new RANSACCovarianceMatrixBuilder(iterations, rnd);
     }
   }

@@ -199,7 +199,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Par<V extends SparseNumberVector> extends NumberVectorLabelParser.Par<V> {
     /**
      * Option ID for normalization.
      */
@@ -211,8 +211,8 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     boolean normalize = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new Flag(NORMALIZE_FLAG).grab(config, x -> normalize = x);
     }
 
@@ -223,7 +223,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     }
 
     @Override
-    protected TermFrequencyParser<V> makeInstance() {
+    public TermFrequencyParser<V> make() {
       return new TermFrequencyParser<>(normalize, format, labelIndices, (SparseNumberVector.Factory<V>) factory);
     }
   }

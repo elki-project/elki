@@ -34,7 +34,7 @@ import elki.distance.Distance;
 import elki.index.lsh.hashfunctions.CosineLocalitySensitiveHashFunction;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.LessEqualConstraint;
@@ -121,7 +121,7 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
    *
    * @author Evgeniy Faerman
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for fixing the random seed.
      */
@@ -143,8 +143,7 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new RandomParameter(RANDOM_ID).grab(config, x -> random = x);
       new IntParameter(NUMPROJ_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -153,7 +152,7 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
     }
 
     @Override
-    protected CosineHashFunctionFamily makeInstance() {
+    public CosineHashFunctionFamily make() {
       return new CosineHashFunctionFamily(k, random);
     }
   }

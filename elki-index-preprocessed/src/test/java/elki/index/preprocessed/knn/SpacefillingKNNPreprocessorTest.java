@@ -82,15 +82,15 @@ public class SpacefillingKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList(//
+            .with(SpacefillingKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList(//
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
                 ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, AchlioptasRandomProjectionFamily.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
-            .with(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.PROJECTION_ID, AchlioptasRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
+            .with(AchlioptasRandomProjectionFamily.Par.RANDOM_ID, 0L) //
             .build().instantiate(relation);
     preproc.initialize();
     // add as index
@@ -117,15 +117,15 @@ public class SpacefillingKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList( //
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
                 ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, CauchyRandomProjectionFamily.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
-            .with(CauchyRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L)//
+            .with(SpacefillingKNNPreprocessor.Factory.Par.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.PROJECTION_ID, CauchyRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
+            .with(CauchyRandomProjectionFamily.Par.RANDOM_ID, 0L)//
             .build().instantiate(relation);
     preproc.initialize();
     // add as index
@@ -152,15 +152,15 @@ public class SpacefillingKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList( //
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
                 ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, GaussianRandomProjectionFamily.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
-            .with(GaussianRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.PROJECTION_ID, GaussianRandomProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
+            .with(GaussianRandomProjectionFamily.Par.RANDOM_ID, 0L) //
             .build().instantiate(relation);
     preproc.initialize();
     // add as index
@@ -187,15 +187,15 @@ public class SpacefillingKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList( //
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
                 ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, RandomSubsetProjectionFamily.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
-            .with(RandomSubsetProjectionFamily.Parameterizer.RANDOM_ID, 0L) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.PROJECTION_ID, RandomSubsetProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
+            .with(RandomSubsetProjectionFamily.Par.RANDOM_ID, 0L) //
             .build().instantiate(relation);
     preproc.initialize();
     // add as index
@@ -222,15 +222,15 @@ public class SpacefillingKNNPreprocessorTest {
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
         new ELKIBuilder<SpacefillingKNNPreprocessor.Factory<DoubleVector>>(SpacefillingKNNPreprocessor.Factory.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, Arrays.asList( //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.CURVES_ID, Arrays.asList( //
                 HilbertSpatialSorter.class, PeanoSpatialSorter.class, //
                 ZCurveSpatialSorter.class, BinarySplitSpatialSorter.class)) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, SimplifiedRandomHyperplaneProjectionFamily.class) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.) //
-            .with(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L) //
-            .with(SimplifiedRandomHyperplaneProjectionFamily.Parameterizer.RANDOM_ID, 1L) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.DIM_ID, 7) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.PROJECTION_ID, SimplifiedRandomHyperplaneProjectionFamily.class) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
+            .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
+            .with(SimplifiedRandomHyperplaneProjectionFamily.Par.RANDOM_ID, 1L) //
             .build().instantiate(relation);
     preproc.initialize();
     // add as index

@@ -29,7 +29,7 @@ import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -177,7 +177,7 @@ public class StandardDeviationScaling implements OutlierScaling {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify a fixed mean to use.
      */
@@ -199,8 +199,7 @@ public class StandardDeviationScaling implements OutlierScaling {
     protected double lambda;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(MEAN_ID) //
           .setOptional(true) //
           .grab(config, x -> fixedmean = x);
@@ -209,7 +208,7 @@ public class StandardDeviationScaling implements OutlierScaling {
     }
 
     @Override
-    protected StandardDeviationScaling makeInstance() {
+    public StandardDeviationScaling make() {
       return new StandardDeviationScaling(fixedmean, lambda);
     }
   }

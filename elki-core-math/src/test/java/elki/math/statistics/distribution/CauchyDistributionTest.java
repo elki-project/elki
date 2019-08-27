@@ -81,8 +81,8 @@ public class CauchyDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("cauchy.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(CauchyDistribution.Parameterizer.LOCATION_ID, .5);
-    params.addParameter(CauchyDistribution.Parameterizer.SHAPE_ID, 1.);
+    params.addParameter(CauchyDistribution.Par.LOCATION_ID, .5);
+    params.addParameter(CauchyDistribution.Par.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(CauchyDistribution.class, params);
     checkPDF(dist, "pdf_gnur_05_1", 1e-15);
   }

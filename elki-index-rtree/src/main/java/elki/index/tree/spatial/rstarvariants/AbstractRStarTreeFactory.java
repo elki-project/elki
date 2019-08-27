@@ -83,7 +83,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
    * @param <O> Object type
    * @param <S> Settings class
    */
-  public abstract static class Parameterizer<O extends NumberVector, S extends RTreeSettings> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Par<O extends NumberVector, S extends RTreeSettings> extends PagedIndexFactory.Par<O> {
     /**
      * Fast-insertion parameter. Optional.
      */
@@ -122,8 +122,8 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     abstract protected S createSettings();
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       settings = createSettings();
       new ObjectParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class) //
           .grab(config, x -> settings.insertionStrategy = x);
@@ -150,6 +150,6 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     }
 
     @Override
-    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance();
+    public abstract AbstractRStarTreeFactory<O, ?, ?, ?> make();
   }
 }

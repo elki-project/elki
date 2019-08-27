@@ -24,7 +24,7 @@ import java.util.List;
 
 import elki.logging.Logging;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -129,9 +129,9 @@ public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CorrelationDependenceMeasure makeInstance() {
+    public CorrelationDependenceMeasure make() {
       return STATIC;
     }
   }

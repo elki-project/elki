@@ -48,7 +48,7 @@ import elki.math.DoubleMinMax;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -139,7 +139,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
   }
 
   /**
-   * Parameterizer.
+   * Par.
    *
    * @author Erich Schubert
    *
@@ -147,7 +147,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Parameter for choosing the clustering algorithm.
      */
@@ -160,14 +160,13 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     KMeans<O, ?> clusterer;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new ObjectParameter<KMeans<O, ?>>(CLUSTERING_ID, KMeans.class, LloydKMeans.class) //
           .grab(config, x -> clusterer = x);
     }
 
     @Override
-    protected KMeansOutlierDetection<O> makeInstance() {
+    public KMeansOutlierDetection<O> make() {
       return new KMeansOutlierDetection<>(clusterer);
     }
   }

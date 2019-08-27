@@ -46,7 +46,7 @@ public class ByLabelFilterTest extends AbstractDataSourceTest {
     String s = "yes";
     String filename = UNITTEST + "label-selection-test-1.csv";
     ByLabelFilter filter = new ELKIBuilder<>(ByLabelFilter.class) //
-        .with(ByLabelFilter.Parameterizer.LABELFILTER_PATTERN_ID, s) //
+        .with(ByLabelFilter.Par.LABELFILTER_PATTERN_ID, s) //
         .build();
     MultipleObjectsBundle filteredBundle = readBundle(filename, filter);
     // Load the test data again without a filter.

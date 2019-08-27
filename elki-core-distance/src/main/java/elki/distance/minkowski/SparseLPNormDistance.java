@@ -24,7 +24,7 @@ import elki.data.SparseNumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.Norm;
 import elki.distance.PrimitiveDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -122,22 +122,21 @@ public class SparseLPNormDistance implements PrimitiveDistance<SparseNumberVecto
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Value for p
      */
     double p = 2.;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new DoubleParameter(LPNormDistance.Parameterizer.P_ID) //
+    public void configure(Parameterization config) {
+      new DoubleParameter(LPNormDistance.Par.P_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> p = x);
     }
 
     @Override
-    protected SparseLPNormDistance makeInstance() {
+    public SparseLPNormDistance make() {
       if(p == 2.) {
         return SparseEuclideanDistance.STATIC;
       }

@@ -714,7 +714,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+  public static class Par extends AbstractDatabaseConnection.Par {
     /**
      * Parameter to give the configuration file
      */
@@ -766,8 +766,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     RandomFactory clusterRandom;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       // Specification file
       new FileParameter(CONFIGFILE_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> specfile = x);
@@ -787,7 +787,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     @Override
-    protected GeneratorXMLDatabaseConnection makeInstance() {
+    public GeneratorXMLDatabaseConnection make() {
       return new GeneratorXMLDatabaseConnection(filters, specfile, sizescale, reassign, reassignByDistance, clusterRandom);
     }
   }

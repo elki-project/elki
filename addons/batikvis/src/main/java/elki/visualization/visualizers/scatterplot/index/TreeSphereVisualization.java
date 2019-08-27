@@ -38,7 +38,7 @@ import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.visualization.VisualizationTask;
@@ -89,14 +89,14 @@ public class TreeSphereVisualization implements VisFactory {
   /**
    * Settings
    */
-  protected Parameterizer settings;
+  protected Par settings;
 
   /**
    * Constructor.
    *
    * @param settings Settings
    */
-  public TreeSphereVisualization(Parameterizer settings) {
+  public TreeSphereVisualization(Par settings) {
     super();
     this.settings = settings;
   }
@@ -293,17 +293,16 @@ public class TreeSphereVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     protected boolean fill = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new Flag(TreeMBRVisualization.Parameterizer.FILL_ID).grab(config, x -> fill = x);
+    public void configure(Parameterization config) {
+      new Flag(TreeMBRVisualization.Par.FILL_ID).grab(config, x -> fill = x);
     }
 
     @Override
-    protected TreeSphereVisualization makeInstance() {
+    public TreeSphereVisualization make() {
       return new TreeSphereVisualization(this);
     }
   }

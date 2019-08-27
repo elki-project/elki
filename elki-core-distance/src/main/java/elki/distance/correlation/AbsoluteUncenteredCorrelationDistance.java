@@ -22,7 +22,7 @@ package elki.distance.correlation;
 
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Absolute uncentered correlation distance function for feature vectors.
@@ -74,9 +74,9 @@ public class AbsoluteUncenteredCorrelationDistance extends AbstractNumberVectorD
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected AbsoluteUncenteredCorrelationDistance makeInstance() {
+    public AbsoluteUncenteredCorrelationDistance make() {
       return AbsoluteUncenteredCorrelationDistance.STATIC;
     }
   }

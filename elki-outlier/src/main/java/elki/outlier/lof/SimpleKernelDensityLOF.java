@@ -199,7 +199,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    *
    * @param <O> vector type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<Distance<? super O>> {
+  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for kernel density LOF kernel.
      */
@@ -216,9 +216,9 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     KernelDensityFunction kernel;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      new IntParameter(LOF.Parameterizer.K_ID) //
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
@@ -226,7 +226,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     }
 
     @Override
-    protected SimpleKernelDensityLOF<O> makeInstance() {
+    public SimpleKernelDensityLOF<O> make() {
       return new SimpleKernelDensityLOF<>(k, distanceFunction, kernel);
     }
   }

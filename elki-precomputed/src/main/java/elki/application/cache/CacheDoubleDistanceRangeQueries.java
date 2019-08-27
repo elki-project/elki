@@ -177,7 +177,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
+  public static class Par<O> extends AbstractApplication.Par {
     /**
      * Parameter that specifies the name of the directory to be re-parsed.
      */
@@ -214,8 +214,8 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     private File out = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new ObjectParameter<Database>(DATABASE_ID, Database.class, StaticArrayDatabase.class) //
           .grab(config, x -> database = x);
       // Distance function parameter
@@ -230,7 +230,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     }
 
     @Override
-    protected CacheDoubleDistanceRangeQueries<O> makeInstance() {
+    public CacheDoubleDistanceRangeQueries<O> make() {
       return new CacheDoubleDistanceRangeQueries<>(database, distance, radius, out);
     }
   }

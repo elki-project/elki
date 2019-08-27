@@ -43,7 +43,7 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
-        .with(COP.Parameterizer.K_ID, 30).build().run(db);
+        .with(COP.Par.K_ID, 30).build().run(db);
     testAUC(db, "Noise", result, 0.89476666);
     testSingleScore(result, 416, 0.26795866);
   }
@@ -52,9 +52,9 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOPChisquared() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
-        .with(COP.Parameterizer.K_ID, 30) //
-        .with(COP.Parameterizer.MODELS_ID) //
-        .with(COP.Parameterizer.DIST_ID, COP.DistanceDist.CHISQUARED)//
+        .with(COP.Par.K_ID, 30) //
+        .with(COP.Par.MODELS_ID) //
+        .with(COP.Par.DIST_ID, COP.DistanceDist.CHISQUARED)//
         .build().run(db);
     testAUC(db, "Noise", result, 0.897);
     testSingleScore(result, 416, 0.0080449);
@@ -64,10 +64,10 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOPRobust() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
-        .with(COP.Parameterizer.K_ID, 30)//
-        .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
-        .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
-        .with(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class) //
+        .with(COP.Par.K_ID, 30)//
+        .with(COP.Par.PCARUNNER_ID, AutotuningPCA.class) //
+        .with(AutotuningPCA.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
+        .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.90166666);
     testSingleScore(result, 416, 0.25705955);
@@ -77,12 +77,12 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
   public void testCOPRANSAC() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
-        .with(COP.Parameterizer.K_ID, 30)//
-        .with(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class) //
-        .with(AutotuningPCA.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
-        .with(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class)//
-        .with(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25) //
-        .with(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0) //
+        .with(COP.Par.K_ID, 30)//
+        .with(COP.Par.PCARUNNER_ID, AutotuningPCA.class) //
+        .with(AutotuningPCA.Par.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
+        .with(AutotuningPCA.Par.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class)//
+        .with(RANSACCovarianceMatrixBuilder.Par.ITER_ID, 25) //
+        .with(RANSACCovarianceMatrixBuilder.Par.SEED_ID, 0) //
         .build().run(db);
     testAUC(db, "Noise", result, 0.8993);
     testSingleScore(result, 416, 0.410516);

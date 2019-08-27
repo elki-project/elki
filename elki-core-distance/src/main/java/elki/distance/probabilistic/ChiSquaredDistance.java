@@ -28,7 +28,7 @@ import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * χ² distance function, symmetric version.
@@ -169,9 +169,9 @@ public class ChiSquaredDistance extends AbstractNumberVectorDistance implements 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected ChiSquaredDistance makeInstance() {
+    public ChiSquaredDistance make() {
       return STATIC;
     }
   }

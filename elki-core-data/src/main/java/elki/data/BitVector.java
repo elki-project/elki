@@ -29,7 +29,7 @@ import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -383,9 +383,9 @@ public class BitVector implements SparseNumberVector {
      *
      * @author Erich Schubert
      */
-    public static class Parameterizer extends AbstractParameterizer {
+    public static class Par implements Parameterizer {
       @Override
-      protected BitVector.Factory makeInstance() {
+      public BitVector.Factory make() {
         return FACTORY;
       }
     }

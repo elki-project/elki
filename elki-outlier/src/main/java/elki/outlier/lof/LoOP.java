@@ -53,7 +53,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -327,7 +327,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractParameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * The distance function to determine the reachability distance between
      * database objects.
@@ -387,8 +387,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     protected Distance<O> comparisonDistance = null;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(KCOMP_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> kcomp = x);
@@ -409,7 +408,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     }
 
     @Override
-    protected LoOP<O> makeInstance() {
+    public LoOP<O> make() {
       Distance<O> realreach = (reachabilityDistance != null) ? reachabilityDistance : comparisonDistance;
       return new LoOP<>(kreach, kcomp, realreach, comparisonDistance, lambda);
     }

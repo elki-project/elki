@@ -44,7 +44,7 @@ import elki.result.Metadata;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -358,7 +358,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * 
    * @author Florian Nuecke
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Relative density threshold parameter Alpha.
      */
@@ -400,8 +400,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     protected RandomFactory random = RandomFactory.DEFAULT;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new DoubleParameter(ALPHA_ID, 0.2) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
@@ -417,7 +416,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     }
 
     @Override
-    protected DOC<V> makeInstance() {
+    public DOC<V> make() {
       return new DOC<>(alpha, beta, w, random);
     }
   }

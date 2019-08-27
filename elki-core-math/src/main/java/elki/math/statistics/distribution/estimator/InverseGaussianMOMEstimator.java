@@ -22,7 +22,7 @@ package elki.math.statistics.distribution.estimator;
 
 import elki.math.MeanVariance;
 import elki.math.statistics.distribution.InverseGaussianDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate parameter of the inverse Gaussian (Wald) distribution.
@@ -59,9 +59,9 @@ public class InverseGaussianMOMEstimator implements MeanVarianceDistributionEsti
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected InverseGaussianMOMEstimator makeInstance() {
+    public InverseGaussianMOMEstimator make() {
       return STATIC;
     }
   }

@@ -24,7 +24,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.distance.PrimitiveDistance;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Levenshtein distance on strings, normalized by string length.
@@ -91,9 +91,9 @@ public class NormalizedLevenshteinDistance implements PrimitiveDistance<String> 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected NormalizedLevenshteinDistance makeInstance() {
+    public NormalizedLevenshteinDistance make() {
       return STATIC_SENSITIVE;
     }
   }

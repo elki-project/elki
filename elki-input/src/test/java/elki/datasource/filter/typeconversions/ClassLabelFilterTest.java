@@ -48,7 +48,7 @@ public class ClassLabelFilterTest extends AbstractDataSourceTest {
     final int c = 2;
     String filename = UNITTEST + "external-id-test-1.csv";
     ClassLabelFilter filter = new ELKIBuilder<>(ClassLabelFilter.class) //
-        .with(ClassLabelFilter.Parameterizer.CLASS_LABEL_INDEX_ID, c).build();
+        .with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, c).build();
     MultipleObjectsBundle bundle = readBundle(filename, filter);
 
     // Ensure that the filter has correctly formed the bundle.

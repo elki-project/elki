@@ -21,7 +21,7 @@
 package elki.math.statistics.distribution.estimator;
 
 import elki.math.statistics.distribution.LaplaceDistribution;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Estimate Laplace distribution parameters using the method of L-Moments (LMM).
@@ -71,9 +71,9 @@ public class LaplaceLMMEstimator implements LMMDistributionEstimator<LaplaceDist
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected LaplaceLMMEstimator makeInstance() {
+    public LaplaceLMMEstimator make() {
       return STATIC;
     }
   }

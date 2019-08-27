@@ -29,7 +29,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -112,11 +112,11 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Selected attributes parameter.
      */
-    public static final OptionID SELECTED_ATTRIBUTES_ID = FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID;
+    public static final OptionID SELECTED_ATTRIBUTES_ID = FeatureSelection.Par.SELECTED_ATTRIBUTES_ID;
 
     /**
      * Selected attributes.
@@ -124,15 +124,14 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
     protected long[] selectedAttributes;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntListParameter(SELECTED_ATTRIBUTES_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .grab(config, x -> selectedAttributes = BitsUtil.of(x));
     }
 
     @Override
-    protected NumberVectorFeatureSelectionFilter<DoubleVector> makeInstance() {
+    public NumberVectorFeatureSelectionFilter<DoubleVector> make() {
       return new NumberVectorFeatureSelectionFilter<>(selectedAttributes);
     }
   }

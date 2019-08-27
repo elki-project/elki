@@ -28,7 +28,7 @@ import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.datastructures.heap.TopBoundedHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -139,7 +139,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Fast-insertion parameter. Optional.
      */
@@ -151,15 +151,14 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     int numCandidates = 32;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(INSERTION_CANDIDATES_ID, numCandidates) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numCandidates = x);
     }
 
     @Override
-    protected ApproximativeLeastOverlapInsertionStrategy makeInstance() {
+    public ApproximativeLeastOverlapInsertionStrategy make() {
       return new ApproximativeLeastOverlapInsertionStrategy(numCandidates);
     }
   }

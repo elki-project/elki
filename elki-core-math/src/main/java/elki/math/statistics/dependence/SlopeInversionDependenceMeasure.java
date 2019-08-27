@@ -22,7 +22,7 @@ package elki.math.statistics.dependence;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
 
 /**
@@ -135,9 +135,9 @@ public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SlopeInversionDependenceMeasure makeInstance() {
+    public SlopeInversionDependenceMeasure make() {
       return STATIC;
     }
   }

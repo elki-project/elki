@@ -20,7 +20,7 @@
  */
 package elki.math.geodesy;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
@@ -86,9 +86,9 @@ public class SphericalVincentyEarthModel extends AbstractEarthModel {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected SphericalVincentyEarthModel makeInstance() {
+    public SphericalVincentyEarthModel make() {
       return STATIC;
     }
   }

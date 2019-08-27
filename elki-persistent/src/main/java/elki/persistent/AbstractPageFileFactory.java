@@ -20,7 +20,7 @@
  */
 package elki.persistent;
 
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -64,7 +64,7 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
    * 
    * @param <P> Page type
    */
-  public static abstract class Parameterizer<P extends Page> extends AbstractParameterizer {
+  public static abstract class Par<P extends Page> implements Parameterizer {
     /**
      * Parameter to specify the size of a page in bytes, must be an integer
      * greater than 0.
@@ -77,14 +77,13 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     protected int pageSize;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(PAGE_SIZE_ID, 4000) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> pageSize = x);
     }
 
     @Override
-    abstract protected PageFileFactory<P> makeInstance();
+    abstract public PageFileFactory<P> make();
   }
 }

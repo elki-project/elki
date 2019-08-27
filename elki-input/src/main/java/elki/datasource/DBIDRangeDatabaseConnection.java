@@ -23,7 +23,7 @@ package elki.datasource;
 import elki.database.ids.DBIDFactory;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.utilities.documentation.Description;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -72,7 +72,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for starting ID to generate
      */
@@ -94,8 +94,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     int count;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
       new IntParameter(START_ID, 0) //
           .grab(config, x -> start = x);
       new IntParameter(COUNT_ID) //
@@ -103,7 +102,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
     }
 
     @Override
-    protected DBIDRangeDatabaseConnection makeInstance() {
+    public DBIDRangeDatabaseConnection make() {
       return new DBIDRangeDatabaseConnection(start, count);
     }
   }

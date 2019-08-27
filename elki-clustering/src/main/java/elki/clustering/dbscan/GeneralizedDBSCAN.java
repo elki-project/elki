@@ -44,7 +44,7 @@ import elki.logging.progress.IndefiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -330,7 +330,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for neighborhood predicate.
      */
@@ -365,7 +365,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     protected boolean coremodel = false;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       // Neighborhood predicate
       new ObjectParameter<NeighborPredicate<?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
           .grab(config, x -> npred = x);
@@ -384,7 +384,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     }
 
     @Override
-    protected GeneralizedDBSCAN makeInstance() {
+    public GeneralizedDBSCAN make() {
       return new GeneralizedDBSCAN(npred, corepred, coremodel);
     }
   }

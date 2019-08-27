@@ -43,9 +43,9 @@ public class ConfidenceTest extends AbstractFrequentItemsetAlgorithmTest {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
     {
       AssociationRuleGeneration ap = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-      .with(FPGrowth.Parameterizer.MINSUPP_ID, 3) //
-      .with(AssociationRuleGeneration.Parameterizer.MINMEASURE_ID, 1.) //
-      .with(AssociationRuleGeneration.Parameterizer.INTERESTMEASURE_ID, Confidence.class) //
+      .with(FPGrowth.Par.MINSUPP_ID, 3) //
+      .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.) //
+      .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Confidence.class) //
           .build();
       AssociationRuleResult res = ap.run(db);
       assertEquals("Size not as expected.", 6, res.getRules().size());

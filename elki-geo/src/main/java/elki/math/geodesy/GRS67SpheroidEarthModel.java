@@ -21,7 +21,7 @@
 package elki.math.geodesy;
 
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * The GRS 67 spheroid earth model.
@@ -67,9 +67,9 @@ public class GRS67SpheroidEarthModel extends AbstractEarthModel {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected GRS67SpheroidEarthModel makeInstance() {
+    public GRS67SpheroidEarthModel make() {
       return STATIC;
     }
   }

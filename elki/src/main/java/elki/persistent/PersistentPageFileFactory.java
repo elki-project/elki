@@ -68,7 +68,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<ExternalizablePage> {
+  public static class Par extends AbstractPageFileFactory.Par<ExternalizablePage> {
     /**
      * File name.
      */
@@ -80,14 +80,14 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     public static final OptionID FILE_ID = new OptionID("pagefile.file", "The name of the file storing the page file.");
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+    public void configure(Parameterization config) {
+      super.configure(config);
       new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE) //
           .grab(config, x -> fileName = x.getPath());
     }
 
     @Override
-    protected PersistentPageFileFactory<ExternalizablePage> makeInstance() {
+    public PersistentPageFileFactory<ExternalizablePage> make() {
       return new PersistentPageFileFactory<>(pageSize, fileName);
     }
   }

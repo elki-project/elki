@@ -43,7 +43,7 @@ public class HiCSDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = new ELKIBuilder<>(HiCSDependenceMeasure.class) //
-        .with(HiCS.Parameterizer.SEED_ID, 0) //
+        .with(HiCS.Par.SEED_ID, 0) //
         .build();
     // Note: only positive correlations are accepted.
     checkPerfectLinear(cor, 1000, 0.800, 0.280, 0.05);

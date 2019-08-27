@@ -129,8 +129,8 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
   public void testParameterizer() throws ClassInstantiationException {
     load("weibull.ascii.gz");
     ListParameterization params = new ListParameterization();
-    params.addParameter(WeibullDistribution.Parameterizer.SHAPE_ID, .1);
-    params.addParameter(WeibullDistribution.Parameterizer.SCALE_ID, 4.);
+    params.addParameter(WeibullDistribution.Par.SHAPE_ID, .1);
+    params.addParameter(WeibullDistribution.Par.SCALE_ID, 4.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(WeibullDistribution.class, params);
     checkPDF(dist, "pdf_scipy_01_4", 1e-15);
   }

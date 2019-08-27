@@ -26,7 +26,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.type.SimpleTypeInformation;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.AbstractParameterizer;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Cosine distance function for feature vectors.
@@ -110,9 +110,9 @@ public class CosineDistance implements SpatialPrimitiveDistance<NumberVector>, N
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     @Override
-    protected CosineDistance makeInstance() {
+    public CosineDistance make() {
       return CosineDistance.STATIC;
     }
   }
