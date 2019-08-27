@@ -314,8 +314,7 @@ public abstract class AbstractApplication {
      * @return Output file
      */
     protected File getParameterOutputFile(Parameterization config, String description) {
-      final FileParameter outputP = new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
-      outputP.setShortDescription(description);
+      final FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
       return config.grab(outputP) ? outputP.getValue() : null;
     }
 
@@ -337,8 +336,7 @@ public abstract class AbstractApplication {
      * @return Input file
      */
     protected File getParameterInputFile(Parameterization config, String description) {
-      final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
-      inputP.setShortDescription(description);
+      FileParameter inputP = new FileParameter(new OptionID(INPUT_ID.getName(), description), FileParameter.FileType.INPUT_FILE);
       return config.grab(inputP) ? inputP.getValue() : null;
     }
 

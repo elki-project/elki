@@ -55,7 +55,7 @@ public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?>
     constraints.weightx = 0;
     label = new JLabel(param.getOptionID().getName());
     label.setAlignmentX(0.0f);
-    label.setToolTipText(param.getShortDescription());
+    label.setToolTipText(param.getOptionID().getDescription());
     parent.add(label, constraints);
     // subclasses will add a second component to the row!
   }

@@ -93,14 +93,14 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   public ClassListParameterConfigurator(ClassListParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
-    textfield.setToolTipText(param.getShortDescription());
+    textfield.setToolTipText(param.getOptionID().getDescription());
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());
     }
     textfield.setPreferredSize(new Dimension(400, textfield.getPreferredSize().height));
 
     button = new JButton(StockIcon.getStockIcon(StockIcon.LIST_ADD));
-    button.setToolTipText(param.getShortDescription());
+    button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
 
     TreeNode root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());

@@ -53,7 +53,7 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setSelected(param.isTrue());
     }
-    value.setToolTipText(param.getShortDescription());
+    value.setToolTipText(param.getOptionID().getDescription());
     parent.add(value, constraints);
     finishGridRow();
     

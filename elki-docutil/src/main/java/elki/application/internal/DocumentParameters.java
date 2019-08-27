@@ -506,7 +506,7 @@ public class DocumentParameters {
       // DD = definition description
       Element optdd = (Element) parent.appendChild(htmldoc.createElement(HTMLUtil.HTML_DD_TAG));
       optdd.appendChild(HTMLUtil.appendMultilineText(htmldoc, //
-          htmldoc.createElement(HTMLUtil.HTML_P_TAG), firstopt.getShortDescription()));
+          htmldoc.createElement(HTMLUtil.HTML_P_TAG), firstopt.getOptionID().getDescription()));
       return optdd;
     }
 
@@ -519,7 +519,7 @@ public class DocumentParameters {
           SerializedParameterization.OPTION_PREFIX + firstopt.getOptionID().getName() + " " + firstopt.getSyntax()));
       // description
       optli.appendChild(HTMLUtil.appendMultilineText(htmldoc, //
-          htmldoc.createElement(HTMLUtil.HTML_P_TAG), firstopt.getShortDescription()));
+          htmldoc.createElement(HTMLUtil.HTML_P_TAG), firstopt.getOptionID().getDescription()));
       // class restriction?
       // was: using getRestrictionClass(oid, firstopt, byopt);
       Class<?> superclass = getRestrictionClass(firstopt);
@@ -689,7 +689,7 @@ public class DocumentParameters {
     public Void writeOptionD(Void parent, Parameter<?> firstopt) {
       out.par().indent(0).append("`").append(SerializedParameterization.OPTION_PREFIX) //
           .append(firstopt.getOptionID().getName()).append(' ').append(firstopt.getSyntax()).append("`: ").par()//
-          .append(firstopt.getShortDescription()).par();
+          .append(firstopt.getOptionID().getDescription()).par();
       return null;
     }
 
@@ -698,8 +698,8 @@ public class DocumentParameters {
       out.indent(0).append("- `").append(SerializedParameterization.OPTION_PREFIX) //
           .append(opt.getOptionID().getName()).append(' ').append(opt.getSyntax()) //
           .append("`").par().indent(2);
-      if(opt.getShortDescription() != null) {
-        out.append(opt.getShortDescription()).lf();
+      if(opt.getOptionID().getDescription() != null) {
+        out.append(opt.getOptionID().getDescription()).lf();
       }
       // class restriction?
       appendClassRestriction(parent, getRestrictionClass(opt));

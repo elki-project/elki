@@ -70,10 +70,10 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     super(fp, parent);
     // create components
     textfield = new JTextField();
-    textfield.setToolTipText(param.getShortDescription());
+    textfield.setToolTipText(param.getOptionID().getDescription());
     textfield.addActionListener(this);
     button = new JButton(StockIcon.getStockIcon(StockIcon.DOCUMENT_OPEN));
-    button.setToolTipText(param.getShortDescription());
+    button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
     // fill with value
     File f = fp.isDefined() ? fp.getValue() : null;

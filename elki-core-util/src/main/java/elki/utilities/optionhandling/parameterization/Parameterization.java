@@ -30,9 +30,8 @@ import elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Interface for object parameterizations.
- * 
- * See the {@link elki.utilities.optionhandling} package for
- * documentation!
+ * <p>
+ * See the {@link elki.utilities.optionhandling} package for documentation!
  *
  * @opt nodefillcolor LemonChiffon
  * @assoc - - - Parameter
@@ -44,15 +43,15 @@ import elki.utilities.optionhandling.parameters.Parameter;
 public interface Parameterization {
   /**
    * Get the option value from the Parameterization.
-   * 
+   * <p>
    * Note: this method returns success; the actual value can be obtained from
    * {@code opt} itself!
-   * 
+   * <p>
    * In particular {@link #grab} can return {@code true} when
    * {@link elki.utilities.optionhandling.parameters.Flag#getValue
    * Flag.getValue()} returns {@code false}! Instead the semantics of
    * {@code grab} are those of {@code Parameter#isDefined()}.
-   * 
+   * <p>
    * This method will catch {@link ParameterException}s and store them to be
    * retrieved by {@link #getErrors}.
    * 
@@ -103,7 +102,7 @@ public interface Parameterization {
 
   /**
    * Descend parameterization tree into sub-option.
-   * 
+   * <p>
    * Note: this is done automatically by a
    * {@link ClassParameter#instantiateClass}.
    * You only need to call this when you want to expose the tree structure

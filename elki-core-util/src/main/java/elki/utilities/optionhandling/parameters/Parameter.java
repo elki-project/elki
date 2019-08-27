@@ -29,11 +29,10 @@ import elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Interface for the parameter of a class.
- * 
+ * <p>
  * A parameter is defined as an option having a specific value.
- * 
- * See the {@link elki.utilities.optionhandling} package for
- * documentation!
+ * <p>
+ * See the {@link elki.utilities.optionhandling} package for documentation!
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
@@ -120,20 +119,6 @@ public interface Parameter<T> {
   OptionID getOptionID();
 
   /**
-   * Returns the short description of the option.
-   *
-   * @return the option's short description.
-   */
-  String getShortDescription();
-
-  /**
-   * Sets the short description of the option.
-   *
-   * @param description the short description to be set
-   */
-  void setShortDescription(String description);
-
-  /**
    * Sets the value of the option.
    *
    * @param obj the option's value to be set
@@ -144,7 +129,7 @@ public interface Parameter<T> {
 
   /**
    * Returns the value of the option.
-   *
+   * <p>
    * You should use either
    * {@link elki.utilities.optionhandling.parameterization.Parameterization#grab}
    * or {@link #isDefined} to test if getValue() will return a well-defined

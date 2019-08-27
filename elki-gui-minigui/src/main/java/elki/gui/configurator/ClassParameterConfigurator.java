@@ -95,7 +95,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   public ClassParameterConfigurator(ClassParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
-    textfield.setToolTipText(param.getShortDescription());
+    textfield.setToolTipText(param.getOptionID().getDescription());
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());
     }
@@ -113,7 +113,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
     else {
       button = new BasicArrowButton(BasicArrowButton.SOUTH);
     }
-    button.setToolTipText(param.getShortDescription());
+    button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
 
     TreeNode root = ClassTree.build(cp.getKnownImplementations(), cp.getRestrictionClass().getPackage().getName());

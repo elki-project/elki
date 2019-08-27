@@ -52,7 +52,7 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
       value = new JComboBox<>();
-      value.setToolTipText(param.getShortDescription());
+      value.setToolTipText(param.getOptionID().getDescription());
       value.setPrototypeDisplayValue(cp.getPossibleValues().iterator().next());
       parent.add(value, constraints);
       finishGridRow();

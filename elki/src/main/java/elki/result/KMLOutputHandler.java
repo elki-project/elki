@@ -669,8 +669,8 @@ public class KMLOutputHandler implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter outputP = new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
-      outputP.setShortDescription("Filename the KMZ file (compressed KML) is written to.");
+      final OptionID opt = new OptionID(OutputStep.Parameterizer.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
+      FileParameter outputP = new FileParameter(opt, FileParameter.FileType.OUTPUT_FILE);
       if(config.grab(outputP)) {
         filename = outputP.getValue();
       }

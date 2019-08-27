@@ -77,7 +77,7 @@ public final class OptionUtil {
    */
   public static String getFullDescription(Parameter<?> param) {
     StringBuilder description = new StringBuilder(1000) //
-        .append(param.getShortDescription()).append(FormatUtil.NEWLINE);
+        .append(param.getOptionID().getDescription()).append(FormatUtil.NEWLINE);
     param.describeValues(description);
     if(!FormatUtil.endsWith(description, FormatUtil.NEWLINE)) {
       description.append(FormatUtil.NEWLINE);

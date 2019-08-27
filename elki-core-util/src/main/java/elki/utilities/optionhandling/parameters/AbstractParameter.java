@@ -33,11 +33,10 @@ import elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Abstract class for specifying a parameter.
- * 
+ * <p>
  * A parameter is defined as an option having a specific value.
- * 
- * See the {@link elki.utilities.optionhandling} package for
- * documentation!
+ * <p>
+ * See the {@link elki.utilities.optionhandling} package for documentation!
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
@@ -51,13 +50,17 @@ import elki.utilities.optionhandling.constraints.ParameterConstraint;
  */
 public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>, T> implements Parameter<T> {
   /**
+   * The option name.
+   */
+  protected final OptionID optionid;
+
+  /**
    * The default value of the parameter (may be null).
    */
   protected T defaultValue = null;
 
   /**
-   * Specifies if the default value of this parameter was taken as parameter
-   * value.
+   * Whether the default value of this parameter was used.
    */
   private boolean defaultValueTaken = false;
 
@@ -70,16 +73,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
    * Holds parameter constraints for this parameter.
    */
   protected List<ParameterConstraint<? super T>> constraints;
-
-  /**
-   * The option name.
-   */
-  protected final OptionID optionid;
-
-  /**
-   * The short description of the option.
-   */
-  protected String shortDescription;
 
   /**
    * The value last passed to this option.
@@ -100,7 +93,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
    */
   public AbstractParameter(OptionID optionID, T defaultValue) {
     this.optionid = optionID;
-    this.shortDescription = optionID.getDescription();
     this.optionalParameter = true;
     this.defaultValue = defaultValue;
   }
@@ -112,7 +104,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
    */
   public AbstractParameter(OptionID optionID) {
     this.optionid = optionID;
-    this.shortDescription = optionID.getDescription();
     this.optionalParameter = false;
     this.defaultValue = null;
   }
@@ -197,16 +188,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   @Override
   public OptionID getOptionID() {
     return optionid;
-  }
-
-  @Override
-  public String getShortDescription() {
-    return shortDescription;
-  }
-
-  @Override
-  public void setShortDescription(String description) {
-    this.shortDescription = description;
   }
 
   @Override
