@@ -128,8 +128,6 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * Adapter for generating number vectors without reboxing.
    *
    * @author Erich Schubert
-   *
-   * @param <V> Vector type
    */
   private class ProjectedNumberFeatureVectorAdapter implements NumberArrayAdapter<Double, NumberVector> {
     @Override
