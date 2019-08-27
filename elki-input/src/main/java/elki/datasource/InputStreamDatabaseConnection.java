@@ -113,6 +113,12 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
       Duration duration = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".load").begin() : null;
       MultipleObjectsBundle objects = invokeStreamFilters(streamParser).asMultipleObjectsBundle();
       parser.cleanup();
+      try {
+        close();
+      }
+      catch(IOException e) {
+        throw new RuntimeException(e);
+      }
       if(duration != null) {
         LOG.statistics(duration.end());
       }
@@ -124,6 +130,12 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
       ins = ins != null ? ins : in.get();
       MultipleObjectsBundle parsingResult = parser.parse(ins);
       parser.cleanup();
+      try {
+        close();
+      }
+      catch(IOException e) {
+        throw new RuntimeException(e);
+      }
       if(duration != null) {
         LOG.statistics(duration.end());
       }
