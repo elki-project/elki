@@ -54,7 +54,7 @@ public final class LoggingConfiguration {
   /**
    * Top level ELKI package (for setting 'verbose')
    */
-  private static final String TOPLEVEL_PACKAGE = "elki";
+  public static final String TOPLEVEL_PACKAGE = "elki";
 
   /**
    * Top level logger.

@@ -21,6 +21,7 @@
 package elki.application;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -31,12 +32,7 @@ import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.AbstractParameterizer;
-import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.OptionUtil;
-import elki.utilities.optionhandling.ParameterException;
-import elki.utilities.optionhandling.UnspecifiedParameterException;
-import elki.utilities.optionhandling.WrongParameterValueException;
+import elki.utilities.optionhandling.*;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -139,12 +135,7 @@ public abstract class AbstractApplication {
         System.exit(1);
       }
       // Parse debug parameter
-      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
-      params.grab(debugP);
-      if(debugP.isDefined()) {
-        Parameterizer.parseDebugParameter(debugP);
-      }
-      // Fail silently on errors.
+      Parameterizer.applyLoggingLevels(Parameterizer.parseDebugParameter(params));
       if(params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
         System.exit(1);
@@ -156,12 +147,7 @@ public abstract class AbstractApplication {
     }
     try {
       TrackParameters config = new TrackParameters(params);
-      Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
-      if(config.grab(verboseF) && verboseF.isTrue()) {
-        // Extra verbosity by repeating the flag:
-        Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
-        LoggingConfiguration.setVerbose((config.grab(verbose2F) && verbose2F.isTrue()) ? Level.VERYVERBOSE : Level.VERBOSE);
-      }
+      LoggingConfiguration.setVerbose(Parameterizer.parseVerbose(config));
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
       if((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
@@ -289,12 +275,94 @@ public abstract class AbstractApplication {
     /**
      * Optional Parameter to specify a class to enable debugging for.
      */
-    public static final OptionID DEBUG_ID = new OptionID("enableDebug", "Parameter to enable debugging for particular packages.");
+    public static final OptionID DEBUG_ID = new OptionID("debug", "Parameter to enable debugging for particular packages.");
 
     /**
      * Flag to allow verbose messages while running the application.
      */
     public static final OptionID VERBOSE_ID = new OptionID("verbose", "Enable verbose messages.");
+
+    /**
+     * Parse the standard <tt>-verbose</tt> options.
+     *
+     * @param config Parameterization
+     */
+    public static java.util.logging.Level parseVerbose(Parameterization config) {
+      Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
+      if(config.grab(verboseF) && verboseF.isTrue()) {
+        // Extra verbosity by repeating the flag:
+        Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
+        return (config.grab(verbose2F) && verbose2F.isTrue()) ? Level.VERYVERBOSE : Level.VERBOSE;
+      }
+      return Level.WARNING;
+    }
+
+    /**
+     * Parse the standard <tt>-debug</tt> parameter.
+     *
+     * @param config Parameterization
+     * @return Levels to set, or {@code null}
+     */
+    public static String[][] parseDebugParameter(Parameterization config) {
+      StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID).setOptional(true);
+      if(!config.grab(debugP) && !debugP.isDefined()) {
+        return null;
+      }
+      String[] opts = debugP.getValue().split(",");
+      String[][] levels = new String[opts.length][];
+      int i = 0;
+      for(String opt : opts) {
+        try {
+          String[] chunks = opt.split("=");
+          if(chunks.length != 1 && chunks.length != 2) {
+            config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "More than one '=' in debug parameter."));
+            continue;
+          }
+          if(chunks.length == 1) {
+            try {
+              Level.parse(chunks[0]);
+              chunks = new String[] { LoggingConfiguration.TOPLEVEL_PACKAGE, chunks[0] };
+            }
+            catch(IllegalArgumentException e) {
+              chunks = new String[] { chunks[0], Level.FINEST.getName() };
+            }
+          }
+          else {
+            try {
+              Level.parse(chunks[1]);
+            }
+            catch(IllegalArgumentException e) {
+              config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "Unkown logging level: " + chunks[1]));
+              continue;
+            }
+          }
+          levels[i++] = chunks;
+        }
+        catch(IllegalArgumentException e) {
+          config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "Could not process value.", e));
+        }
+      }
+      return levels.length == i ? levels : Arrays.copyOf(levels, i);
+    }
+
+    /**
+     * Apply the logging levels.
+     *
+     * @param levels Logging levels, may be null.
+     */
+    public static void applyLoggingLevels(String[][] levels) {
+      if(levels == null) {
+        return;
+      }
+      for(String[] pair : levels) {
+        try {
+          LoggingConfiguration.setLevelFor(pair[0], pair[1]);
+        }
+        catch(IllegalArgumentException e) {
+          LOG.warning("Invalid logging statement for package " + pair[0] + ": " + e.getMessage());
+        }
+      }
+    }
 
     /**
      * Get the output file parameter.
@@ -338,39 +406,6 @@ public abstract class AbstractApplication {
     protected File getParameterInputFile(Parameterization config, String description) {
       FileParameter inputP = new FileParameter(new OptionID(INPUT_ID.getName(), description), FileParameter.FileType.INPUT_FILE);
       return config.grab(inputP) ? inputP.getValue() : null;
-    }
-
-    /**
-     * Parse the option string to configure logging.
-     *
-     * @param param Parameter to process.
-     * @throws WrongParameterValueException On parsing errors
-     */
-    public static final void parseDebugParameter(StringParameter param) throws WrongParameterValueException {
-      String[] opts = param.getValue().split(",");
-      for(String opt : opts) {
-        try {
-          String[] chunks = opt.split("=");
-          if(chunks.length == 1) {
-            try {
-              java.util.logging.Level level = Level.parse(chunks[0]);
-              LoggingConfiguration.setDefaultLevel(level);
-            }
-            catch(IllegalArgumentException e) {
-              LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
-            }
-          }
-          else if(chunks.length == 2) {
-            LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
-          }
-          else {
-            throw new WrongParameterValueException(param, param.getValue(), "More than one '=' in debug parameter.");
-          }
-        }
-        catch(IllegalArgumentException e) {
-          throw (new WrongParameterValueException(param, param.getValue(), "Could not process value.", e));
-        }
-      }
     }
 
     @Override

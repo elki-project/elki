@@ -21,12 +21,8 @@
 package elki.gui.multistep.panels;
 
 import elki.application.AbstractApplication;
-import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
-import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Panel to handle logging
@@ -49,21 +45,8 @@ public class LoggingTabPanel extends ParameterTabPanel {
 
   @Override
   protected synchronized void configureStep(Parameterization config) {
-    StringParameter debugParam = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID) //
-        .setOptional(true);
-    Flag verboseFlag = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
-    // Verbose mode is a lot simpler
-    if (config.grab(verboseFlag) && verboseFlag.isTrue()) {
-      LoggingConfiguration.setVerbose(Level.VERBOSE);
-    }
-    // FIXME: add second level of verbosity!
-    if (config.grab(debugParam)) {
-      try {
-        AbstractApplication.Parameterizer.parseDebugParameter(debugParam);
-      } catch (WrongParameterValueException e) {
-       elki.logging.LoggingUtil.exception(e);
-      }
-    }
+    LoggingConfiguration.setVerbose(AbstractApplication.Parameterizer.parseVerbose(config));
+    AbstractApplication.Parameterizer.applyLoggingLevels(AbstractApplication.Parameterizer.parseDebugParameter(config));
   }
 
   @Override

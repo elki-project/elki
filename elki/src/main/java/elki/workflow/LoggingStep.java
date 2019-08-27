@@ -21,15 +21,10 @@
 package elki.workflow;
 
 import elki.application.AbstractApplication;
-import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.AbstractParameterizer;
-import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Pseudo-step to configure logging / verbose mode.
@@ -41,47 +36,15 @@ import elki.utilities.optionhandling.parameters.StringParameter;
  */
 public class LoggingStep implements WorkflowStep {
   /**
-   * Logger
-   */
-  private static final Logging LOG = Logging.getLogger(LoggingStep.class);
-
-  /**
    * Constructor.
    * 
    * @param verbose Verbose flag
    * @param levels Level settings array
    */
-  public LoggingStep(int verbose, String[][] levels) {
+  public LoggingStep(java.util.logging.Level verbose, String[][] levels) {
     super();
-    if (verbose <= 0) {
-      LoggingConfiguration.setVerbose(Level.WARNING);
-    } else if (verbose == 1) {
-      LoggingConfiguration.setVerbose(Level.VERBOSE);
-    } else {
-      // Extra verbosity - do not call with "false" to not undo!
-      LoggingConfiguration.setVerbose(Level.VERYVERBOSE);
-    }
-    if (levels != null) {
-      for (String[] pair : levels) {
-        try {
-          if (pair.length == 1) {
-            // Try to parse as level:
-            try {
-              java.util.logging.Level level = Level.parse(pair[0]);
-              LoggingConfiguration.setDefaultLevel(level);
-            } catch (IllegalArgumentException e) {
-              LoggingConfiguration.setLevelFor(pair[0], Level.FINEST.getName());
-            }
-          } else if (pair.length == 2) {
-            LoggingConfiguration.setLevelFor(pair[0], pair[1]);
-          } else {
-            throw new AbortException("Invalid logging settings");
-          }
-        } catch (IllegalArgumentException e) {
-          LOG.warning("Invalid logging statement for package " + pair[0] + ": " + e.getMessage());
-        }
-      }
-    }
+    LoggingConfiguration.setVerbose(verbose);
+    AbstractApplication.Parameterizer.applyLoggingLevels(levels);
   }
 
   /**
@@ -93,7 +56,7 @@ public class LoggingStep implements WorkflowStep {
     /**
      * Verbose mode.
      */
-    protected int verbose = 0;
+    protected java.util.logging.Level verbose = Level.WARNING;
 
     /**
      * Enable logging levels manually
@@ -103,30 +66,8 @@ public class LoggingStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final Flag verboseF = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
-      if (config.grab(verboseF) && verboseF.isTrue()) {
-        verbose++;
-        final Flag verbose2F = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
-        if (config.grab(verbose2F) && verbose2F.isTrue()) {
-          verbose++;
-        }
-      }
-      final StringParameter debugP = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID) //
-          .setOptional(true);
-      if (config.grab(debugP)) {
-        String[] opts = debugP.getValue().split(",");
-        levels = new String[opts.length][];
-        int i = 0;
-        for (String opt : opts) {
-          String[] chunks = opt.split("=");
-          if (chunks.length != 1 && chunks.length != 2) {
-            config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "Invalid debug option."));
-            break;
-          }
-          levels[i] = chunks;
-          i++;
-        }
-      }
+      verbose = AbstractApplication.Parameterizer.parseVerbose(config);
+      levels = AbstractApplication.Parameterizer.parseDebugParameter(config);
     }
 
     @Override
