@@ -20,8 +20,6 @@
  */
 package elki.utilities.datastructures.arraylike;
 
-import java.util.List;
-
 import elki.data.FeatureVector;
 import elki.data.NumberVector;
 
@@ -37,16 +35,6 @@ import elki.data.NumberVector;
  * @composed - - - ArrayAdapter
  */
 public final class ArrayLikeUtil {
-  /**
-   * Static instance for lists.
-   */
-  private static final ListArrayAdapter<Object> LISTADAPTER = new ListArrayAdapter<>();
-
-  /**
-   * Static instance for lists of numbers.
-   */
-  private static final NumberListArrayAdapter<Number> NUMBERLISTADAPTER = new NumberListArrayAdapter<>();
-
   /**
    * Static instance.
    */
@@ -72,28 +60,6 @@ public final class ArrayLikeUtil {
    */
   private ArrayLikeUtil() {
     // Do not instantiate
-  }
-
-  /**
-   * Cast the static instance.
-   *
-   * @param dummy Dummy variable, for type inference
-   * @return Static instance
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> ArrayAdapter<T, List<? extends T>> listAdapter(List<? extends T> dummy) {
-    return (ListArrayAdapter<T>) LISTADAPTER;
-  }
-
-  /**
-   * Cast the static instance.
-   *
-   * @param dummy Dummy variable, for type inference
-   * @return Static instance
-   */
-  @SuppressWarnings("unchecked")
-  public static <T extends Number> NumberArrayAdapter<T, List<? extends T>> numberListAdapter(List<? extends T> dummy) {
-    return (NumberListArrayAdapter<T>) NUMBERLISTADAPTER;
   }
 
   /**
@@ -162,16 +128,6 @@ public final class ArrayLikeUtil {
   }
 
   /**
-   * Convert a list of numbers to <code>double[]</code>.
-   *
-   * @param array List of numbers
-   * @return double array
-   */
-  public static double[] toPrimitiveDoubleArray(List<? extends Number> array) {
-    return toPrimitiveDoubleArray(array, NUMBERLISTADAPTER);
-  }
-
-  /**
    * Convert a number vector to <code>double[]</code>.
    *
    * @param obj Object to convert
@@ -200,16 +156,6 @@ public final class ArrayLikeUtil {
   }
 
   /**
-   * Convert a list of numbers to <code>float[]</code>.
-   *
-   * @param array List of numbers
-   * @return float array
-   */
-  public static float[] toPrimitiveFloatArray(List<? extends Number> array) {
-    return toPrimitiveFloatArray(array, NUMBERLISTADAPTER);
-  }
-
-  /**
    * Convert a number vector to <code>float[]</code>.
    *
    * @param obj Object to convert
@@ -232,16 +178,6 @@ public final class ArrayLikeUtil {
       ret[i] = adapter.getInteger(array, i);
     }
     return ret;
-  }
-
-  /**
-   * Convert a list of numbers to <code>int[]</code>.
-   *
-   * @param array List of numbers
-   * @return double array
-   */
-  public static int[] toPrimitiveIntegerArray(List<? extends Number> array) {
-    return toPrimitiveIntegerArray(array, NUMBERLISTADAPTER);
   }
 
   /**
