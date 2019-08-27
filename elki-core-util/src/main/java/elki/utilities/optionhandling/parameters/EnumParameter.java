@@ -85,18 +85,6 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
    * default value.
    * 
    * @param optionID the unique id of the parameter
-   * @param optional Flag to signal an optional parameter.
-   */
-  public EnumParameter(OptionID optionID, Class<E> enumClass, boolean optional) {
-    super(optionID, optional);
-    this.enumClass = enumClass;
-  }
-
-  /**
-   * Constructs an enum parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass) {
     super(optionID);

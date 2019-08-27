@@ -35,16 +35,6 @@ import elki.utilities.optionhandling.WrongParameterValueException;
  */
 public class DoubleListParameter extends ListParameter<DoubleListParameter, double[]> {
   /**
-   * Constructs a list parameter with the given optionID and optional flag.
-   * 
-   * @param optionID Option ID
-   * @param optional Optional flag
-   */
-  public DoubleListParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
-  }
-
-  /**
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID Option ID

@@ -37,16 +37,6 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
    * Constructs an integer list parameter
    * 
    * @param optionID the unique id of this parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntListParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
    */
   public IntListParameter(OptionID optionID) {
     super(optionID);

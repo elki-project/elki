@@ -74,16 +74,6 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(ComputeSimilarityMatrixImage.class);
 
   /**
-   * OptionID for the scaling function to use
-   */
-  public static final OptionID SCALING_ID = new OptionID("simmatrix.scaling", "Class to use as scaling function.");
-
-  /**
-   * OptionID to skip zero values when plotting to increase contrast.
-   */
-  public static final OptionID SKIPZERO_ID = new OptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
-
-  /**
    * The distance function to use
    */
   private Distance<? super O> distanceFunction;
@@ -324,6 +314,16 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**
+     * OptionID for the scaling function to use
+     */
+    public static final OptionID SCALING_ID = new OptionID("simmatrix.scaling", "Class to use as scaling function.");
+
+    /**
+     * OptionID to skip zero values when plotting to increase contrast.
+     */
+    public static final OptionID SKIPZERO_ID = new OptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
+
+    /**
      * The distance function to use
      */
     private Distance<O> distanceFunction;
@@ -345,12 +345,11 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
-
       Flag skipzeroP = new Flag(SKIPZERO_ID);
       if(config.grab(skipzeroP)) {
         skipzero = skipzeroP.getValue();

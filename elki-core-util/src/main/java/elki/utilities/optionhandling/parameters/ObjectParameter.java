@@ -69,18 +69,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
   }
 
   /**
-   * Constructs a class parameter with the given optionID, restriction class,
-   * and optional flag.
-   * 
-   * @param optionID the unique id of the option
-   * @param restrictionClass the restriction class of this class parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public ObjectParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
-    super(optionID, restrictionClass, optional);
-  }
-
-  /**
    * Constructs a class parameter with the given optionID, and restriction
    * class.
    * 

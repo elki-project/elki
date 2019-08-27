@@ -44,16 +44,6 @@ public abstract class NumberParameter<THIS extends NumberParameter<THIS, T>, T e
   }
 
   /**
-   * Constructs a number parameter with the given optionID and optional flag.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public NumberParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
-  }
-
-  /**
    * Constructs a number parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter

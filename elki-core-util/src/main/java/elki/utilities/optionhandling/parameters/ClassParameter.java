@@ -81,16 +81,15 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   }
 
   /**
-   * Constructs a class parameter with the given optionID, restriction class,
-   * and optional flag.
+   * Constructs a class parameter with the given optionID, and restriction
+   * class.
    *
    * @param optionID the unique id of the option
    * @param restrictionClass the restriction class of this class parameter
-   * @param optional specifies if this parameter is an optional parameter
    */
   @SuppressWarnings("unchecked")
-  public ClassParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
-    super(optionID, optional);
+  public ClassParameter(OptionID optionID, Class<?> restrictionClass) {
+    super(optionID);
     // It would be nice to be able to use Class<C> here, but this won't work
     // with nested Generics:
     // * ClassParameter<Foo<Bar>>(optionID, Foo.class) doesn't satisfy Class<C>
@@ -101,17 +100,6 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     if(restrictionClass == null) {
       LOG.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
-  }
-
-  /**
-   * Constructs a class parameter with the given optionID, and restriction
-   * class.
-   *
-   * @param optionID the unique id of the option
-   * @param restrictionClass the restriction class of this class parameter
-   */
-  public ClassParameter(OptionID optionID, Class<?> restrictionClass) {
-    this(optionID, restrictionClass, false);
   }
 
   @SuppressWarnings("unchecked")

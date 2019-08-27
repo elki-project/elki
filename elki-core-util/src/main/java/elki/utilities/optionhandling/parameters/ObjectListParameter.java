@@ -48,17 +48,6 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   private List<C> instances = null;
 
   /**
-   * Constructor with optional flag.
-   * 
-   * @param optionID Option ID
-   * @param restrictionClass Restriction class
-   * @param optional optional flag
-   */
-  public ObjectListParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
-    super(optionID, restrictionClass, optional);
-  }
-
-  /**
    * Constructor for non-optional.
    * 
    * @param optionID Option ID
@@ -115,6 +104,13 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
       // Continue
     }
     return super.parseValue(obj);
+  }
+
+  // Override the return type
+  @Override
+  public ObjectListParameter<C> setOptional(boolean opt) {
+    super.setOptional(opt);
+    return this;
   }
 
   @Override

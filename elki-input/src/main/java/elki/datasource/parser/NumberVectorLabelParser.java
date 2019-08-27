@@ -412,8 +412,8 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
      * @param config Parameterization
      */
     protected void getLabelIndices(Parameterization config) {
-      IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
-
+      IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID) //
+          .setOptional(true);
       if(config.grab(labelIndicesP)) {
         labelIndices = labelIndicesP.getValueAsBitSet();
       }

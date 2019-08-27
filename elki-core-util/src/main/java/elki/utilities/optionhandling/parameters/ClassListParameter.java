@@ -57,20 +57,6 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    *
    * @param optionID the unique id of this parameter
    * @param restrictionClass the restriction class of the list of class names
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  @SuppressWarnings("unchecked")
-  public ClassListParameter(OptionID optionID, Class<?> restrictionClass, boolean optional) {
-    super(optionID, optional);
-    this.restrictionClass = (Class<C>) restrictionClass;
-  }
-
-  /**
-   * Constructs a class list parameter with the given optionID and restriction
-   * class.
-   *
-   * @param optionID the unique id of this parameter
-   * @param restrictionClass the restriction class of the list of class names
    */
   @SuppressWarnings("unchecked")
   public ClassListParameter(OptionID optionID, Class<?> restrictionClass) {

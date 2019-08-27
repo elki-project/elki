@@ -515,7 +515,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
         }
 
         // parameter epsilon
-        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true) //
+        final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID) //
             .setDefaultValue(new double[] { DEFAULT_EPSILON }) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE_LIST);
         if(config.grab(epsilonP)) {

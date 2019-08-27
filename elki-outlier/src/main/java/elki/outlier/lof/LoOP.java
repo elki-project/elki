@@ -389,7 +389,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kcompP = new IntParameter(KCOMP_ID) //
+      IntParameter kcompP = new IntParameter(KCOMP_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kcompP)) {
         kcomp = kcompP.intValue();
@@ -400,17 +400,13 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         comparisonDistance = compDistP.instantiateClass(config);
       }
 
-      final IntParameter kreachP = new IntParameter(KREACH_ID) //
+      IntParameter kreachP = new IntParameter(KREACH_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .setOptional(true);
-      if(config.grab(kreachP)) {
-        kreach = kreachP.intValue();
-      }
-      else {
-        kreach = kcomp;
-      }
+      kreach = config.grab(kreachP) ? kreachP.intValue() : kcomp;
 
-      final ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class, true);
+      ObjectParameter<Distance<O>> reachDistP = new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
+          .setOptional(true);
       if(config.grab(reachDistP)) {
         reachabilityDistance = reachDistP.instantiateClass(config);
       }

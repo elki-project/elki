@@ -106,26 +106,15 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   }
 
   /**
-   * Constructs a parameter with the given optionID, constraints, and optional
-   * flag.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public AbstractParameter(OptionID optionID, boolean optional) {
-    this.optionid = optionID;
-    this.shortDescription = optionID.getDescription();
-    this.optionalParameter = optional;
-    this.defaultValue = null;
-  }
-
-  /**
    * Constructs a parameter with the given optionID, and constraints.
    * 
    * @param optionID the unique id of this parameter
    */
   public AbstractParameter(OptionID optionID) {
-    this(optionID, false);
+    this.optionid = optionID;
+    this.shortDescription = optionID.getDescription();
+    this.optionalParameter = false;
+    this.defaultValue = null;
   }
 
   @SuppressWarnings("unchecked")

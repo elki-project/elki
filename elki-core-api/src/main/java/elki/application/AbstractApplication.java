@@ -130,7 +130,8 @@ public abstract class AbstractApplication {
     Flag helpLongF = new Flag(Parameterizer.HELP_LONG_ID);
     params.grab(helpLongF);
     try {
-      ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class, true);
+      ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class) //
+          .setOptional(true);
       params.grab(descriptionP);
       if(descriptionP.isDefined()) {
         params.clearErrors();

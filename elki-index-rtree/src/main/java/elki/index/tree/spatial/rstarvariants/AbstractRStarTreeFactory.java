@@ -152,7 +152,8 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
      * @param config Parameterization
      */
     protected void configBulkLoad(Parameterization config) {
-      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<>(BULK_SPLIT_ID, BulkSplit.class, true);
+      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class) //
+          .setOptional(true);
       if(config.grab(bulkSplitP)) {
         settings.bulkSplitter = bulkSplitP.instantiateClass(config);
       }

@@ -66,16 +66,6 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
   }
 
   /**
-   * Constructs a list parameter with the given optionID and optional flag.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param optional Optional flag
-   */
-  public ListParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
-  }
-
-  /**
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID the unique id of this parameter

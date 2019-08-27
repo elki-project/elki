@@ -60,17 +60,6 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
     super(optionID, defaultValue != null ? defaultValue : RandomFactory.DEFAULT);
   }
 
-  /**
-   * Constructor with default seed value.
-   * 
-   * @param optionID Option ID
-   * @param seed Default seed.
-   */
-  public RandomParameter(OptionID optionID, long seed) {
-    super(optionID, true);
-    this.seed = Long.valueOf(seed);
-  }
-
   @Override
   public String getSyntax() {
     return "<long>";

@@ -69,19 +69,6 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
     this.fileType = fileType;
   }
 
-  /**
-   * Constructs a file parameter with the given optionID, file type, and
-   * optional flag.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param fileType the file type of this file parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public FileParameter(OptionID optionID, FileType fileType, boolean optional) {
-    this(optionID, fileType);
-    setOptional(optional);
-  }
-
   @Override
   public String getValueAsString() {
     try {

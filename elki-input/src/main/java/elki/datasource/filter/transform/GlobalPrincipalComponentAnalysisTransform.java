@@ -231,7 +231,8 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(FILTER_ID, EigenPairFilter.class, true);
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class) //
+          .setOptional(true);
       if(config.grab(filterP)) {
         filter = filterP.instantiateClass(config);
       }

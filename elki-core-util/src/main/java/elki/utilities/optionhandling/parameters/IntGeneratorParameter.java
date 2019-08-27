@@ -38,16 +38,6 @@ public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParamet
    * Constructs an integer list parameter
    * 
    * @param optionID the unique id of this parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntGeneratorParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
    */
   public IntGeneratorParameter(OptionID optionID) {
     super(optionID);

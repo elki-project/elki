@@ -57,18 +57,6 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
    *
    * @param optionID Option ID
    * @param constraint Constraint
-   * @param optional Optional flag
-   */
-  public DoubleArrayListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a vector list parameter with the given name and description.
-   *
-   * @param optionID Option ID
-   * @param constraint Constraint
    */
   public DoubleArrayListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint) {
     super(optionID);
@@ -83,16 +71,6 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
    */
   public DoubleArrayListParameter(OptionID optionID, List<double[]> defaultValue) {
     super(optionID, defaultValue);
-  }
-
-  /**
-   * Constructs a vector list parameter with the given name and description.
-   *
-   * @param optionID Option ID
-   * @param optional Optional flag
-   */
-  public DoubleArrayListParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
   }
 
   /**

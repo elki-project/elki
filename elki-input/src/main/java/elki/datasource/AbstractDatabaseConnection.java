@@ -156,7 +156,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
      * @param config Parameterization
      */
     protected void configFilters(Parameterization config) {
-      final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<>(FILTERS_ID, ObjectFilter.class, true);
+      ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class).setOptional(true);
       if(config.grab(filterParam)) {
         filters = filterParam.instantiateClasses(config);
       }
