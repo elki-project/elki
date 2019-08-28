@@ -579,44 +579,40 @@ public class MiniGUI extends AbstractApplication {
    * Do a full run of the KDDTask with the specified parameters.
    */
   protected void startTask() {
+    runButton.setEnabled(false);
     parameterTable.editCellAt(-1, -1);
     parameterTable.setEnabled(false);
     final ArrayList<String> params = new ArrayList<>(parameters.size() * 2);
     parameters.serializeParameters(params);
     parameterTable.setEnabled(true);
 
-    runButton.setEnabled(false);
-
     outputArea.clear();
-    SwingWorker<Void, Void> r = new SwingWorker<Void, Void>() {
+    System.gc();
+
+    SerializedParameterization config = new SerializedParameterization(params);
+    config.tryInstantiate(LoggingStep.class);
+    AbstractApplication task = config.tryInstantiate(maincls);
+    config.logUnusedParameters();
+    if(!config.getErrors().isEmpty()) {
+      reportErrors(config);
+      runButton.setEnabled(true);
+      return;
+    }
+    new Thread("ELKI Worker") {
       @Override
-      public Void doInBackground() {
-        SerializedParameterization config = new SerializedParameterization(params);
-        config.tryInstantiate(LoggingStep.class);
-        AbstractApplication task = config.tryInstantiate(maincls);
+      public void run() {
         try {
-          config.logUnusedParameters();
-          if(config.getErrors().size() == 0) {
-            task.run();
-          }
-          else {
-            reportErrors(config);
-          }
+          task.run();
           LOG.debug("Task completed successfully.");
         }
         catch(Throwable e) {
           LOG.exception("Task failed", e);
         }
-        return null;
+        SwingUtilities.invokeLater(() -> {
+          runButton.setEnabled(true);
+        });
       }
-
-      @Override
-      protected void done() {
-        super.done();
-        runButton.setEnabled(true);
-      }
-    };
-    r.execute();
+    }.start();
   }
 
   /**

@@ -105,6 +105,7 @@ public class EvaluationStep implements WorkflowStep {
         Thread.currentThread().setName(evaluator.toString());
         evaluator.processNewResult(r);
       }
+      Thread.currentThread().setName("EvaluationStep finished.");
     }
 
     @Override

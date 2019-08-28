@@ -114,6 +114,7 @@ public class AlgorithmStep implements WorkflowStep {
         Metadata.hierarchyOf(database).addChild(res);
       }
     }
+    Thread.currentThread().setName("AlgorithmStep finished.");
     return stepresult;
   }
 

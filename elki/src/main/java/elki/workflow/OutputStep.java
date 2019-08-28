@@ -67,6 +67,7 @@ public class OutputStep implements WorkflowStep {
       Thread.currentThread().setName(resulthandler.toString());
       resulthandler.processNewResult(db);
     }
+    Thread.currentThread().setName("OutputStep finished.");
   }
 
   /**
