@@ -17,11 +17,12 @@ import static de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistributio
 import de.lmu.ifi.dbs.elki.utils.containers.MwpIndex;
 
 /**
- * Implementation of bivariate Monte Carlo Density Estimation using MWP statistical test as described in paper with the
- * only exception that an additional parameter beta is introduced (see comment below).
+ * Implementation of bivariate Monte Carlo Density Estimation using Mann-Withney U test, known as MWP. See
+ * Edouard Fouché & Klemens Böhm<br>
+ * Monte Carlo Density Estimation<br>
+ * Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)
  *
- * This class extends MCDEDependenceMeasure and implements the Mann-Whitney-U statistical test (as well as p-value computation from the test statistic)
- * and an appropriate index structure.
+ * This class extends MCDEDependenceMeasure and implements the Mann-Whitney-U statistical test and an appropriate index structure.
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
@@ -29,23 +30,27 @@ import de.lmu.ifi.dbs.elki.utils.containers.MwpIndex;
 
 @Reference(authors = "Edouard Fouché, Klemens Böhm", //
         title = "Monte Carlo Density Estimation", //
-        booktitle = "Proceedings of the 31st International Conference on Scientific and Statistical Database Management (SSDBM 2019)",
-        url = "http://doi.acm.org/10.1145/3335783.3335795", //
-        bibkey = "DBLP:conf/ssdbm/FouchéB19")
+        booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)",
+        url = "https://doi.org/10.1145/3335783.3335795", //
+        bibkey = "DBLP:conf/ssdbm/FoucheB19")
 
 public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
 
     /**
      * Constructor
+     *
+     * @param m Monte-Carlo iterations
+     * @param alpha Expected share of instances in slice (under independence)
+     * @param beta Share of instances in marginal restriction (reference dimension)
+     * @param rnd Random source
      */
-
     public McdeMwpDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd){
         super(m, alpha, beta, rnd);
     }
 
     /**
-     * Computes Corrected Rank Index as described in Algorithm 1 of source paper, adjusted for bivariate ELKI interface.
-     * Notation as ELKI convention if applicable, else as in paper.
+     * Computes Corrected Rank Index as described in Algorithm 1 of reference paper.
+     * The notation follows ELKI convention if applicable, else we use the notation from the reference paper.
      *
      * @param adapter ELKI NumberArrayAdapter Subclass
      * @param data One dimensional array containing one dimension of the data
@@ -57,7 +62,6 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      * double l = corrected_rank[0]; double adjusted_rank = corrected_rank[1]; double correction = corrected_rank[2];
      * // correspond to one instance of the original data
      */
-
     protected <A> MwpIndex[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
         MwpIndex[] I = (MwpIndex[]) Array.newInstance(MwpIndex.class, len);
@@ -89,15 +93,15 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
 
     /**
      * Efficient implementation of MWP statistical test using appropriate index structure as described in Algorithm 3
-     * of source paper.
+     * of reference paper.
+     *
      * @param len No of data instances
      * @param slice Return value of randomSlice() created with the index that is not for the reference dimension
      * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
      * @return p-value from two sided Mann-Whitney-U test
      */
-
     protected double statistical_test(int len, boolean[] slice, MwpIndex[] corrected_ranks){
-        final Random random = rnd.getSingleThreadedRandom();
+        final Random random = rnd.getSingleThreadedRandom(); // Note: No "safecut".
         final int start = random.nextInt((int) (len * (1 - this.beta)));
         final int end = start + (int) Math.ceil(len * this.beta);
 
@@ -110,17 +114,19 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
             }
         }
 
-        R -= start * n1; // TODO: Potential for Error
+        // This is to cancel the offset in case the marginal restriction does not start from 0
+        // see "acc - (cutStart * count)" is reference implementation of MWP
+        R -= start * n1;
 
         final int cutLength = end - start;
         if((n1 == 0) || (n1 == cutLength)) return 1;
 
-        final double U = R - ((double)(n1 * (n1 - 1))) / 2; // TODO: Potential for Error
+        final double U = R - ((double)(n1 * (n1 - 1))) / 2;
         final long n2 = cutLength - n1;
 
         final long two_times_sqrt_max_long = 6074000999L;
         if(n1 + n2 > two_times_sqrt_max_long)
-            throw new AbortException("Long type overflowed. Dataset has to many dataobjects. Please subsample and try again with smaller dataset.");
+            throw new AbortException("Long type overflowed. Too many objects: Please subsample and try again with smaller data set.");
 
         final double b_end = corrected_ranks[(end-1)].correction;
         final double b_start = start == 0 ? 0 : corrected_ranks[(start-1)].correction;
@@ -131,7 +137,8 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
         else{
             final double mean = ((double) (n1 * n2)) / 2;
             final double Z = Math.abs((U - mean) / std);
-            return erf(Z / Math.sqrt(2)); // TODO: Potential for Error
+            return erf(Z / Math.sqrt(2)); // Note that this is equivalent to do 1-2*(1-cdf(Z,0,1));
+            // erf(Z / Math.sqrt(2)) is the cdf of the half-normal distribution
         }
     }
 
@@ -141,57 +148,48 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      * @author Alan Mazankiewicz
      * @author Edouard Fouché
      */
-
     public static class Parameterizer extends AbstractParameterizer {
 
         /**
          * Parameter that specifies the number of iterations in the Monte-Carlo
          * process of identifying high contrast subspaces.
          */
-
         public static final OptionID M_ID = new OptionID("McdeMwp.m", "No. of Monte-Carlo iterations.");
 
         /**
          * Parameter that specifies the size of the slice
          */
-
         public static final OptionID ALPHA_ID = new OptionID("McdeMwp.alpha", "Expected share of instances in slice (independent dimensions).");
 
         /**
          * Parameter that specifies the size of the marginal restriction. Note that in the original paper
          * alpha = beta and as such there is no explicit distinction between the parameters.
          */
-
         public static final OptionID BETA_ID = new OptionID("McdeMwp.beta", "Expected share of instances in marginal restriction (dependent dimensions).");
 
         /**
          * Parameter that specifies the random seed.
          */
-
         public static final OptionID SEED_ID = new OptionID("McdeMwp.seed", "The random seed.");
 
         /**
          * Holds the value of {@link #M_ID}.
          */
-
         protected int m = 50;
 
         /**
          * Holds the value of {@link #ALPHA_ID}.
          */
-
         protected double alpha = 0.5;
 
         /**
          * Holds the value of {@link #BETA_ID}.
          */
-
         protected double beta = 0.5;
 
         /**
          * Random generator.
          */
-
         protected RandomFactory rnd;
 
         @Override
