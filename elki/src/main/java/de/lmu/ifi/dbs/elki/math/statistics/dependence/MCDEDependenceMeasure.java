@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-// TODO: Write tests
-
 /**
  * Implementation of bivariate Monte Carlo Density Estimation as described in
  * Edouard Fouché & Klemens Böhm<br>
@@ -94,11 +92,11 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
     protected abstract <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
 
     /**
-     * Subclass must implement the computation the statistical test, based on the slicing scheme.
+     * Subclass must implement the computation of the statistical test, based on the slicing scheme.
      *
      * @param len No of data instances
      * @param slice An array of boolean resulting from a random slice
-     * @param corrected_ranks the precomputed index structure
+     * @param corrected_ranks the precomputed index structure for the reference dimension
      * @return a 1 - p-value
      */
     protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
@@ -129,17 +127,6 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
 
         return slice;
     }
-
-
-    /**
-     * Subclass should implement statistical test returning a p-value
-     *
-     * @param len No of data instances
-     * @param slice Return value of randomSlice(), boolean array indicating which instance is in the slice (by index)
-     * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
-     * @return p-value of given statistical test
-     */
-    protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
 
     /**
      * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
