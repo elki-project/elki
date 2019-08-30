@@ -30,9 +30,10 @@ import java.util.Random;
 
 @Reference(authors = "Edouard Fouché, Klemens Böhm", //
         title = "Monte Carlo Density Estimation", //
-        booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)", // TODO: Check
+        booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)",
         url = "https://doi.org/10.1145/3335783.3335795", //
         bibkey = "DBLP:conf/ssdbm/FoucheB19")
+
 
 public abstract class MCDEDependenceMeasure<R extends RankStruct> extends AbstractDependenceMeasure {
     /**
@@ -41,13 +42,13 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
     protected int m = 50;
 
     /**
-     * Expected share of instances in slice (under independence).
+     * Expected share of instances in slice (independent dimensions).
      */
     protected double alpha = 0.5;
 
     /**
      * Share of instances in marginal restriction (reference dimension).
-     * Note that in the original paper alpha = beta and there is no explicit distinction between the parameters.
+     * Note that in the original paper alpha = beta and as such there is no explicit distinction between the parameters.
      */
     protected double beta = 0.5;
 
@@ -78,7 +79,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
     /**
      * Overloaded wrapper for corrected_ranks()
      */
-    protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) { // TODO: could also be hiding ranks() but problem with static... %EF: I don't understand
+    protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
         return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
     }
 
@@ -88,7 +89,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * @param adapter ELKI NumberArrayAdapter Subclass
      * @param data One dimensional array containing one dimension of the data
      * @param idx Return value of sortedIndex()
-     * @return Array of doubles, acting as rank index
+     * @return Array of RankStruct, acting as rank index
      */
     protected abstract <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
 
@@ -106,7 +107,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
      * Data Slicing
      *
      * @param len No of data instances
-     * @param nonRefIndex Index (see correctedRank()) for the dimension that is not the reference dimension
+     * @param nonRefIndex Index (see correctedRank()) computed for the dimension that is not the reference dimension
      * @return Array of booleans that states which instances are part of the slice
      */
     protected boolean[] randomSlice(int len, R[] nonRefIndex){
@@ -129,9 +130,20 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
         return slice;
     }
 
+
     /**
-     * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in reference paper.
-     * Note: Data may not contain NaN values. //TODO: What does this mean? If that is the case, then you must handle this with an exception, see HiCSDependenceMeasure
+     * Subclass should implement statistical test returning a p-value
+     *
+     * @param len No of data instances
+     * @param slice Return value of randomSlice(), boolean array indicating which instance is in the slice (by index)
+     * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
+     * @return p-value of given statistical test
+     */
+    protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
+
+    /**
+     * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
+     * Note: Data must not contain NaN values. //TODO: What does this mean? If that is the case, then you must handle this with an exception, see HiCSDependenceMeasure
      *
      * @param adapter1 First data adapter
      * @param data1 First data set
@@ -153,7 +165,8 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
         final R[] index_1 = corrected_ranks(adapter2, data2, len);
 
         double mwp = 0;
-        for(int i = 0; i < this.m; i++){ // TODO: could also be done through modulo so that we avoid the random generation // EF: not sure what you mean
+      
+        for(int i = 0; i < this.m; i++){
             int r = random.nextInt(2);
             R[] ref_index;
             R[] other_index;
@@ -172,5 +185,4 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
         return mwp / m;
     }
 
-    // TODO: Parametizer class
 }

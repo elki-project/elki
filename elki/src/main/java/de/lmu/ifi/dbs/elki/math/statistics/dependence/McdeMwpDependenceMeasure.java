@@ -3,6 +3,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import java.lang.reflect.Array;
 import java.util.Random;
@@ -23,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utils.containers.MwpIndex;
 
 @Reference(authors = "Edouard Fouché, Klemens Böhm", //
         title = "Monte Carlo Density Estimation", //
-        booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)", // TODO: Check
+        booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)",
         url = "https://doi.org/10.1145/3335783.3335795", //
         bibkey = "DBLP:conf/ssdbm/FoucheB19")
 
@@ -90,10 +97,9 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      *
      * @param len No of data instances
      * @param slice Return value of randomSlice() created with the index that is not for the reference dimension
-     * @param corrected_ranks Index, return value of corrected_ranks() of the reference dimension
-     * @return p-value from two-sided Mann-Whitney-U test
+     * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
+     * @return p-value from two sided Mann-Whitney-U test
      */
-
     protected double statistical_test(int len, boolean[] slice, MwpIndex[] corrected_ranks){
         final Random random = rnd.getSingleThreadedRandom(); // Note: No "safecut".
         final int start = random.nextInt((int) (len * (1 - this.beta)));
@@ -136,5 +142,85 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
         }
     }
 
-    // TODO: Parametizer class
+    /**
+     * Parameterization class.
+     *
+     * @author Alan Mazankiewicz
+     * @author Edouard Fouché
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+
+        /**
+         * Parameter that specifies the number of iterations in the Monte-Carlo
+         * process of identifying high contrast subspaces.
+         */
+        public static final OptionID M_ID = new OptionID("McdeMwp.m", "No. of Monte-Carlo iterations.");
+
+        /**
+         * Parameter that specifies the size of the slice
+         */
+        public static final OptionID ALPHA_ID = new OptionID("McdeMwp.alpha", "Expected share of instances in slice (independent dimensions).");
+
+        /**
+         * Parameter that specifies the size of the marginal restriction. Note that in the original paper
+         * alpha = beta and as such there is no explicit distinction between the parameters.
+         */
+        public static final OptionID BETA_ID = new OptionID("McdeMwp.beta", "Expected share of instances in marginal restriction (dependent dimensions).");
+
+        /**
+         * Parameter that specifies the random seed.
+         */
+        public static final OptionID SEED_ID = new OptionID("McdeMwp.seed", "The random seed.");
+
+        /**
+         * Holds the value of {@link #M_ID}.
+         */
+        protected int m = 50;
+
+        /**
+         * Holds the value of {@link #ALPHA_ID}.
+         */
+        protected double alpha = 0.5;
+
+        /**
+         * Holds the value of {@link #BETA_ID}.
+         */
+        protected double beta = 0.5;
+
+        /**
+         * Random generator.
+         */
+        protected RandomFactory rnd;
+
+        @Override
+        protected void makeOptions(Parameterization config) {
+            super.makeOptions(config);
+
+            final IntParameter mP = new IntParameter(M_ID, 50) //
+                    .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+            if(config.grab(mP)) {
+                m = mP.intValue();
+            }
+
+            final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5) //
+                    .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE); // actually > 0 and < 1 but no such constrain available
+            if(config.grab(alphaP)) {
+                alpha = alphaP.doubleValue();
+            }
+
+            final DoubleParameter betaP = new DoubleParameter(BETA_ID, 0.5) //
+                    .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE); // actually > 0 and < 1 but no such constrain available
+            if(config.grab(betaP)) {
+                beta = betaP.doubleValue();
+            }
+
+            final RandomParameter rndP = new RandomParameter(SEED_ID);
+            if(config.grab(rndP)) {
+                rnd = rndP.getValue();
+            }
+        }
+
+        @Override
+        protected McdeMwpDependenceMeasure makeInstance() { return new McdeMwpDependenceMeasure(m, alpha, beta, rnd); }
+    }
 }
