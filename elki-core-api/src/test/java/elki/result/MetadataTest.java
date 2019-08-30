@@ -45,13 +45,13 @@ public class MetadataTest {
   @Test
   public void childrenTest() {
     Object a = new byte[] { 1 };
-    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(a).numChildren());
-    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(a).numParents());
+    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(a).numc);
+    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(a).nump);
     String c = "child";
     Metadata.hierarchyOf(a).addChild(c);
-    assertEquals("Expected 1 children.", 1, Metadata.hierarchyOf(a).numChildren());
-    assertEquals("Expected 1 parent.", 1, Metadata.hierarchyOf(c).numParents());
-    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numChildren());
+    assertEquals("Expected 1 children.", 1, Metadata.hierarchyOf(a).numc);
+    assertEquals("Expected 1 parent.", 1, Metadata.hierarchyOf(c).nump);
+    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numc);
     It<Object> it = Metadata.hierarchyOf(a).iterDescendantsSelf();
     assertTrue(it.valid());
     assertEquals(a, it.get());
@@ -60,9 +60,9 @@ public class MetadataTest {
     assertFalse(it.advance().valid());
     assertFalse(Metadata.hierarchyOf(a).iterDescendantsSelf().filter(Integer.class).valid());
     Metadata.hierarchyOf(a).removeChild(c);
-    assertEquals("Expected 0 children again.", 0, Metadata.hierarchyOf(a).numChildren());
-    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numChildren());
-    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(c).numParents());
+    assertEquals("Expected 0 children again.", 0, Metadata.hierarchyOf(a).numc);
+    assertEquals("Expected 0 children.", 0, Metadata.hierarchyOf(c).numc);
+    assertEquals("Expected 0 parents.", 0, Metadata.hierarchyOf(c).nump);
   }
 
   @Test
@@ -114,11 +114,11 @@ public class MetadataTest {
     assertTrue(Metadata.hierarchyOf(a).iterDescendants().valid());
     Metadata.hierarchyOf(a).addChild("strong");
     forceGarbageCollection();
-    assertEquals(2, Metadata.hierarchyOf(a).numChildren());
+    assertEquals(2, Metadata.hierarchyOf(a).numc);
     assertTrue(Metadata.hierarchyOf(a).iterDescendants().valid());
     assertEquals("strong", Metadata.hierarchyOf(a).iterDescendants().get());
     assertFalse(Metadata.hierarchyOf(a).iterDescendants().advance().valid());
-    assertEquals(1, Metadata.hierarchyOf(a).numChildren());
+    assertEquals(1, Metadata.hierarchyOf(a).numc);
   }
 
   private void addWeakChild(Object a) {

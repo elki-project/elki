@@ -112,7 +112,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static It<Object> findVis(VisualizerContext context, Object start) {
     Metadata.Hierarchy hier = Metadata.hierarchyOf(start);
-    if(hier.numChildren() > 0) {
+    if(hier.hasChildren()) {
       return new StackedIter<>(hier.iterDescendantsSelf(), context.getVisHierarchy());
     }
     return context.getVisHierarchy().iterDescendantsSelf(start);

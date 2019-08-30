@@ -282,12 +282,12 @@ public class Metadata extends WeakReference<Object> {
     /**
      * Number of parents.
      */
-    private int nump = 0;
+    int nump = 0;
 
     /**
      * Number of children.
      */
-    private int numc = 0;
+    int numc = 0;
 
     /**
      * Parents.
@@ -458,21 +458,12 @@ public class Metadata extends WeakReference<Object> {
     }
 
     /**
-     * Get the number of parents.
-     *
-     * @return Number of parents
-     */
-    public int numParents() {
-      return nump;
-    }
-
-    /**
      * Get the number of children.
      *
-     * @return Number of children
+     * @return {@code true} if the code has children
      */
-    public int numChildren() {
-      return numc;
+    public boolean hasChildren() {
+      return numc > 0;
     }
 
     /**
