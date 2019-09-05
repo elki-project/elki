@@ -87,7 +87,7 @@ public final class ParseUtil {
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow for long values.") {
+  public static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow when parsing a number.") {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -120,7 +120,7 @@ public final class ParseUtil {
 
   /**
    * Parse a double from a character sequence.
-   *
+   * <p>
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
@@ -153,6 +153,7 @@ public final class ParseUtil {
       return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
     }
 
+    final int realstart = pos;
     // Begin parsing real numbers!
     if(((cur < '0') || (cur > '9')) && (cur != '.')) {
       throw NOT_A_NUMBER;
@@ -182,6 +183,10 @@ public final class ParseUtil {
         break;
       }
       cur = str[pos];
+    }
+    // Not a single digit, only "-." etc.
+    if(pos == realstart + (decimalPoint >= 0 ? 1 : 0)) {
+      throw NOT_A_NUMBER;
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -225,7 +230,7 @@ public final class ParseUtil {
 
   /**
    * Parse a double from a character sequence.
-   *
+   * <p>
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
@@ -240,7 +245,7 @@ public final class ParseUtil {
 
   /**
    * Parse a double from a character sequence.
-   *
+   * <p>
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
@@ -273,6 +278,7 @@ public final class ParseUtil {
       return isNegative ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
     }
 
+    final int realstart = pos;
     // Begin parsing real numbers!
     if(((cur < '0') || (cur > '9')) && (cur != '.')) {
       throw NOT_A_NUMBER;
@@ -302,6 +308,10 @@ public final class ParseUtil {
         break;
       }
       cur = str.charAt(pos);
+    }
+    // Not a single digit, only "-." etc.
+    if(pos == realstart + (decimalPoint >= 0 ? 1 : 0)) {
+      throw NOT_A_NUMBER;
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -362,6 +372,9 @@ public final class ParseUtil {
    * @return Long value
    */
   public static long parseLongBase10(final CharSequence str, final int start, final int end) {
+    if(start >= end) {
+      throw EMPTY_STRING;
+    }
     // Current position and character.
     int pos = start;
     char cur = str.charAt(pos);
@@ -385,19 +398,21 @@ public final class ParseUtil {
       if((digit >= 0) && (digit <= 9)) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
         if(tmp < decimal) {
+          // Special case, Long.MIN_VALUE only.
+          if(isNegative && tmp == 0x8000000000000000L && pos + 1 == end) {
+            return Long.MIN_VALUE;
+          }
           throw PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
-      else { // No more digits, or a second dot.
+      else { // No more digits
         break;
       }
-      if(++pos < end) {
-        cur = str.charAt(pos);
-      }
-      else {
+      if(++pos >= end) {
         break;
       }
+      cur = str.charAt(pos);
     }
     if(pos != end) {
       throw TRAILING_CHARACTERS;
@@ -425,6 +440,9 @@ public final class ParseUtil {
    * @return int value
    */
   public static int parseIntBase10(final CharSequence str, final int start, final int end) {
+    if(start >= end) {
+      throw EMPTY_STRING;
+    }
     // Current position and character.
     int pos = start;
     char cur = str.charAt(pos);
@@ -441,26 +459,28 @@ public final class ParseUtil {
       throw NOT_A_NUMBER;
     }
 
-    // Parse digits into a long, remember offset of decimal point.
+    // Parse digits into a int, remember offset of decimal point.
     int decimal = 0;
     while(true) {
       final int digit = cur - '0';
       if((digit >= 0) && (digit <= 9)) {
         final int tmp = (decimal << 3) + (decimal << 1) + digit;
         if(tmp < decimal) {
+          // Special case, Integer.MIN_VALUE only.
+          if(isNegative && tmp == 0x80000000 && pos + 1 == end) {
+            return Integer.MIN_VALUE;
+          }
           throw PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
-      else { // No more digits, or a second dot.
+      else { // No more digits
         break;
       }
-      if(++pos < end) {
-        cur = str.charAt(pos);
-      }
-      else {
+      if(++pos >= end) {
         break;
       }
+      cur = str.charAt(pos);
     }
     if(pos != end) {
       throw TRAILING_CHARACTERS;

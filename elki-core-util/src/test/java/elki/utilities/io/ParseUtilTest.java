@@ -20,8 +20,7 @@
  */
 package elki.utilities.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -78,9 +77,15 @@ public class ParseUtilTest {
 
     assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("inf"), 0.);
     assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-inf"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("INF"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-INF"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("infINITY"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-infINITY"), 0.);
     assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("\u221E"), 0.);
     assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-\u221E"), 0.);
     assertTrue(Double.isNaN(ParseUtil.parseDouble("nan")));
+    assertTrue(Double.isNaN(ParseUtil.parseDouble("NaN")));
+    assertTrue(Double.isNaN(ParseUtil.parseDouble("NA")));
 
     assertEquals(1, ParseUtil.parseDouble("+1"), 0.);
   }
@@ -131,9 +136,15 @@ public class ParseUtilTest {
 
     assertEquals(Double.POSITIVE_INFINITY, parseBytes("inf"), 0.);
     assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-inf"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, parseBytes("INF"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-INF"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, parseBytes("infINITY"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-infINITY"), 0.);
     assertEquals(Double.POSITIVE_INFINITY, parseBytes("\u221E"), 0.);
     assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-\u221E"), 0.);
     assertTrue(Double.isNaN(parseBytes("nan")));
+    assertTrue(Double.isNaN(parseBytes("NaN")));
+    assertTrue(Double.isNaN(parseBytes("NA")));
 
     assertEquals(1, parseBytes("+1"), 0.);
   }
@@ -143,33 +154,114 @@ public class ParseUtilTest {
     return ParseUtil.parseDouble(bytes, 0, bytes.length);
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textOnlyPlus() {
-    ParseUtil.parseDouble("+");
+  static String[] BAD_FLOATS = {
+      // Incomplete:
+      "", "+", "+.", "-", "-.", "1..1", "1e", "1e-", "-.e0", "1e 1", "-1e 1",
+      // bad letters
+      "A", "1A", "1eA", "1e01A", "-A", "+A", "-.A", "infAnity", "Nana", "non", "naX",
+      // value range
+      "9223372036854775808", "1e1024" };
+
+  @Test
+  public void testExceptions() {
+    for(String bad : BAD_FLOATS) {
+      try {
+        ParseUtil.parseDouble(bad);
+        fail("No exception on '" + bad + "'");
+      }
+      catch(NumberFormatException e) {
+        // Good
+      }
+    }
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textExtraCharacer() {
-    ParseUtil.parseDouble("123Banana");
+  @Test
+  public void testExceptionsBytes() {
+    for(String bad : BAD_FLOATS) {
+      try {
+        parseBytes(bad);
+        fail("No exception on '" + bad + "'");
+      }
+      catch(NumberFormatException e) {
+        // Good
+      }
+    }
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textTooManyDigits() {
-    ParseUtil.parseDouble("123456789012345678901234567890");
+  @Test
+  public void testInteger() {
+    assertEquals(0, ParseUtil.parseIntBase10("0"));
+    assertEquals(42, ParseUtil.parseIntBase10("42"));
+    assertEquals(-31415, ParseUtil.parseIntBase10("-31415"));
+    assertEquals(Integer.MAX_VALUE, ParseUtil.parseIntBase10(Integer.toString(Integer.MAX_VALUE)));
+    assertEquals(Integer.MAX_VALUE - 1, ParseUtil.parseIntBase10(Integer.toString(Integer.MAX_VALUE - 1)));
+    assertEquals(Integer.MIN_VALUE + 1, ParseUtil.parseIntBase10(Integer.toString(Integer.MIN_VALUE + 1)));
+    assertEquals(Integer.MIN_VALUE, ParseUtil.parseIntBase10(Integer.toString(Integer.MIN_VALUE)));
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textNoExponent() {
-    ParseUtil.parseDouble("1e");
+  @Test
+  public void testLong() {
+    assertEquals(0L, ParseUtil.parseLongBase10("0"));
+    assertEquals(42L, ParseUtil.parseLongBase10("42"));
+    assertEquals(-31415L, ParseUtil.parseLongBase10("-31415"));
+    assertEquals(Long.MAX_VALUE, ParseUtil.parseLongBase10(Long.toString(Long.MAX_VALUE)));
+    assertEquals(Long.MAX_VALUE - 1, ParseUtil.parseLongBase10(Long.toString(Long.MAX_VALUE - 1)));
+    assertEquals(Long.MIN_VALUE + 1, ParseUtil.parseLongBase10(Long.toString(Long.MIN_VALUE + 1)));
+    assertEquals(Long.MIN_VALUE, ParseUtil.parseLongBase10(Long.toString(Long.MIN_VALUE)));
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textNoExponentMinus() {
-    ParseUtil.parseDouble("1e-");
+  static String[] BAD_INTEGERS = {
+      // Incomplete:
+      "", "+", "-", "1.0", "1e0",
+      // bad letters
+      "A", "1A", "-A", "+A", "inf", "nan",
+      // value range
+      "9223372036854775808", "-9223372036854775809" };
+
+  @Test
+  public void testBadIntegers() {
+    for(String bad : BAD_INTEGERS) {
+      try {
+        ParseUtil.parseIntBase10(bad);
+        fail("No exception on '" + bad + "'");
+      }
+      catch(NumberFormatException e) {
+        // Good
+      }
+    }
+    try {
+      ParseUtil.parseIntBase10(Integer.toString(Integer.MIN_VALUE).substring(1));
+      fail("No exception on '" + Integer.toString(Integer.MIN_VALUE).substring(1) + "'");
+    }
+    catch(NumberFormatException e) {
+      // Good
+    }
+    try {
+      ParseUtil.parseIntBase10(Long.toString(Integer.MIN_VALUE - 1L));
+      fail("No exception on '" + Long.toString(Integer.MIN_VALUE - 1L) + "'");
+    }
+    catch(NumberFormatException e) {
+      // Good
+    }
   }
 
-  @Test(expected = NumberFormatException.class)
-  public void textEmptyString() {
-    ParseUtil.parseDouble("");
+  @Test
+  public void testBadLongs() {
+    for(String bad : BAD_INTEGERS) {
+      try {
+        ParseUtil.parseLongBase10(bad);
+        fail("No exception on '" + bad + "'");
+      }
+      catch(NumberFormatException e) {
+        // Good
+      }
+    }
+    try {
+      ParseUtil.parseLongBase10(Long.toString(Long.MIN_VALUE).substring(1));
+      fail("No exception on '" + Long.toString(Long.MIN_VALUE).substring(1) + "'");
+    }
+    catch(NumberFormatException e) {
+      // Good
+    }
   }
 }
