@@ -117,7 +117,7 @@ public class CheckParameterizables {
     }
 
     final String internal =elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
-    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, false)) {
+    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false)) {
       // Classes in the same package are special and don't cause warnings.
       if(cls.getName().startsWith(internal)) {
         continue;

@@ -394,7 +394,7 @@ public class DocumentReferences {
     Map<Reference, TreeSet<Object>> map = new HashMap<>();
 
     HashSet<Package> packages = new HashSet<>();
-    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true)) {
       inspectClass(cls, map);
       if(packages.add(cls.getPackage())) {
         Package p = cls.getPackage();

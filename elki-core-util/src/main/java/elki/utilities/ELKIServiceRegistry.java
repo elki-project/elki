@@ -20,7 +20,6 @@
  */
 package elki.utilities;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 import elki.logging.Logging;
@@ -167,7 +166,7 @@ public class ELKIServiceRegistry {
 
   /**
    * Register a class in the registry.
-   *
+   * <p>
    * Careful: do not use this from your code before first making sure this has
    * been fully initialized. Otherwise, other implementations will not be found.
    * Therefore, avoid calling this from your own Java code!
@@ -271,26 +270,24 @@ public class ELKIServiceRegistry {
 
   /**
    * Find all implementations of a given class in the classpath.
-   *
+   * <p>
    * Note: returned classes may be abstract.
    *
-   * @param c Class restriction
+   * @param restrictionClass Class restriction
    * @param everything include interfaces, abstract and private classes
-   * @param parameterizable only return classes instantiable by the
-   *        parameterizable API
    * @return List of found classes.
    */
-  public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
-    if(c == null) {
+  public static List<Class<?>> findAllImplementations(Class<?> restrictionClass, boolean everything) {
+    if(restrictionClass == null) {
       return Collections.emptyList();
     }
     // Default is served from the registry
-    if(!everything && parameterizable) {
-      return findAllImplementations(c);
+    if(!everything) {
+      return findAllImplementations(restrictionClass);
     }
     // This codepath is used by utility classes to also find buggy
     // implementations (e.g. non-instantiable, abstract) of the interfaces.
-    List<Class<?>> known = findAllImplementations(c);
+    List<Class<?>> known = findAllImplementations(restrictionClass);
     // For quickly skipping seen entries:
     HashSet<Class<?>> dupes = new HashSet<>(known);
     for(Iterator<Class<?>> iter = ELKIServiceScanner.nonindexedClasses(); iter.hasNext();) {
@@ -298,30 +295,8 @@ public class ELKIServiceRegistry {
       if(dupes.contains(cls)) {
         continue;
       }
-      // skip abstract / private classes.
-      if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+      if(!restrictionClass.isAssignableFrom(cls)) {
         continue;
-      }
-      if(!c.isAssignableFrom(cls)) {
-        continue;
-      }
-      if(parameterizable) {
-        boolean instantiable = false;
-        try {
-          instantiable = cls.getConstructor() != null;
-        }
-        catch(Exception | Error e) {
-          // ignore
-        }
-        try {
-          instantiable = instantiable || ClassGenericsUtil.getParameterizer(cls) != null;
-        }
-        catch(Exception | Error e) {
-          // ignore
-        }
-        if(!instantiable) {
-          continue;
-        }
       }
       known.add(cls);
       dupes.add(cls);

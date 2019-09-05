@@ -153,7 +153,7 @@ public class CheckELKIServices {
       LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
-    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, false, false);
+    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, false);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
       names.add(c2.getName());

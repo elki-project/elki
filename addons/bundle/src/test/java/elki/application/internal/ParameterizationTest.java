@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.parameterization.UnParameterization;
 public class ParameterizationTest {
   @Test
   public void testParameterization() {
-    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, true)) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false)) {
       checkV3Parameterization(cls);
     }
   }

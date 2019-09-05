@@ -202,7 +202,7 @@ public class DocumentParameters {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     Class<?> appc = appBaseClass();
-    for(final Class<?> cls : sorted(ELKIServiceRegistry.findAllImplementations(Object.class, false, true), ELKIServiceScanner.SORT_BY_NAME)) {
+    for(final Class<?> cls : sorted(ELKIServiceRegistry.findAllImplementations(Object.class, false), ELKIServiceScanner.SORT_BY_NAME)) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
