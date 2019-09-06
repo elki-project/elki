@@ -24,18 +24,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import elki.data.NumberVector;
-import elki.utilities.ClassGenericsUtil;
-import elki.utilities.exceptions.ClassInstantiationException;
+import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Class to handle the serialization and deserialization of type information.
- *
+ * <p>
  * The serialization format is custom, and not very extensible. However, the
  * standard Java "serializable" API did not seem well suited for this task, and
  * assumes an object stream context, while we intend to focus on Java NIO.
- *
+ * <p>
  * TODO: on the long run, this code needs to be refactored, and a more
  * extensible format needs to be created. Maybe, a protobuf based API would be
  * possible.
@@ -71,7 +70,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   @Override
   public TypeInformation fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
     byte type = buffer.get();
-    switch(type) {
+    switch(type){
     case TAG_SIMPLE:
       return SIMPLE_TYPE_SERIALIZER.fromByteBuffer(buffer);
     case TAG_VECTOR:
@@ -88,17 +87,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     final Class<?> clz = object.getClass();
     // We have three supported type informations.
     // We need to check with equals, because we canNOT allow subclasses!
-    if (VectorFieldTypeInformation.class.equals(clz)) {
+    if(VectorFieldTypeInformation.class.equals(clz)) {
       buffer.put(TAG_VECTOR_FIELD);
       VECTOR_FIELD_TYPE_SERIALIZER.toByteBuffer(buffer, (VectorFieldTypeInformation<?>) object);
       return;
     }
-    if (VectorTypeInformation.class.equals(clz)) {
+    if(VectorTypeInformation.class.equals(clz)) {
       buffer.put(TAG_VECTOR);
       VECTOR_TYPE_SERIALIZER.toByteBuffer(buffer, (VectorTypeInformation<?>) object);
       return;
     }
-    if (SimpleTypeInformation.class.equals(clz)) {
+    if(SimpleTypeInformation.class.equals(clz)) {
       buffer.put(TAG_SIMPLE);
       SIMPLE_TYPE_SERIALIZER.toByteBuffer(buffer, (SimpleTypeInformation<?>) object);
       return;
@@ -111,13 +110,13 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     final Class<?> clz = object.getClass();
     // We have three supported type informations.
     // We need to check with equals, because we canNOT allow subclasses!
-    if (VectorFieldTypeInformation.class.equals(clz)) {
+    if(VectorFieldTypeInformation.class.equals(clz)) {
       return 1 + VECTOR_FIELD_TYPE_SERIALIZER.getByteSize((VectorFieldTypeInformation<?>) object);
     }
-    if (VectorTypeInformation.class.equals(clz)) {
+    if(VectorTypeInformation.class.equals(clz)) {
       return 1 + VECTOR_TYPE_SERIALIZER.getByteSize((VectorTypeInformation<?>) object);
     }
-    if (SimpleTypeInformation.class.equals(clz)) {
+    if(SimpleTypeInformation.class.equals(clz)) {
       return 1 + SIMPLE_TYPE_SERIALIZER.getByteSize((SimpleTypeInformation<?>) object);
     }
     throw new UnsupportedOperationException("Unsupported type information.");
@@ -157,9 +156,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).newInstance();
         return new SimpleTypeInformation<>(clz, label, serializer);
-      } catch (ClassNotFoundException e) {
+      }
+      catch(ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
-      } catch (InstantiationException|IllegalAccessException e) {
+      }
+      catch(InstantiationException | IllegalAccessException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }
@@ -168,15 +169,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public void toByteBuffer(ByteBuffer buffer, SimpleTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Type class
@@ -191,15 +194,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public int getByteSize(SimpleTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       int total = 0;
@@ -215,7 +220,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
 
   /**
    * Serialization class for non-field vector types.
-   *
+   * <p>
    * FIXME: "label" is actually not supported.
    *
    * @author Erich Schubert
@@ -229,7 +234,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).newInstance();
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
@@ -237,12 +242,12 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
         return new VectorTypeInformation<NumberVector>(factory, serializer, mindim, maxdim);
-      } catch (ClassInstantiationException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
-      } catch (ClassNotFoundException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
-      } catch (InstantiationException | IllegalAccessException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
+      }
+      catch(ClassNotFoundException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
+      }
+      catch(InstantiationException | IllegalAccessException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }
 
@@ -250,15 +255,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public void toByteBuffer(ByteBuffer buffer, VectorTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Use *factory* class!
@@ -275,15 +282,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public int getByteSize(VectorTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       int total = 0;
@@ -302,7 +311,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
 
   /**
    * Serialization class for field vector types.
-   *
+   * <p>
    * FIXME: "relation label" is actually not properly supported.
    *
    * @author Erich Schubert
@@ -316,7 +325,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).newInstance();
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
@@ -328,22 +337,21 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
         // Column names
         int cols = ByteArrayUtil.readUnsignedVarint(buffer);
-        if (cols > 0) {
-          assert(mindim == maxdim && maxdim == cols) : "Inconsistent dimensionality and column names!";
+        if(cols > 0) {
+          assert (mindim == maxdim && maxdim == cols) : "Inconsistent dimensionality and column names!";
           String[] labels = new String[cols];
-          for (int i = 0; i < cols; i++) {
+          for(int i = 0; i < cols; i++) {
             labels[i] = ByteArrayUtil.readString(buffer);
           }
           return new VectorFieldTypeInformation<>(factory, mindim, labels, serializer);
-        } else {
-          return new VectorFieldTypeInformation<>(factory, mindim, maxdim, serializer);
         }
-      } catch (ClassInstantiationException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
-      } catch (ClassNotFoundException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
-      } catch (InstantiationException | IllegalAccessException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: "+e.getMessage(), e);
+        return new VectorFieldTypeInformation<>(factory, mindim, maxdim, serializer);
+      }
+      catch(ClassNotFoundException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
+      }
+      catch(InstantiationException | IllegalAccessException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }
 
@@ -351,15 +359,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public void toByteBuffer(ByteBuffer buffer, VectorFieldTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Use *factory* class!
@@ -373,11 +383,12 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       ByteArrayUtil.writeSignedVarint(buffer, object.maxdim());
       // Column names
       String[] labels = object.getLabels();
-      if (labels == null) {
+      if(labels == null) {
         ByteArrayUtil.writeUnsignedVarint(buffer, 0);
-      } else {
+      }
+      else {
         ByteArrayUtil.writeUnsignedVarint(buffer, labels.length);
-        for (String s : labels) {
+        for(String s : labels) {
           ByteArrayUtil.writeString(buffer, s);
         }
       }
@@ -387,15 +398,17 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     public int getByteSize(VectorFieldTypeInformation<?> object) throws IOException, UnsupportedOperationException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
-      if (serializer == null) {
+      if(serializer == null) {
         throw new UnsupportedOperationException("No serializer for type " + toString() + " available.");
       }
       // Make sure there is a constructor for the serialization class:
       try {
         serializer.getClass().getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
+      }
+      catch(NoSuchMethodException e) {
         throw new UnsupportedOperationException("No automatic serialization possible - no default constructor for serializer.");
-      } catch (SecurityException e) {
+      }
+      catch(SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       int total = 0;
@@ -410,11 +423,12 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       total += ByteArrayUtil.getSignedVarintSize(object.maxdim());
       // Column names
       String[] labels = object.getLabels();
-      if (labels == null) {
+      if(labels == null) {
         total += ByteArrayUtil.getUnsignedVarintSize(0);
-      } else {
+      }
+      else {
         total += ByteArrayUtil.getUnsignedVarintSize(labels.length);
-        for (String s : labels) {
+        for(String s : labels) {
           total += ByteArrayUtil.getStringSize(s);
         }
       }

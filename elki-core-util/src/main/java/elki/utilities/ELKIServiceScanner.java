@@ -74,15 +74,7 @@ public class ELKIServiceScanner {
    * @param restrictionClass Class to find subclasses for.
    */
   public static void load(Class<?> restrictionClass) {
-    if(MASTER_CACHE == null) {
-      initialize();
-    }
-    if(MASTER_CACHE.isEmpty()) {
-      return;
-    }
-    Iterator<Class<?>> iter = MASTER_CACHE.iterator();
-    while(iter.hasNext()) {
-      Class<?> clazz = iter.next();
+    for(Class<?> clazz : getMasterCache()) {
       // Skip other classes.
       if(!restrictionClass.isAssignableFrom(clazz)) {
         continue;
@@ -117,21 +109,26 @@ public class ELKIServiceScanner {
    * @return Classes.
    */
   public static Iterator<Class<?>> nonindexedClasses() {
-    if(MASTER_CACHE == null) {
-      initialize();
-    }
-    if(MASTER_CACHE.isEmpty()) {
-      return Collections.emptyIterator();
-    }
-    return MASTER_CACHE.iterator();
+    return getMasterCache().iterator();
+  }
+
+  /**
+   * Get or initialize the master cache, synchronizing only on initialization.
+   *
+   * @return Master cache
+   */
+  private static List<Class<?>> getMasterCache() {
+    return MASTER_CACHE != null ? MASTER_CACHE : initialize();
   }
 
   /**
    * Perform a full (slow) scan for classes.
+   *
+   * @return Master cache
    */
-  private synchronized static void initialize() {
+  private synchronized static List<Class<?>> initialize() {
     if(MASTER_CACHE != null) {
-      return;
+      return MASTER_CACHE;
     }
     try {
       Enumeration<URL> cps = CLASSLOADER.getResources("");
@@ -170,8 +167,8 @@ public class ELKIServiceScanner {
     }
     catch(IOException e) {
       LOG.exception(e);
-      return;
     }
+    return MASTER_CACHE;
   }
 
   /**

@@ -75,68 +75,6 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Returns a new instance of the given type for the specified className.
-   * <p>
-   * If the Class for className is not found, the instantiation is tried using
-   * the package of the given type as package of the given className.
-   *
-   * @param <T> Class type for compile time type checking
-   * @param type desired Class type of the Object to retrieve
-   * @param className name of the class to instantiate
-   * @return a new instance of the given type for the specified className
-   * @throws ClassInstantiationException When a class cannot be instantiated.
-   */
-  public static <T> T instantiate(Class<T> type, String className) throws ClassInstantiationException {
-    try {
-      try {
-        return type.cast(CLASSLOADER.loadClass(className).newInstance());
-      }
-      catch(ClassNotFoundException e) {
-        // try package of type
-        return type.cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
-      }
-    }
-    catch(InstantiationException | IllegalAccessException
-        | ClassNotFoundException | ClassCastException e) {
-      throw new ClassInstantiationException(e);
-    }
-  }
-
-  /**
-   * Returns a new instance of the given type for the specified className.
-   * <p>
-   * If the class for className is not found, the instantiation is tried using
-   * the package of the given type as package of the given className.
-   * <p>
-   * This is a weaker type checked version of "{@link #instantiate}" for use
-   * with generics.
-   *
-   * @param <T> Class type for compile time type checking
-   * @param type desired Class type of the Object to retrieve
-   * @param className name of the class to instantiate
-   * @return a new instance of the given type for the specified className
-   * @throws ClassInstantiationException When a class cannot be instantiated.
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T instantiateGenerics(Class<?> type, String className) throws ClassInstantiationException {
-    // TODO: can we do a verification that type conforms to T somehow?
-    // (probably not because generics are implemented via erasure.
-    try {
-      try {
-        return ((Class<T>) type).cast(CLASSLOADER.loadClass(className).newInstance());
-      }
-      catch(ClassNotFoundException e) {
-        // try package of type
-        return ((Class<T>) type).cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
-      }
-    }
-    catch(InstantiationException | IllegalAccessException
-        | ClassNotFoundException | ClassCastException e) {
-      throw new ClassInstantiationException(e);
-    }
-  }
-
-  /**
    * Get a parameterizer for the given class.
    *
    * @param c Class
@@ -238,37 +176,6 @@ public final class ClassGenericsUtil {
   @SuppressWarnings("unchecked")
   public static <D, T extends D> Class<T> uglyCastIntoSubclass(Class<D> cls) {
     return (Class<T>) cls;
-  }
-
-  /**
-   * This class performs an ugly cast, from <code>Class&lt;F&gt;</code> to
-   * <code>Class&lt;T&gt;</code>, where both F and T need to extend B.
-   * <p>
-   * The restrictions are there to avoid misuse of this cast helper.
-   * <p>
-   * While this sounds really ugly, the common use case will be something like
-   *
-   * <pre>
-   * BASE = Class&lt;Database&gt;
-   * FROM = Class&lt;Database&gt;
-   * TO = Class&lt;Database&lt;V&gt;&gt;
-   * </pre>
-   *
-   * i.e. the main goal is to add missing Generics to the compile time type.
-   *
-   * @param <BASE> Base type
-   * @param <TO> Destination type
-   * @param <FROM> Source type
-   * @param cls Class to be cast
-   * @param base Base class for type checking.
-   * @return Casted class.
-   */
-  @SuppressWarnings("unchecked")
-  public static <BASE, FROM extends BASE, TO extends BASE> Class<TO> uglyCrossCast(Class<FROM> cls, Class<BASE> base) {
-    if(!base.isAssignableFrom(cls)) {
-      throw cls == null ? new ClassCastException("Attempted to use 'null' as class.") : new ClassCastException(cls.getName() + " is not a superclass of " + base);
-    }
-    return (Class<TO>) cls;
   }
 
   /**

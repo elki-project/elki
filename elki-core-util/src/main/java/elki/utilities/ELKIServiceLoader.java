@@ -22,6 +22,7 @@ package elki.utilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -81,8 +82,8 @@ public class ELKIServiceLoader {
         URL nextElement = configfiles.nextElement();
         URLConnection conn = nextElement.openConnection();
         conn.setUseCaches(false);
-        try (
-            InputStreamReader is = new InputStreamReader(conn.getInputStream(), "UTF-8");) {
+        try (InputStream ist = conn.getInputStream();
+            InputStreamReader is = new InputStreamReader(ist, "UTF-8")) {
           int start = 0, cur = 0, valid = is.read(buf, 0, buf.length);
           char c;
           while(cur < valid) {

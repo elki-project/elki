@@ -22,7 +22,7 @@ package elki.utilities;
 
 /**
  * This class collects various static helper methods.
- * 
+ * <p>
  * For helper methods related to special application fields see other utilities
  * classes.
  * 

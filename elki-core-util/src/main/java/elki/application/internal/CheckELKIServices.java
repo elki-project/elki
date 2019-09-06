@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,7 +167,8 @@ public class CheckELKIServices {
         URL u = us.nextElement();
         boolean injar = "jar".equals(u.getProtocol());
         try (
-            BufferedReader r = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+            InputStreamReader ir = new InputStreamReader(u.openStream(), StandardCharsets.UTF_8);
+            BufferedReader r = new BufferedReader(ir)) {
           for(String line; (line = r.readLine()) != null;) {
             m.reset(line);
             if(!m.matches()) {
@@ -204,15 +206,19 @@ public class CheckELKIServices {
       }
       // Try to automatically update:
       try {
-        Files.createDirectories(Paths.get(update + File.separator + ELKIServiceLoader.FILENAME_PREFIX));
-        String fname = update + File.separator + ELKIServiceLoader.FILENAME_PREFIX + prop;
-        PrintStream pr = new PrintStream(new FileOutputStream(fname, true));
+        Path folder = Paths.get(update, ELKIServiceLoader.FILENAME_PREFIX);
+        Files.createDirectories(folder);
+        Path out = folder.resolve(prop);
+        if(!out.startsWith(folder)) {
+          throw new RuntimeException("Insecure path: " + out.toString());
+        }
+        PrintStream pr = new PrintStream(new FileOutputStream(out.toFile(), true));
         pr.println(); // In case there was no linefeed at the end.
         for(String remaining : sorted) {
           pr.println(remaining);
         }
         pr.close();
-        LOG.warning("Updated service file: " + fname);
+        LOG.warning("Updated service file: " + out.toString());
       }
       catch(IOException e) {
         LOG.exception(e);
