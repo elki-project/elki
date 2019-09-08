@@ -129,15 +129,14 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
     @Override
     public void configure(Parameterization config) {
       FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(param)) {
-        File matrixfile = param.getValue();
+      param.grab(config, matrixfile -> {
         try {
           cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
         }
         catch(IOException e) {
           config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e.getMessage(), e));
         }
-      }
+      });
     }
 
     @Override

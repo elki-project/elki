@@ -91,7 +91,9 @@ public class StringParameter extends AbstractParameter<StringParameter, String> 
    */
   public boolean grab(Parameterization config, Consumer<String> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

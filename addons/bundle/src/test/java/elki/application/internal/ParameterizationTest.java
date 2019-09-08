@@ -40,31 +40,26 @@ import elki.utilities.optionhandling.parameterization.UnParameterization;
  */
 public class ParameterizationTest {
   @Test
-  public void testParameterization() {
+  public void testParameterization() throws ReflectiveOperationException {
     for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false)) {
       checkV3Parameterization(cls);
     }
   }
 
   /** Check for a V3 constructor. */
-  private void checkV3Parameterization(Class<?> cls) throws NoClassDefFoundError {
+  private void checkV3Parameterization(Class<?> cls) throws ReflectiveOperationException {
     boolean first = true;
     for(Class<?> inner : cls.getDeclaredClasses()) {
       if(Parameterizer.class.isAssignableFrom(inner)) {
-        try {
-          Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
-          pcls.newInstance();
-          assertTrue("More than one parameterization method in class " + cls.getName(), first);
-          checkMakeInstance(cls, pcls);
-          // Configure with missing values; must not throw an exception.
-          Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
-          assertNotNull(par);
-          par.configure(new UnParameterization());
-          par.configure(new EmptyParameterization());
-        }
-        catch(Exception e) {
-          fail(e.getMessage());
-        }
+        Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
+        pcls.newInstance();
+        assertTrue("More than one parameterization method in class " + cls.getName(), first);
+        checkMakeInstance(cls, pcls);
+        // Configure with missing values; must not throw an exception.
+        Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
+        assertNotNull(par);
+        par.configure(new UnParameterization());
+        par.configure(new EmptyParameterization());
         first = false;
       }
     }

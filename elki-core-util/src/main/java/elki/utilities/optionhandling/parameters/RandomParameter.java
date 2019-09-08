@@ -140,7 +140,9 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
    */
   public boolean grab(Parameterization config, Consumer<RandomFactory> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

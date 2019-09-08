@@ -142,7 +142,9 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
    */
   public boolean grab(Parameterization config, Consumer<File> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

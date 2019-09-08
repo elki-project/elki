@@ -262,7 +262,12 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    */
   public boolean grab(Parameterization config, Consumer<C> consumer) {
     if(config.grab(this)) {
-      consumer.accept(instantiateClass(config));
+      if(consumer != null) {
+        final C x = instantiateClass(config);
+        if(x != null) {
+          consumer.accept(x);
+        }
+      }
       return true;
     }
     return false;

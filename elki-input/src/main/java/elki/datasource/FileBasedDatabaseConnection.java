@@ -109,15 +109,12 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     public void configure(Parameterization config) {
-      Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
       // Add the input file first, for usability reasons.
-      FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
-      if(config.grab(inputParam)) {
-        infile = inputParam.getValue();
-        String nam = infile.getName();
-        if(nam != null && (nam.endsWith(".arff") || nam.endsWith(".arff.gz"))) {
-          defaultParser = ArffParser.class;
-        }
+      new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE) //
+          .grab(config, x -> infile = x);
+      Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
+      if(infile != null && (infile.getName().endsWith(".arff") || infile.getName().endsWith(".arff.gz"))) {
+        defaultParser = ArffParser.class;
       }
       configParser(config, Parser.class, defaultParser);
       configFilters(config);

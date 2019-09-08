@@ -186,7 +186,9 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
    */
   public boolean grab(Parameterization config, Consumer<List<double[]>> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

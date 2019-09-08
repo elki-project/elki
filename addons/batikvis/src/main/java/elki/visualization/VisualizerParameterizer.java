@@ -259,15 +259,14 @@ public class VisualizerParameterizer {
           .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT) //
           .grab(config, x -> samplesize = x);
       StringParameter stylelibP = new StringParameter(STYLELIB_ID, PropertiesBasedStyleLibrary.DEFAULT_SCHEME_FILENAME);
-      if(config.grab(stylelibP)) {
-        String filename = stylelibP.getValue();
+      stylelibP.grab(config, filename -> {
         try {
           stylelib = new PropertiesBasedStyleLibrary(filename, filename);
         }
         catch(AbortException e) {
           config.reportError(new WrongParameterValueException(stylelibP, filename, e.getMessage(), e));
         }
-      }
+      });
       new PatternParameter(ENABLEVIS_ID) //
           .setOptional(true) //
           .grab(config, x -> enableVisualizers = x);

@@ -103,7 +103,9 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
    */
   public boolean grab(Parameterization config, DoubleConsumer consumer) {
     if(config.grab(this)) {
-      consumer.accept(doubleValue());
+      if(consumer != null) {
+        consumer.accept(doubleValue());
+      }
       return true;
     }
     return false;

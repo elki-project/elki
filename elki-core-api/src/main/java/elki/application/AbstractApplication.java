@@ -122,11 +122,13 @@ public abstract class AbstractApplication {
   public static void runCLIApplication(Class<?> cls, String[] args) {
     SerializedParameterization params = new SerializedParameterization(args);
     Flag helpF = new Flag(Par.HELP_ID);
-    params.grab(helpF);
+    helpF.grab(params, x -> {
+    });
     Flag helpLongF = new Flag(Par.HELP_LONG_ID);
-    params.grab(helpLongF);
+    helpLongF.grab(params, x -> {
+    });
     try {
-      ClassParameter<Object> descriptionP = new ClassParameter<>(Par.DESCRIPTION_ID, Object.class) //
+      ClassParameter<Object> descriptionP = new ClassParameter<Object>(Par.DESCRIPTION_ID, Object.class) //
           .setOptional(true);
       if(params.grab(descriptionP)) {
         params.clearErrors();
@@ -304,7 +306,7 @@ public abstract class AbstractApplication {
      */
     public static String[][] parseDebugParameter(Parameterization config) {
       StringParameter debugP = new StringParameter(Par.DEBUG_ID).setOptional(true);
-      if(!config.grab(debugP) && !debugP.isDefined()) {
+      if(!debugP.grab(config, null)) {
         return null;
       }
       String[] opts = debugP.getValue().split(",");
@@ -382,7 +384,7 @@ public abstract class AbstractApplication {
      */
     protected File getParameterOutputFile(Parameterization config, String description) {
       FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
-      return config.grab(outputP) ? outputP.getValue() : null;
+      return outputP.grab(config, null) ? outputP.getValue() : null;
     }
 
     /**
@@ -404,7 +406,7 @@ public abstract class AbstractApplication {
      */
     protected File getParameterInputFile(Parameterization config, String description) {
       FileParameter inputP = new FileParameter(new OptionID(INPUT_ID.getName(), description), FileParameter.FileType.INPUT_FILE);
-      return config.grab(inputP) ? inputP.getValue() : null;
+      return inputP.grab(config, null) ? inputP.getValue() : null;
     }
 
     @Override

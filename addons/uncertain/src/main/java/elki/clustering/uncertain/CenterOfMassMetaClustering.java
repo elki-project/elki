@@ -158,13 +158,12 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
     @Override
     public void configure(Parameterization config) {
       ObjectParameter<ClusteringAlgorithm<C>> palgorithm = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, ClusteringAlgorithm.class);
-      if(config.grab(palgorithm)) {
-        inner = palgorithm.instantiateClass(config);
-        if(inner != null && inner.getInputTypeRestriction().length > 0 && //
-            !inner.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+      palgorithm.grab(config, inner -> {
+        if(inner.getInputTypeRestriction().length > 0 && //
+        !inner.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + inner.getInputTypeRestriction()[0]));
         }
-      }
+      });
     }
 
     @Override

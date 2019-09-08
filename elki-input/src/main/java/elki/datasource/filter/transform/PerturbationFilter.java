@@ -371,14 +371,10 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
           .grab(config, x -> seed = x);
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID) //
           .setOptional(true);
-      if(config.grab(minimaP)) {
-        minima = minimaP.getValue().clone();
-      }
+      minimaP.grab(config, x -> minima = x.clone());
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID) //
           .setOptional(!minimaP.isDefined());
-      if(config.grab(maximaP)) {
-        maxima = maximaP.getValue().clone();
-      }
+      maximaP.grab(config, x -> maxima = x.clone());
       // Non-formalized parameter constraint:
       if(minima != null && maxima != null && minima.length != maxima.length) {
         config.reportError(new WrongParameterValueException(minimaP, "and", maximaP, "must have the same number of values."));

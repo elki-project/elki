@@ -717,21 +717,19 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterDistance(Parameterization config) {
-      ObjectParameter<NumberVectorDistance<? super V>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(distanceFunction == null //
-            || distanceFunction instanceof SquaredEuclideanDistance //
-            || distanceFunction instanceof EuclideanDistance) {
-          return;
-        }
-        if(needsMetric() && !distanceFunction.isMetric()) {
-          Logging.getLogger(this.getClass()).warning("This k-means variants requires the triangle inequality, and thus should only be used with squared Euclidean distance!");
-        }
-        else {
-          Logging.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
-        }
-      }
+      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> {
+            this.distanceFunction = x;
+            if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance) {
+              return;
+            }
+            else if(needsMetric() && !x.isMetric()) {
+              Logging.getLogger(this.getClass()).warning("This k-means variants requires the triangle inequality, and thus should only be used with squared Euclidean distance!");
+            }
+            else {
+              Logging.getLogger(this.getClass()).warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
+            }
+          });
     }
 
     /**

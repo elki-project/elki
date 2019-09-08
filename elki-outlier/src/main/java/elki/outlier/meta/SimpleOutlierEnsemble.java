@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.CombinedTypeInformation;
@@ -42,14 +41,13 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.ensemble.EnsembleVoting;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectListParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -73,7 +71,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
   /**
    * The algorithms to run.
    */
-  private List<OutlierAlgorithm> algorithms;
+  private List<? extends OutlierAlgorithm> algorithms;
 
   /**
    * The voting in use.
@@ -86,7 +84,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
    * @param algorithms Algorithms to run
    * @param voting Voting method
    */
-  public SimpleOutlierEnsemble(List<OutlierAlgorithm> algorithms, EnsembleVoting voting) {
+  public SimpleOutlierEnsemble(List<? extends OutlierAlgorithm> algorithms, EnsembleVoting voting) {
     this.algorithms = algorithms;
     this.voting = voting;
   }
@@ -178,7 +176,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     /**
      * The algorithms to run.
      */
-    private List<OutlierAlgorithm> algorithms;
+    private List<? extends OutlierAlgorithm> algorithms;
 
     /**
      * The voting in use.
@@ -187,14 +185,8 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
 
     @Override
     public void configure(Parameterization config) {
-      ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class);
-      if(config.grab(algP)) {
-        ListParameterization subconfig = new ListParameterization();
-        ChainedParameterization chain = new ChainedParameterization(subconfig, config);
-        chain.errorsTo(config);
-        algorithms = algP.instantiateClasses(chain);
-        subconfig.logAndClearReportedErrors();
-      }
+      new ObjectListParameter<OutlierAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class) //
+          .grab(config, x -> algorithms = x);
       new ObjectParameter<EnsembleVoting>(VOTING_ID, EnsembleVoting.class) //
           .grab(config, x -> voting = x);
     }

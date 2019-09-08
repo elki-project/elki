@@ -104,7 +104,9 @@ public class IntParameter extends NumberParameter<IntParameter, Integer> {
    */
   public boolean grab(Parameterization config, IntConsumer consumer) {
     if(config.grab(this)) {
-      consumer.accept(intValue());
+      if (consumer != null) {
+        consumer.accept(intValue());
+      }
       return true;
     }
     return false;

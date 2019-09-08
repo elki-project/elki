@@ -446,21 +446,19 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);
-      if(chain.grab(malgorithm)) {
-        metaAlgorithm = malgorithm.instantiateClass(chain);
-        if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
-            !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
+      malgorithm.grab(config, metaAlgorithm -> {
+        if(metaAlgorithm.getInputTypeRestriction().length > 0 && //
+        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
-      }
+      });
       ObjectParameter<ClusteringAlgorithm<?>> palgorithm = new ObjectParameter<>(ALGORITHM_ID, ClusteringAlgorithm.class);
-      if(config.grab(palgorithm)) {
-        samplesAlgorithm = palgorithm.instantiateClass(config);
-        if(samplesAlgorithm != null && samplesAlgorithm.getInputTypeRestriction().length > 0 && //
-            !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+      palgorithm.grab(config, samplesAlgorithm -> {
+        if(samplesAlgorithm.getInputTypeRestriction().length > 0 && //
+        !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + samplesAlgorithm.getInputTypeRestriction()[0]));
         }
-      }
+      });
       new IntParameter(SAMPLES_ID, DEFAULT_ENSEMBLE_DEPTH) //
           .grab(config, x -> numsamples = x);
       new Flag(KEEP_SAMPLES_ID).grab(config, x -> keep = x);

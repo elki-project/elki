@@ -257,20 +257,17 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     public void configure(Parameterization config) {
       DoubleListParameter meanP = new DoubleListParameter(MEAN_ID) //
           .setOptional(true);
-      if(config.grab(meanP)) {
-        mean = meanP.getValue().clone();
-      }
+      meanP.grab(config, x -> mean = x.clone());
       DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID) //
           .setOptional(!meanP.isDefined());
-      if(config.grab(stddevP)) {
-        stddev = stddevP.getValue().clone();
-
+      stddevP.grab(config, x -> {
+        stddev = x.clone();
         for(double d : stddev) {
           if(d == 0.) {
             config.reportError(new WrongParameterValueException(stddevP, stddevP.getValueAsString(), "Standard deviations must not be 0."));
           }
         }
-      }
+      });
       // Non-formalized parameter constraint:
       if(mean != null && stddev != null && mean.length != stddev.length) {
         config.reportError(new WrongParameterValueException(meanP, "and", stddevP, "must have the same number of values."));

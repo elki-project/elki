@@ -145,7 +145,9 @@ public class Flag extends AbstractParameter<Flag, Boolean> {
    */
   public boolean grab(Parameterization config, BooleanConsumer consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue().booleanValue());
+      if(consumer != null) {
+        consumer.accept(getValue().booleanValue());
+      }
       return true;
     }
     return false;

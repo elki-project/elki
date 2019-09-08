@@ -120,10 +120,8 @@ public class Predefined extends AbstractKMeansInitialization {
 
     @Override
     public void configure(Parameterization config) {
-      DoubleArrayListParameter meansP = new DoubleArrayListParameter(INITIAL_MEANS);
-      if(config.grab(meansP)) {
-        initialMeans = meansP.getValue().toArray(new double[0][]);
-      }
+      new DoubleArrayListParameter(INITIAL_MEANS) //
+          .grab(config, x -> initialMeans = x.toArray(new double[0][]));
     }
 
     @Override

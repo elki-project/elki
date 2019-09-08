@@ -99,7 +99,9 @@ public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParamet
    */
   public boolean grab(Parameterization config, Consumer<IntGenerator> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

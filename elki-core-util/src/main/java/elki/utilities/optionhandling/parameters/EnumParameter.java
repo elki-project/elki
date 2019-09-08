@@ -172,7 +172,9 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
    */
   public boolean grab(Parameterization config, Consumer<E> consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;

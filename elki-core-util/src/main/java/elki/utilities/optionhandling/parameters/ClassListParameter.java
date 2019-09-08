@@ -252,7 +252,9 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    */
   public boolean grab(Parameterization config, Consumer<List<? extends C>> consumer) {
     if(config.grab(this)) {
-      consumer.accept(instantiateClasses(config));
+      if(consumer != null) {
+        consumer.accept(instantiateClasses(config));
+      }
       return true;
     }
     return false;

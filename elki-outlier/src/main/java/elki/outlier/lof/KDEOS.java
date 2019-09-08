@@ -408,15 +408,12 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
       if(kmin > kmax) {
         config.reportError(new WrongParameterValueException(kminP, "must be at most", kmaxP, ""));
       }
-
-      DoubleParameter scaleP = new DoubleParameter(KERNEL_SCALE_ID)//
+      new DoubleParameter(KERNEL_SCALE_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .setDefaultValue(.25);
-      if(config.grab(scaleP)) {
-        // For simpler parameterization, scale kernels by their canonical
-        // bandwidth, when the kernel is configured.
-        scale = scaleP.doubleValue() * ((kernel != null) ? kernel.canonicalBandwidth() : 1.);
-      }
+          .setDefaultValue(.25) //
+          // For simpler parameterization, scale kernels by their canonical
+          // bandwidth, when the kernel is configured.
+          .grab(config, x -> scale = x * ((kernel != null) ? kernel.canonicalBandwidth() : 1.));
       new DoubleParameter(KERNEL_MIN_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .setOptional(true) //

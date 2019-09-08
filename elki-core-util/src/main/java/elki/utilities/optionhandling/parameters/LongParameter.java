@@ -95,7 +95,9 @@ public class LongParameter extends NumberParameter<LongParameter, Long> {
    */
   public boolean grab(Parameterization config, LongConsumer consumer) {
     if(config.grab(this)) {
-      consumer.accept(getValue());
+      if(consumer != null) {
+        consumer.accept(getValue());
+      }
       return true;
     }
     return false;
