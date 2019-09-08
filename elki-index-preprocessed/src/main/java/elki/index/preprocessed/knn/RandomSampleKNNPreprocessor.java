@@ -24,12 +24,7 @@ import java.util.Random;
 
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;

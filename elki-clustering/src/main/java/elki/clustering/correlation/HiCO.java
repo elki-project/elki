@@ -31,34 +31,34 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
+import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
+import elki.database.relation.RelationUtil;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
-import elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import elki.logging.Logging;
+import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
+import elki.logging.statistics.MillisTimeDuration;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.pca.PCAFilteredResult;
+import elki.math.linearalgebra.pca.PCAResult;
+import elki.math.linearalgebra.pca.PCARunner;
 import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import elki.result.Metadata;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
-import elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Implementation of the HiCO algorithm, an algorithm for detecting hierarchies
@@ -103,30 +103,45 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   public static final double DEFAULT_ALPHA = 0.85;
 
   /**
-   * Factory to produce
-   */
-  private KNNQueryFilteredPCAIndex.Factory<V> indexfactory;
-
-  /**
    * Delta parameter
    */
-  double deltasq;
+  private double deltasq;
 
   /**
    * Mu parameter.
    */
-  int mu;
+  private int mu;
+
+  /**
+   * Number of neighbors to query.
+   */
+  private int k;
+
+  /**
+   * PCA utility object.
+   */
+  private PCARunner pca;
+
+  /**
+   * Filter for selecting eigenvectors
+   */
+  private EigenPairFilter filter;
 
   /**
    * Constructor.
    *
-   * @param indexfactory Index factory
+   * @param k number of neighbors k
+   * @param pca PCA class
+   * @param alpha Filter for selecting eigenvectors
    * @param mu Mu parameter
+   * @param delta Delta parameter
    */
-  public HiCO(KNNQueryFilteredPCAIndex.Factory<V> indexfactory, int mu, double delta) {
+  public HiCO(int k, PCARunner pca, double alpha, int mu, double delta) {
     super();
+    this.k = k;
+    this.pca = pca;
+    this.filter = new PercentageEigenPairFilter(alpha);
     this.mu = mu;
-    this.indexfactory = indexfactory;
     this.deltasq = delta * delta;
   }
 
@@ -143,18 +158,18 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    *
-   * @assoc - - - FilteredLocalPCAIndex
+   * @assoc - - - KNNQueryFilteredLocalPCAIndex
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
-    /**
-     * Instantiated index.
-     */
-    private FilteredLocalPCAIndex<V> index;
-
     /**
      * Data relation.
      */
     private Relation<V> relation;
+
+    /**
+     * The storage for precomputed local PCAs
+     */
+    protected WritableDataStore<PCAFilteredResult> localPCAs;
 
     /**
      * Cluster order.
@@ -211,7 +226,25 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     public CorrelationClusterOrder run() {
-      this.index = indexfactory.instantiate(relation);
+      // Sanity check:
+      int dim = RelationUtil.dimensionality(relation);
+      if(dim > 0 && k <= dim) {
+        LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
+      }
+      localPCAs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
+      KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, k);
+
+      Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Performing local PCA", relation.size(), LOG) : null;
+
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        PCAResult epairs = pca.processIds(knnQuery.getKNNForDBID(iditer, k), relation);
+        int numstrong = filter.filter(epairs.getEigenvalues());
+        localPCAs.put(iditer, new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.));
+        LOG.incrementProcessed(progress);
+      }
+      LOG.ensureCompleted(progress);
+      LOG.statistics(dur.end());
       return super.run();
     }
 
@@ -231,7 +264,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     protected void expandDBID(DBIDRef id) {
       clusterOrder.add(id);
 
-      PCAFilteredResult pca1 = index.getLocalProjection(id);
+      PCAFilteredResult pca1 = localPCAs.get(id);
       V dv1 = relation.get(id);
       final int dim = dv1.getDimensionality();
 
@@ -241,7 +274,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
           tmpCorrelation.putInt(iter, 0);
           continue;
         }
-        PCAFilteredResult pca2 = index.getLocalProjection(iter);
+        PCAFilteredResult pca2 = localPCAs.get(iter);
         V dv2 = relation.get(iter);
 
         tmpCorrelation.putInt(iter, correlationDistance(pca1, pca2, dim));
@@ -378,7 +411,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(indexfactory.getInputTypeRestriction());
+    return TypeUtil.array(NumberVector.FIELD);
   }
 
   @Override
@@ -420,52 +453,55 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public static final OptionID ALPHA_ID = new OptionID("hico.alpha", "The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain a portion of at least alpha of the total variance.");
 
     /**
+     * Number of neighbors to query.
+     */
+    protected int k = 0;
+
+    /**
+     * PCA utility object.
+     */
+    protected PCARunner pca;
+
+    /**
      * Mu parameter
      */
     int mu = -1;
 
     /**
-     * Delta parameter
+     * Alpha parameter
      */
-    double delta;
+    double alpha = DEFAULT_ALPHA;
 
     /**
-     * Factory to produce
+     * Delta parameter
      */
-    private KNNQueryFilteredPCAIndex.Factory<V> indexfactory;
+    double delta = DEFAULT_DELTA;
 
     @Override
     public void configure(Parameterization config) {
       new IntParameter(MU_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> mu = x);
-      IntParameter kP = new IntParameter(K_ID) //
+      new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
-          .setOptional(true);
-      int k = config.grab(kP) ? kP.getValue() : mu;
-
-      new DoubleParameter(DELTA_ID, DEFAULT_DELTA)//
+          .setOptional(true) //
+          .grab(config, x -> k = x);
+      new DoubleParameter(DELTA_ID) //
+          .setDefaultValue(DEFAULT_DELTA)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA)//
+      new DoubleParameter(ALPHA_ID) //
+          .setDefaultValue(DEFAULT_ALPHA)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      double alpha = config.grab(alphaP) ? alphaP.doubleValue() : DEFAULT_ALPHA;
-      // Configure Distance function
-      ListParameterization params = new ListParameterization();
-      // preprocessor
-      params.addParameter(KNNQueryFilteredPCAIndex.Factory.Par.K_ID, k);
-      params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, new PercentageEigenPairFilter(alpha));
-
-      ChainedParameterization chain = new ChainedParameterization(params, config);
-      chain.errorsTo(config);
-      final Class<KNNQueryFilteredPCAIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(KNNQueryFilteredPCAIndex.Factory.class);
-      indexfactory = chain.tryInstantiate(cls);
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new ObjectParameter<PCARunner>(PCARunner.Par.PCARUNNER_ID, PCARunner.class, PCARunner.class) //
+          .grab(config, x -> pca = x);
     }
 
     @Override
     public HiCO<V> make() {
-      return new HiCO<>(indexfactory, mu, delta);
+      return new HiCO<>(k > 0 ? k : mu, pca, alpha, mu, delta);
     }
   }
 }

@@ -23,6 +23,7 @@ package elki.index.preprocessed.knn;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDataStore;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
@@ -33,9 +34,9 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
-import elki.index.preprocessed.AbstractPreprocessorIndex;
-import elki.utilities.optionhandling.Parameterizer;
+import elki.logging.Logging;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -49,7 +50,12 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPreprocessorIndex<O, KNNList> implements KNNIndex<O> {
+public abstract class AbstractMaterializeKNNPreprocessor<O> implements KNNIndex<O> {
+  /**
+   * The relation we are bound to.
+   */
+  protected final Relation<O> relation;
+
   /**
    * The query k value.
    */
@@ -66,6 +72,11 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
   protected final DistanceQuery<O> distanceQuery;
 
   /**
+   * The data store.
+   */
+  protected WritableDataStore<KNNList> storage = null;
+
+  /**
    * Constructor.
    *
    * @param relation Relation
@@ -73,8 +84,9 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
    * @param k k
    */
   public AbstractMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
-    super(relation);
+    super();
     this.k = k;
+    this.relation = relation;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceFunction.instantiate(relation);
   }
@@ -122,7 +134,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
    * Create the default storage.
    */
   void createStorage() {
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, KNNList.class);
+    storage = DataStoreUtil.makeStorage(distanceQuery.getRelation().getDBIDs(), DataStoreFactory.HINT_HOT, KNNList.class);
   }
 
   @Override
@@ -130,7 +142,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
     if(storage != null) {
       throw new UnsupportedOperationException("Preprocessor already ran.");
     }
-    if(relation.size() > 0) {
+    if(distanceQuery.getRelation().size() > 0) {
       preprocess();
     }
   }
@@ -149,8 +161,15 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> extends AbstractPrep
         break;
       }
     }
-    return new PreprocessorKNNQuery<O>(relation, this);
+    return new PreprocessorKNNQuery<O>(distanceQuery.getRelation(), this);
   }
+
+  /**
+   * Get the classes static logger.
+   * 
+   * @return Logger
+   */
+  protected abstract Logging getLogger();
 
   /**
    * The parameterizable factory.

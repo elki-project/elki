@@ -41,7 +41,7 @@ import elki.utilities.exceptions.AbortException;
  * Represents a single representation. This is attached to a DBIDs object, which
  * you are supposed to manage first. I.e. put the new DBID in, then invoke
  * set(), remove the DBID, then delete().
- *
+ * <p>
  * TODO: is this semantic sane?
  *
  * @author Erich Schubert

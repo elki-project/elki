@@ -23,19 +23,19 @@ package elki.index.preprocessed.snn;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.index.preprocessed.AbstractPreprocessorIndex;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Shared Nearest Neighbor Preprocessor")
 @Description("Computes the k nearest neighbors of objects of a certain database.")
-public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIndex<O, ArrayDBIDs> implements SharedNearestNeighborIndex<O> {
+public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighborIndex<O> {
   /**
    * Get a logger for this class.
    */
@@ -79,6 +79,16 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
   protected Distance<O> distanceFunction;
 
   /**
+   * The data store.
+   */
+  protected WritableDataStore<ArrayDBIDs> storage = null;
+
+  /**
+   * Relation to use.
+   */
+  protected Relation<O> relation;
+
+  /**
    * Constructor.
    * 
    * @param relation Database to use
@@ -86,20 +96,21 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
    * @param distanceFunction Distance function
    */
   public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, Distance<O> distanceFunction) {
-    super(relation);
-    this.numberOfNeighbors = numberOfNeighbors;
+    super();
+    this.relation = relation;
     this.distanceFunction = distanceFunction;
+    this.numberOfNeighbors = numberOfNeighbors;
   }
 
   @Override
   public void initialize() {
-    if(getLogger().isVerbose()) {
-      getLogger().verbose("Assigning nearest neighbor lists to database objects");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
     KNNQuery<O> knnquery = relation.getKNNQuery(distanceFunction, numberOfNeighbors);
 
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
       DBIDs kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
@@ -114,9 +125,9 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       }
       neighbors.sort();
       storage.put(iditer, neighbors);
-      getLogger().incrementProcessed(progress);
+      LOG.incrementProcessed(progress);
     }
-    getLogger().ensureCompleted(progress);
+    LOG.ensureCompleted(progress);
   }
 
   @Override
@@ -125,11 +136,6 @@ public class SharedNearestNeighborPreprocessor<O> extends AbstractPreprocessorIn
       initialize();
     }
     return storage.get(objid);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   @Override

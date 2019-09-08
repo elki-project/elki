@@ -27,7 +27,6 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.model.SubspaceModel;
 import elki.database.Database;
-import elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -65,7 +64,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
     Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
         .with(DiSH.Par.EPSILON_ID, 0.1) //
         .with(DiSH.Par.MU_ID, 40) //
-        .with(DiSHPreferenceVectorIndex.Factory.STRATEGY_ID, DiSHPreferenceVectorIndex.Strategy.APRIORI) //
+        .with(DiSH.Par.STRATEGY_ID, DiSH.Strategy.APRIORI) //
         .build().run(db);
     testFMeasure(db, result, 0.656432);
     testClusterSizes(result, new int[] { 61, 84, 153, 187, 283, 332 });

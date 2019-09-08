@@ -1,3 +1,2 @@
-elki.index.preprocessed.preference.DiSHPreferenceVectorIndex$Factory
 elki.index.idistance.InMemoryIDistanceIndex$Factory
 elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory

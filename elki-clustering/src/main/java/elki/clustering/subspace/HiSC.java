@@ -32,18 +32,25 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
-import elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
+import elki.database.relation.RelationUtil;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
+import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
+import elki.logging.statistics.MillisTimeDuration;
 import elki.result.Metadata;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 import net.jafama.FastMath;
 
@@ -81,24 +88,26 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   private static final Logging LOG = Logging.getLogger(HiSC.class);
 
   /**
-   * Factory to produce
-   */
-  private HiSCPreferenceVectorIndex.Factory<V> indexfactory;
-
-  /**
    * Holds the maximum diversion allowed.
    */
   private double alpha;
 
   /**
+   * The number of nearest neighbors considered to determine the preference
+   * vector.
+   */
+  protected int k;
+
+  /**
    * Constructor.
    * 
-   * @param indexfactory HiSC index factory
+   * @param alpha Alpha
+   * @param k k
    */
-  public HiSC(HiSCPreferenceVectorIndex.Factory<V> indexfactory) {
+  public HiSC(double alpha, int k) {
     super();
-    this.indexfactory = indexfactory;
-    this.alpha = indexfactory.getAlpha();
+    this.alpha = alpha;
+    this.k = k;
   }
 
   @Override
@@ -113,9 +122,9 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
     /**
-     * Instantiated index.
+     * The data store.
      */
-    private HiSCPreferenceVectorIndex<V> index;
+    protected WritableDataStore<long[]> preferenceVectors = null;
 
     /**
      * Cluster order.
@@ -154,8 +163,50 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     public CorrelationClusterOrder run() {
-      this.index = indexfactory.instantiate(relation);
+      final int usek = k > 0 ? k : 3 * RelationUtil.dimensionality(relation);
+      preferenceVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
+      KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, usek);
+
+      Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        preferenceVectors.put(it, determinePreferenceVector(it, knnQuery.getKNNForDBID(it, usek)));
+        LOG.incrementProcessed(progress);
+      }
+      LOG.ensureCompleted(progress);
+      LOG.statistics(dur.end());
       return super.run();
+    }
+
+    /**
+     * Determines the preference vector according to the specified neighbor ids.
+     *
+     * @param id the id of the object for which the preference vector should be
+     *        determined
+     * @param neighborIDs the ids of the neighbors
+     * @return the preference vector
+     */
+    private long[] determinePreferenceVector(DBIDRef id, DBIDs neighborIDs) {
+      NumberVector p = relation.get(id);
+      // variances
+      final int size = neighborIDs.size(), dim = p.getDimensionality();
+      double[] sumsq = new double[dim];
+      for(DBIDIter iter = neighborIDs.iter(); iter.valid(); iter.advance()) {
+        NumberVector o = relation.get(iter);
+        for(int d = 0; d < dim; d++) {
+          final double diff = o.doubleValue(d) - p.doubleValue(d);
+          sumsq[d] += diff * diff;
+        }
+      }
+
+      // preference vector
+      long[] preferenceVector = BitsUtil.zero(dim);
+      for(int d = 0; d < dim; d++) {
+        if(sumsq[d] < alpha * size) {
+          BitsUtil.setI(preferenceVector, d);
+        }
+      }
+      return preferenceVector;
     }
 
     @Override
@@ -175,7 +226,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     protected void expandDBID(DBIDRef id) {
       clusterOrder.add(id);
 
-      final long[] pv1 = index.getPreferenceVector(id);
+      final long[] pv1 = preferenceVectors.get(id);
       final V v1 = relation.get(id);
       final int dim = v1.getDimensionality();
 
@@ -185,7 +236,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         if(processedIDs.contains(iter)) {
           continue;
         }
-        long[] pv2 = index.getPreferenceVector(iter);
+        long[] pv2 = preferenceVectors.get(iter);
         V v2 = relation.get(iter);
         final long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
 
@@ -272,7 +323,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(indexfactory.getInputTypeRestriction());
+    return TypeUtil.array(NumberVector.FIELD);
   }
 
   @Override
@@ -294,11 +345,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public static final OptionID EPSILON_ID = new OptionID("hisc.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
 
     /**
-     * Factory to produce the index.
-     */
-    private HiSCPreferenceVectorIndex.Factory<V> indexfactory;
-
-    /**
      * The maximum absolute variance along a coordinate axis.
      * Must be in the range of [0.0, 1.0).
      */
@@ -316,15 +362,32 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      */
     public static final OptionID K_ID = new OptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
 
+    /**
+     * The maximum absolute variance along a coordinate axis.
+     */
+    protected double alpha;
+
+    /**
+     * The number of nearest neighbors considered to determine the preference
+     * vector.
+     */
+    protected int k = 0;
+
     @Override
     public void configure(Parameterization config) {
-      Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
-      indexfactory = config.tryInstantiate(cls);
+      new DoubleParameter(HiSC.Par.ALPHA_ID, HiSC.Par.DEFAULT_ALPHA) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+      new IntParameter(HiSC.Par.K_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true) //
+          .grab(config, x -> k = x);
     }
 
     @Override
     public HiSC<V> make() {
-      return new HiSC<>(indexfactory);
+      return new HiSC<>(alpha, k);
     }
   }
 }

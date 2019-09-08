@@ -20,46 +20,36 @@
  */
 package elki.clustering.subspace;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.optics.CorrelationClusterOrder;
 import elki.clustering.optics.GeneralizedOPTICS;
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.NumberVector;
-import elki.data.Subspace;
+import elki.data.*;
 import elki.data.model.SubspaceModel;
+import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
+import elki.data.type.VectorFieldTypeInformation;
 import elki.database.Database;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.datastore.WritableDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.datastore.*;
+import elki.database.ids.*;
+import elki.database.query.range.RangeQuery;
+import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
+import elki.distance.subspace.OnedimensionalDistance;
+import elki.itemsetmining.APRIORI;
+import elki.itemsetmining.Itemset;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
+import elki.logging.statistics.MillisTimeDuration;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.ProjectedCentroid;
+import elki.result.FrequentItemsetsResult;
 import elki.result.Metadata;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.hierarchy.Hierarchy;
 import elki.utilities.datastructures.iterator.It;
@@ -67,15 +57,15 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
-import elki.utilities.optionhandling.parameterization.ChainedParameterization;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.pairs.Pair;
+
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -113,32 +103,46 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   private static final Logging LOG = Logging.getLogger(DiSH.class);
 
   /**
+   * Available strategies for determination of the preference vector.
+   */
+  public enum Strategy {
+    /**
+     * Apriori strategy.
+     */
+    APRIORI,
+    /**
+     * Max intersection strategy.
+     */
+    MAX_INTERSECTION
+  }
+
+  /**
    * Holds the value of {@link Parameterizer#EPSILON_ID}.
    */
   private double epsilon;
 
   /**
-   * The DiSH preprocessor.
-   */
-  private DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor;
-
-  /**
    * OPTICS minPts parameter.
    */
-  private int mu;
+  private int minpts;
+
+  /**
+   * DiSH strategy.
+   */
+  private Strategy strategy;
 
   /**
    * Constructor.
    *
    * @param epsilon Epsilon value
-   * @param mu Mu parameter (minPts)
-   * @param dishPreprocessor DiSH preprocessor
+   * @param minpts Mu parameter (minPts)
+   * @param strategy DiSH strategy
    */
-  public DiSH(double epsilon, int mu, DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor) {
+  public DiSH(double epsilon, int mu, DiSH.Strategy strategy) {
     super();
     this.epsilon = epsilon;
-    this.mu = mu;
-    this.dishPreprocessor = dishPreprocessor;
+    this.minpts = mu;
+    this.strategy = strategy;
   }
 
   /**
@@ -147,8 +151,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param relation Relation to process
    */
   public Clustering<SubspaceModel> run(Database db, Relation<V> relation) {
-    if(mu >= relation.size()) {
-      throw new AbortException("Parameter mu is chosen unreasonably large. This won't yield meaningful results.");
+    if(minpts >= relation.size()) {
+      throw new AbortException("Parameter minpts is chosen unreasonably large. This won't yield meaningful results.");
     }
     DiSHClusterOrder opticsResult = new Instance(db, relation).run();
 
@@ -361,7 +365,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   }
 
   /**
-   * Removes the clusters with size &lt; minpts from the cluster map and adds them
+   * Removes the clusters with size &lt; minpts from the cluster map and adds
+   * them
    * to their parents.
    *
    * @param relation the relation storing the objects
@@ -387,7 +392,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
         List<ArrayModifiableDBIDs> parallelClusters = clustersMap.get(pv);
         List<ArrayModifiableDBIDs> newParallelClusters = new ArrayList<>(parallelClusters.size());
         for(ArrayModifiableDBIDs c : parallelClusters) {
-          if(!BitsUtil.isZero(pv) && c.size() < mu) {
+          if(!BitsUtil.isZero(pv) && c.size() < minpts) {
             notAssigned.add(new Pair<>(pv, c));
           }
           else {
@@ -666,14 +671,19 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     Comparator<DBIDRef> tmpcomp = new Sorter();
 
     /**
-     * Index.
+     * The precomputed preference vectors.
      */
-    private DiSHPreferenceVectorIndex<V> index;
+    protected WritableDataStore<long[]> preferenceVectors;
 
     /**
      * Temporary storage for new preference vectors.
      */
     private WritableDataStore<long[]> tmpPreferenceVectors;
+
+    /**
+     * The DiSH preprocessor.
+     */
+    // private DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor;
 
     /**
      * Constructor.
@@ -696,9 +706,208 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     @Override
     public DiSHClusterOrder run() {
-      // This will be lazily instantiated.
-      this.index = dishPreprocessor.instantiate(relation);
+      preferenceVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
+
+      Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
+
+      final int dim = RelationUtil.dimensionality(relation);
+      ArrayList<RangeQuery<V>> rangeQueries = new ArrayList<>(dim);
+      for(int d = 0; d < dim; d++) {
+        rangeQueries.add(relation.getRangeQuery(new OnedimensionalDistance(d), epsilon));
+      }
+
+      StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        if(msg != null) {
+          msg.setLength(0);
+          msg.append("\nid = ").append(DBIDUtil.toString(it));
+          // msg.append(" ").append(database.get(id));
+          // msg.append(" ").append(database.getObjectLabelQuery().get(id));
+        }
+
+        // determine neighbors in each dimension
+        ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
+        for(int d = 0; d < dim; d++) {
+          allNeighbors[d] = DBIDUtil.newHashSet(rangeQueries.get(d).getRangeForDBID(it, epsilon));
+        }
+
+        if(msg != null) {
+          for(int d = 0; d < dim; d++) {
+            msg.append("\n neighbors [").append(d).append(']') //
+                .append(" (").append(allNeighbors[d].size()).append(") = ").append(allNeighbors[d]);
+          }
+        }
+        preferenceVectors.put(it, determinePreferenceVector(relation, allNeighbors, msg));
+
+        if(msg != null) {
+          LOG.debugFine(msg.toString());
+        }
+        LOG.incrementProcessed(progress);
+      }
+      LOG.ensureCompleted(progress);
+      LOG.statistics(dur.end());
       return super.run();
+    }
+
+    /**
+     * Determines the preference vector according to the specified neighbor ids.
+     *
+     * @param relation the database storing the objects
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     */
+    private long[] determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+      return strategy == Strategy.APRIORI ? //
+          determinePreferenceVectorByApriori(relation, neighborIDs, msg) : //
+          determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
+    }
+
+    /**
+     * Determines the preference vector with the apriori strategy.
+     *
+     * @param relation the database storing the objects
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     */
+    private long[] determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+      int dimensionality = neighborIDs.length;
+
+      ArrayList<BitVector> bvs = new ArrayList<>(relation.size());
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        long[] bits = BitsUtil.zero(dimensionality);
+        boolean allFalse = true;
+        for(int d = 0; d < dimensionality; d++) {
+          if(neighborIDs[d].contains(it)) {
+            BitsUtil.setI(bits, d);
+            allFalse = false;
+          }
+        }
+        if(!allFalse) {
+          bvs.add(new BitVector(bits, dimensionality));
+        }
+      }
+      // Build virtual relation for running apriori
+      SimpleTypeInformation<BitVector> bitmeta = VectorFieldTypeInformation.typeRequest(BitVector.class, dimensionality, dimensionality);
+      DBIDRange vids = DBIDFactory.FACTORY.generateStaticDBIDRange(0, bvs.size());
+      MaterializedRelation<BitVector> bitvectorrel = new MaterializedRelation<>(bitmeta, vids);
+      for(DBIDArrayIter it = vids.iter(); it.valid(); it.advance()) {
+        bitvectorrel.insert(it, bvs.get(it.getOffset()));
+      }
+      APRIORI apriori = new APRIORI(minpts);
+      FrequentItemsetsResult aprioriResult = apriori.run(bitvectorrel);
+
+      // result of apriori
+      List<Itemset> frequentItemsets = aprioriResult.getItemsets();
+      if(msg != null) {
+        msg.append("\n Frequent itemsets: ").append(frequentItemsets);
+      }
+      int maxSupport = 0, maxCardinality = 0;
+      long[] preferenceVector = BitsUtil.zero(dimensionality);
+      for(Itemset itemset : frequentItemsets) {
+        if((maxCardinality < itemset.length()) || (maxCardinality == itemset.length() && maxSupport == itemset.getSupport())) {
+          preferenceVector = Itemset.toBitset(itemset, BitsUtil.zero(dimensionality));
+          maxCardinality = itemset.length();
+          maxSupport = itemset.getSupport();
+        }
+      }
+
+      if(msg != null) {
+        LOG.debugFine(msg.append("\n preference ") //
+            .append(BitsUtil.toStringLow(preferenceVector, dimensionality)) //
+            .append('\n').toString());
+      }
+      return preferenceVector;
+    }
+
+    /**
+     * Determines the preference vector with the max intersection strategy.
+     *
+     * @param neighborIDs the list of ids of the neighbors in each dimension
+     * @param msg a string buffer for debug messages
+     * @return the preference vector
+     */
+    private long[] determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+      int dimensionality = neighborIDs.length;
+      long[] preferenceVector = BitsUtil.zero(dimensionality);
+
+      Map<Integer, ModifiableDBIDs> candidates = new HashMap<>(dimensionality);
+      for(int i = 0; i < dimensionality; i++) {
+        ModifiableDBIDs s_i = neighborIDs[i];
+        if(s_i.size() > minpts) {
+          candidates.put(i, s_i);
+        }
+      }
+      if(msg != null) {
+        msg.append("\n candidates ").append(candidates.keySet());
+      }
+
+      if(!candidates.isEmpty()) {
+        int i = max(candidates);
+        ModifiableDBIDs intersection = candidates.remove(i);
+        BitsUtil.setI(preferenceVector, i);
+        while(!candidates.isEmpty()) {
+          i = maxIntersection(candidates, intersection);
+          candidates.remove(i);
+          if(intersection.size() < minpts) {
+            break;
+          }
+          BitsUtil.setI(preferenceVector, i);
+        }
+      }
+
+      if(msg != null) {
+        msg.append("\n preference ").append(BitsUtil.toStringLow(preferenceVector, dimensionality));
+        LOG.debug(msg.toString());
+      }
+
+      return preferenceVector;
+    }
+
+    /**
+     * Returns the set with the maximum size contained in the specified map.
+     *
+     * @param candidates the map containing the sets
+     * @return the set with the maximum size
+     */
+    private int max(Map<Integer, ModifiableDBIDs> candidates) {
+      int maxDim = -1, size = -1;
+      for(Integer nextDim : candidates.keySet()) {
+        int nextSet = candidates.get(nextDim).size();
+        if(size < nextSet) {
+          size = nextSet;
+          maxDim = nextDim;
+        }
+      }
+      return maxDim;
+    }
+
+    /**
+     * Returns the index of the set having the maximum intersection set with the
+     * specified set contained in the specified map.
+     *
+     * @param candidates the map containing the sets
+     * @param set the set to intersect with and output the result to
+     * @return the set with the maximum size
+     */
+    private int maxIntersection(Map<Integer, ModifiableDBIDs> candidates, ModifiableDBIDs set) {
+      int maxDim = -1;
+      ModifiableDBIDs maxIntersection = null;
+      for(Integer nextDim : candidates.keySet()) {
+        DBIDs nextSet = candidates.get(nextDim);
+        ModifiableDBIDs nextIntersection = DBIDUtil.intersection(set, nextSet);
+        if(maxDim < 0 || maxIntersection.size() < nextIntersection.size()) {
+          maxIntersection = nextIntersection;
+          maxDim = nextDim;
+        }
+      }
+      if(maxDim >= 0) {
+        set.clear();
+        set.addDBIDs(maxIntersection);
+      }
+      return maxDim;
     }
 
     @Override
@@ -718,7 +927,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     protected void expandDBID(DBIDRef id) {
       clusterOrder.add(id);
 
-      long[] pv1 = index.getPreferenceVector(id);
+      long[] pv1 = preferenceVectors.get(id);
       V dv1 = relation.get(id);
       final int dim = dv1.getDimensionality();
 
@@ -727,7 +936,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
       DBIDArrayIter iter = tmpIds.iter();
       for(; iter.valid(); iter.advance()) {
-        long[] pv2 = index.getPreferenceVector(iter);
+        long[] pv2 = preferenceVectors.get(iter);
         V dv2 = relation.get(iter);
         // We need a copy of this for the distance.
         long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
@@ -755,9 +964,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       }
       tmpIds.sort(tmpcomp);
       // Core-distance of OPTICS:
-      // FIXME: what if there are less than mu points of smallest
+      // FIXME: what if there are less than minpts points of smallest
       // dimensionality? Then this distance will not be meaningful.
-      double coredist = tmpDistance.doubleValue(iter.seek(mu - 1));
+      double coredist = tmpDistance.doubleValue(iter.seek(minpts - 1));
       // This is a hack, but needed to enforce core-distance of OPTICS:
       for(iter.seek(0); iter.valid(); iter.advance()) {
         if(processedIDs.contains(iter)) {
@@ -859,13 +1068,48 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    */
   public static class Par<V extends NumberVector> implements Parameterizer {
     /**
-     * Parameter that specifies the maximum radius of the neighborhood to be
-     * considered in each dimension for determination of the preference vector,
-     * must be a double equal to or greater than 0.
+     * The default value for epsilon.
+     */
+    public static final double DEFAULT_EPSILON = 0.001;
+
+    /**
+     * A comma separated list of positive doubles specifying the maximum radius
+     * of the neighborhood to be considered in each dimension for determination
+     * of the preference vector (default is {@link #DEFAULT_EPSILON} in each
+     * dimension). If only one value is specified, this value will be used for
+     * each dimension.
      */
     public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", //
-        "The maximum radius of the neighborhood to be considered in each " //
-            + " dimension for determination of the preference vector.");
+        "A comma separated list of positive doubles specifying the maximum radius " + //
+            "of the neighborhood to be considered in each dimension for determination " + //
+            "of the preference vector " + //
+            "(default is " + DEFAULT_EPSILON + " in each dimension). " + //
+            "If only one value is specified, this value will be used for each dimension.");
+
+    /**
+     * Positive threshold for minimum numbers of points in the
+     * epsilon-neighborhood of a points.
+     */
+    public static final OptionID MINPTS_ID = new OptionID("dish.minpts", //
+        "Positive threshold for minumum numbers of points in the epsilon-neighborhood of a point. " + //
+            "The value of the preference vector in dimension d_i is set to 1 " + //
+            "if the epsilon neighborhood contains more than dish.minpts points and the following condition holds: " + //
+            "for all dimensions d_j: |neighbors(d_i) intersection neighbors(d_j)| >= dish.minpts.");
+
+    /**
+     * Default strategy.
+     */
+    public static final Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
+
+    /**
+     * The strategy for determination of the preference vector, available
+     * strategies are: {@link Strategy#APRIORI } and
+     * {@link Strategy#MAX_INTERSECTION}.
+     */
+    public static final OptionID STRATEGY_ID = new OptionID("dish.strategy", //
+        "The strategy for determination of the preference vector, " + //
+            "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + //
+            "(default is " + DEFAULT_STRATEGY + ")");
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
@@ -875,14 +1119,20 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     public static final OptionID MU_ID = new OptionID("dish.mu", //
         "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
 
-    protected double epsilon = 0.0;
-
-    protected int mu = 1;
+    /**
+     * The epsilon value for each dimension.
+     */
+    protected double epsilon;
 
     /**
-     * DiSH preprocessor.
+     * Threshold for minimum number of points in the neighborhood.
      */
-    protected DiSHPreferenceVectorIndex.Factory<V> dishPreprocessor;
+    protected int minpts;
+
+    /**
+     * The strategy to determine the preference vector.
+     */
+    protected Strategy strategy;
 
     @Override
     public void configure(Parameterization config) {
@@ -891,25 +1141,14 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
           .grab(config, x -> epsilon = x);
       new IntParameter(MU_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .grab(config, x -> mu = x);
-      configDiSHPreprocessor(config, epsilon, mu);
-    }
-
-    public void configDiSHPreprocessor(Parameterization config, double epsilon, int minpts) {
-      ChainedParameterization dishchain = new ChainedParameterization(//
-          new ListParameterization() //
-              .addParameter(DiSHPreferenceVectorIndex.Factory.EPSILON_ID, epsilon) //
-              .addParameter(DiSHPreferenceVectorIndex.Factory.MINPTS_ID, minpts), //
-          config);
-      dishchain.errorsTo(config);
-
-      Class<DiSHPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DiSHPreferenceVectorIndex.Factory.class);
-      dishPreprocessor = dishchain.tryInstantiate(cls);
+          .grab(config, x -> minpts = x);
+      new EnumParameter<Strategy>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY) //
+          .grab(config, x -> strategy = x);
     }
 
     @Override
     public DiSH<V> make() {
-      return new DiSH<>(epsilon, mu, dishPreprocessor);
+      return new DiSH<>(epsilon, minpts, strategy);
     }
   }
 }

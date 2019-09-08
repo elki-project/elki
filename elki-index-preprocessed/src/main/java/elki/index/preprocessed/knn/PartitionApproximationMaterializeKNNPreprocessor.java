@@ -22,12 +22,7 @@ package elki.index.preprocessed.knn;
 
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDPair;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -42,6 +37,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 /**
