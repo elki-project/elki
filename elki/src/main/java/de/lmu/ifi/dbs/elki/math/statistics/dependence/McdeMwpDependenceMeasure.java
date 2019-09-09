@@ -60,7 +60,8 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
      * as required by MWP test. Example:
      * double[] corrected_ranks = corrected_ranks(...);
      * double l = corrected_rank[0]; double adjusted_rank = corrected_rank[1]; double correction = corrected_rank[2];
-     * // correspond to one instance of the original data
+     * 
+     * Correspond to one instance of the original data
      */
     protected <A> MwpIndex[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx){
         final int len = adapter.size(data);
