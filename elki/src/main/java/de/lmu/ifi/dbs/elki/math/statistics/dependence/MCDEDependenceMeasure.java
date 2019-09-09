@@ -130,8 +130,6 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct> extends Abstra
 
     /**
      * Implements dependence from DependenceMeasure superclass. Corresponds to Algorithm 4 in source paper.
-     * Note: Data must not contain NaN values. //TODO: What does this mean? If that is the case, then you must handle this with an exception, see HiCSDependenceMeasure
-     *
      * @param adapter1 First data adapter
      * @param data1 First data set
      * @param adapter2 Second data adapter
