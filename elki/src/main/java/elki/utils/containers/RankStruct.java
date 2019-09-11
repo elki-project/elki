@@ -25,11 +25,12 @@ package elki.utils.containers;
  */
 
 public class RankStruct {
-    public int index;
+  public int index;
 
-    public RankStruct(int index){
-        this.index = index;
-    }
+  public RankStruct(int index) {
+    this.index = index;
+  }
 
-    public RankStruct(){}
+  public RankStruct() {
+  }
 }
