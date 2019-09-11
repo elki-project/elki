@@ -1,0 +1,2 @@
+elki.index.projected.LatLngAsECEFIndex$Factory
+elki.index.projected.LngLatAsECEFIndex$Factory

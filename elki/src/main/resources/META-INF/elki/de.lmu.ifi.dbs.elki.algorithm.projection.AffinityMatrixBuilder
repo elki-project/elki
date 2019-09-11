@@ -1,4 +1,0 @@
-de.lmu.ifi.dbs.elki.algorithm.projection.PerplexityAffinityMatrixBuilder
-de.lmu.ifi.dbs.elki.algorithm.projection.NearestNeighborAffinityMatrixBuilder
-de.lmu.ifi.dbs.elki.algorithm.projection.GaussianAffinityMatrixBuilder
-de.lmu.ifi.dbs.elki.algorithm.projection.IntrinsicNearestNeighborAffinityMatrixBuilder

@@ -1,0 +1,5 @@
+elki.utilities.scaling.IdentityScaling
+elki.utilities.scaling.ClipScaling
+elki.utilities.scaling.GammaScaling
+elki.utilities.scaling.LinearScaling
+elki.utilities.scaling.MinusLogScaling

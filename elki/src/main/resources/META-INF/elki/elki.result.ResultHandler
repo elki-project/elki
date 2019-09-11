@@ -1,0 +1,4 @@
+elki.result.ResultWriter
+elki.result.DiscardResultHandler
+elki.result.KMLOutputHandler
+elki.result.LogResultStructureResultHandler

@@ -1,0 +1,11 @@
+elki.math.statistics.intrinsicdimensionality.MOMEstimator
+elki.math.statistics.intrinsicdimensionality.HillEstimator
+elki.math.statistics.intrinsicdimensionality.RVEstimator
+elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator
+elki.math.statistics.intrinsicdimensionality.ZipfEstimator
+elki.math.statistics.intrinsicdimensionality.LMomentsEstimator
+elki.math.statistics.intrinsicdimensionality.GEDEstimator
+elki.math.statistics.intrinsicdimensionality.PWMEstimator
+elki.math.statistics.intrinsicdimensionality.PWM2Estimator
+elki.math.statistics.intrinsicdimensionality.ALIDEstimator
+elki.math.statistics.intrinsicdimensionality.EnsembleEstimator

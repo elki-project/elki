@@ -1,4 +1,0 @@
-de.lmu.ifi.dbs.elki.evaluation.classification.holdout.DisjointCrossValidation
-de.lmu.ifi.dbs.elki.evaluation.classification.holdout.StratifiedCrossValidation
-de.lmu.ifi.dbs.elki.evaluation.classification.holdout.LeaveOneOut
-de.lmu.ifi.dbs.elki.evaluation.classification.holdout.RandomizedCrossValidation

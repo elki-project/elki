@@ -20,23 +20,23 @@
  */
 package tutorial.javaapi;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomUniformGeneratedInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import elki.clustering.kmeans.LloydKMeans;
+import elki.clustering.kmeans.initialization.RandomUniformGenerated;
+import elki.data.Cluster;
+import elki.data.Clustering;
+import elki.data.NumberVector;
+import elki.data.model.KMeansModel;
+import elki.data.type.TypeUtil;
+import elki.database.Database;
+import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRange;
+import elki.database.relation.Relation;
+import elki.datasource.ArrayAdapterDatabaseConnection;
+import elki.datasource.DatabaseConnection;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.logging.LoggingConfiguration;
+import elki.utilities.random.RandomFactory;
 
 /**
  * Example program to generate a random data set, and run k-means on it.
@@ -75,13 +75,13 @@ public class PassingDataToELKI {
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // K-means should be used with squared Euclidean (least squares):
-    SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+    SquaredEuclideanDistance dist = SquaredEuclideanDistance.STATIC;
     // Default initialization, using global random:
     // To fix the random seed, use: new RandomFactory(seed);
-    RandomUniformGeneratedInitialMeans init = new RandomUniformGeneratedInitialMeans(RandomFactory.DEFAULT);
+    RandomUniformGenerated init = new RandomUniformGenerated(RandomFactory.DEFAULT);
 
     // Textbook k-means clustering:
-    KMeansLloyd<NumberVector> km = new KMeansLloyd<>(dist, //
+    LloydKMeans<NumberVector> km = new LloydKMeans<>(dist, //
     3 /* k - number of partitions */, //
     0 /* maximum number of iterations: no limit */, init);
 

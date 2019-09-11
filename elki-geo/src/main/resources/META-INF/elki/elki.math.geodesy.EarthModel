@@ -1,0 +1,9 @@
+elki.math.geodesy.SphericalHaversineEarthModel
+elki.math.geodesy.SphericalVincentyEarthModel
+elki.math.geodesy.SphericalCosineEarthModel
+elki.math.geodesy.WGS84SpheroidEarthModel WGS-84 WGS84
+elki.math.geodesy.GRS80SpheroidEarthModel GRS-80 GRS80
+elki.math.geodesy.WGS72SpheroidEarthModel WGS72 WGS-72
+elki.math.geodesy.GRS67SpheroidEarthModel GRS67 GRS-67
+elki.math.geodesy.Clarke1880SpheroidEarthModel Clarke1880
+elki.math.geodesy.Clarke1858SpheroidEarthModel Clarke1858

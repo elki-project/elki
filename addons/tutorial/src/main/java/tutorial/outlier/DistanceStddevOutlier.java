@@ -20,34 +20,32 @@
  */
 package tutorial.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.KNNList;
+import elki.database.query.knn.KNNQuery;
+import elki.database.relation.DoubleRelation;
+import elki.database.relation.MaterializedDoubleRelation;
+import elki.database.relation.Relation;
+import elki.distance.Distance;
+import elki.logging.Logging;
+import elki.math.DoubleMinMax;
+import elki.math.MeanVariance;
+import elki.outlier.OutlierAlgorithm;
+import elki.result.outlier.BasicOutlierScoreMeta;
+import elki.result.outlier.OutlierResult;
+import elki.result.outlier.OutlierScoreMeta;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * A simple outlier detection algorithm that computes the standard deviation of
@@ -58,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> Object type
  */
-public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger
    */
@@ -75,7 +73,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
    * @param distanceFunction Distance function to use
    * @param k Number of neighbors to use
    */
-  public DistanceStddevOutlier(DistanceFunction<? super O> distanceFunction, int k) {
+  public DistanceStddevOutlier(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -83,13 +81,12 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
   /**
    * Run the outlier detection algorithm
    *
-   * @param database Database to use
    * @param relation Relation to analyze
    * @return Outlier score result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
+    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores
@@ -114,13 +111,13 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
     // Wrap the result in the standard containers
     // Actual min-max, theoretical min-max!
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
-    DoubleRelation rel = new MaterializedDoubleRelation(relation.getDBIDs(), "stddev-outlier", scores);
+    DoubleRelation rel = new MaterializedDoubleRelation("stddev-outlier", relation.getDBIDs(), scores);
     return new OutlierResult(meta, rel);
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -137,7 +134,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for parameterization.
      */
@@ -149,18 +146,16 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<O, 
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
+    public void configure(Parameterization config) {
       // The super class has the distance function parameter!
-      super.makeOptions(config);
-      IntParameter kParam = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kParam)) {
-        k = kParam.getValue();
-      }
+      super.configure(config);
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override
-    protected DistanceStddevOutlier<O> makeInstance() {
+    public DistanceStddevOutlier<O> make() {
       return new DistanceStddevOutlier<>(distanceFunction, k);
     }
   }

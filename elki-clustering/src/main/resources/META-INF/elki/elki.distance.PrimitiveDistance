@@ -1,0 +1,6 @@
+elki.similarity.cluster.ClusterIntersectionSimilarity
+elki.similarity.cluster.ClusterJaccardSimilarity
+elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity
+elki.similarity.cluster.ClusteringRandIndexSimilarity
+elki.similarity.cluster.ClusteringBCubedF1Similarity
+elki.similarity.cluster.ClusteringFowlkesMallowsSimilarity

@@ -3,7 +3,7 @@ if(project.hasProperty('jacoco')) {
   allprojects {
     apply plugin: 'jacoco'
     task testWithLogging(type: Test) {
-      systemProperty "java.util.logging.config.file", "$rootDir/elki-logging/src/test/resources/de/lmu/ifi/dbs/elki/logging/logging.properties"
+      systemProperty "java.util.logging.config.file", "$rootDir/elki-logging/src/test/resources/elki/logging/logging.properties"
     }
     test.dependsOn testWithLogging
   }

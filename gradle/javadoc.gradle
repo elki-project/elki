@@ -46,12 +46,12 @@ subprojects {
       docTitle = 'ELKI'
       windowTitle = 'ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures'
       if (new File("src/main/javadoc/overview.html").exists()) overview = "src/main/javadoc/overview.html"
-      group('Algorithms', ['de.lmu.ifi.dbs.elki.algorithm*'])
-      group('Databases and Index Structures', ['de.lmu.ifi.dbs.elki.database*', 'de.lmu.ifi.dbs.elki.index*', 'de.lmu.ifi.dbs.elki.datasource*', 'de.lmu.ifi.dbs.elki.persistent*'])
-      group('Datatypes and Distance Functions', ['de.lmu.ifi.dbs.elki.data', 'de.lmu.ifi.dbs.elki.data.*', 'de.lmu.ifi.dbs.elki.distance*'])
-      group('Evaluation', ['de.lmu.ifi.dbs.elki.evalu*'])
-      group('GUI and Visualization', ['de.lmu.ifi.dbs.elki.gui*', 'de.lmu.ifi.dbs.elki.vis*'])
-      group('Utilities and Miscellaneous', ['de.lmu.ifi.dbs.elki', 'de.lmu.ifi.dbs.elki.*'])
+      group('Algorithms', ['elki.algorithm*'])
+      group('Databases and Index Structures', ['elki.database*', 'elki.index*', 'elki.datasource*', 'elki.persistent*'])
+      group('Datatypes and Distance Functions', ['elki.data', 'elki.data.*', 'elki.distance*'])
+      group('Evaluation', ['elki.evalu*'])
+      group('GUI and Visualization', ['elki.gui*', 'elki.vis*'])
+      group('Utilities and Miscellaneous', ['elki', 'elki.*'])
       group('Tutorial Code and Examples', ['tutorial', 'tutorial.*'])
       header = """<img src="{@docRoot}/figures/elki-logo-200.png" width="200"><script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>"""
       footer = """ELKI version $project.version"""
@@ -78,8 +78,8 @@ subprojects {
           addBooleanOption('hideGenerics', true)
           addBooleanOption('horizontal', true)
           addBooleanOption('hideprivateinner', true)
-          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|de.lmu.ifi.dbs.elki.*\\.(Instance(\\..*)?|Parameterizer)')
-          addStringOption('collpackages', 'java.util.*|fastutil.*|de.lmu.ifi.dbs.elki.utilities.datastructures.*')
+          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|elki.*\\.(Instance(\\..*)?|Parameterizer)')
+          addStringOption('collpackages', 'java.util.*|fastutil.*|elki.utilities.datastructures.*')
           addStringOption('edgefontsize', '7')
           addStringOption('edgefontname', 'Roboto')
           addStringOption('nodefontsize', '8')
@@ -117,7 +117,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/parameters-byclass.html"
-    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentParameters'
+    main = 'elki.application.internal.DocumentParameters'
     args "$project.buildDir/docs/javadoc/parameters-byclass.html"
     args "$project.buildDir/docs/javadoc/parameters-byopt.html"
   }
@@ -129,7 +129,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/references.html"
-    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentReferences'
+    main = 'elki.application.internal.DocumentReferences'
     args "$project.buildDir/docs/javadoc/references.html"
     args "$project.buildDir/docs/references.md"
   }

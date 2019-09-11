@@ -1,0 +1,6 @@
+elki.evaluation.AutomaticEvaluation
+elki.evaluation.NoAutomaticEvaluation
+elki.evaluation.index.IndexPurity
+elki.evaluation.index.IndexStatistics
+elki.evaluation.outlier.OutlierThresholdClustering
+elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage

@@ -20,14 +20,14 @@
  */
 package tutorial.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import elki.data.NumberVector;
+import elki.data.type.SimpleTypeInformation;
+import elki.data.type.VectorFieldTypeInformation;
+import elki.distance.AbstractNumberVectorDistance;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Tutorial example Minowski-distance variation with different exponents for
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
+public class MultiLPNorm extends AbstractNumberVectorDistance {
   /**
    * The exponents
    */
@@ -95,7 +95,7 @@ public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Option ID for the exponents
      */
@@ -107,16 +107,12 @@ public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
     double[] ps;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleListParameter ps_param = new DoubleListParameter(EXPONENTS_ID);
-      if(config.grab(ps_param)) {
-        ps = ps_param.getValue().clone();
-      }
+    public void configure(Parameterization config) {
+      new DoubleListParameter(EXPONENTS_ID).grab(config, x -> ps = x);
     }
 
     @Override
-    protected MultiLPNorm makeInstance() {
+    public MultiLPNorm make() {
       return new MultiLPNorm(ps);
     }
   }

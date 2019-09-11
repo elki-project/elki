@@ -1,0 +1,68 @@
+elki.distance.minkowski.EuclideanDistance euclidean euclid l2
+elki.distance.minkowski.ManhattanDistance taxicab cityblock l1
+elki.distance.minkowski.LPNormDistance lp minkowski p
+# elki.distance.minkowski.LPIntegerNormDistance
+elki.distance.ArcCosineDistance arccos
+elki.distance.ArcCosineUnitlengthDistance
+elki.distance.CosineDistance cosine
+elki.distance.CosineUnitlengthDistance
+elki.distance.minkowski.MaximumDistance maximum max chebyshev
+elki.distance.minkowski.MinimumDistance minimum min
+elki.distance.minkowski.SquaredEuclideanDistance squaredeuclidean
+elki.distance.BrayCurtisDistance bray-curtis braycurtis sorensen dice sorensen-dice
+elki.distance.CanberraDistance canberra
+elki.distance.WeightedCanberraDistance
+elki.distance.ClarkDistance
+# elki.distance.MahalanobisDistance
+# elki.distance.MatrixWeightedQuadraticDistance
+elki.distance.minkowski.WeightedLPNormDistance
+elki.distance.minkowski.WeightedEuclideanDistance
+elki.distance.minkowski.WeightedManhattanDistance
+elki.distance.minkowski.WeightedMaximumDistance
+elki.distance.minkowski.WeightedSquaredEuclideanDistance
+elki.distance.minkowski.SparseEuclideanDistance
+elki.distance.minkowski.SparseManhattanDistance
+elki.distance.minkowski.SparseLPNormDistance
+elki.distance.minkowski.SparseMaximumDistance
+elki.distance.minkowski.SparseSquaredEuclideanDistance
+elki.distance.colorhistogram.HSBHistogramQuadraticDistance
+elki.distance.colorhistogram.HistogramIntersectionDistance
+elki.distance.colorhistogram.RGBHistogramQuadraticDistance
+elki.distance.correlation.PearsonCorrelationDistance
+elki.distance.correlation.SquaredPearsonCorrelationDistance
+elki.distance.correlation.AbsolutePearsonCorrelationDistance
+elki.distance.correlation.UncenteredCorrelationDistance
+elki.distance.correlation.SquaredUncenteredCorrelationDistance
+elki.distance.correlation.AbsoluteUncenteredCorrelationDistance
+elki.distance.correlation.WeightedPearsonCorrelationDistance
+elki.distance.correlation.WeightedSquaredPearsonCorrelationDistance
+elki.distance.histogram.HistogramMatchDistance
+elki.distance.histogram.KolmogorovSmirnovDistance
+elki.distance.probabilistic.JeffreyDivergenceDistance j-divergence
+elki.distance.probabilistic.ChiDistance chi
+elki.distance.probabilistic.ChiSquaredDistance chisq
+elki.distance.probabilistic.HellingerDistance hellinger bhattacharyya
+elki.distance.probabilistic.FisherRaoDistance rao fisher-rao fisher
+elki.distance.probabilistic.JensenShannonDivergenceDistance
+elki.distance.probabilistic.KullbackLeiblerDivergenceAsymmetricDistance kl
+elki.distance.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistance kli
+elki.distance.probabilistic.SqrtJensenShannonDivergenceDistance
+elki.distance.probabilistic.TriangularDiscriminationDistance
+elki.distance.probabilistic.TriangularDistance
+elki.distance.set.HammingDistance
+elki.distance.set.JaccardSimilarityDistance
+elki.distance.strings.LevenshteinDistance
+elki.distance.strings.NormalizedLevenshteinDistance
+elki.distance.subspace.SubspaceEuclideanDistance
+elki.distance.subspace.SubspaceLPNormDistance
+elki.distance.subspace.SubspaceManhattanDistance
+elki.distance.subspace.SubspaceMaximumDistance
+elki.distance.subspace.OnedimensionalDistance
+elki.distance.timeseries.DTWDistance
+elki.distance.timeseries.EDRDistance
+elki.distance.timeseries.ERPDistance
+elki.distance.timeseries.LCSSDistance
+elki.distance.timeseries.DerivativeDTWDistance
+elki.similarity.kernel.LinearKernel
+elki.similarity.kernel.PolynomialKernel
+elki.similarity.Kulczynski1Similarity

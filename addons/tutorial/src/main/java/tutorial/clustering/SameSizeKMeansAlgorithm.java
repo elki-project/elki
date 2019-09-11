@@ -25,39 +25,33 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmeans.initialization.KMeansPlusPlus;
+import elki.data.Cluster;
+import elki.data.Clustering;
+import elki.data.DoubleVector;
+import elki.data.NumberVector;
+import elki.data.model.MeanModel;
+import elki.database.Database;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDataStore;
+import elki.database.ids.*;
+import elki.database.relation.Relation;
+import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.logging.Logging;
+import elki.math.MathUtil;
+import elki.result.Metadata;
+import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.IntComparator;
 
 /**
@@ -94,7 +88,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
+  public SameSizeKMeansAlgorithm(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -110,7 +104,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
-    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+    double[][] means = initializer.chooseInitialMeans(relation, k, getDistance());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -127,7 +121,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
-    Clustering<MeanModel> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
+    Clustering<MeanModel> result = new Clustering<>();
+    Metadata.of(result).setLongName("k-Means Samesize Clustering");
     for(int i = 0; i < clusters.size(); i++) {
       result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(means[i])));
     }
@@ -142,7 +137,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return Initialized storage
    */
   protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, double[][] means) {
-    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
+    NumberVectorDistance<? super V> df = getDistance();
     // The actual storage
     final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
     // Build the metadata, track the two nearest cluster centers.
@@ -229,7 +224,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param metas Metadata storage
    * @param df Distance function
    */
-  protected void updateDistances(Relation<V> relation, double[][] means, final WritableDataStore<Meta> metas, NumberVectorDistanceFunction<? super V> df) {
+  protected void updateDistances(Relation<V> relation, double[][] means, final WritableDataStore<Meta> metas, NumberVectorDistance<? super V> df) {
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
@@ -258,7 +253,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return final means
    */
   protected double[][] refineResult(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
-    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
+    NumberVectorDistance<? super V> df = getDistance();
     // Our desired cluster size:
     final int minsize = tids.size() / k; // rounded down
     final int maxsize = (tids.size() + k - 1) / k; // rounded up
@@ -320,7 +315,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         }
         // If the object would prefer a different cluster, put in outgoing
         // transfer list.
-        if (c.primary != preferences[0] && c.dists[c.primary] > c.dists[preferences[0]]) {
+        if(c.primary != preferences[0] && c.dists[c.primary] > c.dists[preferences[0]]) {
           transfers[c.primary].add(id);
         }
       }
@@ -450,7 +445,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * k Parameter.
      */
@@ -469,39 +464,30 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Distance function
      */
-    protected NumberVectorDistanceFunction<? super V> distanceFunction;
+    protected NumberVectorDistance<? super V> distanceFunction;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
-        if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
-          LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
-        }
-      }
-
-      IntParameter kP = new IntParameter(K_ID) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      ObjectParameter<KMeansInitialization> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, -1) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.intValue();
-      }
+    public void configure(Parameterization config) {
+      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> {
+            distanceFunction = x;
+            if(!(distanceFunction instanceof EuclideanDistance) //
+                && !(distanceFunction instanceof SquaredEuclideanDistance)) {
+              LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
+            }
+          });
+      new IntParameter(K_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
+      new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, KMeansPlusPlus.class) //
+          .grab(config, x -> initializer = x);
+      new IntParameter(MAXITER_ID, -1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT) //
+          .grab(config, x -> maxiter = x);
     }
 
     @Override
-    protected SameSizeKMeansAlgorithm<V> makeInstance() {
+    public SameSizeKMeansAlgorithm<V> make() {
       return new SameSizeKMeansAlgorithm<>(distanceFunction, k, maxiter, initializer);
     }
   }

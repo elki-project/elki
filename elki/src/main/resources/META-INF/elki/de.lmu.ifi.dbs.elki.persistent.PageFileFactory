@@ -1,3 +1,0 @@
-de.lmu.ifi.dbs.elki.persistent.LRUCachePageFileFactory
-de.lmu.ifi.dbs.elki.persistent.PersistentPageFileFactory
-de.lmu.ifi.dbs.elki.persistent.OnDiskArrayPageFileFactory

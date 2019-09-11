@@ -20,32 +20,27 @@
  */
 package tutorial.clustering;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
+import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.SLINK;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
+import elki.database.datastore.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
+import elki.distance.Distance;
+import elki.logging.Logging;
+import elki.logging.progress.FiniteProgress;
+import elki.utilities.documentation.Reference;
+import elki.utilities.exceptions.AbortException;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * This tutorial will step you through implementing a well known clustering
@@ -73,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
-public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -154,20 +149,19 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * @param distanceFunction Distance function to use
    * @param linkage Linkage strategy
    */
-  public NaiveAgglomerativeHierarchicalClustering4(DistanceFunction<? super O> distanceFunction, Linkage linkage) {
+  public NaiveAgglomerativeHierarchicalClustering4(Distance<? super O> distanceFunction, Linkage linkage) {
     super(distanceFunction);
     this.linkage = linkage;
   }
 
   /**
    * Run the algorithm
-   * 
-   * @param db Database
+   *
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -183,7 +177,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !getDistanceFunction().isSquared();
+    boolean square = Linkage.WARD.equals(linkage) && !getDistance().isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
@@ -271,7 +265,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     }
     LOG.ensureCompleted(prog);
 
-    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistanceFunction().isSquared());
+    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistance().isSquared());
   }
 
   /**
@@ -287,7 +281,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -304,7 +298,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Option ID for linkage parameter.
      */
@@ -316,17 +310,15 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     protected Linkage linkage = Linkage.SINGLE;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      EnumParameter<Linkage> linkageP = new EnumParameter<>(LINKAGE_ID, Linkage.class) //
-          .setDefaultValue(Linkage.WARD);
-      if(config.grab(linkageP)) {
-        linkage = linkageP.getValue();
-      }
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
+          .setDefaultValue(Linkage.WARD) //
+          .grab(config, x -> linkage = x);
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering4<O> makeInstance() {
+    public NaiveAgglomerativeHierarchicalClustering4<O> make() {
       return new NaiveAgglomerativeHierarchicalClustering4<>(distanceFunction, linkage);
     }
   }

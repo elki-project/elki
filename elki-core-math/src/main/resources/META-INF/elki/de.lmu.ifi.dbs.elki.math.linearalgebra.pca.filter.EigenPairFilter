@@ -1,8 +1,0 @@
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.LimitEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.ProgressiveEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.WeakEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.RelativeEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.DropEigenPairFilter

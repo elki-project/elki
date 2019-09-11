@@ -1,0 +1,5 @@
+elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory rstar r*
+# elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory
+# elki.index.tree.spatial.rstarvariants.flat.FlatRStarTreeFactory
+# elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTreeFactory
+elki.index.preprocessed.knn.SpatialApproximationMaterializeKNNPreprocessor$Factory

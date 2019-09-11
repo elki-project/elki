@@ -1,0 +1,2 @@
+elki.index.idistance.InMemoryIDistanceIndex$Factory
+elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory

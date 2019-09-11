@@ -23,28 +23,28 @@ package tutorial.javaapi;
 import java.util.Arrays;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.math.geodesy.WGS84SpheroidEarthModel;
-import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
+import elki.data.DoubleVector;
+import elki.data.NumberVector;
+import elki.data.type.TypeUtil;
+import elki.database.Database;
+import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDRange;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.KNNList;
+import elki.database.query.knn.KNNQuery;
+import elki.database.relation.Relation;
+import elki.datasource.ArrayAdapterDatabaseConnection;
+import elki.datasource.DatabaseConnection;
+import elki.distance.geo.LatLngDistance;
+import elki.index.Index;
+import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
+import elki.index.tree.spatial.rstarvariants.strategies.bulk.SortTileRecursiveBulkSplit;
+import elki.logging.LoggingConfiguration;
+import elki.math.geodesy.WGS84SpheroidEarthModel;
+import elki.persistent.AbstractPageFileFactory;
+import elki.result.Metadata;
+import elki.utilities.ELKIBuilder;
+import elki.utilities.datastructures.iterator.It;
 
 /**
  * Example code for using the R-tree index of ELKI, with Haversine distance.
@@ -73,9 +73,9 @@ public class GeoIndexing {
     // and additional constraint checks.
     RStarTreeFactory<?> indexfactory = new ELKIBuilder<>(RStarTreeFactory.class) //
         // If you have large query results, a larger page size can be better.
-        .with(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 512) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 512) //
         // Use bulk loading, for better performance.
-        .with(RStarTreeFactory.Parameterizer.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
+        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();
     // Create the database, and initialize it.
     Database db = new StaticArrayDatabase(dbc, Arrays.asList(indexfactory));
@@ -87,15 +87,15 @@ public class GeoIndexing {
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // For all indexes, dump their statistics.
-    for(It<Index> it = db.getHierarchy().iterDescendants(db).filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(db).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
 
     // We use the WGS84 earth model, and "latitude, longitude" coordinates:
     // This distance function returns meters.
-    LatLngDistanceFunction df = new LatLngDistanceFunction(WGS84SpheroidEarthModel.STATIC);
+    LatLngDistance df = new LatLngDistance(WGS84SpheroidEarthModel.STATIC);
     // k nearest neighbor query:
-    KNNQuery<NumberVector> knnq = QueryUtil.getKNNQuery(rel, df);
+    KNNQuery<NumberVector> knnq = rel.getKNNQuery(df);
 
     // Let's find the closest points to New York:
     DoubleVector newYork = DoubleVector.wrap(new double[] { 40.730610, -73.935242 });
@@ -124,7 +124,7 @@ public class GeoIndexing {
 
     // But also that we only read a small part of the data, and only computed
     // the distances to a few points in the data set.
-    for(It<Index> it = db.getHierarchy().iterDescendants(db).filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.hierarchyOf(db).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
   }

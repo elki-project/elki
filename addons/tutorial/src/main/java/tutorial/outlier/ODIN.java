@@ -20,33 +20,32 @@
  */
 package tutorial.outlier;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.KNNList;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.query.knn.KNNQuery;
+import elki.database.relation.DoubleRelation;
+import elki.database.relation.MaterializedDoubleRelation;
+import elki.database.relation.Relation;
+import elki.distance.Distance;
+import elki.logging.Logging;
+import elki.outlier.OutlierAlgorithm;
+import elki.result.outlier.InvertedOutlierScoreMeta;
+import elki.result.outlier.OutlierResult;
+import elki.result.outlier.OutlierScoreMeta;
+import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
@@ -70,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //
     url = "https://doi.org/10.1109/ICPR.2004.1334558", //
     bibkey = "DBLP:conf/icpr/HautamakiKF04")
-public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -87,27 +86,26 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    * @param distanceFunction Distance function
    * @param k k parameter
    */
-  public ODIN(DistanceFunction<? super O> distanceFunction, int k) {
+  public ODIN(Distance<? super O> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
 
   /**
    * Run the ODIN algorithm
-   *
+   * <p>
    * Tutorial note: the <em>signature</em> of this method depends on the types
    * that we requested in the {@link #getInputTypeRestriction} method. Here we
    * requested a single relation of type {@code O} , the data type of our
    * distance function.
    *
-   * @param database Database to run on.
    * @param relation Relation to process.
    * @return ODIN outlier result.
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
+  public OutlierResult run(Relation<O> relation) {
     // Get the query functions:
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, k);
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    KNNQuery<O> knnq = relation.getKNNQuery(dq, k);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
@@ -136,13 +134,13 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     // By actually specifying theoretical min, max and baseline, we get a better
     // visualization (try it out - or see the screenshots in the tutorial)!
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., ids.size() - 1, k);
-    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", "odin", scores, ids);
+    DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", ids, scores);
     return new OutlierResult(meta, rel);
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -159,7 +157,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Parameter for the number of nearest neighbors:
      *
@@ -175,21 +173,18 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     int k;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-
-      IntParameter param = new IntParameter(K_ID);
-      // Since in a database context, the 1 nearest neighbor
-      // will usually be the query object itself, we require
-      // this value to be at least 2.
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
-      if(config.grab(param)) {
-        k = param.intValue();
-      }
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(K_ID)//
+          // Since in a database context, the 1 nearest neighbor
+          // will usually be the query object itself, we require
+          // this value to be at least 2.
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override
-    protected ODIN<O> makeInstance() {
+    public ODIN<O> make() {
       return new ODIN<>(distanceFunction, k);
     }
   }

@@ -1,0 +1,3 @@
+elki.clustering.hierarchical.birch.DiameterCriterion D
+elki.clustering.hierarchical.birch.RadiusCriterion R
+elki.clustering.hierarchical.birch.EuclideanDistanceCriterion

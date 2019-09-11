@@ -22,25 +22,24 @@ package tutorial.clustering;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.*;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import elki.AbstractDistanceBasedAlgorithm;
+import elki.clustering.hierarchical.SLINK;
+import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
+import elki.data.Cluster;
+import elki.data.Clustering;
+import elki.data.model.Model;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
+import elki.database.ids.*;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
+import elki.distance.Distance;
+import elki.logging.Logging;
+import elki.logging.progress.FiniteProgress;
+import elki.result.Metadata;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
@@ -61,7 +60,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
  * 
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
+public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> {
   /**
    * Class logger
    */
@@ -78,7 +77,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
-  public NaiveAgglomerativeHierarchicalClustering1(DistanceFunction<? super O> distanceFunction, int numclusters) {
+  public NaiveAgglomerativeHierarchicalClustering1(Distance<? super O> distanceFunction, int numclusters) {
     super(distanceFunction);
     this.numclusters = numclusters;
   }
@@ -86,12 +85,11 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public Result run(Database db, Relation<O> relation) {
-    DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction());
+  public Clustering<Model> run(Relation<O> relation) {
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -172,7 +170,8 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
     LOG.ensureCompleted(prog);
 
     // Build the clustering result
-    final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
+    final Clustering<Model> dendrogram = new Clustering<>();
+    Metadata.of(dendrogram).setLongName("Hierarchical-Clustering");
     for(int x = 0; x < size; x++) {
       if(height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
@@ -190,7 +189,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(getDistance().getInputTypeRestriction());
   }
 
   @Override
@@ -207,24 +206,22 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     /**
      * Desired number of clusters.
      */
     int numclusters = 0;
 
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      IntParameter numclustersP = new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(numclustersP)) {
-        numclusters = numclustersP.intValue();
-      }
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> numclusters = x);
     }
 
     @Override
-    protected NaiveAgglomerativeHierarchicalClustering1<O> makeInstance() {
+    public NaiveAgglomerativeHierarchicalClustering1<O> make() {
       return new NaiveAgglomerativeHierarchicalClustering1<>(distanceFunction, numclusters);
     }
   }

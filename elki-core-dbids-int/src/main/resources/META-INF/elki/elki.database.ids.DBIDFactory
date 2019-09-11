@@ -1,0 +1,3 @@
+elki.database.ids.integer.TrivialDBIDFactory
+elki.database.ids.integer.SimpleDBIDFactory
+elki.database.ids.integer.ReusingDBIDFactory

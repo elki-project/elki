@@ -1,0 +1,3 @@
+elki.persistent.LRUCachePageFileFactory
+elki.persistent.PersistentPageFileFactory
+elki.persistent.OnDiskArrayPageFileFactory

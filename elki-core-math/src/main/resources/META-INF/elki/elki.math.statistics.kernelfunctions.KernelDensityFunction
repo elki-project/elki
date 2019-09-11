@@ -1,0 +1,8 @@
+elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction epanechnikov
+elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction
+elki.math.statistics.kernelfunctions.CosineKernelDensityFunction
+elki.math.statistics.kernelfunctions.UniformKernelDensityFunction
+elki.math.statistics.kernelfunctions.TriangularKernelDensityFunction
+elki.math.statistics.kernelfunctions.BiweightKernelDensityFunction biweight quartic
+elki.math.statistics.kernelfunctions.TriweightKernelDensityFunction triweight
+elki.math.statistics.kernelfunctions.TricubeKernelDensityFunction
