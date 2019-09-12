@@ -26,9 +26,11 @@ package elki.utils.containers;
 
 public class RankStruct {
   public int index;
+  public double adjusted;
 
-  public RankStruct(int index) {
+  public RankStruct(int index, double adjusted) {
     this.index = index;
+    this.adjusted = adjusted;
   }
 
   public RankStruct() {
