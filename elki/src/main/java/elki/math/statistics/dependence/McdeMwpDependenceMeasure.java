@@ -23,7 +23,6 @@ package elki.math.statistics.dependence;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -36,6 +35,10 @@ import elki.utils.containers.MwpIndex;
 import java.lang.reflect.Array;
 import java.util.Random;
 
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.M_ID;
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.ALPHA_ID;
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.BETA_ID;
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.SEED_ID;
 import static elki.math.statistics.distribution.NormalDistribution.erf;
 
 /**
@@ -184,39 +187,17 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
   public static class Par implements Parameterizer {
 
     /**
-     * Parameter that specifies the number of iterations in the Monte-Carlo
-     * process of identifying high contrast subspaces.
-     */
-    public static final OptionID M_ID = new OptionID("McdeMwp.m", "No. of Monte-Carlo iterations.");
-
-    /**
-     * Parameter that specifies the size of the slice
-     */
-    public static final OptionID ALPHA_ID = new OptionID("McdeMwp.alpha", "Expected share of instances in slice (independent dimensions).");
-
-    /**
-     * Parameter that specifies the size of the marginal restriction. Note that in the original paper
-     * alpha = beta and as such there is no explicit distinction between the parameters.
-     */
-    public static final OptionID BETA_ID = new OptionID("McdeMwp.beta", "Expected share of instances in marginal restriction (dependent dimensions).");
-
-    /**
-     * Parameter that specifies the random seed.
-     */
-    public static final OptionID SEED_ID = new OptionID("McdeMwp.seed", "The random seed.");
-
-    /**
-     * Holds the value of {@link #M_ID}.
+     * Holds the value of M_ID.
      */
     protected int m = 50;
 
     /**
-     * Holds the value of {@link #ALPHA_ID}.
+     * Holds the value of ALPHA_ID.
      */
     protected double alpha = 0.5;
 
     /**
-     * Holds the value of {@link #BETA_ID}.
+     * Holds the value of BETA_ID .
      */
     protected double beta = 0.5;
 
