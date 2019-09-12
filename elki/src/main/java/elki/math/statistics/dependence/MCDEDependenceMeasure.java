@@ -127,7 +127,10 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
     boolean slice[] = new boolean[len];
     Arrays.fill(slice, true);
 
-    final int slizeSize = (int) Math.ceil(Math.pow(this.alpha, 1.0) * len);
+    // According to the actual formula it should be Math.ceil(Math.pow(this.alpha, 1.0) * len).
+    // The exponent in the multivariate case should be the no. of dimensions - 1 which in the
+    // bivariate case is always simply 1.
+    final int slizeSize = (int) Math.ceil(this.alpha * len);
     final int start = random.nextInt(len - slizeSize);
     final int end = start + slizeSize;
 

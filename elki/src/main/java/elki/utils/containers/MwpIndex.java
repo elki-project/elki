@@ -27,9 +27,9 @@ package elki.utils.containers;
 public class MwpIndex extends RankStruct {
   public double adjusted;
 
-  public double correction;
+  public long correction;
 
-  public MwpIndex(int index, double adjusted, double correction) {
+  public MwpIndex(int index, double adjusted, long correction) {
     super(index);
     this.adjusted = adjusted;
     this.correction = correction;

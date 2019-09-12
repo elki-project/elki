@@ -91,7 +91,7 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
     MwpIndex[] I = (MwpIndex[]) Array.newInstance(MwpIndex.class, len);
 
     int j = 0;
-    int correction = 0;
+    long correction = 0;
     while(j < len) {
       int k = j;
       int t = 1;
@@ -159,9 +159,9 @@ public class McdeMwpDependenceMeasure extends MCDEDependenceMeasure<MwpIndex> {
       throw new AbortException("Long type overflowed. Too many objects: Please subsample and try again with smaller data set.");
     }
 
-    final double b_end = corrected_ranks[(end - 1)].correction;
-    final double b_start = start == 0 ? 0 : corrected_ranks[(start - 1)].correction;
-    final double correction = (b_end - b_start) / (cutLength * (cutLength - 1));
+    final long b_end = corrected_ranks[(end - 1)].correction;
+    final long b_start = start == 0 ? 0 : corrected_ranks[(start - 1)].correction;
+    final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
     final double std = Math.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
 
     if(std == 0) {
