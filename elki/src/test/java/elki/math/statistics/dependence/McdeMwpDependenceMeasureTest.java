@@ -23,6 +23,7 @@ package elki.math.statistics.dependence;
 import elki.utilities.ELKIBuilder;
 import elki.utilities.datastructures.arraylike.ExtendedArray;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.random.FastNonThreadsafeRandom;
 import elki.utilities.random.RandomFactory;
 import elki.utils.containers.MwpIndex;
@@ -31,6 +32,7 @@ import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.M_ID;
 
 import org.junit.Test;
 
@@ -80,11 +82,11 @@ public class McdeMwpDependenceMeasureTest {
       more_noise_lin2[i] = (i * 2) + generator.nextGaussian() * 500;
     }
 
-    NumberArrayAdapter adapter = new ExtendedArray<Double>();
+    DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
     RandomFactory rnd = new RandomFactory((long) Math.random());
 
     McdeMwpDependenceMeasure mwp = new ELKIBuilder<>(McdeMwpDependenceMeasure.class) //
-        .with(McdeMwpDependenceMeasure.Par.M_ID, 1000) //
+        .with(M_ID, 1000) //
         .build();
 
     test_result(indi1, indi2, 0.65, 0.35, 0.67, 0.33, adapter, mwp);
