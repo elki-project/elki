@@ -21,10 +21,8 @@
 package elki.math.statistics.dependence;
 
 import elki.utilities.ELKIBuilder;
-import elki.utilities.datastructures.arraylike.ExtendedArray;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
-import elki.utilities.random.FastNonThreadsafeRandom;
 import elki.utilities.random.RandomFactory;
 import elki.utils.containers.MwpIndex;
 
@@ -49,7 +47,8 @@ public class McdeMwpDependenceMeasureTest {
     double[] indi1 = new double[1000];
     double[] indi2 = new double[1000];
 
-    Random generator = new FastNonThreadsafeRandom(0);
+    RandomFactory rnd = new RandomFactory(0);
+    Random generator = rnd.getRandom();
 
     for(int i = 0; i < 1000; i++) {
       indi1[i] = generator.nextDouble();
@@ -83,7 +82,6 @@ public class McdeMwpDependenceMeasureTest {
     }
 
     DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
-    RandomFactory rnd = new RandomFactory((long) Math.random());
 
     McdeMwpDependenceMeasure mwp = new ELKIBuilder<>(McdeMwpDependenceMeasure.class) //
         .with(M_ID, 1000) //
