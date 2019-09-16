@@ -25,8 +25,14 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
-import elki.utils.containers.RankStruct;
+import elki.math.statistics.tests.mcde.*;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -41,7 +47,6 @@ import java.util.Random;
  * returns a p-value and index structure for efficient computation of the statistical test.
  * <p>
  * The instantiation of MCDE based on the Mann-Whitney U test is called MWP (as described in the paper).
- * See McdeMwpDependenceMeasure.
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
@@ -52,7 +57,7 @@ import java.util.Random;
     booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)", url = "https://doi.org/10.1145/3335783.3335795", //
     bibkey = "DBLP:conf/ssdbm/FoucheB19")
 
-public abstract class MCDEDependenceMeasure<R extends RankStruct>
+public class MCDEDependenceMeasure
     extends AbstractDependenceMeasure {
   /**
    * Monte-Carlo iterations.
@@ -75,47 +80,32 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
    */
   protected RandomFactory rnd;
 
+  // TODO: Comment
+  protected MCDETest mcdeTest;
+
   /**
-   * Constructor.
+   * Constructor. TODO: adjust comment
    *
    * @param m     Monte-Carlo iterations
    * @param alpha Expected share of instances in slice (under independence)
    * @param beta  Share of instances in marginal restriction (reference dimension)
    * @param rnd   Random source
    */
-  public MCDEDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd) {
+  public MCDEDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd, MCDETest mcdeTest) {
     this.m = m;
     this.alpha = alpha;
     this.beta = beta;
     this.rnd = rnd;
+    this.mcdeTest = mcdeTest;
   }
 
   /**
-   * Overloaded wrapper for corrected_ranks()
+   * Getter for this.beta
    */
-  protected <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
-    return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
+
+  public double getBeta() {
+    return this.beta;
   }
-
-  /**
-   * Subclass must implement computation of corrected rank index.
-   *
-   * @param adapter ELKI NumberArrayAdapter Subclass
-   * @param data    One dimensional array containing one dimension of the data
-   * @param idx     Return value of sortedIndex()
-   * @return Array of RankStruct, acting as rank index
-   */
-  protected abstract <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
-
-  /**
-   * Subclass must implement the computation of the statistical test, based on the slicing scheme.
-   *
-   * @param len             No of data instances
-   * @param slice           An array of boolean resulting from a random slice
-   * @param corrected_ranks the precomputed index structure for the reference dimension
-   * @return a 1 - p-value
-   */
-  protected abstract double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
 
   /**
    * Data Slicing
@@ -124,7 +114,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
    * @param nonRefIndex Index (see correctedRank()) computed for the dimension that is not the reference dimension
    * @return Array of booleans that states which instances are part of the slice
    */
-  protected boolean[] randomSlice(int len, R[] nonRefIndex) {
+  protected boolean[] randomSlice(int len, MCDETest.RankStruct[] nonRefIndex) {
     final Random random = rnd.getSingleThreadedRandom();
     boolean slice[] = new boolean[len];
     Arrays.fill(slice, true);
@@ -141,7 +131,7 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
     }
 
     for(int j = end; j < len; j++) {
-      slice[(int) nonRefIndex[j].index] = false;
+      slice[ nonRefIndex[j].index] = false;
     }
 
     return slice;
@@ -166,15 +156,15 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
       throw new AbortException("Size of both arrays must match!");
     }
 
-    final R[] index_0 = corrected_ranks(adapter1, data1, len);
-    final R[] index_1 = corrected_ranks(adapter2, data2, len);
+    final MCDETest.RankStruct[] index_0 = mcdeTest.corrected_ranks(adapter1, data1, len);
+    final MCDETest.RankStruct[] index_1 = mcdeTest.corrected_ranks(adapter2, data2, len);
 
     double mwp = 0;
 
     for(int i = 0; i < this.m; i++) {
       int r = random.nextInt(2);
-      R[] ref_index;
-      R[] other_index;
+      MCDETest.RankStruct[] ref_index;
+      MCDETest.RankStruct[] other_index;
 
       if(r == 1) {
         ref_index = index_1;
@@ -185,32 +175,84 @@ public abstract class MCDEDependenceMeasure<R extends RankStruct>
         other_index = index_1;
       }
 
-      mwp += statistical_test(len, randomSlice(len, other_index), ref_index);
+      mwp += mcdeTest.statistical_test(len, randomSlice(len, other_index), ref_index);
     }
     return mwp / m;
   }
 
-  abstract public static class Par implements Parameterizer {
+  public static class Par implements Parameterizer { // TODO: adjust Parametrizer for new MCDETEst
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces.
      */
-    public static final OptionID M_ID = new OptionID("McdeMwp.m", "No. of Monte-Carlo iterations.");
+    public static final OptionID M_ID = new OptionID("MCDE.test", "No. of Monte-Carlo iterations.");
 
     /**
      * Parameter that specifies the size of the slice
      */
-    public static final OptionID ALPHA_ID = new OptionID("McdeMwp.alpha", "Expected share of instances in slice (independent dimensions).");
+    public static final OptionID ALPHA_ID = new OptionID("MCDE.test", "Expected share of instances in slice (independent dimensions).");
 
     /**
      * Parameter that specifies the size of the marginal restriction. Note that in the original paper
      * alpha = beta and as such there is no explicit distinction between the parameters.
      */
-    public static final OptionID BETA_ID = new OptionID("McdeMwp.beta", "Expected share of instances in marginal restriction (dependent dimensions).");
+    public static final OptionID BETA_ID = new OptionID("MCDE.test", "Expected share of instances in marginal restriction (dependent dimensions).");
 
     /**
      * Parameter that specifies the random seed.
      */
-    public static final OptionID SEED_ID = new OptionID("McdeMwp.seed", "The random seed.");
+    public static final OptionID SEED_ID = new OptionID("MCDE.test", "The random seed.");
+
+    /**
+     * Parameter that specifies which mcde statistical test to use in order to
+     * calculate the contrast between the instances in the slice vs out of slice.
+     */
+    public static final OptionID TEST_ID = new OptionID("MCDE.test", "The mcde statistical test that is used to calculate the deviation of two data samples");
+
+
+    /**
+     * Holds the value of {@link #M_ID}.
+     */
+    protected int m = 50;
+
+    /**
+     * Holds the value of {@link #ALPHA_ID}.
+     */
+    protected double alpha = 0.5;
+
+    /**
+     * Holds the value of {@link #BETA_ID} .
+     */
+    protected double beta = 0.5;
+
+    /**
+     * Holds the value of {@link #TEST_ID}.
+     */
+    private MCDETest mcdeTest;
+
+    /**
+     * Random generator.
+     */
+    protected RandomFactory rnd;
+
+    @Override public void configure(Parameterization config) {
+      new IntParameter(M_ID, 50) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT).grab(config, x -> m = x);
+
+      new DoubleParameter(ALPHA_ID, 0.5) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE).addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE).grab(config, x -> alpha = x);
+
+      new DoubleParameter(BETA_ID, 0.5) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE).addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE).grab(config, x -> beta = x);
+
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+
+      new ObjectParameter<MCDETest>(TEST_ID, MCDETest.class, MWPTest.class) //
+          .grab(config, x -> mcdeTest = x);
+    }
+
+    @Override public MCDEDependenceMeasure make() {
+      return new MCDEDependenceMeasure(m, alpha, beta, rnd, mcdeTest);
+    }
   }
 }

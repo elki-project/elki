@@ -24,12 +24,12 @@ import elki.utilities.ELKIBuilder;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.random.RandomFactory;
-import elki.utils.containers.MwpIndex;
-
+import elki.math.statistics.tests.mcde.*;
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
+import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.TEST_ID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static elki.math.statistics.dependence.MCDEDependenceMeasure.Par.M_ID;
 
 import org.junit.Test;
@@ -82,9 +82,11 @@ public class McdeMwpDependenceMeasureTest {
     }
 
     DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
+    MWPTest mwpTest = new MWPTest(0.5, generator);
 
-    McdeMwpDependenceMeasure mwp = new ELKIBuilder<>(McdeMwpDependenceMeasure.class) //
-        .with(M_ID, 1000) //
+    MCDEDependenceMeasure mwp = new ELKIBuilder<>(MCDEDependenceMeasure.class) //
+        .with(M_ID, 1000)
+        .with(TEST_ID, mwpTest)
         .build();
 
     test_result(indi1, indi2, 0.65, 0.35, 0.67, 0.33, adapter, mwp);
@@ -92,10 +94,10 @@ public class McdeMwpDependenceMeasureTest {
     test_result(small_noise_lin1, small_noise_lin2, 1.0, 0.96, 1.0, 0.85, adapter, mwp);
     test_result(more_noise_lin1, more_noise_lin2, 1.0, 0.85, 1.0, 0.83, adapter, mwp);
 
-    test_rankIndex(adapter, mwp);
+    test_rankIndex(adapter, mwpTest);
   }
 
-  public static void test_result(double[] data1, double[] data2, double strict_upper, double strict_lower, double lax_upper, double lax_lower, NumberArrayAdapter adapter, McdeMwpDependenceMeasure mwp) {
+  public static void test_result(double[] data1, double[] data2, double strict_upper, double strict_lower, double lax_upper, double lax_lower, NumberArrayAdapter adapter, MCDEDependenceMeasure mwp) {
     double total_res = 0;
     for(int i = 0; i < 100; i++) {
       double res = mwp.dependence(adapter, data1, adapter, data2);
@@ -108,16 +110,16 @@ public class McdeMwpDependenceMeasureTest {
     assertTrue("MWP result out of acceptable range. Result: " + total_res + ". Strict lower bound: " + strict_lower, (total_res >= strict_lower));
   }
 
-  public static void test_rankIndex(NumberArrayAdapter adapter, McdeMwpDependenceMeasure mwp) {
+  public static void test_rankIndex(NumberArrayAdapter adapter, MWPTest mwpTest) {
     double[] input_no_duplicates = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    MwpIndex[] result_no_duplicates = mwp.corrected_ranks(adapter, input_no_duplicates, 10);
+    MWPTest.MwpIndex[] result_no_duplicates = mwpTest.corrected_ranks(adapter, input_no_duplicates, 10);
 
     for(int i = 0; i < 10; i++) {
       assertTrue("Error in corrected_rank index construction for MCDE MWP", input_no_duplicates[i] == result_no_duplicates[i].adjusted);
     }
 
     double[] input_duplicates_middle = { 0, 1, 1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9 };
-    MwpIndex[] output_duplicates_middle = mwp.corrected_ranks(adapter, input_duplicates_middle, 13);
+    MWPTest.MwpIndex[] output_duplicates_middle = mwpTest.corrected_ranks(adapter, input_duplicates_middle, 13);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_middle[1].adjusted, 1.5, 0);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_middle[2].adjusted, 1.5, 0);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_middle[6].adjusted, 7.0, 0);
@@ -125,7 +127,7 @@ public class McdeMwpDependenceMeasureTest {
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_middle[8].adjusted, 7.0, 0);
 
     double[] input_duplicates_start_end = { 0, 0, 0, 2, 3, 4, 5, 5, 5, 6, 9, 9, 9 };
-    MwpIndex[] output_duplicates_start_end = mwp.corrected_ranks(adapter, input_duplicates_start_end, 13);
+    MWPTest.MwpIndex[] output_duplicates_start_end = mwpTest.corrected_ranks(adapter, input_duplicates_start_end, 13);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_start_end[0].adjusted, 1.0, 0);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_start_end[1].adjusted, 1.0, 0);
     assertEquals("Error in corrected_rank index construction for MCDE MWP", output_duplicates_start_end[2].adjusted, 1.0, 0);
