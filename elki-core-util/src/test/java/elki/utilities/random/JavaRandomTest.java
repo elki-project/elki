@@ -21,6 +21,7 @@
 package elki.utilities.random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -56,7 +57,9 @@ public class JavaRandomTest {
         Random r = new Random(run);
         Arrays.fill(counts, 0);
         for(int i = 0; i < size; i++) {
-          counts[r.nextInt(range)]++;
+          int v = r.nextInt(range);
+          assertTrue("Random outside range.", v >= 0 && v < range);
+          counts[v]++;
         }
         double chisq = computeChiSquared(counts, size);
         maxchisq = chisq > maxchisq ? chisq : maxchisq;
@@ -80,7 +83,9 @@ public class JavaRandomTest {
         Random r = new Random(run);
         Arrays.fill(counts, 0);
         for(int i = 0; i < size; i++) {
-          counts[(int) Math.floor(r.nextDouble() * range)]++;
+          double v = r.nextDouble();
+          assertTrue("Random outside range.", v >= 0 && v < 1.);
+          counts[(int) Math.floor(v * range)]++;
         }
         double chisq = computeChiSquared(counts, size);
         maxchisq = chisq > maxchisq ? chisq : maxchisq;

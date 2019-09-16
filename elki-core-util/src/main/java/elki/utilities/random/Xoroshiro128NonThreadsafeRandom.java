@@ -141,13 +141,7 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
     if(n <= 0) {
       throw new IllegalArgumentException(BADBOUND);
     }
-    long r = nextLong();
-    if((n & -n) == n) { // power of two
-      r &= n - 1;
-    }
-    else {
-      r = ((r >>> 32) * n) >>> 32;
-    }
-    return (int) r;
+    return (int) (((n & -n) == n) ? nextLong() & n - 1 // power of two
+        : ((nextLong() >>> 32) * n) >>> 32);
   }
 }

@@ -76,15 +76,13 @@ public class FastNonThreadsafeRandom extends Random {
   @Override
   protected int next(int bits) {
     // Linear Congruential Generator:
-    seed = (seed * multiplier + addend) & mask;
-    return (int) (seed >>> (48 - bits));
+    return (int) ((seed = (seed * multiplier + addend) & mask) >>> (48 - bits));
   }
 
   @Override
   public int nextInt() {
     // Linear Congruential Generator:
-    seed = (seed * multiplier + addend) & mask;
-    return (int) (seed >>> 16);
+    return (int) ((seed = (seed * multiplier + addend) & mask) >>> 16);
   }
 
   @Override
@@ -103,6 +101,10 @@ public class FastNonThreadsafeRandom extends Random {
    * generated and returned. All {@code n} possible {@code int} values are
    * produced with (approximately) equal probability.
    * <p>
+   * This version mostly does this - except for very large n. In such cases, it
+   * may be better to use {@link #nextIntRefined(int)} instead, which uses a
+   * rejection sampling technique to further reduce the bias.
+   * <p>
    * In contrast to the Java version, we use an approach that tries to avoid
    * divisions for performance. We will have a slightly worse distribution in
    * this fast version (see the XorShift generators for higher quality with
@@ -111,19 +113,27 @@ public class FastNonThreadsafeRandom extends Random {
    * D. Lemire<br>
    * Fast random shuffling<br>
    * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
+   * <p>
+   * D. Lemire<br>
+   * Fast Random Integer Generation in an Interval<br>
+   * ACM Trans. Model. Comput. Simul. 29(1)
    */
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //
       booktitle = "Daniel Lemire's blog", //
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
       bibkey = "blog/Lemire16")
+  @Reference(authors = "D. Lemire", //
+      title = "Fast Random Integer Generation in an Interval", //
+      booktitle = "ACM Trans. Model. Comput. Simul. 29(1)", //
+      url = "https://doi.org/10.1145/3230636", //
+      bibkey = "DBLP:journals/tomacs/Lemire19")
   @Override
   public int nextInt(int n) {
     if(n <= 0) {
       throw new IllegalArgumentException(BADBOUND);
     }
-    seed = (seed * multiplier + addend) & mask;
-    return (int) (((seed >>> 16) * n) >>> 32);
+    return (int) ((((seed = (seed * multiplier + addend) & mask) >>> 16) * n) >>> 32);
   }
 
   /**
@@ -142,6 +152,10 @@ public class FastNonThreadsafeRandom extends Random {
    * Fast random shuffling<br>
    * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
    * <p>
+   * D. Lemire<br>
+   * Fast Random Integer Generation in an Interval<br>
+   * ACM Trans. Model. Comput. Simul. 29(1)
+   * <p>
    * In our experiments, the difference was negligible, as the rejections are
    * quite rare events at least for our use case.
    */
@@ -150,20 +164,23 @@ public class FastNonThreadsafeRandom extends Random {
       booktitle = "Daniel Lemire's blog", //
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/", //
       bibkey = "blog/Lemire16")
+  @Reference(authors = "D. Lemire", //
+      title = "Fast Random Integer Generation in an Interval", //
+      booktitle = "ACM Trans. Model. Comput. Simul. 29(1)", //
+      url = "https://doi.org/10.1145/3230636", //
+      bibkey = "DBLP:journals/tomacs/Lemire19")
   public int nextIntRefined(int n) {
     if(n <= 0) {
       throw new IllegalArgumentException(BADBOUND);
     }
-    seed = (seed * multiplier + addend) & mask;
-    long ret = (seed >>> 16) * n;
-    // Rejection sampling
+    long ret = ((seed = (seed * multiplier + addend) & mask) >>> 16) * n;
+    // Rejection sampling; but the if is only rarely required so this is fast.
     int leftover = (int) (ret & 0x7FFFFFFFL);
     if(leftover < n) {
-      // With Java 8, we could use Integer.remainderUnsigned
-      final long threshold = (-n & 0xFFFFFFFFL) % n;
-      while(leftover < threshold) {
-        seed = (seed * multiplier + addend) & mask;
-        leftover = (int) ((ret = (seed >>> 16) * n) & 0x7FFFFFFFL);
+      while(leftover < Integer.remainderUnsigned(-n, n)) {
+        // Inlined for best performance.
+        // Written in three lines it would be more readable, obviously.
+        leftover = (int) ((ret = ((seed = (seed * multiplier + addend) & mask) >>> 16) * n) & 0x7FFFFFFFL);
       }
     }
     return (int) (ret >>> 32);
