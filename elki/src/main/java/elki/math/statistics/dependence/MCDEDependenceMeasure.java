@@ -70,8 +70,8 @@ public class MCDEDependenceMeasure
   protected double alpha = 0.5;
 
   /**
-   * Share of instances in marginal restriction (reference dimension).
-   * Note that in the original paper alpha = beta and as such there is no explicit distinction between the parameters.
+   * Parameter that specifies the size of the marginal restriction. Note that in the original paper
+   * alpha = beta and as such there is no explicit distinction between the parameters.
    */
   protected double beta = 0.5;
 
@@ -80,16 +80,13 @@ public class MCDEDependenceMeasure
    */
   protected RandomFactory rnd;
 
-  // TODO: Comment
+  /**
+   * Statistical Test returning p-value tailored to MCDE Framework.
+   */
   protected MCDETest mcdeTest;
 
   /**
-   * Constructor. TODO: adjust comment
-   *
-   * @param m     Monte-Carlo iterations
-   * @param alpha Expected share of instances in slice (under independence)
-   * @param beta  Share of instances in marginal restriction (reference dimension)
-   * @param rnd   Random source
+   * Constructor.
    */
   public MCDEDependenceMeasure(int m, double alpha, double beta, RandomFactory rnd, MCDETest mcdeTest) {
     this.m = m;
@@ -97,14 +94,6 @@ public class MCDEDependenceMeasure
     this.beta = beta;
     this.rnd = rnd;
     this.mcdeTest = mcdeTest;
-  }
-
-  /**
-   * Getter for this.beta
-   */
-
-  public double getBeta() {
-    return this.beta;
   }
 
   /**
@@ -175,12 +164,14 @@ public class MCDEDependenceMeasure
         other_index = index_1;
       }
 
-      mwp += mcdeTest.statistical_test(len, randomSlice(len, other_index), ref_index);
+      final int start = random.nextInt((int) (len * (1 - this.beta)));
+      final int end = start + (int) Math.ceil(len * this.beta);
+      mwp += mcdeTest.statistical_test(start,end, randomSlice(len, other_index), ref_index);
     }
     return mwp / m;
   }
 
-  public static class Par implements Parameterizer { // TODO: adjust Parametrizer for new MCDETEst
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces.

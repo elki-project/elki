@@ -1,13 +1,41 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2019
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package elki.math.statistics.tests.mcde;
 
 import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 
-public abstract class MCDETest<R extends MCDETest.RankStruct> {
+/**
+ * Abstract class for statistical tests for MCDEDependenceMeasure.
+ * See MWPTest for an example. Implementation should contain an appropriate index
+ * structure to efficiently compute statistical test and the test itself.
+ *
+ * @param <R> RankStruct or Subclass of RankStruct
+ *
+ * @author Alan Mazankiewicz
+ * @author Edouard Fouché
+ */
 
-  public MCDETest() {
-  }
+public abstract class MCDETest<R extends MCDETest.RankStruct> {
 
   /**
    * Structure to hold return values in index creation for MCDEDependenceEstimate
@@ -15,11 +43,8 @@ public abstract class MCDETest<R extends MCDETest.RankStruct> {
   public class RankStruct {
     public int index;
 
-    public double adjusted;
-
-    public RankStruct(int index, double adjusted) {
+    public RankStruct(int index) {
       this.index = index;
-      this.adjusted = adjusted;
     }
   }
 
@@ -55,12 +80,14 @@ public abstract class MCDETest<R extends MCDETest.RankStruct> {
   abstract public <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
 
   /**
-   * Subclass must implement the computation of the statistical test, based on the slicing scheme.
+   * Subclass must implement the computation of the statistical test, based on the slicing scheme
+   * of MCDEDependenceMeasure.
    *
-   * @param len             No of data instances
+   * @param start           Starting index value for statistical test
+   * @param end             End index value for statistical test
    * @param slice           An array of boolean resulting from a random slice
    * @param corrected_ranks the precomputed index structure for the reference dimension
    * @return a 1 - p-value
    */
-  abstract public double statistical_test(int len, boolean[] slice, R[] corrected_ranks);
+  abstract public double statistical_test(int start, int end, boolean[] slice, R[] corrected_ranks);
 }

@@ -1,44 +1,91 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2019
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package elki.math.statistics.tests.mcde;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
+import elki.utilities.random.RandomFactory;
 
 import java.lang.reflect.Array;
-import java.util.Random;
 
 import static elki.math.statistics.distribution.NormalDistribution.erf;
+
+/**
+ * Implementation of Mann-Whitney U test returning the p-value (not the test
+ * statistic, thus MWP) for MCDEDependenceMeasure. Implements algorithm 1 and 3
+ * of reference paper.
+ *
+ * @author Alan Mazankiewicz
+ * @author Edouard Fouché
+ */
+
+@Reference(authors = "Edouard Fouché, Klemens Böhm", //
+    title = "Monte Carlo Density Estimation", //
+    booktitle = "Proc. 2019 ACM Int. Conf. on Scientific and Statistical Database Management (SSDBM 2019)", url = "https://doi.org/10.1145/3335783.3335795", //
+    bibkey = "DBLP:conf/ssdbm/FoucheB19")
 
 public class MWPTest extends MCDETest<MWPTest.MwpIndex> {
 
   private static final long two_times_sqrt_max_long = 2 * (long) Math.sqrt(Long.MAX_VALUE);
 
+  /**
+   * Share of instances in marginal restriction (reference dimension).
+   * Note that in the original paper alpha = beta and as such there is no explicit distinction between the parameters.
+   */
   protected double beta;
 
-  protected Random random;
+  /**
+   * Random generator.
+   */
+  protected RandomFactory rnd;
 
   /**
-   * Structure to hold return values in index creation for McdeMwpDependenceMeausre
+   * Structure to hold values needed for computing MWP in MCDEDependeneMeasure.
+   * Values get computed during index creation.
    */
 
   public class MwpIndex extends MCDETest.RankStruct {
     long correction;
 
+    public double adjusted;
+
     public MwpIndex(int index, double adjusted, long correction) {
-      super(index, adjusted);
+      super(index);
       this.correction = correction;
+      this.adjusted = adjusted;
     }
   }
 
   /**
-   * Constructor // TODO: Bla
-   *
-   * @param beta
-   * @param random
+   * Static Constructor - use this one
    */
 
-  public MWPTest(double beta, Random random) {
-    this.beta = beta;
-    this.random = random;
+  public static final MWPTest STATIC = new MWPTest();
+
+  /**
+   * Private Constructor - use {@link #STATIC}
+   */
+
+  protected MWPTest(){
   }
 
   /**
@@ -91,17 +138,15 @@ public class MWPTest extends MCDETest<MWPTest.MwpIndex> {
 
   /**
    * Efficient implementation of MWP statistical test using appropriate index structure as described in Algorithm 3
-   * of reference paper.
+   * of reference paper. Tailored to MCDE Framework.
    *
-   * @param len             No of data instances
+   * @param start           Starting index value for statistical test
+   * @param end             End index value for statistical test
    * @param slice           Return value of randomSlice() created with the index that is not for the reference dimension
    * @param corrected_ranks Index of the reference dimension, return value of corrected_ranks() computed for reference dimension
    * @return p-value from two sided Mann-Whitney-U test
    */
-  public double statistical_test(int len, boolean[] slice, MwpIndex[] corrected_ranks) {
-    final int start = random.nextInt((int) (len * (1 - this.beta)));
-    final int end = start + (int) Math.ceil(len * this.beta);
-
+  public double statistical_test(int start, int end, boolean[] slice, MwpIndex[] corrected_ranks) {
     double R = 0.0;
     long n1 = 0;
     for(int j = start; j < end; j++) {
@@ -143,5 +188,4 @@ public class MWPTest extends MCDETest<MWPTest.MwpIndex> {
       // erf(Z / Math.sqrt(2)) is the cdf of the half-normal distribution
     }
   }
-
 }

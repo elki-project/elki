@@ -39,7 +39,7 @@ import org.junit.Test;
  * @author Edouard Fouché
  */
 
-public class McdeMwpDependenceMeasureTest {
+public class MCDEDependenceMeasureTest {
 
   @Test public void runTest() {
 
@@ -82,7 +82,7 @@ public class McdeMwpDependenceMeasureTest {
     }
 
     DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
-    MWPTest mwpTest = new MWPTest(0.5, generator);
+    MWPTest mwpTest = MWPTest.STATIC;
 
     MCDEDependenceMeasure mwp = new ELKIBuilder<>(MCDEDependenceMeasure.class) //
         .with(M_ID, 1000)
