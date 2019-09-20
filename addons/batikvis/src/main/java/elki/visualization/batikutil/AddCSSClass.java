@@ -26,13 +26,11 @@ import org.w3c.dom.events.EventListener;
 
 import elki.visualization.svg.SVGUtil;
 
-
 /**
  * Add a CSS class to the event target.
  * 
  * @author Erich Schubert
  * @since 0.2
- *
  */
 public class AddCSSClass implements EventListener {
   /**
@@ -42,6 +40,7 @@ public class AddCSSClass implements EventListener {
 
   /**
    * Constructor
+   *
    * @param cssclass class to set
    */
   public AddCSSClass(String cssclass) {
@@ -54,7 +53,6 @@ public class AddCSSClass implements EventListener {
    */
   @Override
   public void handleEvent(Event evt) {
-    Element e = (Element) evt.getTarget();
-    SVGUtil.addCSSClass(e, cssclass);
+    SVGUtil.addCSSClass((Element) evt.getTarget(), cssclass);
   }
 }

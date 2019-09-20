@@ -116,9 +116,9 @@ be expressed in terms of a Java API.</p>
 <p>For useful error reporting and input assistance in the GUI we <em>need</em> to have more extensive
 typing than Java uses (for example we might need numerical constraints) and we also want to be able
 to <em>report more than one error at a time</em>. In ELKI 0.4, much of the parameterization was
-refactored to static helper classes usually found as a <tt>public static class Parameterizer</tt>
-and subclasses of
-{@link elki.utilities.optionhandling.AbstractParameterizer AbstractParameterizer}.</p>
+refactored to static helper classes usually found as a <tt>public static class Par</tt>
+and instances of
+{@link elki.utilities.optionhandling.Parameterizer Parameterizer}.</p>
 <p><img src="figures/parameterization.png" width="600" height="213" alt="Parameterization" /></p>
 <p>Keep the complexity of Parameterizer classes and constructors invoked by these classes low, since
 these may be heavily used during the parameterization step. Postpone any extensive initialization

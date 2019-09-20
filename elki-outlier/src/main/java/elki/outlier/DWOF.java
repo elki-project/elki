@@ -81,7 +81,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   private static final Logging LOG = Logging.getLogger(DWOF.class);
 
   /**
-   * Holds the value of {@link Parameterizer#K_ID} i.e. Number of neighbors to
+   * Holds the value of {@link Par#K_ID} i.e. Number of neighbors to
    * consider during the calculation of DWOF scores + the query point.
    */
   protected int kplus;

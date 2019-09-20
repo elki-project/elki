@@ -36,7 +36,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractPageFileFactory<P extends Page> implements PageFileFactory<P> {
   /**
-   * Holds the value of {@link Parameterizer#PAGE_SIZE_ID}.
+   * Holds the value of {@link Par#PAGE_SIZE_ID}.
    */
   protected int pageSize;
 

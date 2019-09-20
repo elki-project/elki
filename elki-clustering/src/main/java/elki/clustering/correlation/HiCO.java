@@ -93,12 +93,12 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   private static final Logging LOG = Logging.getLogger(HiCO.class);
 
   /**
-   * The default value for {@link Parameterizer#DELTA_ID}.
+   * The default value for {@link Par#DELTA_ID}.
    */
   public static final double DEFAULT_DELTA = 0.25;
 
   /**
-   * The default value for {@link Parameterizer#ALPHA_ID}.
+   * The default value for {@link Par#ALPHA_ID}.
    */
   public static final double DEFAULT_ALPHA = 0.85;
 

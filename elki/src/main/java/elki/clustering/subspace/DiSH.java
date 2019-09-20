@@ -117,7 +117,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   }
 
   /**
-   * Holds the value of {@link Parameterizer#EPSILON_ID}.
+   * Holds the value of {@link Par#EPSILON_ID}.
    */
   private double epsilon;
 
@@ -138,10 +138,10 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param minpts Mu parameter (minPts)
    * @param strategy DiSH strategy
    */
-  public DiSH(double epsilon, int mu, DiSH.Strategy strategy) {
+  public DiSH(double epsilon, int minpts, DiSH.Strategy strategy) {
     super();
     this.epsilon = epsilon;
-    this.minpts = mu;
+    this.minpts = minpts;
     this.strategy = strategy;
   }
 

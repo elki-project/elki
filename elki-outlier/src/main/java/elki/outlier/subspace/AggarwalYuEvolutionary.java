@@ -98,7 +98,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
   protected final static double CONVERGENCE = .85;
 
   /**
-   * Holds the value of {@link Parameterizer#M_ID}.
+   * Holds the value of {@link Par#M_ID}.
    */
   private int m;
 

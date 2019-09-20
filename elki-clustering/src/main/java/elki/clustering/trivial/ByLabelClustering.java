@@ -58,7 +58,7 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * If an assignment of an object to multiple clusters is desired, the labels of
  * the object indicating the clusters need to be separated by blanks and the
- * flag {@link Parameterizer#MULTIPLE_ID} needs to be set.
+ * flag {@link Par#MULTIPLE_ID} needs to be set.
  * 
  * TODO: handling of data sets with no labels?
  * 

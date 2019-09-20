@@ -80,7 +80,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
 
   /**
    * Sets the bits set to true in the given BitSet as selected attributes in
-   * {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
+   * {@link Par#SELECTED_ATTRIBUTES_ID}.
    * 
    * @param selectedAttributes the new selected attributes
    */
@@ -90,7 +90,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
 
   /**
    * Provides a BitSet with the bits set to true corresponding to the selected
-   * attributes in {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
+   * attributes in {@link Par#SELECTED_ATTRIBUTES_ID}.
    * 
    * @return the selected attributes
    */

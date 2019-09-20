@@ -141,7 +141,7 @@ public class ChiDistribution implements Distribution {
   public static class Par implements Parameterizer {
     /**
      * Degrees of freedom parameter - same as
-     * {@link ChiSquaredDistribution.Parameterizer#DOF_ID}.
+     * {@link ChiSquaredDistribution.Par#DOF_ID}.
      */
     public static final OptionID DOF_ID = ChiSquaredDistribution.Par.DOF_ID;
 

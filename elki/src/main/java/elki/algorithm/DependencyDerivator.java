@@ -89,7 +89,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
   private static final Logging LOG = Logging.getLogger(DependencyDerivator.class);
 
   /**
-   * Holds the value of {@link Parameterizer#SAMPLE_SIZE_ID}.
+   * Holds the value of {@link Par#SAMPLE_SIZE_ID}.
    */
   private final int sampleSize;
 

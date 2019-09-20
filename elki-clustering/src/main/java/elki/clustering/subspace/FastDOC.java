@@ -68,7 +68,7 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
   private static final Logging LOG = Logging.getLogger(FastDOC.class);
 
   /**
-   * Holds the value of {@link Parameterizer#D_ZERO_ID}.
+   * Holds the value of {@link Par#D_ZERO_ID}.
    */
   private int d_zero;
 

@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
-   * {@link Parameterizer#DISTANCE_FUNCTION_ID}.
+   * {@link Par#DISTANCE_FUNCTION_ID}.
    */
   protected D distanceFunction;
 
