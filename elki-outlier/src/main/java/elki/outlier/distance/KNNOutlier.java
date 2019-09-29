@@ -27,7 +27,6 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -112,8 +111,7 @@ public class KNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? sup
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    final DistanceQuery<O> distanceQuery = relation.getDistanceQuery(getDistance());
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(distanceQuery, kplus);
+    KNNQuery<O> knnQuery = relation.getKNNQuery(distanceFunction, kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
     DoubleMinMax minmax = new DoubleMinMax();

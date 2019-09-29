@@ -20,14 +20,8 @@
  */
 package elki.projection;
 
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -49,6 +43,7 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -104,9 +99,8 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
-    DistanceQuery<T> dq = relation.getDistanceQuery(distanceFunction);
     final int numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
-    KNNQuery<T> knnq = relation.getKNNQuery(dq, numberOfNeighbours + 1);
+    KNNQuery<T> knnq = relation.getKNNQuery(distanceFunction, numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
     }
@@ -118,7 +112,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !SquaredEuclideanDistance.class.isInstance(dq.getDistance());
+    final boolean square = !SquaredEuclideanDistance.class.isInstance(distanceFunction);
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;

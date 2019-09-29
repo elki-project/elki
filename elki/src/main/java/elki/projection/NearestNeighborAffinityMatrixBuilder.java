@@ -20,14 +20,8 @@
  */
 package elki.projection;
 
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -41,6 +35,7 @@ import elki.utilities.datastructures.arraylike.DoubleArray;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
+
 import net.jafama.FastMath;
 
 /**
@@ -101,8 +96,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
-    DistanceQuery<T> dq = relation.getDistanceQuery(distanceFunction);
-    KNNQuery<T> knnq = relation.getKNNQuery(dq, numberOfNeighbours + 1);
+    KNNQuery<T> knnq = relation.getKNNQuery(distanceFunction, numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
     }
@@ -114,7 +108,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !dq.getDistance().isSquared();
+    final boolean square = !distanceFunction.isSquared();
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;
