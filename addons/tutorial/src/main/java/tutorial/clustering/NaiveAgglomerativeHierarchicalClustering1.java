@@ -31,6 +31,7 @@ import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -74,11 +75,11 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param numclusters Number of clusters
    */
-  public NaiveAgglomerativeHierarchicalClustering1(Distance<? super O> distanceFunction, int numclusters) {
-    super(distanceFunction);
+  public NaiveAgglomerativeHierarchicalClustering1(Distance<? super O> distance, int numclusters) {
+    super(distance);
     this.numclusters = numclusters;
   }
 
@@ -89,7 +90,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @return Clustering hierarchy
    */
   public Clustering<Model> run(Relation<O> relation) {
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -222,7 +223,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
 
     @Override
     public NaiveAgglomerativeHierarchicalClustering1<O> make() {
-      return new NaiveAgglomerativeHierarchicalClustering1<>(distanceFunction, numclusters);
+      return new NaiveAgglomerativeHierarchicalClustering1<>(distance, numclusters);
     }
   }
 }

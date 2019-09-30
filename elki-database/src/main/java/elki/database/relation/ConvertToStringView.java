@@ -25,7 +25,6 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
-import elki.logging.Logging;
 import elki.result.Metadata;
 
 /**
@@ -35,12 +34,7 @@ import elki.result.Metadata;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ConvertToStringView extends AbstractRelation<String> {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ConvertToStringView.class);
-
+public class ConvertToStringView implements Relation<String> {
   /**
    * The database we use
    */
@@ -84,10 +78,5 @@ public class ConvertToStringView extends AbstractRelation<String> {
   @Override
   public String getLongName() {
     return "toString(" + Metadata.of(existing).getLongName() + ")";
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

@@ -117,14 +117,14 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    * @param g Number of grids to use
    * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistance<? super V> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
-    super(distanceFunction);
+  public ALOCI(NumberVectorDistance<? super V> distance, int nmin, int alpha, int g, RandomFactory rnd) {
+    super(distance);
     this.nmin = nmin;
     this.alpha = alpha;
     this.g = g;
@@ -699,7 +699,7 @@ public class ALOCI<V extends NumberVector> extends AbstractDistanceBasedAlgorith
 
     @Override
     public ALOCI<O> make() {
-      return new ALOCI<>(distanceFunction, nmin, alpha, g, rnd);
+      return new ALOCI<>(distance, nmin, alpha, g, rnd);
     }
   }
 }

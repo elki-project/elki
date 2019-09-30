@@ -56,11 +56,11 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K parameter
    */
-  public ParallelLloydKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public ParallelLloydKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   /**
@@ -81,7 +81,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
-    KMeansProcessor<V> kmm = new KMeansProcessor<>(relation, distanceFunction, assignment, varsum);
+    KMeansProcessor<V> kmm = new KMeansProcessor<>(relation, distance, assignment, varsum);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -128,7 +128,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
   public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     public ParallelLloydKMeans<V> make() {
-      return new ParallelLloydKMeans<>(distanceFunction, k, maxiter, initializer);
+      return new ParallelLloydKMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

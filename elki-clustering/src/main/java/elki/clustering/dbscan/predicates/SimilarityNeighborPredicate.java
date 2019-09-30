@@ -28,6 +28,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
@@ -88,7 +89,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
   @Override
   public Instance instantiate(Database database) {
     Relation<O> relation = database.getRelation(simFunc.getInputTypeRestriction());
-    RangeQuery<O> rq = relation.getSimilarityRangeQuery(simFunc);
+    RangeQuery<O> rq = new QueryBuilder<>(relation, simFunc).similarityRangeQuery(epsilon);
     return new Instance(epsilon, rq, relation.getDBIDs());
   }
 

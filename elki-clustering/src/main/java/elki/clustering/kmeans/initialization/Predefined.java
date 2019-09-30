@@ -94,7 +94,7 @@ public class Predefined extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(k != initialMeans.length) {
       throw new AbortException("Predefined initial means contained " + initialMeans.length //
           + " means, algorithm requested " + k + " means instead.");

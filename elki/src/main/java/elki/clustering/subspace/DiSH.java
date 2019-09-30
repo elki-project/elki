@@ -34,6 +34,7 @@ import elki.data.type.VectorFieldTypeInformation;
 import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
@@ -714,7 +715,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       final int dim = RelationUtil.dimensionality(relation);
       ArrayList<RangeQuery<V>> rangeQueries = new ArrayList<>(dim);
       for(int d = 0; d < dim; d++) {
-        rangeQueries.add(relation.getRangeQuery(new OnedimensionalDistance(d), epsilon));
+        rangeQueries.add(new QueryBuilder<>(relation, new OnedimensionalDistance(d)).rangeQuery(epsilon));
       }
 
       StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;

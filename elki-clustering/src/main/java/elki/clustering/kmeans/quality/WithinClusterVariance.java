@@ -36,10 +36,10 @@ import elki.distance.NumberVectorDistance;
  */
 public class WithinClusterVariance extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     double variance = 0.;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
-      variance += varianceContributionOfCluster(cluster, distanceFunction, relation);
+      variance += varianceContributionOfCluster(cluster, distance, relation);
     }
     return variance;
   }

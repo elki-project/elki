@@ -34,7 +34,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -116,15 +116,15 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param nf Number format
    * @param pca PCA runner
    * @param filter Eigenvector filter
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(NumberVectorDistance<? super V> distanceFunction, NumberFormat nf, PCARunner pca, EigenPairFilter filter, int sampleSize, boolean randomsample) {
-    super(distanceFunction);
+  public DependencyDerivator(NumberVectorDistance<? super V> distance, NumberFormat nf, PCARunner pca, EigenPairFilter filter, int sampleSize, boolean randomsample) {
+    super(distance);
     this.nf = nf;
     this.pca = pca;
     this.filter = filter;
@@ -155,7 +155,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
       ids = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, RandomFactory.DEFAULT);
     }
     else {
-      ids = relation.getKNNQuery(getDistance(), sampleSize, DatabaseQuery.HINT_SINGLE) //
+      ids = new QueryBuilder<>(relation, distance).cheapOnly().kNNQuery(sampleSize) //
           .getKNNForObject(centroidDV, sampleSize);
     }
     return generateModel(relation, ids, centroid.getArrayRef());
@@ -319,7 +319,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractDistanc
       nf.setMaximumFractionDigits(outputAccuracy);
       nf.setMinimumFractionDigits(outputAccuracy);
 
-      return new DependencyDerivator<>(distanceFunction, nf, pca, filter, sampleSize, randomSample);
+      return new DependencyDerivator<>(distance, nf, pca, filter, sampleSize, randomSample);
     }
   }
 }

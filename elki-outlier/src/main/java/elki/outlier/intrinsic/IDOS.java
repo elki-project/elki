@@ -98,13 +98,13 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param estimator Estimator for intrinsic dimensionality
    * @param kc the context set size for the ID computation
    * @param kr the neighborhood size to use in score computation
    */
-  public IDOS(Distance<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
-    super(distanceFunction);
+  public IDOS(Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
+    super(distance);
     this.estimator = estimator;
     this.k_c = kc;
     this.k_r = kr;
@@ -266,7 +266,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public IDOS<O> make() {
-      return new IDOS<>(distanceFunction, estimator, k_c, k_r);
+      return new IDOS<>(distance, estimator, k_c, k_r);
     }
   }
 }

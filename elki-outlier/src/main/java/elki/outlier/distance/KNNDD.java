@@ -32,6 +32,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -93,11 +94,11 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor for a single kNN query.
    *
-   * @param distanceFunction distance function to use
+   * @param distance distance function to use
    * @param k Value of k (excluding query point!)
    */
-  public KNNDD(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public KNNDD(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k + 1;
   }
 
@@ -117,7 +118,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = relation.getKNNQuery(distanceFunction, k);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
     WritableDoubleDataStore knnDist = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -189,7 +190,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public KNNDD<O> make() {
-      return new KNNDD<>(distanceFunction, k);
+      return new KNNDD<>(distance, k);
     }
   }
 }

@@ -30,6 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -87,11 +88,11 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k Parameter (not including query point!)
    */
-  public LocalIsolationCoefficient(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public LocalIsolationCoefficient(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k;
   }
 
@@ -102,7 +103,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    */
   public OutlierResult run(Relation<O> relation) {
     final int kplus = k + 1;
-    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), kplus);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute Local Isolation Coefficients", relation.size(), LOG) : null;
 
@@ -169,7 +170,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
     @Override
     public LocalIsolationCoefficient<O> make() {
-      return new LocalIsolationCoefficient<>(distanceFunction, k);
+      return new LocalIsolationCoefficient<>(distance, k);
     }
   }
 }

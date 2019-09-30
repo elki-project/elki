@@ -30,6 +30,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
@@ -96,12 +97,12 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
    */
-  public CTLuGLSBackwardSearchAlgorithm(Distance<? super V> distanceFunction, int k, double alpha) {
-    super(distanceFunction);
+  public CTLuGLSBackwardSearchAlgorithm(Distance<? super V> distance, int k, double alpha) {
+    super(distance);
     this.alpha = alpha;
     this.k = k;
   }
@@ -158,7 +159,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V> knnQuery = relationx.getKNNQuery(getDistance(), k + 1);
+    KNNQuery<V> knnQuery = new QueryBuilder<>(relationx, distance).kNNQuery(k + 1);
 
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
@@ -294,7 +295,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
     @Override
     public CTLuGLSBackwardSearchAlgorithm<V> make() {
-      return new CTLuGLSBackwardSearchAlgorithm<>(distanceFunction, k, alpha);
+      return new CTLuGLSBackwardSearchAlgorithm<>(distance, k, alpha);
     }
 
     /**

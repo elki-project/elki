@@ -104,10 +104,10 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    */
-  public VarianceOfVolume(int k, Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public VarianceOfVolume(int k, Distance<? super O> distance) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -256,7 +256,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
     @Override
     public VarianceOfVolume<O> make() {
-      return new VarianceOfVolume<>(k, distanceFunction);
+      return new VarianceOfVolume<>(k, distance);
     }
   }
 }

@@ -41,21 +41,14 @@
  * DistancePrioritySearcher} that allow incremental search.
  * 
  * <h2>Obtaining query objects</h2>
- * The general process of obtaining a query is to retrieve it from the relation
- * using:
+ * The general process of obtaining a query is to retrieve it using the QueryBuilder:
  * <ul>
- * <li>{@link elki.database.relation.Relation#getDistanceQuery
- * Relation.getDistanceQuery(distance)}</li>
- * <li>{@link elki.database.relation.Relation#getSimilarityQuery
- * Relation.getSimilarityQuery(similarity)}</li>
- * <li>{@link elki.database.relation.Relation#getKNNQuery
- * Relation.getKNNQuery(distance)}</li>
- * <li>{@link elki.database.relation.Relation#getRangeQuery
- * Relation.getRangeQuery(distance)}</li>
- * <li>{@link elki.database.relation.Relation#getRKNNQuery
- * Relation.getRKNNQuery(distance)}</li>
- * <li>{@link elki.database.relation.Relation#getPrioritySearcher
- * Relation.getPrioritySearcher(distance)}</li>
+ * <li>{@link elki.database.query.QueryBuilder#distanceQuery}</li>
+ * <li>{@link elki.database.query.QueryBuilder#similarityQuery}</li>
+ * <li>{@link elki.database.query.QueryBuilder#kNNQuery}</li>
+ * <li>{@link elki.database.query.QueryBuilder#rangeQuery}</li>
+ * <li>{@link elki.database.query.QueryBuilder#rKNNQuery}</li>
+ * <li>{@link elki.database.query.QueryBuilder#prioritySearcher}</li>
  * </ul>
  * as appropriate. See the query class links above for the detailed API. Avoid
  * calling this method within a loop construct!<br>
@@ -70,18 +63,11 @@
  * (since a preprocessor or index might only support a certain fixed maximum
  * value)</li>
  * <li>A maximum distance used in range queries</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_EXACT
- * DatabaseQuery.HINT_EXACT} to exclude approximate answers</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_HEAVY_USE
- * DatabaseQuery.HINT_HEAVY_USE} to suggest the use of a cache or
- * preprocessor</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_OPTIMIZED_ONLY
- * DatabaseQuery.HINT_OPTIMIZED_ONLY} to disallow linear scans</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_SINGLE
- * DatabaseQuery.HINT_SINGLE} to disallow expensive optimizations, since the
+ * <li>{@link elki.database.query.QueryBuilder#exactOnly} to exclude approximate answers</li>
+ * <li>{@link elki.database.query.QueryBuilder#optimizedOnly} to disallow linear scans</li>
+ * <li>{@link elki.database.query.QueryBuilder#cheapOnly} to disallow expensive optimizations, since the
  * query will only be used once</li>
- * <li>{@link elki.database.query.DatabaseQuery#HINT_NO_CACHE
- * DatabaseQuery.HINT_NO_CACHE} to disallow retrieving a cache class</li>
+ * <li>{@link elki.database.query.QueryBuilder#noCache} to disallow retrieving a cache class</li>
  * </ul>
  * Please set these hints appropriately, since this can effect your algorithms
  * performance!

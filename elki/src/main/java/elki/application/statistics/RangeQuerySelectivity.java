@@ -25,6 +25,7 @@ import elki.data.NumberVector;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -75,13 +76,13 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
    * Constructor.
    *
    * @param inputstep Input step
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param radius Radius
    * @param sampling Sampling rate
    * @param random Random sampling generator
    */
-  public RangeQuerySelectivity(InputStep inputstep, Distance<? super V> distanceFunction, double radius, double sampling, RandomFactory random) {
-    super(inputstep, distanceFunction);
+  public RangeQuerySelectivity(InputStep inputstep, Distance<? super V> distance, double radius, double sampling, RandomFactory random) {
+    super(inputstep, distance);
     this.radius = radius;
     this.sampling = sampling;
     this.random = random;
@@ -90,7 +91,7 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
   @Override
   public void run() {
     Relation<V> relation = inputstep.getDatabase().getRelation(distance.getInputTypeRestriction());
-    RangeQuery<V> rangeQuery = relation.getRangeQuery(distance, radius);
+    RangeQuery<V> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(radius);
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     MeanVariance numres = new MeanVariance();

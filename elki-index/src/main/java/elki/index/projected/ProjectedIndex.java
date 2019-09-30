@@ -28,7 +28,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -40,8 +40,8 @@ import elki.distance.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -167,72 +167,42 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(!(inner instanceof KNNIndex)) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(!(inner instanceof KNNIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
-    }
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
-        return null;
-      }
     }
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    KNNQuery<I> innerq = ((KNNIndex<I>) inner).getKNNQuery(innerQuery, hints);
-    if(innerq == null) {
-      return null;
-    }
-    return new ProjectedKNNQuery(distanceQuery, innerq);
+    KNNQuery<I> innerq = ((KNNIndex<I>) inner).getKNNQuery(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedKNNQuery(distanceQuery, innerq) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(!(inner instanceof RangeIndex)) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    if(!(inner instanceof RangeIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
-    }
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
-        return null;
-      }
     }
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    RangeQuery<I> innerq = ((RangeIndex<I>) inner).getRangeQuery(innerQuery, hints);
-    if(innerq == null) {
-      return null;
-    }
-    return new ProjectedRangeQuery(distanceQuery, innerq);
+    RangeQuery<I> innerq = ((RangeIndex<I>) inner).getRangeQuery(innerQuery, maxradius, flags);
+    return innerq != null ? new ProjectedRangeQuery(distanceQuery, innerq) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(!(inner instanceof RKNNIndex)) {
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(!(inner instanceof RKNNIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
-    }
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    for(Object o : hints) {
-      if(o == DatabaseQuery.HINT_EXACT) {
-        return null;
-      }
     }
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    RKNNQuery<I> innerq = ((RKNNIndex<I>) inner).getRKNNQuery(innerQuery, hints);
-    if(innerq == null) {
-      return null;
-    }
-    return new ProjectedRKNNQuery(distanceQuery, innerq);
+    RKNNQuery<I> innerq = ((RKNNIndex<I>) inner).getRKNNQuery(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedRKNNQuery(distanceQuery, innerq) : null;
   }
 
   /**
@@ -392,11 +362,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         olist.add(dist, iter);
       }
       return olist;
-    }
-
-    @Override
-    public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      return inner.getRKNNForBulkDBIDs(ids, k);
     }
   }
 

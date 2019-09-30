@@ -57,10 +57,10 @@ public class CloseReinsert extends AbstractPartialReinsert {
    * Constructor.
    * 
    * @param reinsertAmount Amount of objects to reinsert
-   * @param distanceFunction Distance function to use for reinsertion
+   * @param distance Distance function to use for reinsertion
    */
-  public CloseReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distanceFunction) {
-    super(reinsertAmount, distanceFunction);
+  public CloseReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distance) {
+    super(reinsertAmount, distance);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
     double[] dist = new double[size];
     int[] idx = MathUtil.sequence(0, size);
     for(int i = 0; i < size; i++) {
-      dist[i] = distanceFunction.minDist(DoubleVector.wrap(SpatialUtil.centroid(getter.get(entries, i))), centroid);
+      dist[i] = distance.minDist(DoubleVector.wrap(SpatialUtil.centroid(getter.get(entries, i))), centroid);
     }
     DoubleIntegerArrayQuickSort.sort(dist, idx, size);
     return Arrays.copyOf(idx, (int) (reinsertAmount * size));
@@ -84,7 +84,7 @@ public class CloseReinsert extends AbstractPartialReinsert {
   public static class Par extends AbstractPartialReinsert.Par {
     @Override
     public CloseReinsert make() {
-      return new CloseReinsert(reinsertAmount, distanceFunction);
+      return new CloseReinsert(reinsertAmount, distance);
     }
   }
 }

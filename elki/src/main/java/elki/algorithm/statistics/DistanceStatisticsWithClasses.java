@@ -40,6 +40,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDPair;
 import elki.database.ids.ModifiableDBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -98,22 +99,21 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param numbins Number of bins
    * @param exact Exactness flag
    * @param sampling Sampling flag
    */
-  public DistanceStatisticsWithClasses(Distance<? super O> distanceFunction, int numbins, boolean exact, boolean sampling) {
-    super(distanceFunction);
+  public DistanceStatisticsWithClasses(Distance<? super O> distance, int numbins, boolean exact, boolean sampling) {
+    super(distance);
     this.numbin = numbins;
     this.exact = exact;
     this.sampling = sampling;
   }
 
   public HistogramResult run(Database database, Relation<O> relation) {
-    final DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
-
-    final StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
 
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
@@ -121,27 +121,23 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     // Cluster by labels
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
-    // global in-cluster min/max
-    DoubleMinMax giminmax = new DoubleMinMax();
-    // global other-cluster min/max
-    DoubleMinMax gominmax = new DoubleMinMax();
+    // global in-cluster min/max, global other-cluster min/max
+    DoubleMinMax giminmax = new DoubleMinMax(), gominmax = new DoubleMinMax();
     // in-cluster distances
-    MeanVariance mimin = new MeanVariance();
-    MeanVariance mimax = new MeanVariance();
+    MeanVariance mimin = new MeanVariance(), mimax = new MeanVariance();
     MeanVariance midif = new MeanVariance();
     // other-cluster distances
-    MeanVariance momin = new MeanVariance();
-    MeanVariance momax = new MeanVariance();
+    MeanVariance momin = new MeanVariance(), momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
     // Histogram
-    final ObjHistogram<long[]> histogram;
     LOG.beginStep(stepprog, 1, "Prepare histogram.");
     if(exact) {
-      gminmax = exactMinMax(relation, distFunc);
+      gminmax = exactMinMax(relation, dq);
     }
     else if(sampling) {
-      gminmax = sampleMinMax(relation, distFunc);
+      gminmax = sampleMinMax(relation, dq);
     }
+    ObjHistogram<long[]> histogram;
     if(gminmax.isValid()) {
       histogram = new ObjHistogram<long[]>(numbin, gminmax.getMin(), gminmax.getMax(), () -> {
         return new long[2];
@@ -194,7 +190,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
           if(DBIDUtil.equal(id1, iter2)) {
             continue;
           }
-          double d = distFunc.distance(id1, iter2);
+          double d = dq.distance(id1, iter2);
           histogram.get(d)[0]++;
           iminmax.put(d);
         }
@@ -217,7 +213,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
             if(DBIDUtil.equal(id1, iter2)) {
               continue;
             }
-            double d = distFunc.distance(id1, iter2);
+            double d = dq.distance(id1, iter2);
             histogram.get(d)[1]++;
             ominmax.put(d);
           }
@@ -274,10 +270,10 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    * Estimate minimum and maximum via sampling.
    *
    * @param relation Relation to process
-   * @param distFunc Distance function to use
+   * @param distance Distance function to use
    * @return Minimum and maximum
    */
-  private DoubleMinMax sampleMinMax(Relation<O> relation, DistanceQuery<O> distFunc) {
+  private DoubleMinMax sampleMinMax(Relation<O> relation, DistanceQuery<O> distance) {
     int size = relation.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
@@ -305,12 +301,12 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(iter, pair);
+        double d = distance.distance(iter, pair);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(iter, iter2);
+        double d = distance.distance(iter, iter2);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
@@ -324,12 +320,12 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(iter, pair);
+        double d = distance.distance(iter, pair);
         np2.add(DBIDUtil.newPair(d, iter));
         np2.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(iter, iter2);
+        double d = distance.distance(iter, iter2);
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
@@ -351,10 +347,10 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    * Compute the exact maximum and minimum.
    *
    * @param relation Relation to process
-   * @param distFunc Distance function
+   * @param distance Distance function
    * @return Exact maximum and minimum
    */
-  private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O> distFunc) {
+  private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O> distance) {
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Exact fitting distance computations", relation.size(), LOG) : null;
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
@@ -364,8 +360,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
         if(DBIDUtil.equal(iditer, iditer2)) {
           continue;
         }
-        double d = distFunc.distance(iditer, iditer2);
-        minmax.put(d);
+        minmax.put(distance.distance(iditer, iditer2));
       }
       LOG.incrementProcessed(progress);
     }
@@ -459,7 +454,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
     @Override
     public DistanceStatisticsWithClasses<O> make() {
-      return new DistanceStatisticsWithClasses<>(distanceFunction, numbin, exact, sampling);
+      return new DistanceStatisticsWithClasses<>(distance, numbin, exact, sampling);
     }
   }
 }

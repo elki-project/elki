@@ -87,10 +87,8 @@ public class SharedNearestNeighborJaccardDistance<O> extends AbstractIndexBasedD
      * @return Jaccard coefficient
      */
     static protected double jaccardCoefficient(DBIDs neighbors1, DBIDs neighbors2) {
-      int intersection = 0;
-      int union = 0;
-      DBIDIter iter1 = neighbors1.iter();
-      DBIDIter iter2 = neighbors2.iter();
+      int intersection = 0, union = 0;
+      DBIDIter iter1 = neighbors1.iter(), iter2 = neighbors2.iter();
       while(iter1.valid() && iter2.valid()) {
         final int comp = DBIDUtil.compare(iter1, iter2);
         union++;
@@ -102,8 +100,7 @@ public class SharedNearestNeighborJaccardDistance<O> extends AbstractIndexBasedD
         else if(comp < 0) {
           iter1.advance();
         }
-        else // iter2 < iter1
-        {
+        else { // iter2 < iter1
           iter2.advance();
         }
       }
@@ -119,9 +116,7 @@ public class SharedNearestNeighborJaccardDistance<O> extends AbstractIndexBasedD
 
     @Override
     public double distance(DBIDRef id1, DBIDRef id2) {
-      DBIDs neighbors1 = index.getNearestNeighborSet(id1);
-      DBIDs neighbors2 = index.getNearestNeighborSet(id2);
-      return 1.0 - jaccardCoefficient(neighbors1, neighbors2);
+      return 1.0 - jaccardCoefficient(index.getNearestNeighborSet(id1), index.getNearestNeighborSet(id2));
     }
   }
 

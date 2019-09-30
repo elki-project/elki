@@ -106,12 +106,12 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function in use
+   * @param distance Distance function in use
    * @param m m Parameter
    * @param k k Parameter
    */
-  public INFLO(Distance<? super O> distanceFunction, double m, int k) {
-    super(distanceFunction);
+  public INFLO(Distance<? super O> distance, double m, int k) {
+    super(distance);
     this.m = m;
     this.kplus1 = k + 1;
   }
@@ -316,7 +316,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public INFLO<O> make() {
-      return new INFLO<>(distanceFunction, m, k);
+      return new INFLO<>(distance, m, k);
     }
   }
 }

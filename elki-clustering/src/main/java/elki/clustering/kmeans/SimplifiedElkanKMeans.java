@@ -77,14 +77,14 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public SimplifiedElkanKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
-    super(distanceFunction, k, maxiter, initializer);
+  public SimplifiedElkanKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+    super(distance, k, maxiter, initializer);
     this.varstat = varstat;
   }
 
@@ -280,7 +280,7 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
 
     @Override
     public SimplifiedElkanKMeans<V> make() {
-      return new SimplifiedElkanKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
+      return new SimplifiedElkanKMeans<>(distance, k, maxiter, initializer, varstat);
     }
   }
 }

@@ -30,8 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -83,11 +82,11 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k parameter
    */
-  public ODIN(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public ODIN(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k;
   }
 
@@ -103,9 +102,8 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @return ODIN outlier result.
    */
   public OutlierResult run(Relation<O> relation) {
-    // Get the query functions:
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
-    KNNQuery<O> knnq = relation.getKNNQuery(dq, k);
+    // Get the query function:
+    QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
@@ -114,7 +112,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     // Process all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
-      KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      KNNList neighbors = qb.kNNQuery(k).getKNNForDBID(iter, k);
       // For each neighbor, except ourselves, increase the in-degree:
       for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
         if(DBIDUtil.equal(iter, nei)) {
@@ -185,7 +183,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public ODIN<O> make() {
-      return new ODIN<>(distanceFunction, k);
+      return new ODIN<>(distance, k);
     }
   }
 }

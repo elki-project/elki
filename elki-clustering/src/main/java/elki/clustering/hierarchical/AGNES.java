@@ -30,6 +30,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -119,11 +120,11 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param linkage Linkage method
    */
-  public AGNES(Distance<? super O> distanceFunction, Linkage linkage) {
-    super(distanceFunction);
+  public AGNES(Distance<? super O> distance, Linkage linkage) {
+    super(distance);
     this.linkage = linkage;
   }
 
@@ -139,7 +140,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
 
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);
@@ -373,7 +374,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public AGNES<O> make() {
-      return new AGNES<>(distanceFunction, linkage);
+      return new AGNES<>(distance, linkage);
     }
   }
 }

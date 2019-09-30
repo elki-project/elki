@@ -23,6 +23,7 @@ package elki.index.preprocessed.knn;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -73,20 +74,20 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
    * Constructor
    *
    * @param relation Relation to process
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param k query k
    * @param partitions Number of partitions
    * @param rnd Random number generator
    */
-  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, int partitions, RandomFactory rnd) {
-    super(relation, distanceFunction, k);
+  public PartitionApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, int partitions, RandomFactory rnd) {
+    super(relation, distance, k);
     this.partitions = partitions;
     this.rnd = rnd;
   }
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
+    DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance ksize = new MeanVariance();
     if(LOG.isVerbose()) {
@@ -179,19 +180,19 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      * Constructor.
      *
      * @param k k
-     * @param distanceFunction distance function
+     * @param distance distance function
      * @param partitions number of partitions
      * @param rnd
      */
-    public Factory(int k, Distance<? super O> distanceFunction, int partitions, RandomFactory rnd) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance, int partitions, RandomFactory rnd) {
+      super(k, distance);
       this.partitions = partitions;
       this.rnd = rnd;
     }
 
     @Override
     public PartitionApproximationMaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      PartitionApproximationMaterializeKNNPreprocessor<O> instance = new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k, partitions, rnd);
+      PartitionApproximationMaterializeKNNPreprocessor<O> instance = new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distance, k, partitions, rnd);
       return instance;
     }
 
@@ -233,7 +234,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
       @Override
       public Factory<O> make() {
-        return new Factory<>(k, distanceFunction, partitions, rnd);
+        return new Factory<>(k, distance, partitions, rnd);
       }
     }
   }

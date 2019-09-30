@@ -24,6 +24,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
@@ -76,11 +77,11 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param minPts Minimum number of points for density
    */
-  public SLINKHDBSCANLinearMemory(Distance<? super O> distanceFunction, int minPts) {
-    super(distanceFunction, minPts);
+  public SLINKHDBSCANLinearMemory(Distance<? super O> distance, int minPts) {
+    super(distance, minPts);
   }
 
   /**
@@ -90,8 +91,9 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
    * @return Clustering hierarchy
    */
   public PointerDensityHierarchyRepresentationResult run(Relation<O> relation) {
-    final DistanceQuery<O> distQ = relation.getDistanceQuery(getDistance());
-    final KNNQuery<O> knnQ = relation.getKNNQuery(distQ, minPts);
+    final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    final DistanceQuery<O> distQ = qb.distanceQuery();
+    final KNNQuery<O> knnQ = qb.kNNQuery(minPts);
     // We need array addressing later.
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
@@ -248,7 +250,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
   public static class Par<O> extends AbstractHDBSCAN.Par<O> {
     @Override
     public SLINKHDBSCANLinearMemory<O> make() {
-      return new SLINKHDBSCANLinearMemory<>(distanceFunction, minPts);
+      return new SLINKHDBSCANLinearMemory<>(distance, minPts);
     }
   }
 }

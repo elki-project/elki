@@ -32,6 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -91,11 +92,11 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param linkage Linkage method
    */
-  public AnderbergHierarchicalClustering(Distance<? super O> distanceFunction, Linkage linkage) {
-    super(distanceFunction);
+  public AnderbergHierarchicalClustering(Distance<? super O> distance, Linkage linkage) {
+    super(distance);
     this.linkage = linkage;
   }
 
@@ -109,7 +110,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
     final int size = ids.size();
@@ -392,7 +393,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
 
     @Override
     public AnderbergHierarchicalClustering<O> make() {
-      return new AnderbergHierarchicalClustering<>(distanceFunction, linkage);
+      return new AnderbergHierarchicalClustering<>(distance, linkage);
     }
   }
 }

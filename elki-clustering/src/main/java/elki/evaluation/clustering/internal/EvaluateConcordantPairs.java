@@ -94,7 +94,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private PrimitiveDistance<? super NumberVector> distanceFunction;
+  private PrimitiveDistance<? super NumberVector> distance;
 
   /**
    * Key for logging statistics.
@@ -109,7 +109,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    */
   public EvaluateConcordantPairs(PrimitiveDistance<? super NumberVector> distance, NoiseHandling noiseHandling) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
     this.noiseHandling = noiseHandling;
   }
 
@@ -166,7 +166,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
         for(DBIDIter oit1 = ocluster1.getIDs().iter(); oit1.valid(); oit1.advance()) {
           NumberVector obj = rel.get(oit1);
           for(DBIDIter oit2 = ocluster2.getIDs().iter(); oit2.valid(); oit2.advance()) {
-            double dist = distanceFunction.distance(obj, rel.get(oit2));
+            double dist = distance.distance(obj, rel.get(oit2));
             int p = Arrays.binarySearch(withinDistances, dist);
             if(p >= 0) { // Tied distances:
               while(p > 0 && withinDistances[p - 1] >= dist) {
@@ -258,7 +258,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
           if(DBIDUtil.compare(it1, it2) <= 0) {
             continue;
           }
-          concordant[i++] = distanceFunction.distance(obj, rel.get(it2));
+          concordant[i++] = distance.distance(obj, rel.get(it2));
         }
       }
     }
@@ -294,7 +294,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(result);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
       evaluateClustering((Relation<? extends NumberVector>) rel, c);

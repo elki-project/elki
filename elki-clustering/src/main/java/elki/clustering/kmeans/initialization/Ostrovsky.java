@@ -31,6 +31,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -81,17 +82,17 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
-    if(!(distanceFunction instanceof SquaredEuclideanDistance)) {
+    if(!(distance instanceof SquaredEuclideanDistance)) {
       // Really. This uses variance and König-Huygens below, and WILL fail
       throw new IllegalArgumentException("This initialization works ONLY with squared Euclidean distances for correctness.");
     }
     DBIDs ids = relation.getDBIDs();
     @SuppressWarnings("unchecked")
-    DistanceQuery<NumberVector> distQ = ((Relation<NumberVector>) relation).getDistanceQuery((NumberVectorDistance<NumberVector>) distanceFunction);
+    DistanceQuery<NumberVector> distQ = new QueryBuilder<>((Relation<NumberVector>) relation, (NumberVectorDistance<NumberVector>) distance).distanceQuery();
     Random random = rnd.getSingleThreadedRandom();
 
     // Center and total variance

@@ -21,7 +21,6 @@
 package elki.database.query.distance;
 
 import elki.database.ids.DBIDRef;
-import elki.database.query.DatabaseQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 
@@ -36,7 +35,7 @@ import elki.distance.Distance;
  * 
  * @param <O> Input data type
  */
-public interface DistanceQuery<O> extends DatabaseQuery {
+public interface DistanceQuery<O> {
   /**
    * Returns the distance between the two objects specified by their object ids.
    * 

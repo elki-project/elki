@@ -22,12 +22,7 @@ package elki.database.relation;
 
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.logging.Logging;
+import elki.database.ids.*;
 
 /**
  * Pseudo-representation that is the object ID itself.
@@ -35,12 +30,7 @@ import elki.logging.Logging;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class DBIDView extends AbstractRelation<DBID> {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(DBIDView.class);
-
+public class DBIDView implements Relation<DBID> {
   /**
    * The ids object
    */
@@ -58,7 +48,7 @@ public class DBIDView extends AbstractRelation<DBID> {
 
   @Override
   public DBID get(DBIDRef id) {
-    assert(ids.contains(id));
+    assert (ids.contains(id));
     return DBIDUtil.deref(id);
   }
 
@@ -94,10 +84,5 @@ public class DBIDView extends AbstractRelation<DBID> {
   @Override
   public String getLongName() {
     return "Database IDs";
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

@@ -27,7 +27,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.KNNList;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -86,24 +86,25 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**
    * Constructor with actual parameters.
    *
-   * @param distanceFunction distance function parameter
+   * @param distance distance function parameter
    * @param d distance query radius
    * @param p percentage parameter
    */
-  public DBOutlierDetection(Distance<? super O> distanceFunction, double d, double p) {
-    super(distanceFunction, d);
+  public DBOutlierDetection(Distance<? super O> distance, double d, double p) {
+    super(distance, d);
     this.p = p;
   }
 
   @Override
   protected DoubleDataStore computeOutlierScores(Relation<O> relation, double d) {
-    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
-    // Prefer kNN query if available, as this will usually stop earlier.
-    KNNQuery<O> knnQuery = relation.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    RangeQuery<O> rangeQuery = knnQuery == null ? relation.getRangeQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY, d) : null;
-
     // maximum number of objects in the D-neighborhood of an outlier
-    int m = (int) Math.floor((distFunc.getRelation().size()) * (1 - p));
+    final int m = (int) Math.floor((relation.size()) * (1 - p));
+
+    final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    DistanceQuery<O> distFunc = qb.distanceQuery();
+    // Prefer kNN query if available, as this will usually stop earlier.
+    KNNQuery<O> knnQuery = qb.optimizedOnly().kNNQuery(m);
+    RangeQuery<O> rangeQuery = knnQuery == null ? qb.rangeQuery(d) : null;
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
 
@@ -183,7 +184,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
 
     @Override
     public DBOutlierDetection<O> make() {
-      return new DBOutlierDetection<>(distanceFunction, d, p);
+      return new DBOutlierDetection<>(distance, d, p);
     }
   }
 }

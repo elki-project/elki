@@ -20,13 +20,11 @@
  */
 package elki.outlier.lof;
 
-import java.util.List;
-
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
@@ -40,7 +38,6 @@ import elki.math.DoubleMinMax;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.pairs.Pair;
 
 /**
@@ -107,10 +104,9 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
    * @return the kNN and rkNN queries
    */
   private Pair<Pair<KNNQuery<O>, KNNQuery<O>>, Pair<RKNNQuery<O>, RKNNQuery<O>>> getKNNAndRkNNQueries(Relation<O> relation, StepProgress stepprog) {
-    DistanceQuery<O> drefQ = relation.getDistanceQuery(referenceDistance);
-    // Use "HEAVY" flag, since this is an online algorithm
-    KNNQuery<O> kNNRefer = relation.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNRefer = relation.getRKNNQuery(drefQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    DistanceQuery<O> drefQ = new QueryBuilder<>(relation, referenceDistance).distanceQuery();
+    KNNQuery<O> kNNRefer = new QueryBuilder<>(drefQ).optimizedOnly().kNNQuery(krefer);
+    RKNNQuery<O> rkNNRefer = new QueryBuilder<>(drefQ).optimizedOnly().rKNNQuery(krefer);
 
     // No optimized kNN query or RkNN query - use a preprocessor!
     if(kNNRefer == null || rkNNRefer == null) {
@@ -118,8 +114,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
         stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", LOG);
       }
       MaterializeKNNAndRKNNPreprocessor<O> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, referenceDistance, krefer);
-      kNNRefer = preproc.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNRefer = preproc.getRKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
+      kNNRefer = preproc.getKNNQuery(drefQ, krefer, 0);
+      rkNNRefer = preproc.getRKNNQuery(drefQ, krefer, 0);
       // add as index
       Metadata.hierarchyOf(relation).addChild(preproc);
     }
@@ -129,26 +125,22 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
     }
 
-    DistanceQuery<O> dreachQ = relation.getDistanceQuery(reachabilityDistance);
-    KNNQuery<O> kNNReach = relation.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
-    RKNNQuery<O> rkNNReach = relation.getRKNNQuery(dreachQ, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    DistanceQuery<O> dreachQ = new QueryBuilder<>(relation, reachabilityDistance).distanceQuery();
+    KNNQuery<O> kNNReach = new QueryBuilder<>(dreachQ).optimizedOnly().kNNQuery(kreach);
+    RKNNQuery<O> rkNNReach = new QueryBuilder<>(dreachQ).optimizedOnly().rKNNQuery(kreach);
     if(kNNReach == null || rkNNReach == null) {
       if(stepprog != null) {
         stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", LOG);
       }
-      ListParameterization config = new ListParameterization();
-      config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistance);
-      config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.K_ID, kreach);
       MaterializeKNNAndRKNNPreprocessor<O> preproc = new MaterializeKNNAndRKNNPreprocessor<>(relation, reachabilityDistance, kreach);
-      kNNReach = preproc.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
-      rkNNReach = preproc.getRKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
+      kNNReach = preproc.getKNNQuery(dreachQ, kreach, 0);
+      rkNNReach = preproc.getRKNNQuery(dreachQ, kreach, 0);
       // add as index
       Metadata.hierarchyOf(relation).addChild(preproc);
     }
 
     Pair<KNNQuery<O>, KNNQuery<O>> kNNPair = new Pair<>(kNNRefer, kNNReach);
     Pair<RKNNQuery<O>, RKNNQuery<O>> rkNNPair = new Pair<>(rkNNRefer, rkNNReach);
-
     return new Pair<>(kNNPair, rkNNPair);
   }
 
@@ -251,16 +243,19 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(1, "Recompute LRDs.", LOG);
       }
-      ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-      List<? extends DoubleDBIDList> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
-      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
-      ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+      DBIDs lrd_ids = DBIDUtil.union(insertions, updates2);
+      ModifiableDBIDs affected_lrd_id_candidates = DBIDUtil.newHashSet(lrd_ids.size() * kreach);
+      for(DBIDIter it = lrd_ids.iter(); it.valid(); it.advance()) {
+        affected_lrd_id_candidates.addDBIDs(lofResult.getRkNNReach().getRKNNForDBID(it, kreach));
+      }
+      affected_lrd_id_candidates.addDBIDs(lrd_ids);
       WritableDoubleDataStore new_lrds = DataStoreUtil.makeDoubleStorage(affected_lrd_id_candidates, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
       computeLRDs(lofResult.getKNNReach(), affected_lrd_id_candidates, new_lrds);
+
+      ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       for(DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
         double new_lrd = new_lrds.doubleValue(iter);
-        double old_lrd = lofResult.getLrds().doubleValue(iter);
-        if(Double.isNaN(old_lrd) || old_lrd != new_lrd) {
+        if(new_lrd != lofResult.getLrds().doubleValue(iter)) {
           lofResult.getLrds().putDouble(iter, new_lrd);
           affected_lrd_ids.add(iter);
         }
@@ -270,8 +265,13 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LOFS.", LOG);
       }
-      List<? extends DoubleDBIDList> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
-      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
+      ModifiableDBIDs affected_lof_ids = DBIDUtil.newHashSet(affected_lrd_ids.size() * kreach);
+      for(DBIDIter it = affected_lrd_ids.iter(); it.valid(); it.advance()) {
+        affected_lof_ids.addDBIDs(lofResult.getRkNNRefer().getRKNNForDBID(it, kreach));
+      }
+      affected_lof_ids.addDBIDs(affected_lrd_ids);
+      affected_lof_ids.addDBIDs(insertions);
+      affected_lof_ids.addDBIDs(updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
       // fire result changed
@@ -308,16 +308,17 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LRDs.", LOG);
       }
-      ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
-      List<? extends DoubleDBIDList> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, kreach);
-      ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
-      ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
+      ModifiableDBIDs affected_lrd_id_candidates = DBIDUtil.newHashSet(updates2.size() * kreach);
+      for(DBIDIter it = updates2.iter(); it.valid(); it.advance()) {
+        affected_lrd_id_candidates.addDBIDs(lofResult.getRkNNReach().getRKNNForDBID(it, kreach));
+      }
+      affected_lrd_id_candidates.addDBIDs(updates2);
       WritableDoubleDataStore new_lrds = DataStoreUtil.makeDoubleStorage(affected_lrd_id_candidates, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
       computeLRDs(lofResult.getKNNReach(), affected_lrd_id_candidates, new_lrds);
+      ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       for(DBIDIter iter = affected_lrd_id_candidates.iter(); iter.valid(); iter.advance()) {
         double new_lrd = new_lrds.doubleValue(iter);
-        double old_lrd = lofResult.getLrds().doubleValue(iter);
-        if(old_lrd != new_lrd) {
+        if(new_lrd != lofResult.getLrds().doubleValue(iter)) {
           lofResult.getLrds().putDouble(iter, new_lrd);
           affected_lrd_ids.add(iter);
         }
@@ -327,8 +328,12 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       if(stepprog != null) {
         stepprog.beginStep(3, "Recompute LOFS.", LOG);
       }
-      List<? extends DoubleDBIDList> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, krefer);
-      ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
+      ModifiableDBIDs affected_lof_ids = DBIDUtil.newHashSet(affected_lrd_ids.size() * krefer);
+      for(DBIDIter it = affected_lrd_ids.iter(); it.valid(); it.advance()) {
+        affected_lof_ids.addDBIDs(lofResult.getRkNNRefer().getRKNNForDBID(it, krefer));
+      }
+      affected_lof_ids.addDBIDs(affected_lrd_ids);
+      affected_lof_ids.addDBIDs(updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
       // fire result changed
@@ -337,25 +342,6 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       }
       Metadata.of(lofResult.getResult()).notifyChanged();
       LOG.setCompleted(stepprog);
-    }
-
-    /**
-     * Merges the ids of the query result with the specified ids.
-     *
-     * @param queryResults the list of query results
-     * @param ids the list of ids
-     * @return a set containing the ids of the query result and the specified
-     *         ids
-     */
-    private ArrayModifiableDBIDs mergeIDs(List<? extends DoubleDBIDList> queryResults, DBIDs... ids) {
-      ModifiableDBIDs result = DBIDUtil.newHashSet();
-      for(DBIDs dbids : ids) {
-        result.addDBIDs(dbids);
-      }
-      for(DoubleDBIDList queryResult : queryResults) {
-        result.addDBIDs(queryResult);
-      }
-      return DBIDUtil.newArray(result);
     }
 
     /**
@@ -398,7 +384,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
   public static class Par<O> extends FlexibleLOF.Par<O> {
     @Override
     public OnlineLOF<O> make() {
-      return new OnlineLOF<>(kreach, krefer, distanceFunction, reachabilityDistance);
+      return new OnlineLOF<>(kreach, krefer, distance, reachabilityDistance);
     }
   }
 }

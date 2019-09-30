@@ -26,6 +26,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -74,7 +75,7 @@ public class BUILD<O> implements KMeansInitialization, KMedoidsInitialization<O>
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new AbortException("Database has less than k objects.");
     }
@@ -83,8 +84,8 @@ public class BUILD<O> implements KMeansInitialization, KMedoidsInitialization<O>
     Relation<O> rel = (Relation<O>) relation;
     // Get a distance query
     @SuppressWarnings("unchecked")
-    final PrimitiveDistance<? super O> distF = (PrimitiveDistance<? super O>) distanceFunction;
-    final DistanceQuery<O> distQ = rel.getDistanceQuery(distF);
+    final PrimitiveDistance<? super O> distF = (PrimitiveDistance<? super O>) distance;
+    final DistanceQuery<O> distQ = new QueryBuilder<>(rel, distF).distanceQuery();
     DBIDs medids = chooseInitialMedoids(k, rel.getDBIDs(), distQ);
     double[][] medoids = new double[k][];
     DBIDIter iter = medids.iter();

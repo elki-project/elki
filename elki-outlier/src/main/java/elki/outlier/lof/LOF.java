@@ -100,10 +100,10 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    * 
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    */
-  public LOF(int k, Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public LOF(int k, Distance<? super O> distance) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -272,7 +272,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
 
     @Override
     public LOF<O> make() {
-      return new LOF<>(k, distanceFunction);
+      return new LOF<>(k, distance);
     }
   }
 }

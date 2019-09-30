@@ -72,10 +72,10 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    */
-  public MiniMaxAnderberg(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public MiniMaxAnderberg(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -367,7 +367,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public MiniMaxAnderberg<O> make() {
-      return new MiniMaxAnderberg<>(distanceFunction);
+      return new MiniMaxAnderberg<>(distance);
     }
   }
 }

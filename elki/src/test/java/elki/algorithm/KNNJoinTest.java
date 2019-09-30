@@ -26,11 +26,10 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.QueryUtil;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.KNNList;
-import elki.database.query.distance.DistanceQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
@@ -77,8 +76,7 @@ public class KNNJoinTest {
 
     // Euclidean
     {
-      DistanceQuery<NumberVector> dq = relation.getDistanceQuery(EuclideanDistance.STATIC);
-      KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      KNNQuery<NumberVector> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).linearOnly().kNNQuery();
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -89,8 +87,7 @@ public class KNNJoinTest {
     }
     // Manhattan
     {
-      DistanceQuery<NumberVector> dq = relation.getDistanceQuery(ManhattanDistance.STATIC);
-      KNNQuery<NumberVector> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      KNNQuery<NumberVector> knnq = new QueryBuilder<NumberVector>(relation, ManhattanDistance.STATIC).linearOnly().kNNQuery();
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

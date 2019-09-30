@@ -29,7 +29,7 @@ import elki.data.LabelList;
 import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
@@ -39,6 +39,7 @@ import elki.distance.Distance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
+import elki.result.Metadata;
 
 /**
  * Class with Database-related utility functions such as centroid computation,
@@ -187,15 +188,15 @@ public final class DatabaseUtil {
    */
   public static <O> KNNQuery<O> precomputedKNNQuery(Relation<O> relation, DistanceQuery<O> dq, int k) {
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = relation.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
-    // No optimized kNN query - use a preprocessor!
+    KNNQuery<O> knnq = new QueryBuilder<>(dq).optimizedOnly().kNNQuery(k);
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
+    // No optimized kNN query - use a preprocessor!
     MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistance(), k);
     preproc.initialize();
-    // TODO: attach weakly persistent to the relation?
-    return preproc.getKNNQuery(dq, k);
+    Metadata.hierarchyOf(relation).addWeakChild(preproc);
+    return preproc.getKNNQuery(dq, k, 0);
   }
 
   /**
@@ -207,17 +208,18 @@ public final class DatabaseUtil {
    * @return KNNQuery for the given relation, that is precomputed.
    */
   public static <O> KNNQuery<O> precomputedKNNQuery(Relation<O> relation, Distance<? super O> distf, int k) {
-    DistanceQuery<O> dq = relation.getDistanceQuery(distf);
+    final QueryBuilder<O> qb = new QueryBuilder<>(relation, distf);
+    final DistanceQuery<O> dq = qb.distanceQuery(); // may be "unoptimized"
     // "HEAVY" flag for knn query since it is used more than once
-    KNNQuery<O> knnq = relation.getKNNQuery(dq, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnq = qb.optimizedOnly().kNNQuery(k);
     // No optimized kNN query - use a preprocessor!
     if(knnq instanceof PreprocessorKNNQuery) {
       return knnq;
     }
-    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, dq.getDistance(), k);
+    MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, k);
     preproc.initialize();
-    // TODO: attach weakly persistent to the relation?
-    return preproc.getKNNQuery(dq, k);
+    Metadata.hierarchyOf(relation).addWeakChild(preproc);
+    return preproc.getKNNQuery(dq, k, 0);
   }
 
   /**
@@ -232,19 +234,19 @@ public final class DatabaseUtil {
    * @return KNNQuery for the given relation, that is precomputed.
    */
   public static <O> DistanceQuery<O> precomputedDistanceQuery(Relation<O> relation, Distance<? super O> distf, Logging log) {
-    DistanceQuery<O> dq = relation.getDistanceQuery(distf, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distf).optimizedOnly().distanceQuery();
     if(dq == null) {
       DBIDs ids = relation.getDBIDs();
       if(ids instanceof DBIDRange) {
         log.verbose("Precomputing a distance matrix for acceleration.");
         PrecomputedDistanceMatrix<O> idx = new PrecomputedDistanceMatrix<O>(relation, (DBIDRange) ids, distf);
         idx.initialize();
-        // TODO: attach weakly persistent to the relation?
+        Metadata.hierarchyOf(relation).addWeakChild(idx);
         dq = idx.getDistanceQuery(distf);
       }
     }
     if(dq == null) {
-      dq = relation.getDistanceQuery(distf, DatabaseQuery.HINT_HEAVY_USE);
+      dq = new QueryBuilder<>(relation, distf).distanceQuery();
       log.warning("We could not automatically use a distance matrix, expect a performance degradation.");
     }
     return dq;

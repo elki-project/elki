@@ -25,7 +25,6 @@ import elki.data.type.SimpleTypeInformation;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
-import elki.logging.Logging;
 
 /**
  * Projected relation view (non-materialized)
@@ -36,12 +35,7 @@ import elki.logging.Logging;
  * @param <IN> Vector type
  * @param <OUT> Vector type
  */
-public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ProjectedView.class);
-
+public class ProjectedView<IN, OUT> implements Relation<OUT> {
   /**
    * The wrapped representation where we get the IDs from.
    */
@@ -93,10 +87,5 @@ public class ProjectedView<IN, OUT> extends AbstractRelation<OUT> {
   @Override
   public int size() {
     return inner.size();
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

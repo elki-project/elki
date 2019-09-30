@@ -29,6 +29,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -85,11 +86,11 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k parameter
    */
-  public ODIN(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public ODIN(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -101,7 +102,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    */
   public OutlierResult run(Relation<O> relation) {
     // Get the query functions:
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(k);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
@@ -174,7 +175,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public ODIN<O> make() {
-      return new ODIN<>(distanceFunction, k);
+      return new ODIN<>(distance, k);
     }
   }
 }

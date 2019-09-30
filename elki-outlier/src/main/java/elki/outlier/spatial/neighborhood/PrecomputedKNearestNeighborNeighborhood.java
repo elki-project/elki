@@ -27,6 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -82,22 +83,20 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
     /**
      * distance function to use
      */
-    private Distance<? super O> distFunc;
+    private Distance<? super O> distance;
 
     /**
      * Factory Constructor
      */
-    public Factory(int k, Distance<? super O> distFunc) {
+    public Factory(int k, Distance<? super O> distance) {
       super();
       this.k = k;
-      this.distFunc = distFunc;
+      this.distance = distance;
     }
 
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
-      KNNQuery<?> knnQuery = relation.getKNNQuery(distFunc);
-
-      // TODO: use bulk?
+      KNNQuery<?> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBIDs.class);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
@@ -112,7 +111,7 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
 
     @Override
     public TypeInformation getInputTypeRestriction() {
-      return distFunc.getInputTypeRestriction();
+      return distance.getInputTypeRestriction();
     }
 
     /**

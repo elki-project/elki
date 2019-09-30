@@ -131,7 +131,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k_min k_min parameter - minimum number of result clusters
    * @param k_max k_max parameter - maximum number of result clusters
    * @param maxiter Maximum number of iterations each.
@@ -140,15 +140,15 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistance<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
-    super(distanceFunction, k_min, maxiter, initializer);
+  public XMeans(NumberVectorDistance<? super V> distance, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+    super(distance, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
     this.k = k_min;
     this.innerKMeans = innerKMeans;
     this.splitInitializer = new Predefined((double[][]) null);
     this.innerKMeans.setInitializer(this.splitInitializer);
-    this.innerKMeans.setDistance(distanceFunction);
+    this.innerKMeans.setDistance(distance);
     this.informationCriterion = informationCriterion;
     this.rnd = random;
   }
@@ -372,8 +372,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
             .addParameter(KMeans.MAXITER_ID, maxiter) //
             // Setting the distance to null if undefined at this point will
             // cause validation errors later. So fall back to the default.
-            .addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction != null ? //
-                distanceFunction : SquaredEuclideanDistance.STATIC), config);
+            .addParameter(KMeans.DISTANCE_FUNCTION_ID, distance != null ? //
+                distance : SquaredEuclideanDistance.STATIC), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
       }
@@ -384,7 +384,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     @Override
     public XMeans<V, M> make() {
-      return new XMeans<V, M>(distanceFunction, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
+      return new XMeans<V, M>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }
   }
 }

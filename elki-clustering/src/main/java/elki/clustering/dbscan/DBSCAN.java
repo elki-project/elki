@@ -32,6 +32,7 @@ import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -104,12 +105,12 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
    */
-  public DBSCAN(Distance<? super O> distanceFunction, double epsilon, int minpts) {
-    super(distanceFunction);
+  public DBSCAN(Distance<? super O> distance, double epsilon, int minpts) {
+    super(distance);
     this.epsilon = epsilon;
     this.minpts = minpts;
   }
@@ -127,7 +128,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
     }
 
     Instance dbscan = new Instance();
-    dbscan.run(relation, relation.getRangeQuery(getDistance()));
+    dbscan.run(relation, new QueryBuilder<>(relation, distance).rangeQuery(epsilon));
 
     double averagen = dbscan.ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
@@ -337,7 +338,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
 
     @Override
     public DBSCAN<O> make() {
-      return new DBSCAN<>(distanceFunction, epsilon, minpts);
+      return new DBSCAN<>(distance, epsilon, minpts);
     }
   }
 }

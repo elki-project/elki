@@ -96,26 +96,26 @@ public class FastPAM<V> extends FastPAM1<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public FastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    this(distanceFunction, k, maxiter, initializer, 1.);
+  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    this(distance, k, maxiter, initializer, 1.);
   }
 
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
-  public FastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
-    super(distanceFunction, k, maxiter, initializer);
+  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+    super(distance, k, maxiter, initializer);
     this.fasttol = fasttol;
   }
 
@@ -342,7 +342,7 @@ public class FastPAM<V> extends FastPAM1<V> {
 
     @Override
     public FastPAM<V> make() {
-      return new FastPAM<>(distanceFunction, k, maxiter, initializer, fasttol);
+      return new FastPAM<>(distance, k, maxiter, initializer, fasttol);
     }
   }
 }

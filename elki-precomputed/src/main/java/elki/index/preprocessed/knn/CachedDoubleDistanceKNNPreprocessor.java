@@ -58,12 +58,12 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
    * Constructor.
    * 
    * @param relation Relation to index
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K
    * @param file File to load
    */
-  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, File file) {
-    super(relation, distanceFunction, k);
+  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, File file) {
+    super(relation, distance, k);
     this.filename = file;
   }
 
@@ -150,17 +150,17 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
      * Index factory.
      * 
      * @param k k parameter
-     * @param distanceFunction distance function
+     * @param distance distance function
      * @param filename Cache file
      */
-    public Factory(int k, Distance<? super O> distanceFunction, File filename) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance, File filename) {
+      super(k, distance);
       this.filename = filename;
     }
 
     @Override
     public CachedDoubleDistanceKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      CachedDoubleDistanceKNNPreprocessor<O> instance = new CachedDoubleDistanceKNNPreprocessor<>(relation, distanceFunction, k, filename);
+      CachedDoubleDistanceKNNPreprocessor<O> instance = new CachedDoubleDistanceKNNPreprocessor<>(relation, distance, k, filename);
       return instance;
     }
 
@@ -190,7 +190,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
 
       @Override
       public Factory<O> make() {
-        return new Factory<>(k, distanceFunction, filename);
+        return new Factory<>(k, distance, filename);
       }
     }
   }

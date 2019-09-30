@@ -30,7 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
@@ -99,11 +99,11 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k Parameter
    */
-  public LDOF(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public LDOF(Distance<? super O> distance, int k) {
+    super(distance);
     this.kplus = k + 1; // + query point
   }
 
@@ -114,8 +114,9 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance(), DatabaseQuery.HINT_HEAVY_USE);
-    KNNQuery<O> knnQuery = relation.getKNNQuery(distFunc, kplus);
+    QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    KNNQuery<O> knnQuery = qb.kNNQuery(kplus);
+    DistanceQuery<O> distFunc = qb.distanceQuery();
 
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
@@ -205,7 +206,7 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public LDOF<O> make() {
-      return new LDOF<>(distanceFunction, k);
+      return new LDOF<>(distance, k);
     }
   }
 }

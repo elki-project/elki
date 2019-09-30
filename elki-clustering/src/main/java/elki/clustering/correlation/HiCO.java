@@ -33,6 +33,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -232,7 +233,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
       }
       localPCAs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
-      KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, k);
+      KNNQuery<V> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(k);
 
       Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Performing local PCA", relation.size(), LOG) : null;

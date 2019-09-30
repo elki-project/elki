@@ -31,7 +31,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
@@ -149,15 +149,15 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
-    DistanceQuery<O> distQ = relation.getDistanceQuery(reachabilityDistance, DatabaseQuery.HINT_HEAVY_USE);
+    DistanceQuery<O> distQ = new QueryBuilder<>(relation, reachabilityDistance).distanceQuery();
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O> knnReach = relation.getKNNQuery(distQ, kreach, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
+    KNNQuery<O> knnReach = new QueryBuilder<>(distQ).optimizedOnly().kNNQuery(kreach);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
         stepprog.beginStep(1, referenceDistance.equals(reachabilityDistance) ? //
-            "Materializing neighborhoods w.r.t. reference neighborhood distance function." //
-            : "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
+            "Materializing neighborhoods w.r.t. reference neighborhood distance." //
+            : "Not materializing neighborhoods w.r.t. reference neighborhood distance, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
       }
       int kpreproc = (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach;
       knnReach = DatabaseUtil.precomputedKNNQuery(relation, reachabilityDistance, kpreproc);
@@ -167,7 +167,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     KNNQuery<O> knnRefer = knnReach;
     if(!referenceDistance.equals(reachabilityDistance)) {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = relation.getKNNQuery(referenceDistance, krefer);
+      knnRefer = new QueryBuilder<>(relation, referenceDistance).kNNQuery(krefer);
     }
     return doRunInTime(relation.getDBIDs(), knnRefer, knnReach, stepprog).getResult();
   }
@@ -503,7 +503,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> kreach = x);
-      reachabilityDistance = distanceFunction;
+      reachabilityDistance = distance;
       new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
           .setOptional(true) //
           .grab(config, x -> reachabilityDistance = x);
@@ -511,7 +511,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
 
     @Override
     public FlexibleLOF<O> make() {
-      return new FlexibleLOF<>(kreach, krefer, distanceFunction, reachabilityDistance);
+      return new FlexibleLOF<>(kreach, krefer, distance, reachabilityDistance);
     }
   }
 }

@@ -20,11 +20,6 @@
  */
 package elki.database.query.rknn;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.relation.Relation;
@@ -87,17 +82,5 @@ public class PreprocessorRKNNQuery<O> implements RKNNQuery<O> {
   @Override
   public DoubleDBIDList getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
-  }
-
-  @Override
-  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    if(!warned && k != preprocessor.getK()) {
-      LoggingUtil.warning("Requested more neighbors than preprocessed!");
-    }
-    List<DoubleDBIDList> result = new ArrayList<>(ids.size());
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      result.add(preprocessor.getRKNN(iter));
-    }
-    return result;
   }
 }

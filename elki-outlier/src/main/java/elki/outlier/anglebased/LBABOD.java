@@ -27,6 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -116,7 +117,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   public OutlierResult run(Relation<V> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     DBIDArrayIter pB = ids.iter(), pC = ids.iter();
-    SimilarityQuery<V> sq = relation.getSimilarityQuery(kernelFunction);
+    SimilarityQuery<V> sq = new QueryBuilder<>(relation, kernelFunction).similarityQuery();
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     // Output storage.

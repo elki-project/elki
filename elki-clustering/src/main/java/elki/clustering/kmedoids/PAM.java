@@ -111,13 +111,13 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public PAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction);
+  public PAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance);
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -440,7 +440,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
 
     @Override
     public PAM<V> make() {
-      return new PAM<>(distanceFunction, k, maxiter, initializer);
+      return new PAM<>(distance, k, maxiter, initializer);
     }
   }
 }

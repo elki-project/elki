@@ -95,7 +95,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> settings.k_max = x);
       new ObjectParameter<SpatialPrimitiveDistance<NumberVector>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, DEFAULT_DISTANCE_FUNCTION) //
-          .grab(config, x -> settings.distanceFunction = x);
+          .grab(config, x -> settings.distance = x);
     }
 
     @Override

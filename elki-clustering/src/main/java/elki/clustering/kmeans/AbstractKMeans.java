@@ -95,13 +95,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction);
+  public AbstractKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance);
     this.k = k;
     this.maxiter = maxiter > 0 ? maxiter : Integer.MAX_VALUE;
     this.initializer = initializer;
@@ -296,8 +296,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   @Override
-  public void setDistance(NumberVectorDistance<? super V> distanceFunction) {
-    this.distanceFunction = distanceFunction;
+  public void setDistance(NumberVectorDistance<? super V> distance) {
+    this.distance = distance;
   }
 
   @Override
@@ -719,7 +719,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     protected void getParameterDistance(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
-            this.distanceFunction = x;
+            this.distance = x;
             if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance) {
               return;
             }

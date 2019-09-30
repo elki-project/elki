@@ -31,6 +31,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -116,7 +117,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param samplesize Sample size
    * @param random Random generator
    * @param rep Number of repetitions
@@ -124,8 +125,8 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
    * @param minima Data space minima, may be {@code null} (get from data).
    * @param maxima Data space minima, may be {@code null} (get from data).
    */
-  public HopkinsStatisticClusteringTendency(NumberVectorDistance<? super NumberVector> distanceFunction, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
-    super(distanceFunction);
+  public HopkinsStatisticClusteringTendency(NumberVectorDistance<? super NumberVector> distance, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
+    super(distance);
     this.sampleSize = samplesize;
     this.random = random;
     this.rep = rep;
@@ -142,7 +143,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
    */
   public Double run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    final KNNQuery<NumberVector> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
+    KNNQuery<NumberVector> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
 
     final double[] min = new double[dim], extend = new double[dim];
     initializeDataExtends(relation, dim, min, extend);
@@ -386,7 +387,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
 
     @Override
     public HopkinsStatisticClusteringTendency make() {
-      return new HopkinsStatisticClusteringTendency(distanceFunction, sampleSize, random, rep, k, minima, maxima);
+      return new HopkinsStatisticClusteringTendency(distance, sampleSize, random, rep, k, minima, maxima);
     }
   }
 }

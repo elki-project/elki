@@ -32,6 +32,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -55,8 +56,8 @@ import elki.utilities.datastructures.heap.ObjectHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -175,7 +176,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    distq = relation.getDistanceQuery(getDistance());
+    distq = new QueryBuilder<>(relation, distance).distanceQuery();
     d = RelationUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 

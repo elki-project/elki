@@ -32,6 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -113,7 +114,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   @Override
   public Instance instantiate(Database database) {
     Relation<V> relation = database.getRelation(getInputTypeRestriction());
-    RangeQuery<V> rq = relation.getRangeQuery(distFunc);
+    RangeQuery<V> rq = new QueryBuilder<>(relation, distance).rangeQuery(epsilon);
     mvSize.reset();
     mvSize2.reset();
     mvCorDim.reset();

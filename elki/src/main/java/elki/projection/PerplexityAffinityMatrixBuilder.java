@@ -24,7 +24,7 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDUtil;
-import elki.database.query.distance.DistanceQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
@@ -39,6 +39,7 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -84,7 +85,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   /**
    * Input distance function.
    */
-  protected Distance<? super O> distanceFunction;
+  protected Distance<? super O> distance;
 
   /**
    * Perplexity.
@@ -94,21 +95,20 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param perplexity Perplexity
    */
-  public PerplexityAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity) {
-    super(distanceFunction, Double.NaN);
-    this.distanceFunction = distanceFunction;
+  public PerplexityAffinityMatrixBuilder(Distance<? super O> distance, double perplexity) {
+    super(distance, Double.NaN);
+    this.distance = distance;
     this.perplexity = perplexity;
   }
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
-    DistanceQuery<T> dq = relation.getDistanceQuery(distanceFunction);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Compute desired affinities.
-    double[][] dist = buildDistanceMatrix(ids, dq);
+    double[][] dist = buildDistanceMatrix(ids, new QueryBuilder<>(relation, distance).distanceQuery());
     return new DenseAffinityMatrix(computePij(dist, perplexity, initialScale), ids);
   }
 
@@ -217,7 +217,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    */
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distanceFunction.getInputTypeRestriction();
+    return distance.getInputTypeRestriction();
   }
 
   /**
@@ -254,7 +254,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
 
     @Override
     public PerplexityAffinityMatrixBuilder<O> make() {
-      return new PerplexityAffinityMatrixBuilder<>(distanceFunction, perplexity);
+      return new PerplexityAffinityMatrixBuilder<>(distance, perplexity);
     }
   }
 }

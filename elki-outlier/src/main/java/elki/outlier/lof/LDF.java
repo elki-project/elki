@@ -283,7 +283,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
     @Override
     public LDF<O> make() {
-      return new LDF<>(k, distanceFunction, kernel, h, c);
+      return new LDF<>(k, distance, kernel, h, c);
     }
   }
 }

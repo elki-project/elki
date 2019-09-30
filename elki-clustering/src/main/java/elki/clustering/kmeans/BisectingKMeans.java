@@ -159,8 +159,8 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
   }
 
   @Override
-  public void setDistance(NumberVectorDistance<? super V> distanceFunction) {
-    innerkMeans.setDistance(distanceFunction);
+  public void setDistance(NumberVectorDistance<? super V> distance) {
+    innerkMeans.setDistance(distance);
   }
 
   @Override

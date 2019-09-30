@@ -37,12 +37,13 @@ import elki.database.query.knn.KNNQuery;
 public interface KNNIndex<O> extends Index {
   /**
    * Get a KNN query object for the given distance query and k.
-   * 
+   * <p>
    * This function MAY return null, when the given distance is not supported!
    * 
    * @param distanceQuery Distance query
-   * @param hints Hints for the optimizer
+   * @param maxk Maximum value of k
+   * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags);
 }

@@ -74,14 +74,14 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public HamerlyKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
-    super(distanceFunction, k, maxiter, initializer);
+  public HamerlyKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+    super(distance, k, maxiter, initializer);
     this.varstat = varstat;
   }
 
@@ -311,7 +311,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     @Override
     public HamerlyKMeans<V> make() {
-      return new HamerlyKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
+      return new HamerlyKMeans<>(distance, k, maxiter, initializer, varstat);
     }
   }
 }

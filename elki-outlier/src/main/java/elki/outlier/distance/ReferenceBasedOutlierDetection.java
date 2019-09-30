@@ -30,6 +30,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -103,11 +104,11 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
    * Constructor with parameters.
    *
    * @param k k Parameter
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param refp Reference points heuristic
    */
-  public ReferenceBasedOutlierDetection(int k, NumberVectorDistance<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
-    super(distanceFunction);
+  public ReferenceBasedOutlierDetection(int k, NumberVectorDistance<? super NumberVector> distance, ReferencePointsHeuristic refp) {
+    super(distance);
     this.k = k;
     this.refp = refp;
   }
@@ -120,7 +121,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
    */
   public OutlierResult run(Relation<? extends NumberVector> relation) {
     @SuppressWarnings("unchecked")
-    PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) relation.getDistanceQuery(distanceFunction);
+    PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) new QueryBuilder<>(relation, distance).distanceQuery();
     Collection<? extends NumberVector> refPoints = refp.getReferencePoints(relation);
     if(refPoints.isEmpty()) {
       throw new AbortException("Cannot compute ROS without reference points!");
@@ -257,7 +258,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distanceFunction.getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -305,7 +306,7 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
 
     @Override
     public ReferenceBasedOutlierDetection make() {
-      return new ReferenceBasedOutlierDetection(k, distanceFunction, refp);
+      return new ReferenceBasedOutlierDetection(k, distance, refp);
     }
   }
 }

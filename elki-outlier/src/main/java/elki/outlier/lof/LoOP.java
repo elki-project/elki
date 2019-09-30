@@ -32,6 +32,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -164,8 +165,8 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = relation.getKNNQuery(comparisonDistance, kreach + 1);
-      knnReach = relation.getKNNQuery(reachabilityDistance, kcomp + 1);
+      knnComp = new QueryBuilder<>(relation, comparisonDistance).kNNQuery(kreach + 1);
+      knnReach = new QueryBuilder<>(relation, reachabilityDistance).kNNQuery(kcomp + 1);
     }
     return new Pair<>(knnComp, knnReach);
   }

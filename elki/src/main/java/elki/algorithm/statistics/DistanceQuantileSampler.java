@@ -27,10 +27,10 @@ import java.util.Random;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -95,15 +95,15 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param quantile Quantile to compute
    * @param sampling Sampling rate
    * @param nozeros Flag to ignore zero distances (recommended with many
    *        duplicates)
    * @param rand Random generator
    */
-  public DistanceQuantileSampler(Distance<? super O> distanceFunction, double quantile, double sampling, boolean nozeros, RandomFactory rand) {
-    super(distanceFunction);
+  public DistanceQuantileSampler(Distance<? super O> distance, double quantile, double sampling, boolean nozeros, RandomFactory rand) {
+    super(distance);
     this.quantile = quantile;
     this.sampling = sampling;
     this.nozeros = nozeros;
@@ -113,13 +113,12 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
   /**
    * Run the distance quantile sampler.
    * 
-   * @param database
-   * @param rel
+   * @param relation Data relation
    * @return Distances sample
    */
-  public CollectionResult<double[]> run(Database database, Relation<O> rel) {
-    DistanceQuery<O> dq = rel.getDistanceQuery(getDistance());
-    int size = rel.size();
+  public CollectionResult<double[]> run(Relation<O> relation) {
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
+    int size = relation.size();
     long pairs = (size * (long) size) >> 1;
 
     final long ssize = sampling <= 1 ? (long) Math.ceil(sampling * pairs) : (long) sampling;
@@ -130,7 +129,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
 
     DoubleMaxHeap heap = new DoubleMaxHeap(qsize);
 
-    ArrayDBIDs ids = DBIDUtil.ensureArray(rel.getDBIDs());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
     Random r = rand.getSingleThreadedRandom();
 
@@ -231,7 +230,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
 
     @Override
     public DistanceQuantileSampler<O> make() {
-      return new DistanceQuantileSampler<O>(distanceFunction, quantile, sampling, nozeros, rand);
+      return new DistanceQuantileSampler<O>(distance, quantile, sampling, nozeros, rand);
     }
   }
 }

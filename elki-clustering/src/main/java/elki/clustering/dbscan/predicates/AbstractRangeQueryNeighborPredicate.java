@@ -64,23 +64,23 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
   /**
    * Distance function to use.
    */
-  protected Distance<? super O> distFunc;
+  protected Distance<? super O> distance;
 
   /**
    * Full constructor.
    * 
    * @param epsilon Epsilon value
-   * @param distFunc Distance function to use
+   * @param distance Distance function to use
    */
-  public AbstractRangeQueryNeighborPredicate(double epsilon, Distance<? super O> distFunc) {
+  public AbstractRangeQueryNeighborPredicate(double epsilon, Distance<? super O> distance) {
     super();
     this.epsilon = epsilon;
-    this.distFunc = distFunc;
+    this.distance = distance;
   }
 
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distFunc.getInputTypeRestriction();
+    return distance.getInputTypeRestriction();
   }
 
   /**

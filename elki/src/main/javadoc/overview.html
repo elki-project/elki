@@ -84,11 +84,10 @@ invoke its {@link elki.index.IndexFactory IndexFactory}s to add
 {@link elki.database.query.range.RangeQuery range} query is received by the database,
 it queries all indexes if they have support for this query. If so, an optimized query is returned,
 otherwise a linear scan query can be returned unless
-{@link elki.database.query.DatabaseQuery#HINT_OPTIMIZED_ONLY DatabaseQuery.HINT_OPTIMIZED_ONLY}
+{@link elki.database.query.QueryBuilder#optimizedOnly}
 was given.</p>
 <p>For this optimization to work, you should be using the proper APIs of the
-{@link elki.database.Database Database} interface or
-{@link elki.database.QueryUtil QueryUtil} helper where possible, instead of
+{@link elki.database.query QueryBuilder} wheree possible, instead of
 initializing low level classes such as an explicit linear scan query.</p>
 <p>For efficiency, try to instantiate the query only once per algorithm run, and avoid running the
 optimization step for every object.</p>

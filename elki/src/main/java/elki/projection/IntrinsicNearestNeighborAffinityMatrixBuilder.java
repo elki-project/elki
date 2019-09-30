@@ -22,6 +22,7 @@ package elki.projection;
 
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -88,19 +89,19 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param perplexity Perplexity
    * @param estimator Estimator of intrinsic dimensionality
    */
-  public IntrinsicNearestNeighborAffinityMatrixBuilder(Distance<? super O> distanceFunction, double perplexity, IntrinsicDimensionalityEstimator estimator) {
-    super(distanceFunction, perplexity);
+  public IntrinsicNearestNeighborAffinityMatrixBuilder(Distance<? super O> distance, double perplexity, IntrinsicDimensionalityEstimator estimator) {
+    super(distance, perplexity);
     this.estimator = estimator;
   }
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
     final int numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
-    KNNQuery<T> knnq = relation.getKNNQuery(distanceFunction, numberOfNeighbours + 1);
+    KNNQuery<T> knnq = new QueryBuilder<>(relation, distance).kNNQuery(numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
     }
@@ -112,7 +113,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !SquaredEuclideanDistance.class.isInstance(distanceFunction);
+    final boolean square = !SquaredEuclideanDistance.class.isInstance(distance);
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;
@@ -263,7 +264,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
 
     @Override
     public IntrinsicNearestNeighborAffinityMatrixBuilder<O> make() {
-      return new IntrinsicNearestNeighborAffinityMatrixBuilder<>(distanceFunction, perplexity, estimator);
+      return new IntrinsicNearestNeighborAffinityMatrixBuilder<>(distance, perplexity, estimator);
     }
   }
 }

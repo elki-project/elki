@@ -34,7 +34,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -113,7 +113,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    RangeQuery<O> rangeQ = relation.getRangeQuery(distance, radius, DatabaseQuery.HINT_HEAVY_USE);
+    RangeQuery<O> rangeQ = new QueryBuilder<>(relation, distance).rangeQuery();
 
     LOG.verbose("Performing range queries with radius " + radius);
 

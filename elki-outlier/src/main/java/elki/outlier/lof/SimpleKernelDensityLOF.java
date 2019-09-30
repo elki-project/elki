@@ -227,7 +227,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
     @Override
     public SimpleKernelDensityLOF<O> make() {
-      return new SimpleKernelDensityLOF<>(k, distanceFunction, kernel);
+      return new SimpleKernelDensityLOF<>(k, distance, kernel);
     }
   }
 }

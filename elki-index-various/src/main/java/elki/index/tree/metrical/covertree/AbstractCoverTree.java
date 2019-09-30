@@ -69,7 +69,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
   /**
    * Holds the instance of the trees distance function.
    */
-  protected Distance<? super O> distanceFunction;
+  protected Distance<? super O> distance;
 
   /**
    * Distance query, on the data relation.
@@ -90,14 +90,14 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * Constructor.
    *
    * @param relation Data relation
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public AbstractCoverTree(Relation<O> relation, Distance<? super O> distanceFunction, double expansion, int truncate) {
+  public AbstractCoverTree(Relation<O> relation, Distance<? super O> distance, double expansion, int truncate) {
     super(relation);
-    this.distanceFunction = distanceFunction;
-    this.distanceQuery = distanceFunction.instantiate(relation);
+    this.distance = distance;
+    this.distanceQuery = distance.instantiate(relation);
     this.truncate = truncate;
     this.expansion = expansion;
     this.invLogExpansion = 1. / FastMath.log(expansion);
@@ -239,7 +239,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
     /**
      * Holds the instance of the trees distance function.
      */
-    protected Distance<? super O> distanceFunction;
+    protected Distance<? super O> distance;
 
     /**
      * Constant expansion rate. 2 would be the intuitive value, but the original
@@ -256,21 +256,21 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
     /**
      * Constructor.
      *
-     * @param distanceFunction Distance function
+     * @param distance Distance function
      * @param expansion Expansion rate
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(Distance<? super O> distanceFunction, double expansion, int truncate) {
+    public Factory(Distance<? super O> distance, double expansion, int truncate) {
       super();
-      this.distanceFunction = distanceFunction;
+      this.distance = distance;
       this.expansion = expansion;
       this.truncate = truncate;
     }
 
     @Override
     public TypeInformation getInputTypeRestriction() {
-      return distanceFunction.getInputTypeRestriction();
+      return distance.getInputTypeRestriction();
     }
 
     /**
@@ -299,7 +299,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       /**
        * Holds the instance of the trees distance function.
        */
-      protected Distance<? super O> distanceFunction;
+      protected Distance<? super O> distance;
 
       /**
        * Truncate the tree.
@@ -315,8 +315,8 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
       public void configure(Parameterization config) {
         new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class) //
             .grab(config, x -> {
-              distanceFunction = x;
-              if(!distanceFunction.isMetric()) {
+              distance = x;
+              if(!distance.isMetric()) {
                 LoggingUtil.warning("CoverTree requires a metric to be exact.");
               }
             });

@@ -78,12 +78,12 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    * Constructor.
    *
    * @param relation data relation
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param expansion Expansion rate
    * @param truncate Truncate branches with less than this number of instances.
    */
-  public SimplifiedCoverTree(Relation<O> relation, Distance<? super O> distanceFunction, double expansion, int truncate) {
-    super(relation, distanceFunction, expansion, truncate);
+  public SimplifiedCoverTree(Relation<O> relation, Distance<? super O> distance, double expansion, int truncate) {
+    super(relation, distance, expansion, truncate);
   }
 
   /**
@@ -255,44 +255,21 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    return new CoverTreeRangeQuery();
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new CoverTreeRangeQuery() : null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      return null;
-    }
-    return new CoverTreeKNNQuery();
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new CoverTreeKNNQuery() : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    return new PrioritySearcher();
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new PrioritySearcher() : null;
   }
 
   @Override
@@ -593,18 +570,18 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Constructor.
      *
-     * @param distanceFunction Distance function
+     * @param distance Distance function
      * @param expansion Expansion rate
      * @param truncate Truncate branches with less than this number of
      *        instances.
      */
-    public Factory(Distance<? super O> distanceFunction, double expansion, int truncate) {
-      super(distanceFunction, expansion, truncate);
+    public Factory(Distance<? super O> distance, double expansion, int truncate) {
+      super(distance, expansion, truncate);
     }
 
     @Override
     public SimplifiedCoverTree<O> instantiate(Relation<O> relation) {
-      return new SimplifiedCoverTree<O>(relation, distanceFunction, expansion, truncate);
+      return new SimplifiedCoverTree<O>(relation, distance, expansion, truncate);
     }
 
     /**
@@ -615,7 +592,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     public static class Par<O> extends AbstractCoverTree.Factory.Par<O> {
       @Override
       public SimplifiedCoverTree.Factory<O> make() {
-        return new SimplifiedCoverTree.Factory<>(distanceFunction, expansion, truncate);
+        return new SimplifiedCoverTree.Factory<>(distance, expansion, truncate);
       }
     }
   }

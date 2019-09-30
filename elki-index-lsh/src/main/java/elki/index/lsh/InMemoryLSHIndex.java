@@ -24,12 +24,11 @@ import java.util.ArrayList;
 
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
@@ -39,12 +38,13 @@ import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -208,31 +208,17 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     }
 
     @Override
-    public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-      for(Object hint : hints) {
-        if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-          return null;
-        }
-      }
-      Distance<? super V> df = distanceQuery.getDistance();
-      if(!family.isCompatible(df)) {
-        return null;
-      }
-      return new LSHKNNQuery(distanceQuery);
+    public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
+      return (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0 && // approximate
+          family.isCompatible(distanceQuery.getDistance()) ? // compatible
+              new LSHKNNQuery(distanceQuery) : null;
     }
 
     @Override
-    public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
-      for(Object hint : hints) {
-        if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-          return null;
-        }
-      }
-      Distance<? super V> df = distanceQuery.getDistance();
-      if(!family.isCompatible(df)) {
-        return null;
-      }
-      return new LSHRangeQuery(distanceQuery);
+    public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
+      return (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0 && // approximate
+          !family.isCompatible(distanceQuery.getDistance()) ? // compatible
+              new LSHRangeQuery(distanceQuery) : null;
     }
 
     /**

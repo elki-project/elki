@@ -37,6 +37,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -93,18 +94,23 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param numbins Number of bins
    */
-  public EvaluateRankingQuality(Distance<? super V> distanceFunction, int numbins) {
-    super(distanceFunction);
+  public EvaluateRankingQuality(Distance<? super V> distance, int numbins) {
+    super(distance);
     this.numbins = numbins;
   }
 
-  @Override
-  public HistogramResult run(Database database) {
-    final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
-    final KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), relation.size());
+  /**
+   * Run the algorithm.
+   *
+   * @param database Database
+   * @param relation Relation
+   * @return Histogram
+   */
+  public HistogramResult run(Database database, Relation<V> relation) {
+    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -202,7 +208,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
     @Override
     public EvaluateRankingQuality<V> make() {
-      return new EvaluateRankingQuality<>(distanceFunction, numbins);
+      return new EvaluateRankingQuality<>(distance, numbins);
     }
   }
 }

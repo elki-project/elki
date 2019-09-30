@@ -42,14 +42,14 @@ public interface KMeansQualityMeasure<O extends NumberVector> {
    * Calculates and returns the quality measure.
    *
    * @param clustering Clustering to analyze
-   * @param distanceFunction Distance function to use (usually Euclidean or
+   * @param distance Distance function to use (usually Euclidean or
    *        squared Euclidean!)
    * @param relation Relation for accessing objects
    * @param <V> Actual vector type (could be a subtype of O!)
    *
    * @return quality measure
    */
-  <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation);
+  <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation);
 
   /**
    * Compare two scores.

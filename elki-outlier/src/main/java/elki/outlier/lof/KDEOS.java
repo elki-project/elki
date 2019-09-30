@@ -140,7 +140,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param kmin Minimum number of neighbors
    * @param kmax Maximum number of neighbors
    * @param kernel Kernel function
@@ -148,8 +148,8 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param scale Kernel scaling parameter
    * @param idim Intrinsic dimensionality (use 0 to use real dimensionality)
    */
-  public KDEOS(Distance<? super O> distanceFunction, int kmin, int kmax, KernelDensityFunction kernel, double minBandwidth, double scale, int idim) {
-    super(distanceFunction);
+  public KDEOS(Distance<? super O> distance, int kmin, int kmax, KernelDensityFunction kernel, double minBandwidth, double scale, int idim) {
+    super(distance);
     this.kmin = kmin;
     this.kmax = kmax;
     this.kernel = kernel;
@@ -424,7 +424,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public KDEOS<O> make() {
-      return new KDEOS<>(distanceFunction, kmin, kmax, kernel, minBandwidth, scale, idim);
+      return new KDEOS<>(distance, kmin, kmax, kernel, minBandwidth, scale, idim);
     }
   }
 }

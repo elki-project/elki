@@ -29,7 +29,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.data.VectorUtil;
 import elki.data.type.TypeUtil;
@@ -46,6 +45,10 @@ import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.CosineDistance;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.index.KNNIndex;
+import elki.outlier.AbstractOutlierAlgorithmTest;
+import elki.result.Metadata;
+import elki.result.Metadata.Hierarchy;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -70,16 +73,16 @@ public class OnlineLOFTest extends AbstractOutlierAlgorithmTest {
       // Initialize database.
       db.initialize();
       Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-
-      // Algorithms we will compare:
       final int k = 5;
-      FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
-      OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
 
       // 1. Run LOF on original data:
+      FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
       DoubleRelation scores1 = lof.run(db).getScores();
+      Hierarchy h = Metadata.hierarchyOf(rep);
+      h.iterChildren().filter(KNNIndex.class).forEach(h::removeChild);
 
       // 2. Run OnlineLOF
+      OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
       OutlierResult result = onlinelof.run(db);
 
       // prepare synthetic new objects

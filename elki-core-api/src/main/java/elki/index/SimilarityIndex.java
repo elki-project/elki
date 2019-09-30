@@ -24,8 +24,8 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.similarity.Similarity;
 
 /**
- * Index with support for similarity queries (e.g. precomputed similarity
- * matrixes, caches)
+ * Index with support for similarity queries
+ * (e.g., precomputed similarity matrixes, caches)
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -40,8 +40,7 @@ public interface SimilarityIndex<O> extends Index {
    * Get a similarity query object for the given similarity function.
    *
    * @param simFunction Similarity function to use.
-   * @param hints Hints for the optimizer
    * @return similarity query object or {@code null}
    */
-  SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> simFunction, Object... hints);
+  SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> simFunction);
 }

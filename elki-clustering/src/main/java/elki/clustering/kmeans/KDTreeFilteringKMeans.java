@@ -88,15 +88,15 @@ public class KDTreeFilteringKMeans<V extends NumberVector> extends KDTreePruning
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param split Splitting strategy
    * @param leafsize Leaf size
    */
-  public KDTreeFilteringKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, Split split, int leafsize) {
-    super(distanceFunction, k, maxiter, initializer, split, leafsize);
+  public KDTreeFilteringKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, Split split, int leafsize) {
+    super(distance, k, maxiter, initializer, split, leafsize);
   }
 
   @Override
@@ -210,7 +210,7 @@ public class KDTreeFilteringKMeans<V extends NumberVector> extends KDTreePruning
   public static class Par<V extends NumberVector> extends KDTreePruningKMeans.Par<V> {
     @Override
     public KDTreeFilteringKMeans<V> make() {
-      return new KDTreeFilteringKMeans<>(distanceFunction, k, maxiter, initializer, split, leafsize);
+      return new KDTreeFilteringKMeans<>(distance, k, maxiter, initializer, split, leafsize);
     }
   }
 }

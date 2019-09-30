@@ -41,6 +41,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
@@ -119,13 +120,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
    * @param gridwidth Grid width
    */
-  public GriDBSCAN(Distance<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
-    super(distanceFunction);
+  public GriDBSCAN(Distance<? super V> distance, double epsilon, int minpts, double gridwidth) {
+    super(distance);
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.gridwidth = gridwidth;
@@ -174,7 +175,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Distance function used.
      */
-    protected Distance<? super V> distanceFunction;
+    protected Distance<? super V> distance;
 
     /**
      * Holds the epsilon radius threshold.
@@ -244,13 +245,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Constructor.
      *
-     * @param distanceFunction Distance function
+     * @param distance Distance function
      * @param epsilon Epsilon
      * @param minpts MinPts
      * @param gridwidth Grid width
      */
-    public Instance(Distance<? super V> distanceFunction, double epsilon, int minpts, double gridwidth) {
-      this.distanceFunction = distanceFunction;
+    public Instance(Distance<? super V> distance, double epsilon, int minpts, double gridwidth) {
+      this.distance = distance;
       this.epsilon = epsilon;
       this.minpts = minpts;
       this.gridwidth = gridwidth;
@@ -314,7 +315,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     private int runDBSCANOnCell(DBIDs cellids, Relation<V> relation, ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, int clusterid) {
       temporary.clear(); // Reset to "UNPROCESSED"
       ProxyView<V> rel = new ProxyView<>(cellids, relation);
-      RangeQuery<V> rq = rel.getRangeQuery(distanceFunction, epsilon);
+      RangeQuery<V> rq = new QueryBuilder<>(rel, distance).rangeQuery(epsilon);
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Running DBSCAN", cellids.size(), LOG) : null;
       for(DBIDIter id = cellids.iter(); id.valid(); id.advance()) {
         // Skip already processed ids.
@@ -742,7 +743,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     @Override
     public GriDBSCAN<O> make() {
-      return new GriDBSCAN<>(distanceFunction, epsilon, minpts, gridwidth);
+      return new GriDBSCAN<>(distance, epsilon, minpts, gridwidth);
     }
   }
 }

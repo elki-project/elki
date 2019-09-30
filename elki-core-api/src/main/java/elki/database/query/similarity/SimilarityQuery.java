@@ -21,7 +21,6 @@
 package elki.database.query.similarity;
 
 import elki.database.ids.DBIDRef;
-import elki.database.query.DatabaseQuery;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 
@@ -36,7 +35,7 @@ import elki.similarity.Similarity;
  * 
  * @param <O> Input object type
  */
-public interface SimilarityQuery<O> extends DatabaseQuery {
+public interface SimilarityQuery<O> {
   /**
    * Returns the similarity between the two objects specified by their object
    * ids.

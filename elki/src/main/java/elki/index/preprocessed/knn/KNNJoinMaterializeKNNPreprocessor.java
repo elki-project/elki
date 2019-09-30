@@ -47,16 +47,16 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
    * Constructor.
    *
    * @param relation Relation to index
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k
    */
-  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, Distance<? super V> distanceFunction, int k) {
-    super(relation, distanceFunction, k);
+  public KNNJoinMaterializeKNNPreprocessor(Relation<V> relation, Distance<? super V> distance, int k) {
+    super(relation, distance, k);
   }
 
   @Override
   protected void preprocess() {
-    SpatialPrimitiveDistance<? super V> distFunction = (SpatialPrimitiveDistance<? super V>) distanceFunction;
+    SpatialPrimitiveDistance<? super V> distFunction = (SpatialPrimitiveDistance<? super V>) distance;
     // Run KNNJoin
     KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distFunction, k);
     storage = knnjoin.run(relation, relation.getDBIDs());
@@ -98,15 +98,15 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
      * Constructor.
      *
      * @param k K
-     * @param distanceFunction distance function
+     * @param distance distance function
      */
-    public Factory(int k, Distance<? super O> distanceFunction) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance) {
+      super(k, distance);
     }
 
     @Override
     public KNNJoinMaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      return new KNNJoinMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
+      return new KNNJoinMaterializeKNNPreprocessor<>(relation, distance, k);
     }
 
     /**
@@ -121,7 +121,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
     public static class Par<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
       public KNNJoinMaterializeKNNPreprocessor.Factory<O> make() {
-        return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distanceFunction);
+        return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distance);
       }
     }
   }

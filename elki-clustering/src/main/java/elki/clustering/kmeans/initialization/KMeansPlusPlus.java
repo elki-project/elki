@@ -30,6 +30,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -67,13 +68,13 @@ public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements K
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
     DBIDs ids = relation.getDBIDs();
     @SuppressWarnings("unchecked")
-    DistanceQuery<NumberVector> distQ = ((Relation<NumberVector>) relation).getDistanceQuery((NumberVectorDistance<NumberVector>) distanceFunction);
+    DistanceQuery<NumberVector> distQ = new QueryBuilder<>((Relation<NumberVector>) relation, (NumberVectorDistance<NumberVector>) distance).distanceQuery();
 
     // Chose first mean
     Random random = rnd.getSingleThreadedRandom();

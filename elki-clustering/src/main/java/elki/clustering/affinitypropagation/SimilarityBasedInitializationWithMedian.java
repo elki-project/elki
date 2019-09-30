@@ -23,6 +23,7 @@ package elki.clustering.affinitypropagation;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
@@ -68,7 +69,7 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
   @Override
   public double[][] getSimilarityMatrix(Relation<O> relation, ArrayDBIDs ids) {
     final int size = ids.size();
-    SimilarityQuery<O> sq = relation.getSimilarityQuery(similarity);
+    SimilarityQuery<O> sq = new QueryBuilder<>(relation, similarity).similarityQuery();
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();

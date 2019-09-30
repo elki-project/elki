@@ -76,7 +76,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The distance function to use
    */
-  private Distance<? super O> distanceFunction;
+  private Distance<? super O> distance;
 
   /**
    * Scaling function to use
@@ -91,13 +91,13 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param scaling Scaling function to use for contrast
    * @param skipzero Skip zero values when scaling.
    */
-  public ComputeSimilarityMatrixImage(Distance<? super O> distanceFunction, ScalingFunction scaling, boolean skipzero) {
+  public ComputeSimilarityMatrixImage(Distance<? super O> distance, ScalingFunction scaling, boolean skipzero) {
     super();
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
     this.scaling = scaling;
     this.skipzero = skipzero;
   }
@@ -117,7 +117,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     if(order.size() != relation.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
+    DistanceQuery<O> dq = distance.instantiate(relation);
     final int size = order.size();
 
     // When the logging is in the outer loop, it's just 2*size (providing enough
@@ -187,7 +187,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
-      Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
+      Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
       Metadata.hierarchyOf(or).addChild(computeSimilarityMatrixImage(relation, or.order(relation.getDBIDs()).iter()));
       // Process them only once.
       orderings.remove(or);
@@ -197,7 +197,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
+      Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
       DBIDIter iter = or.order(relation.getDBIDs()).iter();
       Metadata.hierarchyOf(or).addChild(computeSimilarityMatrixImage(relation, iter));
       nonefound = false;
@@ -209,7 +209,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       List<Database> iter = ResultUtil.filterResults(result, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
-        Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());
+        Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
         Metadata.hierarchyOf(db).addChild(computeSimilarityMatrixImage(relation, relation.iterDBIDs()));
       }
     }
@@ -326,7 +326,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     /**
      * The distance function to use
      */
-    private Distance<O> distanceFunction;
+    private Distance<O> distance;
 
     /**
      * Scaling function to use
@@ -341,7 +341,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
-          .grab(config, x -> distanceFunction = x);
+          .grab(config, x -> distance = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
           .setOptional(true) //
           .grab(config, x -> scaling = x);
@@ -350,7 +350,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
 
     @Override
     public ComputeSimilarityMatrixImage<O> make() {
-      return new ComputeSimilarityMatrixImage<>(distanceFunction, scaling, skipzero);
+      return new ComputeSimilarityMatrixImage<>(distance, scaling, skipzero);
     }
   }
 }

@@ -26,6 +26,7 @@ import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -230,7 +231,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     }
     Database db = ResultUtil.findDatabase(result);
     Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = relation.getDistanceQuery(distance);
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     for(Clustering<?> c : crs) {
       evaluateClustering(relation, dq, c);
     }

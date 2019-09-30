@@ -38,8 +38,8 @@ public interface KMedoidsInitialization<V> {
    * 
    * @param k Parameter k
    * @param ids Candidate IDs.
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @return List of chosen means for k-means
    */
-  DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super V> distanceFunction);
+  DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super V> distance);
 }

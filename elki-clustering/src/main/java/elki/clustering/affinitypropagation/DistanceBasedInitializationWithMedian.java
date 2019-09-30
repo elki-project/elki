@@ -23,6 +23,7 @@ package elki.clustering.affinitypropagation;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -67,8 +68,8 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
 
   @Override
   public double[][] getSimilarityMatrix(Relation<O> relation, ArrayDBIDs ids) {
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     final int size = ids.size();
-    DistanceQuery<O> dq = relation.getDistanceQuery(distance);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();

@@ -75,7 +75,7 @@ public class RandomNormalGenerated extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     final int dim = RelationUtil.dimensionality(relation);
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

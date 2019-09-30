@@ -33,7 +33,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
@@ -45,8 +45,8 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.math.Mean;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -261,13 +261,9 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    for(Object hint : hints) {
-      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-        return null;
-      }
-    }
-    return new NaiveProjectedKNNQuery(distanceQuery);
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
+        new NaiveProjectedKNNQuery(distanceQuery);
   }
 
   /**
@@ -426,8 +422,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
 
       @Override
       public void configure(Parameterization config) {
-        new DoubleParameter(WINDOW_ID, 10.0)
-            .grab(config, x -> window = x);
+        new DoubleParameter(WINDOW_ID, 10.0).grab(config, x -> window = x);
         new IntParameter(PROJECTIONS_ID) //
             .setOptional(true) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

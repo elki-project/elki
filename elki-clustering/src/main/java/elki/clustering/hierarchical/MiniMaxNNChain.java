@@ -75,10 +75,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<Distance<?
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public MiniMaxNNChain(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public MiniMaxNNChain(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -216,7 +216,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<Distance<?
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public MiniMaxNNChain<O> make() {
-      return new MiniMaxNNChain<>(distanceFunction);
+      return new MiniMaxNNChain<>(distance);
     }
   }
 }

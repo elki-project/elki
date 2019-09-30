@@ -25,6 +25,7 @@ import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -76,13 +77,13 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
    * Constructor.
    *
    * @param inputstep Data input step
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param estimator Estimator
    * @param krate kNN rate
    * @param samples Sample size
    */
-  public EstimateIntrinsicDimensionality(InputStep inputstep, Distance<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
-    super(inputstep, distanceFunction);
+  public EstimateIntrinsicDimensionality(InputStep inputstep, Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
+    super(inputstep, distance);
     this.estimator = estimator;
     this.krate = krate;
     this.samples = samples;
@@ -99,7 +100,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     int kk = 1 + (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
     DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
-    KNNQuery<O> knnq = relation.getKNNQuery(distance, kk);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kk);
 
     double[] idim = new double[ssize];
     int samples = 0;

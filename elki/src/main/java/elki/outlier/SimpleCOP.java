@@ -31,6 +31,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -100,19 +101,20 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k Parameter
    * @param pca PCA runner
    * @param filter Filter for selecting eigenvectors
    */
-  public SimpleCOP(Distance<? super V> distanceFunction, int k, PCARunner pca, EigenPairFilter filter) {
-    super(distanceFunction);
+  public SimpleCOP(Distance<? super V> distance, int k, PCARunner pca, EigenPairFilter filter) {
+    super(distance);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
 
-  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
-    KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
+  public OutlierResult run(Relation<V> relation) {
+    final int k1 = k + 1;
+    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k1);
     DBIDs ids = relation.getDBIDs();
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -124,7 +126,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
       double sqrt2 = MathUtil.SQRT2;
       for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-        KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
+        KNNList neighbors = knnQuery.getKNNForDBID(id, k1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 
@@ -136,15 +138,10 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
         cop_score.putDouble(id, prob);
-
         cop_err_v.put(id, times(depsol.errorVector(relation.get(id)), -1));
-
         cop_datav.put(id, depsol.dataVector(relation.get(id)));
-
         cop_dim.putInt(id, depsol.getCorrelationDimensionality());
-
         cop_sol.put(id, depsol);
-
         LOG.incrementProcessed(progressLocalPCA);
       }
       LOG.ensureCompleted(progressLocalPCA);
@@ -218,7 +215,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     @Override
     public SimpleCOP<V> make() {
-      return new SimpleCOP<>(distanceFunction, k, pca, filter);
+      return new SimpleCOP<>(distance, k, pca, filter);
     }
   }
 }

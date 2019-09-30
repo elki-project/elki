@@ -41,16 +41,6 @@ public abstract class AbstractDatabaseDistance<O> implements Distance<O> {
     super();
   }
 
-  @Override
-  public boolean isMetric() {
-    return false;
-  }
-
-  @Override
-  public boolean isSymmetric() {
-    return true;
-  }
-
   /**
    * The actual instance bound to a particular database.
    * 

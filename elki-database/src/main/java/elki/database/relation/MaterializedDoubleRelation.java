@@ -27,7 +27,6 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.logging.Logging;
 
 /**
  * Represents a single representation. This is attached to a DBIDs object, which
@@ -37,12 +36,7 @@ import elki.logging.Logging;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class MaterializedDoubleRelation extends AbstractRelation<Double>implements DoubleRelation {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(MaterializedDoubleRelation.class);
-
+public class MaterializedDoubleRelation implements DoubleRelation {
   /**
    * Map to hold the objects of the database.
    */
@@ -91,7 +85,7 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
 
   @Override
   public void set(DBIDRef id, double val) {
-    assert(ids.contains(id));
+    assert (ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).putDouble(id, val);
     }
@@ -100,7 +94,7 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
   @Deprecated
   @Override
   public void insert(DBIDRef id, Double val) {
-    assert(ids.contains(id));
+    assert (ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).putDouble(id, val);
     }
@@ -113,7 +107,7 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
    */
   @Override
   public void delete(DBIDRef id) {
-    assert(!ids.contains(id));
+    assert (!ids.contains(id));
     if(content instanceof WritableDoubleDataStore) {
       ((WritableDoubleDataStore) content).delete(id);
     }
@@ -142,10 +136,5 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
   @Override
   public String getLongName() {
     return (name != null) ? name : "Double";
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

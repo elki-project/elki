@@ -59,8 +59,8 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/icml/PellegM00")
 public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    return logLikelihoodXMeans(relation, clustering, distanceFunction) //
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
+    return logLikelihoodXMeans(relation, clustering, distance) //
         - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
   }
 
@@ -71,10 +71,10 @@ public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMea
    *
    * @param relation Data relation
    * @param clustering Clustering
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @return Log Likelihood.
    */
-  public static double logLikelihoodXMeans(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distanceFunction) {
+  public static double logLikelihoodXMeans(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distance) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();
@@ -93,7 +93,7 @@ public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMea
     for(int i = 0; it.hasNext(); ++i) {
       Cluster<? extends MeanModel> cluster = it.next();
       n += n_i[i] = cluster.size();
-      d += d_i[i] = varianceContributionOfCluster(cluster, distanceFunction, relation);
+      d += d_i[i] = varianceContributionOfCluster(cluster, distance, relation);
     }
 
     // No remaining variance, if every point is on its own:

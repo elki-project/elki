@@ -24,7 +24,6 @@ import java.util.List;
 
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.type.TypeInformation;
@@ -32,11 +31,8 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -46,6 +42,7 @@ import elki.evaluation.clustering.internal.EvaluateSilhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -96,12 +93,12 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param clusterer Clustering algorithm
    * @param noiseOption Noise handling option.
    */
-  public SilhouetteOutlierDetection(Distance<? super O> distanceFunction, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
-    super(distanceFunction);
+  public SilhouetteOutlierDetection(Distance<? super O> distance, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
+    super(distance);
     this.clusterer = clusterer;
     this.noiseOption = noiseOption;
   }
@@ -113,9 +110,8 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * @return Outlier scores
    */
   public OutlierResult run(Database database) {
-    Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
-
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, getDistance()).distanceQuery();
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database);
 
@@ -254,7 +250,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
 
     @Override
     public SilhouetteOutlierDetection<O> make() {
-      return new SilhouetteOutlierDetection<>(distanceFunction, clusterer, noiseOption);
+      return new SilhouetteOutlierDetection<>(distance, clusterer, noiseOption);
     }
   }
 }

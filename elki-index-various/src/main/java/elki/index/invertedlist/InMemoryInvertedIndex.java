@@ -253,27 +253,17 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof CosineDistance) {
-      return new CosineKNNQuery();
-    }
-    if(df instanceof ArcCosineDistance) {
-      return new ArcCosineKNNQuery();
-    }
-    return null;
+    return df instanceof CosineDistance ? new CosineKNNQuery() : //
+        df instanceof ArcCosineDistance ? new ArcCosineKNNQuery() : null;
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof CosineDistance) {
-      return new CosineRangeQuery();
-    }
-    if(df instanceof ArcCosineDistance) {
-      return new ArcCosineRangeQuery();
-    }
-    return null;
+    return df instanceof CosineDistance ? new CosineRangeQuery() : //
+        df instanceof ArcCosineDistance ? new ArcCosineRangeQuery() : null;
   }
 
   @Override

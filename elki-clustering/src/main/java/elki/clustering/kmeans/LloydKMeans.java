@@ -75,13 +75,13 @@ public class LloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMean
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public LloydKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public LloydKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -132,7 +132,7 @@ public class LloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMean
   public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     public LloydKMeans<V> make() {
-      return new LloydKMeans<>(distanceFunction, k, maxiter, initializer);
+      return new LloydKMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

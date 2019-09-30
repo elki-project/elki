@@ -137,13 +137,13 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
   /**
    * Constructor.
    * 
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPark(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction);
+  public KMedoidsPark(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance);
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -343,7 +343,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
     @Override
     public KMedoidsPark<V> make() {
-      return new KMedoidsPark<>(distanceFunction, k, maxiter, initializer);
+      return new KMedoidsPark<>(distance, k, maxiter, initializer);
     }
   }
 }

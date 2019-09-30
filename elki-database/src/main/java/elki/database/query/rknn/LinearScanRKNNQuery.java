@@ -83,32 +83,4 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
     }
     return rNNList.sort();
   }
-
-  @Override
-  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    DBIDArrayIter aiter = ids.iter();
-    List<ModifiableDoubleDBIDList> rNNList = new ArrayList<>(ids.size());
-    for(int i = 0; i < ids.size(); i++) {
-      rNNList.add(DBIDUtil.newDistanceDBIDList());
-    }
-
-    ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    // We do not have a bulk query anymore for now, as the better way to
-    // implement this is to precompute all forward-nearest-neighbors with some
-    // index, at which point this is only a trivial lookup.
-    for(DBIDArrayIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = knnQuery.getKNNForDBID(iter, k);
-      for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
-        for(aiter.seek(0); aiter.valid(); aiter.advance()) {
-          if(DBIDUtil.equal(n, aiter)) {
-            rNNList.get(aiter.getOffset()).add(n.doubleValue(), iter);
-          }
-        }
-      }
-    }
-    for(int j = 0; j < ids.size(); j++) {
-      rNNList.get(j).sort();
-    }
-    return rNNList;
-  }
 }

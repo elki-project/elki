@@ -218,7 +218,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   public static class Par<N, O> extends AbstractDistanceBasedSpatialOutlier.Par<N, O> {
     @Override
     public SLOM<N, O> make() {
-      return new SLOM<>(npredf, distanceFunction);
+      return new SLOM<>(npredf, distance);
     }
   }
 }

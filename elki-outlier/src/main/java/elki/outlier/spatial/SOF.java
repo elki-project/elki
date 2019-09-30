@@ -166,7 +166,7 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   public static class Par<N, O> extends AbstractDistanceBasedSpatialOutlier.Par<N, O> {
     @Override
     public SOF<N, O> make() {
-      return new SOF<>(npredf, distanceFunction);
+      return new SOF<>(npredf, distance);
     }
   }
 }

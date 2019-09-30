@@ -20,12 +20,8 @@
  */
 package elki.database.query.rknn;
 
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
-import elki.database.query.DatabaseQuery;
 
 /**
  * Abstract reverse kNN Query interface.
@@ -37,7 +33,7 @@ import elki.database.query.DatabaseQuery;
  * 
  * @param <O> Object type
  */
-public interface RKNNQuery<O> extends DatabaseQuery {
+public interface RKNNQuery<O> {
   /**
    * Get the reverse k nearest neighbors for a particular id.
    * 
@@ -55,13 +51,4 @@ public interface RKNNQuery<O> extends DatabaseQuery {
    * @return reverse k nearest neighbors
    */
   DoubleDBIDList getRKNNForObject(O obj, int k);
-
-  /**
-   * Bulk query method for reverse k nearest neighbors for ids.
-   * 
-   * @param ids query object IDs
-   * @param k number of neighbors requested
-   * @return reverse k nearest neighbors
-   */
-  List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 }

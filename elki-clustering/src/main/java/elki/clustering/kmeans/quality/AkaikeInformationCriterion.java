@@ -59,8 +59,8 @@ import elki.utilities.documentation.Reference;
     bibkey = "DBLP:conf/icml/PellegM00")
 public class AkaikeInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    return logLikelihood(relation, clustering, distanceFunction) - numberOfFreeParameters(relation, clustering);
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
+    return logLikelihood(relation, clustering, distance) - numberOfFreeParameters(relation, clustering);
   }
 
   @Override

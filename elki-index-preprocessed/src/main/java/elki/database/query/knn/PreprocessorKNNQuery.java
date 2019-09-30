@@ -74,7 +74,8 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
       getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
       warned = true;
     }
-    return preprocessor.get(id).subList(k);
+    final KNNList knnList = preprocessor.get(id);
+    return knnList != null ? knnList.subList(k) : null;
   }
 
   @Override

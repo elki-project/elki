@@ -74,10 +74,10 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use.
+   * @param distance Distance function to use.
    */
-  public MiniMax(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public MiniMax(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -412,7 +412,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public MiniMax<O> make() {
-      return new MiniMax<>(distanceFunction);
+      return new MiniMax<>(distance);
     }
   }
 }

@@ -23,8 +23,9 @@ package elki.index.preprocessed.knn;
 import javax.swing.event.EventListenerList;
 
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.index.DynamicIndex;
@@ -74,12 +75,13 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    * Constructor with preprocessing step.
    *
    * @param relation Relation to preprocess
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param k query k
    */
-  public MaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
-    super(relation, distanceFunction, k);
-    this.knnQuery = relation.getKNNQuery(distanceQuery, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_NO_CACHE);
+  public MaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
+    super(relation, distance, k);
+    this.knnQuery = new QueryBuilder<>(distanceQuery).noCache().kNNQuery(k);
+    assert !(knnQuery instanceof PreprocessorKNNQuery) : knnQuery.toString();
   }
 
   /**
@@ -154,7 +156,6 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   protected void objectsInserted(DBIDs ids) {
     final Logging log = getLogger(); // Could be subclass
     StepProgress stepprog = log.isVerbose() ? new StepProgress(3) : null;
-
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // materialize the new kNNs
     log.beginStep(stepprog, 1, "New insertions ocurred, materialize their new kNNs.");
@@ -170,7 +171,6 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     // inform listener
     log.beginStep(stepprog, 3, "New insertions ocurred, inform listeners.");
     fireKNNsInserted(ids, rkNN_ids);
-
     log.setCompleted(stepprog);
   }
 
@@ -242,7 +242,6 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   protected void objectsRemoved(DBIDs ids) {
     final Logging log = getLogger();
     StepProgress stepprog = log.isVerbose() ? new StepProgress(3) : null;
-
     // delete the materialized (old) kNNs
     log.beginStep(stepprog, 1, "New deletions ocurred, remove their materialized kNNs.");
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -256,8 +255,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     // inform listener
     log.beginStep(stepprog, 3, "New deletions ocurred, inform listeners.");
     fireKNNsRemoved(ids, rkNN_ids);
-
-    log.ensureCompleted(stepprog);
+    log.setCompleted(stepprog);
   }
 
   /**
@@ -357,15 +355,15 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
      * Index factory.
      *
      * @param k k parameter
-     * @param distanceFunction distance function
+     * @param distance distance function
      */
-    public Factory(int k, Distance<? super O> distanceFunction) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance) {
+      super(k, distance);
     }
 
     @Override
     public MaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      MaterializeKNNPreprocessor<O> instance = new MaterializeKNNPreprocessor<O>(relation, distanceFunction, k);
+      MaterializeKNNPreprocessor<O> instance = new MaterializeKNNPreprocessor<O>(relation, distance, k);
       return instance;
     }
 
@@ -377,7 +375,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
       public Factory<O> make() {
-        return new Factory<>(k, distanceFunction);
+        return new Factory<>(k, distance);
       }
     }
   }

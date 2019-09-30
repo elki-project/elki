@@ -107,12 +107,12 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k Neighborhood size parameter
    * @param alpha Alpha parameter
    */
-  public LSDBC(Distance<? super O> distanceFunction, int k, double alpha) {
-    super(distanceFunction);
+  public LSDBC(Distance<? super O> distance, int k, double alpha) {
+    super(distance);
     this.k = k + 1; // Skip query point
     this.alpha = alpha;
   }
@@ -338,7 +338,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
     @Override
     public LSDBC<O> make() {
-      return new LSDBC<>(distanceFunction, k, alpha);
+      return new LSDBC<>(distance, k, alpha);
     }
   }
 }

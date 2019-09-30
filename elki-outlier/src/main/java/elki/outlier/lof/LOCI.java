@@ -33,6 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.DoubleDBIDListIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -109,13 +110,13 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param rmax Maximum radius
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    */
-  public LOCI(Distance<? super O> distanceFunction, double rmax, int nmin, double alpha) {
-    super(distanceFunction);
+  public LOCI(Distance<? super O> distance, double rmax, int nmin, double alpha) {
+    super(distance);
     this.rmax = rmax;
     this.nmin = nmin;
     this.alpha = alpha;
@@ -128,7 +129,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
+    RangeQuery<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery();
     DBIDs ids = relation.getDBIDs();
 
     // LOCI preprocessing step
@@ -445,7 +446,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public LOCI<O> make() {
-      return new LOCI<>(distanceFunction, rmax, nmin, alpha);
+      return new LOCI<>(distance, rmax, nmin, alpha);
     }
   }
 }

@@ -68,7 +68,7 @@ public class RandomUniformGenerated extends AbstractKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     double[][] minmax = RelationUtil.computeMinMax(relation);
     final int dim = minmax[0].length;
     double[] min = minmax[0], scale = minmax[1];

@@ -30,6 +30,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
@@ -136,7 +137,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    */
   public ClusterOrder run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> dq = relation.getDistanceQuery(EuclideanDistance.STATIC);
+    DistanceQuery<V> dq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // initialize points used and reachability distance
     reachDist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, UNDEFINED_DISTANCE);

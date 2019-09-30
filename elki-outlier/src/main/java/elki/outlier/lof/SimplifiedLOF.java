@@ -231,7 +231,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? 
 
     @Override
     public SimplifiedLOF<O> make() {
-      return new SimplifiedLOF<>(k, distanceFunction);
+      return new SimplifiedLOF<>(k, distance);
     }
   }
 }

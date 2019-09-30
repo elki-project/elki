@@ -30,6 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -70,11 +71,11 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k Number of neighbors to use
    */
-  public DistanceStddevOutlier(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public DistanceStddevOutlier(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k;
   }
 
@@ -86,7 +87,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
    */
   public OutlierResult run(Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores
@@ -156,7 +157,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
 
     @Override
     public DistanceStddevOutlier<O> make() {
-      return new DistanceStddevOutlier<>(distanceFunction, k);
+      return new DistanceStddevOutlier<>(distance, k);
     }
   }
 }

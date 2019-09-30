@@ -30,6 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -73,24 +74,24 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
   /**
    * Distance function to use
    */
-  protected Distance<? super O> distFunc;
+  protected Distance<? super O> distance;
 
   /**
    * Full constructor.
    *
    * @param epsilon Epsilon value
-   * @param distFunc Distance function to use
+   * @param distance Distance function to use
    */
-  public EpsilonNeighborPredicate(double epsilon, Distance<? super O> distFunc) {
+  public EpsilonNeighborPredicate(double epsilon, Distance<? super O> distance) {
     super();
     this.epsilon = epsilon;
-    this.distFunc = distFunc;
+    this.distance = distance;
   }
 
   @Override
   public Instance instantiate(Database database) {
-    Relation<O> relation = database.getRelation(distFunc.getInputTypeRestriction());
-    RangeQuery<O> rq = relation.getRangeQuery(distFunc);
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    RangeQuery<O> rq = new QueryBuilder<>(relation, distance).rangeQuery(epsilon);
     return new Instance(epsilon, rq, relation.getDBIDs());
   }
 
@@ -101,7 +102,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
 
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distFunc.getInputTypeRestriction();
+    return distance.getInputTypeRestriction();
   }
 
   /**

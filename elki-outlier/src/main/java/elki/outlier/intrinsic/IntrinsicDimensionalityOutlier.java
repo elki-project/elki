@@ -27,6 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -89,12 +90,12 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k Neighborhood size
    * @param estimator Estimator for intrinsic dimensionality
    */
-  public IntrinsicDimensionalityOutlier(Distance<? super O> distanceFunction, int k, IntrinsicDimensionalityEstimator estimator) {
-    super(distanceFunction);
+  public IntrinsicDimensionalityOutlier(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
+    super(distance);
     this.kplus = k + 1; // + query point
     this.estimator = estimator;
   }
@@ -106,7 +107,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), kplus);
+    final KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
@@ -178,7 +179,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
 
     @Override
     public IntrinsicDimensionalityOutlier<O> make() {
-      return new IntrinsicDimensionalityOutlier<>(distanceFunction, k, estimator);
+      return new IntrinsicDimensionalityOutlier<>(distance, k, estimator);
     }
   }
 }

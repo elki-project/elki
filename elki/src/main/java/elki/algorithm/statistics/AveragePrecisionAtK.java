@@ -32,7 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -88,14 +88,14 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K parameter
    * @param sampling Sampling rate
    * @param random Random sampling generator
    * @param includeSelf Include query object in evaluation
    */
-  public AveragePrecisionAtK(Distance<? super O> distanceFunction, int k, double sampling, RandomFactory random, boolean includeSelf) {
-    super(distanceFunction);
+  public AveragePrecisionAtK(Distance<? super O> distance, int k, double sampling, RandomFactory random, boolean includeSelf) {
+    super(distance);
     this.k = k;
     this.sampling = sampling;
     this.random = random;
@@ -111,20 +111,16 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
    */
   public CollectionResult<double[]> run(Relation<O> relation, Relation<?> lrelation) {
     final int qk = k + (includeSelf ? 0 : 1);
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), qk);
-
-    MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
-
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(qk);
     final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
+    MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList knn = knnQuery.getKNNForDBID(iter, qk);
       Object label = lrelation.get(iter);
-
       int positive = 0, i = 0;
-      for(DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance()) {
+      for(DBIDIter ri = knnQuery.getKNNForDBID(iter, qk).iter(); i < k && ri.valid(); ri.advance()) {
         if(!includeSelf && DBIDUtil.equal(iter, ri)) {
           // Do not increment i.
           continue;
@@ -266,7 +262,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
 
     @Override
     public AveragePrecisionAtK<O> make() {
-      return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed, includeSelf);
+      return new AveragePrecisionAtK<>(distance, k, sampling, seed, includeSelf);
     }
   }
 }

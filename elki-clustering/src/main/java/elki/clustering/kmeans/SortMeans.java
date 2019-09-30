@@ -69,13 +69,13 @@ public class SortMeans<V extends NumberVector> extends CompareMeans<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public SortMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public SortMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -168,7 +168,7 @@ public class SortMeans<V extends NumberVector> extends CompareMeans<V> {
 
     @Override
     public SortMeans<V> make() {
-      return new SortMeans<>(distanceFunction, k, maxiter, initializer);
+      return new SortMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

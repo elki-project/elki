@@ -34,21 +34,22 @@ import elki.database.query.range.RangeQuery;
  */
 public interface DistancePriorityIndex<O> extends KNNIndex<O>, RangeIndex<O> {
   @Override
-  default KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    return getPriorityQuery(distanceQuery, hints);
+  default KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return getPriorityQuery(distanceQuery, Double.POSITIVE_INFINITY, flags);
   }
 
   @Override
-  default RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    return getPriorityQuery(distanceQuery, hints);
+  default RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return getPriorityQuery(distanceQuery, maxrange, flags);
   }
 
   /**
    * Get a priority search object.
    *
    * @param distanceQuery Distance query
-   * @param hints Optimizer hints
+   * @param maxrange Maximum search range (may be {@code Double.POSITIVE_INFINITY}
+   * @param flags Optimizer hints
    * @return Priority searcher
    */
-  DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags);
 }

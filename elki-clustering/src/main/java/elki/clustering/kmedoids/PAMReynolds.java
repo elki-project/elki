@@ -73,13 +73,13 @@ public class PAMReynolds<V> extends PAM<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public PAMReynolds(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public PAMReynolds(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -235,7 +235,7 @@ public class PAMReynolds<V> extends PAM<V> {
   public static class Par<V> extends PAM.Par<V> {
     @Override
     public PAMReynolds<V> make() {
-      return new PAMReynolds<>(distanceFunction, k, maxiter, initializer);
+      return new PAMReynolds<>(distance, k, maxiter, initializer);
     }
   }
 }

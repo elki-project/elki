@@ -78,13 +78,13 @@ public class FastPAM1<V> extends PAM<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public FastPAM1(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public FastPAM1(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -357,7 +357,7 @@ public class FastPAM1<V> extends PAM<V> {
   public static class Par<V> extends PAM.Par<V> {
     @Override
     public FastPAM1<V> make() {
-      return new FastPAM1<>(distanceFunction, k, maxiter, initializer);
+      return new FastPAM1<>(distance, k, maxiter, initializer);
     }
   }
 }

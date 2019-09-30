@@ -94,11 +94,11 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * KMeansModel is returned).
    *
    * @param cluster Cluster to access
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param relation Data relation
    * @return Cluster variance
    */
-  public static double varianceContributionOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistance<?> distanceFunction, Relation<? extends NumberVector> relation) {
+  public static double varianceContributionOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistance<?> distance, Relation<? extends NumberVector> relation) {
     if(cluster.size() <= 1) {
       return 0.;
     }
@@ -113,10 +113,10 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
     // Re-compute:
     DoubleVector mean = DoubleVector.wrap(model.getMean());
-    boolean squared = distanceFunction.isSquared();
+    boolean squared = distance.isSquared();
     double variance = 0.;
     for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-      double dist = distanceFunction.distance(relation.get(iter), mean);
+      double dist = distance.distance(relation.get(iter), mean);
       variance += squared ? dist : (dist * dist);
     }
     return variance;
@@ -130,7 +130,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    *
    * @param relation Data relation
    * @param clustering Clustering
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @return Log Likelihood.
    */
   @Reference(authors = "A. Foglia, B. Hancock", //
@@ -138,7 +138,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       booktitle = "Online", //
       url = "https://github.com/bobhancock/goxmeans/blob/master/doc/BIC_notes.pdf", //
       bibkey = "")
-  public static double logLikelihood(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distanceFunction) {
+  public static double logLikelihood(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distance) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();
@@ -155,7 +155,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     for(int i = 0; it.hasNext(); ++i) {
       Cluster<? extends MeanModel> cluster = it.next();
       n += n_i[i] = cluster.size();
-      d += varianceContributionOfCluster(cluster, distanceFunction, relation);
+      d += varianceContributionOfCluster(cluster, distance, relation);
     }
 
     // No remaining variance, if every point is on its own:
