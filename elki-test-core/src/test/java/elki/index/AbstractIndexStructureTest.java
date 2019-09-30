@@ -126,7 +126,7 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC);
+    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectKNNQuery != null) {
@@ -182,7 +182,7 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, CosineDistance.STATIC);
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, CosineDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectKNNQuery != null) {
@@ -233,7 +233,7 @@ public abstract class AbstractIndexStructureTest {
     Database db = new StaticArrayDatabase(dbc, factory != null ? Arrays.asList(factory) : null);
     db.initialize();
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC);
+    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DBIDRef first = relation.iterDBIDs();
     if(expectKNNQuery != null) {
       KNNQuery<DoubleVector> knnq = qb.kNNQuery(1);
@@ -266,7 +266,7 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC);
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectQuery != null) {

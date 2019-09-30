@@ -92,6 +92,21 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> implements KNNIndex<
   }
 
   /**
+   * Constructor.
+   *
+   * @param relation Relation
+   * @param distanceQuery Distance query
+   * @param k k
+   */
+  public AbstractMaterializeKNNPreprocessor(Relation<O> relation, DistanceQuery<O> distanceQuery, int k) {
+    super();
+    this.k = k;
+    this.relation = relation;
+    this.distance = distanceQuery.getDistance();
+    this.distanceQuery = distanceQuery;
+  }
+
+  /**
    * The distance query we used.
    *
    * @return Distance query

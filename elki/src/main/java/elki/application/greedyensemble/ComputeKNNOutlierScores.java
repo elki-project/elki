@@ -33,9 +33,9 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.DatabaseUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.DoubleRelation;
@@ -170,7 +170,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, distance, lim);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(lim);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       throw new AbortException("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }

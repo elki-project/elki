@@ -23,7 +23,6 @@ package elki.outlier.lof;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -104,7 +103,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("COF", 3) : null;
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     LOG.beginStep(stepprog, 1, "Materializing COF neighborhoods.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, dq, k);
+    KNNQuery<O> knnq = new QueryBuilder<>(dq).precomputed().kNNQuery(k);
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 2, "Computing Average Chaining Distances.");

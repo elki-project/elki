@@ -51,6 +51,11 @@ import elki.utilities.optionhandling.parameterization.EmptyParameterization;
 
 /**
  * Class to build a query.
+ * <p>
+ * TODO: move this class to the elki-core-api module,
+ * linking the linear-scan dependencies via dynamic class loading instead?
+ * <p>
+ * TODO: use a service loader to load optimization modules.
  *
  * @author Erich Schubert
  * 
@@ -65,22 +70,22 @@ public class QueryBuilder<O> {
   /**
    * Linear scans only
    */
-  public static int FLAG_LINEAR_ONLY = 0b1;
+  public static final int FLAG_LINEAR_ONLY = 0b1;
 
   /**
    * Optimized queries only, no linear scans
    */
-  public static int FLAG_OPTIMIZED_ONLY = 0b10;
+  public static final int FLAG_OPTIMIZED_ONLY = 0b10;
 
   /**
    * Exact queries only
    */
-  public static int FLAG_EXACT_ONLY = 0b100;
+  public static final int FLAG_EXACT_ONLY = 0b100;
 
   /**
    * Cheap query only - do not build indexes automatically
    */
-  public static int FLAG_CHEAP_ONLY = 0b1000;
+  public static final int FLAG_CHEAP_ONLY = 0b1000;
 
   /**
    * Do not keep auto-generated indexes (c.f., MaterializeKNNPreprocessor).
@@ -88,44 +93,24 @@ public class QueryBuilder<O> {
   public static final int FLAG_NO_CACHE = 0b1_0000;
 
   /**
+   * Flag indicating expected pairwise usage / need for precomputation.
+   */
+  public static final int FLAG_PRECOMPUTE = 0b10_0000;
+
+  /**
    * Flags that do not allow the optimizer to run.
    */
-  public static int FLAGS_NO_OPTIMIZER = FLAG_LINEAR_ONLY | FLAG_CHEAP_ONLY;
+  public static final int FLAGS_NO_OPTIMIZER = FLAG_LINEAR_ONLY | FLAG_CHEAP_ONLY;
+
+  /**
+   * Flags that are not inherited to nested distanceQuery calls.
+   */
+  public static final int FLAGS_NO_INHERIT = FLAG_PRECOMPUTE;
 
   /**
    * Global query optimizer, populated at startup.
    */
   private static final QueryOptimizer OPTIMIZER = initStaticOptimizer();
-
-  /**
-   * Initialization method, which sets {@link #OPTIMIZER}.
-   *
-   * @return Optimizer
-   */
-  static QueryOptimizer initStaticOptimizer() {
-    if(OPTIMIZER != null) {
-      return OPTIMIZER;
-    }
-    String opt = System.getenv("elki.optimizer");
-    if(opt != null) {
-      if(opt.isEmpty()) { // Disable
-        LOG.warning("Optimizer disabled.");
-        return DisableQueryOptimizer.STATIC;
-      }
-      try {
-        Class<? extends QueryOptimizer> clz = ELKIServiceRegistry.findImplementation(QueryOptimizer.class, opt);
-        if(clz == null) {
-          throw new AbortException("Could not find query optimizer: " + opt);
-        }
-        return ClassGenericsUtil.tryInstantiate(QueryOptimizer.class, clz, new EmptyParameterization());
-      }
-      catch(ClassInstantiationException e) {
-        throw new AbortException("Failed to initialize query optimizer: " + opt, e);
-      }
-    }
-    // Default optimizer
-    return new EmpiricalQueryOptimizer();
-  }
 
   /**
    * Relation to query.
@@ -201,33 +186,80 @@ public class QueryBuilder<O> {
     this.similarity = simQuery.getSimilarity();
   }
 
+  /**
+   * Only build linear-scan queries, useful as reference for evaluation of
+   * approximate methods. This can obviously not be combined with
+   * {@link #FLAG_OPTIMIZED_ONLY}.
+   * 
+   * @return query builder, for chaining
+   */
   public QueryBuilder<O> linearOnly() {
     assert (flags & FLAG_OPTIMIZED_ONLY) == 0;
     this.flags |= FLAG_LINEAR_ONLY;
     return this;
   }
 
+  /**
+   * Only query for optimized functions, returning null otherwise. This allows
+   * the user to choose fallback strategies instead. This can obviously not be
+   * combined with {@link #FLAG_LINEAR_ONLY}.
+   * 
+   * @return query builder, for chaining
+   */
   public QueryBuilder<O> optimizedOnly() {
     assert (flags & FLAG_LINEAR_ONLY) == 0;
     this.flags |= FLAG_OPTIMIZED_ONLY;
     return this;
   }
 
+  /**
+   * Only accept exact methods, no approximate methods.
+   * 
+   * @return query builder, for chaining
+   */
   public QueryBuilder<O> exactOnly() {
     this.flags |= FLAG_EXACT_ONLY;
     return this;
   }
 
+  /**
+   * Only perform the cheapest optimizations, used to indicate that the query
+   * will not be used much.
+   * 
+   * @return query builder, for chaining
+   */
   public QueryBuilder<O> cheapOnly() {
     this.flags |= FLAG_CHEAP_ONLY;
     return this;
   }
 
+  /**
+   * Avoid caching optimizations such as computing a distance matrix, because
+   * the results will be used to, e.g., build a similar data structure.
+   * 
+   * @return query builder, for chaining
+   */
   public QueryBuilder<O> noCache() {
     this.flags |= FLAG_NO_CACHE;
     return this;
   }
 
+  /**
+   * Indicate that the almost all pairwise distances / each objects knn will be
+   * used multiple times, and results should be precomputed and cached.
+   * 
+   * @return query builder, for chaining
+   */
+  public QueryBuilder<O> precomputed() {
+    this.flags |= FLAG_PRECOMPUTE;
+    return this;
+  }
+
+  /**
+   * Build a distance query.
+   *
+   * @return distance query
+   */
   public DistanceQuery<O> distanceQuery() {
     if(distQuery != null) {
       return distQuery;
@@ -255,6 +287,11 @@ public class QueryBuilder<O> {
     return (distQuery = distance.instantiate(relation));
   }
 
+  /**
+   * Build a similarity query.
+   *
+   * @return similarity query
+   */
   public SimilarityQuery<O> similarityQuery() {
     if(simQuery != null) {
       return simQuery;
@@ -270,9 +307,11 @@ public class QueryBuilder<O> {
       }
     }
     // Use optimizer
-    simQuery = OPTIMIZER.getSimilarityQuery(relation, similarity, flags);
-    if(simQuery != null) {
-      return simQuery;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      simQuery = OPTIMIZER.getSimilarityQuery(relation, similarity, flags);
+      if(simQuery != null) {
+        return simQuery;
+      }
     }
     if((flags & FLAG_OPTIMIZED_ONLY) != 0 && !(similarity instanceof DBIDSimilarity)) {
       return null; // Disallowed
@@ -280,13 +319,27 @@ public class QueryBuilder<O> {
     return similarity.instantiate(relation);
   }
 
+  /**
+   * Build a k-nearest-neighbors query; if possible also give a maximum k.
+   *
+   * @return knn query
+   */
   public KNNQuery<O> kNNQuery() {
     return kNNQuery(Integer.MAX_VALUE);
   }
 
+  /**
+   * Build a k-nearest-neighbors query.
+   * 
+   * @param maxk Maximum k that will be used later.
+   * @return knn query
+   */
   @SuppressWarnings("unchecked")
   public KNNQuery<O> kNNQuery(int maxk) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
     for(It<KNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
       KNNQuery<O> q = it.get().getKNNQuery(distanceQuery, maxk, flags);
       logUsing(it.get(), "kNN", q != null);
@@ -295,11 +348,13 @@ public class QueryBuilder<O> {
       }
     }
     // Use optimizer
-    KNNQuery<O> q = OPTIMIZER.getKNNQuery(relation, distanceQuery, maxk, flags);
-    if(q != null) {
-      return q;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      KNNQuery<O> q = OPTIMIZER.getKNNQuery(relation, distanceQuery, maxk, flags);
+      if(q != null) {
+        return q;
+      }
     }
-    if(q != null || (flags & FLAG_OPTIMIZED_ONLY) != 0) {
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
       return null;
     }
     logNotAccelerated("knn");
@@ -315,13 +370,27 @@ public class QueryBuilder<O> {
     return new LinearScanDistanceKNNQuery<>(distanceQuery);
   }
 
+  /**
+   * Build a range query; if possible also give a maximum query radius.
+   *
+   * @return range query
+   */
   public RangeQuery<O> rangeQuery() {
     return rangeQuery(Double.POSITIVE_INFINITY);
   }
 
+  /**
+   * Build a range query with maximum radius.
+   *
+   * @param maxrange Maximum radius that will be used.
+   * @return range query
+   */
   @SuppressWarnings("unchecked")
   public RangeQuery<O> rangeQuery(double maxrange) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
     for(It<RangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
       RangeQuery<O> q = it.get().getRangeQuery(distanceQuery, maxrange, flags);
       if(LOG.isDebuggingFinest()) {
@@ -333,9 +402,11 @@ public class QueryBuilder<O> {
     }
 
     // Use optimizer
-    RangeQuery<O> q = OPTIMIZER.getRangeQuery(relation, distanceQuery, maxrange, flags);
-    if(q != null) {
-      return q;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RangeQuery<O> q = OPTIMIZER.getRangeQuery(relation, distanceQuery, maxrange, flags);
+      if(q != null) {
+        return q;
+      }
     }
     if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
       return null;
@@ -353,14 +424,30 @@ public class QueryBuilder<O> {
     return new LinearScanDistanceRangeQuery<>(distanceQuery);
   }
 
+  /**
+   * Build a similarity range query; if possible also specify the least
+   * selective
+   * threshold.
+   *
+   * @return Similarity range query
+   */
   public RangeQuery<O> similarityRangeQuery() {
     return this.similarityRangeQuery(Double.NEGATIVE_INFINITY);
   }
 
-  public RangeQuery<O> similarityRangeQuery(double maxrange) {
+  /**
+   * Build a similarity range query.
+   *
+   * @param threshold smallest similarity that will be queried later
+   * @return Similarity range query
+   */
+  public RangeQuery<O> similarityRangeQuery(double threshold) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
     SimilarityQuery<O> simQuery = similarityQuery();
+    flags ^= precompute; // Restore
     for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
-      RangeQuery<O> q = it.get().getSimilarityRangeQuery(simQuery, maxrange, flags);
+      RangeQuery<O> q = it.get().getSimilarityRangeQuery(simQuery, threshold, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
       }
@@ -370,9 +457,11 @@ public class QueryBuilder<O> {
     }
 
     // Use optimizer
-    RangeQuery<O> q = OPTIMIZER.getSimilarityRangeQuery(relation, simQuery, maxrange, flags);
-    if(q != null) {
-      return q;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RangeQuery<O> q = OPTIMIZER.getSimilarityRangeQuery(relation, simQuery, threshold, flags);
+      if(q != null) {
+        return q;
+      }
     }
     if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
       return null;
@@ -384,14 +473,28 @@ public class QueryBuilder<O> {
         new LinearScanSimilarityRangeQuery<>(simQuery);
   }
 
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @return rkNN query
+   */
   public RKNNQuery<O> rKNNQuery() {
     return rKNNQuery(Integer.MAX_VALUE);
   }
 
-  public RKNNQuery<O> rKNNQuery(int maxk) {
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @param k k to be used; many indexes cannot support arbitrary k.
+   * @return rkNN query
+   */
+  public RKNNQuery<O> rKNNQuery(int k) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
     for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
-      RKNNQuery<O> q = it.get().getRKNNQuery(distanceQuery, maxk, flags);
+      RKNNQuery<O> q = it.get().getRKNNQuery(distanceQuery, k, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
       }
@@ -401,24 +504,40 @@ public class QueryBuilder<O> {
     }
 
     // Use optimizer
-    RKNNQuery<O> q = OPTIMIZER.getRKNNQuery(relation, distanceQuery, maxk, flags);
-    if(q != null) {
-      return q;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RKNNQuery<O> q = OPTIMIZER.getRKNNQuery(relation, distanceQuery, k, flags);
+      if(q != null) {
+        return q;
+      }
     }
     if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
       return null;
     }
     logNotAccelerated("rknn");
-    return new LinearScanRKNNQuery<>(distanceQuery, kNNQuery(), maxk); // Default
+    return new LinearScanRKNNQuery<>(distanceQuery, kNNQuery(), k); // Default
   }
 
+  /**
+   * Build a priority searcher.
+   *
+   * @return priority searcher
+   */
   public DistancePrioritySearcher<O> prioritySearcher() {
     return prioritySearcher(Double.POSITIVE_INFINITY);
   }
 
+  /**
+   * Build a priority searcher.
+   *
+   * @param maxrange maximum cut-off
+   * @return priority searcher
+   */
   @SuppressWarnings("unchecked")
   public DistancePrioritySearcher<O> prioritySearcher(double maxrange) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
     for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
       DistancePrioritySearcher<O> q = it.get().getPriorityQuery(distanceQuery, maxrange, flags);
       if(LOG.isDebuggingFinest()) {
@@ -430,9 +549,11 @@ public class QueryBuilder<O> {
     }
 
     // Use optimizer
-    DistancePrioritySearcher<O> q = OPTIMIZER.getPrioritySearcher(relation, distanceQuery, maxrange, flags);
-    if(q != null) {
-      return q;
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      DistancePrioritySearcher<O> q = OPTIMIZER.getPrioritySearcher(relation, distanceQuery, maxrange, flags);
+      if(q != null) {
+        return q;
+      }
     }
     if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
       return null;
@@ -490,5 +611,35 @@ public class QueryBuilder<O> {
       }
       LOG.debugFinest(buf.toString());
     }
+  }
+
+  /**
+   * Initialization method, which sets {@link #OPTIMIZER}.
+   *
+   * @return Optimizer
+   */
+  private static QueryOptimizer initStaticOptimizer() {
+    if(OPTIMIZER != null) {
+      return OPTIMIZER;
+    }
+    String opt = System.getenv("elki.optimizer");
+    if(opt != null) {
+      if(opt.isEmpty()) { // Disable
+        LOG.warning("Optimizer disabled.");
+        return DisableQueryOptimizer.STATIC;
+      }
+      try {
+        Class<? extends QueryOptimizer> clz = ELKIServiceRegistry.findImplementation(QueryOptimizer.class, opt);
+        if(clz == null) {
+          throw new AbortException("Could not find query optimizer: " + opt);
+        }
+        return ClassGenericsUtil.tryInstantiate(QueryOptimizer.class, clz, new EmptyParameterization());
+      }
+      catch(ClassInstantiationException e) {
+        throw new AbortException("Failed to initialize query optimizer: " + opt, e);
+      }
+    }
+    // Default optimizer
+    return new EmpiricalQueryOptimizer();
   }
 }

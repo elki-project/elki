@@ -25,7 +25,6 @@ import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -34,6 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -166,9 +166,8 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    */
   public OutlierResult run(Relation<O> rel) {
     final DBIDs ids = rel.getDBIDs();
-
     LOG.verbose("Running kNN preprocessor.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(rel, getDistance(), kmax + 1);
+    KNNQuery<O> knnq = new QueryBuilder<>(rel, distance).precomputed().kNNQuery(kmax + 1);
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);

@@ -31,12 +31,12 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -118,6 +118,9 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
    */
   public PAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distance);
+    if(k > 0x7FFF) {
+      throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
+    }
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -130,10 +133,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
    * @return result
    */
   public Clustering<MedoidModel> run(Relation<V> relation) {
-    if(k > 0x7FFF) {
-      throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
-    }
-    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     DBIDs ids = relation.getDBIDs();
     ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids);
 

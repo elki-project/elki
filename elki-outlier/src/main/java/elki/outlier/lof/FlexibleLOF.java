@@ -25,7 +25,6 @@ import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -159,8 +158,8 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
             "Materializing neighborhoods w.r.t. reference neighborhood distance." //
             : "Not materializing neighborhoods w.r.t. reference neighborhood distance, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
       }
-      int kpreproc = (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach;
-      knnReach = DatabaseUtil.precomputedKNNQuery(relation, reachabilityDistance, kpreproc);
+      knnReach = new QueryBuilder<>(relation, reachabilityDistance).precomputed().kNNQuery(//
+          (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach);
     }
 
     // knnReach is only used once

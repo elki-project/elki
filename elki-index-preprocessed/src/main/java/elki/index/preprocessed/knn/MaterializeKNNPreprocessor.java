@@ -24,6 +24,7 @@ import javax.swing.event.EventListenerList;
 
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.Relation;
@@ -81,6 +82,21 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   public MaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
     super(relation, distance, k);
     this.knnQuery = new QueryBuilder<>(distanceQuery).noCache().kNNQuery(k);
+    assert !(knnQuery instanceof PreprocessorKNNQuery) : knnQuery.toString();
+  }
+
+  /**
+   * Constructor with preprocessing step.
+   *
+   * @param relation Relation to preprocess
+   * @param distance the distance function to use
+   * @param k query k
+   * @param noopt Flag to disable optimization
+   */
+  public MaterializeKNNPreprocessor(Relation<O> relation, DistanceQuery<O> distanceQuery, int k, boolean noopt) {
+    super(relation, distanceQuery, k);
+    QueryBuilder<O> qb = new QueryBuilder<>(distanceQuery).noCache();
+    this.knnQuery = (noopt ? qb.cheapOnly() : qb).kNNQuery(k);
     assert !(knnQuery instanceof PreprocessorKNNQuery) : knnQuery.toString();
   }
 

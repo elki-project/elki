@@ -24,7 +24,6 @@ import elki.AbstractAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -54,8 +53,8 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -160,8 +159,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     KNNQuery<O> knnComp, knnReach;
     if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnComp = DatabaseUtil.precomputedKNNQuery(relation, comparisonDistance, MathUtil.max(kcomp, kreach) + 1);
-      knnReach = knnComp;
+      knnReach = knnComp = new QueryBuilder<>(relation, comparisonDistance).precomputed().kNNQuery(MathUtil.max(kcomp, kreach) + 1);
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
