@@ -92,7 +92,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
   @Override
   public double getKNNDistance() {
-    return inner.doubleValue(k - 1);
+    return k <= size ? inner.doubleValue(k - 1) : Double.POSITIVE_INFINITY;
   }
 
   @Override
