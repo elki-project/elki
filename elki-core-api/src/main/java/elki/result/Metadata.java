@@ -88,15 +88,20 @@ public class Metadata extends WeakReference<Object> {
 
     public void run() {
       LOG.debugFinest("Garbage collection thread started.");
-      try {
-        while(!global.isEmpty()) {
+      while(true) {
+        try {
           ((Metadata) queue.remove()).cleanup();
         }
+        catch(InterruptedException e) {
+          // Ok to stop.
+        }
+        synchronized(global) {
+          if(global.isEmpty()) {
+            LOG.debugFinest("Garbage collection thread has quit.");
+            return;
+          }
+        }
       }
-      catch(InterruptedException e) {
-        // Ok to stop.
-      }
-      LOG.debugFinest("Garbage collection thread has quit.");
     };
   };
 
@@ -113,7 +118,7 @@ public class Metadata extends WeakReference<Object> {
       Metadata ret = global.get(o);
       if(ret == null) {
         global.put(o, ret = new Metadata(o));
-        if(global.size() == 1 && (CLEANER == null || !CLEANER.isAlive())) {
+        if(CLEANER == null || !CLEANER.isAlive()) {
           CLEANER = new CleanerThread();
           CLEANER.start();
         }
@@ -201,11 +206,19 @@ public class Metadata extends WeakReference<Object> {
       LOG.debugFine("Garbage collecting: " + name);
     }
     listeners = null;
-    for(int i = hierarchy.numc - 1; i >= 0; i--) {
-      Metadata.of(hierarchy.children[i]).hierarchy().removeParentInt(this);
+    if(hierarchy.numc > 0) {
+      synchronized(global) {
+        for(int i = hierarchy.numc - 1; i >= 0; i--) {
+          Metadata ret = global.get(hierarchy.children[i]);
+          if(ret != null) {
+            ret.hierarchy().removeParentInt(this);
+          }
+        }
+      }
+      hierarchy.numc = 0;
+      Arrays.fill(hierarchy.children, null);
     }
-    hierarchy.nump = hierarchy.numc = 0;
-    Arrays.fill(hierarchy.children, null);
+    hierarchy.nump = 0;
     Arrays.fill(hierarchy.parents, null);
   }
 
@@ -443,7 +456,8 @@ public class Metadata extends WeakReference<Object> {
         return false;
       }
       for(int i = 0; i < numc; i++) {
-        if(child.equals(children[i])) {
+        Object ci = children[i];
+        if(child.equals(ci) || ci instanceof Reference && child.equals(ci = ((Reference<?>) ci).get())) {
           if(--numc == 0) {
             children = EMPTY_CHILDREN;
           }
