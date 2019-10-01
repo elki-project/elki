@@ -212,7 +212,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   private <O> Index makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
-    if(matrixIndex == null) {
+    if(matrixIndex == null || relation.size() > 65536) {
       return null;
     }
     long freeMemory = getFreeMemory();

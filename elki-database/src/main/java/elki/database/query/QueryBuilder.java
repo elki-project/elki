@@ -284,6 +284,9 @@ public class QueryBuilder<O> {
     if((flags & FLAG_OPTIMIZED_ONLY) != 0 && !(distance instanceof DBIDDistance)) {
       return null; // Disallowed
     }
+    if((flags & FLAG_PRECOMPUTE) != 0) {
+      LOG.warning("The algorithm requested a distance matrix, but we could not precompute one.\n This may or may not be very expensive / slow.", new Throwable());
+    }
     return (distQuery = distance.instantiate(relation));
   }
 
