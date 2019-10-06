@@ -69,13 +69,13 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "Michael E. Houle, Erich Schubert, Arthur Zimek", //
     title = "On the Correlation Between Local Intrinsic Dimensionality and Outlierness", //
     booktitle = "Proc. 11th Int. Conf. Similarity Search and Applications (SISAP'2018)", //
-    // TODO: add url when DOI is assigned.
+    url = "https://doi.org/10.1007/978-3-030-02224-2_14", //
     bibkey = "DBLP:conf/sisap/HouleSZ18")
-public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class LID<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(IntrinsicDimensionalityOutlier.class);
+  private static final Logging LOG = Logging.getLogger(LID.class);
 
   /**
    * Number of neighbors to use + query point.
@@ -94,7 +94,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
    * @param k Neighborhood size
    * @param estimator Estimator for intrinsic dimensionality
    */
-  public IntrinsicDimensionalityOutlier(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
+  public LID(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
     super(distance);
     this.kplus = k + 1; // + query point
     this.estimator = estimator;
@@ -178,8 +178,8 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
     }
 
     @Override
-    public IntrinsicDimensionalityOutlier<O> make() {
-      return new IntrinsicDimensionalityOutlier<>(distance, k, estimator);
+    public LID<O> make() {
+      return new LID<>(distance, k, estimator);
     }
   }
 }

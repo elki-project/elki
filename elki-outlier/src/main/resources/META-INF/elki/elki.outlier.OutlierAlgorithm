@@ -51,7 +51,7 @@ elki.outlier.spatial.SOF
 elki.outlier.spatial.TrimmedMeanApproach
 elki.outlier.intrinsic.IDOS
 elki.outlier.intrinsic.ISOS
-elki.outlier.intrinsic.IntrinsicDimensionalityOutlier
+elki.outlier.intrinsic.LID
 elki.outlier.meta.ExternalDoubleOutlierScore
 elki.outlier.meta.FeatureBagging
 elki.outlier.meta.HiCS

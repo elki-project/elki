@@ -55,6 +55,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   private static final Logging LOG = Logging.getLogger(EmpiricalQueryOptimizer.class);
 
   /**
+   * Megabytes for formatting memory.
+   */
+  private static final long MEGA = 1024 * 1024;
+
+  /**
    * Distance matrix index class.
    */
   private final Constructor<? extends Index> matrixIndex;
@@ -287,11 +292,6 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     final Runtime r = Runtime.getRuntime();
     return r.freeMemory() + r.maxMemory() - r.totalMemory();
   }
-
-  /**
-   * Megabytes.
-   */
-  private static long MEGA = 1024 * 1024;
 
   /**
    * Format a memory amount.

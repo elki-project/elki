@@ -50,7 +50,7 @@ import elki.outlier.anglebased.FastABOD;
 import elki.outlier.distance.*;
 import elki.outlier.intrinsic.IDOS;
 import elki.outlier.intrinsic.ISOS;
-import elki.outlier.intrinsic.IntrinsicDimensionalityOutlier;
+import elki.outlier.intrinsic.LID;
 import elki.outlier.lof.*;
 import elki.outlier.trivial.ByLabelOutlier;
 import elki.result.ResultUtil;
@@ -253,8 +253,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           k -> new COF<O>(k, distance) //
               .run(relation), out);
       // Run simple Intrinsic dimensionality
-      runForEachK("Intrinsic", 2, maxk, //
-          k -> new IntrinsicDimensionalityOutlier<O>(distance, k, AggregatedHillEstimator.STATIC) //
+      runForEachK("LID", 2, maxk, //
+          k -> new LID<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
       // Run IDOS
       runForEachK("IDOS", 2, maxk, //

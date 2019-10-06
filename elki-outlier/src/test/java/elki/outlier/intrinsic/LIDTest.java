@@ -29,17 +29,17 @@ import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Tests the Intrinsic Dimensionality outlier detection algorithm.
+ * Tests the Local Intrinsic Dimensionality (LID) outlier detection algorithm.
  * 
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class IntrinsicDimensionalityOutlierTest extends AbstractOutlierAlgorithmTest {
+public class LIDTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-    OutlierResult result = new ELKIBuilder<IntrinsicDimensionalityOutlier<DoubleVector>>(IntrinsicDimensionalityOutlier.class) //
-        .with(IntrinsicDimensionalityOutlier.Par.K_ID, 100).build().run(db);
+    OutlierResult result = new ELKIBuilder<LID<DoubleVector>>(LID.class) //
+        .with(LID.Par.K_ID, 100).build().run(db);
     testAUC(db, "Noise", result, 0.9167222);
     testSingleScore(result, 945, 2.5368047);
   }
