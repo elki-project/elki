@@ -89,7 +89,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    * Constructor with preprocessing step.
    *
    * @param relation Relation to preprocess
-   * @param distance the distance function to use
+   * @param distanceQuery the distance function to use
    * @param k query k
    * @param noopt Flag to disable optimization
    */

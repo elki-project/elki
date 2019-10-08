@@ -245,7 +245,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
           LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
           continue;
         }
-        assert (rknnlist != null);
         storage.put(reknn, rknnlist);
         for(DoubleDBIDListIter it = rknnlist.iter(); it.valid(); it.advance()) {
           ModifiableDoubleDBIDList rstor = storageRkNN.get(it);

@@ -102,8 +102,6 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
    *
    * @param relation data relation
    * @param distance distance function
-   * @param expansion Expansion rate
-   * @param truncate Truncate branches with less than this number of instances.
    */
   // Note: used from {@link EmpiricalQueryOptimizer} via reflection!
   public CoverTree(Relation<O> relation, Distance<? super O> distance) {

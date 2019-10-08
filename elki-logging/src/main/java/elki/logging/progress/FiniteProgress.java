@@ -103,7 +103,7 @@ public class FiniteProgress extends AbstractProgress {
     }
     int percentage = (int) (p * 100.0 / total);
     buf.append(p).append(" [") //
-        .append(percentage < 100 ? "  " : percentage < 10 ? " " : "") //
+        .append(percentage < 10 ? "  " : percentage < 100 ? " " : "") //
         .append(percentage).append("%]");
     if(ratems > 0. && p < total) {
       int secs = (int) Math.round((total - p) / ratems / 1000. + .2);
