@@ -38,6 +38,7 @@ import elki.result.SettingsResult;
 import elki.result.SettingsResult.SettingInformation;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
+import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
@@ -90,6 +91,11 @@ public class VisualizerParameterizer {
   private Collection<VisualizationProcessor> factories;
 
   /**
+   * Pattern to show additional visualizers
+   */
+  private Pattern showVisualizers = null;
+
+  /**
    * Sample size
    */
   private int samplesize = -1;
@@ -107,12 +113,14 @@ public class VisualizerParameterizer {
    * @param samplesize
    * @param stylelib Style library
    * @param factories Factories to use
+   * @param showVisualizers Visualizers to force visible (may be null)
    */
-  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
+  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories, Pattern showVisualizers) {
     super();
     this.samplesize = samplesize;
     this.stylelib = stylelib;
     this.factories = factories;
+    this.showVisualizers = showVisualizers;
   }
 
   /**
@@ -136,7 +144,16 @@ public class VisualizerParameterizer {
         ResultUtil.addChildResult(rel, sample);
       }
     }
-    return new VisualizerContext(start, stylelib, factories);
+    VisualizerContext ctx = new VisualizerContext(start, stylelib, factories);
+    // Make additional visualizers visible
+    if(showVisualizers != null) {
+      for(It<VisualizationTask> iter2 = ctx.getVisHierarchy().iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
+        if(!iter2.get().isVisible() && showVisualizers.matcher(iter2.get().getMenuName()).find()) {
+          iter2.get().visibility(true);
+        }
+      }
+    }
+    return ctx;
   }
 
   /**
@@ -234,6 +251,11 @@ public class VisualizerParameterizer {
     public static final OptionID SAMPLING_ID = new OptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
 
     /**
+     * Parameter to show visualizers hidden by default
+     */
+    public static final OptionID SHOWVIS_ID = new OptionID("vis.show", "Visualizers to force visible, that would be hidden by default.");
+
+    /**
      * Style library
      */
     protected StyleLibrary stylelib = null;
@@ -242,6 +264,11 @@ public class VisualizerParameterizer {
      * Pattern to enable visualizers
      */
     protected Pattern enableVisualizers = null;
+
+    /**
+     * Pattern to show additional visualizers
+     */
+    protected Pattern showVisualizers = null;
 
     /**
      * Visualizer factories
@@ -270,6 +297,9 @@ public class VisualizerParameterizer {
       new PatternParameter(ENABLEVIS_ID) //
           .setOptional(true) //
           .grab(config, x -> enableVisualizers = x);
+      new PatternParameter(SHOWVIS_ID) //
+          .setOptional(true) //
+          .grab(config, x -> showVisualizers = x);
       MergedParameterization merged = new MergedParameterization(config);
       factories = collectFactorys(merged, enableVisualizers);
     }
@@ -306,7 +336,7 @@ public class VisualizerParameterizer {
 
     @Override
     public VisualizerParameterizer make() {
-      return new VisualizerParameterizer(samplesize, stylelib, factories);
+      return new VisualizerParameterizer(samplesize, stylelib, factories, showVisualizers);
     }
   }
 }
