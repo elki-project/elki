@@ -672,7 +672,7 @@ public class Metadata extends WeakReference<Object> {
             return this;
           }
           // Expired weak reference detected.
-          System.arraycopy(children, pos + 1, children, pos, numc - pos);
+          System.arraycopy(children, pos + 1, children, pos, numc - pos - 1);
           children[--numc] = null;
         }
         return this;
