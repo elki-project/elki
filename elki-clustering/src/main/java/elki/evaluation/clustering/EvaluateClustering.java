@@ -208,7 +208,7 @@ public class EvaluateClustering implements Evaluator {
      */
     public ScoreResult(ClusterContingencyTable contmat) {
       super();
-      Metadata.of(this).setLongName("Cluster Evalation");
+      Metadata.of(this).setLongName("Clustering Evaluation");
       this.contmat = contmat;
 
       PairCounting paircount = contmat.getPaircount();
