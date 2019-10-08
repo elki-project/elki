@@ -260,8 +260,9 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
       DBIDArrayIter m = medoids.iter();
-      int iteration = 1;
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         // Try to swap a non-medoid with a medoid member:
         double best = Double.POSITIVE_INFINITY;

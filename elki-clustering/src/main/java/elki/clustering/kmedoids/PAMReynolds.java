@@ -125,8 +125,9 @@ public class PAMReynolds<V> extends PAM<V> {
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
-      int iteration = 1;
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         // Try to swap a non-medoid with a medoid member:
         double best = Double.POSITIVE_INFINITY;

@@ -129,9 +129,10 @@ public class FastPAM1<V> extends PAM<V> {
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
       DBIDArrayIter m = medoids.iter();
-      int iteration = 1;
       double[] cost = new double[k];
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         double best = Double.POSITIVE_INFINITY;
         int bestcluster = -1;

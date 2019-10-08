@@ -181,9 +181,10 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids EM iteration", LOG) : null;
     // Swap phase
-    int iteration = 0;
     DBIDVar best = DBIDUtil.newVar();
-    while(true) {
+    int iteration = 0;
+    while(iteration < maxiter || maxiter <= 0) {
+      ++iteration;
       boolean changed = false;
       // Try to swap the medoid with a better cluster member:
       int i = 0;
@@ -218,7 +219,6 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
       }
       // Reassign
       double nc = assignToNearestCluster(miter, mdists, clusters, distQ);
-      ++iteration;
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
       }

@@ -168,11 +168,12 @@ public class FastPAM<V> extends FastPAM1<V> {
       int fastswaps = 0; // For statistics
       // Swap phase
       DBIDArrayIter m = medoids.iter();
-      int iteration = 1;
       ArrayModifiableDBIDs bestids = DBIDUtil.newArray(k);
       DBIDVar bestid = DBIDUtil.newVar();
       double[] best = new double[k], cost = new double[k];
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         findBestSwaps(m, bestids, best, cost);
         // Convergence check
