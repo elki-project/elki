@@ -8,6 +8,4 @@ dependencies {
   compile group: 'xalan', name: 'xalan', version:'[2.7.2,3)'
   compile project(':elki-gui-minigui') // For GUIUtil, otherwise elki would be enough
   compile project(':elki-uncertain')
-  // Included since Java 1.5, causing problems with modules since Java 9:
-  configurations.all { exclude group: 'xml-apis', module: 'xml-apis' }
 }
