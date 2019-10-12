@@ -32,8 +32,8 @@ public class SURFINGDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = SURFINGDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 0.392, 0.392, 0.001);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 0.1, 0.02, 0.099, 0.001);
-    AbstractDependenceMeasureTest.checkTwoClusters(cor, 1000, 0.13, 0.001);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 0.392, 0.392, 0.001);
+    DependenceMeasureTest.checkUniform(cor, 1000, 0.1, 0.02, 0.099, 0.001);
+    DependenceMeasureTest.checkTwoClusters(cor, 1000, 0.13, 0.001);
   }
 }

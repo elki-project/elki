@@ -32,7 +32,7 @@ public class SlopeInversionDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = SlopeInversionDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 1.0, 1e-15);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.06, 0.01);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 1.0, 1e-15);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.06, 0.01);
   }
 }

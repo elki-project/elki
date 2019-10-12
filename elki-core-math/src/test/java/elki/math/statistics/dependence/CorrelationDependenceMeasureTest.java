@@ -55,8 +55,8 @@ public class CorrelationDependenceMeasureTest {
   public void testBasic() {
     DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
     // This will become better with data size.
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1, -1, 1e-14);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.03);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1, -1, 1e-14);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.03);
   }
 
   @Test

@@ -54,8 +54,8 @@ public class SpearmanCorrelationDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = SpearmanCorrelationDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, -1.0, 1e-15);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, -0.026, 0.01);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, -1.0, 1e-15);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, -0.026, 0.01);
   }
 
   @Test

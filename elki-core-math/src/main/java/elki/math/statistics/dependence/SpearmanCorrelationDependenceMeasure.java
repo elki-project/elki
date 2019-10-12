@@ -30,7 +30,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeasure {
+public class SpearmanCorrelationDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -45,9 +45,9 @@ public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeas
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
-    double[] ranks1 = computeNormalizedRanks(adapter1, data1, len);
-    double[] ranks2 = computeNormalizedRanks(adapter2, data2, len);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
+    double[] ranks1 = Util.computeNormalizedRanks(adapter1, data1, len);
+    double[] ranks2 = Util.computeNormalizedRanks(adapter2, data2, len);
 
     // Second pass: variances and covariance
     double v1 = 0., v2 = 0., cov = 0.;

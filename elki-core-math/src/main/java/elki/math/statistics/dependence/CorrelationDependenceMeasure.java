@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
+public class CorrelationDependenceMeasure implements DependenceMeasure {
   /**
    * Class logger.
    */
@@ -53,7 +53,7 @@ public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     // Perform two-pass estimation, which is numerically stable and often faster
     // than the Knuth-Welford approach (see PearsonCorrelation class)
     double m1 = 0., m2 = 0;
@@ -72,14 +72,14 @@ public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
       v2 += d2 * d2;
       cov += d1 * d2;
     }
+    final double vsq = v1 * v2;
     // Note: we did not normalize by len, as this cancels out.
-    return cov / FastMath.sqrt(v1 * v2);
+    return vsq > 0 ? cov / FastMath.sqrt(vsq) : 0.;
   }
 
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
-    final int dims = data.size();
-    final int len = size(adapter, data);
+    final int dims = data.size(), len = Util.size(adapter, data);
     double[] means = new double[dims];
     // Two passes - often faster due to the lower numerical cost
     // And accurate, don't use sum-of-squares.

@@ -22,25 +22,26 @@ package elki.math.statistics.dependence;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
+
 import net.jafama.FastMath;
 
 /**
  * Mutual Information (MI) dependence measure by dividing each attribute into
  * equal-width bins. MI can be seen as Kullback–Leibler divergence of the joint
  * distribution and the product of the marginal distributions.
- * 
+ * <p>
  * For normalization, the resulting values are scaled by {@code mi/log(nbins)}.
  * This both cancels out the logarithm base, and normalizes for the number of
  * bins (a uniform distribution will yield a MI with itself of 1).
- * 
+ * <p>
  * TODO: Offer normalized and non-normalized variants?
- * 
+ * <p>
  * For a median-based discretization, see {@link MCEDependenceMeasure}.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class MutualInformationEquiwidthDependenceMeasure extends AbstractDependenceMeasure {
+public class MutualInformationEquiwidthDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -55,7 +56,7 @@ public class MutualInformationEquiwidthDependenceMeasure extends AbstractDepende
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     final int bins = (int) FastMath.round(FastMath.sqrt(len));
     final int maxbin = bins - 1;
 

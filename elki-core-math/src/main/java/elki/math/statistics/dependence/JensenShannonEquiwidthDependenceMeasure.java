@@ -27,17 +27,17 @@ import net.jafama.FastMath;
 
 /**
  * Jensen-Shannon Divergence is closely related to mutual information.
- * 
+ * <p>
  * The output value is normalized, such that an evenly distributed and identical
  * distribution will yield a value of 1. Independent distributions may still
  * yield values close to .25, though.
- * 
+ * <p>
  * TODO: Offer normalized and non-normalized variants?
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class JensenShannonEquiwidthDependenceMeasure extends AbstractDependenceMeasure {
+public class JensenShannonEquiwidthDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -52,7 +52,7 @@ public class JensenShannonEquiwidthDependenceMeasure extends AbstractDependenceM
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     final int bins = (int) FastMath.round(FastMath.sqrt(len));
     final int maxbin = bins - 1;
 

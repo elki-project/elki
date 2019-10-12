@@ -66,8 +66,8 @@ public class MutualInformationEquiwidthDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure mi = MutualInformationEquiwidthDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.87, 0.87, 0.002);
-    AbstractDependenceMeasureTest.checkUniform(mi, 1000, 1.0, 0.01, 0.163, 0.001);
+    DependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.87, 0.87, 0.002);
+    DependenceMeasureTest.checkUniform(mi, 1000, 1.0, 0.01, 0.163, 0.001);
   }
 
   @Test

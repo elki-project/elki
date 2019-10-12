@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.Parameterizer;
     booktitle = "IEEE Trans. Visualization and Computer Graphics", //
     url = "https://doi.org/10.1109/TVCG.2010.242", //
     bibkey = "DBLP:journals/tvcg/TatuAEBTMK11")
-public class HSMDependenceMeasure extends AbstractDependenceMeasure {
+public class HSMDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -80,7 +80,7 @@ public class HSMDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     boolean[][] pic = new boolean[resolution][resolution];
 
     // Get attribute value range:

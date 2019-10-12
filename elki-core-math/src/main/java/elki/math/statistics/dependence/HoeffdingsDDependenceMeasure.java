@@ -46,7 +46,7 @@ import net.jafama.FastMath;
     booktitle = "The Annals of Mathematical Statistics 19", //
     url = "http://www.jstor.org/stable/2236021", //
     bibkey = "journals/mathstat/Hoeffding48")
-public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
+public class HoeffdingsDDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -61,13 +61,13 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int n = size(adapter1, data1, adapter2, data2);
+    final int n = Util.size(adapter1, data1, adapter2, data2);
     assert (n > 4) : "Hoeffdings D needs at least 5 elements!";
     if(n <= 4) {
       return Double.NaN;
     }
-    double[] r = ranks(adapter1, data1, n);
-    double[] s = ranks(adapter2, data2, n);
+    double[] r = Util.ranks(adapter1, data1, n);
+    double[] s = Util.ranks(adapter2, data2, n);
     // TODO: is it possible to exploit sorting to accelerate computing q?
     double[] q = computeBivariateRanks(adapter1, data1, adapter2, data2, n);
 

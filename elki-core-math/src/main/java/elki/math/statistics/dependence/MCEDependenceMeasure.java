@@ -50,7 +50,7 @@ import net.jafama.FastMath;
     booktitle = "Information Visualization, 2(4)", //
     url = "https://doi.org/10.1057/palgrave.ivs.9500053", //
     bibkey = "DBLP:journals/ivs/Guo03")
-public class MCEDependenceMeasure extends AbstractDependenceMeasure {
+public class MCEDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -66,7 +66,7 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     // Find a number of bins as recommended by Cheng et al.
     double p = MathUtil.log2(len / (double) TARGET);
     // As we are in 2d, take the root (*.5) But let's use at least 1, too.

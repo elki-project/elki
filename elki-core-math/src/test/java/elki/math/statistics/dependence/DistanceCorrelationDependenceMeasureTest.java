@@ -56,8 +56,8 @@ public class DistanceCorrelationDependenceMeasureTest {
   public void testBasic() {
     DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
     // This will become better with data size.
-    AbstractDependenceMeasureTest.checkPerfectLinear(dCor, 1000, 1, 1, 1e-13);
-    AbstractDependenceMeasureTest.checkUniform(dCor, 1000, 1.0, 1e-15, 0.05, 0.01);
+    DependenceMeasureTest.checkPerfectLinear(dCor, 1000, 1, 1, 1e-13);
+    DependenceMeasureTest.checkUniform(dCor, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 
   @Test

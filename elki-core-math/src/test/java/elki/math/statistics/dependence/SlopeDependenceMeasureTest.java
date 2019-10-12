@@ -33,7 +33,7 @@ public class SlopeDependenceMeasureTest {
   public void testBasic() {
     DependenceMeasure cor = SlopeDependenceMeasure.STATIC;
     // Note: only positive correlations are accepted.
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 0.125, 0.01);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.05, 0.01);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 0.125, 0.01);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 }

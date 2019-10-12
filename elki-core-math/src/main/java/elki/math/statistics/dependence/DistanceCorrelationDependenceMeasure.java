@@ -52,7 +52,7 @@ import net.jafama.FastMath;
     booktitle = "The Annals of Statistics, 35(6), 2769-2794", //
     url = "https://doi.org/10.1214/009053607000000505", //
     bibkey = "doi:10.1214/009053607000000505")
-public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeasure {
+public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -67,7 +67,7 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     double[] dMatrixA = computeDistances(adapter1, data1);
     double[] dMatrixB = computeDistances(adapter2, data2);
 
@@ -87,8 +87,7 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
 
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
-    final int dims = data.size();
-    final int len = size(adapter, data);
+    final int dims = data.size(), len = Util.size(adapter, data);
     double[][] dMatrix = new double[dims][];
     for(int i = 0; i < dims; i++) {
       dMatrix[i] = computeDistances(adapter, data.get(i));

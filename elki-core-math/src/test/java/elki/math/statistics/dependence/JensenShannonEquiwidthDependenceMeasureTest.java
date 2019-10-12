@@ -83,7 +83,7 @@ public class JensenShannonEquiwidthDependenceMeasureTest {
   public void testBasic() {
     DependenceMeasure mi = JensenShannonEquiwidthDependenceMeasure.STATIC;
     // This will become better with data size.
-    AbstractDependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.938, 0.938, 0.001);
-    AbstractDependenceMeasureTest.checkUniform(mi, 1000, 0.998, 0.001, 0.267, 0.001);
+    DependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.938, 0.938, 0.001);
+    DependenceMeasureTest.checkUniform(mi, 1000, 0.998, 0.001, 0.267, 0.001);
   }
 }

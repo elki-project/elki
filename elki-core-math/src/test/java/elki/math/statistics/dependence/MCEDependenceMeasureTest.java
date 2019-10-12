@@ -32,7 +32,7 @@ public class MCEDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = MCEDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 1.0, 1e-15);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.002, 0.005);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 1.0, 1e-15);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.002, 0.005);
   }
 }

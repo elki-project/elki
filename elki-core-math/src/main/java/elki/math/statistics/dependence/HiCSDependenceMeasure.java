@@ -22,11 +22,9 @@ package elki.math.statistics.dependence;
 
 import java.util.Random;
 
-import elki.math.MathUtil;
 import elki.math.statistics.tests.GoodnessOfFitTest;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -67,7 +65,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.88", //
     bibkey = "DBLP:conf/icde/KellerMB12")
-public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
+public class HiCSDependenceMeasure implements DependenceMeasure {
   /**
    * Monte-Carlo iterations
    */
@@ -106,14 +104,13 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     final int windowsize = (int) (len * alphasqrt);
     final Random random = rnd.getSingleThreadedRandom();
 
     // Sorted copies for slicing.
-    int[] s1 = MathUtil.sequence(0, len), s2 = MathUtil.sequence(0, len);
-    IntegerArrayQuickSort.sort(s1, (x, y) -> Double.compare(adapter1.getDouble(data1, x), adapter1.getDouble(data1, y)));
-    IntegerArrayQuickSort.sort(s2, (x, y) -> Double.compare(adapter2.getDouble(data2, x), adapter2.getDouble(data2, y)));
+    int[] s1 = Util.sortedIndex(adapter1, data1, len);
+    int[] s2 = Util.sortedIndex(adapter2, data2, len);
 
     // Distributions for testing
     double[] fullValues = new double[len];

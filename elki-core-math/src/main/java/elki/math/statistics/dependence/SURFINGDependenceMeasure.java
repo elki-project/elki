@@ -70,7 +70,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
     url = "https://doi.org/10.1109/ICDM.2004.10112", //
     bibkey = "DBLP:conf/icdm/BaumgartnerPKKK04")
-public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
+public class SURFINGDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -85,7 +85,7 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
     final int k = Math.max(1, len / 10);
 
     double[] knns = new double[len];

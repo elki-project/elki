@@ -37,24 +37,31 @@ import elki.utilities.random.FastNonThreadsafeRandom;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class AbstractDependenceMeasureTest {
-  @Test
-  public void testIndexing() {
-    double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
-    int[] indexes = { 0, 2, 1, 3, 5, 4 };
-    int[] idx = AbstractDependenceMeasure.sortedIndex(DoubleArrayAdapter.STATIC, data, data.length);
-    for(int i = 0; i < indexes.length; i++) {
-      assertEquals("Index " + i, indexes[i], idx[i]);
+public class DependenceMeasureTest {
+  /**
+   * Test the inner util class.
+   *
+   * @author Erich Schubert
+   */
+  public static class UtilTest {
+    @Test
+    public void testIndexing() {
+      double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
+      int[] indexes = { 0, 2, 1, 3, 5, 4 };
+      int[] idx = Dependence.Util.sortedIndex(DoubleArrayAdapter.STATIC, data, data.length);
+      for(int i = 0; i < indexes.length; i++) {
+        assertEquals("Index " + i, indexes[i], idx[i]);
+      }
     }
-  }
 
-  @Test
-  public void testRanks() {
-    double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
-    double[] ranks = { 1., 4, 2., 4, 6, 4 };
-    double[] r = AbstractDependenceMeasure.ranks(DoubleArrayAdapter.STATIC, data, data.length);
-    for(int i = 0; i < ranks.length; i++) {
-      assertEquals("Rank " + i, ranks[i], r[i], 1e-20);
+    @Test
+    public void testRanks() {
+      double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
+      double[] ranks = { 1., 4, 2., 4, 6, 4 };
+      double[] r = Dependence.Util.ranks(DoubleArrayAdapter.STATIC, data, data.length);
+      for(int i = 0; i < ranks.length; i++) {
+        assertEquals("Rank " + i, ranks[i], r[i], 1e-20);
+      }
     }
   }
 

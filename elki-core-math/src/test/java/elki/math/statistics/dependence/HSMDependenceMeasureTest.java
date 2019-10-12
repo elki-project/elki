@@ -34,8 +34,8 @@ public class HSMDependenceMeasureTest {
     DependenceMeasure cor = HSMDependenceMeasure.STATIC;
     // These tests primarily show that this measure does not detect linear
     // relationships too well - they cause parallel lines, not intersections.
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 100, 0.725, 0.740, 0.001);
-    AbstractDependenceMeasureTest.checkUniform(cor, 100, 0.655, 0.005, 0.680, 0.001);
-    AbstractDependenceMeasureTest.checkTwoClusters(cor, 100, 0.663, 0.001);
+    DependenceMeasureTest.checkPerfectLinear(cor, 100, 0.725, 0.740, 0.001);
+    DependenceMeasureTest.checkUniform(cor, 100, 0.655, 0.005, 0.680, 0.001);
+    DependenceMeasureTest.checkTwoClusters(cor, 100, 0.663, 0.001);
   }
 }

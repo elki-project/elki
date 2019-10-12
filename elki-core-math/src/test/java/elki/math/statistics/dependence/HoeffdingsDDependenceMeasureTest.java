@@ -32,7 +32,7 @@ public class HoeffdingsDDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = HoeffdingsDDependenceMeasure.STATIC;
-    AbstractDependenceMeasureTest.checkPerfectLinear(cor, 1000, 1., 1., 1e-15);
-    AbstractDependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.001);
+    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1., 1., 1e-15);
+    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.001);
   }
 }

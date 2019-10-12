@@ -48,7 +48,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
     url = "https://doi.org/10.1145/2463676.2463696", //
     bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
-public class SlopeDependenceMeasure extends AbstractDependenceMeasure {
+public class SlopeDependenceMeasure implements DependenceMeasure {
   /**
    * Static instance.
    */
@@ -78,7 +78,7 @@ public class SlopeDependenceMeasure extends AbstractDependenceMeasure {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = size(adapter1, data1, adapter2, data2);
+    final int len = Util.size(adapter1, data1, adapter2, data2);
 
     // Get attribute value range:
     final double off1, scale1, off2, scale2;
