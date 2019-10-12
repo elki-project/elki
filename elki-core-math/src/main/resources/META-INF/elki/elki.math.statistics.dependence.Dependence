@@ -10,3 +10,4 @@ elki.math.statistics.dependence.SlopeInversionDependence
 elki.math.statistics.dependence.HoughSpaceMeasure
 elki.math.statistics.dependence.SURFINGDependence
 elki.math.statistics.dependence.HiCSDependence
+elki.math.statistics.dependence.MCDEDependence
