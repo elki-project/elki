@@ -20,74 +20,66 @@
  */
 package elki.math.statistics.tests.mcde;
 
-import elki.math.MathUtil;
+import elki.math.statistics.dependence.MCDEDependenceMeasure;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 
 /**
- * Abstract class for statistical tests for MCDEDependenceMeasure.
- * See MWPTest for an example. Implementation should contain an appropriate index
- * structure to efficiently compute statistical test and the test itself.
- *
- * @param <R> RankStruct or Subclass of RankStruct
+ * Interface for statistical tests for {@link MCDEDependenceMeasure}.
+ * See {@link MWPTest} for an example. Implementation should contain an
+ * appropriate index structure to efficiently compute statistical test and the
+ * test itself.
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
+ *
+ * @param <R> RankStruct or Subclass of RankStruct
  */
-
-public abstract class MCDETest<R extends MCDETest.RankStruct> {
-
+public interface MCDETest<R extends MCDETest.RankStruct> {
   /**
-   * Structure to hold return values in index creation for MCDEDependenceEstimate
+   * Structure to hold return values in index creation for
+   * MCDEDependenceEstimate
+   *
+   * @author Alan Mazankiewicz
+   * @author Edouard Fouché
    */
   public class RankStruct {
-    public int index;
+    /**
+     * Position information
+     */
+    public int[] index;
 
-    public RankStruct(int index) {
-      this.index = index;
+    /**
+     * Constructor.
+     *
+     * @param len Size
+     */
+    public RankStruct(int[] idx) {
+      this.index = idx;
     }
   }
 
   /**
-   * Build a sorted index of objects.
-   *
-   * @param adapter Data adapter
-   * @param data    Data array
-   * @param len     Length of data
-   * @return Sorted index
+   * Compute the corrected rank index.
+   * 
+   * @param <A> Input array type
+   * @param adapter Array-like adapter
+   * @param data Data object
+   * @param len Length
+   * @return corrected ranks
    */
-  protected <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
-    int[] s1 = MathUtil.sequence(0, len);
-    IntegerArrayQuickSort.sort(s1, (x, y) -> Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y)));
-    return s1;
-  }
+  <A> R correctedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len);
 
   /**
-   * Overloaded wrapper for corrected_ranks()
-   */
-  public <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
-    return corrected_ranks(adapter, data, sortedIndex(adapter, data, len));
-  }
-
-  /**
-   * Subclass must implement computation of corrected rank index.
-   *
-   * @param adapter ELKI NumberArrayAdapter Subclass
-   * @param data    One dimensional array containing one dimension of the data
-   * @param idx     Return value of sortedIndex()
-   * @return Array of RankStruct, acting as rank index
-   */
-  abstract public <A> R[] corrected_ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx);
-
-  /**
-   * Subclass must implement the computation of the statistical test, based on the slicing scheme
+   * Subclass must implement the computation of the statistical test, based on
+   * the slicing scheme
    * of MCDEDependenceMeasure.
    *
-   * @param start           Starting index value for statistical test
-   * @param end             End index value for statistical test
-   * @param slice           An array of boolean resulting from a random slice
-   * @param corrected_ranks the precomputed index structure for the reference dimension
+   * @param start Starting index value for statistical test
+   * @param end End index value for statistical test
+   * @param slice An array of boolean resulting from a random slice
+   * @param correctedRanks the precomputed index structure for the reference
+   *        dimension
    * @return a 1 - p-value
    */
-  abstract public double statistical_test(int start, int end, boolean[] slice, R[] corrected_ranks);
+  double statisticalTest(int start, int end, boolean[] slice, R correctedRanks);
 }
