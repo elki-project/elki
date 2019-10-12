@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.outlier.meta.HiCS;
 import elki.math.MathUtil;
 import elki.utilities.ELKIBuilder;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
@@ -43,7 +42,7 @@ public class HiCSDependenceMeasureTest {
   @Test
   public void testBasic() {
     DependenceMeasure cor = new ELKIBuilder<>(HiCSDependenceMeasure.class) //
-        .with(HiCS.Par.SEED_ID, 0) //
+        .with(HiCSDependenceMeasure.Par.SEED_ID, 0) //
         .build();
     // Note: only positive correlations are accepted.
     checkPerfectLinear(cor, 1000, 0.800, 0.280, 0.05);

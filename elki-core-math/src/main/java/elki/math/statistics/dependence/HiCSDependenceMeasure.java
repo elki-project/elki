@@ -22,14 +22,13 @@ package elki.math.statistics.dependence;
 
 import java.util.Random;
 
-import elki.outlier.meta.HiCS;
 import elki.math.MathUtil;
 import elki.math.statistics.tests.GoodnessOfFitTest;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
-import elki.utilities.exceptions.AbortException;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -125,7 +124,7 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     for(int i = 0; i < len; i++) {
       fullValues[i] = adapter1.getDouble(data1, i);
       if(fullValues[i] != fullValues[i]) {
-        throw new AbortException("NaN values are not allowed by this implementation!");
+        throw new ArithmeticException("NaN values are not allowed by this implementation!");
       }
     }
 
@@ -147,7 +146,7 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
     for(int i = 0; i < len; i++) {
       fullValues[i] = adapter2.getDouble(data2, i);
       if(fullValues[i] != fullValues[i]) {
-        throw new AbortException("NaN values are not allowed by this implementation!");
+        throw new ArithmeticException("NaN values are not allowed by this implementation!");
       }
     }
 
@@ -174,6 +173,29 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
    */
   public static class Par implements Parameterizer {
     /**
+     * Parameter that specifies the number of iterations in the Monte-Carlo
+     * process of identifying high contrast subspaces.
+     */
+    public static final OptionID M_ID = new OptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
+
+    /**
+     * Parameter that determines the size of the test statistic during the
+     * Monte-Carlo iteration.
+     */
+    public static final OptionID ALPHA_ID = new OptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
+
+    /**
+     * Parameter that specifies which statistical test to use in order to
+     * calculate the deviation of two given data samples.
+     */
+    public static final OptionID TEST_ID = new OptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
+
+    /**
+     * Parameter that specifies the random seed.
+     */
+    public static final OptionID SEED_ID = new OptionID("hics.seed", "The random seed.");
+
+    /**
      * Statistical test to use
      */
     private GoodnessOfFitTest statTest;
@@ -195,15 +217,15 @@ public class HiCSDependenceMeasure extends AbstractDependenceMeasure {
 
     @Override
     public void configure(Parameterization config) {
-      new IntParameter(HiCS.Par.M_ID, 50) //
+      new IntParameter(M_ID, 50) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> m = x);
-      new DoubleParameter(HiCS.Par.ALPHA_ID, 0.1) //
+      new DoubleParameter(ALPHA_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> alpha = x);
-      new ObjectParameter<GoodnessOfFitTest>(HiCS.Par.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class) //
+      new ObjectParameter<GoodnessOfFitTest>(TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class) //
           .grab(config, x -> statTest = x);
-      new RandomParameter(HiCS.Par.SEED_ID).grab(config, x -> rnd = x);
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override
