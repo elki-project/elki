@@ -38,9 +38,9 @@ public interface KMeansInitialization {
    *
    * @param relation Relation
    * @param k Parameter k
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    *
    * @return List of chosen means for k-means
    */
-  double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction);
+  double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance);
 }

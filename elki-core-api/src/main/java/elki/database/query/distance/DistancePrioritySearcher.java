@@ -20,22 +20,16 @@
  */
 package elki.database.query.distance;
 
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.DatabaseQuery;
+import elki.database.ids.*;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 
 /**
  * Distance priority-based searcher. When used with an index, this will return
  * relevant objects in - approximately - increasing order. But unless you give
- * the hint {@link DatabaseQuery#HINT_OPTIMIZED_ONLY}, the system may fall back
- * to a slow linear scan that returns objects in arbitrary order, if no suitable
- * index is available.
+ * the hint {@link elki.database.query.QueryBuilder#optimizedOnly}, the system
+ * may fall back to a slow linear scan that returns objects in arbitrary order,
+ * if no suitable index is available.
  *
  * @author Erich Schubert
  *

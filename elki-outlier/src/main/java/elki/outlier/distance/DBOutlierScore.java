@@ -25,6 +25,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -71,16 +72,16 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param d distance radius parameter
    */
-  public DBOutlierScore(Distance<? super O> distanceFunction, double d) {
-    super(distanceFunction, d);
+  public DBOutlierScore(Distance<? super O> distance, double d) {
+    super(distance, d);
   }
 
   @Override
   protected DoubleDataStore computeOutlierScores(Relation<O> relation, double d) {
-    RangeQuery<O> rangeQuery = relation.getRangeQuery(getDistance());
+    RangeQuery<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(d);
     final int size = relation.size();
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -109,7 +110,7 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   public static class Par<O> extends AbstractDBOutlier.Par<O> {
     @Override
     public DBOutlierScore<O> make() {
-      return new DBOutlierScore<>(distanceFunction, d);
+      return new DBOutlierScore<>(distance, d);
     }
   }
 }

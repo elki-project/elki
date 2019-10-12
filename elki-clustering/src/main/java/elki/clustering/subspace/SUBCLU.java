@@ -106,7 +106,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   /**
    * The distance function to determine the distance between objects.
    */
-  protected DimensionSelectingSubspaceDistance<V> distanceFunction;
+  protected DimensionSelectingSubspaceDistance<V> distance;
 
   /**
    * Maximum radius of the neighborhood to be considered.
@@ -126,14 +126,14 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    * @param mindim Minimum dimensionality
    */
-  public SUBCLU(DimensionSelectingSubspaceDistance<V> distanceFunction, double epsilon, int minpts, int mindim) {
+  public SUBCLU(DimensionSelectingSubspaceDistance<V> distance, double epsilon, int minpts, int mindim) {
     super();
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.mindim = mindim;
@@ -304,7 +304,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
    */
   private List<Cluster<Model>> runDBSCAN(Relation<V> relation, DBIDs ids, Subspace subspace) {
     // distance function
-    distanceFunction.setSelectedDimensions(subspace.getDimensions());
+    distance.setSelectedDimensions(subspace.getDimensions());
     // run DBSCAN
     if(LOG.isVerbose()) {
       LOG.verbose("Run DBSCAN on subspace " + subspace.dimensionsToString() + //
@@ -313,7 +313,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     // subset filter:
     relation = ids == null ? relation : new ProxyView<>(ids, relation);
 
-    DBSCAN<V> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
+    DBSCAN<V> dbscan = new DBSCAN<>(distance, epsilon, minpts);
     Clustering<Model> dbsres = dbscan.run(relation);
 
     // separate cluster and noise

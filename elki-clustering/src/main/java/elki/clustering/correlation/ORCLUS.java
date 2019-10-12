@@ -90,7 +90,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   private static final Logging LOG = Logging.getLogger(ORCLUS.class);
 
   /**
-   * Holds the value of {@link Parameterizer#ALPHA_ID}.
+   * Holds the value of {@link Par#ALPHA_ID}.
    */
   private double alpha;
 

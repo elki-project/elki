@@ -69,13 +69,13 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public KMediansLloyd(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -169,7 +169,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
   public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     public KMediansLloyd<V> make() {
-      return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
+      return new KMediansLloyd<>(distance, k, maxiter, initializer);
     }
   }
 }

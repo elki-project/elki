@@ -119,15 +119,15 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   /**
    * Constructor.
    *
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    * @param clusteringAlgorithm the clustering algorithm
    * @param alpha the ratio of the data that should be included in the large
    *        clusters
    * @param beta the ratio of the sizes of the clusters at the boundary between
    *        the large and the small clusters
    */
-  public CBLOF(NumberVectorDistance<? super O> distanceFunction, ClusteringAlgorithm<Clustering<MeanModel>> clusteringAlgorithm, double alpha, double beta) {
-    super(distanceFunction);
+  public CBLOF(NumberVectorDistance<? super O> distance, ClusteringAlgorithm<Clustering<MeanModel>> clusteringAlgorithm, double alpha, double beta) {
+    super(distance);
     this.clusteringAlgorithm = clusteringAlgorithm;
     this.alpha = alpha;
     this.beta = beta;

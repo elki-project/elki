@@ -69,14 +69,14 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public ExponionKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
-    super(distanceFunction, k, maxiter, initializer, varstat);
+  public ExponionKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+    super(distance, k, maxiter, initializer, varstat);
   }
 
   @Override
@@ -193,7 +193,7 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
   public static class Par<V extends NumberVector> extends HamerlyKMeans.Par<V> {
     @Override
     public ExponionKMeans<V> make() {
-      return new ExponionKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
+      return new ExponionKMeans<>(distance, k, maxiter, initializer, varstat);
     }
   }
 }

@@ -148,7 +148,7 @@ public class CLISmartHandler extends Handler {
       Collection<Progress> completed = ptrack.removeCompleted();
       Collection<Progress> progresses = ptrack.getProgresses();
 
-      StringBuilder buf = new StringBuilder();
+      StringBuilder buf = new StringBuilder(200);
       if(!completed.isEmpty()) {
         buf.append(OutputStreamLogger.CARRIAGE_RETURN);
         for(Progress prog : completed) {
@@ -156,20 +156,15 @@ public class CLISmartHandler extends Handler {
           prog.appendToBuffer(buf);
           buf.append(OutputStreamLogger.NEWLINE);
         }
+        buf.setLength(buf.length() - 1);
       }
       if(!progresses.isEmpty()) {
-        boolean first = true;
         buf.append(OutputStreamLogger.CARRIAGE_RETURN);
         for(Progress prog : progresses) {
-          if(first) {
-            first = false;
-          }
-          else {
-            buf.append(' ');
-          }
           // TODO: use formatter, somehow?
-          prog.appendToBuffer(buf);
+          prog.appendToBuffer(buf).append(' ');
         }
+        buf.setLength(buf.length() - 1);
       }
       m = buf.toString();
     }

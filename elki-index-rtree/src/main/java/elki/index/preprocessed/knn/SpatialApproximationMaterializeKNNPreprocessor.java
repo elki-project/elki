@@ -26,6 +26,7 @@ import elki.data.NumberVector;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -71,16 +72,16 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * Constructor
    *
    * @param relation Relation to preprocess
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param k query k
    */
-  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
-    super(relation, distanceFunction, k);
+  public SpatialApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
+    super(relation, distance, k);
   }
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
+    DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
     SpatialIndexTree<N, E> index = getSpatialIndex(relation);
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
@@ -190,15 +191,15 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      * Constructor.
      *
      * @param k k
-     * @param distanceFunction distance function
+     * @param distance distance function
      */
-    public Factory(int k, Distance<? super NumberVector> distanceFunction) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super NumberVector> distance) {
+      super(k, distance);
     }
 
     @Override
     public SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instantiate(Relation<NumberVector> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distance, k);
       return instance;
     }
 
@@ -210,7 +211,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     public static class Par<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Par<NumberVector> {
       @Override
       public Factory<N, E> make() {
-        return new Factory<>(k, distanceFunction);
+        return new Factory<>(k, distance);
       }
     }
   }

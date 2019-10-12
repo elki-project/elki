@@ -54,9 +54,9 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/ictai/ZhaoXF08")
 public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    return logLikelihoodZhao(relation, clustering, distanceFunction) //
+    return logLikelihoodZhao(relation, clustering, distance) //
         - (.5 * clustering.getAllClusters().size()) * FastMath.log(numPoints(clustering)) * (dim + 1);
   }
 
@@ -67,10 +67,10 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
    *
    * @param relation Data relation
    * @param clustering Clustering
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @return Log Likelihood.
    */
-  public static double logLikelihoodZhao(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distanceFunction) {
+  public static double logLikelihoodZhao(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distance) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
     final int m = clusters.size();
@@ -89,7 +89,7 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
       n += n_i[i] = cluster.size();
       // Note: the paper used 1/(n-m) but that is probably a typo
       // as it will cause divisions by zero.
-      d_i[i] = varianceContributionOfCluster(cluster, distanceFunction, relation) / (double) n_i[i];
+      d_i[i] = varianceContributionOfCluster(cluster, distance, relation) / (double) n_i[i];
     }
 
     final int dim = RelationUtil.dimensionality(relation);

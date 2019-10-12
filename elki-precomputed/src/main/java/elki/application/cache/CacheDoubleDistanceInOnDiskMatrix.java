@@ -29,6 +29,7 @@ import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -98,7 +99,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distance);
+    DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
 
     DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
     int size = ids.size();

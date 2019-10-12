@@ -66,11 +66,11 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
   /**
    * Constructor with actual parameters.
    * 
-   * @param distanceFunction distance function to use
+   * @param distance distance function to use
    * @param d radius d value
    */
-  public AbstractDBOutlier(Distance<? super O> distanceFunction, double d) {
-    super(distanceFunction);
+  public AbstractDBOutlier(Distance<? super O> distance, double d) {
+    super(distance);
     this.d = d;
   }
 
@@ -121,7 +121,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
     @Override
     public void configure(Parameterization config) {
       super.configure(config); // Distance function
-      configD(config, distanceFunction);
+      configD(config, distance);
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      * 
      * @param config Parameterization
      */
-    protected void configD(Parameterization config, Distance<?> distanceFunction) {
+    protected void configD(Parameterization config, Distance<?> distance) {
       new DoubleParameter(D_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> d = x);

@@ -32,8 +32,6 @@
  * <ul>
  * <li>{@link elki.data.type.TypeUtil}: Data type utility
  * functions and common type definitions.</li>
- * <li>{@link elki.database.QueryUtil}: Database Query API
- * simplifications.</li>
  * <li>{@link elki.database.ids.DBIDUtil}: Database ID DBID
  * handling.</li>
  * <li>{@link elki.database.datastore.DataStoreUtil}: Data

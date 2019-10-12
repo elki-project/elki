@@ -25,6 +25,7 @@ import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -76,7 +77,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
   /**
    * Input distance function.
    */
-  protected Distance<? super O> distanceFunction;
+  protected Distance<? super O> distance;
 
   /**
    * Kernel bandwidth sigma.
@@ -86,21 +87,20 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param sigma Gaussian kernel bandwidth
    */
-  public GaussianAffinityMatrixBuilder(Distance<? super O> distanceFunction, double sigma) {
+  public GaussianAffinityMatrixBuilder(Distance<? super O> distance, double sigma) {
     super();
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
     this.sigma = sigma;
   }
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
-    DistanceQuery<T> dq = relation.getDistanceQuery(distanceFunction);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Compute desired affinities.
-    double[][] dist = buildDistanceMatrix(ids, dq);
+    double[][] dist = buildDistanceMatrix(ids, new QueryBuilder<>(relation, distance).distanceQuery());
     return new DenseAffinityMatrix(computePij(dist, sigma, initialScale), ids);
   }
 
@@ -221,7 +221,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
    */
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distanceFunction.getInputTypeRestriction();
+    return distance.getInputTypeRestriction();
   }
 
   /**
@@ -257,7 +257,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
 
     @Override
     public GaussianAffinityMatrixBuilder<O> make() {
-      return new GaussianAffinityMatrixBuilder<>(distanceFunction, sigma);
+      return new GaussianAffinityMatrixBuilder<>(distance, sigma);
     }
   }
 }

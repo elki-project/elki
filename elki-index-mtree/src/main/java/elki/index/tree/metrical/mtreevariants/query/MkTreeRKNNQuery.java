@@ -65,10 +65,4 @@ public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
   public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
     return index.reverseKNNQuery(id, k);
   }
-
-  @Override
-  public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // TODO: implement
-    throw new NotImplementedException();
-  }
 }

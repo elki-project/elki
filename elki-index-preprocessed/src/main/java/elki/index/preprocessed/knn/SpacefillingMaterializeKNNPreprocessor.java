@@ -32,7 +32,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
@@ -114,15 +114,15 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
    * Constructor.
    *
    * @param relation Relation to index.
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k
    * @param curvegen Curve generators
    * @param window Window multiplicator
    * @param variants Number of curve variants to generate
    * @param random Random number generator
    */
-  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, List<? extends SpatialSorter> curvegen, double window, int variants, Random random) {
-    super(relation, distanceFunction, k);
+  public SpacefillingMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, List<? extends SpatialSorter> curvegen, double window, int variants, Random random) {
+    super(relation, distance, k);
     this.curvegen = curvegen;
     this.window = window;
     this.variants = variants;
@@ -252,13 +252,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, Object... hints) {
-    for(Object hint : hints) {
-      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-        return null;
-      }
-    }
-    return super.getKNNQuery(distQ, hints);
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, int maxk, int flags) {
+    return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
+        super.getKNNQuery(distQ, maxk, flags);
   }
 
   /**
@@ -297,8 +293,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
      * @param variants Number of curve variants to generate
      * @param random Random number generator
      */
-    public Factory(int k, Distance<? super V> distanceFunction, List<? extends SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super V> distance, List<? extends SpatialSorter> curvegen, double window, int variants, RandomFactory random) {
+      super(k, distance);
       this.curvegen = curvegen;
       this.window = window;
       this.variants = variants;
@@ -307,7 +303,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
     @Override
     public SpacefillingMaterializeKNNPreprocessor<V> instantiate(Relation<V> relation) {
-      return new SpacefillingMaterializeKNNPreprocessor<>(relation, distanceFunction, k, curvegen, window, variants, random.getRandom());
+      return new SpacefillingMaterializeKNNPreprocessor<>(relation, distance, k, curvegen, window, variants, random.getRandom());
     }
 
     @Override
@@ -380,7 +376,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
       @Override
       public Factory<V> make() {
-        return new Factory<>(k, distanceFunction, curvegen, window, variants, random);
+        return new Factory<>(k, distance, curvegen, window, variants, random);
       }
     }
   }

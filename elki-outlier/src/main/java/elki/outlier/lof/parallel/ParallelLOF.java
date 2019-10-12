@@ -29,6 +29,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -82,11 +83,11 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K parameter
    */
-  public ParallelLOF(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public ParallelLOF(Distance<? super O> distance, int k) {
+    super(distance);
     this.kplus = k + 1;
   }
 
@@ -108,7 +109,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
    */
   public OutlierResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), kplus);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
 
     // Phase one: KNN and k-dist
     WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
@@ -196,7 +197,7 @@ public class ParallelLOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? su
 
     @Override
     public ParallelLOF<O> make() {
-      return new ParallelLOF<>(distanceFunction, k);
+      return new ParallelLOF<>(distance, k);
     }
   }
 }

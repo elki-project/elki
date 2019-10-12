@@ -69,10 +69,10 @@ public class CLINK<O> extends SLINK<O> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public CLINK(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public CLINK(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -216,7 +216,7 @@ public class CLINK<O> extends SLINK<O> {
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public CLINK<O> make() {
-      return new CLINK<>(distanceFunction);
+      return new CLINK<>(distance);
     }
   }
 }

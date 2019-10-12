@@ -28,6 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -90,11 +91,11 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K parameter
    */
-  public ParallelKNNOutlier(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public ParallelKNNOutlier(Distance<? super O> distance, int k) {
+    super(distance);
     this.kplus = k + 1;
   }
 
@@ -117,7 +118,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
   public OutlierResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), kplus);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
 
     // Compute the kNN
     KNNProcessor<O> knnm = new KNNProcessor<>(kplus, knnq);
@@ -172,7 +173,7 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
 
     @Override
     public ParallelKNNOutlier<O> make() {
-      return new ParallelKNNOutlier<>(distanceFunction, k);
+      return new ParallelKNNOutlier<>(distance, k);
     }
   }
 }

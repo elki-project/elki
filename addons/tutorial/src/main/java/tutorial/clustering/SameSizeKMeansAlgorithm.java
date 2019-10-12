@@ -83,13 +83,13 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k K parameter
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public SameSizeKMeansAlgorithm(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   /**
@@ -464,15 +464,15 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Distance function
      */
-    protected NumberVectorDistance<? super V> distanceFunction;
+    protected NumberVectorDistance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
-            distanceFunction = x;
-            if(!(distanceFunction instanceof EuclideanDistance) //
-                && !(distanceFunction instanceof SquaredEuclideanDistance)) {
+            distance = x;
+            if(!(distance instanceof EuclideanDistance) //
+                && !(distance instanceof SquaredEuclideanDistance)) {
               LOG.warning("k-means optimizes the sum of squares - it should be used with squared euclidean distance and may stop converging otherwise!");
             }
           });
@@ -488,7 +488,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
     @Override
     public SameSizeKMeansAlgorithm<V> make() {
-      return new SameSizeKMeansAlgorithm<>(distanceFunction, k, maxiter, initializer);
+      return new SameSizeKMeansAlgorithm<>(distance, k, maxiter, initializer);
     }
   }
 }

@@ -36,13 +36,14 @@ import elki.database.query.rknn.RKNNQuery;
  */
 public interface RKNNIndex<O> extends Index {
   /**
-   * Get a KNN query object for the given distance query and k.
-   * 
+   * Get a RKNN query object for the given distance query and k.
+   * <p>
    * This function MAY return null, when the given distance is not supported!
    * 
    * @param distanceQuery Distance query
-   * @param hints Hints for the optimizer
-   * @return KNN Query object or {@code null}
+   * @param maxk Maximum k for RkNN query
+   * @param flags Hints for the optimizer
+   * @return RKNN Query object or {@code null}
    */
-  RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags);
 }

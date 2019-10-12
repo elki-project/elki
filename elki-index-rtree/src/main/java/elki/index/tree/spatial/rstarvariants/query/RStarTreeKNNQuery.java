@@ -64,7 +64,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
   /**
    * Spatial primitive distance function.
    */
-  protected final SpatialPrimitiveDistance<? super O> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super O> distance;
 
   /**
    * Relation we query.
@@ -76,13 +76,13 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
    * 
    * @param tree Index to use
    * @param relation Data relation to query
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction) {
+  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
     super();
     this.relation = relation;
     this.tree = tree;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 
   @Override
@@ -122,23 +122,23 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
-        double distance = distanceFunction.minDist(entry, object);
+        double dist = distance.minDist(entry, object);
         tree.statistics.countDistanceCalculation();
-        maxDist = distance <= maxDist ? knnList.insert(distance, entry.getDBID()) : maxDist;
+        maxDist = dist <= maxDist ? knnList.insert(dist, entry.getDBID()) : maxDist;
       }
     }
     // directory node
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
-        double distance = distanceFunction.minDist(entry, object);
+        double dist = distance.minDist(entry, object);
         tree.statistics.countDistanceCalculation();
         // Greedy expand, bypassing the queue
-        if(distance <= 0) {
+        if(dist <= 0) {
           expandNode(object, knnList, pq, maxDist, entry.getPageID());
         }
-        else if(distance <= maxDist) {
-          pq.add(distance, entry.getPageID());
+        else if(dist <= maxDist) {
+          pq.add(dist, entry.getPageID());
         }
       }
     }

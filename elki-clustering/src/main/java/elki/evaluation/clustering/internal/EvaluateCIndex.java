@@ -27,6 +27,7 @@ import elki.data.Clustering;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -45,8 +46,8 @@ import elki.utilities.datastructures.heap.DoubleHeap;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.datastructures.heap.DoubleMinHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -253,8 +254,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
     Database db = ResultUtil.findDatabase(result);
     Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = relation.getDistanceQuery(distance);
-
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     for(Clustering<?> c : crs) {
       evaluateClustering(relation, dq, c);
     }

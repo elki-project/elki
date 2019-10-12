@@ -34,6 +34,7 @@ import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -107,7 +108,7 @@ public class FastCLARA<V> extends FastPAM<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k Number of clusters to produce
    * @param maxiter Maximum number of iterations
    * @param initializer Initialization function
@@ -116,8 +117,8 @@ public class FastCLARA<V> extends FastPAM<V> {
    * @param keepmed Keep the previous medoids in the next sample
    * @param random Random generator
    */
-  public FastCLARA(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
-    super(distanceFunction, k, maxiter, initializer, fasttol);
+  public FastCLARA(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
+    super(distance, k, maxiter, initializer, fasttol);
     this.numsamples = numsamples;
     this.sampling = sampling;
     this.random = random;
@@ -127,7 +128,7 @@ public class FastCLARA<V> extends FastPAM<V> {
   @Override
   public Clustering<MedoidModel> run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
     if(samplesize < 3 * k) {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
@@ -248,7 +249,7 @@ public class FastCLARA<V> extends FastPAM<V> {
 
     @Override
     public FastCLARA<V> make() {
-      return new FastCLARA<>(distanceFunction, k, maxiter, initializer, fasttol, numsamples, sampling, keepmed, random);
+      return new FastCLARA<>(distance, k, maxiter, initializer, fasttol, numsamples, sampling, keepmed, random);
     }
   }
 }

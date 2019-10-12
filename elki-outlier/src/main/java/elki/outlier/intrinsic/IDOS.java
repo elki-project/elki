@@ -23,12 +23,12 @@ package elki.outlier.intrinsic;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -98,13 +98,13 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param estimator Estimator for intrinsic dimensionality
    * @param kc the context set size for the ID computation
    * @param kr the neighborhood size to use in score computation
    */
-  public IDOS(Distance<? super O> distanceFunction, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
-    super(distanceFunction);
+  public IDOS(Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
+    super(distance);
     this.estimator = estimator;
     this.k_c = kc;
     this.k_r = kr;
@@ -121,7 +121,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     if(stepprog != null) {
       stepprog.beginStep(1, "Precomputing neighborhoods", LOG);
     }
-    KNNQuery<O> knnQ = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), Math.max(k_c, k_r) + 1);
+    KNNQuery<O> knnQ = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(Math.max(k_c, k_r) + 1);
     DBIDs ids = relation.getDBIDs();
 
     if(stepprog != null) {
@@ -266,7 +266,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public IDOS<O> make() {
-      return new IDOS<>(distanceFunction, estimator, k_c, k_r);
+      return new IDOS<>(distance, estimator, k_c, k_r);
     }
   }
 }

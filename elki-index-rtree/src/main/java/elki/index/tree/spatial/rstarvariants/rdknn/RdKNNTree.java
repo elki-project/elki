@@ -27,6 +27,7 @@ import java.util.List;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
@@ -97,8 +98,8 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode> pagefile, RdkNNSettings settings) {
     super(pagefile, settings);
     this.relation = relation;
-    this.distanceQuery = settings.distanceFunction.instantiate(relation);
-    this.knnQuery = relation.getKNNQuery(distanceQuery);
+    this.distanceQuery = settings.distance.instantiate(relation);
+    this.knnQuery = new QueryBuilder<>(distanceQuery).kNNQuery();
   }
 
   /**
@@ -155,8 +156,8 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     doExtraIntegrityChecks();
   }
 
-  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distanceFunction, KNNQuery<O> knnQuery) {
-    checkDistance(distanceFunction);
+  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distance, KNNQuery<O> knnQuery) {
+    checkDistance(distance);
     if(k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
     }
@@ -246,16 +247,16 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    *
    * @param node the node
    * @param q the query object
-   * @param distanceFunction the distance function for computing the distances
+   * @param distance the distance function for computing the distances
    * @return a list of the sorted entries
    */
   // TODO: move somewhere else?
-  protected List<DoubleObjPair<RdKNNEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistance<?> distanceFunction) {
+  protected List<DoubleObjPair<RdKNNEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistance<?> distance) {
     List<DoubleObjPair<RdKNNEntry>> result = new ArrayList<>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       RdKNNEntry entry = (RdKNNEntry) node.getEntry(i);
-      double minDist = distanceFunction.minDist(entry, q);
+      double minDist = distance.minDist(entry, q);
       result.add(new DoubleObjPair<>(minDist, entry));
     }
 
@@ -304,7 +305,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     // directory node
     else {
       O obj = relation.get(((LeafEntry) q).getDBID());
-      List<DoubleObjPair<RdKNNEntry>> entries = getSortedEntries(node, obj, settings.distanceFunction);
+      List<DoubleObjPair<RdKNNEntry>> entries = getSortedEntries(node, obj, settings.distance);
       for(DoubleObjPair<RdKNNEntry> distEntry : entries) {
         RdKNNEntry entry = distEntry.second;
         double entry_knnDist = entry.getKnnDistance();
@@ -424,11 +425,11 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * not an instance of the distance function used by this index.
    *
    * @throws IllegalArgumentException
-   * @param distanceFunction the distance function to be checked
+   * @param distance the distance function to be checked
    */
-  private void checkDistance(SpatialPrimitiveDistance<? super O> distanceFunction) {
-    if(!settings.distanceFunction.equals(distanceFunction)) {
-      throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + this.distanceQuery.getClass() + ", but is " + distanceFunction.getClass());
+  private void checkDistance(SpatialPrimitiveDistance<? super O> distance) {
+    if(!settings.distance.equals(distance)) {
+      throw new IllegalArgumentException("Parameter distance must be an instance of " + this.distanceQuery.getClass() + ", but is " + distance.getClass());
     }
   }
 
@@ -507,47 +508,28 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    return RStarTreeUtil.getRangeQuery(this, (SpatialDistanceQuery<O>) distanceQuery, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxk, flags) : null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    return RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getRangeQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
-    return RStarTreeUtil.getDistancePrioritySearcher(this, dq, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getDistancePrioritySearcher(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // FIXME: re-add
     return null;
   }

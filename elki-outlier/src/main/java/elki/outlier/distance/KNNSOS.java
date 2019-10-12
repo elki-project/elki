@@ -20,8 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.outlier.intrinsic.ISOS;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -31,6 +29,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -39,6 +38,8 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
+import elki.outlier.intrinsic.ISOS;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -129,7 +130,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
   public OutlierResult run(Relation<O> relation) {
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
-    KNNQuery<O> knnq = relation.getKNNQuery(getDistance(), k1);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(k1);
     final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
@@ -193,7 +194,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
 
     @Override
     public KNNSOS<O> make() {
-      return new KNNSOS<O>(distanceFunction, k);
+      return new KNNSOS<O>(distance, k);
     }
   }
 }

@@ -25,7 +25,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.logging.Logging;
 import elki.result.Metadata;
 
 /**
@@ -37,12 +36,7 @@ import elki.result.Metadata;
  *
  * @param <O> Object type
  */
-public class ProxyView<O> extends AbstractRelation<O> {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ProxyView.class);
-
+public class ProxyView<O> implements Relation<O> {
   /**
    * The DBIDs we contain
    */
@@ -67,7 +61,7 @@ public class ProxyView<O> extends AbstractRelation<O> {
 
   @Override
   public O get(DBIDRef id) {
-    assert(idview.contains(id)) : "Accessing object not included in view.";
+    assert (idview.contains(id)) : "Accessing object not included in view.";
     return inner.get(id);
   }
 
@@ -103,10 +97,5 @@ public class ProxyView<O> extends AbstractRelation<O> {
    */
   public void setDBIDs(DBIDs ids) {
     this.idview = ids;
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

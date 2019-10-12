@@ -32,6 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -81,11 +82,11 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to evaluate
+   * @param distance Distance function to evaluate
    * @param numbins Number of bins
    */
-  public RankingQualityHistogram(Distance<? super O> distanceFunction, int numbins) {
-    super(distanceFunction);
+  public RankingQualityHistogram(Distance<? super O> distance, int numbins) {
+    super(distance);
     this.numbins = numbins;
   }
 
@@ -97,7 +98,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
    * @return Histogram of ranking qualities
    */
   public HistogramResult run(Database database, Relation<O> relation) {
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), relation.size());
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -179,7 +180,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
 
     @Override
     public RankingQualityHistogram<O> make() {
-      return new RankingQualityHistogram<>(distanceFunction, numbins);
+      return new RankingQualityHistogram<>(distance, numbins);
     }
   }
 }

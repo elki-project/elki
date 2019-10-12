@@ -39,17 +39,17 @@ public class RdkNNSettings extends RTreeSettings {
   /**
    * The distance function.
    */
-  SpatialPrimitiveDistance<NumberVector> distanceFunction;
+  SpatialPrimitiveDistance<NumberVector> distance;
 
   /**
    * Constructor.
    *
    * @param k_max Maximum k to support
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public RdkNNSettings(int k_max, SpatialPrimitiveDistance<NumberVector> distanceFunction) {
+  public RdkNNSettings(int k_max, SpatialPrimitiveDistance<NumberVector> distance) {
     super();
     this.k_max = k_max;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 }

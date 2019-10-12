@@ -62,7 +62,7 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
@@ -84,7 +84,7 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
         if(prev != prev) {
           continue; // NaN: already chosen!
         }
-        double dsum = prev + distanceFunction.distance(prevmean, relation.get(it));
+        double dsum = prev + distance.distance(prevmean, relation.get(it));
         // Don't store distance to first mean, when it will be dropped below.
         if(i > 0) {
           store.putDouble(it, dsum);

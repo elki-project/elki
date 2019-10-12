@@ -210,7 +210,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   public static class Par implements Distribution.Parameterizer {
     /**
      * Rate option, same as
-     * {@link ExponentialDistribution.Parameterizer#RATE_ID}.
+     * {@link ExponentialDistribution.Par#RATE_ID}.
      */
     public static final OptionID RATE_ID = ExponentialDistribution.Par.RATE_ID;
 

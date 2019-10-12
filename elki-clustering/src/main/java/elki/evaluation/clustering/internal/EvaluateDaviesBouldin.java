@@ -82,7 +82,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistance<?> distanceFunction;
+  private NumberVectorDistance<?> distance;
 
   /**
    * Key for logging statistics.
@@ -97,7 +97,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
    */
   public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
     this.noiseOption = noiseOpt;
   }
 
@@ -128,7 +128,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
         // Both are real clusters:
         if(centroid != null && ocentroid != null) {
           // bD = between group distance
-          double bD = distanceFunction.distance(centroid, ocentroid);
+          double bD = distance.distance(centroid, ocentroid);
           // d = within-to-between cluster spread
           double d = (withinGroupDistancei + withinGroupDistance[j]) / bD;
           max = d > max ? d : max;
@@ -138,7 +138,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
             double d = Double.POSITIVE_INFINITY;
             // Find the closest element
             for(DBIDIter it = clusters.get(j).getIDs().iter(); it.valid(); it.advance()) {
-              double d2 = distanceFunction.distance(centroid, rel.get(it));
+              double d2 = distance.distance(centroid, rel.get(it));
               d = d2 < d ? d2 : d;
             }
             d = withinGroupDistancei / d;
@@ -148,7 +148,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
             double d = Double.POSITIVE_INFINITY;
             // Find the closest element
             for(DBIDIter it = clusters.get(i).getIDs().iter(); it.valid(); it.advance()) {
-              double d2 = distanceFunction.distance(rel.get(it), ocentroid);
+              double d2 = distance.distance(rel.get(it), ocentroid);
               d = d2 < d ? d2 : d;
             }
             d = withinGroupDistance[j] / d;
@@ -190,7 +190,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
       }
       double wD = 0.;
       for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-        wD += distanceFunction.distance(centroid, rel.get(it));
+        wD += distance.distance(centroid, rel.get(it));
       }
       withinGroupDists[i] = wD / cluster.size();
     }
@@ -204,7 +204,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(result);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
       evaluateClustering(rel, c);

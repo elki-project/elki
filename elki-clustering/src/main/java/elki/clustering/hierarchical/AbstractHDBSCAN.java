@@ -71,11 +71,11 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractDistanceBasedAlgorit
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param minPts Minimum number of points for density
    */
-  public AbstractHDBSCAN(Distance<? super O> distanceFunction, int minPts) {
-    super(distanceFunction);
+  public AbstractHDBSCAN(Distance<? super O> distance, int minPts) {
+    super(distance);
     this.minPts = minPts;
   }
 

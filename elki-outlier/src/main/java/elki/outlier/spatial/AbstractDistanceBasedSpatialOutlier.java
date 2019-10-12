@@ -84,13 +84,13 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     /**
      * The distance function to use on the non-spatial attributes.
      */
-    protected PrimitiveDistance<O> distanceFunction = null;
+    protected PrimitiveDistance<O> distance = null;
 
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
       new ObjectParameter<PrimitiveDistance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
-          .grab(config, x -> distanceFunction = x);
+          .grab(config, x -> distance = x);
     }
   }
 }

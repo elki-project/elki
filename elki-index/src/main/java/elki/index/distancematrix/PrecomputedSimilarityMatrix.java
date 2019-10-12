@@ -175,19 +175,13 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
   }
 
   @Override
-  public SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction, Object... hints) {
-    if(this.similarityFunction.equals(similarityFunction)) {
-      return new PrecomputedSimilarityQuery();
-    }
-    return null;
+  public SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction) {
+    return this.similarityFunction.equals(similarityFunction) ? new PrecomputedSimilarityQuery() : null;
   }
 
   @Override
-  public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
-    if(this.similarityFunction.equals(simQuery.getSimilarity())) {
-      return new PrecomputedSimilarityRangeQuery();
-    }
-    return null;
+  public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, double maxradius, int flags) {
+    return this.similarityFunction.equals(simQuery.getSimilarity()) ? new PrecomputedSimilarityRangeQuery() : null;
   }
 
   /**

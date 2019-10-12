@@ -32,6 +32,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -122,8 +123,9 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     if(RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! (" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
-    DistanceQuery<V> distFunc = relation.getDistanceQuery(SquaredEuclideanDistance.STATIC);
-    RangeQuery<V> rangeQuery = relation.getRangeQuery(distFunc);
+    final QueryBuilder<V> qb = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC);
+    DistanceQuery<V> distFunc = qb.distanceQuery();
+    RangeQuery<V> rangeQuery = qb.rangeQuery();
     final Random random = rnd.getSingleThreadedRandom();
 
     // TODO: use a StepProgress!
@@ -199,7 +201,6 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       Cluster<SubspaceModel> cluster = new Cluster<>(c.objectIDs);
       cluster.setModel(new SubspaceModel(new Subspace(c.getDimensions()), c.centroid));
       cluster.setName("cluster_" + numClusters++);
-
       result.addToplevelCluster(cluster);
     }
     return result;
@@ -208,13 +209,13 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Returns a piercing set of k medoids from the specified sample set.
    *
-   * @param distFunc the distance function
+   * @param distance the distance function
    * @param sampleSet the sample set
    * @param m the number of medoids to be returned
    * @param random random number generator
    * @return a piercing set of m medoids from the specified sample set
    */
-  private ArrayDBIDs greedy(DistanceQuery<V> distFunc, DBIDs sampleSet, int m, Random random) {
+  private ArrayDBIDs greedy(DistanceQuery<V> distance, DBIDs sampleSet, int m, Random random) {
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(m);
 
     ArrayModifiableDBIDs s = DBIDUtil.newArray(sampleSet);
@@ -236,7 +237,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     // compute distances between each point in S and m_i
     WritableDoubleDataStore distances = DataStoreUtil.makeDoubleStorage(s, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for(iter.seek(0); iter.getOffset() < size; iter.advance()) {
-      final double dist = distFunc.distance(iter, m_i);
+      final double dist = distance.distance(iter, m_i);
       distances.putDouble(iter, dist);
       if(dist > worstd) {
         worstd = dist;
@@ -253,7 +254,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       worst = -1;
       worstd = Double.NEGATIVE_INFINITY;
       for(iter.seek(0); iter.getOffset() < size; iter.advance()) {
-        double dist_new = distFunc.distance(iter, m_i);
+        double dist_new = distance.distance(iter, m_i);
         double dist_old = distances.doubleValue(iter);
         double dist = (dist_new < dist_old) ? dist_new : dist_old;
         distances.putDouble(iter, dist);
@@ -310,7 +311,6 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         m_current.add(iter);
       }
     }
-
     return m_current;
   }
 
@@ -321,10 +321,10 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * m_i.
    *
    * @param medoids the ids of the medoids
-   * @param distFunc the distance function
+   * @param distance the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
+  private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<V> distance, RangeQuery<V> rangeQuery) {
     WritableDataStore<DBIDs> result = DataStoreUtil.makeStorage(medoids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, DBIDs.class);
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
@@ -335,7 +335,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         if(DBIDUtil.equal(iter, iter2)) {
           continue;
         }
-        double currentDist = distFunc.distance(iter, iter2);
+        double currentDist = distance.distance(iter, iter2);
         if(currentDist < minDist) {
           minDist = currentDist;
         }
@@ -354,26 +354,26 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * specified medoid set.
    *
    * @param medoids the set of medoids
-   * @param database the database containing the objects
-   * @param distFunc the distance function
+   * @param relation the relation containing the objects
+   * @param distance the distance function
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */
-  private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
+  private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> relation, DistanceQuery<V> distance, RangeQuery<V> rangeQuery) {
     // get localities
-    DataStore<DBIDs> localities = getLocalities(medoids, distFunc, rangeQuery);
+    DataStore<DBIDs> localities = getLocalities(medoids, distance, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
-    final int dim = RelationUtil.dimensionality(database);
+    final int dim = RelationUtil.dimensionality(relation);
     final int numc = medoids.size();
     double[][] averageDistances = new double[numc][];
 
     for(DBIDArrayIter iter = medoids.iter(); iter.valid(); iter.advance()) {
-      V medoid_i = database.get(iter);
+      V medoid_i = relation.get(iter);
       DBIDs l_i = localities.get(iter);
       double[] x_i = new double[dim];
       for(DBIDIter qr = l_i.iter(); qr.valid(); qr.advance()) {
-        V o = database.get(qr);
+        V o = relation.get(qr);
         for(int d = 0; d < dim; d++) {
           x_i[d] += Math.abs(medoid_i.doubleValue(d) - o.doubleValue(d));
         }

@@ -26,10 +26,9 @@ import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.DatabaseUtil;
-import elki.database.QueryUtil;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
 import elki.database.query.LinearScanQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
@@ -98,7 +97,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
    * Constructor.
    * 
    * @param input Data input
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k K parameter
    * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
@@ -106,8 +105,8 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
    * @param forcelinear Force the use of linear scanning.
    * @param pattern
    */
-  public ValidateApproximativeKNNIndex(InputStep input, Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
-    super(input, distanceFunction);
+  public ValidateApproximativeKNNIndex(InputStep input, Distance<? super O> distance, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
+    super(input, distance);
     this.k = k;
     this.queries = queries;
     this.sampling = sampling;
@@ -124,13 +123,13 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     // Approximate query:
-    KNNQuery<O> knnQuery = relation.getKNNQuery(distance, k, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().kNNQuery(k);
     if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
       throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
     }
     // Exact query:
-    KNNQuery<O> truekNNQuery = forcelinear ? QueryUtil.getLinearScanKNNQuery(relation.getDistanceQuery(distance)) //
-        : relation.getKNNQuery(distance, k, DatabaseQuery.HINT_EXACT);
+    KNNQuery<O> truekNNQuery = forcelinear ? new QueryBuilder<>(relation, distance).linearOnly().kNNQuery(k) //
+        : new QueryBuilder<>(relation, distance).exactOnly().kNNQuery(k);
     if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
       LOG.warning("Query classes are the same. This experiment may be invalid!");
     }

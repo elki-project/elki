@@ -21,6 +21,7 @@
 package elki.clustering.optics;
 
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -71,12 +72,12 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public OPTICSHeap(Distance<? super O> distanceFunction, double epsilon, int minpts) {
-    super(distanceFunction, epsilon, minpts);
+  public OPTICSHeap(Distance<? super O> distance, double epsilon, int minpts) {
+    super(distance, epsilon, minpts);
   }
 
   @Override
@@ -131,7 +132,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
       clusterOrder = new ClusterOrder(ids);
       Metadata.of(clusterOrder).setLongName("OPTICS Clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
-      rangeQuery = relation.getRangeQuery(getDistance(), epsilon);
+      rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(epsilon);
       heap = new UpdatableHeap<>();
     }
 
@@ -197,7 +198,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
   public static class Par<O> extends AbstractOPTICS.Par<O> {
     @Override
     public OPTICSHeap<O> make() {
-      return new OPTICSHeap<>(distanceFunction, epsilon, minpts);
+      return new OPTICSHeap<>(distance, epsilon, minpts);
     }
   }
 }

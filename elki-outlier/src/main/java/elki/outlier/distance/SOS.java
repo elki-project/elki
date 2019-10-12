@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -28,6 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -36,6 +36,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
@@ -112,7 +113,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    * @return outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     final double logPerp = FastMath.log(perplexity);
 
     ModifiableDoubleDBIDList dlist = DBIDUtil.newDistanceDBIDList(relation.size() - 1);
@@ -329,7 +330,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
 
     @Override
     public SOS<O> make() {
-      return new SOS<O>(distanceFunction, perplexity);
+      return new SOS<O>(distance, perplexity);
     }
   }
 }

@@ -238,25 +238,15 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof LPNormDistance) {
-      double p = ((LPNormDistance) df).getP();
-      return new VAFileKNNQuery(distanceQuery, p);
-    }
-    // Not supported.
-    return null;
+    return df instanceof LPNormDistance ? new VAFileKNNQuery(distanceQuery, ((LPNormDistance) df).getP()) : null;
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof LPNormDistance) {
-      double p = ((LPNormDistance) df).getP();
-      return new VAFileRangeQuery(distanceQuery, p);
-    }
-    // Not supported.
-    return null;
+    return df instanceof LPNormDistance ? new VAFileRangeQuery(distanceQuery, ((LPNormDistance) df).getP()) : null;
   }
 
   /**

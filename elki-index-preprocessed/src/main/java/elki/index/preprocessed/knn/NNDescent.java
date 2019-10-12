@@ -25,7 +25,7 @@ import java.util.Random;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
@@ -111,7 +111,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * Constructor.
    *
    * @param relation Relation to index
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k
    * @param rnd Random generator
    * @param delta Delta threshold
@@ -119,8 +119,8 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param noInitialNeighbors Do not use initial neighbors
    * @param iterations Maximum number of iterations
    */
-  public NNDescent(Relation<O> relation, Distance<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
-    super(relation, distanceFunction, k);
+  public NNDescent(Relation<O> relation, Distance<? super O> distance, int k, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
+    super(relation, distance, k);
     this.rnd = rnd;
     this.delta = delta;
     this.rho = rho;
@@ -476,13 +476,9 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    for(Object hint : hints) {
-      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
-        return null;
-      }
-    }
-    return super.getKNNQuery(distanceQuery, hints);
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
+        super.getKNNQuery(distanceQuery, maxk, flags);
   }
 
   /**
@@ -522,15 +518,15 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
      * Constructor.
      *
      * @param k K
-     * @param distanceFunction distance function
+     * @param distance distance function
      * @param rnd Random generator
      * @param delta Delta threshold
      * @param rho Rho threshold
      * @param noInitialNeighbors Do not use initial neighbors
      * @param iterations Maximum number of iterations
      */
-    public Factory(int k, Distance<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
+      super(k, distance);
       this.rnd = rnd;
       this.delta = delta;
       this.rho = rho;
@@ -540,7 +536,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
     @Override
     public NNDescent<O> instantiate(Relation<O> relation) {
-      return new NNDescent<>(relation, distanceFunction, k, rnd, delta, rho, noInitialNeighbors, iterations);
+      return new NNDescent<>(relation, distance, k, rnd, delta, rho, noInitialNeighbors, iterations);
     }
 
     /**
@@ -621,7 +617,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
       @Override
       public NNDescent.Factory<O> make() {
-        return new NNDescent.Factory<>(k, distanceFunction, rnd, delta, rho, noInitialNeighbors, iterations);
+        return new NNDescent.Factory<>(k, distance, rnd, delta, rho, noInitialNeighbors, iterations);
       }
     }
   }

@@ -30,6 +30,7 @@ import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -102,12 +103,12 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param kernel Kernel function
    * @param range Kernel radius
    */
-  public NaiveMeanShiftClustering(NumberVectorDistance<? super V> distanceFunction, KernelDensityFunction kernel, double range) {
-    super(distanceFunction);
+  public NaiveMeanShiftClustering(NumberVectorDistance<? super V> distance, KernelDensityFunction kernel, double range) {
+    super(distance);
     this.kernel = kernel;
     this.bandwidth = range;
   }
@@ -119,8 +120,9 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @return Clustering result
    */
   public Clustering<MeanModel> run(Relation<V> relation) {
-    final DistanceQuery<V> distq = relation.getDistanceQuery(getDistance());
-    final RangeQuery<V> rangeq = relation.getRangeQuery(distq);
+    final QueryBuilder<V> qb = new QueryBuilder<>(relation, distance);
+    final RangeQuery<V> rangeq = qb.rangeQuery(bandwidth);
+    final DistanceQuery<V> distq = qb.distanceQuery();
     final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     final int dim = RelationUtil.dimensionality(relation);
 
@@ -129,7 +131,6 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
 
     // Result store:
     ArrayList<Pair<V, ModifiableDBIDs>> clusters = new ArrayList<>();
-
     ModifiableDBIDs noise = DBIDUtil.newArray();
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Mean-shift clustering", relation.size(), LOG) : null;
@@ -264,7 +265,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
 
     @Override
     public NaiveMeanShiftClustering<V> make() {
-      return new NaiveMeanShiftClustering<>(distanceFunction, kernel, range);
+      return new NaiveMeanShiftClustering<>(distance, kernel, range);
     }
   }
 }

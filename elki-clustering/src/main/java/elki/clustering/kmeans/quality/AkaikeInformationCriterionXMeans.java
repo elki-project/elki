@@ -50,8 +50,8 @@ import elki.utilities.documentation.Reference;
     bibkey = "DBLP:conf/icml/PellegM00")
 public class AkaikeInformationCriterionXMeans extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    return BayesianInformationCriterionXMeans.logLikelihoodXMeans(relation, clustering, distanceFunction) - numberOfFreeParameters(relation, clustering);
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
+    return BayesianInformationCriterionXMeans.logLikelihoodXMeans(relation, clustering, distance) - numberOfFreeParameters(relation, clustering);
   }
 
   @Override

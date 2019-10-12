@@ -33,8 +33,10 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
-import elki.database.relation.AbstractRelation;
-import elki.logging.Logging;
+import elki.database.relation.Relation;
+import elki.index.KNNIndex;
+import elki.index.RangeIndex;
+import elki.result.Metadata;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -43,12 +45,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDocumentRelation extends AbstractRelation<Document> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(LuceneDocumentRelation.class);
-
+public class LuceneDocumentRelation implements Relation<Document> {
   /**
    * Static type for Lucene document references.
    */
@@ -74,6 +71,7 @@ public class LuceneDocumentRelation extends AbstractRelation<Document> {
     super();
     this.ids = ids;
     this.reader = reader;
+    Metadata.hierarchyOf(this).addChild(new LuceneIndex());
   }
 
   @Override
@@ -111,24 +109,42 @@ public class LuceneDocumentRelation extends AbstractRelation<Document> {
     return "Lucene documents";
   }
 
-  @Override
-  public RangeQuery<Document> getRangeQuery(DistanceQuery<Document> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistance().getClass() == LuceneDistance.class) {
-      return (RangeQuery<Document>) new LuceneDistanceRangeQuery(reader, ids);
+  /**
+   * Pseudo index that simply accesses Lucene.
+   *
+   * @author Erich Schubert
+   */
+  public class LuceneIndex implements KNNIndex<Document>, RangeIndex<Document> {
+    @Override
+    public void initialize() {
+      // Handled by the database already.
     }
-    return super.getRangeQuery(distanceQuery, hints);
-  }
 
-  @Override
-  public KNNQuery<Document> getKNNQuery(DistanceQuery<Document> distanceQuery, Object... hints) {
-    if(distanceQuery.getDistance().getClass() == LuceneDistance.class) {
-      return (KNNQuery<Document>) new LuceneDistanceKNNQuery(reader, ids);
+    @Override
+    public RangeQuery<Document> getRangeQuery(DistanceQuery<Document> distanceQuery, double maxradius, int flags) {
+      return distanceQuery.getDistance().getClass() == LuceneDistance.class && distanceQuery.getRelation() == this ? //
+          (RangeQuery<Document>) new LuceneDistanceRangeQuery(reader, ids) : null;
     }
-    return super.getKNNQuery(distanceQuery, hints);
-  }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
+    @Override
+    public KNNQuery<Document> getKNNQuery(DistanceQuery<Document> distanceQuery, int maxk, int flags) {
+      return distanceQuery.getDistance().getClass() == LuceneDistance.class && distanceQuery.getRelation() == this ? //
+          (KNNQuery<Document>) new LuceneDistanceKNNQuery(reader, ids) : null;
+    }
+
+    @Override
+    public void logStatistics() {
+      // Log some stats from lucene?
+    }
+
+    @Override
+    public String getLongName() {
+      return "Lucene index";
+    }
+
+    @Override
+    public String getShortName() {
+      return "lucene-index";
+    }
   }
 }

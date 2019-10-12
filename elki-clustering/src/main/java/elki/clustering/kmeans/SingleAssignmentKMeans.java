@@ -49,12 +49,12 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param initializer Initialization method
    */
-  public SingleAssignmentKMeans(NumberVectorDistance<? super V> distanceFunction, int k, KMeansInitialization initializer) {
-    super(distanceFunction, k, 1, initializer);
+  public SingleAssignmentKMeans(NumberVectorDistance<? super V> distance, int k, KMeansInitialization initializer) {
+    super(distance, k, 1, initializer);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
 
     @Override
     public SingleAssignmentKMeans<V> make() {
-      return new SingleAssignmentKMeans<>(distanceFunction, k, initializer);
+      return new SingleAssignmentKMeans<>(distance, k, initializer);
     }
   }
 }

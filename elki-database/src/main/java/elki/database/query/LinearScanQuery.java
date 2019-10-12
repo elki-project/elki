@@ -28,6 +28,6 @@ package elki.database.query;
  * 
  * @assoc - - - elki.database.Database
  */
-public interface LinearScanQuery extends DatabaseQuery {
+public interface LinearScanQuery {
   // Empty marker interface
 }

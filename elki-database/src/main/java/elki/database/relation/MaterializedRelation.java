@@ -25,14 +25,9 @@ import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.StaticDBIDs;
+import elki.database.ids.*;
 import elki.index.DynamicIndex;
 import elki.index.Index;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.AbortException;
@@ -49,12 +44,7 @@ import elki.utilities.exceptions.AbortException;
  *
  * @param <O> Data type
  */
-public class MaterializedRelation<O> extends AbstractRelation<O> implements ModifiableRelation<O> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(MaterializedRelation.class);
-
+public class MaterializedRelation<O> implements ModifiableRelation<O> {
   /**
    * The class of objects we store.
    */
@@ -89,6 +79,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
 
   /**
    * Constructor.
+   * 
    * @param name Name
    * @param type Type information
    * @param ids IDs
@@ -104,6 +95,7 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
 
   /**
    * Constructor.
+   * 
    * @param name Name
    * @param type Type information
    * @param ids IDs
@@ -179,11 +171,6 @@ public class MaterializedRelation<O> extends AbstractRelation<O> implements Modi
 
   @Override
   public String getLongName() {
-    return (name != null) ? name : type.toString();
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
+    return name != null ? name : type.toString();
   }
 }

@@ -221,12 +221,12 @@ public class ExpGammaDistribution implements Distribution {
   public static class Par implements Parameterizer {
     /**
      * Theta parameter, same as
-     * {@link GammaDistribution.Parameterizer#THETA_ID}.
+     * {@link GammaDistribution.Par#THETA_ID}.
      */
     public static final OptionID THETA_ID = GammaDistribution.Par.THETA_ID;
 
     /**
-     * k parameter, same as {@link GammaDistribution.Parameterizer#K_ID}.
+     * k parameter, same as {@link GammaDistribution.Par#K_ID}.
      */
     public static final OptionID K_ID = GammaDistribution.Par.K_ID;
 

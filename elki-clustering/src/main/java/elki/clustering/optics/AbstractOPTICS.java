@@ -72,12 +72,12 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
   /**
    * Constructor.
    * 
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
    */
-  public AbstractOPTICS(Distance<? super O> distanceFunction, double epsilon, int minpts) {
-    super(distanceFunction);
+  public AbstractOPTICS(Distance<? super O> distance, double epsilon, int minpts) {
+    super(distance);
     this.epsilon = epsilon;
     this.minpts = minpts;
   }

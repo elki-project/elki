@@ -60,7 +60,7 @@ public class FirstK<O> implements KMeansInitialization, KMedoidsInitialization<O
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     DBIDIter iter = relation.iterDBIDs();
     double[][] means = new double[k][];
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
@@ -70,7 +70,7 @@ public class FirstK<O> implements KMeansInitialization, KMedoidsInitialization<O
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distanceFunction) {
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distance) {
     DBIDIter iter = ids.iter();
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {

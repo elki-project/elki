@@ -102,13 +102,13 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param alpha Alpha parameter
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public CTLuRandomWalkEC(Distance<? super P> distanceFunction, double alpha, double c, int k) {
-    super(distanceFunction);
+  public CTLuRandomWalkEC(Distance<? super P> distance, double alpha, double c, int k) {
+    super(distance);
     this.alpha = alpha;
     this.c = c;
     this.k = k;
@@ -288,7 +288,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
 
     @Override
     public CTLuRandomWalkEC<O> make() {
-      return new CTLuRandomWalkEC<>(distanceFunction, alpha, c, k);
+      return new CTLuRandomWalkEC<>(distance, alpha, c, k);
     }
   }
 }

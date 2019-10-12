@@ -59,7 +59,9 @@ public class ParameterizationTest {
         Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
         assertNotNull(par);
         par.configure(new UnParameterization());
-        par.configure(new EmptyParameterization());
+        EmptyParameterization ep = new EmptyParameterization();
+        par.configure(ep);
+        ep.clearErrors(); // Finalizer would report them automatically.
         first = false;
       }
     }

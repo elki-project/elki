@@ -128,8 +128,8 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public void setDistance(NumberVectorDistance<? super V> distanceFunction) {
-    innerkMeans.setDistance(distanceFunction);
+  public void setDistance(NumberVectorDistance<? super V> distance) {
+    innerkMeans.setDistance(distance);
   }
 
   @Override

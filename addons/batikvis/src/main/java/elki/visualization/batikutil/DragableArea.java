@@ -69,7 +69,7 @@ public class DragableArea implements EventListener {
 
   /**
    * Constructor for a dragable area. use getElement() to get the DOM node.
-   * 
+   * <p>
    * Note: always remember to call 'destroy()' to remove listeners!
    * 
    * @param plot Plot we'll be added to
@@ -88,7 +88,7 @@ public class DragableArea implements EventListener {
 
   /**
    * Constructor for a dragable area. use getElement() to get the DOM node.
-   * 
+   * <p>
    * Note: always remember to call 'destroy()' to remove listeners!
    * 
    * @param plot Plot we'll be added to
@@ -108,7 +108,7 @@ public class DragableArea implements EventListener {
 
   /**
    * Constructor for a dragable area. use getElement() to get the DOM node.
-   * 
+   * <p>
    * Note: always remember to call 'destroy()' to remove listeners!
    * 
    * @param plot Plot we'll be added to
@@ -129,7 +129,7 @@ public class DragableArea implements EventListener {
 
   /**
    * Constructor for a dragable area. use getElement() to get the DOM node.
-   * 
+   * <p>
    * Note: always remember to call 'destroy()' to remove listeners!
    * 
    * @param plot Plot we'll be added to

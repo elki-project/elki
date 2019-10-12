@@ -95,14 +95,14 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
   /**
    * Set the distance function to use.
    *
-   * @param distanceFunction Distance function.
+   * @param distance Distance function.
    */
-  void setDistance(NumberVectorDistance<? super V> distanceFunction);
+  void setDistance(NumberVectorDistance<? super V> distance);
 
   /**
-   * Returns the distanceFunction.
+   * Returns the distance.
    *
-   * @return the distanceFunction
+   * @return the distance
    */
   NumberVectorDistance<? super V> getDistance();
 

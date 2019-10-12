@@ -84,7 +84,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistance.STATIC) {
       @Override
-      public KNNQuery<NumberVector> getKNNQuery(DistanceQuery<NumberVector> distanceQuery, Object... hints) {
+      public KNNQuery<NumberVector> getKNNQuery(DistanceQuery<NumberVector> distanceQuery, int maxk, int flags) {
         return null; // Disable kNN queries, to force range queries to be tested.
       }
     };

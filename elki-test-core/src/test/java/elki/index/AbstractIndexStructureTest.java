@@ -30,6 +30,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
@@ -125,14 +126,14 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = relation.getDistanceQuery(EuclideanDistance.STATIC);
+    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
+    DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectKNNQuery != null) {
-      // get the 10 next neighbors
-      DoubleVector dv = DoubleVector.wrap(querypoint);
-      KNNQuery<DoubleVector> knnq = relation.getKNNQuery(dist, k);
+      KNNQuery<DoubleVector> knnq = qb.kNNQuery(k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      KNNList ids = knnq.getKNNForObject(dv, k);
+      // get the 10 next neighbors
+      KNNList ids = knnq.getKNNForObject(DoubleVector.wrap(querypoint), k);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
 
       // verify that the neighbors match.
@@ -147,11 +148,10 @@ public abstract class AbstractIndexStructureTest {
       }
     }
     if(expectRangeQuery != null) {
-      // Do a range query
-      DoubleVector dv = DoubleVector.wrap(querypoint);
-      RangeQuery<DoubleVector> rangeq = relation.getRangeQuery(dist, eps);
+      RangeQuery<DoubleVector> rangeq = qb.rangeQuery(eps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      DoubleDBIDList ids = rangeq.getRangeForObject(dv, eps);
+      // Do a range query
+      DoubleDBIDList ids = rangeq.getRangeForObject(DoubleVector.wrap(querypoint), eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
 
       // verify that the neighbors match.
@@ -182,14 +182,14 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = relation.getDistanceQuery(CosineDistance.STATIC);
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, CosineDistance.STATIC).cheapOnly();
+    DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectKNNQuery != null) {
-      // get the 10 next neighbors
-      DoubleVector dv = DoubleVector.wrap(querypoint);
-      KNNQuery<DoubleVector> knnq = relation.getKNNQuery(dist, k);
+      KNNQuery<DoubleVector> knnq = qb.cheapOnly().kNNQuery(k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      KNNList ids = knnq.getKNNForObject(dv, k);
+      // get the 10 next neighbors
+      KNNList ids = knnq.getKNNForObject(DoubleVector.wrap(querypoint), k);
       assertEquals("Result size does not match expectation!", cosshouldd.length, ids.size());
 
       // verify that the neighbors match.
@@ -204,11 +204,10 @@ public abstract class AbstractIndexStructureTest {
       }
     }
     if(expectRangeQuery != null) {
-      // Do a range query
-      DoubleVector dv = DoubleVector.wrap(querypoint);
-      RangeQuery<DoubleVector> rangeq = relation.getRangeQuery(dist, coseps);
+      RangeQuery<DoubleVector> rangeq = qb.cheapOnly().rangeQuery(coseps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      DoubleDBIDList ids = rangeq.getRangeForObject(dv, coseps);
+      // Do a range query
+      DoubleDBIDList ids = rangeq.getRangeForObject(DoubleVector.wrap(querypoint), coseps);
       assertEquals("Result size does not match expectation!", cosshouldd.length, ids.size());
 
       // verify that the neighbors match.
@@ -234,17 +233,17 @@ public abstract class AbstractIndexStructureTest {
     Database db = new StaticArrayDatabase(dbc, factory != null ? Arrays.asList(factory) : null);
     db.initialize();
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = relation.getDistanceQuery(EuclideanDistance.STATIC);
+    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DBIDRef first = relation.iterDBIDs();
     if(expectKNNQuery != null) {
-      KNNQuery<DoubleVector> knnq = relation.getKNNQuery(dist);
+      KNNQuery<DoubleVector> knnq = qb.kNNQuery(1);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
       KNNList knn = knnq.getKNNForDBID(first, 1);
       assertEquals("Wrong number of knn results", 1, knn.size());
       assertTrue("Wrong knn result", DBIDUtil.equal(knn.iter(), first));
     }
     if(expectRangeQuery != null) {
-      RangeQuery<DoubleVector> rangeq = relation.getRangeQuery(dist);
+      RangeQuery<DoubleVector> rangeq = qb.rangeQuery(0.);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       DoubleDBIDList range = rangeq.getRangeForDBID(first, 0);
       assertEquals("Wrong number of range results", 1, range.size());
@@ -267,14 +266,15 @@ public abstract class AbstractIndexStructureTest {
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> dist = relation.getDistanceQuery(EuclideanDistance.STATIC);
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
+    DistanceQuery<DoubleVector> dist = qb.distanceQuery();
 
     if(expectQuery != null) {
-      // get the 10 next neighbors
-      DoubleVector dv = DoubleVector.wrap(querypoint);
-      DistancePrioritySearcher<DoubleVector> prioq = relation.getPrioritySearcher(dist);
+      DistancePrioritySearcher<DoubleVector> prioq = qb.prioritySearcher();
       assertTrue("Returned priority search is not of expected class: expected " + expectQuery + " got " + prioq.getClass(), expectQuery.isAssignableFrom(prioq.getClass()));
 
+      // get the 10 next neighbors
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       { // verify the knn result:
         int i = 0;
         ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();

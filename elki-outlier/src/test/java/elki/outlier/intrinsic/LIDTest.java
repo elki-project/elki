@@ -18,41 +18,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query;
+package elki.outlier.intrinsic;
+
+import org.junit.Test;
+
+import elki.outlier.AbstractOutlierAlgorithmTest;
+import elki.data.DoubleVector;
+import elki.database.Database;
+import elki.result.outlier.OutlierResult;
+import elki.utilities.ELKIBuilder;
 
 /**
- * General interface for database queries.
- * Will only contain elemental stuff such as some hints.
+ * Tests the Local Intrinsic Dimensionality (LID) outlier detection algorithm.
  * 
  * @author Erich Schubert
- * @since 0.4.0
- * 
- * @opt nodefillcolor LemonChiffon
+ * @since 0.7.5
  */
-public interface DatabaseQuery {
-  /**
-   * Optimizer hint: only a single request will be done - avoid expensive
-   * optimizations
-   */
-  String HINT_SINGLE = "single_query";
-
-  /**
-   * Optimizer hint: no linear scans allowed - return null then!
-   */
-  String HINT_OPTIMIZED_ONLY = "optimized";
-
-  /**
-   * Optimizer hint: heavy use - caching/preprocessing/approximation recommended
-   */
-  String HINT_HEAVY_USE = "heavy";
-
-  /**
-   * Optimizer hint: exact - no approximations allowed!
-   */
-  String HINT_EXACT = "exact";
-
-  /**
-   * Optimizer hint: no cache instances
-   */
-  String HINT_NO_CACHE = "no-cache";
+public class LIDTest extends AbstractOutlierAlgorithmTest {
+  @Test
+  public void testToyExample() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+    OutlierResult result = new ELKIBuilder<LID<DoubleVector>>(LID.class) //
+        .with(LID.Par.K_ID, 100).build().run(db);
+    testAUC(db, "Noise", result, 0.9167222);
+    testSingleScore(result, 945, 2.5368047);
+  }
 }

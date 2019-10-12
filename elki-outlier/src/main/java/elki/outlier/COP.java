@@ -33,6 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
@@ -153,15 +154,15 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k number of neighbors
    * @param pca PCA computation method
    * @param expect Expected fraction of outliers (for score normalization)
    * @param dist Distance distribution model (ChiSquared, Gamma)
    * @param models Report models
    */
-  public COP(Distance<? super V> distanceFunction, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
-    super(distanceFunction);
+  public COP(Distance<? super V> distance, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
+    super(distance);
     this.k = k;
     this.pca = pca;
     this.expect = expect;
@@ -177,7 +178,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    KNNQuery<V> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
+    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
     if(k <= dim + 1) {
@@ -380,7 +381,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
     @Override
     public COP<V> make() {
-      return new COP<>(distanceFunction, k, pca, expect, dist, models);
+      return new COP<>(distance, k, pca, expect, dist, models);
     }
   }
 }

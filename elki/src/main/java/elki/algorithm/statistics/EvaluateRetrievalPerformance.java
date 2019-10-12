@@ -26,6 +26,7 @@ import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -97,14 +98,14 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param sampling Sampling rate
    * @param random Random sampling generator
    * @param includeSelf Include query object in evaluation
    * @param maxk Maximum k for kNN evaluation
    */
-  public EvaluateRetrievalPerformance(Distance<? super O> distanceFunction, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
-    super(distanceFunction);
+  public EvaluateRetrievalPerformance(Distance<? super O> distance, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
+    super(distance);
     this.sampling = sampling;
     this.random = random;
     this.includeSelf = includeSelf;
@@ -119,8 +120,8 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    * @return Vectors containing mean and standard deviation.
    */
   public RetrievalPerformanceResult run(Relation<O> relation, Relation<?> lrelation) {
-    final DistanceQuery<O> distQuery = relation.getDistanceQuery(getDistance());
-    final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+    DistanceQuery<O> distQuery = new QueryBuilder<>(relation, distance).distanceQuery();
 
     // For storing the positive neighbors.
     ModifiableDBIDs posn = DBIDUtil.newHashSet();
@@ -501,7 +502,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
     @Override
     public EvaluateRetrievalPerformance<O> make() {
-      return new EvaluateRetrievalPerformance<>(distanceFunction, sampling, seed, includeSelf, maxk);
+      return new EvaluateRetrievalPerformance<>(distance, sampling, seed, includeSelf, maxk);
     }
   }
 }

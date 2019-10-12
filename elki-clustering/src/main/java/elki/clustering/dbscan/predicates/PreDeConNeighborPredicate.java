@@ -26,6 +26,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -87,8 +88,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
 
   @Override
   public Instance instantiate(Database database) {
-    Relation<V> relation = database.getRelation(distFunc.getInputTypeRestriction());
-    RangeQuery<V> rq = relation.getRangeQuery(distFunc);
+    Relation<V> relation = database.getRelation(distance.getInputTypeRestriction());
+    RangeQuery<V> rq = new QueryBuilder<>(relation, distance).rangeQuery(epsilon);
     mvSize.reset();
     mvVar.reset();
     DataStore<PreDeConModel> storage = preprocess(PreDeConModel.class, relation, rq);

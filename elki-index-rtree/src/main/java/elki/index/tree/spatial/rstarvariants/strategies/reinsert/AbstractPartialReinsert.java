@@ -45,18 +45,18 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
   /**
    * Distance function to use for measuring
    */
-  SpatialPrimitiveDistance<?> distanceFunction;
+  SpatialPrimitiveDistance<?> distance;
 
   /**
    * Constructor.
    * 
    * @param reinsertAmount Relative amount of objects to reinsert.
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    */
-  public AbstractPartialReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distanceFunction) {
+  public AbstractPartialReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distance) {
     super();
     this.reinsertAmount = reinsertAmount;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 
   /**
@@ -83,7 +83,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     /**
      * Distance function to use for measuring
      */
-    SpatialPrimitiveDistance<?> distanceFunction;
+    SpatialPrimitiveDistance<?> distance;
 
     @Override
     public void configure(Parameterization config) {
@@ -92,7 +92,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
           .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE) //
           .grab(config, x -> reinsertAmount = x);
       new ObjectParameter<SpatialPrimitiveDistance<?>>(REINSERT_DISTANCE_ID, SpatialPrimitiveDistance.class, SquaredEuclideanDistance.class) //
-          .grab(config, x -> distanceFunction = x);
+          .grab(config, x -> distance = x);
     }
   }
 }

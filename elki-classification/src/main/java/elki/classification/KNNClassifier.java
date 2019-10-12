@@ -31,6 +31,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -86,24 +87,24 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
   /**
    * Distance function
    */
-  protected Distance<? super O> distanceFunction;
+  protected Distance<? super O> distance;
 
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k Number of nearest neighbors to access.
    */
-  public KNNClassifier(Distance<? super O> distanceFunction, int k) {
+  public KNNClassifier(Distance<? super O> distance, int k) {
     super();
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
     this.k = k;
   }
 
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labels) {
-    Relation<O> relation = database.getRelation(getDistance().getInputTypeRestriction());
-    this.knnq = relation.getKNNQuery(getDistance(), k);
+    Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    this.knnq = new QueryBuilder<>(relation, distance).kNNQuery(k);
     this.labelrep = labels;
   }
 
@@ -156,12 +157,12 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
   }
 
   /**
-   * Returns the distanceFunction.
+   * Returns the distance.
    *
-   * @return the distanceFunction
+   * @return the distance
    */
   public Distance<? super O> getDistance() {
-    return distanceFunction;
+    return distance;
   }
 
   @Override

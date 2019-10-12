@@ -37,12 +37,13 @@ import elki.database.query.range.RangeQuery;
 public interface RangeIndex<O> extends Index {
   /**
    * Get a range query object for the given distance query and k.
-   *
+   * <p>
    * This function MAY return null, when the given distance is not supported!
    *
    * @param distanceQuery Distance query
-   * @param hints Hints for the optimizer
+   * @param maxrange Maximum range
+   * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags);
 }

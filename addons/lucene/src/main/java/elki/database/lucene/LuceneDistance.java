@@ -23,7 +23,11 @@ package elki.database.lucene;
 import org.apache.lucene.search.DefaultSimilarity;
 import org.apache.lucene.search.Similarity;
 
+import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
+import elki.database.query.distance.DBIDRangeDistanceQuery;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.AbstractDBIDRangeDistance;
 import elki.utilities.exceptions.AbortException;
 
@@ -48,5 +52,11 @@ public class LuceneDistance extends AbstractDBIDRangeDistance {
   @Override
   public void checkRange(DBIDRange range) {
     // FIXME: check that we refer to the same DBIDs as the Lucene database.
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
+    return (DistanceQuery<O>) new DBIDRangeDistanceQuery((Relation<DBID>) database, this);
   }
 }

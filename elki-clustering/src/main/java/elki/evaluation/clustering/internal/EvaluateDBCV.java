@@ -32,6 +32,7 @@ import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -78,7 +79,7 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private Distance<? super O> distanceFunction;
+  private Distance<? super O> distance;
 
   /**
    * Constructor.
@@ -87,26 +88,26 @@ public class EvaluateDBCV<O> implements Evaluator {
    */
   public EvaluateDBCV(Distance<? super O> distance) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
   }
 
   /**
    * Evaluate a single clustering.
    *
-   * @param rel Data relation
+   * @param relation Data relation
    * @param cl Clustering
    *
    * @return dbcv DBCV-index
    */
-  public double evaluateClustering(Relation<O> rel, Clustering<?> cl) {
-    final DistanceQuery<O> dq = rel.getDistanceQuery(distanceFunction);
+  public double evaluateClustering(Relation<O> relation, Clustering<?> cl) {
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
 
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
     final int numc = clusters.size();
 
     // DBCV needs a "dimensionality".
     @SuppressWarnings("unchecked")
-    final Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) rel;
+    final Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) relation;
     final int dim = RelationUtil.dimensionality(vrel);
 
     // precompute all core distances
@@ -237,7 +238,7 @@ public class EvaluateDBCV<O> implements Evaluator {
 
       // compute DBCV
       double vc = (dspcMin - currentDscMax) / MathUtil.max(dspcMin, currentDscMax);
-      double weight = cluster.size() / (double) rel.size();
+      double weight = cluster.size() / (double) relation.size();
       dbcv += weight * vc;
     }
 
@@ -256,7 +257,7 @@ public class EvaluateDBCV<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(newResult);
-    TypeInformation typ = new CombinedTypeInformation(this.distanceFunction.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+    TypeInformation typ = new CombinedTypeInformation(this.distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<O> rel = db.getRelation(typ);
 
     if(rel != null) {

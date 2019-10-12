@@ -42,27 +42,27 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> extends AbstractAlgorithm<R> {
   /**
    * Holds the instance of the distance function specified by
-   * {@link Parameterizer#DISTANCE_FUNCTION_ID}.
+   * {@link Par#DISTANCE_FUNCTION_ID}.
    */
-  protected D distanceFunction;
+  protected D distance;
 
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  protected AbstractDistanceBasedAlgorithm(D distanceFunction) {
+  protected AbstractDistanceBasedAlgorithm(D distance) {
     super();
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 
   /**
-   * Returns the distanceFunction.
+   * Returns the distance.
    *
-   * @return the distanceFunction
+   * @return the distance
    */
   public D getDistance() {
-    return distanceFunction;
+    return distance;
   }
 
   /**
@@ -79,12 +79,12 @@ public abstract class AbstractDistanceBasedAlgorithm<D extends Distance<?>, R> e
     /**
      * The distance function to use.
      */
-    protected D distanceFunction;
+    protected D distance;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<D>(DISTANCE_FUNCTION_ID, getDistanceRestriction(), getDefaultDistance()) //
-          .grab(config, x -> distanceFunction = x);
+          .grab(config, x -> distance = x);
     }
 
     /**

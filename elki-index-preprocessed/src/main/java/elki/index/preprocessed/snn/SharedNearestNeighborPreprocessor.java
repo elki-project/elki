@@ -25,6 +25,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -76,7 +77,7 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
   /**
    * Hold the distance function to be used.
    */
-  protected Distance<O> distanceFunction;
+  protected Distance<O> distance;
 
   /**
    * The data store.
@@ -93,12 +94,12 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
    * 
    * @param relation Database to use
    * @param numberOfNeighbors Number of neighbors
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, Distance<O> distanceFunction) {
+  public SharedNearestNeighborPreprocessor(Relation<O> relation, int numberOfNeighbors, Distance<O> distance) {
     super();
     this.relation = relation;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
     this.numberOfNeighbors = numberOfNeighbors;
   }
 
@@ -108,16 +109,14 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
       LOG.verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
-    KNNQuery<O> knnquery = relation.getKNNQuery(distanceFunction, numberOfNeighbors);
+    KNNQuery<O> knnquery = new QueryBuilder<>(relation, distance).kNNQuery(numberOfNeighbors);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
       DBIDs kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
       for(DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
-        // if(!id.equals(nid)) {
         neighbors.add(iter);
-        // }
         // Size limitation to exactly numberOfNeighbors
         if(neighbors.size() >= numberOfNeighbors) {
           break;
@@ -198,12 +197,12 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
      * Constructor.
      * 
      * @param numberOfNeighbors Number of neighbors
-     * @param distanceFunction Distance function
+     * @param distance Distance function
      */
-    public Factory(int numberOfNeighbors, Distance<O> distanceFunction) {
+    public Factory(int numberOfNeighbors, Distance<O> distance) {
       super();
       this.numberOfNeighbors = numberOfNeighbors;
-      this.distanceFunction = distanceFunction;
+      this.distanceFunction = distance;
     }
 
     @Override

@@ -77,7 +77,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
 
   /**
    * Compute ranks of all objects, ranging from 1 to len.
-   *
+   * <p>
    * Ties are given the average rank.
    *
    * @param adapter Data adapter
@@ -91,7 +91,7 @@ public abstract class AbstractDependenceMeasure implements DependenceMeasure {
 
   /**
    * Compute ranks of all objects, ranging from 1 to len.
-   *
+   * <p>
    * Ties are given the average rank.
    *
    * @param adapter Data adapter

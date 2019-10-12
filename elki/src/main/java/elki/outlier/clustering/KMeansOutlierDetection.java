@@ -25,7 +25,6 @@ import java.util.List;
 import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.LloydKMeans;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -37,19 +36,20 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -100,9 +100,7 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
    * @return Outlier detection result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
-    Distance<? super O> df = clusterer.getDistance();
-    DistanceQuery<O> dq = relation.getDistanceQuery(df);
-
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, clusterer.getDistance()).distanceQuery();
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database, relation);
 

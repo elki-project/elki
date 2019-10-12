@@ -34,8 +34,8 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -137,13 +137,13 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
   /**
    * Constructor.
    * 
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPark(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction);
+  public KMedoidsPark(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance);
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -156,7 +156,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
    * @return result
    */
   public Clustering<MedoidModel> run(Relation<V> relation) {
-    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
@@ -181,9 +181,10 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids EM iteration", LOG) : null;
     // Swap phase
-    int iteration = 0;
     DBIDVar best = DBIDUtil.newVar();
-    while(true) {
+    int iteration = 0;
+    while(iteration < maxiter || maxiter <= 0) {
+      ++iteration;
       boolean changed = false;
       // Try to swap the medoid with a better cluster member:
       int i = 0;
@@ -218,7 +219,6 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
       }
       // Reassign
       double nc = assignToNearestCluster(miter, mdists, clusters, distQ);
-      ++iteration;
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
       }
@@ -343,7 +343,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
     @Override
     public KMedoidsPark<V> make() {
-      return new KMedoidsPark<>(distanceFunction, k, maxiter, initializer);
+      return new KMedoidsPark<>(distance, k, maxiter, initializer);
     }
   }
 }

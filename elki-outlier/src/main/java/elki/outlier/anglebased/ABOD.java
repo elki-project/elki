@@ -31,6 +31,7 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
+import elki.database.query.QueryBuilder;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -110,7 +111,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
   public OutlierResult run(Relation<V> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Build a kernel matrix, to make O(n^3) slightly less bad.
-    SimilarityQuery<V> sq = relation.getSimilarityQuery(kernelFunction);
+    SimilarityQuery<V> sq = new QueryBuilder<>(relation, kernelFunction).similarityQuery();
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);

@@ -69,13 +69,13 @@ public class CompareMeans<V extends NumberVector> extends AbstractKMeans<V, KMea
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public CompareMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public CompareMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -195,7 +195,7 @@ public class CompareMeans<V extends NumberVector> extends AbstractKMeans<V, KMea
 
     @Override
     public CompareMeans<V> make() {
-      return new CompareMeans<>(distanceFunction, k, maxiter, initializer);
+      return new CompareMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

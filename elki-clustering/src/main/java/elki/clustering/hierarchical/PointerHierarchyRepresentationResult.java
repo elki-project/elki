@@ -199,7 +199,7 @@ public class PointerHierarchyRepresentationResult {
 
   /**
    * Compute the maximum height of nodes.
-   * 
+   * <p>
    * This is necessary, because some linkages may sometimes yield anomalies,
    * where {@code d(a+b,c) < min(d(a,c), d(b,c))}.
    * 
@@ -222,15 +222,15 @@ public class PointerHierarchyRepresentationResult {
 
   /**
    * Topological sort the object IDs.
-   *
+   * <p>
    * Even when we have this predefined merge order, it may be sub-optimal.
    * Such cases arise for example when using NNChain with single-link, as it
    * does not guarantee to discover merges in ascending order.
-   * 
+   * <p>
    * Therefore, we employ the following logic:
-   * We process merges in merge order, and note the maximum height of the
+   * (1) We process merges in merge order, and note the maximum height of the
    * subtree.
-   * We then order points by this maximum height, then by their merge order.
+   * (2) We then order points by this maximum height, then by their merge order.
    * 
    * @return Sorted object ids.
    */

@@ -33,6 +33,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -93,12 +94,12 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   private static final Logging LOG = Logging.getLogger(HiCO.class);
 
   /**
-   * The default value for {@link Parameterizer#DELTA_ID}.
+   * The default value for {@link Par#DELTA_ID}.
    */
   public static final double DEFAULT_DELTA = 0.25;
 
   /**
-   * The default value for {@link Parameterizer#ALPHA_ID}.
+   * The default value for {@link Par#ALPHA_ID}.
    */
   public static final double DEFAULT_ALPHA = 0.85;
 
@@ -232,7 +233,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
       }
       localPCAs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
-      KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, k);
+      KNNQuery<V> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(k);
 
       Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Performing local PCA", relation.size(), LOG) : null;

@@ -71,13 +71,13 @@ public class MacQueenKMeans<V extends NumberVector> extends AbstractKMeans<V, KM
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public MacQueenKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(distanceFunction, k, maxiter, initializer);
+  public MacQueenKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(distance, k, maxiter, initializer);
   }
 
   @Override
@@ -174,7 +174,7 @@ public class MacQueenKMeans<V extends NumberVector> extends AbstractKMeans<V, KM
   public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     public MacQueenKMeans<V> make() {
-      return new MacQueenKMeans<>(distanceFunction, k, maxiter, initializer);
+      return new MacQueenKMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

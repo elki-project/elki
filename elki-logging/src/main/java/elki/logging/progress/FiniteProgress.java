@@ -25,7 +25,7 @@ import elki.logging.Logging;
 /**
  * A progress object for a given overall number of items to process. The number
  * of already processed items at a point in time can be updated.
- * 
+ * <p>
  * The main feature of this class is to provide a String representation of the
  * progress suitable as a message for printing to the command line interface.
  * 
@@ -53,7 +53,7 @@ public class FiniteProgress extends AbstractProgress {
   protected FiniteProgress(String task, int total) {
     super(task);
     this.total = total;
-    this.totalLength = Integer.toString(total).length();
+    this.totalLength = numDigits(total);
   }
 
   /**
@@ -66,7 +66,7 @@ public class FiniteProgress extends AbstractProgress {
   public FiniteProgress(String task, int total, Logging logger) {
     super(task);
     this.total = total;
-    this.totalLength = Integer.toString(total).length();
+    this.totalLength = numDigits(total);
     logger.progress(this);
   }
 
@@ -96,36 +96,38 @@ public class FiniteProgress extends AbstractProgress {
    */
   @Override
   public StringBuilder appendToBuffer(StringBuilder buf) {
-    String processedString = Integer.toString(getProcessed());
-    int percentage = (int) (getProcessed() * 100.0 / total);
-    buf.append(getTask());
-    buf.append(": ");
-    for(int i = 0; i < totalLength - processedString.length(); i++) {
+    final int p = getProcessed();
+    buf.append(getTask()).append(": ");
+    for(int i = 0, l = totalLength - numDigits(p); i < l; i++) {
       buf.append(' ');
     }
-    buf.append(getProcessed());
-    buf.append(" [");
-    if(percentage < 100) {
-      buf.append(' ');
-    }
-    if(percentage < 10) {
-      buf.append(' ');
-    }
-    buf.append(percentage);
-    buf.append("%]");
-    if(ratems > 0. && getProcessed() < total) {
-      buf.append(' ');
-      int secs = (int) Math.round((total - getProcessed()) / ratems / 1000. + .2);
+    int percentage = (int) (p * 100.0 / total);
+    buf.append(p).append(" [") //
+        .append(percentage < 10 ? "  " : percentage < 100 ? " " : "") //
+        .append(percentage).append("%]");
+    if(ratems > 0. && p < total) {
+      int secs = (int) Math.round((total - p) / ratems / 1000. + .2);
       if(secs > 300) {
-        buf.append(secs / 60);
-        buf.append(" min remaining");
+        buf.append(' ').append(secs / 60).append(" min remaining");
       }
       else {
-        buf.append(secs);
-        buf.append(" sec remaining");
+        buf.append(' ').append(secs).append(" sec remaining");
       }
     }
     return buf;
+  }
+
+  /**
+   * Length of a number.
+   *
+   * @param x Number
+   * @return Number of digits
+   */
+  private int numDigits(int x) {
+    return x == Integer.MIN_VALUE ? 10 : x < 0 ? 1 + numDigits(-x) : //
+        x < 10000 ? (x < 100 ? (x < 10 ? 1 : 2) : (x < 1000 ? 3 : 4)) : //
+            x < 100000000 ? (x < 1000000 ? (x < 100000 ? 5 : 6) : (x < 10000000 ? 7 : 8)) : //
+                (x < 1000000000 ? 9 : 10); //
   }
 
   /**

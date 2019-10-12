@@ -23,9 +23,9 @@ package elki.outlier.lof;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -106,12 +106,12 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function in use
+   * @param distance Distance function in use
    * @param m m Parameter
    * @param k k Parameter
    */
-  public INFLO(Distance<? super O> distanceFunction, double m, int k) {
-    super(distanceFunction);
+  public INFLO(Distance<? super O> distance, double m, int k) {
+    super(distance);
     this.m = m;
     this.kplus1 = k + 1;
   }
@@ -127,7 +127,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     // Step one: find the kNN
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), kplus1);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus1);
 
     // Step two: find the RkNN, minus kNN.
     LOG.beginStep(stepprog, 2, "Materialize reverse NN.");
@@ -316,7 +316,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public INFLO<O> make() {
-      return new INFLO<>(distanceFunction, m, k);
+      return new INFLO<>(distance, m, k);
     }
   }
 }

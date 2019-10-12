@@ -63,7 +63,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
   /**
    * Spatial primitive distance function
    */
-  protected final SpatialPrimitiveDistance<? super O> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super O> distance;
 
   /**
    * Relation we query.
@@ -75,13 +75,13 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
    * 
    * @param tree Index to use
    * @param relation Data relation to query
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction) {
+  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
     super();
     this.relation = relation;
     this.tree = tree;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 
   @Override
@@ -106,19 +106,19 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
       if(node.isLeaf()) {
         for(int i = 0; i < numEntries; i++) {
           SpatialPointLeafEntry entry = (SpatialPointLeafEntry) node.getEntry(i);
-          double distance = distanceFunction.minDist(obj, entry);
+          double dist = distance.minDist(obj, entry);
           tree.statistics.countDistanceCalculation();
-          if(distance <= range) {
-            result.add(distance, entry.getDBID());
+          if(dist <= range) {
+            result.add(dist, entry.getDBID());
           }
         }
       }
       else {
         for(int i = 0; i < numEntries; i++) {
           SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
-          double distance = distanceFunction.minDist(obj, entry);
+          double dist = distance.minDist(obj, entry);
           tree.statistics.countDistanceCalculation();
-          if(distance <= range) {
+          if(dist <= range) {
             if(ps == pq.length) {
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
             }

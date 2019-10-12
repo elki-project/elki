@@ -23,8 +23,8 @@ package elki.clustering.hierarchical;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -74,10 +74,10 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use.
+   * @param distance Distance function to use.
    */
-  public MiniMax(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public MiniMax(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -87,7 +87,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    * @return Hierarchical result
    */
   public PointerPrototypeHierarchyRepresentationResult run(Relation<O> relation) {
-    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -412,7 +412,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public MiniMax<O> make() {
-      return new MiniMax<>(distanceFunction);
+      return new MiniMax<>(distance);
     }
   }
 }

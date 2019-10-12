@@ -25,6 +25,7 @@ import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
@@ -88,14 +89,14 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
    * Constructor.
    *
    * @param inputstep Input step
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k K parameter
    * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
    * @param random Random factory
    */
-  public KNNBenchmark(InputStep inputstep, Distance<? super O> distanceFunction, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
-    super(inputstep, distanceFunction);
+  public KNNBenchmark(InputStep inputstep, Distance<? super O> distance, int k, DatabaseConnection queries, double sampling, RandomFactory random) {
+    super(inputstep, distance);
     this.k = k;
     this.queries = queries;
     this.sampling = sampling;
@@ -110,7 +111,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     // Get a kNN query instance.
-    KNNQuery<O> knnQuery = relation.getKNNQuery(distance, k);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
     // No query set - use original database.
     if(queries == null) {
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);

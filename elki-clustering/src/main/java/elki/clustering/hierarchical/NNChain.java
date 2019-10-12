@@ -24,6 +24,7 @@ import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -69,10 +70,10 @@ public class NNChain<O> extends AGNES<O> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public NNChain(Distance<? super O> distanceFunction, Linkage linkage) {
-    super(distanceFunction, linkage);
+  public NNChain(Distance<? super O> distance, Linkage linkage) {
+    super(distance, linkage);
   }
 
   /**
@@ -85,7 +86,7 @@ public class NNChain<O> extends AGNES<O> {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     MatrixParadigm mat = new MatrixParadigm(ids);
 
@@ -221,7 +222,7 @@ public class NNChain<O> extends AGNES<O> {
   public static class Par<O> extends AGNES.Par<O> {
     @Override
     public NNChain<O> make() {
-      return new NNChain<>(distanceFunction, linkage);
+      return new NNChain<>(distance, linkage);
     }
   }
 }

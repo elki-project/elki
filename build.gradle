@@ -25,6 +25,8 @@ allprojects  {
 
   // For tests depending on other module's tests
   configurations { testOutput.extendsFrom testCompile }
+
+  test.testLogging.showStandardStreams = true
 }
 
 apply from: 'gradle/modules.gradle'

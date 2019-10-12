@@ -20,8 +20,6 @@
  */
 package elki.index.preprocessed.knn;
 
-import java.util.*;
-
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -43,7 +41,10 @@ import elki.utilities.documentation.Title;
  * nearest neighbors (and their distances) to each database object.
  * <p>
  * BUG: This class currently does <em>not</em> seem able to correctly keep track
- * of the nearest neighbors!
+ * of the nearest neighbors?
+ * <p>
+ * TODO: for better performance, we would need some
+ * ModifiableDoubleDBIDHashSet or TreeSet to store the rkNN.
  *
  * @author Elke Achtert
  * @since 0.4.0
@@ -62,23 +63,23 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   /**
    * Additional data storage for RkNN.
    */
-  private WritableDataStore<TreeSet<DoubleDBIDPair>> materialized_RkNN;
+  private WritableDataStore<ModifiableDoubleDBIDList> storageRkNN;
 
   /**
    * Constructor.
    *
    * @param relation Relation to process
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param k query k
    */
-  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
-    super(relation, distanceFunction, k);
+  public MaterializeKNNAndRKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
+    super(relation, distance, k);
   }
 
   @Override
   protected void preprocess() {
     createStorage();
-    materialized_RkNN = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, TreeSet.class);
+    storageRkNN = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT, ModifiableDoubleDBIDList.class);
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Materializing k nearest neighbors and reverse k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
     materializeKNNAndRKNNs(DBIDUtil.ensureArray(relation.getDBIDs()), progress);
   }
@@ -91,8 +92,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
     // add an empty list to each rknn
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      if(materialized_RkNN.get(iter) == null) {
-        materialized_RkNN.put(iter, new TreeSet<DoubleDBIDPair>());
+      if(storageRkNN.get(iter) == null) {
+        storageRkNN.put(iter, DBIDUtil.newDistanceDBIDList());
       }
     }
 
@@ -100,8 +101,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     for(DBIDArrayIter id = ids.iter(); id.valid(); id.advance()) {
       KNNList kNNs = knnQuery.getKNNForDBID(id, k);
       storage.put(id, kNNs);
+      // inverse rkNN index:
       for(DoubleDBIDListIter iter = kNNs.iter(); iter.valid(); iter.advance()) {
-        materialized_RkNN.get(iter).add(DBIDUtil.newPair(iter.doubleValue(), id));
+        storageRkNN.get(iter).add(iter.doubleValue(), id);
       }
       LOG.incrementProcessed(progress);
     }
@@ -112,7 +114,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   @Override
   protected void objectsInserted(DBIDs ids) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
-
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // materialize the new kNNs and RkNNs
     LOG.beginStep(stepprog, 1, "New insertions ocurred, materialize their new kNNs and RkNNs.");
@@ -120,13 +121,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     // update the old kNNs and RkNNs
     LOG.beginStep(stepprog, 2, "New insertions ocurred, update the affected kNNs and RkNNs.");
-    ArrayDBIDs rkNN_ids = updateKNNsAndRkNNs(ids);
+    DBIDs rkNN_ids = updateKNNsAndRkNNs(ids);
 
     // inform listener
     LOG.beginStep(stepprog, 3, "New insertions ocurred, inform listeners.");
     fireKNNsInserted(ids, rkNN_ids);
-
-    LOG.ensureCompleted(stepprog);
+    LOG.setCompleted(stepprog);
   }
 
   /**
@@ -137,7 +137,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
    * @return the RkNNs of the specified ids, i.e. the kNNs which have been
    *         updated
    */
-  private ArrayDBIDs updateKNNsAndRkNNs(DBIDs ids) {
+  private DBIDs updateKNNsAndRkNNs(DBIDs ids) {
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for(DBIDIter id = oldids.iter(); id.valid(); id.advance()) {
@@ -189,13 +189,17 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
         }
         // add new RkNN
         for(DoubleDBIDListIter newnn = added.iter(); newnn.valid(); newnn.advance()) {
-          materialized_RkNN.get(newnn).add(DBIDUtil.newPair(newnn.doubleValue(), id));
+          storageRkNN.get(newnn).add(newnn.doubleValue(), id);
         }
         // remove old RkNN
         for(DoubleDBIDListIter oldnn = removed.iter(); oldnn.valid(); oldnn.advance()) {
-          materialized_RkNN.get(oldnn).remove(DBIDUtil.newPair(oldnn.doubleValue(), id));
+          for(DoubleDBIDListMIter iter = storageRkNN.get(oldnn).iter(); iter.valid(); iter.advance()) {
+            if(DBIDUtil.equal(iter, id)) {
+              iter.remove();
+              break;
+            }
+          }
         }
-
         rkNN_ids.add(id);
       }
     }
@@ -205,61 +209,47 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   @Override
   protected void objectsRemoved(DBIDs ids) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
-
-    // For debugging: valid DBIDs still in the database.
-    final DBIDs valid = DBIDUtil.ensureSet(distanceQuery.getRelation().getDBIDs());
-
-    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     // delete the materialized (old) kNNs and RkNNs
     LOG.beginStep(stepprog, 1, "New deletions ocurred, remove their materialized kNNs and RkNNs.");
-    // Temporary storage of removed lists
-    List<KNNList> kNNs = new ArrayList<>(ids.size());
-    List<TreeSet<DoubleDBIDPair>> rkNNs = new ArrayList<>(ids.size());
-    for(DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
-      kNNs.add(storage.get(iter));
-      for(DBIDIter it = storage.get(iter).iter(); it.valid(); it.advance()) {
-        if(!valid.contains(it) && !ids.contains(it)) {
-          LOG.warning("False kNN: " + it);
-        }
-      }
+    ModifiableDBIDs kNNs = DBIDUtil.newHashSet(), rkNNs = DBIDUtil.newHashSet();
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      kNNs.addDBIDs(storage.get(iter));
       storage.delete(iter);
-      rkNNs.add(materialized_RkNN.get(iter));
-      for(DoubleDBIDPair it : materialized_RkNN.get(iter)) {
-        if(!valid.contains(it) && !ids.contains(it)) {
-          LOG.warning("False RkNN: " + it);
-        }
-      }
-      materialized_RkNN.delete(iter);
+      rkNNs.addDBIDs(storageRkNN.get(iter));
+      storageRkNN.delete(iter);
     }
     // Keep only those IDs not also removed
-    ArrayDBIDs kNN_ids = affectedkNN(kNNs, aids);
-    ArrayDBIDs rkNN_ids = affectedRkNN(rkNNs, aids);
+    kNNs.removeDBIDs(ids);
+    rkNNs.removeDBIDs(ids);
 
     // update the affected kNNs and RkNNs
     LOG.beginStep(stepprog, 2, "New deletions ocurred, update the affected kNNs and RkNNs.");
-    // Recompute the kNN for affected objects (in rkNN lists)
-    {
-      for(DBIDArrayIter reknn = rkNN_ids.iter(); reknn.valid(); reknn.advance()) {
-        KNNList rknnlist = knnQuery.getKNNForDBID(reknn, k);
-        if(rknnlist == null && !valid.contains(reknn)) {
-          LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
-          continue;
-        }
-        assert (rknnlist != null);
-        storage.put(reknn, rknnlist);
-        for(DoubleDBIDListIter it = rknnlist.iter(); it.valid(); it.advance()) {
-          materialized_RkNN.get(it).add(DBIDUtil.newPair(it.doubleValue(), reknn));
-        }
-      }
-    }
     // remove objects from RkNNs of objects (in kNN lists)
     {
       SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
-      for(DBIDIter nn = kNN_ids.iter(); nn.valid(); nn.advance()) {
-        TreeSet<DoubleDBIDPair> rkNN = materialized_RkNN.get(nn);
-        for(Iterator<DoubleDBIDPair> it = rkNN.iterator(); it.hasNext();) {
-          if(idsSet.contains(it.next())) {
+      for(DBIDIter nn = kNNs.iter(); nn.valid(); nn.advance()) {
+        ModifiableDoubleDBIDList rkNN = storageRkNN.get(nn);
+        for(DoubleDBIDListMIter it = rkNN.iter(); it.valid(); it.advance()) {
+          if(idsSet.contains(it)) {
             it.remove();
+            break;
+          }
+        }
+      }
+    }
+    // Recompute the kNN for affected objects (in rkNN lists)
+    {
+      for(DBIDIter reknn = rkNNs.iter(); reknn.valid(); reknn.advance()) {
+        KNNList rknnlist = knnQuery.getKNNForDBID(reknn, k);
+        if(rknnlist == null) {
+          LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
+          continue;
+        }
+        storage.put(reknn, rknnlist);
+        for(DoubleDBIDListIter it = rknnlist.iter(); it.valid(); it.advance()) {
+          ModifiableDoubleDBIDList rstor = storageRkNN.get(it);
+          if(!rstor.contains(reknn)) {
+            rstor.add(it.doubleValue(), reknn);
           }
         }
       }
@@ -267,47 +257,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     // inform listener
     LOG.beginStep(stepprog, 3, "New deletions ocurred, inform listeners.");
-    fireKNNsRemoved(ids, rkNN_ids);
-
-    LOG.ensureCompleted(stepprog);
-  }
-
-  /**
-   * Extracts and removes the DBIDs in the given collections.
-   *
-   * @param extract a list of lists of DistanceResultPair to extract
-   * @param remove the ids to remove
-   * @return the DBIDs in the given collection
-   */
-  protected ArrayDBIDs affectedkNN(List<? extends KNNList> extract, DBIDs remove) {
-    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(KNNList drps : extract) {
-      for(DBIDIter iter = drps.iter(); iter.valid(); iter.advance()) {
-        ids.add(iter);
-      }
-    }
-    ids.removeDBIDs(remove);
-    // Convert back to array
-    return DBIDUtil.newArray(ids);
-  }
-
-  /**
-   * Extracts and removes the DBIDs in the given collections.
-   *
-   * @param extract a list of lists of DistanceResultPair to extract
-   * @param remove the ids to remove
-   * @return the DBIDs in the given collection
-   */
-  protected ArrayDBIDs affectedRkNN(List<? extends Collection<DoubleDBIDPair>> extract, DBIDs remove) {
-    HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(Collection<DoubleDBIDPair> drps : extract) {
-      for(DoubleDBIDPair drp : drps) {
-        ids.add(drp);
-      }
-    }
-    ids.removeDBIDs(remove);
-    // Convert back to array
-    return DBIDUtil.newArray(ids);
+    fireKNNsRemoved(ids, rkNNs);
+    LOG.setCompleted(stepprog);
   }
 
   /**
@@ -327,32 +278,14 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
    * @return the RkNNs
    */
   public DoubleDBIDList getRKNN(DBIDRef id) {
-    TreeSet<DoubleDBIDPair> rKNN = materialized_RkNN.get(id);
-    if(rKNN == null) {
-      return null;
-    }
-    ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList(rKNN.size());
-    for(DoubleDBIDPair pair : rKNN) {
-      ret.add(pair);
-    }
-    return ret.sort();
+    // TODO: do not sort?
+    return storageRkNN.get(id).sort();
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(!this.distanceFunction.equals(distanceQuery.getDistance())) {
-      return null;
-    }
-    // k max supported?
-    for(Object hint : hints) {
-      if(hint instanceof Integer) {
-        if(((Integer) hint) > k) {
-          return null;
-        }
-        break;
-      }
-    }
-    return new PreprocessorRKNNQuery<>(relation, this);
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return relation == distanceQuery.getRelation() && distance.equals(distanceQuery.getDistance()) //
+        && maxk == k ? new PreprocessorRKNNQuery<>(relation, this) : null;
   }
 
   @Override
@@ -383,16 +316,15 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
      * Constructor.
      *
      * @param k k
-     * @param distanceFunction distance function
+     * @param distance distance function
      */
-    public Factory(int k, Distance<? super O> distanceFunction) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance) {
+      super(k, distance);
     }
 
     @Override
     public MaterializeKNNAndRKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      MaterializeKNNAndRKNNPreprocessor<O> instance = new MaterializeKNNAndRKNNPreprocessor<>(relation, distanceFunction, k);
-      return instance;
+      return new MaterializeKNNAndRKNNPreprocessor<>(relation, distance, k);
     }
 
     /**
@@ -403,7 +335,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     public static class Par<O> extends MaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
       public Factory<O> make() {
-        return new Factory<>(k, distanceFunction);
+        return new Factory<>(k, distance);
       }
     }
   }

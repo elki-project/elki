@@ -57,8 +57,8 @@ import net.jafama.FastMath;
     bibkey = "doi:10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
-    return logLikelihood(relation, clustering, distanceFunction) //
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
+    return logLikelihood(relation, clustering, distance) //
         - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
   }
 

@@ -51,7 +51,7 @@ import elki.utilities.io.ByteArrayUtil;
  *
  * @param <O> Object type
  */
-public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The relation indexed.
    */
@@ -192,7 +192,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;
@@ -207,7 +207,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     // Query on the relation we index
     if(distanceQuery.getRelation() != relation) {
       return null;

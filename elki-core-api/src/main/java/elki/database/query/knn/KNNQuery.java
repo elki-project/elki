@@ -22,7 +22,6 @@ package elki.database.query.knn;
 
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
-import elki.database.query.DatabaseQuery;
 
 /**
  * The interface of an actual instance.
@@ -35,7 +34,7 @@ import elki.database.query.DatabaseQuery;
  * 
  * @param <O> Object type
  */
-public interface KNNQuery<O> extends DatabaseQuery {
+public interface KNNQuery<O> {
   /**
    * Get the k nearest neighbors for a particular id.
    * 

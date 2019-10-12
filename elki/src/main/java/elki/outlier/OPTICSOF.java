@@ -33,6 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -91,11 +92,11 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param minpts minPts parameter
    */
-  public OPTICSOF(Distance<? super O> distanceFunction, int minpts) {
-    super(distanceFunction);
+  public OPTICSOF(Distance<? super O> distance, int minpts) {
+    super(distance);
     this.minpts = minpts;
   }
 
@@ -106,7 +107,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), minpts);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(minpts);
     DBIDs ids = relation.getDBIDs();
 
     // FIXME: implicit preprocessor.
@@ -190,7 +191,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super
 
     @Override
     public OPTICSOF<O> make() {
-      return new OPTICSOF<>(distanceFunction, minpts);
+      return new OPTICSOF<>(distance, minpts);
     }
   }
 }

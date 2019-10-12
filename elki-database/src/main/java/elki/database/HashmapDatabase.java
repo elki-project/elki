@@ -24,14 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import elki.data.type.SimpleTypeInformation;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDFactory;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.HashSetModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.DBIDView;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ModifiableRelation;
@@ -283,7 +276,6 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
       }
       ((ModifiableRelation<?>) relation).delete(id);
     }
-    DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
 
   @Override

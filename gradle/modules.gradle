@@ -8,6 +8,8 @@ configurations {
 dependencies {
   def depsExclude = [ rootProject.path, ":elki-bundle" ]
   rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.each { enabledModules it }
+  // Included since Java 1.5, causing problems with modules since Java 9:
+  configurations.all { exclude group: 'xml-apis', module: 'xml-apis' }
 }
 eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
 

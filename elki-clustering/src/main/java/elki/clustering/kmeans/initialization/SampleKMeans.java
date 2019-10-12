@@ -91,7 +91,7 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
@@ -104,11 +104,11 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
     @SuppressWarnings("unchecked")
     Relation<V> rel = (Relation<V>) relation;
     // FIXME: This does not necessarily hold. Check and fail!
-    if(!distanceFunction.getInputTypeRestriction().isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+    if(!distance.getInputTypeRestriction().isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
       LoggingUtil.warning("Initializing k-means with k-means using specialized distance functions MAY fail, if the initialization method does require a distance defined on arbitrary number vectors.");
     }
     @SuppressWarnings("unchecked")
-    NumberVectorDistance<? super V> pdf = (NumberVectorDistance<? super V>) distanceFunction;
+    NumberVectorDistance<? super V> pdf = (NumberVectorDistance<? super V>) distance;
     ProxyView<V> proxyv = new ProxyView<>(sample, rel);
     ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
 

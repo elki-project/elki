@@ -57,10 +57,10 @@ public class FarReinsert extends AbstractPartialReinsert {
    * Constructor.
    * 
    * @param reinsertAmount Amount to reinsert
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public FarReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distanceFunction) {
-    super(reinsertAmount, distanceFunction);
+  public FarReinsert(double reinsertAmount, SpatialPrimitiveDistance<?> distance) {
+    super(reinsertAmount, distance);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class FarReinsert extends AbstractPartialReinsert {
     double[] dist = new double[size];
     int[] idx = MathUtil.sequence(0, size);
     for(int i = 0; i < size; i++) {
-      dist[i] = distanceFunction.minDist(DoubleVector.wrap(SpatialUtil.centroid(getter.get(entries, i))), centroid);
+      dist[i] = distance.minDist(DoubleVector.wrap(SpatialUtil.centroid(getter.get(entries, i))), centroid);
     }
     DoubleIntegerArrayQuickSort.sortReverse(dist, idx, size);
 
@@ -85,7 +85,7 @@ public class FarReinsert extends AbstractPartialReinsert {
   public static class Par extends AbstractPartialReinsert.Par {
     @Override
     public FarReinsert make() {
-      return new FarReinsert(reinsertAmount, distanceFunction);
+      return new FarReinsert(reinsertAmount, distance);
     }
   }
 }

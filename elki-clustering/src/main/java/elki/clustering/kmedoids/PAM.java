@@ -31,12 +31,12 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -111,13 +111,16 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public PAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distanceFunction);
+  public PAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    super(distance);
+    if(k > 0x7FFF) {
+      throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
+    }
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -130,10 +133,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
    * @return result
    */
   public Clustering<MedoidModel> run(Relation<V> relation) {
-    if(k > 0x7FFF) {
-      throw new NotImplementedException("PAM supports at most " + 0x7FFF + " clusters.");
-    }
-    DistanceQuery<V> distQ = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     DBIDs ids = relation.getDBIDs();
     ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids);
 
@@ -260,8 +260,9 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
       DBIDArrayIter m = medoids.iter();
-      int iteration = 1;
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         // Try to swap a non-medoid with a medoid member:
         double best = Double.POSITIVE_INFINITY;
@@ -440,7 +441,7 @@ public class PAM<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, 
 
     @Override
     public PAM<V> make() {
-      return new PAM<>(distanceFunction, k, maxiter, initializer);
+      return new PAM<>(distance, k, maxiter, initializer);
     }
   }
 }

@@ -26,9 +26,9 @@ import java.util.Random;
  * RandomFactory is responsible for creating {@link Random} generator objects.
  * It does not provide individual random numbers, but will create a random
  * generator; either using a fixed seed or random seeded (default).
- * 
+ * <p>
  * The seed can be globally predefined using {@code -Delki.seed=123}.
- * 
+ * <p>
  * These classes are not optimized for non-predictability, but for speed, as
  * scientific experiments are not likely to be adversarial.
  *

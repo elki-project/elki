@@ -39,6 +39,7 @@ import elki.database.AbstractDatabase;
 import elki.database.HashmapDatabase;
 import elki.database.UpdatableDatabase;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.LinearScanDistanceKNNQuery;
@@ -95,7 +96,7 @@ public class MaterializedKNNPreprocessorTest {
     }
 
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = relation.getDistanceQuery(EuclideanDistance.STATIC);
+    DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // verify data set size.
     assertEquals("Data set size doesn't match parameters.", shoulds, relation.size());
@@ -109,7 +110,7 @@ public class MaterializedKNNPreprocessorTest {
             .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
             .with(MaterializeKNNPreprocessor.Factory.K_ID, k) //
             .build().instantiate(relation);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
+    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
 

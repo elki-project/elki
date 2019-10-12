@@ -28,6 +28,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDPair;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -74,17 +75,17 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * Constructor
    *
    * @param relation Relation to preprocess
-   * @param distanceFunction the distance function to use
+   * @param distance the distance function to use
    * @param k query k
    */
-  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k) {
-    super(relation, distanceFunction, k);
+  public MetricalIndexApproximationMaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
+    super(relation, distance, k);
   }
 
   @Override
   protected void preprocess() {
     final Logging log = getLogger();
-    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
+    DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
 
     MetricalIndexTree<O, N, E> index = getMetricalIndex(relation);
 
@@ -203,15 +204,15 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * Constructor.
      *
      * @param k k
-     * @param distanceFunction distance function
+     * @param distance distance function
      */
-    public Factory(int k, Distance<? super O> distanceFunction) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance) {
+      super(k, distance);
     }
 
     @Override
     public MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instantiate(Relation<O> relation) {
-      MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
+      MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distance, k);
       return instance;
     }
 
@@ -223,7 +224,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     public static class Par<O extends NumberVector, N extends Node<E>, E extends MTreeEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
       public Factory<O, N, E> make() {
-        return new Factory<>(k, distanceFunction);
+        return new Factory<>(k, distance);
       }
     }
   }

@@ -41,8 +41,9 @@ public interface SimilarityRangeIndex<O> extends Index {
    * This function MAY return null, when the given distance is not supported!
    *
    * @param simQuery Similarity query
-   * @param hints Hints for the optimizer
+   * @param maxrange Maximum range
+   * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints);
+  RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, double maxrange, int flags);
 }

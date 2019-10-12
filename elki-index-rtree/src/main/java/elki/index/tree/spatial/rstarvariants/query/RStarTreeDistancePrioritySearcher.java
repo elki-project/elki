@@ -49,7 +49,7 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
   /**
    * Spatial primitive distance function.
    */
-  protected final SpatialPrimitiveDistance<? super O> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super O> distance;
 
   /**
    * Relation we query.
@@ -92,13 +92,13 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
    * 
    * @param tree Index to use
    * @param relation Data relation to query
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public RStarTreeDistancePrioritySearcher(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distanceFunction) {
+  public RStarTreeDistancePrioritySearcher(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
     super();
     this.relation = relation;
     this.tree = tree;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
   }
 
   @Override
@@ -152,7 +152,7 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
     this.threshold = Double.POSITIVE_INFINITY;
     pq.clear();
     // Push the root node to the heap.
-    double rootdist = distanceFunction.minDist(query, tree.getRootEntry());
+    double rootdist = distance.minDist(query, tree.getRootEntry());
     tree.statistics.countDistanceCalculation();
     pq.add(rootdist, tree.getRootID());
     advance(); // Find first
@@ -215,10 +215,10 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialDirectoryEntry entry = (SpatialDirectoryEntry) node.getEntry(i);
-        double distance = distanceFunction.minDist(query, entry);
+        double dist = distance.minDist(query, entry);
         tree.statistics.countDistanceCalculation();
-        if(distance <= threshold) {
-          pq.add(distance, entry.getPageID());
+        if(dist <= threshold) {
+          pq.add(dist, entry.getPageID());
         }
       }
       node = null;
@@ -236,7 +236,7 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
   public double computeExactDistance() {
     assert valid();
     tree.statistics.countDistanceCalculation();
-    return distanceFunction.minDist(query, node.getEntry(childnr));
+    return distance.minDist(query, node.getEntry(childnr));
   }
 
   @Override

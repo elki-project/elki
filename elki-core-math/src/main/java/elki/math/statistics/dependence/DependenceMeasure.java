@@ -34,7 +34,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 public interface DependenceMeasure {
   /**
    * Measure the dependence of two variables.
-   * 
+   * <p>
    * This is the more flexible API, which allows using different internal data
    * representations.
    * 
@@ -50,7 +50,7 @@ public interface DependenceMeasure {
 
   /**
    * Measure the dependence of two variables.
-   * 
+   * <p>
    * This is the more flexible API, which allows using different internal data
    * representations.
    * 
@@ -66,10 +66,10 @@ public interface DependenceMeasure {
 
   /**
    * Measure the dependence of two variables.
-   * 
+   * <p>
    * This is the more flexible API, which allows using different internal data
    * representations.
-   *
+   * <p>
    * The resulting data is a serialized lower triangular matrix:
    * 
    * <pre>

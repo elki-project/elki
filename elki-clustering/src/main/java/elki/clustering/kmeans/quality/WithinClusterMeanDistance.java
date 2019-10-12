@@ -39,7 +39,7 @@ import elki.distance.NumberVectorDistance;
  */
 public class WithinClusterMeanDistance implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     double clusterDistanceSum = 0;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       DBIDs ids = cluster.getIDs();
@@ -49,7 +49,7 @@ public class WithinClusterMeanDistance implements KMeansQualityMeasure<NumberVec
       for(DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
         NumberVector obj1 = relation.get(iter1);
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          clusterPairwiseDistanceSum += distanceFunction.distance(obj1, relation.get(iter2));
+          clusterPairwiseDistanceSum += distance.distance(obj1, relation.get(iter2));
         }
       }
       clusterDistanceSum += clusterPairwiseDistanceSum / (ids.size() * ids.size());

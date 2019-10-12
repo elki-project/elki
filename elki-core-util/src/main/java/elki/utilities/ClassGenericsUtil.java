@@ -38,14 +38,9 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * using helper functions, so that we have to suppress these warnings only in
  * one place.
  * <p>
- * Note that many of these situations are still type safe, i.e. an <i>empty</i>
+ * Note that many of these situations are still type safe, i.e., an <i>empty</i>
  * array of {@code List<List<?>>} can indeed be cast into a
  * {@code List<List<Whatever>>}.
- * <p>
- * The only one potentially unsafe is {@link #instantiateGenerics}, since we
- * can't verify that the runtime type 'type' adhers to the compile time
- * restriction T. When T is not generic, such a check is possible, and then the
- * developer should use {@link #instantiate} instead.
  *
  * @author Erich Schubert
  * @since 0.2

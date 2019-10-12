@@ -193,45 +193,24 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
-    return RStarTreeUtil.getRangeQuery(this, dq, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxk, flags) : null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
-    return RStarTreeUtil.getKNNQuery(this, dq, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getRangeQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
+  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
-      return null;
-    }
-    SpatialDistanceQuery<O> dq = (SpatialDistanceQuery<O>) distanceQuery;
-    return RStarTreeUtil.getDistancePrioritySearcher(this, dq, hints);
+    return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
+        RStarTreeUtil.getDistancePrioritySearcher(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override

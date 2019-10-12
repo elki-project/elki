@@ -23,12 +23,12 @@ package elki.outlier.lof;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -100,10 +100,10 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    * 
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    */
-  public LOF(int k, Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public LOF(int k, Distance<? super O> distance) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -118,7 +118,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(k);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing Local Reachability Densities (LRD).");
@@ -272,7 +272,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
 
     @Override
     public LOF<O> make() {
-      return new LOF<>(k, distanceFunction);
+      return new LOF<>(k, distance);
     }
   }
 }

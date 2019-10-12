@@ -25,8 +25,8 @@ import java.util.Arrays;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -72,10 +72,10 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    */
-  public MiniMaxAnderberg(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public MiniMaxAnderberg(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -85,7 +85,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
    * @return Clustering hierarchy
    */
   public PointerHierarchyRepresentationResult run(Relation<O> relation) {
-    DistanceQuery<O> dq = DatabaseUtil.precomputedDistanceQuery(relation, getDistance(), LOG);
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -367,7 +367,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public MiniMaxAnderberg<O> make() {
-      return new MiniMaxAnderberg<>(distanceFunction);
+      return new MiniMaxAnderberg<>(distance);
     }
   }
 }

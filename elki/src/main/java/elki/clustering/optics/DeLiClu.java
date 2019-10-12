@@ -116,11 +116,11 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param minpts MinPts
    */
-  public DeLiClu(DeLiCluTreeFactory<? super V> indexer, SpatialPrimitiveDistance<? super V> distanceFunction, int minpts) {
-    super(distanceFunction);
+  public DeLiClu(DeLiCluTreeFactory<? super V> indexer, SpatialPrimitiveDistance<? super V> distance, int minpts) {
+    super(distance);
     this.indexer = indexer;
     this.minpts = minpts;
   }
@@ -483,7 +483,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
 
     @Override
     public DeLiClu<V> make() {
-      return new DeLiClu<>(indexer, distanceFunction, minpts);
+      return new DeLiClu<>(indexer, distance, minpts);
     }
   }
 }

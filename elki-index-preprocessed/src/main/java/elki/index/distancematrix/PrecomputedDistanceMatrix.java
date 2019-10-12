@@ -76,7 +76,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   /**
    * Nested distance function.
    */
-  protected final Distance<? super O> distanceFunction;
+  protected final Distance<? super O> distance;
 
   /**
    * Distance matrix.
@@ -98,15 +98,15 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
    *
    * @param relation Data relation
    * @param range DBID range
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, Distance<? super O> distanceFunction) {
+  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, Distance<? super O> distance) {
     super();
     this.refrelation = new WeakReference<>(relation);
     this.ids = range;
-    this.distanceFunction = distanceFunction;
+    this.distance = distance;
 
-    if(!distanceFunction.isSymmetric()) {
+    if(!distance.isSymmetric()) {
       throw new AbortException("Distance matrixes currently only support symmetric distance functions (Patches welcome).");
     }
   }
@@ -117,7 +117,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     if(size > 65536) {
       throw new AbortException("Distance matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
     }
-    DistanceQuery<O> distanceQuery = distanceFunction.instantiate(refrelation.get());
+    DistanceQuery<O> distanceQuery = distance.instantiate(refrelation.get());
 
     final int msize = triangleSize(size);
     matrix = new double[msize];
@@ -177,27 +177,18 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   }
 
   @Override
-  public DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints) {
-    if(this.distanceFunction.equals(distanceFunction)) {
-      return new PrecomputedDistanceQuery();
-    }
-    return null;
+  public DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction) {
+    return this.distance.equals(distanceFunction) ? new PrecomputedDistanceQuery() : null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistance())) {
-      return new PrecomputedKNNQuery();
-    }
-    return null;
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return this.distance.equals(distanceQuery.getDistance()) ? new PrecomputedKNNQuery() : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistance())) {
-      return new PrecomputedRangeQuery();
-    }
-    return null;
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return this.distance.equals(distanceQuery.getDistance()) ? new PrecomputedRangeQuery() : null;
   }
 
   /**
@@ -214,7 +205,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
 
     @Override
     public Distance<? super O> getDistance() {
-      return distanceFunction;
+      return distance;
     }
 
     @Override
@@ -317,16 +308,16 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     /**
      * Nested distance function.
      */
-    final protected Distance<? super O> distanceFunction;
+    final protected Distance<? super O> distance;
 
     /**
      * Constructor.
      *
-     * @param distanceFunction Distance function
+     * @param distance Distance function
      */
-    public Factory(Distance<? super O> distanceFunction) {
+    public Factory(Distance<? super O> distance) {
       super();
-      this.distanceFunction = distanceFunction;
+      this.distance = distance;
     }
 
     @Override
@@ -335,12 +326,12 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
       if(!(rids instanceof DBIDRange)) {
         throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases; not on modifiable databases) for performance reasons (Patches welcome).");
       }
-      return new PrecomputedDistanceMatrix<>(relation, (DBIDRange) rids, distanceFunction);
+      return new PrecomputedDistanceMatrix<>(relation, (DBIDRange) rids, distance);
     }
 
     @Override
     public TypeInformation getInputTypeRestriction() {
-      return distanceFunction.getInputTypeRestriction();
+      return distance.getInputTypeRestriction();
     }
 
     /**

@@ -89,15 +89,15 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param noiseFlag Create a noise cluster instead of assigning to the nearest
    *        cluster
    */
-  public KMeansMinusMinus(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
-    super(distanceFunction, k, maxiter, initializer);
+  public KMeansMinusMinus(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
+    super(distance, k, maxiter, initializer);
     this.rate = rate;
     this.noiseFlag = noiseFlag;
   }
@@ -326,7 +326,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
 
     @Override
     public KMeansMinusMinus<V> make() {
-      return new KMeansMinusMinus<V>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
+      return new KMeansMinusMinus<V>(distance, k, maxiter, initializer, rate, noiseFlag);
     }
   }
 }

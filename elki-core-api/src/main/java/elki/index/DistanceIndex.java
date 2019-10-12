@@ -24,8 +24,8 @@ import elki.database.query.distance.DistanceQuery;
 import elki.distance.Distance;
 
 /**
- * Index with support for distance queries (e.g. precomputed distance matrixes,
- * caches)
+ * Index with support for distance queries
+ * (e.g., precomputed distance matrixes, caches)
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -38,12 +38,11 @@ import elki.distance.Distance;
 public interface DistanceIndex<O> extends Index {
   /**
    * Get a KNN query object for the given distance query and k.
-   * 
+   * <p>
    * This function MAY return null, when the given distance is not supported!
    * 
    * @param distanceFunction Distance function to use.
-   * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction, Object... hints);
+  DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction);
 }

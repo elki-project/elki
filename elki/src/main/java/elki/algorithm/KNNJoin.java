@@ -97,11 +97,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k parameter
    */
-  public KNNJoin(SpatialPrimitiveDistance<? super V> distanceFunction, int k) {
-    super(distanceFunction);
+  public KNNJoin(SpatialPrimitiveDistance<? super V> distance, int k) {
+    super(distance);
     this.k = k;
   }
 
@@ -387,7 +387,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
     @Override
     public KNNJoin<V, N, E> make() {
-      return new KNNJoin<>(distanceFunction, k);
+      return new KNNJoin<>(distance, k);
     }
   }
 }

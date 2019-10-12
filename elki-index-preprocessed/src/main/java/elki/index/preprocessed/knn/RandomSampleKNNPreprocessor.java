@@ -25,6 +25,7 @@ import java.util.Random;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -78,20 +79,20 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
    * Constructor.
    *
    * @param relation Relation to index
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k
    * @param share Relative share
    * @param rnd Random generator
    */
-  public RandomSampleKNNPreprocessor(Relation<O> relation, Distance<? super O> distanceFunction, int k, double share, RandomFactory rnd) {
-    super(relation, distanceFunction, k);
+  public RandomSampleKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, double share, RandomFactory rnd) {
+    super(relation, distance, k);
     this.share = share;
     this.rnd = rnd;
   }
 
   @Override
   protected void preprocess() {
-    DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
+    DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing random-sample k nearest neighbors (k=" + k + ")", relation.size(), getLogger()) : null;
 
@@ -160,19 +161,19 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
      * Constructor.
      *
      * @param k K
-     * @param distanceFunction distance function
+     * @param distance distance function
      * @param share Sample size (relative)
      * @param rnd Random generator
      */
-    public Factory(int k, Distance<? super O> distanceFunction, double share, RandomFactory rnd) {
-      super(k, distanceFunction);
+    public Factory(int k, Distance<? super O> distance, double share, RandomFactory rnd) {
+      super(k, distance);
       this.share = share;
       this.rnd = rnd;
     }
 
     @Override
     public RandomSampleKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      return new RandomSampleKNNPreprocessor<>(relation, distanceFunction, k, share, rnd);
+      return new RandomSampleKNNPreprocessor<>(relation, distance, k, share, rnd);
     }
 
     /**
@@ -217,7 +218,7 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
 
       @Override
       public RandomSampleKNNPreprocessor.Factory<O> make() {
-        return new RandomSampleKNNPreprocessor.Factory<>(k, distanceFunction, share, rnd);
+        return new RandomSampleKNNPreprocessor.Factory<>(k, distance, share, rnd);
       }
     }
   }

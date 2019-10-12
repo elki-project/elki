@@ -29,7 +29,6 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.query.rknn.RKNNQuery;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
 import elki.index.DynamicIndex;
 import elki.index.KNNIndex;
 import elki.index.RKNNIndex;
@@ -49,7 +48,7 @@ import elki.utilities.exceptions.NotImplementedException;
  *
  * @param <O> Object type
  */
-public class MkMaxTreeIndex<O> extends MkMaxTree<O>implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * Relation indexed.
    */
@@ -123,41 +122,21 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O>implements RangeIndex<O>, KNN
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    return new MTreeKNNQuery<>(this, distanceQuery);
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeKNNQuery<>(this, distanceQuery) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    return new MTreeRangeQuery<>(this, distanceQuery);
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeRangeQuery<>(this, distanceQuery) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    return new MkTreeRKNNQuery<>(this, distanceQuery);
+  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }
 
   @Override

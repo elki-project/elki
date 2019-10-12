@@ -87,7 +87,7 @@ public class EvaluatePBMIndex implements Evaluator {
   /**
    * Distance function to use.
    */
-  private NumberVectorDistance<?> distanceFunction;
+  private NumberVectorDistance<?> distance;
 
   /**
    * Key for logging statistics.
@@ -102,7 +102,7 @@ public class EvaluatePBMIndex implements Evaluator {
    */
   public EvaluatePBMIndex(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
     super();
-    this.distanceFunction = distance;
+    this.distance = distance;
     this.noiseHandling = noiseOpt;
   }
 
@@ -137,25 +137,25 @@ public class EvaluatePBMIndex implements Evaluator {
           // Need to compute pairwise distances of noise clusters.
           for(DBIDIter iti = clusters.get(i).getIDs().iter(); iti.valid(); iti.advance()) {
             for(DBIDIter itj = clusters.get(j).getIDs().iter(); itj.valid(); itj.advance()) {
-              double dist = distanceFunction.distance(rel.get(iti), rel.get(itj));
+              double dist = distance.distance(rel.get(iti), rel.get(itj));
               max = dist > max ? dist : max;
             }
           }
         }
         else if(centroids[i] == null) {
           for(DBIDIter iti = clusters.get(i).getIDs().iter(); iti.valid(); iti.advance()) {
-            double dist = distanceFunction.distance(rel.get(iti), centroids[j]);
+            double dist = distance.distance(rel.get(iti), centroids[j]);
             max = dist > max ? dist : max;
           }
         }
         else if(centroids[j] == null) {
           for(DBIDIter itj = clusters.get(j).getIDs().iter(); itj.valid(); itj.advance()) {
-            double dist = distanceFunction.distance(centroids[i], rel.get(itj));
+            double dist = distance.distance(centroids[i], rel.get(itj));
             max = dist > max ? dist : max;
           }
         }
         else {
-          double dist = distanceFunction.distance(centroids[i], centroids[j]);
+          double dist = distance.distance(centroids[i], centroids[j]);
           max = dist > max ? dist : max;
         }
       }
@@ -184,8 +184,8 @@ public class EvaluatePBMIndex implements Evaluator {
 
       for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
         NumberVector obj = rel.get(it);
-        a += distanceFunction.distance(centroids[i], obj);
-        b += distanceFunction.distance(overallCentroid, obj);
+        a += distance.distance(centroids[i], obj);
+        b += distance.distance(overallCentroid, obj);
       }
     }
 
@@ -214,7 +214,7 @@ public class EvaluatePBMIndex implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(result);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
       evaluateClustering(rel, c);

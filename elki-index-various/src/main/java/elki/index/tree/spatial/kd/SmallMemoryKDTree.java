@@ -211,7 +211,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance) {
@@ -227,7 +227,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //

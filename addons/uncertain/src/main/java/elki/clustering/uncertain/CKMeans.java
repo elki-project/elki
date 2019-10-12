@@ -82,13 +82,13 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
   /**
    * Constructor that uses Lloyd's k-means algorithm.
    *
-   * @param distanceFunction Distance functions for centers
+   * @param distance Distance functions for centers
    * @param k K parameter
    * @param maxiter Maximum number of iterations
    * @param initializer Initializer
    */
-  public CKMeans(NumberVectorDistance<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization initializer) {
-    super(new LloydKMeans<>(distanceFunction, k, maxiter, initializer));
+  public CKMeans(NumberVectorDistance<? super NumberVector> distance, int k, int maxiter, KMeansInitialization initializer) {
+    super(new LloydKMeans<>(distance, k, maxiter, initializer));
   }
 
   @Override

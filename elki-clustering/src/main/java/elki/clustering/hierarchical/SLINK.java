@@ -28,6 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -79,10 +80,10 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    */
-  public SLINK(Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public SLINK(Distance<? super O> distance) {
+    super(distance);
   }
 
   /**
@@ -124,7 +125,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     }
     else {
       // Fallback branch
-      DistanceQuery<O> distQ = relation.getDistanceQuery(getDistance());
+      DistanceQuery<O> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
       for(id.seek(1); id.valid(); id.advance()) {
         step2(id, it, id.getOffset(), distQ, m);
         process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK
@@ -168,13 +169,13 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param n Last object
    * @param m Data store
    * @param relation Data relation
-   * @param distFunc Distance function to use
+   * @param distance Distance function to use
    */
-  private void step2primitive(DBIDRef id, DBIDArrayIter it, int n, Relation<? extends O> relation, PrimitiveDistance<? super O> distFunc, WritableDoubleDataStore m) {
+  private void step2primitive(DBIDRef id, DBIDArrayIter it, int n, Relation<? extends O> relation, PrimitiveDistance<? super O> distance, WritableDoubleDataStore m) {
     O newObj = relation.get(id);
     for(it.seek(0); it.getOffset() < n; it.advance()) {
       // M(i) = dist(i, n+1)
-      m.putDouble(it, distFunc.distance(relation.get(it), newObj));
+      m.putDouble(it, distance.distance(relation.get(it), newObj));
     }
   }
 
@@ -279,7 +280,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
     @Override
     public SLINK<O> make() {
-      return new SLINK<>(distanceFunction);
+      return new SLINK<>(distance);
     }
   }
 }

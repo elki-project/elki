@@ -27,6 +27,7 @@ import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.database.Database;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -134,7 +135,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    RangeQuery<O> rangeQuery = relation.getRangeQuery(distance);
+    RangeQuery<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery();
     int hash;
     MeanVariance mv = new MeanVariance(); // result statistics to collect.
     if(queries != null) {

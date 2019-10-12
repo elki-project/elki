@@ -32,6 +32,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -165,7 +166,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public CorrelationClusterOrder run() {
       final int usek = k > 0 ? k : 3 * RelationUtil.dimensionality(relation);
       preferenceVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
-      KNNQuery<V> knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, usek);
+      KNNQuery<V> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(usek);
 
       Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;

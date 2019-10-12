@@ -24,7 +24,6 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.DatabaseQuery;
 
 /**
  * The interface for range queries, that can return all objects within the
@@ -41,7 +40,7 @@ import elki.database.query.DatabaseQuery;
  *
  * @param <O> Object type
  */
-public interface RangeQuery<O> extends DatabaseQuery {
+public interface RangeQuery<O> {
   /**
    * Get the neighbors for a particular id in a given query range
    *

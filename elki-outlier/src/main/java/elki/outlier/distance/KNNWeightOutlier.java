@@ -30,6 +30,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -103,11 +104,11 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
   /**
    * Constructor with parameters.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k Parameter (not including query point!)
    */
-  public KNNWeightOutlier(Distance<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+  public KNNWeightOutlier(Distance<? super O> distance, int k) {
+    super(distance);
     this.k = k;
   }
 
@@ -119,7 +120,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
   public OutlierResult run(Relation<O> relation) {
     // k neighbors + query point
     final int kplus = k + 1;
-    KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), kplus);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
@@ -190,7 +191,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance
 
     @Override
     public KNNWeightOutlier<O> make() {
-      return new KNNWeightOutlier<>(distanceFunction, k);
+      return new KNNWeightOutlier<>(distance, k);
     }
   }
 }

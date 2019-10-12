@@ -25,7 +25,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
-import elki.database.query.DatabaseQuery;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -81,7 +81,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   private static final Logging LOG = Logging.getLogger(DWOF.class);
 
   /**
-   * Holds the value of {@link Parameterizer#K_ID} i.e. Number of neighbors to
+   * Holds the value of {@link Par#K_ID} i.e. Number of neighbors to
    * consider during the calculation of DWOF scores + the query point.
    */
   protected int kplus;
@@ -94,12 +94,12 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use in queries
+   * @param distance Distance function to use in queries
    * @param k the value of k
    * @param delta Radius increase factor
    */
-  public DWOF(Distance<? super O> distanceFunction, int k, double delta) {
-    super(distanceFunction);
+  public DWOF(Distance<? super O> distance, int k, double delta) {
+    super(distance);
     this.kplus = k + 1; // + query point
     this.delta = delta;
   }
@@ -113,10 +113,11 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    */
   public OutlierResult run(Relation<O> relation) {
     final DBIDs ids = relation.getDBIDs();
-    DistanceQuery<O> distFunc = relation.getDistanceQuery(getDistance());
+    final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    DistanceQuery<O> distFunc = qb.distanceQuery();
     // Get k nearest neighbor and range query on the relation.
-    KNNQuery<O> knnq = relation.getKNNQuery(distFunc, kplus, DatabaseQuery.HINT_HEAVY_USE);
-    RangeQuery<O> rnnQuery = relation.getRangeQuery(distFunc, DatabaseQuery.HINT_HEAVY_USE);
+    KNNQuery<O> knnq = qb.kNNQuery(kplus);
+    RangeQuery<O> rnnQuery = qb.rangeQuery();
 
     StepProgress stepProg = LOG.isVerbose() ? new StepProgress("DWOF", 2) : null;
     // DWOF output score storage.
@@ -357,7 +358,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public DWOF<O> make() {
-      return new DWOF<>(distanceFunction, k, delta);
+      return new DWOF<>(distance, k, delta);
     }
   }
 }

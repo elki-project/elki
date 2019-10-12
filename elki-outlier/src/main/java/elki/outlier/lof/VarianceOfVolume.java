@@ -25,7 +25,6 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -34,6 +33,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -104,10 +104,10 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    *
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    */
-  public VarianceOfVolume(int k, Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public VarianceOfVolume(int k, Distance<? super O> distance) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -123,7 +123,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
     int dim = RelationUtil.dimensionality(relation);
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, getDistance(), k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(k);
 
     // Compute Volumes
     LOG.beginStep(stepprog, 2, "Computing Volumes.");
@@ -256,7 +256,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
     @Override
     public VarianceOfVolume<O> make() {
-      return new VarianceOfVolume<>(k, distanceFunction);
+      return new VarianceOfVolume<>(k, distance);
     }
   }
 }

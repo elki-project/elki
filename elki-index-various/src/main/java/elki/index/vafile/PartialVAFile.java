@@ -47,8 +47,8 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.ByteArrayUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -221,37 +221,27 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof SubspaceLPNormDistance) {
-      double p = ((SubspaceLPNormDistance) df).getP();
-      long[] bits = ((SubspaceLPNormDistance) df).getSelectedDimensions();
-      return new PartialVAFileKNNQuery(distanceQuery, p, bits);
-    }
-    if(df instanceof LPNormDistance) {
-      double p = ((LPNormDistance) df).getP();
-      long[] bits = BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()));
-      return new PartialVAFileKNNQuery(distanceQuery, p, bits);
-    }
-    // Not supported.
-    return null;
+    return df instanceof SubspaceLPNormDistance ? //
+        new PartialVAFileKNNQuery(distanceQuery, ((SubspaceLPNormDistance) df).getP(), //
+            ((SubspaceLPNormDistance) df).getSelectedDimensions()) //
+        : df instanceof LPNormDistance ? //
+            new PartialVAFileKNNQuery(distanceQuery, ((LPNormDistance) df).getP(), //
+                BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()))) //
+            : null; // Not supported.
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, Object... hints) {
+  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
-    if(df instanceof SubspaceLPNormDistance) {
-      double p = ((SubspaceLPNormDistance) df).getP();
-      long[] bits = ((SubspaceLPNormDistance) df).getSelectedDimensions();
-      return new PartialVAFileRangeQuery(distanceQuery, p, bits);
-    }
-    if(df instanceof LPNormDistance) {
-      double p = ((LPNormDistance) df).getP();
-      long[] bits = BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()));
-      return new PartialVAFileRangeQuery(distanceQuery, p, bits);
-    }
-    // Not supported.
-    return null;
+    return df instanceof SubspaceLPNormDistance ? //
+        new PartialVAFileRangeQuery(distanceQuery, ((SubspaceLPNormDistance) df).getP(), //
+            ((SubspaceLPNormDistance) df).getSelectedDimensions()) //
+        : df instanceof LPNormDistance ? //
+            new PartialVAFileRangeQuery(distanceQuery, ((LPNormDistance) df).getP(), //
+                BitsUtil.ones(RelationUtil.dimensionality(distanceQuery.getRelation()))) //
+            : null; // Not supported.
   }
 
   /**

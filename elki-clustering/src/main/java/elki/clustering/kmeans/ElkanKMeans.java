@@ -68,14 +68,14 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public ElkanKMeans(NumberVectorDistance<? super V> distanceFunction, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
-    super(distanceFunction, k, maxiter, initializer, varstat);
+  public ElkanKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+    super(distance, k, maxiter, initializer, varstat);
   }
 
   @Override
@@ -177,7 +177,7 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
   public static class Par<V extends NumberVector> extends SimplifiedElkanKMeans.Par<V> {
     @Override
     public ElkanKMeans<V> make() {
-      return new ElkanKMeans<>(distanceFunction, k, maxiter, initializer, varstat);
+      return new ElkanKMeans<>(distance, k, maxiter, initializer, varstat);
     }
   }
 }

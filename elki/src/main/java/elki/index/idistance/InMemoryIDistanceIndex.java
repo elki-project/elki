@@ -173,35 +173,15 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      if(LOG.isDebugging()) {
-        LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    return new IDistanceKNNQuery(distanceQuery);
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new IDistanceKNNQuery(distanceQuery) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      if(LOG.isDebugging()) {
-        LOG.debug("Distance function not supported by index - or 'equals' not implemented right!");
-      }
-      return null;
-    }
-    return new IDistanceRangeQuery(distanceQuery);
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new IDistanceRangeQuery(distanceQuery) : null;
   }
 
   /**

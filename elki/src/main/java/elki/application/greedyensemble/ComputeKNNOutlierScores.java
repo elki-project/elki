@@ -35,12 +35,12 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
 import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
@@ -50,10 +50,9 @@ import elki.outlier.anglebased.FastABOD;
 import elki.outlier.distance.*;
 import elki.outlier.intrinsic.IDOS;
 import elki.outlier.intrinsic.ISOS;
-import elki.outlier.intrinsic.IntrinsicDimensionalityOutlier;
+import elki.outlier.intrinsic.LID;
 import elki.outlier.lof.*;
 import elki.outlier.trivial.ByLabelOutlier;
-import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
 import elki.similarity.kernel.LinearKernel;
@@ -144,7 +143,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * Constructor.
    *
    * @param inputstep Input step
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param krange K parameter range
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
@@ -152,8 +151,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * @param disable Pattern for disabling methods
    * @param ksquarestop Maximum k for O(k^2) methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distanceFunction, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
-    super(inputstep, distanceFunction);
+  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distance, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
+    super(inputstep, distance);
     this.krange = krange;
     this.bylabel = bylabel;
     this.outfile = outfile;
@@ -171,17 +170,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
 
     // Get a KNN query.
     final int lim = Math.min(maxk + 2, relation.size());
-    KNNQuery<O> knnq = relation.getKNNQuery(distance, lim);
-
-    // Precompute kNN:
-    if(!(knnq instanceof PreprocessorKNNQuery)) {
-      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distance, lim);
-      preproc.initialize();
-      Metadata.hierarchyOf(relation).addChild(preproc);
-    }
-
-    // Test that we now get a proper index query
-    knnq = relation.getKNNQuery(distance, lim);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(lim);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       throw new AbortException("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
@@ -264,8 +253,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           k -> new COF<O>(k, distance) //
               .run(relation), out);
       // Run simple Intrinsic dimensionality
-      runForEachK("Intrinsic", 2, maxk, //
-          k -> new IntrinsicDimensionalityOutlier<O>(distance, k, AggregatedHillEstimator.STATIC) //
+      runForEachK("LID", 2, maxk, //
+          k -> new LID<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
       // Run IDOS
       runForEachK("IDOS", 2, maxk, //

@@ -23,12 +23,12 @@ package elki.outlier.lof;
 import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.DatabaseUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
@@ -86,10 +86,10 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    *
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
-   * @param distanceFunction the neighborhood distance function
+   * @param distance the neighborhood distance function
    */
-  public COF(int k, Distance<? super O> distanceFunction) {
-    super(distanceFunction);
+  public COF(int k, Distance<? super O> distance) {
+    super(distance);
     this.k = k + 1; // + query point
   }
 
@@ -101,9 +101,9 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("COF", 3) : null;
-    DistanceQuery<O> dq = relation.getDistanceQuery(getDistance());
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     LOG.beginStep(stepprog, 1, "Materializing COF neighborhoods.");
-    KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(relation, dq, k);
+    KNNQuery<O> knnq = new QueryBuilder<>(dq).precomputed().kNNQuery(k);
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 2, "Computing Average Chaining Distances.");
@@ -262,7 +262,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
 
     @Override
     public COF<O> make() {
-      return new COF<>(k, distanceFunction);
+      return new COF<>(k, distance);
     }
   }
 }

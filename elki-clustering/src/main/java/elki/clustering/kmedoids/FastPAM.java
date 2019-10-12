@@ -96,26 +96,26 @@ public class FastPAM<V> extends FastPAM1<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public FastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    this(distanceFunction, k, maxiter, initializer, 1.);
+  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+    this(distance, k, maxiter, initializer, 1.);
   }
 
   /**
    * Constructor.
    *
-   * @param distanceFunction distance function
+   * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
-  public FastPAM(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
-    super(distanceFunction, k, maxiter, initializer);
+  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+    super(distance, k, maxiter, initializer);
     this.fasttol = fasttol;
   }
 
@@ -168,11 +168,12 @@ public class FastPAM<V> extends FastPAM1<V> {
       int fastswaps = 0; // For statistics
       // Swap phase
       DBIDArrayIter m = medoids.iter();
-      int iteration = 1;
       ArrayModifiableDBIDs bestids = DBIDUtil.newArray(k);
       DBIDVar bestid = DBIDUtil.newVar();
       double[] best = new double[k], cost = new double[k];
-      for(; maxiter <= 0 || iteration <= maxiter; iteration++) {
+      int iteration = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
         LOG.incrementProcessed(prog);
         findBestSwaps(m, bestids, best, cost);
         // Convergence check
@@ -342,7 +343,7 @@ public class FastPAM<V> extends FastPAM1<V> {
 
     @Override
     public FastPAM<V> make() {
-      return new FastPAM<>(distanceFunction, k, maxiter, initializer, fasttol);
+      return new FastPAM<>(distance, k, maxiter, initializer, fasttol);
     }
   }
 }

@@ -32,6 +32,12 @@ def customizePom(pom, project) { pom.withXml {
 } }
 
 subprojects {
+  jar {
+    inputs.property("moduleName", project.name.replace("-","."))
+    manifest {
+      attributes('Automatic-Module-Name': project.name.replace("-","."))
+    }
+  }
   processResources {
     from("$rootDir/elki/src/main/resources/META-INF") {
       include "NOTICE"

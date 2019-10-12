@@ -31,6 +31,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -114,7 +115,7 @@ public class CLARA<V> extends PAM<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k Number of clusters to produce
    * @param maxiter Maximum number of iterations
    * @param initializer Initialization function
@@ -123,8 +124,8 @@ public class CLARA<V> extends PAM<V> {
    * @param keepmed Keep the previous medoids in the next sample
    * @param random Random generator
    */
-  public CLARA(Distance<? super V> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
-    super(distanceFunction, k, maxiter, initializer);
+  public CLARA(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer, int numsamples, double sampling, boolean keepmed, RandomFactory random) {
+    super(distance, k, maxiter, initializer);
     this.numsamples = numsamples;
     this.sampling = sampling;
     this.random = random;
@@ -134,7 +135,7 @@ public class CLARA<V> extends PAM<V> {
   @Override
   public Clustering<MedoidModel> run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
     if(samplesize < 3 * k) {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
@@ -416,7 +417,7 @@ public class CLARA<V> extends PAM<V> {
 
     @Override
     public CLARA<V> make() {
-      return new CLARA<>(distanceFunction, k, maxiter, initializer, numsamples, sampling, keepmed, random);
+      return new CLARA<>(distance, k, maxiter, initializer, numsamples, sampling, keepmed, random);
     }
   }
 }

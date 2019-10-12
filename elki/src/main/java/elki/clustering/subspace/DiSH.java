@@ -34,6 +34,7 @@ import elki.data.type.VectorFieldTypeInformation;
 import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
@@ -117,7 +118,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   }
 
   /**
-   * Holds the value of {@link Parameterizer#EPSILON_ID}.
+   * Holds the value of {@link Par#EPSILON_ID}.
    */
   private double epsilon;
 
@@ -138,10 +139,10 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param minpts Mu parameter (minPts)
    * @param strategy DiSH strategy
    */
-  public DiSH(double epsilon, int mu, DiSH.Strategy strategy) {
+  public DiSH(double epsilon, int minpts, DiSH.Strategy strategy) {
     super();
     this.epsilon = epsilon;
-    this.minpts = mu;
+    this.minpts = minpts;
     this.strategy = strategy;
   }
 
@@ -714,7 +715,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       final int dim = RelationUtil.dimensionality(relation);
       ArrayList<RangeQuery<V>> rangeQueries = new ArrayList<>(dim);
       for(int d = 0; d < dim; d++) {
-        rangeQueries.add(relation.getRangeQuery(new OnedimensionalDistance(d), epsilon));
+        rangeQueries.add(new QueryBuilder<>(relation, new OnedimensionalDistance(d)).rangeQuery(epsilon));
       }
 
       StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;

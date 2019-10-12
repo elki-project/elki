@@ -28,6 +28,7 @@ import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -75,14 +76,14 @@ public class FastCLARANS<V> extends CLARANS<V> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function to use
+   * @param distance Distance function to use
    * @param k Number of clusters to produce
    * @param numlocal Number of samples (restarts)
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
    */
-  public FastCLARANS(Distance<? super V> distanceFunction, int k, int numlocal, double maxneighbor, RandomFactory random) {
-    super(distanceFunction, k, numlocal, maxneighbor, random);
+  public FastCLARANS(Distance<? super V> distance, int k, int numlocal, double maxneighbor, RandomFactory random) {
+    super(distance, k, numlocal, maxneighbor, random);
   }
 
   @Override
@@ -92,7 +93,7 @@ public class FastCLARANS<V> extends CLARANS<V> {
       LOG.warning("A very large k was chosen. This implementation is not optimized for this case.");
     }
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = relation.getDistanceQuery(getDistance());
+    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
     final boolean metric = getDistance().isMetric();
 
     // Number of retries, relative rate, or absolute count:
@@ -333,7 +334,7 @@ public class FastCLARANS<V> extends CLARANS<V> {
 
     @Override
     public FastCLARANS<V> make() {
-      return new FastCLARANS<>(distanceFunction, k, numlocal, maxneighbor, random);
+      return new FastCLARANS<>(distance, k, numlocal, maxneighbor, random);
     }
   }
 }

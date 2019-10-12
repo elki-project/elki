@@ -29,7 +29,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
+import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -112,13 +112,13 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param distance Distance function
    * @param k k Parameter
    * @param sample Sampling rate, or sample size (when &gt; 1)
    * @param rnd Random source.
    */
-  public KNNDistancesSampler(Distance<? super O> distanceFunction, int k, double sample, RandomFactory rnd) {
-    super(distanceFunction);
+  public KNNDistancesSampler(Distance<? super O> distance, int k, double sample, RandomFactory rnd) {
+    super(distance);
     this.k = k;
     this.sample = sample;
     this.rnd = rnd;
@@ -132,7 +132,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
    * @return Result
    */
   public KNNDistanceOrderResult run(Relation<O> relation) {
-    final KNNQuery<O> knnQuery = relation.getKNNQuery(getDistance(), k + 1);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
     final int size = (int) ((sample <= 1.) ? Math.ceil(relation.size() * sample) : sample);
     DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), size, rnd);
 
@@ -140,8 +140,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
     double[] knnDistances = new double[size];
     int i = 0;
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knnQuery.getKNNForDBID(iditer, k + 1);
-      knnDistances[i++] = neighbors.getKNNDistance();
+      knnDistances[i++] = knnQuery.getKNNForDBID(iditer, k + 1).getKNNDistance();
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -233,7 +232,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<Dista
 
     @Override
     public KNNDistancesSampler<O> make() {
-      return new KNNDistancesSampler<>(distanceFunction, k, percentage, rnd);
+      return new KNNDistancesSampler<>(distance, k, percentage, rnd);
     }
   }
 }

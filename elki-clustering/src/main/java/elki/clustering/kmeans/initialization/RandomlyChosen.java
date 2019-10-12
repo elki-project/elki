@@ -83,7 +83,7 @@ public class RandomlyChosen<O> extends AbstractKMeansInitialization implements K
   }
 
   @Override
-  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distanceFunction) {
+  public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
@@ -97,7 +97,7 @@ public class RandomlyChosen<O> extends AbstractKMeansInitialization implements K
   }
 
   @Override
-  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distanceFunction) {
+  public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distance) {
     return DBIDUtil.randomSample(ids, k, rnd);
   }
 
