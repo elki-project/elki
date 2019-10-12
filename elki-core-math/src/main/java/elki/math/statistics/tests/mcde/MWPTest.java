@@ -48,6 +48,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. Scientific and Statistical Database Management (SSDBM 2019)", //
     url = "https://doi.org/10.1145/3335783.3335795", //
     bibkey = "DBLP:conf/ssdbm/FoucheB19")
+
 public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
   /**
    * Static Constructor - use this one
