@@ -20,17 +20,8 @@
  */
 package elki.outlier.meta;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.outlier.lof.LOF;
 import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
@@ -42,33 +33,27 @@ import elki.database.ProxyDatabase;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.relation.DoubleRelation;
-import elki.database.relation.MaterializedDoubleRelation;
-import elki.database.relation.ProjectedView;
-import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
+import elki.database.ids.*;
+import elki.database.relation.*;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.tests.GoodnessOfFitTest;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
+import elki.outlier.OutlierAlgorithm;
+import elki.outlier.lof.LOF;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.heap.Heap;
 import elki.utilities.datastructures.heap.TopBoundedHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -76,6 +61,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -194,7 +180,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       }
 
       ProxyDatabase pdb = new ProxyDatabase(ids);
-      pdb.addRelation(new ProjectedView<>(relation, new NumericalFeatureSelection<V>(dimset)));
+      pdb.addRelation(new ProjectedView<>(relation, new NumericalFeatureSelection<V>(dimset.bits)));
 
       // run LOF and collect the result
       OutlierResult result = outlierAlgorithm.run(pdb);
@@ -267,9 +253,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     // compute two-element sets of subspaces
     for(int i = 0; i < dbdim; i++) {
       for(int j = i + 1; j < dbdim; j++) {
-        HiCSSubspace ts = new HiCSSubspace();
-        ts.set(i);
-        ts.set(j);
+        HiCSSubspace ts = new HiCSSubspace(dbdim).set(i).set(j);
         calculateContrast(relation, ts, subspaceIndex, random);
         dDimensionalList.add(ts);
         LOG.incrementProcessed(prog);
@@ -296,12 +280,9 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       // TODO: optimize APRIORI style, by not even computing the bit set or?
       for(int i = 0; i < candidateList.size() - 1; i++) {
         for(int j = i + 1; j < candidateList.size(); j++) {
-          HiCSSubspace set1 = candidateList.get(i), set2 = candidateList.get(j);
-
-          HiCSSubspace joinedSet = new HiCSSubspace();
-          joinedSet.or(set1);
-          joinedSet.or(set2);
-          if(joinedSet.cardinality() != d) {
+          HiCSSubspace joinedSet = new HiCSSubspace(candidateList.get(i)) //
+              .or(candidateList.get(j));
+          if(joinedSet.dimensionality() != d) {
             continue;
           }
 
@@ -336,7 +317,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * @param subspaceIndex Subspace indexes
    */
   private void calculateContrast(Relation<? extends NumberVector> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
-    final int card = subspace.cardinality();
+    final int card = subspace.dimensionality();
     final double alpha1 = FastMath.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
     final FiniteProgress prog = LOG.isDebugging() ? new FiniteProgress("Monte-Carlo iterations", m, LOG) : null;
@@ -425,11 +406,11 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * 
    * @author Erich Schubert
    */
-  public static class HiCSSubspace extends BitSet {
+  public static class HiCSSubspace {
     /**
-     * Serial version.
+     * Subspace bitset.
      */
-    private static final long serialVersionUID = 1L;
+    protected long[] bits;
 
     /**
      * The HiCS contrast value.
@@ -438,20 +419,73 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
     /**
      * Constructor.
+     * 
+     * @param maxdim Maximum dimensionality
      */
-    public HiCSSubspace() {
+    protected HiCSSubspace(int maxdim) {
       super();
+      this.bits = BitsUtil.zero(maxdim);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param other Existing set to clone
+     */
+    protected HiCSSubspace(HiCSSubspace other) {
+      super();
+      this.bits = other.bits.clone();
+    }
+
+    /**
+     * Get the subspace dimensionality.
+     *
+     * @return Dimensionality
+     */
+    public int dimensionality() {
+      return BitsUtil.cardinality(bits);
+    }
+
+    /**
+     * Set a bit in the subspace.
+     *
+     * @param i Bit to set
+     * @return this object
+     */
+    protected HiCSSubspace set(int i) {
+      BitsUtil.setI(bits, i);
+      return this;
+    }
+
+    /**
+     * Or-combine with another subspace.
+     *
+     * @param other Other subspace
+     * @return This subspace
+     */
+    protected HiCSSubspace or(HiCSSubspace other) {
+      BitsUtil.orI(bits, other.bits);
+      return this;
     }
 
     @Override
     public String toString() {
-      StringBuilder buf = new StringBuilder(1000);
-      buf.append("[contrast=").append(contrast);
+      StringBuilder buf = new StringBuilder(1000) //
+          .append("[contrast=").append(contrast);
       for(int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
-        buf.append(' ').append(i + 1);
+        buf.append(' ').append(i);
       }
-      buf.append(']');
-      return buf.toString();
+      return buf.append(']').toString();
+    }
+
+    /**
+     * Get the next set bit.
+     *
+     * @param start Starting value
+     * @return Next set bit, or -1
+     */
+    public int nextSetBit(int start) {
+      return BitsUtil.nextSetBit(bits, start);
     }
 
     /**

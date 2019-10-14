@@ -20,13 +20,12 @@
  */
 package elki.data.projection;
 
-import java.util.BitSet;
-
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.data.type.VectorTypeInformation;
+import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -80,12 +79,12 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
    * 
    * @param bits Bitset
    */
-  public NumericalFeatureSelection(BitSet bits) {
+  public NumericalFeatureSelection(long[] bits) {
     super();
-    final int card = bits.cardinality();
+    final int card = BitsUtil.cardinality(bits);
     this.dims = new int[card];
     int mind = 0;
-    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
+    for(int i = BitsUtil.nextSetBit(bits, 0), j = 0; i >= 0; i = BitsUtil.nextSetBit(bits, i + 1), j++) {
       dims[j] = i;
       mind = (i > mind) ? i : mind;
     }
@@ -135,7 +134,7 @@ public class NumericalFeatureSelection<V extends NumberVector> implements Projec
     @Override
     public void configure(Parameterization config) {
       new IntListParameter(FeatureSelection.Par.SELECTED_ATTRIBUTES_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
           .grab(config, x -> dims = x);
     }
 
