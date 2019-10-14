@@ -113,27 +113,28 @@ public class HiCSDependence implements Dependence {
     int[] s2 = Util.sortedIndex(adapter2, data2, len);
 
     // Distributions for testing
-    double[] fullValues = new double[len];
-    double[] sampleValues = new double[windowsize];
+    double[] full = new double[len], sample = new double[windowsize];
     double deviationSum = 0.;
 
     // For the first half, we use the first dimension as reference
+    final int half = m >> 1; // TODO: remove bias?
     for(int i = 0; i < len; i++) {
-      fullValues[i] = adapter1.getDouble(data1, i);
-      if(fullValues[i] != fullValues[i]) {
+      full[i] = adapter1.getDouble(data1, i);
+      if(full[i] != full[i]) {
         throw new ArithmeticException("NaN values are not allowed by this implementation!");
       }
     }
 
-    int half = m >> 1; // TODO: remove bias?
-    for(int i = 0; i < half; ++i) {
+    int retries = 1000;
+    for(int i = 0; i < half && retries > 0; ++i) {
       // Build the sample
       for(int j = random.nextInt(len - windowsize), k = 0; k < windowsize; ++k, ++j) {
-        sampleValues[k] = adapter2.getDouble(data2, j);
+        sample[k] = adapter2.getDouble(data2, s1[j]);
       }
-      double contrast = statTest.deviation(fullValues, sampleValues);
+      double contrast = statTest.deviation(full, sample);
       if(Double.isNaN(contrast)) {
         --i; // Retry.
+        --retries;
         continue;
       }
       deviationSum += contrast;
@@ -141,25 +142,29 @@ public class HiCSDependence implements Dependence {
 
     // For the second half, we use the second dimension as reference
     for(int i = 0; i < len; i++) {
-      fullValues[i] = adapter2.getDouble(data2, i);
-      if(fullValues[i] != fullValues[i]) {
+      full[i] = adapter2.getDouble(data2, i);
+      if(full[i] != full[i]) {
         throw new ArithmeticException("NaN values are not allowed by this implementation!");
       }
     }
 
-    for(int i = half; i < m; ++i) {
+    for(int i = half; i < m && retries > 0; ++i) {
       // Build the sample
       for(int j = random.nextInt(len - windowsize), k = 0; k < windowsize; ++k, ++j) {
-        sampleValues[k] = adapter1.getDouble(data1, j);
+        sample[k] = adapter1.getDouble(data1, s2[j]);
       }
-      double contrast = statTest.deviation(fullValues, sampleValues);
+      double contrast = statTest.deviation(full, sample);
       if(Double.isNaN(contrast)) {
         --i; // Retry.
+        --retries;
         continue;
       }
       deviationSum += contrast;
     }
 
+    if(retries == 0) {
+      throw new ArithmeticException("Too many NaNs during HiCSDependence");
+    }
     return 1 - deviationSum / m;
   }
 

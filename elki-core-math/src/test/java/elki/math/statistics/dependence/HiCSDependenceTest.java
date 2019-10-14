@@ -20,17 +20,11 @@
  */
 package elki.math.statistics.dependence;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Random;
-
 import org.junit.Test;
 
-import elki.math.MathUtil;
+import elki.math.statistics.tests.KolmogorovSmirnovTest;
+import elki.math.statistics.tests.WelchTTest;
 import elki.utilities.ELKIBuilder;
-import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
-import elki.utilities.random.FastNonThreadsafeRandom;
 
 /**
  * Ensure basic integrity.
@@ -38,43 +32,32 @@ import elki.utilities.random.FastNonThreadsafeRandom;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class HiCSDependenceTest {
+public class HiCSDependenceTest extends DependenceTest {
   @Test
-  public void testBasic() {
+  public void testKS() {
     Dependence cor = new ELKIBuilder<>(HiCSDependence.class) //
         .with(HiCSDependence.Par.SEED_ID, 0) //
+        .with(HiCSDependence.Par.TEST_ID, KolmogorovSmirnovTest.STATIC) //
         .build();
-    // Note: only positive correlations are accepted.
-    checkPerfectLinear(cor, 1000, 0.800, 0.280, 0.05);
-    checkUniform(cor, 1000, 0.950, 0.02, 0.50, 0.08);
+    // Linear correlations do affect marginal distributions!
+    checkPerfectLinear(cor, 1000, 0.5, 0.12, 0.08);
+    // Note that for HiCS, even independent uniform is related,
+    // because the marginal distribution does not change.
+    checkUniform(cor, 1000, 0.5, 0.01, 0.5, 0.08);
+    // Gaussian marginals are also related
+    checkGaussians(cor, 1000, 0.62, 0.08);
   }
 
-  // Ugly duplication, but necessary because we cannot access the *test* classes
-  // of other modules easily
-  public static void checkPerfectLinear(Dependence m, int len, double expectp, double expectn, double tol) {
-    Random r = new FastNonThreadsafeRandom(0L);
-    double[] x = new double[len], y = new double[len], z = new double[len];
-    for(int i = 0; i < len; i++) {
-      z[i] = -(y[i] = (x[i] = r.nextGaussian() * Math.PI + Math.E) * MathUtil.SQRTTHIRD + MathUtil.LOG2);
-    }
-    double[] res = m.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(new double[][] { x, y, z }));
-    assertEquals("Perfect positive linear", expectp, m.dependence(x, y), tol);
-    assertEquals("Perfect positive linear", expectp, res[0], tol);
-    assertEquals("Perfect negative linear", expectn, m.dependence(x, z), tol);
-    assertEquals("Perfect negative linear", expectn, res[1], tol);
-    assertEquals("Perfect negative linear", expectn, m.dependence(y, z), tol);
-    assertEquals("Perfect negative linear", expectn, res[2], tol);
-  }
-
-  public static void checkUniform(Dependence m, int len, double expectSelf, double tolSelf, double expectCross, double tolCross) {
-    Random r = new FastNonThreadsafeRandom(0L);
-    double[] x = new double[len], y = new double[len];
-    for(int i = 0; i < len; i++) {
-      x[i] = r.nextDouble() * Math.PI - MathUtil.SQRT3;
-      y[i] = r.nextDouble() * -Math.E + MathUtil.LOGLOG2;
-    }
-    assertEquals("Uniform", expectCross, m.dependence(x, y), tolCross);
-    assertEquals("Uniform-self1", expectSelf, m.dependence(x, x), tolSelf);
-    assertEquals("Uniform-self2", expectSelf, m.dependence(y, y), tolSelf);
+  @Test
+  public void testWelch() {
+    Dependence cor = new ELKIBuilder<>(HiCSDependence.class) //
+        .with(HiCSDependence.Par.SEED_ID, 0) //
+        .with(HiCSDependence.Par.TEST_ID, WelchTTest.STATIC) //
+        .build();
+    // This test mostly shows that Welch-T is too aggressive for this to work:
+    // Even i.i.d. distributed data frequently pass as different.
+    checkPerfectLinear(cor, 1000, 0.01, 0., 0.01);
+    checkUniform(cor, 1000, 0.01, 0.05, 0., 0.08);
+    checkGaussians(cor, 1000, 0.02, 0.08);
   }
 }
