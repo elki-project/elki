@@ -22,10 +22,10 @@ package elki.math.statistics.tests;
 
 /**
  * Interface for the statistical test used by HiCS.
- * 
+ * <p>
  * Consists of a single method that calculates the deviation between two data
  * samples, given as arrays of double values.
- * 
+ * <p>
  * Note that different measures may have very different scale!
  * 
  * @author Jan Brusis
@@ -35,13 +35,12 @@ package elki.math.statistics.tests;
 public interface GoodnessOfFitTest {
   /**
    * Measure the deviation of a full sample from a conditional sample.
+   * <p>
+   * Sample arrays <em>may</em> be modified, e.g., sorted, by the test.
    * 
-   * Sample arrays <em>may</em> be modified, e.g. sorted, by the test.
-   * 
-   * @param fullSample Full sample
-   * @param conditionalSample Conditional sample
-   * 
+   * @param full Full sample
+   * @param conditional Conditional sample
    * @return Deviation
    */
-  double deviation(double[] fullSample, double[] conditionalSample);
+  double deviation(double[] full, double[] conditional);
 }

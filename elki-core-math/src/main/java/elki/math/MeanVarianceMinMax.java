@@ -198,9 +198,10 @@ public class MeanVarianceMinMax extends MeanVariance {
   }
 
   @Override
-  public void reset() {
+  public MeanVarianceMinMax reset() {
     super.reset();
     min = Double.POSITIVE_INFINITY;
     max = Double.NEGATIVE_INFINITY;
+    return this;
   }
 }

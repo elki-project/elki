@@ -296,8 +296,9 @@ public class MeanVariance extends Mean {
   }
 
   @Override
-  public void reset() {
+  public MeanVariance reset() {
     super.reset();
     m2 = 0;
+    return this;
   }
 }
