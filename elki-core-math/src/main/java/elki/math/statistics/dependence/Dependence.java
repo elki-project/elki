@@ -35,7 +35,7 @@ import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public interface DependenceMeasure {
+public interface Dependence {
   /**
    * Measure the dependence of two variables.
    * <p>

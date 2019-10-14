@@ -30,16 +30,16 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class SpearmanCorrelationDependenceMeasure implements DependenceMeasure {
+public class SpearmanCorrelationDependence implements Dependence {
   /**
    * Static instance.
    */
-  public static final SpearmanCorrelationDependenceMeasure STATIC = new SpearmanCorrelationDependenceMeasure();
+  public static final SpearmanCorrelationDependence STATIC = new SpearmanCorrelationDependence();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected SpearmanCorrelationDependenceMeasure() {
+  protected SpearmanCorrelationDependence() {
     super();
   }
 
@@ -68,7 +68,7 @@ public class SpearmanCorrelationDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public SpearmanCorrelationDependenceMeasure make() {
+    public SpearmanCorrelationDependence make() {
       return STATIC;
     }
   }

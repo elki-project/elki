@@ -65,7 +65,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.88", //
     bibkey = "DBLP:conf/icde/KellerMB12")
-public class HiCSDependenceMeasure implements DependenceMeasure {
+public class HiCSDependence implements Dependence {
   /**
    * Monte-Carlo iterations
    */
@@ -94,7 +94,7 @@ public class HiCSDependenceMeasure implements DependenceMeasure {
    * @param alpha Alpha threshold
    * @param rnd Random source
    */
-  public HiCSDependenceMeasure(GoodnessOfFitTest statTest, int m, double alpha, RandomFactory rnd) {
+  public HiCSDependence(GoodnessOfFitTest statTest, int m, double alpha, RandomFactory rnd) {
     super();
     this.statTest = statTest;
     this.m = m;
@@ -226,8 +226,8 @@ public class HiCSDependenceMeasure implements DependenceMeasure {
     }
 
     @Override
-    public HiCSDependenceMeasure make() {
-      return new HiCSDependenceMeasure(statTest, m, alpha, rnd);
+    public HiCSDependence make() {
+      return new HiCSDependence(statTest, m, alpha, rnd);
     }
   }
 }

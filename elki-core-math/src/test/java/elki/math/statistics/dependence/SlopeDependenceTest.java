@@ -28,11 +28,11 @@ import org.junit.Test;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class MCEDependenceMeasureTest {
+public class SlopeDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
-    DependenceMeasure cor = MCEDependenceMeasure.STATIC;
-    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 1.0, 1e-15);
-    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.002, 0.005);
+    // Note: only positive correlations are accepted.
+    checkPerfectLinear(SlopeDependence.STATIC, 1000, 1.0, 0.125, 0.01);
+    checkUniform(SlopeDependence.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 }

@@ -34,7 +34,7 @@ import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class JensenShannonEquiwidthDependenceMeasureTest {
+public class JensenShannonEquiwidthDependenceTest extends DependenceTest {
   double[][] data = { //
       { 1, 2, 3, 4 }, //
       { 1, 3, 5, 7 }, //
@@ -61,7 +61,7 @@ public class JensenShannonEquiwidthDependenceMeasureTest {
 
   @Test
   public void testJS() {
-    DependenceMeasure mi = JensenShannonEquiwidthDependenceMeasure.STATIC;
+    Dependence mi = JensenShannonEquiwidthDependence.STATIC;
     // Single computations
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
@@ -78,12 +78,11 @@ public class JensenShannonEquiwidthDependenceMeasureTest {
       }
     }
   }
-  
+
   @Test
   public void testBasic() {
-    DependenceMeasure mi = JensenShannonEquiwidthDependenceMeasure.STATIC;
     // This will become better with data size.
-    DependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.938, 0.938, 0.001);
-    DependenceMeasureTest.checkUniform(mi, 1000, 0.998, 0.001, 0.267, 0.001);
+    checkPerfectLinear(JensenShannonEquiwidthDependence.STATIC, 1000, 0.938, 0.938, 0.001);
+    checkUniform(JensenShannonEquiwidthDependence.STATIC, 1000, 0.998, 0.001, 0.267, 0.001);
   }
 }

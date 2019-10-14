@@ -37,16 +37,16 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class JensenShannonEquiwidthDependenceMeasure implements DependenceMeasure {
+public class JensenShannonEquiwidthDependence implements Dependence {
   /**
    * Static instance.
    */
-  public static final JensenShannonEquiwidthDependenceMeasure STATIC = new JensenShannonEquiwidthDependenceMeasure();
+  public static final JensenShannonEquiwidthDependence STATIC = new JensenShannonEquiwidthDependence();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected JensenShannonEquiwidthDependenceMeasure() {
+  protected JensenShannonEquiwidthDependence() {
     super();
   }
 
@@ -133,7 +133,7 @@ public class JensenShannonEquiwidthDependenceMeasure implements DependenceMeasur
    */
   public static class Par implements Parameterizer {
     @Override
-    public JensenShannonEquiwidthDependenceMeasure make() {
+    public JensenShannonEquiwidthDependence make() {
       return STATIC;
     }
   }

@@ -28,12 +28,13 @@ import org.junit.Test;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class SlopeDependenceMeasureTest {
+public class HoughSpaceMeasureTest extends DependenceTest {
   @Test
   public void testBasic() {
-    DependenceMeasure cor = SlopeDependenceMeasure.STATIC;
-    // Note: only positive correlations are accepted.
-    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1.0, 0.125, 0.01);
-    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0.05, 0.01);
+    // These tests primarily show that this measure does not detect linear
+    // relationships too well - they cause parallel lines, not intersections.
+    checkPerfectLinear(HoughSpaceMeasure.STATIC, 100, 0.725, 0.740, 0.001);
+    checkUniform(HoughSpaceMeasure.STATIC, 100, 0.655, 0.005, 0.680, 0.001);
+    checkGaussians(HoughSpaceMeasure.STATIC, 100, 0.663, 0.001);
   }
 }

@@ -36,21 +36,21 @@ import net.jafama.FastMath;
  * <p>
  * TODO: Offer normalized and non-normalized variants?
  * <p>
- * For a median-based discretization, see {@link MCEDependenceMeasure}.
+ * For a median-based discretization, see {@link MaximumConditionalEntropy}.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class MutualInformationEquiwidthDependenceMeasure implements DependenceMeasure {
+public class MutualInformationEquiwidthDependence implements Dependence {
   /**
    * Static instance.
    */
-  public static final MutualInformationEquiwidthDependenceMeasure STATIC = new MutualInformationEquiwidthDependenceMeasure();
+  public static final MutualInformationEquiwidthDependence STATIC = new MutualInformationEquiwidthDependence();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected MutualInformationEquiwidthDependenceMeasure() {
+  protected MutualInformationEquiwidthDependence() {
     super();
   }
 
@@ -128,7 +128,7 @@ public class MutualInformationEquiwidthDependenceMeasure implements DependenceMe
    */
   public static class Par implements Parameterizer {
     @Override
-    public MutualInformationEquiwidthDependenceMeasure make() {
+    public MutualInformationEquiwidthDependence make() {
       return STATIC;
     }
   }

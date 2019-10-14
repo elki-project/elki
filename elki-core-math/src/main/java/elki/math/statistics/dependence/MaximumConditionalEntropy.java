@@ -50,11 +50,11 @@ import net.jafama.FastMath;
     booktitle = "Information Visualization, 2(4)", //
     url = "https://doi.org/10.1057/palgrave.ivs.9500053", //
     bibkey = "DBLP:journals/ivs/Guo03")
-public class MCEDependenceMeasure implements DependenceMeasure {
+public class MaximumConditionalEntropy implements Dependence {
   /**
    * Static instance.
    */
-  public static final MCEDependenceMeasure STATIC = new MCEDependenceMeasure();
+  public static final MaximumConditionalEntropy STATIC = new MaximumConditionalEntropy();
 
   /**
    * Desired size: 35 observations.
@@ -259,7 +259,7 @@ public class MCEDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public MCEDependenceMeasure make() {
+    public MaximumConditionalEntropy make() {
       return STATIC;
     }
   }

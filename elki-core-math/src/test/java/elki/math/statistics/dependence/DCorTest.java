@@ -29,52 +29,51 @@ import org.junit.Test;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
- * Validate correlation by comparing to the results of R.
+ * Validate dCor by comparing to output of the official R version.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class CorrelationDependenceMeasureTest {
+public class DCorTest  extends DependenceTest {
   double[][] data = { //
       { 1, 2, 3, 4 }, //
       { 1, 3, 5, 7 }, //
       { 4, 3, 2, 1 }, //
       { 1, 4, 2, 3 }, //
       { 1, 0, 0, 1 }, //
-  };
+      { 0, 0, 0, 0 } };
 
   double[][] R = { //
       { 1. }, //
       { 1., 1. }, //
-      { -1., -1., 1. }, //
-      { 0.4, 0.4, -0.4, 1. }, //
-      { 0., 0., 0., -0.4472136, 1 }, //
+      { 1., 1., 1. }, //
+      { 0.7337994, 0.7337994, 0.7337994, 1. }, //
+      { 0.5266404, 0.5266404, 0.5266404, 0.5266404, 1 }, //
+      { 0., 0., 0., 0., 0., 0. }, //
   };
 
   @Test
   public void testBasic() {
-    DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
     // This will become better with data size.
-    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1, -1, 1e-14);
-    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.03);
+    checkPerfectLinear(DCor.STATIC, 1000, 1, 1, 1e-13);
+    checkUniform(DCor.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 
   @Test
   public void testR() {
-    DependenceMeasure cor = CorrelationDependenceMeasure.STATIC;
-    // Single computations
+    DCor dCor = DCor.STATIC;
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
-        double co = cor.dependence(data[i], data[j]);
-        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
+        double dcor = dCor.dependence(data[i], data[j]);
+        assertEquals("dCor does not match for " + i + "," + j, R[i][j], dcor, 1e-7);
       }
     }
     // Bulk computation
-    double[] mat = cor.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
+    double[] mat = dCor.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
     for(int i = 0, c = 0; i < data.length; i++) {
       for(int j = 0; j < i; j++) {
         double co = mat[c++];
-        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
+        assertEquals("dCor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
   }

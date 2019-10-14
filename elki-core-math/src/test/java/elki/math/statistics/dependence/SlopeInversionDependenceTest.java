@@ -28,11 +28,10 @@ import org.junit.Test;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class HoeffdingsDDependenceMeasureTest {
+public class SlopeInversionDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
-    DependenceMeasure cor = HoeffdingsDDependenceMeasure.STATIC;
-    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 1., 1., 1e-15);
-    DependenceMeasureTest.checkUniform(cor, 1000, 1.0, 1e-15, 0, 0.001);
+    checkPerfectLinear(SlopeInversionDependence.STATIC, 1000, 1.0, 1.0, 1e-15);
+    checkUniform(SlopeInversionDependence.STATIC, 1000, 1.0, 1e-15, 0.06, 0.01);
   }
 }

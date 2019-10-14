@@ -29,52 +29,51 @@ import org.junit.Test;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
- * Validate dCor by comparing to output of the official R version.
+ * Validate correlation by comparing to the results of R.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class DistanceCorrelationDependenceMeasureTest {
+public class PearsonCorrelationDependenceTest extends DependenceTest {
   double[][] data = { //
       { 1, 2, 3, 4 }, //
       { 1, 3, 5, 7 }, //
       { 4, 3, 2, 1 }, //
       { 1, 4, 2, 3 }, //
       { 1, 0, 0, 1 }, //
-      { 0, 0, 0, 0 } };
+  };
 
   double[][] R = { //
       { 1. }, //
       { 1., 1. }, //
-      { 1., 1., 1. }, //
-      { 0.7337994, 0.7337994, 0.7337994, 1. }, //
-      { 0.5266404, 0.5266404, 0.5266404, 0.5266404, 1 }, //
-      { 0., 0., 0., 0., 0., 0. }, //
+      { -1., -1., 1. }, //
+      { 0.4, 0.4, -0.4, 1. }, //
+      { 0., 0., 0., -0.4472136, 1 }, //
   };
 
   @Test
   public void testBasic() {
-    DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
     // This will become better with data size.
-    DependenceMeasureTest.checkPerfectLinear(dCor, 1000, 1, 1, 1e-13);
-    DependenceMeasureTest.checkUniform(dCor, 1000, 1.0, 1e-15, 0.05, 0.01);
+    checkPerfectLinear(PearsonCorrelationDependence.STATIC, 1000, 1, -1, 1e-14);
+    checkUniform(PearsonCorrelationDependence.STATIC, 1000, 1.0, 1e-15, 0, 0.03);
   }
 
   @Test
   public void testR() {
-    DistanceCorrelationDependenceMeasure dCor = DistanceCorrelationDependenceMeasure.STATIC;
+    Dependence cor = PearsonCorrelationDependence.STATIC;
+    // Single computations
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
-        double dcor = dCor.dependence(data[i], data[j]);
-        assertEquals("dCor does not match for " + i + "," + j, R[i][j], dcor, 1e-7);
+        double co = cor.dependence(data[i], data[j]);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
     // Bulk computation
-    double[] mat = dCor.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
+    double[] mat = cor.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
     for(int i = 0, c = 0; i < data.length; i++) {
       for(int j = 0; j < i; j++) {
         double co = mat[c++];
-        assertEquals("dCor does not match for " + i + "," + j, R[i][j], co, 1e-7);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
   }

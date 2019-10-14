@@ -46,16 +46,16 @@ import net.jafama.FastMath;
     booktitle = "The Annals of Mathematical Statistics 19", //
     url = "http://www.jstor.org/stable/2236021", //
     bibkey = "journals/mathstat/Hoeffding48")
-public class HoeffdingsDDependenceMeasure implements DependenceMeasure {
+public class HoeffdingsD implements Dependence {
   /**
    * Static instance.
    */
-  public static final HoeffdingsDDependenceMeasure STATIC = new HoeffdingsDDependenceMeasure();
+  public static final HoeffdingsD STATIC = new HoeffdingsD();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected HoeffdingsDDependenceMeasure() {
+  protected HoeffdingsD() {
     super();
   }
 
@@ -199,7 +199,7 @@ public class HoeffdingsDDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public HoeffdingsDDependenceMeasure make() {
+    public HoeffdingsD make() {
       return STATIC;
     }
   }

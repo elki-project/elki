@@ -26,66 +26,53 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
- * Validate correlation by comparing to manual computation.
+ * Validate correlation by comparing to the results of R.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class MutualInformationEquiwidthDependenceMeasureTest {
+public class SpearmanCorrelationDependenceTest extends DependenceTest {
   double[][] data = { //
       { 1, 2, 3, 4 }, //
-      { 1, 3, 5, 7 }, //
-      { 4, 3, 2, 1 }, //
-      { 1, 4, 2, 3 }, //
-      { 1, 0, 0, 1 }, //
-      { 0, 1, 1, 1 }, //
+      { 1, 3, 5, 700 }, //
+      { 400, 3, 2, 1 }, //
+      { 1, 400, 2, 3 }, //
+      { 100, 0, 0, 100 }, //
   };
 
-  // Due to ties in last example, quantization yields:
-  // X [1, 0] 1
-  // Y [1, 2] 3
-  // M [2, 2] 4
-  final static double HH = (.5 * Math.log(4. / 3) + .25 * Math.log(2.) + .25 * Math.log(2. / 3)) * MathUtil.ONE_BY_LOG2;
-
-  // Diagonal: [1, 3]
-  final static double H4 = (.75 * Math.log(4. / 3) + .25 * Math.log(4.)) * MathUtil.ONE_BY_LOG2;
-
-  double[][] manual = { //
+  double[][] R = { //
       { 1. }, //
       { 1., 1. }, //
-      { 1., 1., 1. }, //
-      { 0., 0., 0., 1. }, //
-      { 0., 0., 0., 0., 1 }, //
-      { HH, HH, HH, HH, HH, H4 }, //
+      { -1., -1., 1. }, //
+      { 0.4, 0.4, -0.4, 1. }, //
+      { 0., 0., 0., -0.4472136, 1 }, //
   };
 
   @Test
   public void testBasic() {
-    DependenceMeasure mi = MutualInformationEquiwidthDependenceMeasure.STATIC;
-    DependenceMeasureTest.checkPerfectLinear(mi, 1000, 0.87, 0.87, 0.002);
-    DependenceMeasureTest.checkUniform(mi, 1000, 1.0, 0.01, 0.163, 0.001);
+    checkPerfectLinear(SpearmanCorrelationDependence.STATIC, 1000, 1.0, -1.0, 1e-15);
+    checkUniform(SpearmanCorrelationDependence.STATIC, 1000, 1.0, 1e-15, -0.026, 0.01);
   }
 
   @Test
-  public void testManual() {
-    DependenceMeasure mi = MutualInformationEquiwidthDependenceMeasure.STATIC;
+  public void testR() {
+    Dependence cor = SpearmanCorrelationDependence.STATIC;
     // Single computations
     for(int i = 0; i < data.length; i++) {
       for(int j = 0; j <= i; j++) {
-        double co = mi.dependence(data[i], data[j]);
-        assertEquals("MI does not match for " + i + "," + j, manual[i][j], co, 1e-7);
+        double co = cor.dependence(data[i], data[j]);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
     // Bulk computation
-    double[] mat = mi.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
+    double[] mat = cor.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
     for(int i = 0, c = 0; i < data.length; i++) {
       for(int j = 0; j < i; j++) {
         double co = mat[c++];
-        assertEquals("MI does not match for " + i + "," + j, manual[i][j], co, 1e-7);
+        assertEquals("Cor does not match for " + i + "," + j, R[i][j], co, 1e-7);
       }
     }
   }

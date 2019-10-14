@@ -21,7 +21,7 @@
 package elki.visualization.parallel3d.layout;
 
 import elki.data.NumberVector;
-import elki.math.statistics.dependence.DependenceMeasure;
+import elki.math.statistics.dependence.Dependence;
 import elki.utilities.optionhandling.OptionID;
 
 /**
@@ -41,7 +41,7 @@ public interface SimilarityBasedLayouter3DPC extends Layouter3DPC<NumberVector> 
    * 
    * @return Similarity measure.
    */
-  DependenceMeasure getSimilarity();
+  Dependence getSimilarity();
 
   /**
    * Main analysis method.

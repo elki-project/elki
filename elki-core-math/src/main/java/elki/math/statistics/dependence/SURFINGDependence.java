@@ -59,7 +59,6 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.5
  */
-@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
@@ -70,16 +69,17 @@ import net.jafama.FastMath;
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2004)", //
     url = "https://doi.org/10.1109/ICDM.2004.10112", //
     bibkey = "DBLP:conf/icdm/BaumgartnerPKKK04")
-public class SURFINGDependenceMeasure implements DependenceMeasure {
+@Priority(Priority.SUPPLEMENTARY)
+public class SURFINGDependence implements Dependence {
   /**
    * Static instance.
    */
-  public static final SURFINGDependenceMeasure STATIC = new SURFINGDependenceMeasure();
+  public static final SURFINGDependence STATIC = new SURFINGDependence();
 
   /**
    * Constructor. Use static instance instead!
    */
-  protected SURFINGDependenceMeasure() {
+  protected SURFINGDependence() {
     super();
   }
 
@@ -135,7 +135,7 @@ public class SURFINGDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public SURFINGDependenceMeasure make() {
+    public SURFINGDependence make() {
       return STATIC;
     }
   }

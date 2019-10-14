@@ -22,6 +22,7 @@ package elki.math.statistics.dependence;
 
 import java.util.List;
 
+import elki.utilities.Priority;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -52,16 +53,17 @@ import net.jafama.FastMath;
     booktitle = "The Annals of Statistics, 35(6), 2769-2794", //
     url = "https://doi.org/10.1214/009053607000000505", //
     bibkey = "doi:10.1214/009053607000000505")
-public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
+@Priority(Priority.RECOMMENDED)
+public class DCor implements Dependence {
   /**
    * Static instance.
    */
-  public static final DistanceCorrelationDependenceMeasure STATIC = new DistanceCorrelationDependenceMeasure();
+  public static final DCor STATIC = new DCor();
 
   /**
    * Constructor - use {@link #STATIC} instance instead!
    */
-  protected DistanceCorrelationDependenceMeasure() {
+  protected DCor() {
     super();
   }
 
@@ -194,7 +196,7 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public DistanceCorrelationDependenceMeasure make() {
+    public DCor make() {
       return STATIC;
     }
   }

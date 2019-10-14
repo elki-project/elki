@@ -28,14 +28,10 @@ import org.junit.Test;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class HSMDependenceMeasureTest {
+public class MaximumConditionalEntropyTest extends DependenceTest {
   @Test
   public void testBasic() {
-    DependenceMeasure cor = HSMDependenceMeasure.STATIC;
-    // These tests primarily show that this measure does not detect linear
-    // relationships too well - they cause parallel lines, not intersections.
-    DependenceMeasureTest.checkPerfectLinear(cor, 100, 0.725, 0.740, 0.001);
-    DependenceMeasureTest.checkUniform(cor, 100, 0.655, 0.005, 0.680, 0.001);
-    DependenceMeasureTest.checkTwoClusters(cor, 100, 0.663, 0.001);
+    checkPerfectLinear(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1.0, 1e-15);
+    checkUniform(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1e-15, 0.002, 0.005);
   }
 }

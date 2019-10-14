@@ -23,6 +23,7 @@ package elki.math.statistics.dependence;
 import java.util.List;
 
 import elki.logging.Logging;
+import elki.utilities.Priority;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
 import net.jafama.FastMath;
@@ -33,21 +34,22 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class CorrelationDependenceMeasure implements DependenceMeasure {
+@Priority(Priority.RECOMMENDED + 1)
+public class PearsonCorrelationDependence implements Dependence {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(CorrelationDependenceMeasure.class);
+  private static final Logging LOG = Logging.getLogger(PearsonCorrelationDependence.class);
 
   /**
    * Static instance.
    */
-  public static final CorrelationDependenceMeasure STATIC = new CorrelationDependenceMeasure();
+  public static final PearsonCorrelationDependence STATIC = new PearsonCorrelationDependence();
 
   /**
    * Constructor - use {@link #STATIC} instance.
    */
-  protected CorrelationDependenceMeasure() {
+  protected PearsonCorrelationDependence() {
     super();
   }
 
@@ -55,7 +57,7 @@ public class CorrelationDependenceMeasure implements DependenceMeasure {
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = Util.size(adapter1, data1, adapter2, data2);
     // Perform two-pass estimation, which is numerically stable and often faster
-    // than the Knuth-Welford approach (see PearsonCorrelation class)
+    // than the Knuth-Welford approach (see PearsonCorrelationDependence class)
     double m1 = 0., m2 = 0;
     for(int i = 0; i < len; i++) {
       m1 += adapter1.getDouble(data1, i);
@@ -109,7 +111,7 @@ public class CorrelationDependenceMeasure implements DependenceMeasure {
     // Compute standard deviations (times sqrt(len)!):
     for(int y = 0; y < dims; y++) {
       if(vst[y] == 0.) {
-        LOG.warning("Correlation is not well defined for constant attributes.");
+        LOG.warning("PearsonCorrelationDependence is not well defined for constant attributes.");
       }
       vst[y] = FastMath.sqrt(vst[y]);
     }
@@ -117,8 +119,7 @@ public class CorrelationDependenceMeasure implements DependenceMeasure {
       for(int x = 0; x < y; x++) {
         // We don't need to divide by sqrt(len), because it will cancel out with
         // the division we skipped just above.
-        cov[c] = cov[c] / (vst[x] * vst[y]);
-        c++;
+        cov[c++] /= vst[x] * vst[y];
       }
     }
     return cov;
@@ -131,7 +132,7 @@ public class CorrelationDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public CorrelationDependenceMeasure make() {
+    public PearsonCorrelationDependence make() {
       return STATIC;
     }
   }

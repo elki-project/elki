@@ -27,7 +27,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Compute the "interestingness" of dimension connections using the hough
+ * HSM: Compute the "interestingness" of dimension connections using the Hough
  * transformation. This is a very visual approach, designed to find certain
  * patterns in parallel coordinates visualizations. The patterns detected
  * here occur mostly if you have mutliple <em>clusters</em> of linear patterns
@@ -55,11 +55,11 @@ import elki.utilities.optionhandling.Parameterizer;
     booktitle = "IEEE Trans. Visualization and Computer Graphics", //
     url = "https://doi.org/10.1109/TVCG.2010.242", //
     bibkey = "DBLP:journals/tvcg/TatuAEBTMK11")
-public class HSMDependenceMeasure implements DependenceMeasure {
+public class HoughSpaceMeasure implements Dependence {
   /**
    * Static instance.
    */
-  public static final HSMDependenceMeasure STATIC = new HSMDependenceMeasure();
+  public static final HoughSpaceMeasure STATIC = new HoughSpaceMeasure();
 
   /**
    * Angular resolution. Best if divisible by 4: smaller tables.
@@ -232,7 +232,7 @@ public class HSMDependenceMeasure implements DependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public HSMDependenceMeasure make() {
+    public HoughSpaceMeasure make() {
       return STATIC;
     }
   }

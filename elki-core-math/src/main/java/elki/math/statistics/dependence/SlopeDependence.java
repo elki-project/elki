@@ -28,6 +28,9 @@ import net.jafama.FastMath;
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
  * <p>
+ * This version only accepts <em>positive</em> correlations, see also
+ * {@link SlopeInversionDependence}.
+ * <p>
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br>
@@ -45,16 +48,31 @@ import net.jafama.FastMath;
     booktitle = "Proc. 2013 ACM Int. Conf. on Management of Data (SIGMOD 2013)", //
     url = "https://doi.org/10.1145/2463676.2463696", //
     bibkey = "DBLP:conf/sigmod/AchtertKSZ13")
-public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
+public class SlopeDependence implements Dependence {
   /**
    * Static instance.
    */
-  public static final SlopeInversionDependenceMeasure STATIC = new SlopeInversionDependenceMeasure();
+  public static final SlopeDependence STATIC = new SlopeDependence();
+
+  /**
+   * Full precision.
+   */
+  protected final static int PRECISION = 40;
+
+  /**
+   * Precision for entropy normalization.
+   */
+  protected final static double LOG_PRECISION = FastMath.log(PRECISION);
+
+  /**
+   * Scaling factor.
+   */
+  protected final static double RESCALE = PRECISION * .5;
 
   /**
    * Constructor. Use static instance instead!
    */
-  protected SlopeInversionDependenceMeasure() {
+  protected SlopeDependence() {
     super();
   }
 
@@ -87,47 +105,28 @@ public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
     // Collect angular histograms.
     // Note, we only fill half of the matrix
     int[] angles = new int[PRECISION];
-    int[] angleI = new int[PRECISION];
 
     // Scratch buffer
     for(int i = 0; i < len; i++) {
       double x = adapter1.getDouble(data1, i), y = adapter2.getDouble(data2, i);
       x = (x - off1) * scale1;
       y = (y - off2) * scale2;
-      {
-        final double delta = x - y + 1;
-        int div = (int) Math.round(delta * RESCALE);
-        // TODO: do we really need this check?
-        div = (div < 0) ? 0 : (div >= PRECISION) ? PRECISION - 1 : div;
-        angles[div] += 1;
-      }
-      {
-        final double delta = x + y;
-        int div = (int) Math.round(delta * RESCALE);
-        // TODO: do we really need this check?
-        div = (div < 0) ? 0 : (div >= PRECISION) ? PRECISION - 1 : div;
-        angleI[div] += 1;
-      }
+      final double delta = x - y + 1;
+      int div = (int) Math.round(delta * RESCALE);
+      // TODO: do we really need this check?
+      div = (div < 0) ? 0 : (div >= PRECISION) ? PRECISION - 1 : div;
+      angles[div] += 1;
     }
 
     // Compute entropy:
-    double entropy = 0., entropyI = 0.;
+    double entropy = 0.;
     for(int l = 0; l < PRECISION; l++) {
       if(angles[l] > 0) {
         final double p = angles[l] / (double) len;
         entropy += p * FastMath.log(p);
       }
-      if(angleI[l] > 0) {
-        final double p = angleI[l] / (double) len;
-        entropyI += p * FastMath.log(p);
-      }
     }
-    if(entropy >= entropyI) {
-      return 1 + entropy / LOG_PRECISION;
-    }
-    else {
-      return 1 + entropyI / LOG_PRECISION;
-    }
+    return 1 + entropy / LOG_PRECISION;
   }
 
   /**
@@ -137,7 +136,7 @@ public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
    */
   public static class Par implements Parameterizer {
     @Override
-    public SlopeInversionDependenceMeasure make() {
+    public SlopeDependence make() {
       return STATIC;
     }
   }

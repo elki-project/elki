@@ -28,12 +28,11 @@ import org.junit.Test;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class SURFINGDependenceMeasureTest {
+public class SURFINGDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
-    DependenceMeasure cor = SURFINGDependenceMeasure.STATIC;
-    DependenceMeasureTest.checkPerfectLinear(cor, 1000, 0.392, 0.392, 0.001);
-    DependenceMeasureTest.checkUniform(cor, 1000, 0.1, 0.02, 0.099, 0.001);
-    DependenceMeasureTest.checkTwoClusters(cor, 1000, 0.13, 0.001);
+    checkPerfectLinear(SURFINGDependence.STATIC, 1000, 0.392, 0.392, 0.001);
+    checkUniform(SURFINGDependence.STATIC, 1000, 0.1, 0.02, 0.099, 0.001);
+    checkGaussians(SURFINGDependence.STATIC, 1000, 0.13, 0.001);
   }
 }
