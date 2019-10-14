@@ -42,7 +42,7 @@ import net.jafama.FastMath;
  * Implementation notice: we exploit symmetry, and thus use diagonal matrixes.
  * While initially the diagonal is zero, after double-centering the matrix these
  * values can become non-zero!
- * 
+ *
  * @author Marie Kiermeier
  * @author Erich Schubert
  * @since 0.7.0
@@ -69,20 +69,17 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = Util.size(adapter1, data1, adapter2, data2);
     double[] dMatrixA = computeDistances(adapter1, data1);
-    double[] dMatrixB = computeDistances(adapter2, data2);
-
-    // distance variance
     double dVarA = computeDCovar(dMatrixA, dMatrixA, len);
     if(!(dVarA > 0.)) {
       return 0.;
     }
+    double[] dMatrixB = computeDistances(adapter2, data2);
     double dVarB = computeDCovar(dMatrixB, dMatrixB, len);
     if(!(dVarB > 0.)) {
       return 0.;
     }
-    double dCovar = computeDCovar(dMatrixA, dMatrixB, len);
     // distance correlation
-    return FastMath.sqrt(dCovar / FastMath.sqrt(dVarA * dVarB));
+    return FastMath.sqrt(computeDCovar(dMatrixA, dMatrixB, len) / FastMath.sqrt(dVarA * dVarB));
   }
 
   @Override
@@ -98,13 +95,17 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
     }
     double[] dCor = new double[(dims * (dims - 1)) >> 1];
     for(int y = 1, c = 0; y < dims; y++) {
-      for(int x = 0; x < y; x++) {
-        if(!(dVar[x] * dVar[y] > 0.)) {
-          dCor[c++] = 0.;
-          continue;
+      final double dy = dVar[y];
+      if(dy == 0.) {
+        c += y; // Skip row
+        continue;
+      }
+      final double[] dMatrixy = dMatrix[y];
+      for(int x = 0; x < y; x++, c++) {
+        final double sqnorm = dVar[x] * dy;
+        if(sqnorm > 0.) {
+          dCor[c] = FastMath.sqrt(computeDCovar(dMatrix[x], dMatrixy, len) / FastMath.sqrt(sqnorm));
         }
-        double dCovar = computeDCovar(dMatrix[x], dMatrix[y], len);
-        dCor[c++] = FastMath.sqrt(dCovar / FastMath.sqrt(dVar[x] * dVar[y]));
       }
     }
     return dCor;
@@ -112,7 +113,7 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
 
   /**
    * Compute the double-centered delta matrix.
-   * 
+   *
    * @param adapter Data adapter
    * @param data Input data
    * @return Double-centered delta matrix.
@@ -120,15 +121,14 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
   protected static <A> double[] computeDistances(NumberArrayAdapter<?, A> adapter, A data) {
     final int size = adapter.size(data);
     double[] dMatrix = new double[(size * (size + 1)) >> 1];
-    for(int i = 0, c = 0; i < size; i++) {
-      for(int j = 0; j < i; j++) {
+    for(int i = 0, c = 0; i < size; i++, c++) {
+      for(int j = 0; j < i; j++, c++) {
         double dx = adapter.getDouble(data, i) - adapter.getDouble(data, j);
-        dMatrix[c++] = (dx < 0) ? -dx : dx; // Absolute difference.
+        dMatrix[c] = dx < 0 ? -dx : dx; // Absolute difference.
       }
-      c++; // Diagonal entry: zero
+      // Diagonal entry must be zero
     }
-    doubleCenterMatrix(dMatrix, size);
-    return dMatrix;
+    return doubleCenterMatrix(dMatrix, size);
   }
 
   /**
@@ -136,33 +136,34 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
    * 
    * @param dMatrix distance matrix of the axis
    * @param size Dimensionality
+   * @return dMatrix
    */
-  public static void doubleCenterMatrix(double[] dMatrix, int size) {
+  public static double[] doubleCenterMatrix(double[] dMatrix, int size) {
     double[] rowMean = new double[size];
     // row sum
-    for(int i = 0, c = 0; i < size; i++) {
-      for(int j = 0; j < i; j++) {
-        double v = dMatrix[c++];
+    for(int i = 0, c = 0; i < size; i++, c++) {
+      for(int j = 0; j < i; j++, c++) {
+        double v = dMatrix[c];
         rowMean[i] += v;
         rowMean[j] += v;
       }
+      // No need to add the diagonal entry. Must be zero!
       assert (dMatrix[c] == 0.);
-      c++; // Diagonal entry. Must be zero!
     }
     // Normalize averages:
     double matrixMean = 0.;
     for(int i = 0; i < size; i++) {
-      matrixMean += rowMean[i];
-      rowMean[i] /= size;
+      matrixMean += (rowMean[i] /= size);
     }
-    matrixMean /= size * size;
-
+    matrixMean /= size;
     for(int o = 0, c = 0; o < size; o++) {
-      // Including row mean!
+      final double rowMeano = rowMean[o];
+      // Including row mean now, which may no longer be zero now.
       for(int p = 0; p <= o; p++) {
-        dMatrix[c++] -= rowMean[o] + rowMean[p] - matrixMean;
+        dMatrix[c++] -= rowMeano + rowMean[p] - matrixMean;
       }
     }
+    return dMatrix;
   }
 
   /**
@@ -176,21 +177,19 @@ public class DistanceCorrelationDependenceMeasure implements DependenceMeasure {
    */
   protected double computeDCovar(double[] dVarMatrixA, double[] dVarMatrixB, int n) {
     double result = 0.;
-    for(int i = 0, c = 0; i < n; i++) {
-      for(int j = 0; j < i; j++) {
-        result += 2. * dVarMatrixA[c] * dVarMatrixB[c];
-        c++;
+    for(int i = 0, c = 0; i < n; i++, c++) {
+      for(int j = 0; j < i; j++, c++) {
+        result += dVarMatrixA[c] * dVarMatrixB[c];
       }
       // Diagonal entry.
-      result += dVarMatrixA[c] * dVarMatrixB[c];
-      c++;
+      result += .5 * dVarMatrixA[c] * dVarMatrixB[c];
     }
-    return result / (n * n);
+    return result / (.5 * n * n);
   }
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Marie Kiermeier
    */
   public static class Par implements Parameterizer {
