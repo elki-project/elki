@@ -35,19 +35,6 @@ import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
  */
 public abstract class AbstractDependenceMeasure implements DependenceMeasure {
   /**
-   * Clamp values to a given minimum and maximum.
-   * 
-   * @param value True value
-   * @param min Minimum
-   * @param max Maximum
-   * @return {@code value}, unless smaller than {@code min} or larger than
-   *         {@code max}.
-   */
-  protected static double clamp(double value, double min, double max) {
-    return value < min ? min : value > max ? max : value;
-  }
-
-  /**
    * Compute ranks of all objects, normalized to [0;1]
    * (where 0 is the smallest value, 1 is the largest).
    * 
