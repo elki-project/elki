@@ -37,7 +37,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 public interface MCDETest<R extends MCDETest.RankStruct> {
   /**
    * Structure to hold return values in index creation for
-   * MCDEDependenceEstimate
+   * MCDEDependence
    *
    * @author Alan Mazankiewicz
    * @author Edouard Fouché
@@ -72,7 +72,7 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
   /**
    * Subclass must implement the computation of the statistical test, based on
    * the slicing scheme
-   * of MCDEDependenceMeasure.
+   * of MCDEDependence.
    *
    * @param start Starting index value for statistical test
    * @param end End index value for statistical test
