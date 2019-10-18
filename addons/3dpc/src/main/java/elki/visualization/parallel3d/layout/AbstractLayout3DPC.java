@@ -30,8 +30,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.math.geometry.PrimsMinimumSpanningTree;
-import elki.math.statistics.dependence.CorrelationDependenceMeasure;
-import elki.math.statistics.dependence.DependenceMeasure;
+import elki.math.statistics.dependence.PearsonCorrelationDependence;
+import elki.math.statistics.dependence.Dependence;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,20 +48,20 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   /**
    * Similarity measure
    */
-  DependenceMeasure sim = CorrelationDependenceMeasure.STATIC;
+  Dependence sim = PearsonCorrelationDependence.STATIC;
 
   /**
    * Constructor.
    *
    * @param sim Similarity measure
    */
-  public AbstractLayout3DPC(DependenceMeasure sim) {
+  public AbstractLayout3DPC(Dependence sim) {
     super();
     this.sim = sim;
   }
 
   @Override
-  public DependenceMeasure getSimilarity() {
+  public Dependence getSimilarity() {
     return sim;
   }
 
@@ -77,7 +77,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    * @param rel Vector relation
    * @return Similarity matrix (lower triangular form)
    */
-  public static double[] computeSimilarityMatrix(DependenceMeasure sim, Relation<? extends NumberVector> rel) {
+  public static double[] computeSimilarityMatrix(Dependence sim, Relation<? extends NumberVector> rel) {
     final int dim = RelationUtil.dimensionality(rel);
     // TODO: we could use less memory (no copy), but this would likely be
     // slower. Maybe as a fallback option?
@@ -315,11 +315,11 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     /**
      * Similarity measure
      */
-    DependenceMeasure sim;
+    Dependence sim;
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<DependenceMeasure>(SIM_ID, DependenceMeasure.class, CorrelationDependenceMeasure.class) //
+      new ObjectParameter<Dependence>(SIM_ID, Dependence.class, PearsonCorrelationDependence.class) //
           .grab(config, x -> sim = x);
     }
   }

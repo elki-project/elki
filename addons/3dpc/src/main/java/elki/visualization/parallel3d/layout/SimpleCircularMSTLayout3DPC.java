@@ -23,7 +23,7 @@ package elki.visualization.parallel3d.layout;
 import java.util.List;
 
 import elki.math.MathUtil;
-import elki.math.statistics.dependence.DependenceMeasure;
+import elki.math.statistics.dependence.Dependence;
 import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
@@ -52,7 +52,7 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
    * 
    * @param sim Similarity measure
    */
-  public SimpleCircularMSTLayout3DPC(DependenceMeasure sim) {
+  public SimpleCircularMSTLayout3DPC(Dependence sim) {
     super(sim);
   }
 

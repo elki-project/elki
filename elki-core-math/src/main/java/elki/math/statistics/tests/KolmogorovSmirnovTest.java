@@ -26,7 +26,7 @@ import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Kolmogorov-Smirnov test.
- * 
+ * <p>
  * Class that tests two given real-valued data samples on whether they might
  * have originated from the same underlying distribution using the
  * Kolmogorov-Smirnov test statistic that compares the two empirical cumulative

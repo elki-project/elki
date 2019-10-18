@@ -21,15 +21,20 @@
 package elki.math.statistics.tests;
 
 import elki.math.MeanVariance;
-import elki.math.statistics.distribution.StudentsTDistribution;
+import elki.math.statistics.distribution.BetaDistribution;
 import elki.utilities.optionhandling.Parameterizer;
+
+import net.jafama.FastMath;
 
 /**
  * Calculates a test statistic according to Welch's t test for two samples
  * Supplies methods for calculating the degrees of freedom according to the
  * Welch-Satterthwaite Equation. Also directly calculates a two-sided p-value
- * for the underlying t-distribution
- * 
+ * for the underlying t-distribution.
+ * <p>
+ * Note: if you test i.i.d. normal distributed data, the p-values will be
+ * approximately uniformly distributed.
+ *
  * @author Jan Brusis
  * @author Erich Schubert
  * @since 0.5.0
@@ -51,59 +56,19 @@ public class WelchTTest implements GoodnessOfFitTest {
 
   @Override
   public double deviation(double[] sample1, double[] sample2) {
-    MeanVariance mv1 = new MeanVariance(), mv2 = new MeanVariance();
-    for(double d : sample1) {
-      mv1.put(d);
-    }
-    for(double d : sample2) {
-      mv2.put(d);
-    }
-
-    final double t = calculateTestStatistic(mv1, mv2);
-    final int v = calculateDOF(mv1, mv2);
-    return 1 - calculatePValue(t, v);
-  }
-
-  /**
-   * Calculate the statistic of Welch's t test using statistical moments of the
-   * provided data samples
-   * 
-   * @param mv1 Mean and variance of first sample
-   * @param mv2 Mean and variance of second sample
-   * @return Welch's t statistic
-   */
-  public static double calculateTestStatistic(MeanVariance mv1, MeanVariance mv2) {
-    final double delta = mv1.getMean() - mv2.getMean();
-    final double relvar1 = mv1.getSampleVariance() / mv1.getCount();
-    final double relvar2 = mv2.getSampleVariance() / mv2.getCount();
-    return delta / Math.sqrt(relvar1 + relvar2);
-  }
-
-  /**
-   * Calculates the degree of freedom according to Welch-Satterthwaite
-   * 
-   * @param mv1 Mean and variance of first sample
-   * @param mv2 Mean and variance of second sample
-   * @return Estimated degrees of freedom.
-   */
-  public static int calculateDOF(MeanVariance mv1, MeanVariance mv2) {
-    final double relvar1 = mv1.getSampleVariance() / mv1.getCount();
-    final double relvar2 = mv2.getSampleVariance() / mv2.getCount();
-    final double wvariance = relvar1 + relvar2;
-    final double div = relvar1 * relvar1 / (mv1.getCount() - 1) + relvar2 * relvar2 / (mv2.getCount() - 1);
-    return (int) (wvariance * wvariance / div);
-  }
-
-  /**
-   * Calculates the two-sided p-Value of the underlying t-Distribution with v
-   * degrees of freedom
-   * 
-   * @param t Integration limit
-   * @param v Degrees of freedom
-   * @return p-Value
-   */
-  public static double calculatePValue(double t, int v) {
-    return 2 * (1 - StudentsTDistribution.cdf(Math.abs(t), v));
+    MeanVariance mv = new MeanVariance();
+    double mean1 = mv.put(sample1).getMean();
+    double avgvar1 = mv.getSampleVariance() / sample1.length;
+    double mean2 = mv.reset().put(sample2).getMean();
+    double avgvar2 = mv.getSampleVariance() / sample2.length;
+    // Welch t-statistic:
+    double t = (mean1 - mean2) / FastMath.sqrt(avgvar1 + avgvar2);
+    // Degrees of freedom using Welch-Satterthwaite:
+    double wvariance = avgvar1 + avgvar2;
+    double v = Math.round(wvariance * wvariance / //
+        (avgvar1 * avgvar1 / ((double) sample1.length - 1) + avgvar2 * avgvar2 / ((double) sample2.length - 1)));
+    // Student-t p-value, two-sided:
+    return 1 - BetaDistribution.regularizedIncBeta(v / (t * t + v), v * .5, 0.5);
   }
 
   /**

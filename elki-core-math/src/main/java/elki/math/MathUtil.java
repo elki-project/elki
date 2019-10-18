@@ -795,4 +795,16 @@ public final class MathUtil {
         a <= c ? (a <= d ? a : d) : (c <= d ? c : d) : //
         b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
+
+  /**
+   * Clamp values to a given minimum and maximum.
+   * 
+   * @param value True value
+   * @param min Minimum
+   * @param max Maximum
+   * @return {@code value}, but at least {@code min} and at most {@code max}
+   */
+  public static double clamp(double value, double min, double max) {
+    return value < min ? min : value > max ? max : value;
+  }
 }

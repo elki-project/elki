@@ -18,37 +18,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.visualization.parallel3d.layout;
+package elki.math.statistics.dependence;
 
-import elki.data.NumberVector;
-import elki.math.statistics.dependence.Dependence;
-import elki.utilities.optionhandling.OptionID;
+import org.junit.Test;
 
 /**
- * Similarity based layouting algorithms.
+ * Ensure basic integrity.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.5
  */
-public interface SimilarityBasedLayouter3DPC extends Layouter3DPC<NumberVector> {
-  /**
-   * Option for similarity measure.
-   */
-  OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
-
-  /**
-   * Get the similarity measure to use.
-   * 
-   * @return Similarity measure.
-   */
-  Dependence getSimilarity();
-
-  /**
-   * Main analysis method.
-   * 
-   * @param dim Dimensionality
-   * @param mat Similarity matrix
-   * @return Layout
-   */
-  Layout layout(final int dim, double[] mat);
+public class HoughSpaceMeasureTest extends DependenceTest {
+  @Test
+  public void testBasic() {
+    // These tests primarily show that this measure does not detect linear
+    // relationships too well - they cause parallel lines, not intersections.
+    checkPerfectLinear(HoughSpaceMeasure.STATIC, 100, 0.725, 0.740, 0.001);
+    checkUniform(HoughSpaceMeasure.STATIC, 100, 0.655, 0.005, 0.680, 0.001);
+    checkGaussians(HoughSpaceMeasure.STATIC, 100, 0.663, 0.001);
+  }
 }

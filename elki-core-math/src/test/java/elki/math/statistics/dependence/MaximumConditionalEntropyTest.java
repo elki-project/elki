@@ -18,37 +18,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.visualization.parallel3d.layout;
+package elki.math.statistics.dependence;
 
-import elki.data.NumberVector;
-import elki.math.statistics.dependence.Dependence;
-import elki.utilities.optionhandling.OptionID;
+import org.junit.Test;
 
 /**
- * Similarity based layouting algorithms.
+ * Ensure basic integrity.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.7.5
  */
-public interface SimilarityBasedLayouter3DPC extends Layouter3DPC<NumberVector> {
-  /**
-   * Option for similarity measure.
-   */
-  OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
-
-  /**
-   * Get the similarity measure to use.
-   * 
-   * @return Similarity measure.
-   */
-  Dependence getSimilarity();
-
-  /**
-   * Main analysis method.
-   * 
-   * @param dim Dimensionality
-   * @param mat Similarity matrix
-   * @return Layout
-   */
-  Layout layout(final int dim, double[] mat);
+public class MaximumConditionalEntropyTest extends DependenceTest {
+  @Test
+  public void testBasic() {
+    checkPerfectLinear(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1.0, 1e-15);
+    checkUniform(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1e-15, 0.002, 0.005);
+  }
 }

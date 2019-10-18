@@ -170,10 +170,13 @@ public class Mean {
 
   /**
    * Reset the value.
+   *
+   * @return this accumulator
    */
-  public void reset() {
+  public Mean reset() {
     sum = 0;
     n = 0;
+    return this;
   }
 
   /**

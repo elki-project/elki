@@ -343,9 +343,10 @@ public class StatisticalMoments extends MeanVarianceMinMax {
   }
 
   @Override
-  public void reset() {
+  public StatisticalMoments reset() {
     super.reset();
     m3 = 0;
     m4 = 0;
+    return this;
   }
 }

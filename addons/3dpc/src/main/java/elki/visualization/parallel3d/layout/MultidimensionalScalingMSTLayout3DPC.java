@@ -23,7 +23,7 @@ package elki.visualization.parallel3d.layout;
 import java.util.List;
 
 import elki.math.linearalgebra.SingularValueDecomposition;
-import elki.math.statistics.dependence.DependenceMeasure;
+import elki.math.statistics.dependence.Dependence;
 import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
@@ -52,7 +52,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
    * 
    * @param sim Similarity measure
    */
-  public MultidimensionalScalingMSTLayout3DPC(DependenceMeasure sim) {
+  public MultidimensionalScalingMSTLayout3DPC(Dependence sim) {
     super(sim);
   }
 

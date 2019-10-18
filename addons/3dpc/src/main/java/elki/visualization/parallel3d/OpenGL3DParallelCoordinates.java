@@ -46,7 +46,7 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.evaluation.AutomaticEvaluation;
 import elki.logging.Logging;
-import elki.math.statistics.dependence.DependenceMeasure;
+import elki.math.statistics.dependence.Dependence;
 import elki.result.ResultHandler;
 import elki.result.ResultUtil;
 import elki.result.ScalesResult;
@@ -164,7 +164,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     /**
      * Similarity measure in use.
      */
-    public DependenceMeasure sim;
+    public Dependence sim;
 
     /**
      * Layouting method.
@@ -393,7 +393,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         if(options.size() > 0) {
           options.add(null); // Spacer.
         }
-        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(DependenceMeasure.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(Dependence.class)) {
           options.add(clz.getSimpleName());
         }
       }
@@ -437,9 +437,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         // Try with Dimension Similarity instead.
       }
       try {
-        final Class<?> simc = ELKIServiceRegistry.findImplementation(DependenceMeasure.class, parname);
+        final Class<?> simc = ELKIServiceRegistry.findImplementation(Dependence.class, parname);
         if(simc != null) {
-          shared.settings.sim = ClassGenericsUtil.tryInstantiate(DependenceMeasure.class, simc, new EmptyParameterization());
+          shared.settings.sim = ClassGenericsUtil.tryInstantiate(Dependence.class, simc, new EmptyParameterization());
           if(!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
             ListParameterization params = new ListParameterization();
             params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
