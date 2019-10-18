@@ -20,11 +20,11 @@
  */
 package elki.math.statistics.tests.mcde;
 
-import elki.math.statistics.dependence.MCDEDependenceMeasure;
+import elki.math.statistics.dependence.MCDEDependence;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Interface for statistical tests for {@link MCDEDependenceMeasure}.
+ * Interface for statistical tests for {@link MCDEDependence}.
  * See {@link MWPTest} for an example. Implementation should contain an
  * appropriate index structure to efficiently compute statistical test and the
  * test itself.
