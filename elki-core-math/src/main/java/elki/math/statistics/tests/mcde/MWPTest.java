@@ -175,6 +175,11 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     final long b_start = start == 0 ? 0 : corrected_ranks.correction[start - 1];
     final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
     final double std = FastMath.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
+
+    if(std == 0){
+      return 0;
+    }
+
     final double Z = Math.abs((U - (0.5 * n1 * n2)) / std);
     // Note that this is equivalent to do 1-2*(1-cdf(Z,0,1));
     return NormalDistribution.erf(Z * MathUtil.SQRTHALF);
