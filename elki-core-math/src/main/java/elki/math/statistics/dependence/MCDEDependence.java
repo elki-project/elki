@@ -105,12 +105,12 @@ public class MCDEDependence implements Dependence {
    * Data slicing
    *
    * @param random Random generator
-   * @param len No of data instances
    * @param nonRefIndex Index (see correctedRank()) computed for the dimension
    *        that is not the reference dimension
    * @return Array of booleans that states which instances are part of the slice
    */
-  protected boolean[] randomSlice(Random random, int len, MCDETest.RankStruct nonRefIndex) {
+  protected boolean[] randomSlice(Random random, MCDETest.RankStruct nonRefIndex) {
+    int len = nonRefIndex.len;
     boolean slice[] = new boolean[len];
     // According to the actual formula it should be
     // Math.ceil(Math.pow(this.alpha, 1.0) * len).
@@ -140,8 +140,9 @@ public class MCDEDependence implements Dependence {
       final boolean flip = random.nextInt(2) == 1;
       final int width = (int) Math.ceil(len * this.beta);
       final int start = random.nextInt(len - width);
-      boolean[] slice = randomSlice(random, len, flip ? i1 : i2);
-      mwp += mcdeTest.statisticalTest(start, start + width, slice, flip ? i2 : i1);
+
+      boolean[] slice = randomSlice(random, flip ? i1 : i2);
+      mwp += mcdeTest.statisticalTest(start, width, slice, flip ? i2 : i1);
     }
     return mwp / m;
   }
@@ -171,8 +172,9 @@ public class MCDEDependence implements Dependence {
           final boolean flip = random.nextInt(2) == 1;
           final int width = (int) Math.ceil(len * this.beta);
           final int start = random.nextInt(len - width);
-          boolean[] slice = randomSlice(random, len, flip ? iy : idx[x]);
-          mwp += mcdeTest.statisticalTest(start, start + width, slice, flip ? idx[x] : iy);
+
+          boolean[] slice = randomSlice(random, flip ? iy : idx[x]);
+          mwp += mcdeTest.statisticalTest(start, width, slice, flip ? idx[x] : iy);
         }
         out[o++] = mwp / m;
       }

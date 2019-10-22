@@ -21,20 +21,18 @@
 package elki.math.statistics.dependence.mcde;
 
 import elki.math.MathUtil;
-import elki.math.statistics.dependence.Dependence;
-import elki.math.statistics.dependence.MCDEDependence;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.random.RandomFactory;
 
 import net.jafama.FastMath;
 
 /**
  * Implementation of Mann-Whitney U test returning the p-value (not the test
- * statistic, thus MWP) for {@link MCDEDependence}. Implements algorithm 1 and 3
- * of the reference paper.
+ * statistic, thus MWP) for MCDEDependenceMeasure. Implements algorithm 1 and 3
+ * of reference paper.
  * <p>
  * Reference:
  * <p>
@@ -50,6 +48,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. Scientific and Statistical Database Management (SSDBM 2019)", //
     url = "https://doi.org/10.1145/3335783.3335795", //
     bibkey = "DBLP:conf/ssdbm/FoucheB19")
+
 public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
   /**
    * Static Constructor - use this one
@@ -57,12 +56,19 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
   public static final MWPTest STATIC = new MWPTest();
 
   /**
+   * Share of instances in marginal restriction (reference dimension).
+   * Note that in the original paper alpha = beta and as such there is no
+   * explicit distinction between the parameters.
+   */
+  protected double beta;
+
+  /**
    * Random generator.
    */
   protected RandomFactory rnd;
 
   /**
-   * Structure to hold values needed for computing MWP in MCDEDependeneMeasure.
+   * Structure to hold values needed for computing MWP in MCDEDependene.
    * Values get computed during index creation.
    *
    * @author Alan Mazankiewicz
@@ -84,8 +90,8 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
      *
      * @param idx Index
      */
-    public MWPRanking(int[] idx) {
-      super(idx);
+    public MWPRanking(int[] idx, int len) {
+      super(idx, len);
       this.correction = new long[idx.length];
       this.adjusted = new double[idx.length];
     }
@@ -100,14 +106,14 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
 
   @Override
   public <A> MWPRanking correctedRanks(NumberArrayAdapter<?, A> adapter, A data, int len) {
-    int[] idx = Dependence.Util.sortedIndex(adapter, data, len);
     // Note: As described in Algorithm 1 of reference paper.
-    MWPRanking I = new MWPRanking(idx);
+    int[] idx = MathUtil.sequence(0, len);
+    IntegerArrayQuickSort.sort(idx, (x, y) -> Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y)));
+    MWPRanking I = new MWPRanking(idx, len);
     long correction = 0;
     for(int j = 0; j < len;) {
-      final double v = adapter.getDouble(data, idx[j]);
       int k = j, t = 1, adjust = 0;
-      while(k < len - 1 && adapter.getDouble(data, idx[k + 1]) == v) {
+      while(k < len - 1 && adapter.getDouble(data, idx[k]) == adapter.getDouble(data, idx[k + 1])) {
         adjust += k;
         k++;
         t++;
@@ -116,9 +122,6 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
       if(k > j) {
         double adjusted = (adjust + k) / (double) t;
         correction += t * (t * t - 1);
-        if(correction < 0) {
-          throw new ArithmeticException("Long overflow: too many ties (>2^10)");
-        }
         for(int m = j; m <= k; m++) {
           I.adjusted[m] = adjusted;
           I.correction[m] = correction;
@@ -139,53 +142,85 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
    * Framework.
    *
    * @param start Starting index value for statistical test
-   * @param end End index value for statistical test
+   * @param width Width of the slice for statistical test (endindex = start + width)
    * @param slice Return value of randomSlice() created with the index that is
    *        not for the reference dimension
    * @param corrected_ranks Index of the reference dimension, return value of
    *        corrected_ranks() computed for reference dimension
    * @return p-value from two sided Mann-Whitney-U test
    */
-  public double statisticalTest(int start, int end, boolean[] slice, MWPRanking corrected_ranks) {
+  public double statisticalTest(int start, int width, boolean[] slice, MWPRanking corrected_ranks) {
+    final int safeStart = getSafeCut(start, corrected_ranks);
+    final int len = corrected_ranks.len;
+    final int sliceEndSearchStart = safeStart + width > len -1 ? len -1 : safeStart + width;
+    final int safeEnd = getSafeCut(sliceEndSearchStart, corrected_ranks);
+
     double R = 0.0;
     int n1 = 0;
-    for(int j = start; j < end; j++) {
+    for(int j = start; j < safeEnd; j++) {
       if(slice[corrected_ranks.index[j]]) {
         R += corrected_ranks.adjusted[j];
         n1++;
       }
     }
 
-    // Cancel the offset in case the marginal restriction does not start from 0
-    // see "acc-(cutStart*count)" in reference implementation of MWP
+    // This is to cancel the offset in case the marginal restriction does not
+    // start from 0 see "acc-(cutStart*count)" is reference implementation of
+    // MWP
     R -= start * n1;
 
-    final int cutLength = end - start;
+    final int cutLength = safeEnd - start;
     if(n1 == 0 || n1 == cutLength) {
       return 1;
     }
 
     final double U = R - 0.5 * n1 * (n1 - 1);
     final int n2 = cutLength - n1;
-    final long b_end = corrected_ranks.correction[end - 1];
+    final long b_end = corrected_ranks.correction[safeEnd - 1];
     final long b_start = start == 0 ? 0 : corrected_ranks.correction[start - 1];
     final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
     final double std = FastMath.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
-    final double Z = std > 0 ? Math.abs((U - (0.5 * n1 * n2)) / std) : 0.;
+
+    if(std == 0){
+      return 0;
+    }
+
+    final double Z = Math.abs((U - (0.5 * n1 * n2)) / std);
     // Note that this is equivalent to do 1-2*(1-cdf(Z,0,1));
     return NormalDistribution.erf(Z * MathUtil.SQRTHALF);
     // erf(Z / Math.sqrt(2)) is the cdf of the half-normal distribution
   }
 
   /**
-   * Parameterizer, returning the static instance.
-   * 
-   * @author Erich Schubert
+   * Adjusts idx so that it lies not in the middle of a tie by searching the ranks index
+   *
+   * @param idx value to adjust for tie. In MCDE MWP the start and end of a slice
+   * @param ranks the corrected ranks index
+   * @return adjusted idx
    */
-  public static final class Par implements Parameterizer {
-    @Override
-    public MWPTest make() {
-      return STATIC;
+
+  protected int getSafeCut(int idx, MWPRanking ranks){
+    double[] ref = ranks.adjusted;
+
+    int i = 0;
+    while(true){
+      // principle of asking for forgiveness instead of permission, exception gets thrown very rarely
+      try {
+        if(ref[idx + i] != ref[idx + i - 1]){
+          return idx + i;
+        }
+      } catch(IndexOutOfBoundsException error) {
+        return idx + i;
+      }
+
+      try {
+        if(ref[idx - i] != ref[idx - i - 1]){
+          return idx - i;
+        }
+      } catch(IndexOutOfBoundsException error) {
+        return idx - i;
+      }
+      i++;
     }
   }
 }

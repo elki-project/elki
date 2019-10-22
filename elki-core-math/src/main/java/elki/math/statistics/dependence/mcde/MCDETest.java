@@ -37,7 +37,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 public interface MCDETest<R extends MCDETest.RankStruct> {
   /**
    * Structure to hold return values in index creation for
-   * MCDEDependenceEstimate
+   * MCDEDependence
    *
    * @author Alan Mazankiewicz
    * @author Edouard Fouché
@@ -49,18 +49,24 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
     public int[] index;
 
     /**
+     * Length of data
+     */
+    public int len;
+
+    /**
      * Constructor.
      *
      * @param idx Array containing index (position) values
      */
-    public RankStruct(int[] idx) {
+    public RankStruct(int[] idx, int len) {
       this.index = idx;
+      this.len = len;
     }
   }
 
   /**
    * Compute the corrected rank index.
-   * 
+   *
    * @param <A> Input array type
    * @param adapter Array-like adapter
    * @param data Data object
@@ -71,13 +77,15 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
 
   /**
    * Subclass must implement the computation of the statistical test, based on
-   * the slicing scheme of MCDEDependence.
+   * the slicing scheme
+   * of MCDEDependence.
    *
    * @param start Starting index value for statistical test
-   * @param end End index value for statistical test
+   * @param width Width of the slice for statistical test (endindex = start + width)
    * @param slice An array of boolean resulting from a random slice
-   * @param correctedRanks the precomputed index for the reference dimension
+   * @param correctedRanks the precomputed index structure for the reference
+   *        dimension
    * @return a 1 - p-value
    */
-  double statisticalTest(int start, int end, boolean[] slice, R correctedRanks);
+  double statisticalTest(int start, int width, boolean[] slice, R correctedRanks);
 }
