@@ -103,7 +103,7 @@ public class MCDEDependence implements Dependence {
   }
 
   /**
-   * Data slicing
+   * Bivariate data slicing
    *
    * @param random Random generator
    * @param nonRefIndex Index (see correctedRank()) computed for the dimension
@@ -125,6 +125,14 @@ public class MCDEDependence implements Dependence {
     return slice;
   }
 
+  /**
+   * Multivariate data slicing
+   * @param random Random generator
+   * @param nonRefIndex Array of indices computed for each dimension
+   * @param refDim Indexvalue of reference dimension
+   * @param nDim No of dimensions
+   * @return Array of booleans that states which instances are part of the slice
+   */
   protected boolean[] randomSlice(Random random, MCDETest.RankStruct[] nonRefIndex, int refDim, int nDim) {
     int len = nonRefIndex[0].len;
     boolean slice[] = new boolean[len];
@@ -206,6 +214,13 @@ public class MCDEDependence implements Dependence {
     return out;
   }
 
+  /**
+   * Runs MCDE Algorithm with possibly more than two dimensions
+   * @param adapter Array type adapter
+   * @param data Data sets. Must have fast random access!
+   * @param <A> Array type
+   * @return Dependence Measure
+   */
   public <A> double higherOrderDependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
     final int dims = data.size();
     final int len = adapter.size(data.get(0));
