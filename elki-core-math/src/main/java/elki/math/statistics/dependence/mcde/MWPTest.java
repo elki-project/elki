@@ -157,7 +157,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
 
     double R = 0.0;
     int n1 = 0;
-    for(int j = start; j < safeEnd; j++) {
+    for(int j = safeStart; j < safeEnd; j++) {
       if(slice[corrected_ranks.index[j]]) {
         R += corrected_ranks.adjusted[j];
         n1++;
@@ -167,9 +167,9 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     // This is to cancel the offset in case the marginal restriction does not
     // start from 0 see "acc-(cutStart*count)" is reference implementation of
     // MWP
-    R -= start * n1;
+    R -= safeStart * n1;
 
-    final int cutLength = safeEnd - start;
+    final int cutLength = safeEnd - safeStart;
     if(n1 == 0 || n1 == cutLength) {
       return 1;
     }
@@ -177,7 +177,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     final double U = R - 0.5 * n1 * (n1 - 1);
     final int n2 = cutLength - n1;
     final long b_end = corrected_ranks.correction[safeEnd - 1];
-    final long b_start = start == 0 ? 0 : corrected_ranks.correction[start - 1];
+    final long b_start = safeStart == 0 ? 0 : corrected_ranks.correction[safeStart - 1];
     final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
     final double std = FastMath.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
     if(std == 0) { return 0; }

@@ -1,0 +1,13 @@
+elki.math.statistics.dependence.PearsonCorrelationDependence
+elki.math.statistics.dependence.SpearmanCorrelationDependence
+elki.math.statistics.dependence.DCor
+elki.math.statistics.dependence.MutualInformationEquiwidthDependence
+elki.math.statistics.dependence.JensenShannonEquiwidthDependence
+elki.math.statistics.dependence.HoeffdingsD
+elki.math.statistics.dependence.MaximumConditionalEntropy
+elki.math.statistics.dependence.SlopeDependence
+elki.math.statistics.dependence.SlopeInversionDependence
+elki.math.statistics.dependence.HoughSpaceMeasure
+elki.math.statistics.dependence.SURFINGDependence
+elki.math.statistics.dependence.HiCSDependence
+elki.math.statistics.dependence.MCDEDependence

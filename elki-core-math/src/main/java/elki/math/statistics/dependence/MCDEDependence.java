@@ -20,6 +20,7 @@
  */
 package elki.math.statistics.dependence;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -124,6 +125,29 @@ public class MCDEDependence implements Dependence {
     return slice;
   }
 
+  protected boolean[] randomSlice(Random random, MCDETest.RankStruct[] nonRefIndex, int refDim, int nDim) {
+    int len = nonRefIndex[0].len;
+    boolean slice[] = new boolean[len];
+    Arrays.fill(slice, true);
+    final int sliceSize = (int) Math.ceil(Math.pow(this.alpha, 1.0 / (double) (nDim -1)) * len); // alpha is between 0.1 and 0.9
+
+    for(int i = 0; i < nDim; i++)
+    {
+      if(i != refDim){
+        final int start = random.nextInt(len - sliceSize);
+
+        for(int j = 0; j < start; j++){
+          slice[nonRefIndex[i].index[j]] = false;
+        }
+
+        for(int j = start + sliceSize; j < len; j++) {
+          slice[nonRefIndex[i].index[j]] = false;
+        }
+      }
+    }
+    return slice;
+  }
+
   @Override
   public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2) {
     final int len = adapter1.size(data1);
@@ -180,6 +204,32 @@ public class MCDEDependence implements Dependence {
       }
     }
     return out;
+  }
+
+  public <A> double higherOrderDependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
+    final int dims = data.size();
+    final int len = adapter.size(data.get(0));
+    // Build indexes:
+    MCDETest.RankStruct[] idx = new MCDETest.RankStruct[dims];
+    for(int i = 0; i < dims; i++) {
+      A d = data.get(i);
+      if(adapter.size(d) != len) {
+        throw new ArrayIndexOutOfBoundsException("Arrays must have the same size");
+      }
+      idx[i] = mcdeTest.correctedRanks(adapter, d, len);
+    }
+
+    final Random random = rnd.getSingleThreadedRandom();
+    double mwp = 0;
+    for(int i = 0; i < m; i++) {
+      final int refDim = random.nextInt(dims);
+      final int width = (int) Math.ceil(len * this.beta);
+      final int start = random.nextInt(len - width);
+
+      boolean[] slice = randomSlice(random, idx, refDim, dims);
+      mwp += mcdeTest.statisticalTest(start, width, slice, idx[refDim]);
+    }
+    return mwp / m;
   }
 
   /**
