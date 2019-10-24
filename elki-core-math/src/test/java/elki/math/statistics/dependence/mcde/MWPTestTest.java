@@ -22,11 +22,10 @@ package elki.math.statistics.dependence.mcde;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
-
 import elki.math.statistics.dependence.mcde.MWPTest;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
+import java.util.Arrays;
 
 /**
  * Test for the Mann-Whitney based p-test.
@@ -62,5 +61,19 @@ public class MWPTestTest {
     assertEquals("ranks incorrect", output_duplicates_start_end.adjusted[10], 11.0, 0);
     assertEquals("ranks incorrect", output_duplicates_start_end.adjusted[11], 11.0, 0);
     assertEquals("ranks incorrect", output_duplicates_start_end.adjusted[12], 11.0, 0);
+  }
+
+  @Test
+  public void testStatTest(){
+    int len = 10;
+    DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
+    MWPTest mwpTest = MWPTest.STATIC;
+    double[] data = new double[len];
+    Arrays.fill(data, 1.0);
+    boolean[] slice = { false, false, true, true, true, true, true, false, false, false };
+
+    MWPTest.MWPRanking ranks = mwpTest.correctedRanks(adapter, data, len);
+    assertEquals("MWPTest.statisticalTest() returns NaN", //
+    mwpTest.statisticalTest(0, 5, slice, ranks), 0, 0 );
   }
 }
