@@ -20,7 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
@@ -108,7 +107,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
 @Alias({ "HAC", "SAHN" })
-public class AGNES<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AGNES<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */

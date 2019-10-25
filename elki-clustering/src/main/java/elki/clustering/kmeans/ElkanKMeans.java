@@ -24,7 +24,6 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -79,8 +78,8 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
   }
 
   @Override
-  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildResult(varstat, relation);
   }

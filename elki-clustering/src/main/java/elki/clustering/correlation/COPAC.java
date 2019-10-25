@@ -20,7 +20,6 @@
  */
 package elki.clustering.correlation;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
@@ -81,7 +80,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
     url = "https://doi.org/10.1137/1.9781611972771.37", //
     bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
-public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<DimensionModel>> implements ClusteringAlgorithm<Clustering<DimensionModel>> {
+public class COPAC<V extends NumberVector> implements ClusteringAlgorithm<Clustering<DimensionModel>> {
   /**
    * Settings class.
    */
@@ -95,6 +94,11 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
   public COPAC(COPAC.Settings settings) {
     super();
     this.settings = settings;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -121,11 +125,6 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
       }
     }
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

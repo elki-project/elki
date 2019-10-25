@@ -40,7 +40,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.93866);
     testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
@@ -51,7 +51,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, RadiusCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.92082);
     testClusterSizes(clustering, new int[] { 82, 154, 200, 202 });
   }
@@ -62,7 +62,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, EuclideanDistanceCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.93023);
     testClusterSizes(clustering, new int[] { 75, 161, 200, 202 });
   }
@@ -74,7 +74,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidEuclideanDistance.class) // d3
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.86062);
     testClusterSizes(clustering, new int[] { 102, 114, 200, 222 });
   }
@@ -86,7 +86,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidManhattanDistance.class) // d3
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.92236);
     testClusterSizes(clustering, new int[] { 83, 154, 200, 201 });
   }
@@ -98,7 +98,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, AverageInterclusterDistance.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.86062);
     testClusterSizes(clustering, new int[] { 102, 114, 200, 222 });
   }
@@ -110,7 +110,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, AverageIntraclusterDistance.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.82023);
     testClusterSizes(clustering, new int[] { 158, 224, 256 });
   }
@@ -122,7 +122,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.93814);
     testClusterSizes(clustering, new int[] { 200, 218, 220});
   }

@@ -22,8 +22,6 @@ package elki.clustering.optics;
 
 import java.util.Comparator;
 
-import elki.AbstractAlgorithm;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
@@ -36,7 +34,6 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.ids.QuickSelectDBIDs;
-import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 
@@ -52,24 +49,13 @@ import elki.logging.progress.FiniteProgress;
  * @param <O> the type of objects handled by the algorithm
  * @param <R> the type of results in the cluster order
  */
-public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends AbstractAlgorithm<R> implements OPTICSTypeAlgorithm {
+public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * Constructor.
    */
   public GeneralizedOPTICS() {
     super();
   }
-
-  /**
-   * Run OPTICS on the database.
-   *
-   * @param db Database
-   * @param relation Relation
-   * @return Result
-   */
-  public abstract ClusterOrder run(Database db, Relation<O> relation);
-
-  // Usually: return new Instance(db, relation).run();
 
   /**
    * Instance for processing a single data set.
@@ -110,11 +96,10 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
     /**
      * Constructor for a single data set.
      *
-     * @param db Database
-     * @param relation Data relation
+     * @param ids IDs to process
      */
-    public Instance(Database db, Relation<O> relation) {
-      ids = relation.getDBIDs();
+    public Instance(DBIDs ids) {
+      this.ids = ids;
       processedIDs = DBIDUtil.newHashSet(ids.size());
       candidates = DBIDUtil.newArray();
       predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);

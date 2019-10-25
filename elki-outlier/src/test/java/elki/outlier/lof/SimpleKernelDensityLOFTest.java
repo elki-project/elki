@@ -42,7 +42,7 @@ public class SimpleKernelDensityLOFTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<SimpleKernelDensityLOF<DoubleVector>>(SimpleKernelDensityLOF.class) //
         .with(LOF.Par.K_ID, 20) //
         .with(SimpleKernelDensityLOF.Par.KERNEL_ID, BiweightKernelDensityFunction.class) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.87192156);
     testSingleScore(result, 1293, 12.271188);
   }

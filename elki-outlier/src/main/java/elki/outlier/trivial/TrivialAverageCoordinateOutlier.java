@@ -20,7 +20,6 @@
  */
 package elki.outlier.trivial;
 
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -48,7 +47,7 @@ import elki.utilities.Priority;
  * @since 0.6.0
  */
 @Priority(Priority.SUPPLEMENTARY - 50)
-public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class TrivialAverageCoordinateOutlier implements OutlierAlgorithm {
   /**
    * Constructor.
    */
@@ -74,7 +73,7 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       m.reset();
       NumberVector nv = relation.get(iditer);
-      for (int i = 0; i < nv.getDimensionality(); i++) {
+      for(int i = 0; i < nv.getDimensionality(); i++) {
         m.put(nv.doubleValue(i));
       }
       final double score = m.getMean();

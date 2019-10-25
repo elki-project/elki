@@ -54,7 +54,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Par.K_ID, 5)//
         .with(FastABOD.Par.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
   }
@@ -71,7 +71,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Par.K_ID, 5)//
         .with(FastABOD.Par.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
   }
@@ -88,7 +88,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Par.K_ID, 5)//
         .with(FastABOD.Par.KERNEL_FUNCTION_ID, LinearKernel.STATIC) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
   }
@@ -99,7 +99,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
         .with(FastABOD.Par.K_ID, 5)//
         .with(FastABOD.Par.KERNEL_FUNCTION_ID, new PolynomialKernel(1)) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.993814148);
     testSingleScore(result, 945, 0.498653289);
   }
@@ -108,7 +108,7 @@ public class FastABODTest extends AbstractOutlierAlgorithmTest {
   public void testFastABODPoly2() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<FastABOD<DoubleVector>>(FastABOD.class) //
-        .with(FastABOD.Par.K_ID, 5).build().run(db);
+        .with(FastABOD.Par.K_ID, 5).build().autorun(db);
     testAUC(db, "Noise", result, 0.94626962962);
     testSingleScore(result, 945, 3.28913914467E-4);
   }

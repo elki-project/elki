@@ -45,7 +45,7 @@ public class GiniIndexTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.2) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, GiniIndex.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 18, res.getRules().size());
   }
 }

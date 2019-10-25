@@ -20,16 +20,10 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -42,6 +36,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -75,7 +70,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "arXiv preprint arXiv:1109.2378", //
     url = "https://arxiv.org/abs/1109.2378", //
     bibkey = "DBLP:journals/corr/abs-1109-2378")
-public class MiniMaxNNChain<O> extends AbstractAlgorithm<PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */
@@ -94,6 +89,11 @@ public class MiniMaxNNChain<O> extends AbstractAlgorithm<PointerPrototypeHierarc
   public MiniMaxNNChain(Distance<? super O> distance) {
     super();
     this.distance = distance;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -207,11 +207,6 @@ public class MiniMaxNNChain<O> extends AbstractAlgorithm<PointerPrototypeHierarc
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -22,7 +22,6 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -74,7 +73,7 @@ import net.jafama.FastMath;
  * @author Ahmed Hettab
  * @since 0.4.0
  *
- * @param <P> Spatial Vector type
+ * @param <O> object type
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
@@ -83,7 +82,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
     url = "https://doi.org/10.1145/1869790.1869841", //
     bibkey = "DBLP:conf/gis/LiuLC10")
-public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<O> implements OutlierAlgorithm {
   /**
    * Class logger
    */
@@ -92,7 +91,7 @@ public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implem
   /**
    * Distance function used.
    */
-  private Distance<? super P> distance;
+  private Distance<? super O> distance;
 
   /**
    * Parameter alpha: Attribute difference exponent.
@@ -117,12 +116,18 @@ public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implem
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public CTLuRandomWalkEC(Distance<? super P> distance, double alpha, double c, int k) {
+  public CTLuRandomWalkEC(Distance<? super O> distance, double alpha, double c, int k) {
     super();
     this.distance = distance;
     this.alpha = alpha;
     this.c = c;
     this.k = k;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   /**
@@ -132,8 +137,8 @@ public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implem
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<P> spatial, Relation<? extends NumberVector> relation) {
-    DistanceQuery<P> distFunc = new QueryBuilder<>(spatial, distance).distanceQuery();
+  public OutlierResult run(Relation<O> spatial, Relation<? extends NumberVector> relation) {
+    DistanceQuery<O> distFunc = new QueryBuilder<>(spatial, distance).distanceQuery();
     WritableDataStore<double[]> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
@@ -233,11 +238,6 @@ public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implem
     DoubleRelation scoreResult = new MaterializedDoubleRelation("randomwalkec", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   /**

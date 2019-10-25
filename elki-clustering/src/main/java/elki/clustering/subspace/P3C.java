@@ -25,32 +25,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.em.EM;
 import elki.clustering.em.EMClusterModel;
 import elki.clustering.em.MultivariateGaussianModel;
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.NumberVector;
-import elki.data.Subspace;
-import elki.data.VectorUtil;
+import elki.data.*;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.model.SubspaceModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDMIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.SetDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
@@ -68,8 +54,8 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -105,7 +91,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     url = "https://doi.org/10.1109/ICDM.2006.123", //
     bibkey = "DBLP:conf/icdm/MoiseSE06")
 @Priority(Priority.RECOMMENDED - 10) // More specialized
-public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -155,10 +141,15 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     this.minClusterSize = minClusterSize;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Performs the P3C algorithm on the given Database.
    */
-  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     // Overall progress.
@@ -861,11 +852,6 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       }
       this.ids = DBIDUtil.newArray(clusterCore.ids.size());
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

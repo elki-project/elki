@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -34,7 +33,6 @@ import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -52,8 +50,8 @@ import elki.utilities.datastructures.histogram.DoubleHistogram.Iter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.TooManyRetriesException;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -90,7 +88,7 @@ import net.jafama.FastMath;
     booktitle = "Pattern Recognition volume 40, Issue 10", //
     url = "https://doi.org/10.1016/j.patcog.2007.01.020", //
     bibkey = "DBLP:journals/pr/HaralickH07")
-public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -149,25 +147,27 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
     this.rnd = rnd;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * The main LMCLUS (Linear manifold clustering algorithm) is processed in this
    * method.
-   *
-   * <PRE>
-   * The algorithm samples random linear manifolds and tries to find clusters in it.
-   * It calculates a distance histogram searches for a threshold and partitions the
-   * points in two groups the ones in the cluster and everything else.
-   * Then the best fitting linear manifold is searched and registered as a cluster.
-   * The process is started over until all points are clustered.
-   * The last cluster should contain all the outliers. (or the whole data if no clusters have been found.)
-   * For details see {@link LMCLUS}.
-   * </PRE>
-   *
-   * @param database The database to operate on
+   * <p>
+   * The algorithm samples random linear manifolds and tries to find clusters in
+   * it. It calculates a distance histogram searches for a threshold and
+   * partitions the points in two groups the ones in the cluster and everything
+   * else. Then the best fitting linear manifold is searched and registered as a
+   * cluster. The process is started over until all points are clustered.
+   * The last cluster should contain all the outliers (or the whole data if no
+   * clusters have been found.)
+   * 
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<NumberVector> relation) {
+  public Clustering<Model> run(Relation<NumberVector> relation) {
     Clustering<Model> ret = new Clustering<>();
     Metadata.of(ret).setLongName("LMCLUS Clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
@@ -249,7 +249,6 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
   private double deviation(double[] delta, double[][] beta) {
     final double a = squareSum(delta);
     final double b = squareSum(transposeTimes(beta, delta));
-
     return (a > b) ? FastMath.sqrt(a - b) : 0.;
   }
 
@@ -461,11 +460,6 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
     Iter iter = histogram.iter();
     iter.seek(bestpos);
     return new double[] { iter.getRight(), bestgoodness };
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

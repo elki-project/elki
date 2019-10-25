@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
@@ -49,7 +48,6 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
 import elki.math.linearalgebra.CovarianceMatrix;
-import elki.result.CollectionResult;
 import elki.result.HistogramResult;
 import elki.result.Metadata;
 import elki.utilities.datastructures.histogram.ObjHistogram;
@@ -84,7 +82,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgorithm<CollectionResult<double[]>> {
+public class EvaluateRankingQuality<V extends NumberVector> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -112,6 +110,11 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgo
     this.numbins = numbins;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+  }
+
   /**
    * Run the algorithm.
    *
@@ -126,7 +129,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgo
       LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).autorun(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, double[]> averages = new HashMap<>(split.size());
@@ -176,11 +179,6 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgo
     HistogramResult result = new HistogramResult(res);
     Metadata.of(result).setLongName("Ranking Quality Histogram");
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**

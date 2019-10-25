@@ -23,11 +23,11 @@ package elki.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
+import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -83,7 +83,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 @Priority(Priority.DEFAULT - 10) // Mostly used inside others.
-public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractAlgorithm<Relation<KNNList>> {
+public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -109,6 +109,16 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     super();
     this.distance = distance;
     this.k = k;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  @Override
+  public Relation<KNNList> autorun(Database database) {
+    return run(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -306,11 +316,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
       return Double.POSITIVE_INFINITY;
     }
     return pr_knn_distance;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

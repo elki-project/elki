@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -35,7 +34,11 @@ import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.datasource.parser.CSVReaderFormat;
 import elki.logging.Logging;
@@ -46,12 +49,16 @@ import elki.utilities.io.FileUtil;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
-
-import it.unimi.dsi.fastutil.ints.*;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
@@ -77,7 +84,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Description("Load clustering results from an external file. "//
     + "Each line is expected to consists of one clustering, one integer per point "//
     + "and an (optional) non-numeric label.")
-public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends Model>> implements ClusteringAlgorithm<Clustering<? extends Model>> {
+public class ExternalClustering implements ClusteringAlgorithm<Clustering<? extends Model>> {
   /**
    * The logger for this class.
    */
@@ -103,6 +110,11 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
     this.file = file;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array();
+  }
+
   /**
    * Run the algorithm.
    *
@@ -110,7 +122,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
    * @return Result
    */
   @Override
-  public Clustering<? extends Model> run(Database database) {
+  public Clustering<? extends Model> autorun(Database database) {
     Clustering<? extends Model> m = null;
     try (FileInputStream fis = new FileInputStream(file); //
         InputStream in = FileUtil.tryGzipInput(fis); //
@@ -184,11 +196,6 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
       result.addToplevelCluster(new Cluster<>(entry.getValue(), noise, ClusterModel.CLUSTER));
     }
     Metadata.hierarchyOf(r).addChild(result);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.ANY);
   }
 
   /**

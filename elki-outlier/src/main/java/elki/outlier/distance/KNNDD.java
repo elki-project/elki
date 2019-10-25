@@ -20,11 +20,9 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
@@ -84,7 +82,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)", //
     url = "http://prlab.tudelft.nl/sites/default/files/asci_98.pdf", //
     bibkey = "conf/asci/deRidderTD98")
-public class KNNDD<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class KNNDD<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -112,14 +110,9 @@ public class KNNDD<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
     this.kplus = k + 1;
   }
 
-  /**
-   * Runs the algorithm in the timed evaluation part.
-   *
-   * @param database Database (no longer used)
-   * @param relation Data relation
-   */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    return run(relation);
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -160,11 +153,6 @@ public class KNNDD<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
     DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Data Descriptor", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 1.);
     return new OutlierResult(meta, scoreres);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

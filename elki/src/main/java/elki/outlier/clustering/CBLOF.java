@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.SortMeans;
@@ -88,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Pattern Recognition Letters 24(9-10)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00003-5", //
     bibkey = "DBLP:journals/prl/HeXD03")
-public class CBLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class CBLOF<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -141,18 +140,18 @@ public class CBLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
   }
 
   /**
-   * Runs the CBLOF algorithm on the given database.
+   * Run CBLOF.
    *
-   * @param database Database to query
-   * @param relation Data to process
-   * @return CBLOF outlier result
+   * @param database Database to run on
+   * @param relation Relation to use for CBLOF computation
+   * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("CBLOF", 3) : null;
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Computing clustering.");
-    Clustering<MeanModel> clustering = clusteringAlgorithm.run(database);
+    Clustering<MeanModel> clustering = clusteringAlgorithm.autorun(database);
 
     LOG.beginStep(stepprog, 2, "Computing boundary between large and small clusters.");
     List<? extends Cluster<MeanModel>> clusters = clustering.getAllClusters();

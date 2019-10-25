@@ -47,7 +47,7 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
         .with(DOC.Par.RANDOM_ID, 0) //
         .with(DOC.Par.ALPHA_ID, 0.4) //
         .with(DOC.Par.BETA_ID, 0.85) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 1.0);
     testClusterSizes(result, new int[] { 200, 400 });
   }
@@ -62,7 +62,7 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
         .with(DOC.Par.RANDOM_ID, 2) //
         .with(DOC.Par.ALPHA_ID, 0.4) //
         .with(DOC.Par.BETA_ID, 0.99) //
-        .build().run(db);
+        .build().autorun(db);
     // Haven't found any working parameters for DOC on this data yet.
     testFMeasure(db, result, .5477386);
     testClusterSizes(result, new int[] { 850 });

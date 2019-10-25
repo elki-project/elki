@@ -25,12 +25,12 @@ import static elki.math.linearalgebra.VMath.*;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import elki.clustering.optics.ClusterOrder;
 import elki.clustering.optics.CorrelationClusterOrder;
 import elki.clustering.optics.GeneralizedOPTICS;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
@@ -147,11 +147,21 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   }
 
   @Override
-  public CorrelationClusterOrder run(Database db, Relation<V> relation) {
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Run the HiCO algorithm.
+   *
+   * @param relation Data relation
+   * @return OPTICS cluster order
+   */
+  public ClusterOrder run(Relation<V> relation) {
     if(mu >= relation.size()) {
       throw new AbortException("Parameter mu is chosen unreasonably large. This won't yield meaningful results.");
     }
-    return new Instance(db, relation).run();
+    return new Instance(relation).run();
   }
 
   /**
@@ -211,11 +221,10 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Constructor.
      *
-     * @param db Database
      * @param relation Relation
      */
-    public Instance(Database db, Relation<V> relation) {
-      super(db, relation);
+    public Instance(Relation<V> relation) {
+      super(relation.getDBIDs());
       DBIDs ids = relation.getDBIDs();
       this.clusterOrder = DBIDUtil.newArray(ids.size());
       this.relation = relation;
@@ -408,11 +417,6 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   @Override
   public int getMinPts() {
     return mu;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(NumberVector.FIELD);
   }
 
   /**

@@ -27,7 +27,6 @@ import static elki.utilities.io.FormatUtil.formatTo;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
@@ -85,11 +84,16 @@ import elki.utilities.random.RandomFactory;
     url = "https://doi.org/10.1145/1150402.1150408", //
     bibkey = "DBLP:conf/kdd/AchtertBKKZ06")
 @Priority(Priority.DEFAULT - 5) // Mostly used inside others, not standalone
-public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorithm<CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector> implements Algorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(DependencyDerivator.class);
+
+  /**
+   * Distance function used.
+   */
+  private NumberVectorDistance<? super V> distance;
 
   /**
    * The number of samples to draw.
@@ -117,11 +121,6 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorit
   private final boolean randomsample;
 
   /**
-   * Distance function used.
-   */
-  protected NumberVectorDistance<? super V> distance;
-
-  /**
    * Constructor.
    *
    * @param distance distance function
@@ -139,6 +138,11 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorit
     this.filter = filter;
     this.sampleSize = sampleSize;
     this.randomsample = randomsample;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -239,11 +243,6 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorit
           .append(lq.equationsToString(nf.getMaximumFractionDigits())).toString());
     }
     return sol;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

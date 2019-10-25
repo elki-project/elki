@@ -22,7 +22,6 @@ package elki.clustering.biclustering;
 
 import java.util.BitSet;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -55,7 +54,7 @@ import elki.utilities.datastructures.BitsUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector, M extends BiclusterModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractBiclustering<V extends NumberVector, M extends BiclusterModel> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */

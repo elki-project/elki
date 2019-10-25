@@ -22,7 +22,6 @@ package elki.algorithm.statistics;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
@@ -41,7 +40,6 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
-import elki.result.CollectionResult;
 import elki.result.HistogramResult;
 import elki.result.Metadata;
 import elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
@@ -70,7 +68,7 @@ import net.jafama.FastMath;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
+public class DistanceStatisticsWithClasses<O> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -112,6 +110,11 @@ public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<Collecti
     this.sampling = sampling;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   public HistogramResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
@@ -120,7 +123,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<Collecti
     DoubleMinMax gminmax = new DoubleMinMax();
 
     // Cluster by labels
-    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).autorun(database).getAllClusters();
 
     // global in-cluster min/max, global other-cluster min/max
     DoubleMinMax giminmax = new DoubleMinMax(), gominmax = new DoubleMinMax();
@@ -389,11 +392,6 @@ public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<Collecti
         cnt++;
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

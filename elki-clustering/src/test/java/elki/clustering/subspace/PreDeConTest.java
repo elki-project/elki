@@ -62,7 +62,7 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
         .with(PreDeCon.Settings.Par.DELTA_ID, 400) //
         .with(PreDeCon.Settings.Par.KAPPA_ID, 20.) //
         .with(PreDeCon.Settings.Par.LAMBDA_ID, 4) //
-        .build().run(db);
+        .build().autorun(db);
 
     // FIXME: find better working parameters?
     testFMeasure(db, result, 0.724752);
@@ -82,7 +82,7 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
         .with(PreDeCon.Settings.Par.DELTA_ID, 0.012) //
         .with(PreDeCon.Settings.Par.KAPPA_ID, 10.) //
         .with(PreDeCon.Settings.Par.LAMBDA_ID, 2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.74982899);
     testClusterSizes(result, new int[] { 356, 494 });
   }

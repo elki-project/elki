@@ -20,14 +20,17 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.*;
+import static elki.math.linearalgebra.VMath.clear;
+import static elki.math.linearalgebra.VMath.copy;
+import static elki.math.linearalgebra.VMath.identity;
+import static elki.math.linearalgebra.VMath.minusEquals;
+import static elki.math.linearalgebra.VMath.squareSum;
 
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
-
 import net.jafama.FastMath;
 
 /**

@@ -22,7 +22,6 @@ package elki.clustering.dbscan.parallel;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.predicates.CorePredicate;
 import elki.clustering.dbscan.predicates.EpsilonNeighborPredicate;
@@ -42,7 +41,11 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.parallel.Executor;
@@ -51,8 +54,8 @@ import elki.parallel.processor.Processor;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -101,7 +104,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
     url = "https://doi.org/10.1109/SC.2012.9", //
     bibkey = "DBLP:conf/sc/PatwaryPALMC12")
-public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -142,20 +145,20 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Clustering<Model> run(Database database) {
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(npred.getInputTypeRestriction());
+  }
+
+  @Override
+  public Clustering<Model> autorun(Database database) {
     // Ignore the generic, we do a run-time test below:
+    @SuppressWarnings("unchecked")
     CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
     if(!cp.acceptsType(npred.getOutputType())) {
       throw new AbortException("Predicates are not compatible.");
     }
     return new Instance<>(database, npred, cp, coremodel).run();
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(npred.getInputTypeRestriction());
   }
 
   /**

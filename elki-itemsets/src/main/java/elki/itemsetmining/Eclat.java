@@ -30,7 +30,6 @@ import elki.data.SparseFeatureVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -100,14 +99,18 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     super(minsupp, minlength, maxlength);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
+  }
+
   /**
    * Run the Eclat algorithm
    * 
-   * @param db Database to process
    * @param relation Bit vector relation
    * @return Frequent patterns found
    */
-  public FrequentItemsetsResult run(Database db, final Relation<BitVector> relation) {
+  public FrequentItemsetsResult run(final Relation<BitVector> relation) {
     // TODO: implement with resizable arrays, to not need dim.
     final int dim = RelationUtil.dimensionality(relation);
     final VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
@@ -219,11 +222,6 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
       }
     }
     return idx;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
 
   /**

@@ -20,7 +20,6 @@
  */
 package elki.clustering.optics;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -62,7 +61,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1145/304181.304187", //
     bibkey = "DBLP:conf/sigmod/AnkerstBKS99")
 @Alias({ "OPTICS" })
-public abstract class AbstractOPTICS<O> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
+public abstract class AbstractOPTICS<O> implements OPTICSTypeAlgorithm {
   /**
    * Distance function used.
    */
@@ -92,6 +91,11 @@ public abstract class AbstractOPTICS<O> extends AbstractAlgorithm<ClusterOrder> 
     this.minpts = minpts;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
    * Run OPTICS on the database.
    *
@@ -103,11 +107,6 @@ public abstract class AbstractOPTICS<O> extends AbstractAlgorithm<ClusterOrder> 
   @Override
   public int getMinPts() {
     return minpts;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

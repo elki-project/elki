@@ -50,7 +50,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
     Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
         .with(DiSH.Par.EPSILON_ID, 0.005) //
         .with(DiSH.Par.MU_ID, 50) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, .99516369);
     testClusterSizes(result, new int[] { 50, 199, 201 });
   }
@@ -65,7 +65,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
         .with(DiSH.Par.EPSILON_ID, 0.1) //
         .with(DiSH.Par.MU_ID, 40) //
         .with(DiSH.Par.STRATEGY_ID, DiSH.Strategy.APRIORI) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.656432);
     testClusterSizes(result, new int[] { 61, 84, 153, 187, 283, 332 });
   }

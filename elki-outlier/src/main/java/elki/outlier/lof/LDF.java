@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
@@ -85,7 +84,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
     url = "https://doi.org/10.1007/978-3-540-73499-4_6", //
     bibkey = "DBLP:conf/mldm/LateckiLP07")
-public class LDF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LDF<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -131,6 +130,12 @@ public class LDF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult
     this.kernel = kernel;
     this.h = h;
     this.c = c;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: it could be a non-numeric field, too.
+    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -214,11 +219,6 @@ public class LDF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**

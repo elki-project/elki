@@ -44,7 +44,7 @@ public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest
         .with(SilhouetteOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 7) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.69553333);
     testSingleScore(result, 416, 0.48453988);
   }

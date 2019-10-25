@@ -52,7 +52,7 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.686953412);
     testClusterSizes(clustering, new int[] { 1, 200, 437 });
   }
@@ -68,7 +68,7 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 0 } }), null);
     db.initialize();
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
@@ -76,6 +76,6 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
   }
 }

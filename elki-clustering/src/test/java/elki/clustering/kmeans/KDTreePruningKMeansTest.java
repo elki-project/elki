@@ -41,7 +41,7 @@ public class KDTreePruningKMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<KDTreePruningKMeans<DoubleVector>>(KDTreePruningKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -53,7 +53,7 @@ public class KDTreePruningKMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KDTreePruningKMeans.Par.SPLIT_ID, Split.MEDIAN) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -65,7 +65,7 @@ public class KDTreePruningKMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KDTreePruningKMeans.Par.SPLIT_ID, Split.BOUNDED_MIDPOINT) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -77,7 +77,7 @@ public class KDTreePruningKMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KDTreePruningKMeans.Par.SPLIT_ID, Split.SSQ) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

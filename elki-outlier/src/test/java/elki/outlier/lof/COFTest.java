@@ -39,7 +39,7 @@ public class COFTest extends AbstractOutlierAlgorithmTest {
   public void testCOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<COF<DoubleVector>>(COF.class) //
-        .with(COF.Par.K_ID, 10).build().run(db);
+        .with(COF.Par.K_ID, 10).build().autorun(db);
     testSingleScore(result, 1293, 1.415457);
     testAUC(db, "Noise", result, 0.8696806);
   }

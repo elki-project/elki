@@ -50,7 +50,7 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
     Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE>(CLIQUE.class) //
         .with(CLIQUE.Par.TAU_ID, "0.1") //
         .with(CLIQUE.Par.XSI_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9882);
     testClusterSizes(result, new int[] { 200, 200, 216, 400 });
@@ -66,7 +66,7 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
     Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE>(CLIQUE.class) //
         .with(CLIQUE.Par.TAU_ID, 0.2) //
         .with(CLIQUE.Par.XSI_ID, 6) //
-        .build().run(db);
+        .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
@@ -83,7 +83,7 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
         .with(CLIQUE.Par.TAU_ID, 0.2) //
         .with(CLIQUE.Par.XSI_ID, 6) //
         .with(CLIQUE.Par.PRUNE_ID) //
-        .build().run(db);
+        .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
     testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });

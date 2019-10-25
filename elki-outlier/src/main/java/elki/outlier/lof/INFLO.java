@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -91,7 +90,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1007/11731139_68", //
     bibkey = "DBLP:conf/pakdd/JinTHW06")
-public class INFLO<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class INFLO<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -124,6 +123,11 @@ public class INFLO<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
     this.distance = distance;
     this.m = m;
     this.kplus = k + 1;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -271,11 +275,6 @@ public class INFLO<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

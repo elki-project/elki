@@ -77,13 +77,13 @@ public class OnlineLOFTest extends AbstractOutlierAlgorithmTest {
 
       // 1. Run LOF on original data:
       FlexibleLOF<DoubleVector> lof = new FlexibleLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
-      DoubleRelation scores1 = lof.run(db).getScores();
+      DoubleRelation scores1 = lof.autorun(db).getScores();
       Hierarchy h = Metadata.hierarchyOf(rep);
       h.iterChildren().filter(KNNIndex.class).forEach(h::removeChild);
 
       // 2. Run OnlineLOF
       OnlineLOF<DoubleVector> onlinelof = new OnlineLOF<>(k, k, EuclideanDistance.STATIC, CosineDistance.STATIC);
-      OutlierResult result = onlinelof.run(db);
+      OutlierResult result = onlinelof.autorun(db);
 
       // prepare synthetic new objects
       ArrayList<DoubleVector> insertions = new ArrayList<>();

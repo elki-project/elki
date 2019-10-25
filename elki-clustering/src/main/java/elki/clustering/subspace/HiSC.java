@@ -26,7 +26,6 @@ import elki.clustering.optics.GeneralizedOPTICS;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -112,8 +111,18 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   }
 
   @Override
-  public ClusterOrder run(Database db, Relation<V> relation) {
-    return new Instance(db, relation).run();
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Run the HiSC algorithm
+   *
+   * @param relation Data relation
+   * @return OPTICS cluster order
+   */
+  public ClusterOrder run(Relation<V> relation) {
+    return new Instance(relation).run();
   }
 
   /**
@@ -150,16 +159,14 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Constructor.
      *
-     * @param db Database
      * @param relation Relation
      */
-    public Instance(Database db, Relation<V> relation) {
-      super(db, relation);
-      DBIDs ids = relation.getDBIDs();
-      this.clusterOrder = DBIDUtil.newArray(ids.size());
+    public Instance(Relation<V> relation) {
+      super(relation.getDBIDs());
+      this.clusterOrder = DBIDUtil.newArray(relation.size());
       this.relation = relation;
-      this.correlationValue = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_DB, Integer.MAX_VALUE);
-      this.commonPreferenceVectors = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, long[].class);
+      this.correlationValue = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, Integer.MAX_VALUE);
+      this.commonPreferenceVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP, long[].class);
     }
 
     @Override
@@ -320,11 +327,6 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   @Override
   public int getMinPts() {
     return 2;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(NumberVector.FIELD);
   }
 
   /**

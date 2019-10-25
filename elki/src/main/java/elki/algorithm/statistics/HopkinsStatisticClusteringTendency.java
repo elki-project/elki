@@ -23,7 +23,6 @@ package elki.algorithm.statistics;
 import java.util.Arrays;
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
@@ -82,7 +81,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Annals of Botany, 18(2), 213-227", //
     url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
     bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
-public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double> {
+public class HopkinsStatisticClusteringTendency implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -145,11 +144,16 @@ public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double
     this.maxima = maxima;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
-   * Runs the algorithm in the timed evaluation part.
+   * Compute the Hopkins statistic for a vector relation.
    *
-   * @param relation Relation to analyze
-   * @return Hopkins p
+   * @param relation Relation
+   * @return Hopkins statistic
    */
   public Double run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
@@ -286,11 +290,6 @@ public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double
     else {
       throw new AbortException("Invalid maxima specified: expected " + dim + " got maxima dimensionality: " + maxima.length);
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

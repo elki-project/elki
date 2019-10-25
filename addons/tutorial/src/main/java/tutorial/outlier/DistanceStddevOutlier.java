@@ -20,7 +20,6 @@
  */
 package tutorial.outlier;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -60,7 +59,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class DistanceStddevOutlier<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -81,6 +80,11 @@ public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> i
     super();
     this.distance = distance;
     this.k = k;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -118,11 +122,6 @@ public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> i
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
     DoubleRelation rel = new MaterializedDoubleRelation("stddev-outlier", relation.getDBIDs(), scores);
     return new OutlierResult(meta, rel);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

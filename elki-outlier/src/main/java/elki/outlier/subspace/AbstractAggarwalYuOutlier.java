@@ -22,8 +22,6 @@ package elki.outlier.subspace;
 
 import java.util.ArrayList;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.type.TypeInformation;
@@ -32,10 +30,10 @@ import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.math.MathUtil;
-import elki.result.outlier.OutlierResult;
+import elki.outlier.OutlierAlgorithm;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -63,7 +61,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //
     bibkey = "DBLP:conf/sigmod/AggarwalY01")
-public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Symbolic value for subspaces not in use.
    */

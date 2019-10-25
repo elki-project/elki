@@ -23,7 +23,6 @@ package elki.classification;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.ClassLabel;
 import elki.data.type.TypeInformation;
@@ -39,13 +38,13 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -61,7 +60,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
 @Priority(Priority.IMPORTANT)
-public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classifier<O> {
+public class KNNClassifier<O> implements Classifier<O> {
   /**
    * Holds the value of @link #K_PARAM}.
    */
@@ -92,6 +91,11 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
     super();
     this.distance = distance;
     this.k = k;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override
@@ -143,12 +147,6 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
     return "lazy learner - provides no model";
   }
 
-  @Override
-  @Deprecated
-  public Void run(Database database) throws IllegalStateException {
-    throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
-  }
-
   /**
    * Returns the distance.
    *
@@ -156,11 +154,6 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
    */
   public Distance<? super O> getDistance() {
     return distance;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

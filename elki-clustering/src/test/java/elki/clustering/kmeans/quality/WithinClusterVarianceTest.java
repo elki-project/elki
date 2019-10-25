@@ -54,7 +54,7 @@ public class WithinClusterVarianceTest extends AbstractClusterAlgorithmTest {
     Clustering<KMeansModel> result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstK.class) //
-        .build().run(db);
+        .build().autorun(db);
     // Test Cluster Variance
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVariance();
     final double quality = variance.quality(result, SquaredEuclideanDistance.STATIC, rel);

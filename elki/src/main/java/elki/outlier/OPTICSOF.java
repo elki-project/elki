@@ -20,7 +20,6 @@
  */
 package elki.outlier;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.optics.AbstractOPTICS;
 import elki.clustering.optics.OPTICSTypeAlgorithm;
@@ -81,7 +80,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 3rd European Conf. on Principles of Knowledge Discovery and Data Mining (PKDD'99)", //
     url = "https://doi.org/10.1007/978-3-540-48247-5_28", //
     bibkey = "DBLP:conf/pkdd/BreunigKNS99")
-public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OPTICSOF<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -102,6 +101,11 @@ public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements Out
     super();
     this.distance = distance;
     this.minpts = minpts;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -162,11 +166,6 @@ public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements Out
     DoubleRelation scoreResult = new MaterializedDoubleRelation("OPTICS Outlier Scores", relation.getDBIDs(), ofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -37,9 +37,8 @@ import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
-import elki.database.Database;
-import elki.database.ProxyDatabase;
 import elki.database.ids.DBIDIter;
+import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -156,19 +155,18 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   /**
    * Run the algorithm on a database and relation.
    *
-   * @param database Database to process
    * @param relation Data relation
    * @return Clustering result.
    */
   @Override
-  public Clustering<M> run(Database database, Relation<V> relation) {
+  public Clustering<M> run(Relation<V> relation) {
     MutableProgress prog = LOG.isVerbose() ? new MutableProgress("X-means number of clusters", k_max, LOG) : null;
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
     LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     splitInitializer.setInitialMeans(initializer.chooseInitialMeans(relation, k_min, distance));
-    Clustering<M> clustering = innerKMeans.run(database, relation);
+    Clustering<M> clustering = innerKMeans.run(relation);
 
     if(prog != null) {
       prog.setProcessed(k_min, LOG);
@@ -180,7 +178,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       ArrayList<Cluster<M>> nextClusters = new ArrayList<>();
       for(Cluster<M> cluster : clusters) {
         // Try to split this cluster:
-        List<Cluster<M>> childClusterList = splitCluster(cluster, database, relation);
+        List<Cluster<M>> childClusterList = splitCluster(cluster, relation);
         nextClusters.addAll(childClusterList);
         if(childClusterList.size() > 1) {
           k += childClusterList.size() - 1;
@@ -198,7 +196,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       // Improve-Params:
       splitInitializer.setInitialClusters(nextClusters);
       innerKMeans.setK(nextClusters.size());
-      clustering = innerKMeans.run(database, relation);
+      clustering = innerKMeans.run(relation);
       clusters.clear();
       clusters.addAll(clustering.getAllClusters());
     }
@@ -218,12 +216,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * Conditionally splits the clusters based on the information criterion.
    *
    * @param parentCluster Cluster to split
-   * @param database Database
    * @param relation Data relation
    * @return Parent cluster when split decreases clustering quality or child
    *         clusters when split improves clustering.
    */
-  protected List<Cluster<M>> splitCluster(Cluster<M> parentCluster, Database database, Relation<V> relation) {
+  protected List<Cluster<M>> splitCluster(Cluster<M> parentCluster, Relation<V> relation) {
     // Transform parent cluster into a clustering
     ArrayList<Cluster<M>> parentClusterList = new ArrayList<Cluster<M>>(1);
     parentClusterList.add(parentCluster);
@@ -232,12 +229,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       return parentClusterList;
     }
     Clustering<M> parentClustering = new Clustering<>(parentClusterList);
-
-    ProxyDatabase proxyDB = new ProxyDatabase(parentCluster.getIDs(), database);
-
     splitInitializer.setInitialMeans(splitCentroid(parentCluster, relation));
     innerKMeans.setK(2);
-    Clustering<M> childClustering = innerKMeans.run(proxyDB);
+    Clustering<M> childClustering = innerKMeans.run(new ProxyView<V>(parentCluster.getIDs(), relation));
 
     double parentEvaluation = informationCriterion.quality(parentClustering, distance, relation);
     double childrenEvaluation = informationCriterion.quality(childClustering, distance, relation);

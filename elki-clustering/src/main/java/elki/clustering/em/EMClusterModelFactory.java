@@ -24,7 +24,6 @@ import java.util.List;
 
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 
@@ -37,16 +36,16 @@ import elki.distance.NumberVectorDistance;
  * @navassoc - creates - EMClusterModel
  *
  * @param <V> Vector type
+ * @param <M> Model type
  */
 public interface EMClusterModelFactory<V extends NumberVector, M extends MeanModel> {
   /**
    * Build the initial models
    *
-   * @param database Database
    * @param relation Relation
    * @param k Number of clusters
    * @param df Distance function
    * @return Initial models
    */
-  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df);
+  List<? extends EMClusterModel<M>> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df);
 }

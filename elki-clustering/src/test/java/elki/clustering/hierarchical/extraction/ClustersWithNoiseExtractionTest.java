@@ -43,7 +43,7 @@ public class ClustersWithNoiseExtractionTest extends AbstractClusterAlgorithmTes
         .with(ClustersWithNoiseExtraction.Par.K_ID, 3) //
         .with(ClustersWithNoiseExtraction.Par.MINCLUSTERSIZE_ID, 5) //
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.9242);
     testClusterSizes(clustering, new int[] { 56, 123, 151 });
   }

@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
@@ -104,7 +103,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM 2014)", //
     url = "https://doi.org/10.1137/1.9781611973440.63", //
     bibkey = "DBLP:conf/sdm/SchubertZK14")
-public class KDEOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class KDEOS<O> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -170,6 +169,13 @@ public class KDEOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
     this.minBandwidth = minBandwidth;
     this.scale = scale;
     this.idim = idim;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    TypeInformation res = distance.getInputTypeRestriction();
+    res = idim == 0 ? res : new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, res);
+    return TypeUtil.array(res);
   }
 
   /**
@@ -320,15 +326,6 @@ public class KDEOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlie
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation res = distance.getInputTypeRestriction();
-    if(idim < 0) {
-      res = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, res);
-    }
-    return TypeUtil.array(res);
   }
 
   /**

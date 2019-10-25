@@ -51,13 +51,18 @@ public class AddUniformScale implements Algorithm {
     super();
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
+  /**
+   * Run the algorithm on all vector relations of a database.
+   * 
+   * @param database Database
+   * @return Empty (scales are attached to the relations)
+   */
   public Void run(Database database) {
     for(Relation<?> rel : database.getRelations()) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        ScalesResult res = run((Relation<? extends NumberVector>) rel);
-        ResultUtil.addChildResult(rel, res);
+        @SuppressWarnings("unchecked")
+        Relation<? extends NumberVector> vrel = (Relation<? extends NumberVector>) rel;
+        ResultUtil.addChildResult(rel, run(vrel));
       }
     }
     return null;

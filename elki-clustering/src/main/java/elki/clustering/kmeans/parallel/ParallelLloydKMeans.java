@@ -29,7 +29,6 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
@@ -74,9 +73,9 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
   }
 
   @Override
-  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel> run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();
-    double[][] means = initialMeans(database, relation);
+    double[][] means = initialMeans(relation);
 
     // Store for current cluster assignment.
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);

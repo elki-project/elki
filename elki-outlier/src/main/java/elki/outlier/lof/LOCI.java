@@ -22,7 +22,6 @@ package elki.outlier.lof;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -90,7 +89,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
     url = "https://doi.org/10.1109/ICDE.2003.1260802", //
     bibkey = "DBLP:conf/icde/PapadimitriouKGF03")
-public class LOCI<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LOCI<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -130,6 +129,11 @@ public class LOCI<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     this.rmax = rmax;
     this.nmin = nmin;
     this.alpha = alpha;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -390,11 +394,6 @@ public class LOCI<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     public void sort() {
       DoubleIntegerArrayQuickSort.sort(keys, vals, size);
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

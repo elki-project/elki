@@ -20,7 +20,6 @@
  */
 package elki.clustering.dbscan;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.predicates.CorePredicate;
 import elki.clustering.dbscan.predicates.EpsilonNeighborPredicate;
@@ -37,20 +36,24 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.DBIDs;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
@@ -78,7 +81,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
     booktitle = "Data Mining and Knowledge Discovery", //
     url = "https://doi.org/10.1023/A:1009745219419", //
     bibkey = "DBLP:journals/datamine/SanderEKX98")
-public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -119,10 +122,10 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Clustering<Model> run(Database database) {
+  public Clustering<Model> autorun(Database database) {
     // Ignore the generic, we do a run-time test below:
+    @SuppressWarnings("unchecked")
     CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
     if(!cp.acceptsType(npred.getOutputType())) {
       throw new AbortException("Core predicate and neighbor predicate are not compatible.");

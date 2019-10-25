@@ -209,22 +209,15 @@ public class VisualizerContext implements DataStoreListener {
    */
   private Clustering<Model> generateDefaultClustering() {
     final Database db = ResultUtil.findDatabase(baseResult);
-    Clustering<Model> c = null;
     try {
       // Try to cluster by labels
-      ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
-      c = split.run(db);
+      return new ByLabelHierarchicalClustering().autorun(db);
     }
     catch(NoSupportedDataTypeException e) {
       // Put everything into one
-      c = new TrivialAllInOne().run(db);
+      return new TrivialAllInOne().autorun(db);
     }
-    return c;
   }
-
-  // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
-
-  // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
 
   /**
    * Get the current selection result.

@@ -22,8 +22,6 @@ package elki.outlier.trivial;
 
 import java.util.regex.Pattern;
 
-import elki.AbstractAlgorithm;
-import elki.data.ClassLabel;
 import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -53,7 +51,7 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  * @since 0.4.0
  */
 @Priority(Priority.SUPPLEMENTARY)
-public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ByLabelOutlier implements OutlierAlgorithm {
   /**
    * The default pattern to use.
    */
@@ -87,11 +85,10 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
   }
 
   @Override
-  public OutlierResult run(Database database) {
+  public OutlierResult autorun(Database database) {
     // Prefer a true class label
     try {
-      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-      return run(relation);
+      return run(database.getRelation(TypeUtil.CLASSLABEL));
     }
     catch(NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.

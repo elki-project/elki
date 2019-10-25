@@ -22,7 +22,6 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.LloydKMeans;
 import elki.data.Cluster;
@@ -31,7 +30,6 @@ import elki.data.NumberVector;
 import elki.data.model.ModelUtil;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -70,7 +68,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class KMeansOutlierDetection<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * Clustering algorithm to use
    */
@@ -86,18 +84,21 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     this.clusterer = clusterer;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(clusterer.getDistance().getInputTypeRestriction());
+  }
+
   /**
    * Run the outlier detection algorithm.
    *
-   * @param database Database
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<O> relation) {
-    DistanceQuery<O> dq = new QueryBuilder<>(relation, clusterer.getDistance()).distanceQuery();
-    // TODO: improve ELKI api to ensure we're using the same DBIDs!
-    Clustering<?> c = clusterer.run(database, relation);
+  public OutlierResult run(Relation<O> relation) {
+    Clustering<?> c = clusterer.run(relation);
 
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, clusterer.getDistance()).distanceQuery();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
 
@@ -118,11 +119,6 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
     DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans outlier scores", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(clusterer.getDistance().getInputTypeRestriction());
   }
 
   /**

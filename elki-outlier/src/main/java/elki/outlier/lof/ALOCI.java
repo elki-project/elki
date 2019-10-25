@@ -24,13 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -92,7 +90,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
     url = "https://doi.org/10.1109/ICDE.2003.1260802", //
     bibkey = "DBLP:conf/icde/PapadimitriouKGF03")
-public class ALOCI<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ALOCI<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -141,7 +139,13 @@ public class ALOCI<V extends NumberVector> extends AbstractAlgorithm<OutlierResu
     this.rnd = rnd;
   }
 
-  public OutlierResult run(Database database, Relation<V> relation) {
+  /**
+   * Run the algorithm.
+   *
+   * @param relation Relation to process
+   * @return Outlier detection result
+   */
+  public OutlierResult run(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final Random random = rnd.getSingleThreadedRandom();
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;

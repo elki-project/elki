@@ -25,7 +25,6 @@ import static elki.math.linearalgebra.VMath.argmax;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
@@ -35,7 +34,6 @@ import elki.data.model.MeanModel;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -53,8 +51,8 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -102,7 +100,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/s00357-007-0004-5", //
     bibkey = "DBLP:journals/classification/FraleyR07")
 @Priority(Priority.RECOMMENDED)
-public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
+public class EM<V extends NumberVector, M extends MeanModel> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * The logger for this class.
    */
@@ -197,6 +195,11 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     this.soft = soft;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Performs the EM clustering algorithm on the given database.
    *
@@ -205,16 +208,15 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
    * still, the database objects hold associated the complete probability-vector
    * for all models.
    * 
-   * @param database Database
    * @param relation Relation
-   * @return Result
+   * @return Clustering result
    */
-  public Clustering<M> run(Database database, Relation<V> relation) {
+  public Clustering<M> run(Relation<V> relation) {
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
-    List<? extends EMClusterModel<M>> models = mfactory.buildInitialModels(database, relation, k, SquaredEuclideanDistance.STATIC);
+    List<? extends EMClusterModel<M>> models = mfactory.buildInitialModels(relation, k, SquaredEuclideanDistance.STATIC);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
     DoubleStatistic likestat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".loglikelihood") : null;
@@ -375,11 +377,6 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       }
     }
     return acc > 1. ? (max + FastMath.log(acc)) : max;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

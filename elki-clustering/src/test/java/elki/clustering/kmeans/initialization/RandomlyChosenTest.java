@@ -49,7 +49,7 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .with(KMeans.INIT_ID, RandomlyChosen.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.702733);
     testClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
   }
@@ -69,7 +69,7 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.99602);
     testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }

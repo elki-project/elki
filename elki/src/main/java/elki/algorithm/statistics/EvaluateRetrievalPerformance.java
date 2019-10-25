@@ -20,7 +20,6 @@
  */
 package elki.algorithm.statistics;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
@@ -64,7 +63,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *
  * @param <O> Object type
  */
-public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
+public class EvaluateRetrievalPerformance<O> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -116,6 +115,12 @@ public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateR
     this.random = random;
     this.includeSelf = includeSelf;
     this.maxk = maxk;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction(), //
+        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   /**
@@ -255,12 +260,6 @@ public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateR
       nlist.add(dist, ri);
     }
     nlist.sort();
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction(), //
-        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   /**

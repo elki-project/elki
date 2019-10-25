@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.data.ClassLabel;
 import elki.database.Database;
 import elki.utilities.exceptions.AbortException;
@@ -38,11 +37,11 @@ import elki.utilities.exceptions.AbortException;
  * @param <O> Input type
  * @param <R> Result type
  */
-public abstract class AbstractClassifier<O, R> extends AbstractAlgorithm<R> implements Classifier<O> {
+public abstract class AbstractClassifier<O, R> implements Classifier<O> {
   @Override
   @Deprecated
-  public R run(Database database) {
-    throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
+  public R autorun(Database database) {
+    throw new AbortException("Classifiers cannot autorun on a database, but need to be trained and can then predict.");
   }
 
   /**

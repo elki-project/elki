@@ -26,13 +26,11 @@ import java.util.List;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MeanVariance;
-
 import net.jafama.FastMath;
 
 /**
@@ -59,7 +57,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
   }
 
   @Override
-  public List<SphericalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
+  public List<SphericalGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
     assert (initialMeans.length == k);
     final int dim = RelationUtil.dimensionality(relation);

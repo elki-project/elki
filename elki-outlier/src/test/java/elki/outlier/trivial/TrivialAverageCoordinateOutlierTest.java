@@ -37,7 +37,7 @@ public class TrivialAverageCoordinateOutlierTest extends AbstractOutlierAlgorith
   @Test
   public void testTrivial() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-    OutlierResult result = new ELKIBuilder<>(TrivialAverageCoordinateOutlier.class).build().run(db);
+    OutlierResult result = new ELKIBuilder<>(TrivialAverageCoordinateOutlier.class).build().autorun(db);
     testAUC(db, "Noise", result, 0.4795);
   }
 }

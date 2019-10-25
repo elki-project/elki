@@ -45,7 +45,7 @@ public class CosineTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 2) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.86) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Cosine.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 8, res.getRules().size());
   }
 }

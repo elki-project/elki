@@ -45,7 +45,7 @@ public class CBLOFTest extends AbstractOutlierAlgorithmTest {
         .with(CBLOF.Par.BETA_ID, 3) //
         .with(CBLOF.Par.CLUSTERING_ID, SortMeans.class) //
         .with(KMeans.K_ID, 1) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.8232666666666666);
     testSingleScore(result, 416, 260.80721255987174);
   }

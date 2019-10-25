@@ -20,7 +20,6 @@
  */
 package elki.clustering.kmedoids;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
@@ -36,14 +35,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -97,7 +89,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch2", //
     bibkey = "doi:10.1002/9780470316801.ch2")
-public class PAM<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -140,6 +132,11 @@ public class PAM<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implement
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -399,11 +396,6 @@ public class PAM<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implement
       return cost;
     }
 
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -53,7 +53,7 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //
         .with(FourC.Settings.Par.LAMBDA_ID, 1) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.7052);
     testClusterSizes(result, new int[] { 218, 382 });
   }
@@ -69,7 +69,7 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //
         .with(FourC.Settings.Par.LAMBDA_ID, 3) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.9073744);
     testClusterSizes(result, new int[] { 200, 202, 248 });
   }

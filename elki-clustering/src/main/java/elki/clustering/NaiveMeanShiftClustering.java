@@ -22,7 +22,6 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -30,12 +29,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
@@ -87,7 +81,7 @@ import elki.utilities.pairs.Pair;
     booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", //
     url = "https://doi.org/10.1109/34.400568", //
     bibkey = "DBLP:journals/pami/Cheng95")
-public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class NaiveMeanShiftClustering<V extends NumberVector> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
@@ -125,6 +119,11 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAl
     this.distance = distance;
     this.kernel = kernel;
     this.bandwidth = range;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -221,11 +220,6 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAl
     Clustering<MeanModel> c = new Clustering<>(cs);
     Metadata.of(c).setLongName("Mean-shift Clustering");
     return c;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

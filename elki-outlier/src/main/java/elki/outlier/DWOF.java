@@ -20,7 +20,6 @@
  */
 package elki.outlier;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -78,7 +77,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)", //
     url = "https://doi.org/10.1007/978-3-642-38628-2_61", //
     bibkey = "DBLP:conf/ibpria/MomtazMG13")
-public class DWOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class DWOF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -112,6 +111,11 @@ public class DWOF<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     this.distance = distance;
     this.kplus = k + 1; // + query point
     this.delta = delta;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -312,11 +316,6 @@ public class DWOF<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       }
     }
     return countUnmerged;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -47,7 +47,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
     Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.696491);
     testClusterSizes(clustering, new int[] { 3, 5, 43, 55, 58, 62, 104 });
   }
@@ -58,7 +58,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
     Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 1) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
     assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
   }
@@ -70,7 +70,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.96941);
     testClusterSizes(clustering, new int[] { 7, 14, 54, 103, 152 });
   }
@@ -82,7 +82,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 1) //
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
     assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
   }
@@ -93,7 +93,7 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
     Clustering<DendrogramModel> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 1) //
         .with(Algorithm.Utils.ALGORITHM_ID, MiniMaxNNChain.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
     assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
   }

@@ -23,9 +23,7 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
-import elki.data.DoubleVector;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
@@ -59,7 +57,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<DoubleVector>> {
+public class AveragePrecisionAtK<O> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -106,6 +104,12 @@ public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<D
     this.sampling = sampling;
     this.random = random;
     this.includeSelf = includeSelf;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction(), //
+        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   /**
@@ -188,12 +192,6 @@ public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<D
     }
     // Fallback to equality, e.g. on class labels
     return ref.equals(test);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction(), //
-        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   /**

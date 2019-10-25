@@ -140,7 +140,7 @@ public class EvaluateClustering implements Evaluator {
     }
     if(refc == null) {
       LOG.debug("Generating a new reference clustering.");
-      Object refres = referencealg.run(db);
+      Object refres = referencealg.autorun(db);
       List<Clustering<?>> refcrs = Clustering.getClusteringResults(refres);
       if(refcrs.isEmpty()) {
         LOG.warning("Reference algorithm did not return a clustering result!");

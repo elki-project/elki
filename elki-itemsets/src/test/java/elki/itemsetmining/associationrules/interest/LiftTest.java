@@ -45,7 +45,7 @@ public class LiftTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 2) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.5) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Lift.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 18, res.getRules().size());
   }
 }

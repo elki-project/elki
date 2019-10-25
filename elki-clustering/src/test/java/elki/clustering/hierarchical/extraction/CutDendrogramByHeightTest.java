@@ -42,7 +42,7 @@ public class CutDendrogramByHeightTest extends AbstractClusterAlgorithmTest {
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByHeight.class) //
         .with(CutDendrogramByHeight.Par.THRESHOLD_ID, 0.14) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.9474250948);
     testClusterSizes(clustering, new int[] { 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }
@@ -54,7 +54,7 @@ public class CutDendrogramByHeightTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByHeight.Par.THRESHOLD_ID, 0.14) //
         .with(CutDendrogramByHeight.Par.HIERARCHICAL_ID) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.9474250948);
     testClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }

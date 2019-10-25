@@ -20,8 +20,6 @@
  */
 package elki.outlier.svm;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -37,22 +35,19 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.EnumParameter;
-import libsvm.svm;
-import libsvm.svm_model;
-import libsvm.svm_node;
-import libsvm.svm_parameter;
-import libsvm.svm_print_interface;
-import libsvm.svm_problem;
+
+import libsvm.*;
 
 /**
  * Outlier-detection using one-class support vector machines.
@@ -82,7 +77,7 @@ import libsvm.svm_problem;
     booktitle = "Neural computation 13.7", //
     url = "https://doi.org/10.1162/089976601750264965", //
     bibkey = "DBLP:journals/neco/ScholkopfPSSW01")
-public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -119,6 +114,11 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     super();
     this.kernel = kernel;
     this.nu = nu;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -228,11 +228,6 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     DoubleRelation scoreResult = new MaterializedDoubleRelation("One-Class SVM Decision", ids, scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

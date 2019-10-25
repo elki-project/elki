@@ -24,9 +24,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.data.ClassLabel;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
@@ -35,13 +33,7 @@ import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.utilities.Priority;
@@ -75,7 +67,7 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
 @Title("Clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 @Priority(Priority.SUPPLEMENTARY)
-public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelClustering implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Allow multiple cluster assignment.
    */
@@ -106,11 +98,15 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   }
 
   @Override
-  public Clustering<Model> run(Database database) {
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.GUESSED_LABEL);
+  }
+
+  @Override
+  public Clustering<Model> autorun(Database database) {
     // Prefer a true class label
     try {
-      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-      return run(relation);
+      return run(database.getRelation(TypeUtil.CLASSLABEL));
     }
     catch(NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.
@@ -213,11 +209,6 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     else {
       labelMap.put(label, DBIDUtil.deref(id));
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.GUESSED_LABEL);
   }
 
   /**

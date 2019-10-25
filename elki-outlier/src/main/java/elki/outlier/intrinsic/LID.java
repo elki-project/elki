@@ -20,7 +20,6 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -74,7 +73,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 11th Int. Conf. Similarity Search and Applications (SISAP'2018)", //
     url = "https://doi.org/10.1007/978-3-030-02224-2_14", //
     bibkey = "DBLP:conf/sisap/HouleSZ18")
-public class LID<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LID<O> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -109,6 +108,11 @@ public class LID<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
     this.estimator = estimator;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
    * Run the algorithm
    *
@@ -138,11 +142,6 @@ public class LID<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
     DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic dimensionality", relation.getDBIDs(), id_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

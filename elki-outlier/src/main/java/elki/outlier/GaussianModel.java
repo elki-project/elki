@@ -22,7 +22,6 @@ package elki.outlier;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -62,7 +61,7 @@ import net.jafama.FastMath;
  */
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
-public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Invert the result
    */
@@ -76,6 +75,11 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
   public GaussianModel(boolean invert) {
     super();
     this.invert = invert;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -125,11 +129,6 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     }
     DoubleRelation res = new MaterializedDoubleRelation("Gaussian Model Outlier Score", relation.getDBIDs(), oscores);
     return new OutlierResult(meta, res);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

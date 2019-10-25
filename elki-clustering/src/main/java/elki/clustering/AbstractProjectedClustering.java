@@ -20,12 +20,11 @@
  */
 package elki.clustering;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.subspace.PROCLUS;
 import elki.data.Clustering;
 import elki.data.NumberVector;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Abstract superclass for projected clustering algorithms, like {@link PROCLUS}
@@ -37,7 +36,7 @@ import elki.utilities.optionhandling.OptionID;
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector> implements ClusteringAlgorithm<R> {
   /**
    * Holds the value of {@link Par#K_ID}.
    */

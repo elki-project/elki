@@ -27,21 +27,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.DoubleVector;
-import elki.data.NumberVector;
-import elki.data.SparseNumberVector;
+import elki.data.*;
 import elki.data.model.KMeansModel;
 import elki.data.model.Model;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
@@ -68,6 +62,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -81,7 +76,7 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> implements KMeans<V, M> {
   /**
    * Distance function used.
    */
@@ -137,11 +132,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   /**
    * Choose the initial means.
    *
-   * @param database Database
    * @param relation Relation
    * @return Means
    */
-  protected double[][] initialMeans(Database database, Relation<V> relation) {
+  protected double[][] initialMeans(Relation<V> relation) {
     Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
     double[][] means = initializer.chooseInitialMeans(relation, k, distance);
     getLogger().statistics(inittime.end());

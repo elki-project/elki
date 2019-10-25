@@ -42,8 +42,7 @@ import elki.utilities.documentation.Title;
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
  * <p>
- * Used for example by LOF via
- * {@link elki.database.DatabaseUtil#precomputedKNNQuery}.
+ * Automatically added by the query optimizer if memory permits.
  *
  * @author Erich Schubert
  * @since 0.2

@@ -44,8 +44,8 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
         .with(HDBSCANHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build();
-    testFMeasure(db, slink.run(db), 0.9407684);
-    testClusterSizes(slink.run(db), new int[] { 8, 62, 104, 156 });
+    testFMeasure(db, slink.autorun(db), 0.9407684);
+    testClusterSizes(slink.autorun(db), new int[] { 8, 62, 104, 156 });
   }
 
   @Test
@@ -55,8 +55,8 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
         .with(HDBSCANHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 1) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build();
-    testFMeasure(db, slink.run(db), 0.497315);
-    testClusterSizes(slink.run(db), new int[] { 0, 1, 329 });
+    testFMeasure(db, slink.autorun(db), 0.497315);
+    testClusterSizes(slink.autorun(db), new int[] { 0, 1, 329 });
   }
 
   @Test
@@ -67,8 +67,8 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build();
-    testFMeasure(db, slink.run(db), 0.97218);
-    testClusterSizes(slink.run(db), new int[] { 21, 54, 103, 152 });
+    testFMeasure(db, slink.autorun(db), 0.97218);
+    testClusterSizes(slink.autorun(db), new int[] { 21, 54, 103, 152 });
   }
 
   @Test
@@ -78,7 +78,7 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
         .with(HDBSCANHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
         .with(Algorithm.Utils.ALGORITHM_ID, MiniMaxNNChain.class) //
         .build();
-    testFMeasure(db, slink.run(db), 0.91459);
-    testClusterSizes(slink.run(db), new int[] { 0, 59, 112, 159 });
+    testFMeasure(db, slink.autorun(db), 0.91459);
+    testClusterSizes(slink.autorun(db), new int[] { 0, 59, 112, 159 });
   }
 }

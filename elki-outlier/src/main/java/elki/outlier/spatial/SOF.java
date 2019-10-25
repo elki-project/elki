@@ -82,6 +82,12 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     super(npred, nonSpatialDistance);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * The main run method
    * 
@@ -135,11 +141,6 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

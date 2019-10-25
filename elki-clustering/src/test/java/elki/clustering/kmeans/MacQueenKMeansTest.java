@@ -49,7 +49,7 @@ public class MacQueenKMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<MacQueenKMeans<DoubleVector>>(MacQueenKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

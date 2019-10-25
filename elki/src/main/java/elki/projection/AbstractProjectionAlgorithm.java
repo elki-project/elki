@@ -20,7 +20,7 @@
  */
 package elki.projection;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.database.relation.Relation;
 import elki.index.Index;
 import elki.logging.Logging;
@@ -37,7 +37,7 @@ import elki.utilities.optionhandling.OptionID;
  *
  * @param <R> Result type.
  */
-public abstract class AbstractProjectionAlgorithm<R> extends AbstractAlgorithm<R> {
+public abstract class AbstractProjectionAlgorithm<R> implements Algorithm {
   /**
    * Keep the original data relation.
    */

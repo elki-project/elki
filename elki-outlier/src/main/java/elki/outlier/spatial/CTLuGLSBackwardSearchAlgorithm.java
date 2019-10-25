@@ -22,7 +22,6 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -81,7 +80,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/1835804.1835939", //
     bibkey = "DBLP:conf/kdd/ChenLB10")
-public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -109,6 +108,12 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     this.distance = distance;
     this.alpha = alpha;
     this.k = k;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -248,11 +253,6 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     }
 
     return new Pair<>(worstid, FastMath.sqrt(worstscore));
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

@@ -45,7 +45,7 @@ public class LeverageTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 2) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.16) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Leverage.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 18, res.getRules().size());
   }
 }

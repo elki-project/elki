@@ -45,6 +45,9 @@ import elki.database.Database;
  * @param <C> Clustering type
  */
 public interface ClusteringAlgorithm<C extends Clustering<? extends Model>> extends Algorithm {
+  @SuppressWarnings("unchecked")
   @Override
-  C run(Database database);
+  default C autorun(Database database) {
+    return (C) Algorithm.Utils.autorun(this, database);
+  }
 }

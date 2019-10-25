@@ -84,6 +84,11 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
     super(distance, minPts);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
    * Run the algorithm
    *
@@ -226,11 +231,6 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
         pi.put(it, id);
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override

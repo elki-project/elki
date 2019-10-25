@@ -22,7 +22,6 @@ package elki.clustering.subspace;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -49,8 +48,8 @@ import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -97,7 +96,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. SIAM Int. Conf. on Data Mining (SDM'04)", //
     url = "https://doi.org/10.1137/1.9781611972740.23", //
     bibkey = "DBLP:conf/sdm/KroegerKK04")
-public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class SUBCLU<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -137,6 +136,11 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.mindim = mindim;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -428,11 +432,6 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     }
 
     return bestSubspace;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

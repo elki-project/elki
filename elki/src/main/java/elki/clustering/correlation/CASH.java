@@ -20,31 +20,18 @@
  */
 package elki.clustering.correlation;
 
-import static elki.math.linearalgebra.VMath.euclideanLength;
-import static elki.math.linearalgebra.VMath.getMatrix;
-import static elki.math.linearalgebra.VMath.minusEquals;
-import static elki.math.linearalgebra.VMath.minusTimesEquals;
-import static elki.math.linearalgebra.VMath.scalarProduct;
-import static elki.math.linearalgebra.VMath.timesEquals;
-import static elki.math.linearalgebra.VMath.transpose;
-import static elki.math.linearalgebra.VMath.transposeTimes;
-import static elki.math.linearalgebra.VMath.transposeTimesTimes;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import elki.AbstractAlgorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.correlation.cash.CASHInterval;
 import elki.clustering.correlation.cash.CASHIntervalSplit;
 import elki.clustering.correlation.cash.ParameterizationFunction;
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.DoubleVector;
-import elki.data.HyperBoundingBox;
-import elki.data.NumberVector;
+import elki.data.*;
 import elki.data.model.ClusterModel;
 import elki.data.model.CorrelationAnalysisSolution;
 import elki.data.model.LinearEquationModel;
@@ -54,7 +41,6 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
 import elki.database.ProxyDatabase;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -71,7 +57,6 @@ import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.LinearEquationSystem;
 import elki.math.linearalgebra.pca.PCARunner;
 import elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
-import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
 import elki.result.Metadata;
 import elki.utilities.datastructures.heap.ComparatorMaxHeap;
@@ -80,13 +65,14 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -116,7 +102,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)", //
     url = "https://doi.org/10.1137/1.9781611972788.69", //
     bibkey = "DBLP:conf/sdm/AchtertBDKZ08")
-public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -621,64 +607,31 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param relation the database containing the parameterization functions
    * @param interval the interval to build the model
    * @param dim the dimensionality of the database
-   * @param ids an empty set to assign the ids
+   * @param outids an empty set to assign the ids
    * @return a basis of the found subspace
    */
-  private double[][] runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
-    Database derivatorDB = buildDerivatorDB(relation, interval);
-
-    PCARunner pca = new PCARunner(new StandardCovarianceMatrixBuilder());
-    EigenPairFilter filter = new FirstNEigenPairFilter(dim - 1);
-    DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, pca, filter, 0, false);
-
-    CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
+  private double[][] runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs outids) {
+    CorrelationAnalysisSolution<DoubleVector> model = new DependencyDerivator<DoubleVector>(null, FormatUtil.NF4, //
+        new PCARunner(new StandardCovarianceMatrixBuilder()), //
+        new FirstNEigenPairFilter(dim - 1), 0, false) //
+            .run(buildDerivatorDB(relation, interval.getIDs()));
 
     double[][] weightMatrix = model.getSimilarityMatrix();
     double[] centroid = model.getCentroid();
     double eps = .25;
 
-    ids.addDBIDs(interval.getIDs());
+    outids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] v = minusEquals(relation.get(iditer).getColumnVector(), centroid);
       double d = transposeTimesTimes(v, weightMatrix, v);
       if(d <= eps) {
-        ids.add(iditer);
+        outids.add(iditer);
       }
     }
 
     double[][] basis = model.getStrongEigenvectors();
     return getMatrix(basis, 0, basis.length, 0, dim - 1);
-  }
-
-  /**
-   * Builds a database for the derivator consisting of the ids in the specified
-   * interval.
-   *
-   * @param relation the database storing the parameterization functions
-   * @param interval the interval to build the database from
-   * @return a database for the derivator consisting of the ids in the specified
-   *         interval
-   */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, CASHInterval interval) {
-    DBIDs ids = interval.getIDs();
-    ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    WritableDataStore<DoubleVector> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, DoubleVector.class);
-
-    // Project
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      prep.put(iter, DoubleVector.wrap(relation.get(iter).getColumnVector()));
-    }
-
-    if(LOG.isDebugging()) {
-      LOG.debugFine("db fuer derivator : " + ids.size());
-    }
-
-    MaterializedRelation<DoubleVector> prel = new MaterializedRelation<>(null, type, ids, prep);
-    proxy.addRelation(prel);
-    return proxy;
   }
 
   /**
@@ -694,18 +647,12 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private LinearEquationSystem runDerivator(Relation<ParameterizationFunction> relation, int dimensionality, DBIDs ids) {
     try {
       // build database for derivator
-      Database derivatorDB = buildDerivatorDB(relation, ids);
-
-      PCARunner pca = new PCARunner(new StandardCovarianceMatrixBuilder());
-      EigenPairFilter filter = new FirstNEigenPairFilter(dimensionality);
-      DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, pca, filter, 0, false);
-
-      CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
-      LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
-      return les;
+      DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, new PCARunner(new StandardCovarianceMatrixBuilder()), new FirstNEigenPairFilter(dimensionality), 0, false);
+      CorrelationAnalysisSolution<DoubleVector> model = derivator.run(buildDerivatorDB(relation, ids));
+      return model.getNormalizedLinearEquationSystem(null);
     }
     catch(NonNumericFeaturesException e) {
-      throw new IllegalStateException("Error during normalization" + e);
+      throw new IllegalStateException("Error during normalization: " + e.getMessage(), e);
     }
   }
 
@@ -718,18 +665,14 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @return a database for the derivator consisting of the ids in the specified
    *         interval
    */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) {
-    ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+  private Relation<DoubleVector> buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) {
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dimensionality(relation));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(null, type, ids);
-    proxy.addRelation(prep);
-
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       prep.insert(iter, DoubleVector.wrap(relation.get(iter).getColumnVector()));
     }
-    return proxy;
+    return prep;
   }
 
   @Override

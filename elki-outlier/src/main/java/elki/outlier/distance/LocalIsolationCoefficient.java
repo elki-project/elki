@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -78,7 +77,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Int. Conf. on Information Technology and Computer Science (ITCS) 2009", //
     url = "https://doi.org/10.1109/ITCS.2009.230", //
     bibkey = "doi:10.1109/ITCS.2009.230")
-public class LocalIsolationCoefficient<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LocalIsolationCoefficient<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -104,6 +103,11 @@ public class LocalIsolationCoefficient<O> extends AbstractAlgorithm<OutlierResul
     super();
     this.distance = distance;
     this.kplus = k + 1;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -139,11 +143,6 @@ public class LocalIsolationCoefficient<O> extends AbstractAlgorithm<OutlierResul
     DoubleRelation res = new MaterializedDoubleRelation("Local Isolation Coefficient", relation.getDBIDs(), lic_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, res);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

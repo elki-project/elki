@@ -39,7 +39,7 @@ public class KNNDDTest extends AbstractOutlierAlgorithmTest {
   public void testKNNOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<KNNDD<DoubleVector>>(KNNDD.class) //
-        .with(KNNDD.Par.K_ID, 100).build().run(db);
+        .with(KNNDD.Par.K_ID, 100).build().autorun(db);
     testSingleScore(result, 945, 0.965469269);
     testAUC(db, "Noise", result, 0.875203703);
   }

@@ -47,7 +47,7 @@ public class ConfidenceTest extends AbstractFrequentItemsetAlgorithmTest {
       .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.) //
       .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Confidence.class) //
           .build();
-      AssociationRuleResult res = ap.run(db);
+      AssociationRuleResult res = ap.autorun(db);
       assertEquals("Size not as expected.", 6, res.getRules().size());
     }
   }

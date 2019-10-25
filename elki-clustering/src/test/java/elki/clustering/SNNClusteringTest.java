@@ -51,7 +51,7 @@ public class SNNClusteringTest extends AbstractClusterAlgorithmTest {
         .with(SNNClustering.Par.EPSILON_ID, 77) //
         .with(SNNClustering.Par.MINPTS_ID, 28) //
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 100) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.832371422);
     testClusterSizes(result, new int[] { 73, 228, 213, 219, 231, 236 });
   }

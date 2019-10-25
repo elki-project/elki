@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -61,7 +60,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
     url = "http://www.vldb.org/conf/1998/p392.pdf", //
     bibkey = "DBLP:conf/vldb/KnorrN98")
-public abstract class AbstractDBOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractDBOutlier<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */

@@ -198,7 +198,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           .append(" data type: " + relation.getDataTypeInformation()).append(FormatUtil.NEWLINE);
 
       // Label outlier result (reference)
-      writeResult(fout, ids, bylabel.run(database), new IdentityScaling(), "bylabel");
+      writeResult(fout, ids, bylabel.autorun(database), new IdentityScaling(), "bylabel");
 
       // Output function:
       BiConsumer<String, OutlierResult> out = (kstr, result) -> writeResult(fout, ids, result, scaling, kstr);

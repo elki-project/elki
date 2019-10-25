@@ -23,13 +23,9 @@ package elki.outlier.meta;
 import java.util.ArrayList;
 import java.util.Random;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.outlier.lof.LOF;
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -42,14 +38,16 @@ import elki.distance.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
+import elki.outlier.lof.LOF;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -80,7 +78,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. 11th ACM SIGKDD Int. Conf. on Knowledge Discovery in Data Mining", //
     url = "https://doi.org/10.1145/1081870.1081891", //
     bibkey = "DBLP:conf/kdd/LazarevicK05")
-public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class FeatureBagging implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -122,14 +120,18 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     this.rnd = rnd;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Run the algorithm on a data set.
    *
-   * @param database Database context
    * @param relation Relation to use
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<NumberVector> relation) {
+  public OutlierResult run(Relation<NumberVector> relation) {
     final int dbdim = RelationUtil.dimensionality(relation);
     final int mindim = dbdim >> 1;
     final int maxdim = dbdim - 1;
@@ -234,11 +236,6 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       dims[s] = dims[alldim - d - 1];
     }
     return dimset;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

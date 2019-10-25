@@ -115,9 +115,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
   }
 
   @Override
-  public Clustering<DendrogramModel> run(Database database) {
-    PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
-    return run(pointerresult);
+  public Clustering<DendrogramModel> autorun(Database database) {
+    return run(algorithm.autorun(database));
   }
 
   /**

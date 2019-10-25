@@ -20,27 +20,30 @@
  */
 package elki.itemsetmining.associationrules;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import elki.Algorithm;
+import elki.data.BitVector;
+import elki.data.type.TypeInformation;
+import elki.data.type.VectorFieldTypeInformation;
+import elki.database.Database;
 import elki.itemsetmining.AbstractFrequentItemsetAlgorithm;
 import elki.itemsetmining.FPGrowth;
 import elki.itemsetmining.Itemset;
 import elki.itemsetmining.SparseItemset;
 import elki.itemsetmining.associationrules.interest.Confidence;
 import elki.itemsetmining.associationrules.interest.InterestingnessMeasure;
-import elki.AbstractAlgorithm;
-import elki.data.BitVector;
-import elki.data.type.TypeInformation;
-import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
 import elki.logging.Logging;
 import elki.result.AssociationRuleResult;
 import elki.result.FrequentItemsetsResult;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -72,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "Data mining and analysis: fundamental concepts and algorithms", //
     booktitle = "Cambridge University Press, 2014", //
     bibkey = "DBLP:books/cu/ZM2014")
-public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRuleResult> {
+public class AssociationRuleGeneration implements Algorithm {
   /**
    * Class logger.
    */
@@ -131,9 +134,9 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
    * @param database Database
    * @return Association rules
    */
-  public AssociationRuleResult run(Database database) {
+  public AssociationRuleResult autorun(Database database) {
     // Run frequent itemset mining
-    return new Instance().run(frequentItemAlgo.run(database));
+    return new Instance().run(frequentItemAlgo.autorun(database));
   }
 
   /**

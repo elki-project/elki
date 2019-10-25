@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -83,7 +82,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 13th Pacific-Asia Conf. Adv. Knowledge Discovery and Data Mining (PAKDD 2009)", //
     url = "https://doi.org/10.1007/978-3-642-01307-2_84", //
     bibkey = "DBLP:conf/pakdd/ZhangHJ09")
-public class LDOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LDOF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -115,6 +114,11 @@ public class LDOF<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -176,11 +180,6 @@ public class LDOF<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     DoubleRelation scoreResult = new MaterializedDoubleRelation("LDOF Outlier Score", relation.getDBIDs(), ldofs);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

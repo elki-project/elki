@@ -114,6 +114,11 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     this.rnd = rnd;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Performs the PROCLUS algorithm on the given database.
    *
@@ -698,11 +703,6 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       }
     }
     return badMedoids;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

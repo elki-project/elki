@@ -22,9 +22,7 @@ package elki.algorithm;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
-import elki.algorithm.KNNDistancesSampler.KNNDistanceOrderResult;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
@@ -92,7 +90,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "ACM Trans. Database Systems (TODS)", //
     url = "https://doi.org/10.1145/3068335", //
     bibkey = "DBLP:journals/tods/SchubertSEKX17")
-public class KNNDistancesSampler<O> extends AbstractAlgorithm<KNNDistanceOrderResult> {
+public class KNNDistancesSampler<O> implements Algorithm {
   /**
    * The logger for this class.
    */

@@ -22,7 +22,6 @@ package elki.clustering.subspace;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.subspace.clique.CLIQUESubspace;
 import elki.clustering.subspace.clique.CLIQUEUnit;
 import elki.data.Cluster;
@@ -45,8 +44,8 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -91,7 +90,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", //
     url = "https://doi.org/10.1145/276304.276314", //
     bibkey = "DBLP:conf/sigmod/AgrawalGGR98")
-public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class CLIQUE implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */

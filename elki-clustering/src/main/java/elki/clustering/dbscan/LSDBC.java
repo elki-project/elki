@@ -22,7 +22,6 @@ package elki.clustering.dbscan;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
@@ -36,12 +35,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
@@ -63,6 +57,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.jafama.FastMath;
 
@@ -90,7 +85,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-3-540-71618-1_82", //
     bibkey = "DBLP:conf/icannga/BiciciY07")
 @Priority(Priority.IMPORTANT)
-public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Class logger.
    */
@@ -129,6 +124,11 @@ public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<
     this.distance = distance;
     this.kplus = k + 1; // Skip query point
     this.alpha = alpha;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -300,11 +300,6 @@ public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

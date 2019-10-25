@@ -20,10 +20,11 @@
  */
 package elki.itemsetmining;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
+import elki.database.Database;
 import elki.result.FrequentItemsetsResult;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -37,7 +38,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @has - produces - FrequentItemsetsResult
  */
-public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm<FrequentItemsetsResult> {
+public abstract class AbstractFrequentItemsetAlgorithm implements Algorithm {
   /**
    * Minimum support.
    */
@@ -71,6 +72,11 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
     this(minsupp, 0, Integer.MAX_VALUE);
   }
 
+  @Override
+  public FrequentItemsetsResult autorun(Database database) {
+    return (FrequentItemsetsResult) Algorithm.super.autorun(database);
+  }
+
   /**
    * Get the minimum support for a given data set size.
    * 
@@ -93,20 +99,20 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
      * Parameter to specify the minimum support, in absolute or relative terms.
      */
     public static final OptionID MINSUPP_ID = new OptionID("itemsetmining.minsupp", //
-    "Threshold for minimum support as minimally required number of transactions (if > 1) " //
-        + "or the minimum frequency (if <= 1).");
+        "Threshold for minimum support as minimally required number of transactions (if > 1) " //
+            + "or the minimum frequency (if <= 1).");
 
     /**
      * Parameter to specify the minimum itemset length.
      */
     public static final OptionID MINLENGTH_ID = new OptionID("itemsetmining.minlength", //
-    "Minimum length of frequent itemsets to report. This can help to reduce the output size to only the most interesting patterns.");
+        "Minimum length of frequent itemsets to report. This can help to reduce the output size to only the most interesting patterns.");
 
     /**
      * Parameter to specify the maximum itemset length.
      */
     public static final OptionID MAXLENGTH_ID = new OptionID("itemsetmining.maxlength", //
-    "Maximum length of frequent itemsets to report. This can help to reduce the output size to only the most interesting patterns.");
+        "Maximum length of frequent itemsets to report. This can help to reduce the output size to only the most interesting patterns.");
 
     /**
      * Parameter for minimum support.
@@ -121,15 +127,15 @@ public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm
     @Override
     public void configure(Parameterization config) {
       new DoubleParameter(MINSUPP_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> minsupp = x);
       new IntParameter(MINLENGTH_ID) //
-      .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minlength = x);
       new IntParameter(MAXLENGTH_ID) //
-      .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> maxlength = x);
     }
   }

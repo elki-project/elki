@@ -30,7 +30,6 @@ import elki.data.SparseFeatureVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -60,7 +59,8 @@ import elki.utilities.documentation.Reference;
  * This implementation is in-memory only, and has not yet been carefully
  * optimized.
  * <p>
- * The worst case memory use probably is \(O(\min(n\cdot l,i^l))\) where i is the
+ * The worst case memory use probably is \(O(\min(n\cdot l,i^l))\) where i is
+ * the
  * number of items, l the average itemset length, and n the number of items. The
  * worst case scenario is when every item is frequent, and every transaction is
  * unique. The resulting tree will then be larger than the original data.
@@ -106,14 +106,18 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     super(minsupp, minlength, maxlength);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
+  }
+
   /**
    * Run the FP-Growth algorithm
    *
-   * @param db Database to process
    * @param relation Bit vector relation
    * @return Frequent patterns found
    */
-  public FrequentItemsetsResult run(Database db, final Relation<BitVector> relation) {
+  public FrequentItemsetsResult run(final Relation<BitVector> relation) {
     // TODO: implement with resizable array, to not need dim.
     final int dim = RelationUtil.dimensionality(relation);
     final VectorFieldTypeInformation<BitVector> meta = RelationUtil.assumeVectorField(relation);
@@ -661,11 +665,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
        */
       StringBuilder appendTo(StringBuilder buf, int i);
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
 
   /**

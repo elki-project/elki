@@ -23,9 +23,9 @@ package elki.clustering.correlation;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.dbscan.*;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.CorePredicate;
 import elki.clustering.dbscan.predicates.ERiCNeighborPredicate;
 import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
@@ -57,8 +57,8 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -98,7 +98,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
     url = "https://doi.org/10.1109/SSDBM.2007.21", //
     bibkey = "DBLP:conf/ssdbm/AchtertBKKZ07")
-public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel>> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
+public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * The logger for this class.
    */
@@ -117,6 +117,11 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
   public ERiC(ERiC.Settings settings) {
     super();
     this.settings = settings;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -347,11 +352,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       LOG.debugFine(msg.toString());
     }
     return false;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

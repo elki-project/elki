@@ -20,7 +20,8 @@
  */
 package elki.clustering.kmeans;
 
-import static elki.math.linearalgebra.VMath.*;
+import static elki.math.linearalgebra.VMath.argmax;
+import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.Arrays;
 
@@ -30,7 +31,6 @@ import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.model.KMeansModel;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -143,8 +143,8 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
   }
 
   @Override
-  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildResult();
   }

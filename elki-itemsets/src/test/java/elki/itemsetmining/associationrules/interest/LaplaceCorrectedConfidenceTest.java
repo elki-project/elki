@@ -45,7 +45,7 @@ public class LaplaceCorrectedConfidenceTest extends AbstractFrequentItemsetAlgor
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.5) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, LaplaceCorrectedConfidence.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 9, res.getRules().size());
   }
 }

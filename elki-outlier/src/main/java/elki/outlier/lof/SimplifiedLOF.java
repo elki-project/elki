@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -73,21 +72,21 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Data Mining and Knowledge Discovery 28(1)", //
     url = "https://doi.org/10.1007/s10618-012-0300-z", //
     bibkey = "DBLP:journals/datamine/SchubertZK14")
-public class SimplifiedLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SimplifiedLOF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(SimplifiedLOF.class);
 
   /**
-   * The number of neighbors to query, plus the query point.
-   */
-  protected int kplus;
-
-  /**
    * Distance function used.
    */
   protected Distance<? super O> distance;
+
+  /**
+   * The number of neighbors to query, plus the query point.
+   */
+  protected int kplus;
 
   /**
    * Constructor.
@@ -99,6 +98,11 @@ public class SimplifiedLOF<O> extends AbstractAlgorithm<OutlierResult> implement
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -205,11 +209,6 @@ public class SimplifiedLOF<O> extends AbstractAlgorithm<OutlierResult> implement
       LOG.incrementProcessed(progressLOFs);
     }
     LOG.ensureCompleted(progressLOFs);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

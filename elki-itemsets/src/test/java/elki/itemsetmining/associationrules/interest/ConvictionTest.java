@@ -45,7 +45,7 @@ public class ConvictionTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 2) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.5) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Conviction.class) //
-        .build().run(db);
+        .build().autorun(db);
       assertEquals("Size not as expected.", 12, res.getRules().size());
   }
 }

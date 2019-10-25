@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -74,7 +73,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "In Advances in Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1007/3-540-47887-6_53", //
     bibkey = "DBLP:conf/pakdd/TangCFC02")
-public class COF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class COF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */

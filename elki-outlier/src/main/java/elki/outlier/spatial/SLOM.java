@@ -82,6 +82,12 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     super(npred, nonSpatialDistance);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * @param database Database to process
    * @param spatial Spatial Relation to use.
@@ -187,11 +193,6 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

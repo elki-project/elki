@@ -34,7 +34,6 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
@@ -96,12 +95,11 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
   /**
    * Run k-means with cluster size constraints.
    *
-   * @param database Database
    * @param relation relation to use
    * @return result
    */
   @Override
-  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
+  public Clustering<MeanModel> run(Relation<V> relation) {
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means

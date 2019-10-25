@@ -33,7 +33,9 @@ import elki.database.Database;
  */
 public interface OPTICSTypeAlgorithm extends Algorithm {
   @Override
-  ClusterOrder run(Database database);
+  default ClusterOrder autorun(Database database) {
+    return (ClusterOrder) Algorithm.Utils.autorun(this, database);
+  }
 
   /**
    * Get the minpts value used. Needed for OPTICS Xi.

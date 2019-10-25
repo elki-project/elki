@@ -97,6 +97,11 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
     super(distance, minPts);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
    * Run the algorithm
    *
@@ -128,11 +133,6 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
     convertToPointerRepresentation(ids, heap, pi, lambda);
 
     return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override

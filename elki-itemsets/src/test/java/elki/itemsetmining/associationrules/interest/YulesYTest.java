@@ -45,7 +45,7 @@ public class YulesYTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, -0.11) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, YulesY.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 6, res.getRules().size());
   }
 }

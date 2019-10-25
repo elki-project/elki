@@ -41,7 +41,7 @@ public class ALOCITest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<ALOCI<DoubleVector>>(ALOCI.class) //
         .with(ALOCI.Par.SEED_ID, 2) //
         .with(ALOCI.Par.GRIDS_ID, 3) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.7622222);
     testSingleScore(result, 146, 1.1305337);
   }

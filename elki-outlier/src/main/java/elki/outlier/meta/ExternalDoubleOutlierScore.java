@@ -27,11 +27,8 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -43,6 +40,7 @@ import elki.database.relation.Relation;
 import elki.datasource.parser.CSVReaderFormat;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -52,8 +50,8 @@ import elki.utilities.io.FileUtil;
 import elki.utilities.io.ParseUtil;
 import elki.utilities.io.TokenizedReader;
 import elki.utilities.io.Tokenizer;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -76,7 +74,7 @@ import elki.utilities.scaling.outlier.OutlierScaling;
  * @has - - - File
  * @composed - - - CSVReaderFormat
  */
-public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ExternalDoubleOutlierScore implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -135,14 +133,18 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     this.scaling = scaling;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.DBID);
+  }
+
   /**
    * Run the algorithm.
    *
-   * @param database Database to use
    * @param relation Relation to use
    * @return Result
    */
-  public OutlierResult run(Database database, Relation<?> relation) {
+  public OutlierResult run(Relation<?> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     DoubleMinMax minmax = new DoubleMinMax();
@@ -212,11 +214,6 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());
     return new OutlierResult(meta, scoresult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.ANY);
   }
 
   /**

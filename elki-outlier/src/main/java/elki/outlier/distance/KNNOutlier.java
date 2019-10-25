@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -88,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     bibkey = "DBLP:conf/sigmod/RamaswamyRS00")
 @Alias({ "knno" })
 @Priority(Priority.RECOMMENDED)
-public class KNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class KNNOutlier<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -116,6 +115,11 @@ public class KNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements O
     this.kplus = k + 1; // INCLUDE the query point now
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
    * Runs the algorithm in the timed evaluation part.
    *
@@ -140,11 +144,6 @@ public class KNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements O
     DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Outlier Score", relation.getDBIDs(), knno_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, scoreres);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -41,7 +41,7 @@ public class IDOSTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<IDOS<DoubleVector>>(IDOS.class) //
         .with(IDOS.Par.KC_ID, 100) //
         .with(IDOS.Par.KR_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.9194814);
     testSingleScore(result, 945, 1.130819);
   }

@@ -22,8 +22,6 @@ package elki.outlier.trivial;
 
 import java.util.HashSet;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.data.synthetic.bymodel.GeneratorSingleCluster;
@@ -43,12 +41,13 @@ import elki.logging.Logging;
 import elki.math.statistics.distribution.ChiSquaredDistribution;
 import elki.math.statistics.distribution.Distribution;
 import elki.math.statistics.distribution.NormalDistribution;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -62,7 +61,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class TrivialGeneratedOutlier implements OutlierAlgorithm {
   /**
    * Class logger
    */
@@ -96,13 +95,12 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   }
 
   @Override
-  public OutlierResult run(Database database) {
+  public OutlierResult autorun(Database database) {
     Relation<NumberVector> vecs = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<Model> models = database.getRelation(new SimpleTypeInformation<>(Model.class));
     // Prefer a true class label
     try {
-      Relation<?> relation = database.getRelation(TypeUtil.CLASSLABEL);
-      return run(models, vecs, relation);
+      return run(models, vecs, database.getRelation(TypeUtil.CLASSLABEL));
     }
     catch(NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.

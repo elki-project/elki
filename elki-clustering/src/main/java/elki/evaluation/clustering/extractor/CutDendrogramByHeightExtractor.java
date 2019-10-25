@@ -92,7 +92,7 @@ public class CutDendrogramByHeightExtractor implements Evaluator {
     }
 
     @Override
-    public PointerHierarchyRepresentationResult run(Database db) {
+    public PointerHierarchyRepresentationResult autorun(Database db) {
       throw new AbortException("This must not be called");
     }
   }

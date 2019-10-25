@@ -45,7 +45,7 @@ public class OddsRatioTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.6) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, OddsRatio.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 6, res.getRules().size());
   }
 }

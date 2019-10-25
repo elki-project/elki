@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -62,7 +61,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @navassoc - reads - OutlierResult
  * @navassoc - create - OutlierResult
  */
-public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SimpleOutlierEnsemble implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -90,20 +89,27 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
   }
 
   @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
+  public TypeInformation[] getInputTypeRestriction() {
+    TypeInformation[] trs = new TypeInformation[algorithms.size()];
+    for(int i = 0; i < trs.length; i++) {
+      // FIXME: what if an algorithm needs more than one input data source?
+      trs[i] = algorithms.get(i).getInputTypeRestriction()[0];
+    }
+    return TypeUtil.array(new CombinedTypeInformation(trs));
+  }
+
+  @Override
+  public OutlierResult autorun(Database database) throws IllegalStateException {
     int num = algorithms.size();
     // Run inner outlier algorithms
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     ArrayList<OutlierResult> results = new ArrayList<>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, LOG) : null;
-      for(Algorithm alg : algorithms) {
-        Object res = alg.run(database);
-        List<OutlierResult> ors = OutlierResult.getOutlierResults(res);
-        for(OutlierResult or : ors) {
-          results.add(or);
-          ids.addDBIDs(or.getScores().getDBIDs());
-        }
+      for(OutlierAlgorithm alg : algorithms) {
+        OutlierResult or = alg.autorun(database);
+        results.add(or);
+        ids.addDBIDs(or.getScores().getDBIDs());
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
@@ -145,16 +151,6 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     DoubleRelation scores = new MaterializedDoubleRelation("Simple Outlier Ensemble", ids, sumscore);
     return new OutlierResult(meta, scores);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation[] trs = new TypeInformation[algorithms.size()];
-    for(int i = 0; i < trs.length; i++) {
-      // FIXME: what if an algorithm needs more than one input data source?
-      trs[i] = algorithms.get(i).getInputTypeRestriction()[0];
-    }
-    return TypeUtil.array(new CombinedTypeInformation(trs));
   }
 
   /**

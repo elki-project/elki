@@ -23,7 +23,6 @@ package elki.clustering.kmedoids;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.AbstractKMeans;
@@ -35,15 +34,7 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -119,7 +110,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of the Operational Research Society 15.3", //
     url = "https://doi.org/10.1057/jors.1964.47", //
     bibkey = "doi:10.1057/jors.1964.47")
-public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -164,6 +155,11 @@ public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> 
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -321,11 +317,6 @@ public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> 
       }
     }
     return -1;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

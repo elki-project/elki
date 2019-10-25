@@ -20,7 +20,6 @@
  */
 package elki.clustering.trivial;
 
-import elki.data.ClassLabel;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
@@ -29,7 +28,6 @@ import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDs;
-import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 /**
@@ -49,18 +47,16 @@ public class ByLabelOrAllInOneClustering extends ByLabelClustering {
   }
 
   @Override
-  public Clustering<Model> run(Database database) {
+  public Clustering<Model> autorun(Database database) {
     // Prefer a true class label
     try {
-      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-      return run(relation);
+      return run(database.getRelation(TypeUtil.CLASSLABEL));
     }
     catch(NoSupportedDataTypeException e) {
       // Ignore.
     }
     try {
-      Relation<ClassLabel> relation = database.getRelation(TypeUtil.GUESSED_LABEL);
-      return run(relation);
+      return run(database.getRelation(TypeUtil.GUESSED_LABEL));
     }
     catch(NoSupportedDataTypeException e) {
       // Ignore.

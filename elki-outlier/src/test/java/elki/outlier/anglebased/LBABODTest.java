@@ -41,7 +41,7 @@ public class LBABODTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<LBABOD<DoubleVector>>(LBABOD.class) //
         .with(FastABOD.Par.K_ID, 150) //
         .with(LBABOD.Par.L_ID, 10) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.92279629629629);
     testSingleScore(result, 945, 2.0897348547799E-5);
   }

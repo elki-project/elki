@@ -20,7 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -75,7 +74,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public abstract class AbstractHDBSCAN<O, R> extends AbstractAlgorithm<R> {
+public abstract class AbstractHDBSCAN<O, R> implements Algorithm {
   /**
    * MinPts parameter.
    */

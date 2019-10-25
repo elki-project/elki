@@ -26,7 +26,6 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
@@ -79,8 +78,8 @@ public class SortMeans<V extends NumberVector> extends CompareMeans<V> {
   }
 
   @Override
-  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildResult();
   }

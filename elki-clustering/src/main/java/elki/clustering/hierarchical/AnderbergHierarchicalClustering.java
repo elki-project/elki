@@ -22,7 +22,6 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
@@ -80,7 +79,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED)
-public class AnderbergHierarchicalClustering<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AnderbergHierarchicalClustering<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */

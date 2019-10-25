@@ -86,6 +86,12 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     super(npredf);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
+  }
+
   /**
    * Main method.
    * 
@@ -142,11 +148,6 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   /**

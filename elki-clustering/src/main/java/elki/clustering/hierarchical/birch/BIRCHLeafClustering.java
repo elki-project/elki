@@ -23,7 +23,6 @@ package elki.clustering.hierarchical.birch;
 import java.util.HashMap;
 import java.util.Map;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -70,7 +69,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
     booktitle = "Data Min. Knowl. Discovery", //
     url = "https://doi.org/10.1023/A:1009783824328", //
     bibkey = "DBLP:journals/datamine/ZhangRL97")
-public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class BIRCHLeafClustering implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * CFTree factory.
    */
@@ -84,6 +83,11 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
   public BIRCHLeafClustering(CFTree.Factory cffactory) {
     super();
     this.cffactory = cffactory;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -118,11 +122,6 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
     }
     Metadata.of(result).setLongName("BIRCH Clustering");
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

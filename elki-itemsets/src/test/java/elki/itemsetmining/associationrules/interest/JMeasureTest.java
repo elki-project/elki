@@ -45,7 +45,7 @@ public class JMeasureTest extends AbstractFrequentItemsetAlgorithmTest {
         .with(FPGrowth.Par.MINSUPP_ID, 2) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.1) //
         .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, JMeasure.class) //
-        .build().run(db);
+        .build().autorun(db);
     assertEquals("Size not as expected.", 9, res.getRules().size());
   }
 }

@@ -20,7 +20,6 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -77,7 +76,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "NII Technical Report (NII-2015-003E)", //
     url = "http://www.nii.ac.jp/TechReports/15-003E.html", //
     bibkey = "tr/nii/BrunkenHZ15")
-public class IDOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class IDOS<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -117,6 +116,11 @@ public class IDOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     this.estimator = estimator;
     this.k_c = kc;
     this.k_r = kr;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -210,11 +214,6 @@ public class IDOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     }
     LOG.ensureCompleted(prog);
     return ldms;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

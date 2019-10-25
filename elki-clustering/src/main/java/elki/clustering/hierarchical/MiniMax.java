@@ -20,19 +20,10 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -44,6 +35,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -77,7 +69,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Journal of the American Statistical Association 106(495)", //
     url = "https://doi.org/10.1198/jasa.2011.tm10183", //
     bibkey = "doi:10.1198/jasa.2011.tm10183")
-public class MiniMax<O> extends AbstractAlgorithm<PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class Logger.
    */
@@ -96,6 +88,11 @@ public class MiniMax<O> extends AbstractAlgorithm<PointerPrototypeHierarchyRepre
   public MiniMax(Distance<? super O> distance) {
     super();
     this.distance = distance;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -405,11 +402,6 @@ public class MiniMax<O> extends AbstractAlgorithm<PointerPrototypeHierarchyRepre
       }
     }
     return maxDist;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
@@ -68,11 +67,16 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> the type of objects handled by this algorithm
  */
-public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SimpleKernelDensityLOF<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(SimpleKernelDensityLOF.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of neighbors + the query point
@@ -85,11 +89,6 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgo
   protected KernelDensityFunction kernel;
 
   /**
-   * Distance function used.
-   */
-  protected Distance<? super O> distance;
-
-  /**
    * Constructor.
    *
    * @param k number of neighbors
@@ -100,6 +99,12 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgo
     this.distance = distance;
     this.kplus = k + 1; // + query point
     this.kernel = kernel;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: it could be a non-numeric field, too.
+    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -187,11 +192,6 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgo
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**

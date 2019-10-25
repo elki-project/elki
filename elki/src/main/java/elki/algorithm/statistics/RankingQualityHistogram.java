@@ -23,7 +23,6 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
@@ -43,7 +42,6 @@ import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
-import elki.result.CollectionResult;
 import elki.result.HistogramResult;
 import elki.result.Metadata;
 import elki.utilities.datastructures.histogram.DoubleHistogram;
@@ -72,7 +70,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
+public class RankingQualityHistogram<O> implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -100,8 +98,13 @@ public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResu
     this.numbins = numbins;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
-   * Process a database
+   * Process a relation
    *
    * @param database Database to process
    * @param relation Relation to process
@@ -114,7 +117,7 @@ public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResu
       LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).autorun(database).getAllClusters();
 
     DoubleHistogram hist = new DoubleHistogram(numbins, 0.0, 1.0);
 
@@ -148,11 +151,6 @@ public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResu
     Metadata.of(result).setLongName("Ranking Quality Histogram");
     result.addHeader("Mean: " + mv.getMean() + " Variance: " + mv.getSampleVariance());
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

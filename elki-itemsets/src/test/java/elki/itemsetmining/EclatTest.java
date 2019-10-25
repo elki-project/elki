@@ -40,7 +40,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
     Database db = loadTransactions(UNITTEST + "itemsets/missing1.txt", 4);
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 1).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 1).build().autorun(db);
       assertEquals("Size not as expected.", 14, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
@@ -48,7 +48,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 0.5).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 0.5).build().autorun(db);
       assertEquals("Size not as expected.", 10, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
@@ -56,7 +56,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 3).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 3).build().autorun(db);
       assertEquals("Size not as expected.", 4, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
@@ -64,7 +64,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 4).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 4).build().autorun(db);
       assertEquals("Size not as expected.", 0, res.getItemsets().size());
     }
     {
@@ -72,7 +72,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
           .with(Eclat.Par.MINSUPP_ID, 1) //
           .with(Eclat.Par.MINLENGTH_ID, 2) //
           .with(Eclat.Par.MAXLENGTH_ID, 3) //
-          .build().run(db);
+          .build().autorun(db);
       assertEquals("Size not as expected.", 10, res.getItemsets().size());
       for(Itemset i : res.getItemsets()) {
         assertEquals("Bad support", 4 - i.length(), i.getSupport());
@@ -85,22 +85,22 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
     Database db = loadTransactions(UNITTEST + "itemsets/increasing.txt", 4);
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 1).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 1).build().autorun(db);
       assertEquals("Size not as expected.", 15, res.getItemsets().size());
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, .5).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, .5).build().autorun(db);
       assertEquals("Size not as expected.", 7, res.getItemsets().size());
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 3).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 3).build().autorun(db);
       assertEquals("Size not as expected.", 3, res.getItemsets().size());
     }
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-          .with(Eclat.Par.MINSUPP_ID, 4).build().run(db);
+          .with(Eclat.Par.MINSUPP_ID, 4).build().autorun(db);
       assertEquals("Size not as expected.", 1, res.getItemsets().size());
     }
   }
@@ -109,7 +109,7 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
   public void testLarge() {
     Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
     FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
-        .with(Eclat.Par.MINSUPP_ID, 200).build().run(db);
+        .with(Eclat.Par.MINSUPP_ID, 200).build().autorun(db);
     assertEquals("Size not as expected.", 184, res.getItemsets().size());
   }
 }

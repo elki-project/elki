@@ -41,7 +41,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.KERNEL_ID, TriweightKernelDensityFunction.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 0.2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.960385);
     testClusterSizes(result, new int[] { 1, 1, 1, 2, 3, 3, 3, 4, 55, 105, 152 });
   }
@@ -52,7 +52,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.KERNEL_ID, TricubeKernelDensityFunction.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 0.2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.9482767);
     testClusterSizes(result, new int[] { 1, 1, 2, 2, 3, 4, 55, 110, 152 });
   }
@@ -63,7 +63,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.KERNEL_ID, UniformKernelDensityFunction.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 0.2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.943331);
     testClusterSizes(result, new int[] { 1, 1, 1, 1, 3, 4, 56, 110, 153 });
   }
@@ -74,7 +74,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.KERNEL_ID, CosineKernelDensityFunction.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 0.2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.9352097);
     testClusterSizes(result, new int[] { 2, 2, 4, 56, 112, 154 });
   }
@@ -85,7 +85,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.KERNEL_ID, TriangularKernelDensityFunction.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 0.2) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.935209);
     testClusterSizes(result, new int[] { 2, 2, 4, 56, 112, 154 });
   }
@@ -95,7 +95,7 @@ public class NaiveMeanShiftClusteringTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> result = new ELKIBuilder<NaiveMeanShiftClustering<DoubleVector>>(NaiveMeanShiftClustering.class) //
         .with(NaiveMeanShiftClustering.Par.RANGE_ID, 25) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.9385142);
     testClusterSizes(result, new int[] { 202, 209, 227 });
   }

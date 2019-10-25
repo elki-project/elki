@@ -22,7 +22,6 @@ package elki.clustering.kmedoids;
 
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
@@ -36,13 +35,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -99,7 +92,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
     url = "https://doi.org/10.1109/TKDE.2002.1033770", //
     bibkey = "DBLP:journals/tkde/NgH02")
-public class CLARANS<V> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger.
    */

@@ -20,7 +20,6 @@
  */
 package tutorial.outlier;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -71,7 +70,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //
     url = "https://doi.org/10.1109/ICPR.2004.1334558", //
     bibkey = "DBLP:conf/icpr/HautamakiKF04")
-public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ODIN<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -92,6 +91,11 @@ public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -138,11 +142,6 @@ public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., ids.size() - 1, kplus - 1);
     DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", ids, scores);
     return new OutlierResult(meta, rel);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

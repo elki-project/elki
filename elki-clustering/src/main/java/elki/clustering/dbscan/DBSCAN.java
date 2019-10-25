@@ -23,7 +23,6 @@ package elki.clustering.dbscan;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
@@ -32,14 +31,7 @@ import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
@@ -97,7 +89,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1145/3068335", //
     bibkey = "DBLP:journals/tods/SchubertSEKX17")
 @Priority(Priority.RECOMMENDED)
-public class DBSCAN<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -130,6 +122,11 @@ public class DBSCAN<O> extends AbstractAlgorithm<Clustering<Model>> implements C
     this.distance = distance;
     this.epsilon = epsilon;
     this.minpts = minpts;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -300,11 +297,6 @@ public class DBSCAN<O> extends AbstractAlgorithm<Clustering<Model>> implements C
         currentCluster.add(neighbor);
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

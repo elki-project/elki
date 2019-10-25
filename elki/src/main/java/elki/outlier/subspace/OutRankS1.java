@@ -20,7 +20,6 @@
  */
 package elki.outlier.subspace;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.subspace.SubspaceClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -71,12 +70,12 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("OutRank: ranking outliers in high dimensional data")
 @Description("Ranking outliers in high dimensional data - score 1")
-@Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", //
+@Reference(authors = "E. Müller, I. Assent, U. Steinhausen, T. Seidl", //
     title = "OutRank: ranking outliers in high dimensional data", //
     booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank)", //
     url = "https://doi.org/10.1109/ICDEW.2008.4498387", //
     bibkey = "DBLP:conf/icde/MullerASS08")
-public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OutRankS1 implements OutlierAlgorithm {
   /**
    * Clustering algorithm to run.
    */
@@ -100,10 +99,15 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   }
 
   @Override
-  public OutlierResult run(Database database) {
+  public TypeInformation[] getInputTypeRestriction() {
+    return clusteralg.getInputTypeRestriction();
+  }
+
+  @Override
+  public OutlierResult autorun(Database database) {
     DBIDs ids = database.getRelation(TypeUtil.ANY).getDBIDs();
     // Run the primary algorithm
-    Clustering<? extends SubspaceModel> clustering = clusteralg.run(database);
+    Clustering<? extends SubspaceModel> clustering = clusteralg.autorun(database);
 
     WritableDoubleDataStore score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -134,11 +138,6 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     OutlierResult res = new OutlierResult(meta, scoreResult);
     Metadata.hierarchyOf(res).addChild(clustering);
     return res;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return clusteralg.getInputTypeRestriction();
   }
 
   /**

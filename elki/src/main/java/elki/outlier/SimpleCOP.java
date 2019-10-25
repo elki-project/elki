@@ -22,7 +22,6 @@ package elki.outlier;
 
 import static elki.math.linearalgebra.VMath.times;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.data.NumberVector;
@@ -85,7 +84,7 @@ import net.jafama.FastMath;
     title = "Application 2: Outlier Detection (Chapter 18)", //
     booktitle = "Correlation Clustering", //
     bibkey = "phd/dnb/Zimek08/Ch18")
-public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -97,9 +96,9 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
   protected Distance<? super V> distance;
 
   /**
-   * Number of neighbors to be considered.
+   * Number of neighbors to be considered + the query point
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * Holds the object performing the dependency derivation
@@ -117,13 +116,23 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
   public SimpleCOP(Distance<? super V> distance, int k, PCARunner pca, EigenPairFilter filter) {
     super();
     this.distance = distance;
-    this.k = k;
+    this.kplus = k + 1;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Run Simple COP outlier detection.
+   *
+   * @param relation Data relation
+   * @return Outlier result
+   */
   public OutlierResult run(Relation<V> relation) {
-    final int k1 = k + 1;
-    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k1);
+    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
     DBIDs ids = relation.getDBIDs();
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -135,7 +144,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
       double sqrt2 = MathUtil.SQRT2;
       for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-        KNNList neighbors = knnQuery.getKNNForDBID(id, k1);
+        KNNList neighbors = knnQuery.getKNNForDBID(id, kplus);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 
@@ -165,11 +174,6 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
     Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Data vectors", TypeUtil.DOUBLE_ARRAY, ids, cop_datav));
     Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Correlation analysis", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), ids, cop_sol));
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

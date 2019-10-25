@@ -39,7 +39,7 @@ public class LIDTest extends AbstractOutlierAlgorithmTest {
   public void testToyExample() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<LID<DoubleVector>>(LID.class) //
-        .with(LID.Par.K_ID, 100).build().run(db);
+        .with(LID.Par.K_ID, 100).build().autorun(db);
     testAUC(db, "Noise", result, 0.9167222);
     testSingleScore(result, 945, 2.5368047);
   }

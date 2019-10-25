@@ -28,8 +28,7 @@ import elki.database.Database;
  * <p>
  * This interface allows the algorithms to be used by, e.g.,
  * {@link elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters}
- * and
- * {@link elki.clustering.hierarchical.extraction.CutDendrogramByHeight}.
+ * and {@link elki.clustering.hierarchical.extraction.CutDendrogramByHeight}.
  *
  * @author Erich Schubert
  * @since 0.6.0
@@ -38,5 +37,7 @@ import elki.database.Database;
  */
 public interface HierarchicalClusteringAlgorithm extends Algorithm {
   @Override
-  PointerHierarchyRepresentationResult run(Database db);
+  default PointerHierarchyRepresentationResult autorun(Database database) {
+    return (PointerHierarchyRepresentationResult) Algorithm.Utils.autorun(this, database);
+  }
 }

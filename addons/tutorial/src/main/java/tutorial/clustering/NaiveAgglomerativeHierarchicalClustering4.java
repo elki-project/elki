@@ -20,7 +20,6 @@
  */
 package tutorial.clustering;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
@@ -73,7 +72,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
-public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class NaiveAgglomerativeHierarchicalClustering4<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -163,6 +162,12 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgori
     super();
     this.distance = distance;
     this.linkage = linkage;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // The input relation must match our distance function:
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -287,12 +292,6 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgori
    */
   protected static int triangleSize(int x) {
     return (x * (x - 1)) >>> 1;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    // The input relation must match our distance function:
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

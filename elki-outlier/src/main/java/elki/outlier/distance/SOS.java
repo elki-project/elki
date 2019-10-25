@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -73,7 +72,7 @@ import net.jafama.FastMath;
     booktitle = "TiCC TR 2012–001", //
     url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
     bibkey = "tr/tilburg/JanssensHPv12")
-public class SOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOS<O> implements OutlierAlgorithm {
   /**
    * Class logger.
    */

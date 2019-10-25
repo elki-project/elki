@@ -67,7 +67,7 @@ public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorit
   protected <O> void testFMeasure(Database database, Clustering<?> clustering, double expected) {
     // Run by-label as reference
     ByLabelClustering bylabel = new ByLabelClustering();
-    Clustering<Model> rbl = bylabel.run(database);
+    Clustering<Model> rbl = bylabel.autorun(database);
 
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);

@@ -22,7 +22,6 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -41,6 +40,7 @@ import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.CovarianceMatrix;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -85,6 +85,12 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
    */
   public CTLuMeanMultipleAttributes(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // FIXME: force relation 2 different from relation 1?
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -134,11 +140,6 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

@@ -33,7 +33,6 @@ import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -121,13 +120,17 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     this.pca = pca;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Performs the ORCLUS algorithm on the given database.
-   * 
-   * @param database Database
+   *
    * @param relation Relation
    */
-  public Clustering<Model> run(Database database, Relation<V> relation) {
+  public Clustering<Model> run(Relation<V> relation) {
     // current dimensionality associated with each seed
     int dim_c = RelationUtil.dimensionality(relation);
 
@@ -393,11 +396,6 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    */
   private double[] project(ORCLUSCluster c, double[] o) {
     return times(c.basis, o);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

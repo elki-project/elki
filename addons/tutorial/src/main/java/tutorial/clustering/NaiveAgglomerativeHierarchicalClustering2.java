@@ -22,7 +22,6 @@ package tutorial.clustering;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.hierarchical.SLINK;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
@@ -65,7 +64,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
  *
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractAlgorithm<Clustering<Model>> {
+public class NaiveAgglomerativeHierarchicalClustering2<O> implements Algorithm {
   /**
    * Class logger
    */
@@ -93,11 +92,17 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractAlgori
     this.numclusters = numclusters;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // The input relation must match our distance function:
+    return TypeUtil.array(distance.getInputTypeRestriction());
+  }
+
   /**
-   * Run the algorithm
+   * Perform HAC
    *
-   * @param relation Relation
-   * @return Clustering hierarchy
+   * @param relation Data relation
+   * @return Clustering
    */
   public Clustering<Model> run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
@@ -232,12 +237,6 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractAlgori
    */
   protected static int triangleSize(int x) {
     return (x * (x - 1)) >>> 1;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    // The input relation must match our distance function:
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

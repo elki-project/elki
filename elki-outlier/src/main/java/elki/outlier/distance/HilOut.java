@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -95,7 +94,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
     url = "https://doi.org/10.1007/3-540-45681-3_2", //
     bibkey = "DBLP:conf/pkdd/AngiulliP02")
-public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -177,6 +176,11 @@ public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierRes
     this.t = distance.getP();
     this.n_star = 0;
     this.omega_star = 0.0;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -422,11 +426,6 @@ public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierRes
         n_star++;
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new LPNormDistance(t).getInputTypeRestriction());
   }
 
   /**

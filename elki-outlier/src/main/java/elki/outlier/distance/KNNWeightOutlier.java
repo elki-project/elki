@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -94,7 +93,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1007/3-540-45681-3_2", //
     bibkey = "DBLP:conf/pkdd/AngiulliP02")
 @Alias({ "knnw" })
-public class KNNWeightOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class KNNWeightOutlier<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,6 +119,11 @@ public class KNNWeightOutlier<O> extends AbstractAlgorithm<OutlierResult> implem
     super();
     this.distance = distance;
     this.kplus = k + 1; // Plus query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -159,11 +163,6 @@ public class KNNWeightOutlier<O> extends AbstractAlgorithm<OutlierResult> implem
     DoubleRelation res = new MaterializedDoubleRelation("kNN weight Outlier Score", relation.getDBIDs(), knnw_score);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(meta, res);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

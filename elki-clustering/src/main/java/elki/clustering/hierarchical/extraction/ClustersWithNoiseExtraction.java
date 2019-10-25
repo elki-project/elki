@@ -114,8 +114,8 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
   }
 
   @Override
-  public Clustering<Model> run(Database database) {
-    return run(algorithm.run(database));
+  public Clustering<Model> autorun(Database database) {
+    return run(algorithm.autorun(database));
   }
 
   /**

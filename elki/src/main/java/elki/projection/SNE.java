@@ -27,6 +27,7 @@ import elki.data.DoubleVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
+import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.DBIDArrayIter;
@@ -40,15 +41,11 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.random.RandomFactory;
 
 /**
@@ -168,6 +165,23 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
     this.random = random;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(affinity.getInputTypeRestriction());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Relation<DoubleVector> autorun(Database database) {
+    return (Relation<DoubleVector>) Utils.autorun(this, database);
+  }
+
+  /**
+   * Perform SNE projection.
+   *
+   * @param relation Input relation
+   * @return Output relation
+   */
   public Relation<DoubleVector> run(Relation<O> relation) {
     AffinityMatrix pij = affinity.computeAffinityMatrix(relation, 1.);
 
@@ -336,11 +350,6 @@ public class SNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>> 
         sol_i[k] += meta[movk];
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(affinity.getInputTypeRestriction());
   }
 
   /**

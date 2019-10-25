@@ -20,7 +20,6 @@
  */
 package elki.clustering.affinitypropagation;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -38,8 +37,8 @@ import elki.logging.progress.MutableProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -71,7 +70,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
     booktitle = "Science Vol 315", //
     url = "https://doi.org/10.1126/science.1136800", //
     bibkey = "doi:10.1126/science.1136800")
-public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class AffinityPropagation<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger
    */
@@ -111,6 +110,11 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
     this.lambda = lambda;
     this.convergence = convergence;
     this.maxiter = maxiter;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(initialization.getInputTypeRestriction());
   }
 
   /**
@@ -311,11 +315,6 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
       clustering.addToplevelCluster(new Cluster<>(noise, true, mod));
     }
     return clustering;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(initialization.getInputTypeRestriction());
   }
 
   /**

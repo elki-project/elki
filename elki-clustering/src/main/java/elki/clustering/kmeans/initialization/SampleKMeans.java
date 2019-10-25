@@ -26,7 +26,6 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.ModelUtil;
 import elki.data.type.TypeUtil;
-import elki.database.ProxyDatabase;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.ProxyView;
@@ -109,12 +108,9 @@ public class SampleKMeans<V extends NumberVector> extends AbstractKMeansInitiali
     }
     @SuppressWarnings("unchecked")
     NumberVectorDistance<? super V> pdf = (NumberVectorDistance<? super V>) distance;
-    ProxyView<V> proxyv = new ProxyView<>(sample, rel);
-    ProxyDatabase proxydb = new ProxyDatabase(sample, proxyv);
-
     innerkMeans.setK(k);
     innerkMeans.setDistance(pdf);
-    Clustering<?> clusters = innerkMeans.run(proxydb, proxyv);
+    Clustering<?> clusters = innerkMeans.run(new ProxyView<>(sample, rel));
 
     double[][] means = new double[clusters.getAllClusters().size()][];
     int i = 0;

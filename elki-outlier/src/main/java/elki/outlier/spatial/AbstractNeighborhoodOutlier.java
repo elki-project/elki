@@ -20,12 +20,10 @@
  */
 package elki.outlier.spatial;
 
-import elki.AbstractAlgorithm;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
-import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -38,7 +36,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractNeighborhoodOutlier<O> implements OutlierAlgorithm {
   /**
    * Parameter to specify the neighborhood predicate to use.
    */

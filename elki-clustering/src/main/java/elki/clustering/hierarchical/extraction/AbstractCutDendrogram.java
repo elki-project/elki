@@ -91,10 +91,15 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     this.hierarchical = hierarchical;
   }
 
-  @Override
+  /**
+   * Run the algorithms on a database.
+   * 
+   * @param database Database to process
+   * @return Clustering
+   */
   public Clustering<DendrogramModel> run(Database database) {
-    PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
-    return run(pointerresult);
+    assert algorithm != null : "To auto-run on a database, the algorithm must be configured.";
+    return run(algorithm.autorun(database));
   }
 
   /**

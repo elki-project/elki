@@ -20,7 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -28,12 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -81,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     bibkey = "DBLP:journals/cj/Sibson73")
 @Alias({ "single-link", "single-linkage" })
 @Priority(Priority.RECOMMENDED)
-public class SLINK<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class SLINK<O> implements HierarchicalClusteringAlgorithm {
   /**
    * The logger for this class.
    */
@@ -100,6 +94,11 @@ public class SLINK<O> extends AbstractAlgorithm<PointerHierarchyRepresentationRe
   public SLINK(Distance<? super O> distance) {
     super();
     this.distance = distance;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -276,11 +275,6 @@ public class SLINK<O> extends AbstractAlgorithm<PointerHierarchyRepresentationRe
         pi.put(it, id);
       }
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

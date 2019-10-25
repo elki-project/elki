@@ -42,7 +42,7 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
     Clustering<Model> result = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
         .with(LSDBC.Par.ALPHA_ID, 0.4) //
         .with(LSDBC.Par.K_ID, 20) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.44848979);
     testClusterSizes(result, new int[] { 38, 38, 41, 54, 159 });
   }
@@ -53,7 +53,7 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
     Clustering<Model> result = new ELKIBuilder<LSDBC<DoubleVector>>(LSDBC.class) //
         .with(LSDBC.Par.ALPHA_ID, 0.2) //
         .with(LSDBC.Par.K_ID, 120) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.95681073);
     testClusterSizes(result, new int[] { 32, 197, 203, 206 });
   }

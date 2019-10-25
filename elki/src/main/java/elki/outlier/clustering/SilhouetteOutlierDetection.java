@@ -22,7 +22,6 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
@@ -76,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
     url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
     bibkey = "doi:10.1016/0377-04278790125-7")
-public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -106,17 +105,33 @@ public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResu
     this.noiseOption = noiseOption;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    final TypeInformation dt = distance.getInputTypeRestriction();
+    TypeInformation[] t = clusterer.getInputTypeRestriction();
+    for(TypeInformation i : t) {
+      if(dt.isAssignableFromType(i)) {
+        return t;
+      }
+    }
+    // Prepend distance type:
+    TypeInformation[] t2 = new TypeInformation[t.length + 1];
+    t2[0] = dt;
+    System.arraycopy(t, 0, t2, 1, t.length);
+    return t2;
+  }
+
   /**
    * Run the Silhouette score as outlier method.
    *
    * @param database Database
    * @return Outlier scores
    */
-  public OutlierResult run(Database database) {
+  public OutlierResult autorun(Database database) {
+    Clustering<?> c = clusterer.autorun(database);
+
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    // TODO: improve ELKI api to ensure we're using the same DBIDs!
-    Clustering<?> c = clusterer.run(database);
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
@@ -193,22 +208,6 @@ public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResu
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
     return new OutlierResult(scoreMeta, scoreResult);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    final TypeInformation dt = distance.getInputTypeRestriction();
-    TypeInformation[] t = clusterer.getInputTypeRestriction();
-    for(TypeInformation i : t) {
-      if(dt.isAssignableFromType(i)) {
-        return t;
-      }
-    }
-    // Prepend distance type:
-    TypeInformation[] t2 = new TypeInformation[t.length + 1];
-    t2[0] = dt;
-    System.arraycopy(t, 0, t2, 1, t.length);
-    return t2;
   }
 
   /**

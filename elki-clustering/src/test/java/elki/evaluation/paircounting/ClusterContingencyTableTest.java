@@ -56,9 +56,9 @@ public class ClusterContingencyTableTest {
   public void testCompareDatabases() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
-    Clustering<Model> rai = new TrivialAllInOne().run(db);
-    Clustering<Model> ran = new TrivialAllNoise().run(db);
-    Clustering<?> rbl = new ByLabelClustering().run(db);
+    Clustering<Model> rai = new TrivialAllInOne().autorun(db);
+    Clustering<Model> ran = new TrivialAllNoise().autorun(db);
+    Clustering<?> rbl = new ByLabelClustering().autorun(db);
 
     assertEquals(1.0, computeFMeasure(rai, rai, false), Double.MIN_VALUE);
     assertEquals(1.0, computeFMeasure(ran, ran, false), Double.MIN_VALUE);

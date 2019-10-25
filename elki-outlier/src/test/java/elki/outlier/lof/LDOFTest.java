@@ -39,7 +39,7 @@ public class LDOFTest extends AbstractOutlierAlgorithmTest {
   public void testLDOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     OutlierResult result = new ELKIBuilder<LDOF<DoubleVector>>(LDOF.class) //
-        .with(LDOF.Par.K_ID, 24).build().run(db);
+        .with(LDOF.Par.K_ID, 24).build().autorun(db);
     testAUC(db, "Noise", result, 0.9637948717948718);
     testSingleScore(result, 1025, 0.8976268846182947);
   }

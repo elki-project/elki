@@ -20,7 +20,6 @@
  */
 package elki.clustering.onedimensional;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -43,8 +42,8 @@ import elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import elki.result.Metadata;
 import elki.utilities.datastructures.QuickSelect;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -58,7 +57,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends AbstractAlgorithm<Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
+public class KNNKernelDensityMinimaClustering<V extends NumberVector> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**
    * Class logger.
    */
@@ -113,6 +112,11 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     this.mode = mode;
     this.k = k;
     this.minwindow = minwindow;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(VectorFieldTypeInformation.typeRequest(NumberVector.class, dim + 1, Integer.MAX_VALUE));
   }
 
   /**
@@ -221,7 +225,8 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
       iter.seek(0);
       // Fill initial buffer.
       for(int i = 0; i < size; i++, iter.advance()) {
-        final int m = i % scratch.length, t = (i - minwindow - 1) % scratch.length;
+        final int m = i % scratch.length,
+            t = (i - minwindow - 1) % scratch.length;
         scratch[m] = density.doubleValue(iter);
         if(i > scratch.length) {
           double min = Double.POSITIVE_INFINITY;
@@ -266,11 +271,6 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
 
     LOG.ensureCompleted(sprog);
     return clustering;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(VectorFieldTypeInformation.typeRequest(NumberVector.class, dim + 1, Integer.MAX_VALUE));
   }
 
   /**

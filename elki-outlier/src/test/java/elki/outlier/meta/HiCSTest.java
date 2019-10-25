@@ -46,7 +46,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
         .with(HiCS.Par.LIMIT_ID, 10) //
         .with(HiCS.Par.SEED_ID, 0) //
         .with(HiCS.Par.TEST_ID, KolmogorovSmirnovTest.STATIC) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.85340056);
     testSingleScore(result, 1293, 4.935802);
   }
@@ -59,7 +59,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
         .with(HiCS.Par.LIMIT_ID, 10) //
         .with(HiCS.Par.SEED_ID, 0) //
         .with(HiCS.Par.TEST_ID, WelchTTest.STATIC) //
-        .build().run(db);
+        .build().autorun(db);
     testAUC(db, "Noise", result, 0.867159);
     testSingleScore(result, 1293, 4.7877822);
   }

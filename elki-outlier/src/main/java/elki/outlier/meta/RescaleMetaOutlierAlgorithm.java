@@ -20,7 +20,6 @@
  */
 package elki.outlier.meta;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
@@ -52,7 +51,7 @@ import elki.utilities.scaling.outlier.OutlierScaling;
  * 
  * @composed - - - OutlierAlgorithm
  */
-public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class RescaleMetaOutlierAlgorithm implements OutlierAlgorithm {
   /**
    * Holds the algorithm to run.
    */
@@ -76,8 +75,8 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   }
 
   @Override
-  public OutlierResult run(Database database) {
-    Object innerresult = algorithm.run(database);
+  public OutlierResult autorun(Database database) {
+    Object innerresult = algorithm.autorun(database);
 
     OutlierResult or = getOutlierResult(innerresult);
     final DoubleRelation scores = or.getScores();

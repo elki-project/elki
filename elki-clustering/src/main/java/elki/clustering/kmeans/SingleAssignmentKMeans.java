@@ -24,7 +24,6 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
@@ -58,8 +57,8 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
   }
 
   @Override
-  public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(1);
     return instance.buildResult();
   }

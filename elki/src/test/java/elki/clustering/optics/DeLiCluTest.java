@@ -57,9 +57,9 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
         .with(OPTICSXi.Par.XI_ID, 0.05) //
         .with(OPTICSXi.Par.XIALG_ID, DeLiClu.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 1000) //
-        .build().run(db);
+        .build().autorun(db);
     // Test F-Measure
-    Clustering<Model> rbl = new ByLabelClustering().run(db);
+    Clustering<Model> rbl = new ByLabelClustering().autorun(db);
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
     double score = ct.getPaircount().f1Measure();

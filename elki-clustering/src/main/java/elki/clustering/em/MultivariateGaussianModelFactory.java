@@ -29,11 +29,9 @@ import java.util.List;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
-
 import net.jafama.FastMath;
 
 /**
@@ -61,7 +59,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
   }
 
   @Override
-  public List<MultivariateGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
+  public List<MultivariateGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
     assert (initialMeans.length == k);
     // Compute the global covariance matrix for better starting conditions:

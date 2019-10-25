@@ -22,14 +22,12 @@ package elki.clustering.uncertain;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmedoids.PAM;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
-import elki.data.model.Model;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -57,8 +55,8 @@ import elki.similarity.cluster.ClusteringAdjustedRandIndexSimilarity;
 import elki.similarity.cluster.ClusteringDistanceSimilarity;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -99,7 +97,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/2623330.2623725", //
     bibkey = "DBLP:conf/kdd/ZufleESMZR14")
-public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class RepresentativeUncertainClustering implements ClusteringAlgorithm<Clustering<?>> {
   /**
    * Initialize a Logger.
    */
@@ -160,12 +158,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     this.keep = keep;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
+  }
+
   /**
    * This run method will do the wrapping.
-   *
-   * Its called from {@link AbstractAlgorithm#run(Database)} and performs the
-   * call to the algorithms particular run method as well as the storing and
-   * comparison of the resulting Clusterings.
    *
    * @param database Database
    * @param relation Data relation of uncertain objects
@@ -207,10 +206,9 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>("Clusterings", Clustering.TYPE, rids, datastore);
     PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, rids, distance);
     mat.initialize();
-    ProxyDatabase d = new ProxyDatabase(rids, crel);
     Metadata.hierarchyOf(crel).addChild(mat);
-    Clustering<?> c = metaAlgorithm.run(d);
-    Metadata.hierarchyOf(d).removeChild(c); // Detach from database
+    Clustering<?> c = metaAlgorithm.autorun(new ProxyDatabase(rids, crel));
+    Metadata.hierarchyOf(new ProxyDatabase(rids, crel)).removeChild(c); // Detach from database
 
     // "Result" to group or representative results
     Object reps = new Object();
@@ -300,18 +298,12 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   protected Clustering<?> runClusteringAlgorithm(Object parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(title, t, ids, store);
-    ProxyDatabase d = new ProxyDatabase(ids, sample);
-    Clustering<?> clusterResult = samplesAlgorithm.run(d);
+    Clustering<?> clusterResult = samplesAlgorithm.autorun(new ProxyDatabase(ids, sample));
     ResultUtil.removeRecursive(sample);
     ResultUtil.removeRecursive(clusterResult);
     Metadata.hierarchyOf(parent).addChild(sample);
     Metadata.hierarchyOf(sample).addChild(clusterResult);
     return clusterResult;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
   }
 
   /**
@@ -362,7 +354,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     /**
      * Parameter to hand an algorithm for creating the meta-clustering to our
      * instance of {@link RepresentativeUncertainClustering}.
-     *
+     * <p>
      * It has to use a metric distance function to work on the
      * sample-clusterings.
      */

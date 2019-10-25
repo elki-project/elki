@@ -22,8 +22,6 @@ package elki.outlier.subspace;
 
 import java.util.Arrays;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -44,13 +42,14 @@ import elki.math.MeanVariance;
 import elki.math.statistics.distribution.GammaDistribution;
 import elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -83,7 +82,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 19th ACM Int. Conf. on Information and Knowledge Management", //
     url = "https://doi.org/10.1145/1871437.1871690", //
     bibkey = "DBLP:conf/cikm/MullerSS10")
-public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OUTRES implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -107,6 +106,11 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
   public OUTRES(double eps) {
     super();
     this.eps = eps;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -364,11 +368,6 @@ public class OUTRES extends AbstractAlgorithm<OutlierResult> implements OutlierA
       }
       return e;
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

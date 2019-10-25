@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -99,7 +98,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00)", //
     url = "https://doi.org/10.1145/342009.335388", //
     bibkey = "DBLP:conf/sigmod/BreunigKNS00")
-public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class FlexibleLOF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -139,6 +138,12 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     this.kreach = kreach + 1;
     this.referenceDistance = neighborhoodDistance;
     this.reachabilityDistance = reachabilityDistance;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(reachabilityDistance.equals(referenceDistance) ? reachabilityDistance.getInputTypeRestriction() : //
+        new CombinedTypeInformation(reachabilityDistance.getInputTypeRestriction(), referenceDistance.getInputTypeRestriction()));
   }
 
   /**
@@ -287,18 +292,6 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
       LOG.incrementProcessed(progressLOFs);
     }
     LOG.ensureCompleted(progressLOFs);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    final TypeInformation type;
-    if(reachabilityDistance.equals(referenceDistance)) {
-      type = reachabilityDistance.getInputTypeRestriction();
-    }
-    else {
-      type = new CombinedTypeInformation(referenceDistance.getInputTypeRestriction(), reachabilityDistance.getInputTypeRestriction());
-    }
-    return TypeUtil.array(type);
   }
 
   /**

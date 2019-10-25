@@ -22,7 +22,6 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -71,7 +70,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 6th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/347090.347123", //
     bibkey = "DBLP:conf/kdd/McCallumNU00")
-public class CanopyPreClustering<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class CanopyPreClustering<O> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
    */
@@ -107,7 +106,7 @@ public class CanopyPreClustering<O> extends AbstractAlgorithm<Clustering<Prototy
   }
 
   /**
-   * Run the algorithm
+   * Run the canopy clustering algorithm
    *
    * @param relation Relation to process
    */

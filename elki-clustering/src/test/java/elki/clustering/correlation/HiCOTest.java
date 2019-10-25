@@ -46,7 +46,7 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
         .with(HiCO.Par.K_ID, 20) //
         .with(HiCO.Par.DELTA_ID, 0.05) //
         .with(HiCO.Par.ALPHA_ID, 0.9) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.73834);
     testClusterSizes(result, new int[] { 0, 4, 4, 6, 30, 176, 380 });
   }
@@ -61,7 +61,7 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
         .with(HiCO.Par.K_ID, 20) //
         .with(HiCO.Par.DELTA_ID, 0.25) //
         .with(HiCO.Par.ALPHA_ID, 0.95) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.78091);
     testClusterSizes(result, new int[] { 6, 6, 20, 25, 51, 140, 201, 201 });
   }

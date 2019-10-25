@@ -20,13 +20,11 @@
  */
 package elki.outlier.clustering;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.em.EM;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -63,14 +61,14 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 // TODO: Allow using an existing EM result
 @Title("EM Outlier: Outlier Detection based on the generic EM clustering")
 @Description("The outlier score assigned is based on the highest cluster probability obtained from EM clustering.")
-public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class EMOutlier<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Inner algorithm.
    */
   private EM<V, ?> emClustering;
 
   /**
-   * Constructor with an existing em clustering algorithm.
+   * Constructor with an existing EM clustering algorithm.
    * 
    * @param emClustering EM clustering algorithm to use.
    */
@@ -79,16 +77,20 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     this.emClustering = emClustering;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Runs the algorithm in the timed evaluation part.
    * 
-   * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
-  public OutlierResult run(Database database, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     emClustering.setSoft(true);
-    Clustering<?> emresult = emClustering.run(database, relation);
+    Clustering<?> emresult = emClustering.run(relation);
     Relation<double[]> soft = null;
     for(It<Relation<double[]>> iter = Metadata.hierarchyOf(emresult).iterChildren().filter(Relation.class); iter.valid(); iter.advance()) {
       if(iter.get().getDataTypeInformation() == EM.SOFT_TYPE) {
@@ -117,11 +119,6 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     // TODO: add a keep-EM flag?
     Metadata.hierarchyOf(result).addChild(emresult);
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

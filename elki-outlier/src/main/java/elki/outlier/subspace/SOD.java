@@ -20,8 +20,6 @@
  */
 package elki.outlier.subspace;
 
-import elki.outlier.OutlierAlgorithm;
-import elki.AbstractAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
@@ -37,28 +35,29 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.distance.subspace.SubspaceEuclideanDistance;
-import elki.similarity.SharedNearestNeighborSimilarity;
-import elki.similarity.Similarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.Mean;
 import elki.math.linearalgebra.Centroid;
 import elki.math.linearalgebra.VMath;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.textwriter.TextWriteable;
 import elki.result.textwriter.TextWriterStream;
+import elki.similarity.SharedNearestNeighborSimilarity;
+import elki.similarity.Similarity;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.heap.Heap;
 import elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -91,7 +90,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2009)", //
     url = "https://doi.org/10.1007/978-3-642-01307-2_86", //
     bibkey = "DBLP:conf/pakdd/KriegelKSZ09")
-public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -131,6 +130,11 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     this.alpha = alpha;
     this.similarityFunction = similarityFunction;
     this.models = models;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -254,11 +258,6 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     }
     final SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(weightVector);
     return df.distance(queryObject, DoubleVector.wrap(center)) / card;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

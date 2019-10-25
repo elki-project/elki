@@ -22,7 +22,6 @@ package elki.outlier.meta;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -91,7 +90,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012)", //
     url = "https://doi.org/10.1109/ICDE.2012.88", //
     bibkey = "DBLP:conf/icde/KellerMB12")
-public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HiCS<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * The Logger for this class.
    */
@@ -152,6 +151,11 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     this.rnd = rnd;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
   /**
    * Perform HiCS on a given database.
    * 
@@ -183,7 +187,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
       pdb.addRelation(new ProjectedView<>(relation, new NumericalFeatureSelection<V>(dimset.bits)));
 
       // run LOF and collect the result
-      OutlierResult result = outlierAlgorithm.run(pdb);
+      OutlierResult result = outlierAlgorithm.autorun(pdb);
       results.add(result.getScores());
       LOG.incrementProcessed(prog);
     }
@@ -388,11 +392,6 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     }
     LOG.ensureCompleted(prog);
     subspace.contrast = deviationSum / m;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

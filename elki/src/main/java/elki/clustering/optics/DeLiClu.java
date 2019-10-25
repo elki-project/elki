@@ -23,13 +23,11 @@ package elki.clustering.optics;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDUtil;
@@ -92,7 +90,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
     booktitle = "Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2006)", //
     url = "https://doi.org/10.1007/11731139_16", //
     bibkey = "DBLP:conf/pakdd/AchtertBK06")
-public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
+public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
@@ -131,7 +129,18 @@ public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOr
     this.minpts = minpts;
   }
 
-  public ClusterOrder run(Database database, Relation<V> relation) {
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Run the DeLiClu clustering algorithm.
+   *
+   * @param relation Relation to cluster
+   * @return OPTICS cluster order
+   */
+  public ClusterOrder run(Relation<V> relation) {
     if(LOG.isVerbose()) {
       LOG.verbose("Building DeLiClu index");
     }
@@ -343,11 +352,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOr
   @Override
   public int getMinPts() {
     return minpts;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -61,7 +60,7 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
 @Title("Clustering by model")
 @Description("Cluster points by a (pre-assigned!) model. For comparing results with a reference clustering.")
 @Priority(Priority.SUPPLEMENTARY - 5)
-public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByModelClustering implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Pattern to recognize noise clusters with.
    */
@@ -82,6 +81,11 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    */
   public ByModelClustering() {
     this(null);
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(Model.TYPE);
   }
 
   /**
@@ -115,11 +119,6 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       result.addToplevelCluster(c);
     }
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(Model.TYPE);
   }
 
   /**

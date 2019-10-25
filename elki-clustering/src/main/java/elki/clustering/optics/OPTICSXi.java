@@ -22,7 +22,6 @@ package elki.clustering.optics;
 
 import java.util.*;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -39,8 +38,8 @@ import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ClassParameter;
@@ -90,7 +89,7 @@ import elki.utilities.optionhandling.parameters.Flag;
     url = "http://ceur-ws.org/Vol-2191/paper37.pdf", //
     bibkey = "DBLP:conf/lwa/SchubertG18")
 @Priority(Priority.RECOMMENDED)
-public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
+public class OPTICSXi implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
   /**
    * The logger for this class.
    */
@@ -142,14 +141,24 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     this(optics, xi, false, false);
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return optics.getInputTypeRestriction();
+  }
+
+  @Override
+  public Clustering<OPTICSModel> autorun(Database database) {
+    return run(optics.autorun(database));
+  }
+
   /**
-   * Run the algorithm.
+   * Process the cluster order of an OPTICS clustering.
    *
-   * @param database Database to run on
+   * @param clusterOrder cluster order result
    * @return Clustering
    */
-  public Clustering<OPTICSModel> run(Database database) {
-    return extractClusters(optics.run(database), 1.0 - xi, optics.getMinPts());
+  public Clustering<OPTICSModel> run(ClusterOrder clusterOrder) {
+    return extractClusters(clusterOrder, 1.0 - xi, optics.getMinPts());
   }
 
   /**
@@ -312,7 +321,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
    * @return New end position
    */
   private static int predecessorFilter(ClusterOrder clusterOrderResult, int cstart, int cend, DBIDArrayIter tmp) {
-    if (cend == clusterOrderResult.size()) {
+    if(cend == clusterOrderResult.size()) {
       return cend;
     }
     double startval = clusterOrderResult.reachability.doubleValue(tmp.seek(cstart));
@@ -695,11 +704,6 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     public Iterator<SteepArea> iterator() {
       return areas.iterator();
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return optics.getInputTypeRestriction();
   }
 
   /**

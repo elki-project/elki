@@ -20,7 +20,6 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -77,7 +76,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //
     bibkey = "DBLP:conf/sisap/SchubertG17")
-public class ISOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ISOS<O> implements OutlierAlgorithm {
   /**
    * Class logger.
    */

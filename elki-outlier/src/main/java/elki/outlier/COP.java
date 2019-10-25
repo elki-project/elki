@@ -24,7 +24,6 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -80,7 +79,7 @@ import elki.utilities.optionhandling.parameters.*;
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21", //
     bibkey = "DBLP:conf/icdm/KriegelKSZ12")
-public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class COP<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -177,6 +176,11 @@ public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     this.expect = expect;
     this.dist = dist;
     this.models = models;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -302,11 +306,6 @@ public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       }
     }
     timesEquals(centroid, 1. / ids.size());
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

@@ -20,7 +20,6 @@
  */
 package elki.outlier.anglebased;
 
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -81,7 +80,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 14th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining (KDD'08)", //
     url = "https://doi.org/10.1145/1401890.1401946", //
     bibkey = "DBLP:conf/kdd/KriegelSZ08")
-public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ABOD<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Store the configured Kernel version.
    */

@@ -49,7 +49,7 @@ public class CLINKTest extends AbstractClusterAlgorithmTest {
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 2) //
         .with(Algorithm.Utils.ALGORITHM_ID, CLINK.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.5147426);
     testClusterSizes(clustering, new int[] { 131, 507 });
   }

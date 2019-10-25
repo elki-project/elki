@@ -24,7 +24,6 @@
  */
 package elki.clustering.optics;
 
-import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -71,7 +70,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)", //
     url = "https://doi.org/10.1145/2505515.2505590", //
     bibkey = "DBLP:conf/cikm/SchneiderV13")
-public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
+public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
   /**
    * Class logger.
    */
@@ -128,6 +127,11 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     super();
     this.minPts = minpts;
     this.index = index;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -203,11 +207,6 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
   @Override
   public int getMinPts() {
     return minPts;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(EuclideanDistance.STATIC.getInputTypeRestriction());
   }
 
   /**

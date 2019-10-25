@@ -49,7 +49,7 @@ public class FarthestPointsTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 3) //
         .with(KMeans.INIT_ID, FarthestPoints.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.88132453);
     testClusterSizes(result, new int[] { 128, 199, 201, 201, 271 });
   }
@@ -68,7 +68,7 @@ public class FarthestPointsTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.8832692);
     testClusterSizes(result, new int[] { 128, 200, 200, 201, 271 });
   }

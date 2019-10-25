@@ -50,7 +50,7 @@ public class PAMTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<PAM<DoubleVector>>(PAM.class) //
         .with(KMeans.K_ID, 5) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

@@ -20,7 +20,6 @@
  */
 package elki.outlier.distance.parallel;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -85,7 +84,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Data Mining and Knowledge Discovery 28(1)", //
     url = "https://doi.org/10.1007/s10618-012-0300-z", //
     bibkey = "DBLP:journals/datamine/SchubertZK14")
-public class ParallelKNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ParallelKNNOutlier<O> implements OutlierAlgorithm {
   /**
    * Distance function used.
    */

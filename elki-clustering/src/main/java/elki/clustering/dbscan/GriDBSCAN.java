@@ -22,7 +22,6 @@ package elki.clustering.dbscan;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.util.Assignment;
@@ -41,16 +40,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.ProxyView;
@@ -76,6 +66,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.jafama.FastMath;
 
@@ -108,7 +99,7 @@ import net.jafama.FastMath;
     booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
     url = "https://doi.org/10.1109/CIT.2008.4594646", //
     bibkey = "DBLP:conf/IEEEcit/MahranM08")
-public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -150,12 +141,17 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Cluster
     this.gridwidth = gridwidth;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    // We strictly need a vector field of fixed dimensionality!
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, distance.getInputTypeRestriction()));
+  }
+
   /**
    * Performs the DBSCAN algorithm on the given database.
    */
   public Clustering<Model> run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-
     // Degenerate result:
     if(ids.size() < minpts) {
       Clustering<Model> result = new Clustering<>();
@@ -685,12 +681,6 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Cluster
       }
       return result;
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    // We strictly need a vector field of fixed dimensionality!
-    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, distance.getInputTypeRestriction()));
   }
 
   /**

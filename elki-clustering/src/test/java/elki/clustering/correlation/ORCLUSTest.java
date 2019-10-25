@@ -51,7 +51,7 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
         .with(ORCLUS.Par.K_ID, 3) //
         .with(ORCLUS.Par.L_ID, 1) //
         .with(ORCLUS.Par.SEED_ID, 1) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.62504);
     testClusterSizes(result, new int[] { 28, 33, 389 });
   }
@@ -67,7 +67,7 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
         .with(ORCLUS.Par.K_ID, 3) //
         .with(ORCLUS.Par.L_ID, 4) //
         .with(ORCLUS.Par.SEED_ID, 0) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.848054);
     testClusterSizes(result, new int[] { 189, 200, 212 });
   }

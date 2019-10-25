@@ -50,7 +50,7 @@ public class ParallelLloydKMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<ParallelLloydKMeans<DoubleVector>>(ParallelLloydKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }

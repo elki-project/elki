@@ -20,7 +20,13 @@
  */
 package elki.clustering.optics;
 
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;

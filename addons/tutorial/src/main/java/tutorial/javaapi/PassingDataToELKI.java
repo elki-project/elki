@@ -88,7 +88,7 @@ public class PassingDataToELKI {
     // K-means will automatically choose a numerical relation from the data set:
     // But we could make it explicit (if there were more than one numeric
     // relation!): km.run(db, rel);
-    Clustering<KMeansModel> c = km.run(db);
+    Clustering<KMeansModel> c = km.autorun(db);
 
     // Output all clusters:
     int i = 0;

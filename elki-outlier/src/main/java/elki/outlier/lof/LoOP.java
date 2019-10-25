@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -60,7 +59,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.pairs.Pair;
 
 import net.jafama.FastMath;
 
@@ -99,7 +97,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/1645953.1646195", //
     bibkey = "DBLP:conf/cikm/KriegelKSZ09")
 @Priority(Priority.RECOMMENDED)
-public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LoOP<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -148,25 +146,10 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     this.lambda = lambda;
   }
 
-  /**
-   * Get the kNN queries for the algorithm.
-   *
-   * @param relation Relation to analyze
-   * @param stepprog Progress logger, may be {@code null}
-   * @return result
-   */
-  protected Pair<KNNQuery<O>, KNNQuery<O>> getKNNQueries(Relation<O> relation, StepProgress stepprog) {
-    KNNQuery<O> knnComp, knnReach;
-    if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
-      LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnReach = knnComp = new QueryBuilder<>(relation, comparisonDistance).precomputed().kNNQuery(MathUtil.max(kcomp, kreach) + 1);
-    }
-    else {
-      LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = new QueryBuilder<>(relation, comparisonDistance).kNNQuery(kreach + 1);
-      knnReach = new QueryBuilder<>(relation, reachabilityDistance).kNNQuery(kcomp + 1);
-    }
-    return new Pair<>(knnComp, knnReach);
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(reachabilityDistance.equals(comparisonDistance) ? reachabilityDistance.getInputTypeRestriction() : //
+        new CombinedTypeInformation(reachabilityDistance.getInputTypeRestriction(), comparisonDistance.getInputTypeRestriction()));
   }
 
   /**
@@ -177,10 +160,16 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(5) : null;
-
-    Pair<KNNQuery<O>, KNNQuery<O>> pair = getKNNQueries(relation, stepprog);
-    KNNQuery<O> knnComp = pair.getFirst();
-    KNNQuery<O> knnReach = pair.getSecond();
+    KNNQuery<O> knnComp, knnReach;
+    if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
+      LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
+      knnReach = knnComp = new QueryBuilder<>(relation, comparisonDistance).precomputed().kNNQuery(MathUtil.max(kcomp, kreach) + 1);
+    }
+    else {
+      LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
+      knnComp = new QueryBuilder<>(relation, comparisonDistance).kNNQuery(kreach + 1);
+      knnReach = new QueryBuilder<>(relation, reachabilityDistance).kNNQuery(kcomp + 1);
+    }
 
     // Assert we got something
     if(knnComp == null) {
@@ -298,18 +287,6 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
       LOG.debugFine("nplof normalization factor is " + nplof);
     }
     return nplof > 0. ? nplof : 1.;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    final TypeInformation type;
-    if(reachabilityDistance.equals(comparisonDistance)) {
-      type = reachabilityDistance.getInputTypeRestriction();
-    }
-    else {
-      type = new CombinedTypeInformation(reachabilityDistance.getInputTypeRestriction(), comparisonDistance.getInputTypeRestriction());
-    }
-    return TypeUtil.array(type);
   }
 
   /**

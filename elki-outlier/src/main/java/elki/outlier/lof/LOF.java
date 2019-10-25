@@ -20,7 +20,6 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -88,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1145/342009.335388", //
     bibkey = "DBLP:conf/sigmod/BreunigKNS00")
 @Priority(Priority.RECOMMENDED)
-public class LOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class LOF<O> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -115,6 +114,11 @@ public class LOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -238,11 +242,6 @@ public class LOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
       ++count;
     }
     return sum / (lrdp * count);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

@@ -20,7 +20,6 @@
  */
 package elki.clustering.trivial;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -28,7 +27,6 @@ import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.utilities.Priority;
@@ -46,7 +44,7 @@ import elki.utilities.documentation.Title;
 @Title("Trivial all-noise clustering")
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")
 @Priority(Priority.SUPPLEMENTARY - 50)
-public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class TrivialAllNoise implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Constructor.
    */
@@ -54,17 +52,21 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
     super();
   }
 
-  public Clustering<Model> run(Relation<?> relation) {
-    final DBIDs ids = relation.getDBIDs();
-    Clustering<Model> result = new ReferenceClustering<>();
-    Metadata.of(result).setLongName("All-in-noise Trivial Clustering");
-    Cluster<Model> c = new Cluster<Model>(ids, true, ClusterModel.CLUSTER);
-    result.addToplevelCluster(c);
-    return result;
-  }
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
+  }
+
+  /**
+   * Run the trivial clustering algorithm.
+   *
+   * @param relation Data
+   * @return clustering
+   */
+  public Clustering<Model> run(Relation<?> relation) {
+    Clustering<Model> result = new ReferenceClustering<>();
+    Metadata.of(result).setLongName("All-in-noise Trivial Clustering");
+    result.addToplevelCluster(new Cluster<Model>(relation.getDBIDs(), true, ClusterModel.CLUSTER));
+    return result;
   }
 }

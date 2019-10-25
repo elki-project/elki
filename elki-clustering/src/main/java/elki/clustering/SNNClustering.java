@@ -24,28 +24,26 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.similarity.SharedNearestNeighborSimilarity;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
 import elki.result.Metadata;
+import elki.similarity.SharedNearestNeighborSimilarity;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -76,7 +74,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. of SIAM Data Mining (SDM'03)", //
     url = "https://doi.org/10.1137/1.9781611972733.5", //
     bibkey = "DBLP:conf/sdm/ErtozSK03")
-public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class SNNClustering<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -126,16 +124,19 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     this.minpts = minpts;
   }
 
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(similarityFunction.getInputTypeRestriction());
+  }
+
   /**
    * Perform SNN clustering
    *
-   * @param database Database
    * @param relation Relation
    * @return Result
    */
-  public Clustering<Model> run(Database database, Relation<O> relation) {
+  public Clustering<Model> run(Relation<O> relation) {
     SimilarityQuery<O> snnInstance = similarityFunction.instantiate(relation);
-
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<>();
@@ -274,11 +275,6 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(similarityFunction.getInputTypeRestriction());
   }
 
   /**

@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.data.ClassLabel;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.ClusterModel;
@@ -45,16 +43,16 @@ import elki.utilities.documentation.Title;
 
 /**
  * Pseudo clustering using labels.
- * 
+ * <p>
  * This "algorithm" puts elements into the same cluster when they agree in their
  * labels. I.e. it just uses a predefined clustering, and is mostly useful for
  * testing and evaluation (e.g. comparing the result of a real algorithm to a
  * reference result / golden standard).
- * 
+ * <p>
  * This variant derives a hierarchical result by doing a prefix comparison on
  * labels.
- * 
- * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
+ * <p>
+ * TODO: Noise handling (e.g., allow the user to specify a noise label pattern?)
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -64,7 +62,7 @@ import elki.utilities.documentation.Title;
 @Title("Hierarchical clustering by label")
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 @Priority(Priority.SUPPLEMENTARY - 5)
-public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -78,12 +76,12 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
   }
 
   @Override
-  public Clustering<Model> run(Database database) {
+  public Clustering<Model> autorun(Database database) {
     // Prefer a true class label
     try {
-      Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
-      return run(relation);
-    } catch (NoSupportedDataTypeException e) {
+      return run(database.getRelation(TypeUtil.CLASSLABEL));
+    }
+    catch(NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.
       return run(database.getRelation(getInputTypeRestriction()[0]));
     }
@@ -100,9 +98,9 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     Clustering<Model> clustering = new ReferenceClustering<>();
     Metadata.of(clustering).setLongName("By Label Hierarchical Clustering");
 
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final Object val = relation.get(iditer);
-      if (val == null) {
+      if(val == null) {
         noiseids.add(iditer);
         continue;
       }
@@ -112,9 +110,9 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     }
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<>(labelmap.size());
-    for (Entry<String, DBIDs> entry : labelmap.entrySet()) {
+    for(Entry<String, DBIDs> entry : labelmap.entrySet()) {
       DBIDs ids = entry.getValue();
-      if (ids instanceof DBID) {
+      if(ids instanceof DBID) {
         noiseids.add((DBID) ids);
         continue;
       }
@@ -122,23 +120,23 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       clusters.add(clus);
     }
 
-    for (Cluster<Model> cur : clusters) {
+    for(Cluster<Model> cur : clusters) {
       boolean isrootcluster = true;
-      for (Cluster<Model> oth : clusters) {
-        if (oth != cur && oth.getName().startsWith(cur.getName())) {
+      for(Cluster<Model> oth : clusters) {
+        if(oth != cur && oth.getName().startsWith(cur.getName())) {
           clustering.addChildCluster(oth, cur);
-          if (LOG.isDebuggingFiner()) {
+          if(LOG.isDebuggingFiner()) {
             LOG.debugFiner(oth.getName() + " is a child of " + cur.getName());
           }
           isrootcluster = false;
         }
       }
-      if (isrootcluster) {
+      if(isrootcluster) {
         clustering.addToplevelCluster(cur);
       }
     }
     // Collected noise IDs.
-    if (noiseids.size() > 0) {
+    if(noiseids.size() > 0) {
       Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
       clustering.addToplevelCluster(c);
@@ -154,19 +152,21 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    * @param id the id of the object to be assigned
    */
   private void assign(HashMap<String, DBIDs> labelMap, String label, DBIDRef id) {
-    if (labelMap.containsKey(label)) {
+    if(labelMap.containsKey(label)) {
       DBIDs exist = labelMap.get(label);
-      if (exist instanceof DBID) {
+      if(exist instanceof DBID) {
         ModifiableDBIDs n = DBIDUtil.newHashSet();
         n.add((DBID) exist);
         n.add(id);
         labelMap.put(label, n);
-      } else {
+      }
+      else {
         assert (exist instanceof HashSetModifiableDBIDs);
         assert (exist.size() > 1);
         ((ModifiableDBIDs) exist).add(id);
       }
-    } else {
+    }
+    else {
       labelMap.put(label, DBIDUtil.deref(id));
     }
   }

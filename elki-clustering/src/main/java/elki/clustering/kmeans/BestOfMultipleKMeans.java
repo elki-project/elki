@@ -20,20 +20,18 @@
  */
 package elki.clustering.kmeans;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.quality.KMeansQualityMeasure;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
-import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -52,7 +50,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> Vector type
  * @param <M> Model type
  */
-public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -88,15 +86,20 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public Clustering<M> run(Database database, Relation<V> relation) {
+  public TypeInformation[] getInputTypeRestriction() {
+    return innerkMeans.getInputTypeRestriction();
+  }
+
+  @Override
+  public Clustering<M> run(Relation<V> relation) {
     @SuppressWarnings("unchecked")
-    final NumberVectorDistance<? super NumberVector> df = (NumberVectorDistance<? super NumberVector>) innerkMeans.getDistance();
+    NumberVectorDistance<? super NumberVector> df = (NumberVectorDistance<? super NumberVector>) innerkMeans.getDistance();
 
     Clustering<M> bestResult = null;
     double bestCost = Double.NaN;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("K-means iterations", trials, LOG) : null;
     for(int i = 0; i < trials; i++) {
-      Clustering<M> currentCandidate = innerkMeans.run(database, relation);
+      Clustering<M> currentCandidate = innerkMeans.run(relation);
       double currentCost = qualityMeasure.quality(currentCandidate, df, relation);
       if(LOG.isVerbose()) {
         LOG.verbose("Cost of candidate " + i + ": " + currentCost);
@@ -110,11 +113,6 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     }
     LOG.ensureCompleted(prog);
     return bestResult;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return innerkMeans.getInputTypeRestriction();
   }
 
   @Override

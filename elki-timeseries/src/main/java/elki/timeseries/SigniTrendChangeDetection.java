@@ -20,7 +20,7 @@
  */
 package elki.timeseries;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -86,7 +86,7 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/2623330.2623740", //
     bibkey = "DBLP:conf/kdd/SchubertWK14")
 @Priority(Priority.RECOMMENDED)
-public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
+public class SigniTrendChangeDetection implements Algorithm {
   /**
    * Exponential aging parameter.
    */
@@ -114,6 +114,11 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
     this.alpha = 1. - FastMath.exp(FastMath.log(0.5) / halflife);
     this.bias = bias;
     this.minsigma = minsigma;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -228,11 +233,6 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
       }
       return absmax;
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

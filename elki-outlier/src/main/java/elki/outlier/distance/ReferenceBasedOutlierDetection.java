@@ -22,7 +22,6 @@ package elki.outlier.distance;
 
 import java.util.Collection;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -86,7 +85,7 @@ import elki.utilities.referencepoints.ReferencePointsHeuristic;
     booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
     url = "https://doi.org/10.1109/ICDM.2006.17", //
     bibkey = "DBLP:conf/icdm/PeiZG06")
-public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection implements OutlierAlgorithm {
   /**
    * Distance function used.
    */
@@ -114,6 +113,11 @@ public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierRes
     this.distance = distance;
     this.k = k;
     this.refp = refp;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -258,11 +262,6 @@ public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierRes
       }
     }
     return k / sum;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

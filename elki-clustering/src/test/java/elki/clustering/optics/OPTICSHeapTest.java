@@ -46,7 +46,7 @@ public class OPTICSHeapTest extends AbstractClusterAlgorithmTest {
         .with(OPTICSHeap.Par.EPSILON_ID, 0.15) //
         .with(OPTICSXi.Par.XI_ID, 0.05) //
         .with(OPTICSXi.Par.XIALG_ID, OPTICSHeap.class) //
-        .build().run(db);
+        .build().autorun(db);
     testFMeasure(db, clustering, 0.893865);
     testClusterSizes(clustering, new int[] { 8, 35, 72, 115, 209, 271 });
   }

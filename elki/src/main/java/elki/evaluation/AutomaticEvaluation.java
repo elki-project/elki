@@ -148,7 +148,7 @@ public class AutomaticEvaluation implements Evaluator {
    */
   public static void ensureClusteringResult(final Database db) {
     if(!Metadata.hierarchyOf(db).iterDescendantsSelf().filter(Clustering.class).valid()) {
-      Metadata.hierarchyOf(db).addChild(new ByLabelOrAllInOneClustering().run(db));
+      Metadata.hierarchyOf(db).addChild(new ByLabelOrAllInOneClustering().autorun(db));
     }
   }
 

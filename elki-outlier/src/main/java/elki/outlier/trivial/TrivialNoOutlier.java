@@ -20,7 +20,6 @@
  */
 package elki.outlier.trivial;
 
-import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -44,7 +43,7 @@ import elki.utilities.Priority;
  * @since 0.4.0
  */
 @Priority(Priority.SUPPLEMENTARY - 50)
-public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class TrivialNoOutlier implements OutlierAlgorithm {
   /**
    * Constructor.
    */
@@ -58,7 +57,7 @@ public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implement
   }
 
   /**
-   * Run the actual algorithm.
+   * Run the trivial algorithm.
    * 
    * @param relation Relation
    * @return Result

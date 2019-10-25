@@ -22,16 +22,10 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -44,6 +38,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -72,7 +67,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED - 5)
-public class MiniMaxAnderberg<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -91,6 +86,11 @@ public class MiniMaxAnderberg<O> extends AbstractAlgorithm<PointerHierarchyRepre
   public MiniMaxAnderberg(Distance<? super O> distance) {
     super();
     this.distance = distance;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -357,11 +357,6 @@ public class MiniMaxAnderberg<O> extends AbstractAlgorithm<PointerHierarchyRepre
     }
     bestd[j] = bestdj;
     besti[j] = bestij;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

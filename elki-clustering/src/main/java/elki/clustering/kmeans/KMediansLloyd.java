@@ -29,7 +29,6 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.model.MeanModel;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -79,8 +78,8 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
   }
 
   @Override
-  public Clustering<MeanModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
+  public Clustering<MeanModel> run(Relation<V> relation) {
+    Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildMediansResult();
   }

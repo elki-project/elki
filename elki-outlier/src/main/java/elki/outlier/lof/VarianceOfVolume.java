@@ -20,10 +20,8 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.spatial.SpatialComparable;
-import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -93,7 +91,7 @@ import net.jafama.FastMath;
     booktitle = "Pattern Recognition Letters 24(16)", //
     url = "https://doi.org/10.1016/S0167-8655(03)00165-X", //
     bibkey = "DBLP:journals/prl/HuS03")
-public class VarianceOfVolume<O extends SpatialComparable> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class VarianceOfVolume<O extends SpatialComparable> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -119,6 +117,11 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractAlgor
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -222,11 +225,6 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractAlgor
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.SPATIAL_OBJECT));
   }
 
   /**

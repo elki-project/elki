@@ -20,7 +20,6 @@
  */
 package elki.clustering;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -72,7 +71,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Clustering algorithms", // )
     url = "http://dl.acm.org/citation.cfm?id=540298", //
     bibkey = "books/wiley/Hartigan75/C3")
-public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class Leader<O> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
    */
@@ -98,6 +97,11 @@ public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> 
     super();
     this.distance = distance;
     this.threshold = threshold;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -135,11 +139,6 @@ public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> 
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".queries", queries));
     LOG.ensureCompleted(prog);
     return clustering;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

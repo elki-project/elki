@@ -54,7 +54,7 @@ public class WithinClusterMeanDistanceTest extends AbstractClusterAlgorithmTest 
     Clustering<KMeansModel> result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstK.class) //
-        .build().run(db);
+        .build().autorun(db);
 
     // Test Cluster Average Overall Distance
     KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistance();

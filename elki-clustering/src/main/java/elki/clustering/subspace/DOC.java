@@ -22,7 +22,6 @@ package elki.clustering.subspace;
 
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -45,8 +44,8 @@ import elki.result.Metadata;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -77,7 +76,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
     url = "https://doi.org/10.1145/564691.564739", //
     bibkey = "DBLP:conf/sigmod/ProcopiucJAM02")
-public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -116,6 +115,11 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     this.beta = beta;
     this.w = w;
     this.rnd = random;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**
@@ -342,11 +346,6 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    */
   protected double computeClusterQuality(int clusterSize, int numRelevantDimensions) {
     return clusterSize * FastMath.pow(1. / beta, numRelevantDimensions);
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   /**

@@ -22,7 +22,7 @@ package elki.timeseries;
 
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.DoubleVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -91,7 +91,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Detection of Abrupt Changes - Theory and Application", //
     url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf", //
     bibkey = "books/prentice/BassevilleN93/C2")
-public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePoints> {
+public class OfflineChangePointDetectionAlgorithm implements Algorithm {
   /**
    * Number of samples for bootstrap significance.
    */
@@ -117,6 +117,11 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     this.minConfidence = confidence;
     this.bootstrapSamples = bootstrapSteps;
     this.rnd = rnd;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
   }
 
   /**
@@ -330,11 +335,6 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
       bstrap[r] = bstrap[i];
       bstrap[i] = tmp;
     }
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
   }
 
   /**

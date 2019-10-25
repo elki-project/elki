@@ -22,23 +22,21 @@ package elki.clustering.kmeans;
 
 import java.util.LinkedList;
 
-import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
-import elki.database.Database;
-import elki.database.ProxyDatabase;
+import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -70,7 +68,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "KDD workshop on text mining. Vol. 400. No. 1", //
     url = "http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf", //
     bibkey = "conf/kdd/SteinbachKK00")
-public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public class BisectingKMeans<V extends NumberVector, M extends MeanModel> implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -99,12 +97,15 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
   }
 
   @Override
-  public Clustering<M> run(Database database, Relation<V> relation) {
-    ProxyDatabase proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
+  public TypeInformation[] getInputTypeRestriction() {
+    return innerkMeans.getInputTypeRestriction();
+  }
 
-    // Linked list is preferrable for scratch, as we will A) not need that many
-    // clusters and B) be doing random removals of the largest cluster (often at
-    // the head)
+  @Override
+  public Clustering<M> run(Relation<V> relation) {
+    // Linked list is preferrable for scratch, as we will
+    // A) not need that many clusters and
+    // B) be doing random removals of the largest cluster (often at the head)
     LinkedList<Cluster<M>> currentClusterList = new LinkedList<>();
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Bisecting k-means", k - 1, LOG) : null;
@@ -112,7 +113,8 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     for(int j = 0; j < this.k - 1; j++) {
       // Choose a cluster to split and project database to cluster
       if(currentClusterList.isEmpty()) {
-        proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
+        // Run the inner k-means algorithm:
+        currentClusterList.addAll(innerkMeans.run(relation).getAllClusters());
       }
       else {
         Cluster<M> largestCluster = null;
@@ -123,16 +125,9 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
         }
         assert largestCluster != null;
         currentClusterList.remove(largestCluster);
-        proxyDB.setDBIDs(largestCluster.getIDs());
+        // Run the inner k-means algorithm:
+        currentClusterList.addAll(innerkMeans.run(new ProxyView<>(largestCluster.getIDs(), relation)).getAllClusters());
       }
-
-      // Run the inner k-means algorithm:
-      // FIXME: ensure we run on the correct relation in a multirelational
-      // setting!
-      Clustering<M> innerResult = innerkMeans.run(proxyDB);
-      // Add resulting clusters to current result.
-      currentClusterList.addAll(innerResult.getAllClusters());
-
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -141,11 +136,6 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     Clustering<M> result = new Clustering<>(currentClusterList);
     Metadata.of(result).setLongName("Bisecting k-Means Result");
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return innerkMeans.getInputTypeRestriction();
   }
 
   @Override

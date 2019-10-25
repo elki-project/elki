@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -65,7 +64,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
+public class DistanceQuantileSampler<O> implements Algorithm {
   /**
    * Class logger.
    */
@@ -75,6 +74,11 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
    * Statistics prefix.
    */
   private static final String PREFIX = DistanceQuantileSampler.class.getName();
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super O> distance;
 
   /**
    * Quantile to compute.
@@ -97,11 +101,6 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
   private RandomFactory rand;
 
   /**
-   * Distance function used.
-   */
-  protected Distance<? super O> distance;
-
-  /**
    * Constructor.
    *
    * @param distance Distance function
@@ -118,6 +117,11 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
     this.sampling = sampling;
     this.nozeros = nozeros;
     this.rand = rand;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -164,11 +168,6 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
     CollectionResult<double[]> result = new CollectionResult<>(data, header);
     Metadata.of(result).setLongName("Distances Sample");
     return result;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
