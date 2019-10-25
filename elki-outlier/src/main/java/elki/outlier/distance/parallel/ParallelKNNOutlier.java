@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance.parallel;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -34,6 +34,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
@@ -49,8 +50,10 @@ import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Parallel implementation of KNN Outlier detection.
@@ -82,11 +85,21 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Data Mining and Knowledge Discovery 28(1)", //
     url = "https://doi.org/10.1007/s10618-012-0300-z", //
     bibkey = "DBLP:journals/datamine/SchubertZK14")
-public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class ParallelKNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(ParallelKNNOutlier.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
   /**
    * Parameter k + 1
    */
-  private int kplus;
+  protected int kplus;
 
   /**
    * Constructor.
@@ -95,18 +108,14 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
    * @param k K parameter
    */
   public ParallelKNNOutlier(Distance<? super O> distance, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.kplus = k + 1;
   }
 
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ParallelKNNOutlier.class);
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -158,15 +167,21 @@ public class ParallelKNNOutlier<O> extends AbstractDistanceBasedAlgorithm<Distan
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     /**
      * K parameter
      */
-    int k;
+    protected int k;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(KNNOutlier.Par.K_ID) //
           .grab(config, x -> k = x);
     }

@@ -20,7 +20,7 @@
  */
 package elki.outlier;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
@@ -33,6 +33,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -46,10 +47,12 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Algorithm to compute dynamic-window outlier factors in a database based on a
@@ -74,11 +77,16 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 6th Iberian Conf. Pattern Recognition and Image Analysis (IbPRIA 2013)", //
     url = "https://doi.org/10.1007/978-3-642-38628-2_61", //
     bibkey = "DBLP:conf/ibpria/MomtazMG13")
-public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class DWOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(DWOF.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Holds the value of {@link Par#K_ID} i.e. Number of neighbors to
@@ -89,7 +97,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * The radii changing ratio
    */
-  private double delta = 1.1;
+  protected double delta = 1.1;
 
   /**
    * Constructor.
@@ -99,7 +107,8 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @param delta Radius increase factor
    */
   public DWOF(Distance<? super O> distance, int k, double delta) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.kplus = k + 1; // + query point
     this.delta = delta;
   }
@@ -306,7 +315,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -323,7 +332,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID for the number of neighbors.
      */
@@ -344,9 +353,15 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
      */
     protected double delta = 1.1;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config); // Distance
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

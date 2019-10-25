@@ -80,7 +80,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
 
   @Override
   public Clustering<MeanModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildMediansResult();
   }

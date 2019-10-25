@@ -4,7 +4,7 @@
  * The algorithms in this package are meant to be used in run time benchmarks,
  * to evalute e.g. the performance of an index structure.
  *
- * @opt include .*elki.algorithm.AbstractDistanceBasedAlgorithm
+ * @opt include .*elki.algorithm.AbstractAlgorithm
  */
 /*
  * This file is part of ELKI:

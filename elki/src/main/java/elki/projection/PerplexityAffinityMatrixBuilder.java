@@ -20,7 +20,7 @@
  */
 package elki.projection;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDUtil;
@@ -36,9 +36,11 @@ import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -227,7 +229,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Perplexity parameter, the number of neighbors to preserve.
      */
@@ -238,14 +240,15 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
      */
     protected double perplexity;
 
-    @Override
-    public Class<?> getDefaultDistance() {
-      return SquaredEuclideanDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(PERPLEXITY_ID)//
           .setDefaultValue(40.0) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

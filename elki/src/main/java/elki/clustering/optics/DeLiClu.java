@@ -23,7 +23,7 @@ package elki.clustering.optics;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -36,16 +36,12 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.IndexTreePath;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluDirectoryEntry;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
-import elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeIndex;
+import elki.index.tree.spatial.rstarvariants.deliclu.*;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -57,9 +53,12 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 /**
@@ -92,11 +91,21 @@ import it.unimi.dsi.fastutil.ints.IntSet;
     booktitle = "Proc. 10th Pacific-Asia Conf. on Knowledge Discovery and Data Mining (PAKDD 2006)", //
     url = "https://doi.org/10.1007/11731139_16", //
     bibkey = "DBLP:conf/pakdd/AchtertBK06")
-public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<SpatialPrimitiveDistance<? super V>, ClusterOrder> implements OPTICSTypeAlgorithm {
+public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(DeLiClu.class);
+
+  /**
+   * Distance function used.
+   */
+  protected SpatialPrimitiveDistance<? super V> distance;
+
+  /**
+   * DeLiClu Index factory.
+   */
+  protected DeLiCluTreeFactory<? super V> indexer;
 
   /**
    * The priority queue for the algorithm.
@@ -109,18 +118,14 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   private int minpts;
 
   /**
-   * DeLiClu Index factory.
-   */
-  protected DeLiCluTreeFactory<? super V> indexer;
-
-  /**
    * Constructor.
    *
    * @param distance Distance function
    * @param minpts MinPts
    */
   public DeLiClu(DeLiCluTreeFactory<? super V> indexer, SpatialPrimitiveDistance<? super V> distance, int minpts) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.indexer = indexer;
     this.minpts = minpts;
   }
@@ -137,7 +142,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     if(LOG.isVerbose()) {
       LOG.verbose("Performing kNN join");
     }
-    DataStore<KNNList> knns = new KNNJoin<V, DeLiCluNode, DeLiCluEntry>(getDistance(), minpts).run(index, relation.getDBIDs());
+    DataStore<KNNList> knns = new KNNJoin<V, DeLiCluNode, DeLiCluEntry>(distance, minpts).run(index, relation.getDBIDs());
     DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -224,7 +229,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
     int numEntries_1 = node1.getNumEntries(),
         numEntries_2 = node2.getNumEntries();
-    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
+    SpatialPrimitiveDistance<? super V> distFunction = distance;
 
     // insert all combinations of unhandled - handled children of
     // node1-node2 into pq
@@ -235,12 +240,10 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
       }
       for(int j = 0; j < numEntries_2; j++) {
         DeLiCluEntry entry2 = node2.getEntry(j);
-
         if(!entry2.hasHandled()) {
           continue;
         }
-        double distance = distFunction.minDist(entry1, entry2);
-        heap.add(new SpatialObjectPair(distance, entry1, entry2, true));
+        heap.add(new SpatialObjectPair(distFunction.minDist(entry1, entry2), entry1, entry2, true));
       }
     }
   }
@@ -258,7 +261,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
     }
     int numEntries_1 = node1.getNumEntries(),
         numEntries_2 = node2.getNumEntries();
-    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
+    SpatialPrimitiveDistance<? super V> distFunction = distance;
 
     // insert all combinations of unhandled - handled children of
     // node1-node2 into pq
@@ -272,7 +275,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
         if(!entry2.hasHandled()) {
           continue;
         }
-
         double distance = distFunction.minDist(entry1, entry2);
         double reach = MathUtil.max(distance, knns.get(((LeafEntry) entry2).getDBID()).getKNNDistance());
         heap.add(new SpatialObjectPair(reach, entry1, entry2, false));
@@ -306,7 +308,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
   private void reinsertExpanded(DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry);
     SpatialEntry entry2 = path.get(pos).getEntry();
-    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
+    SpatialPrimitiveDistance<? super V> distFunction = distance;
 
     if(entry2 instanceof LeafEntry) {
       assert (pos == 0);
@@ -449,7 +451,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<SpatialPrimitiveDistance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the threshold for minimum number of points within a
      * cluster, must be an integer greater than 0.
@@ -466,14 +468,15 @@ public class DeLiClu<V extends NumberVector> extends AbstractDistanceBasedAlgori
      */
     protected DeLiCluTreeFactory<? super V> indexer;
 
-    @Override
-    public Class<?> getDistanceRestriction() {
-      return SpatialPrimitiveDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected SpatialPrimitiveDistance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minpts = x);

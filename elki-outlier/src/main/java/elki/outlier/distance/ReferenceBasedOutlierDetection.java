@@ -22,7 +22,7 @@ package elki.outlier.distance;
 
 import java.util.Collection;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -36,6 +36,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
@@ -49,6 +50,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -84,31 +86,37 @@ import elki.utilities.referencepoints.ReferencePointsHeuristic;
     booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
     url = "https://doi.org/10.1109/ICDM.2006.17", //
     bibkey = "DBLP:conf/icdm/PeiZG06")
-public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ReferenceBasedOutlierDetection.class);
 
   /**
+   * Distance function used.
+   */
+  protected NumberVectorDistance<? super NumberVector> distance;
+
+  /**
    * Holds the number of neighbors to use for density estimation.
    */
-  private int k;
+  protected int k;
 
   /**
    * Stores the reference point strategy.
    */
-  private ReferencePointsHeuristic refp;
+  protected ReferencePointsHeuristic refp;
 
   /**
    * Constructor with parameters.
    *
-   * @param k k Parameter
+   * @param k number of neighbors
    * @param distance distance function
    * @param refp Reference points heuristic
    */
   public ReferenceBasedOutlierDetection(int k, NumberVectorDistance<? super NumberVector> distance, ReferencePointsHeuristic refp) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.refp = refp;
   }
@@ -203,11 +211,12 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
 
   /**
    * Computes the density of an object. The density of an object is the
-   * distances to the k nearest neighbors. Neighbors and distances are computed
-   * approximately. (approximation for kNN distance: instead of a normal NN
-   * search the NN of an object are those objects that have a similar distance
-   * to a reference point. The k- nearest neighbors of an object are those
-   * objects that lay close to the object in the reference distance vector)
+   * distances to the k nearest neighbors. Neighbors and distances are
+   * computed approximately. (approximation for kNN distance: instead of a
+   * normal NN search the NN of an object are those objects that have a similar
+   * distance to a reference point. The k-nearest neighbors of an object are
+   * those objects that lay close to the object in the reference distance
+   * vector)
    *
    * @param referenceDists vector of the reference distances
    * @param iter Iterator to this list (will be reused)
@@ -271,21 +280,25 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
    *
    * @author Erich Schubert
    */
-  public static class Par extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super NumberVector>> {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the reference points heuristic.
      */
     public static final OptionID REFP_ID = new OptionID("refod.refp", "The heuristic for finding reference points.");
 
     /**
-     * Parameter to specify the number of nearest neighbors of an object, to be
-     * considered for computing its REFOD_SCORE, must be an integer greater than
-     * 1.
+     * The number of nearest neighbors of an object, to be considered for
+     * computing its REFOD_SCORE, must be an integer greater than 1.
      */
     public static final OptionID K_ID = new OptionID("refod.k", "The number of nearest neighbors");
 
     /**
-     * Holds the value of {@link #K_ID}.
+     * The distance function to use.
+     */
+    protected NumberVectorDistance<? super NumberVector> distance;
+
+    /**
+     * Number of nearest neighbors.
      */
     private int k;
 
@@ -296,7 +309,8 @@ public class ReferenceBasedOutlierDetection extends AbstractDistanceBasedAlgorit
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

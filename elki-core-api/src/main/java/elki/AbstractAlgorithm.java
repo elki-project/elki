@@ -117,4 +117,9 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
    * Parameter to specify the algorithm to run.
    */
   public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
+
+  /**
+   * OptionID for the distance function.
+   */
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 }

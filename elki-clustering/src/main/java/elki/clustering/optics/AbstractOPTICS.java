@@ -20,18 +20,21 @@
  */
 package elki.clustering.optics;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
@@ -58,7 +61,12 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     url = "https://doi.org/10.1145/304181.304187", //
     bibkey = "DBLP:conf/sigmod/AnkerstBKS99")
 @Alias({ "OPTICS" })
-public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, ClusterOrder> implements OPTICSTypeAlgorithm {
+public abstract class AbstractOPTICS<O> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
   /**
    * Holds the maximum distance to search for objects (performance parameter)
    */
@@ -77,7 +85,8 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
    * @param minpts Minpts value
    */
   public AbstractOPTICS(Distance<? super O> distance, double epsilon, int minpts) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.epsilon = epsilon;
     this.minpts = minpts;
   }
@@ -97,7 +106,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -109,7 +118,7 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
    * 
    * @param <O> Object type
    */
-  public static abstract class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static abstract class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.
@@ -132,9 +141,15 @@ public abstract class AbstractOPTICS<O> extends AbstractDistanceBasedAlgorithm<D
      */
     protected int minpts = 0;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(EPSILON_ID) //
           .setOptional(true) //
           .grab(config, x -> epsilon = x);

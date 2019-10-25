@@ -34,7 +34,7 @@ import elki.data.model.KMeansModel;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -51,21 +51,13 @@ public class WithinClusterVarianceTest extends AbstractClusterAlgorithmTest {
   public void testVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "quality-measure-test.csv", 7);
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-
-    // Setup algorithm
-    LloydKMeans<DoubleVector> kmeans = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
+    Clustering<KMeansModel> result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstK.class) //
-        .build();
-
-    // run KMeans on database
-    Clustering<KMeansModel> result = kmeans.run(db);
-
+        .build().run(db);
     // Test Cluster Variance
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVariance();
-    final NumberVectorDistance<? super DoubleVector> dist = kmeans.getDistance();
-
-    final double quality = variance.quality(result, dist, rel);
+    final double quality = variance.quality(result, SquaredEuclideanDistance.STATIC, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);
   }
 }

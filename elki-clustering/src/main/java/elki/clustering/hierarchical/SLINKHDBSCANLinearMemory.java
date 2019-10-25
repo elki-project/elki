@@ -230,7 +230,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override

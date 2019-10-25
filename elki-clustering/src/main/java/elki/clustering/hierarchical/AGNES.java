@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
@@ -41,6 +41,7 @@ import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -106,16 +107,21 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
 @Alias({ "HAC", "SAHN" })
-public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AGNES<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(AGNES.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
+  /**
    * Current linkage method in use.
    */
-  Linkage linkage = WardLinkage.STATIC;
+  protected Linkage linkage = WardLinkage.STATIC;
 
   /**
    * Constructor.
@@ -124,7 +130,8 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param linkage Linkage method
    */
   public AGNES(Distance<? super O> distance, Linkage linkage) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.linkage = linkage;
   }
 
@@ -271,7 +278,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, linkage.restore(mindist, getDistance().isSquared()), iy);
+    builder.add(ix, linkage.restore(mindist, distance.isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
@@ -330,8 +337,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -348,7 +354,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID for linkage parameter.
      */
@@ -359,17 +365,20 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
      */
     protected Linkage linkage;
 
-    @Override
-    public Class<?> getDefaultDistance() {
-      return (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) ? SquaredEuclideanDistance.class : EuclideanDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<Linkage>(LINKAGE_ID, Linkage.class) //
           .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> linkage = x);
-      super.configure(config);
+      Class<? extends Distance<?>> defaultD = (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) //
+          ? SquaredEuclideanDistance.class : EuclideanDistance.class;
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, defaultD) //
+          .grab(config, x -> distance = x);
     }
 
     @Override

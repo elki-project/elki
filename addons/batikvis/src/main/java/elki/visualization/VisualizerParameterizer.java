@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.database.Database;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;
@@ -176,7 +176,7 @@ public class VisualizerParameterizer {
       if(setting.name.equals(AlgorithmStep.Par.ALGORITHM_ID.getName())) {
         algorithm = setting.value;
       }
-      if(setting.name.equals(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID.getName())) {
+      if(setting.name.equals(AbstractAlgorithm.DISTANCE_FUNCTION_ID.getName())) {
         distance = setting.value;
       }
       if(setting.name.equals(FileBasedDatabaseConnection.Par.INPUT_ID.getName())) {

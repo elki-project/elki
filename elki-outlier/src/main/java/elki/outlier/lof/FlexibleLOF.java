@@ -21,7 +21,6 @@
 package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
-import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -39,6 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -53,6 +53,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -451,7 +452,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
    *
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * The distance function to determine the reachability distance between
      * database objects.
@@ -482,9 +483,9 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     protected int kreach = 2;
 
     /**
-     * Neighborhood distance function.
+     * The distance function to use.
      */
-    protected Distance<? super O> neighborhoodDistance = null;
+    protected Distance<? super O> distance;
 
     /**
      * Reachability distance function.
@@ -493,7 +494,6 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
       new IntParameter(KREF_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> krefer = x);
@@ -502,6 +502,8 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> kreach = x);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       reachabilityDistance = distance;
       new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //
           .setOptional(true) //

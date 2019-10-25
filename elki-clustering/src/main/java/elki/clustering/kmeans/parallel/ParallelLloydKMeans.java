@@ -70,7 +70,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override

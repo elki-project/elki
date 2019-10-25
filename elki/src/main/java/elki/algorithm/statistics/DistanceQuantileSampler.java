@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
@@ -34,6 +34,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -43,10 +44,12 @@ import elki.result.Metadata;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
@@ -61,7 +64,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
+public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
   /**
    * Class logger.
    */
@@ -93,6 +96,11 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
   private RandomFactory rand;
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
+  /**
    * Constructor.
    *
    * @param distance Distance function
@@ -103,7 +111,8 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
    * @param rand Random generator
    */
   public DistanceQuantileSampler(Distance<? super O> distance, double quantile, double sampling, boolean nozeros, RandomFactory rand) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.quantile = quantile;
     this.sampling = sampling;
     this.nozeros = nozeros;
@@ -158,7 +167,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -173,7 +182,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Quantile to compute.
      */
@@ -195,28 +204,34 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<D
     public static final OptionID SEED_ID = new OptionID("distsample.seed", "Random generator seed.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Quantile to compute.
      */
-    private double quantile;
+    protected double quantile;
 
     /**
      * Sampling rate.
      */
-    private double sampling;
+    protected double sampling;
 
     /**
      * Flag to ignore zero distances (recommended with many duplicates).
      */
-    private boolean nozeros;
+    protected boolean nozeros;
 
     /**
      * Random generator.
      */
-    private RandomFactory rand;
+    protected RandomFactory rand;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(QUANTILE_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //

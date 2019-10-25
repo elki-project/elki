@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -35,6 +35,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -46,9 +47,11 @@ import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -89,11 +92,16 @@ import net.jafama.FastMath;
     booktitle = "TiCC TR 2012–001", //
     url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
     bibkey = "tr/tilburg/JanssensHPv12")
-public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class KNNSOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(KNNSOS.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of neighbors (not including query point).
@@ -112,13 +120,14 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    * @param k Number of neighbors to consider
    */
   public KNNSOS(Distance<? super O> distance, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -173,20 +182,26 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the number of neighbors
      */
     public static final OptionID KNN_ID = new OptionID("sos.k", "Number of neighbors to use. Should be about 3x the desired perplexity.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Number of neighbors
      */
-    int k = 15;
+    protected int k = 15;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(KNN_ID, 15) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

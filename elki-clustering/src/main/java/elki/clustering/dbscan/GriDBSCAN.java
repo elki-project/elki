@@ -22,7 +22,7 @@ package elki.clustering.dbscan;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.util.Assignment;
 import elki.clustering.dbscan.util.Border;
@@ -40,13 +40,23 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.DBIDs;
+import elki.database.ids.DoubleDBIDList;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -58,12 +68,13 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.jafama.FastMath;
 
@@ -96,11 +107,16 @@ import net.jafama.FastMath;
     booktitle = "8th IEEE Int. Conf. on Computer and Information Technology", //
     url = "https://doi.org/10.1109/CIT.2008.4594646", //
     bibkey = "DBLP:conf/IEEEcit/MahranM08")
-public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(GriDBSCAN.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
 
   /**
    * Holds the epsilon radius threshold.
@@ -126,7 +142,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @param gridwidth Grid width
    */
   public GriDBSCAN(Distance<? super V> distance, double epsilon, int minpts, double gridwidth) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.epsilon = epsilon;
     this.minpts = minpts;
     this.gridwidth = gridwidth;
@@ -151,7 +168,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       LOG.warning("Invalid grid width (less than 2*epsilon, recommended 10*epsilon). Increasing grid width automatically.");
       gridwidth = 2. * epsilon;
     }
-    return new Instance<V>(getDistance(), epsilon, minpts, gridwidth).run(relation);
+    return new Instance<V>(distance, epsilon, minpts, gridwidth).run(relation);
   }
 
   /**
@@ -672,8 +689,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // We strictly need a vector field of fixed dimensionality!
-    TypeInformation type = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistance().getInputTypeRestriction());
-    return TypeUtil.array(type);
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, distance.getInputTypeRestriction()));
   }
 
   @Override
@@ -690,7 +706,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    *
    * @param <O> Vector type to use
    */
-  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Parameter to control the grid width.
      *
@@ -713,18 +729,18 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      */
     protected double gridwidth;
 
-    @Override
-    public Class<?> getDistanceRestriction() {
-      return LPNormDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected LPNormDistance distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<LPNormDistance>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> epsilon = x);
-
       new IntParameter(DBSCAN.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> {
@@ -733,7 +749,6 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
               LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
             }
           });
-
       new DoubleParameter(GRID_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .setDefaultValue(epsilon > 0 ? 10. * epsilon : 1.) //

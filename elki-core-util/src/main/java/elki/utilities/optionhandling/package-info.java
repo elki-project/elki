@@ -15,8 +15,6 @@
  * public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
  * </pre>
  * 
- * (This example is from
- * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * </li>
  * <li><b>Parameter Object</b>: To obtain a value, you <em>must</em> use a
  * {@link elki.utilities.optionhandling.parameters.AbstractParameter
@@ -54,8 +52,6 @@
  * final ObjectParameter&lt;Distance&lt;O, D&gt;&gt; DISTANCE_FUNCTION_PARAM = new ObjectParameter&lt;Distance&lt;O, D&gt;&gt;(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class);
  * </pre>
  * 
- * (This example is from
- * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * </li>
  * <li><b>Initialization</b>: Initialization happens in the constructor, which
  * <em>must</em> have the signature {@code Class(Parameterization config)} or
@@ -100,9 +96,6 @@
  *   }
  * }
  * </pre>
- * 
- * (This example is from
- * {@link elki.AbstractDistanceBasedAlgorithm AbstractDistanceBasedAlgorithm}.)
  * 
  * <pre>
  * // Using flags

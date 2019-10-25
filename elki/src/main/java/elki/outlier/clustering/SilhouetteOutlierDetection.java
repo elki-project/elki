@@ -22,7 +22,7 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -38,6 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.internal.EvaluateSilhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
 import elki.logging.Logging;
@@ -48,6 +49,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -74,21 +76,26 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
     url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
     bibkey = "doi:10.1016/0377-04278790125-7")
-public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(SilhouetteOutlierDetection.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
+  /**
    * Clustering algorithm to use
    */
-  ClusteringAlgorithm<?> clusterer;
+  protected ClusteringAlgorithm<?> clusterer;
 
   /**
    * Option for noise handling.
    */
-  private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+  protected NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
   /**
    * Constructor.
@@ -98,7 +105,8 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * @param noiseOption Noise handling option.
    */
   public SilhouetteOutlierDetection(Distance<? super O> distance, ClusteringAlgorithm<?> clusterer, NoiseHandling noiseOption) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.clusterer = clusterer;
     this.noiseOption = noiseOption;
   }
@@ -111,7 +119,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    */
   public OutlierResult run(Database database) {
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = new QueryBuilder<>(relation, getDistance()).distanceQuery();
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     // TODO: improve ELKI api to ensure we're using the same DBIDs!
     Clustering<?> c = clusterer.run(database);
 
@@ -194,7 +202,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    final TypeInformation dt = getDistance().getInputTypeRestriction();
+    final TypeInformation dt = distance.getInputTypeRestriction();
     TypeInformation[] t = clusterer.getInputTypeRestriction();
     for(TypeInformation i : t) {
       if(dt.isAssignableFromType(i)) {
@@ -222,7 +230,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
    * 
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for choosing the clustering algorithm
      */
@@ -230,18 +238,24 @@ public class SilhouetteOutlierDetection<O> extends AbstractDistanceBasedAlgorith
         "Clustering algorithm to use for the silhouette coefficients.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Clustering algorithm to use
      */
-    ClusteringAlgorithm<?> clusterer;
+    protected ClusteringAlgorithm<?> clusterer;
 
     /**
      * Noise handling
      */
-    private NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
+    protected NoiseHandling noiseOption = NoiseHandling.TREAT_NOISE_AS_SINGLETONS;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new ObjectParameter<ClusteringAlgorithm<?>>(CLUSTERING_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> clusterer = x);
       new EnumParameter<NoiseHandling>(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //

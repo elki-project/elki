@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -36,6 +36,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -45,9 +46,11 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * The Local Isolation Coefficient is the sum of the kNN distance and the
@@ -74,16 +77,21 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Int. Conf. on Information Technology and Computer Science (ITCS) 2009", //
     url = "https://doi.org/10.1109/ITCS.2009.230", //
     bibkey = "doi:10.1109/ITCS.2009.230")
-public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class LocalIsolationCoefficient<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(LocalIsolationCoefficient.class);
 
   /**
-   * Holds the number of nearest neighbors to query (including query point!)
+   * Holds the number of nearest neighbors to query (plus the query point!)
    */
-  private int k;
+  private int kplus;
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Constructor with parameters.
@@ -92,8 +100,9 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    * @param k k Parameter (not including query point!)
    */
   public LocalIsolationCoefficient(Distance<? super O> distance, int k) {
-    super(distance);
-    this.k = k;
+    super();
+    this.distance = distance;
+    this.kplus = k + 1;
   }
 
   /**
@@ -102,7 +111,6 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    final int kplus = k + 1;
     KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute Local Isolation Coefficients", relation.size(), LOG) : null;
@@ -113,7 +121,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
       final KNNList knn = knnQuery.getKNNForDBID(iditer, kplus);
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
-      for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
+      for(DoubleDBIDListIter neighbor = knn.iter(); neighbor.getOffset() < kplus && neighbor.valid(); neighbor.advance()) {
         if(DBIDUtil.equal(iditer, neighbor)) {
           continue;
         }
@@ -134,7 +142,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -147,7 +155,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
    *
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the k nearest neighbor.
      */
@@ -156,13 +164,19 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
             + "(i.e. query point is the 0-nearest-neighbor)");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * k parameter
      */
     protected int k = 0;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

@@ -20,18 +20,29 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.DBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
-
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -65,11 +76,16 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Journal of the American Statistical Association 106(495)", //
     url = "https://doi.org/10.1198/jasa.2011.tm10183", //
     bibkey = "doi:10.1198/jasa.2011.tm10183")
-public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMax<O> extends AbstractAlgorithm<PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class Logger.
    */
   private static final Logging LOG = Logging.getLogger(MiniMax.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Constructor.
@@ -77,7 +93,8 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    * @param distance Distance function to use.
    */
   public MiniMax(Distance<? super O> distance) {
-    super(distance);
+    super();
+    this.distance = distance;
   }
 
   /**
@@ -391,7 +408,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -409,7 +426,18 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    @Override
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+    }
+
     @Override
     public MiniMax<O> make() {
       return new MiniMax<>(distance);

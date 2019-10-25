@@ -20,30 +20,21 @@
  */
 package elki.algorithm.statistics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDPair;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -58,10 +49,13 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.EmptyDataException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -75,11 +69,16 @@ import net.jafama.FastMath;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
+public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(DistanceStatisticsWithClasses.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of bins to use in sampling.
@@ -105,7 +104,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    * @param sampling Sampling flag
    */
   public DistanceStatisticsWithClasses(Distance<? super O> distance, int numbins, boolean exact, boolean sampling) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.numbin = numbins;
     this.exact = exact;
     this.sampling = sampling;
@@ -392,7 +392,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -409,7 +409,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Flag to compute exact value range for binning.
      */
@@ -424,6 +424,11 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
      * Option to configure the number of bins to use.
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Number of bins to use in sampling.
@@ -442,7 +447,8 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbin = x);

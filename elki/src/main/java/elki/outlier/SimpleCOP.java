@@ -22,7 +22,7 @@ package elki.outlier;
 
 import static elki.math.linearalgebra.VMath.times;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
@@ -38,6 +38,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -53,6 +54,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -82,21 +84,26 @@ import net.jafama.FastMath;
     title = "Application 2: Outlier Detection (Chapter 18)", //
     booktitle = "Correlation Clustering", //
     bibkey = "phd/dnb/Zimek08/Ch18")
-public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
+public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(SimpleCOP.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
+
+  /**
    * Number of neighbors to be considered.
    */
-  int k;
+  protected int k;
 
   /**
    * Holds the object performing the dependency derivation
    */
-  private DependencyDerivator<V> dependencyDerivator;
+  protected DependencyDerivator<V> dependencyDerivator;
 
   /**
    * Constructor.
@@ -107,7 +114,8 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @param filter Filter for selecting eigenvectors
    */
   public SimpleCOP(Distance<? super V> distance, int k, PCARunner pca, EigenPairFilter filter) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
@@ -173,7 +181,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its COP_SCORE, must be an integer greater
@@ -187,9 +195,14 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
+
+    /**
      * Number of neighbors to be considered.
      */
-    int k;
+    protected int k;
 
     /**
      * Holds the object performing the dependency derivation
@@ -199,11 +212,12 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Filter for selecting eigenvectors.
      */
-    private EigenPairFilter filter;
+    protected EigenPairFilter filter;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

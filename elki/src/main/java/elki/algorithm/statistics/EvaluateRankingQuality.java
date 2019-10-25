@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.NumberVector;
@@ -41,6 +41,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.EvaluateClustering;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -54,9 +55,11 @@ import elki.utilities.datastructures.histogram.ObjHistogram;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -80,16 +83,21 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, CollectionResult<double[]>> {
+public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgorithm<CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(EvaluateRankingQuality.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
+
+  /**
    * Number of bins to use.
    */
-  int numbins = 20;
+  protected int numbins = 20;
 
   /**
    * Constructor.
@@ -98,7 +106,8 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    * @param numbins Number of bins
    */
   public EvaluateRankingQuality(Distance<? super V> distance, int numbins) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.numbins = numbins;
   }
 
@@ -170,7 +179,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override
@@ -187,11 +196,16 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
    *
    * @param <V> Vector type
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Option to configure the number of bins to use.
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
 
     /**
      * Number of bins to use.
@@ -200,7 +214,8 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbins = x);

@@ -82,7 +82,7 @@ public class MacQueenKMeans<V extends NumberVector> extends AbstractKMeans<V, KM
 
   @Override
   public Clustering<KMeansModel> run(Database database, Relation<V> relation) {
-    Instance instance = new Instance(relation, getDistance(), initialMeans(database, relation));
+    Instance instance = new Instance(relation, distance, initialMeans(database, relation));
     instance.run(maxiter);
     return instance.buildResult();
   }

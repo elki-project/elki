@@ -132,7 +132,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override

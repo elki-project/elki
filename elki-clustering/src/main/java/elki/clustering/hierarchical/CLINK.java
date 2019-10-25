@@ -20,14 +20,21 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.AbstractDistanceBasedAlgorithm;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * CLINK algorithm for complete linkage.
@@ -213,7 +220,18 @@ public class CLINK<O> extends SLINK<O> {
    *
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    @Override
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+    }
+
     @Override
     public CLINK<O> make() {
       return new CLINK<>(distance);

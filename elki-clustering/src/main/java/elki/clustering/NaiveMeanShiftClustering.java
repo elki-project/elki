@@ -22,20 +22,26 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DoubleDBIDList;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.Centroid;
@@ -44,6 +50,7 @@ import elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -79,26 +86,31 @@ import elki.utilities.pairs.Pair;
     booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", //
     url = "https://doi.org/10.1109/34.400568", //
     bibkey = "DBLP:journals/pami/Cheng95")
-public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(NaiveMeanShiftClustering.class);
 
   /**
+   * Distance function used.
+   */
+  protected NumberVectorDistance<? super V> distance;
+
+  /**
    * Density estimation kernel.
    */
-  KernelDensityFunction kernel = EpanechnikovKernelDensityFunction.KERNEL;
+  protected KernelDensityFunction kernel = EpanechnikovKernelDensityFunction.KERNEL;
 
   /**
    * Range of the kernel.
    */
-  double bandwidth;
+  protected double bandwidth;
 
   /**
    * Maximum number of iterations.
    */
-  static final int MAXITER = 1000;
+  protected static final int MAXITER = 1000;
 
   /**
    * Constructor.
@@ -108,7 +120,8 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * @param range Kernel radius
    */
   public NaiveMeanShiftClustering(NumberVectorDistance<? super V> distance, KernelDensityFunction kernel, double range) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.kernel = kernel;
     this.bandwidth = range;
   }
@@ -228,7 +241,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
    * 
    * @param <V> Vector type
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter for kernel function.
      */
@@ -249,14 +262,15 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
      */
     double range;
 
-    @Override
-    public Class<?> getDistanceRestriction() {
-      return NumberVectorDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected NumberVectorDistance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
           .grab(config, x -> kernel = x);
       new DoubleParameter(RANGE_ID) //

@@ -20,16 +20,12 @@
  */
 package elki.index.tree.metrical.mtreevariants.query;
 
-import java.util.List;
-
-import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.rknn.AbstractRKNNQuery;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Instance of a rKNN query for a particular spatial index.

@@ -20,7 +20,7 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -33,6 +33,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -46,6 +47,7 @@ import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -74,11 +76,16 @@ import net.jafama.FastMath;
     booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //
     bibkey = "DBLP:conf/sisap/SchubertG17")
-public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class ISOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(ISOS.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of neighbors (not including query point).
@@ -88,7 +95,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
   /**
    * Estimator of intrinsic dimensionality.
    */
-  IntrinsicDimensionalityEstimator estimator;
+  protected IntrinsicDimensionalityEstimator estimator;
 
   /**
    * Expected outlier rate.
@@ -103,14 +110,15 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @param estimator Estimator of intrinsic dimensionality.
    */
   public ISOS(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.estimator = estimator;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -261,7 +269,7 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the number of neighbors
      */
@@ -273,18 +281,24 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     public static final OptionID ESTIMATOR_ID = new OptionID("isos.estimator", "Estimator for intrinsic dimensionality.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Number of neighbors
      */
-    int k = 15;
+    protected int k = 15;
 
     /**
      * Estimator of intrinsic dimensionality.
      */
-    IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
+    protected IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(KNN_ID, 100) //
           .addConstraint(new GreaterEqualConstraint(5)) //
           .grab(config, x -> k = x);

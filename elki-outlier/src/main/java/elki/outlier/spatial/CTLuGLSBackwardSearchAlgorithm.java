@@ -22,7 +22,7 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -34,6 +34,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.NormalDistribution;
@@ -44,9 +45,11 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.pairs.Pair;
 
 import net.jafama.FastMath;
@@ -78,21 +81,26 @@ import net.jafama.FastMath;
     booktitle = "Proc. 16th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/1835804.1835939", //
     bibkey = "DBLP:conf/kdd/ChenLB10")
-public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(CTLuGLSBackwardSearchAlgorithm.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
+
+  /**
    * Parameter Alpha - significance niveau
    */
-  private double alpha;
+  protected double alpha;
 
   /**
    * Parameter k - neighborhood size
    */
-  private int k;
+  protected int k;
 
   /**
    * Constructor.
@@ -102,7 +110,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    * @param alpha Significance niveau
    */
   public CTLuGLSBackwardSearchAlgorithm(Distance<? super V> distance, int k, double alpha) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.alpha = alpha;
     this.k = k;
   }
@@ -248,7 +257,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override
@@ -265,7 +274,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    *
    * @param <V> Input vector type
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Holds the alpha value - significance niveau
      */
@@ -286,36 +295,24 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
      */
     private int k;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
-      getParameterAlpha(config);
-      getParameterK(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new DoubleParameter(ALPHA_ID) //
+          .grab(config, x1 -> alpha = x1);
+      new IntParameter(K_ID) //
+          .grab(config, x2 -> k = x2);
     }
 
     @Override
     public CTLuGLSBackwardSearchAlgorithm<V> make() {
       return new CTLuGLSBackwardSearchAlgorithm<>(distance, k, alpha);
-    }
-
-    /**
-     * Get the alpha parameter
-     *
-     * @param config Parameterization
-     */
-    protected void getParameterAlpha(Parameterization config) {
-      new DoubleParameter(ALPHA_ID) //
-          .grab(config, x -> alpha = x);
-    }
-
-    /**
-     * Get the k parameter
-     *
-     * @param config Parameterization
-     */
-    protected void getParameterK(Parameterization config) {
-      new IntParameter(K_ID) //
-          .grab(config, x -> k = x);
     }
   }
 }

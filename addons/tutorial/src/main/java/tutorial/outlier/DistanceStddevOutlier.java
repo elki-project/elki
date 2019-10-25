@@ -20,7 +20,7 @@
  */
 package tutorial.outlier;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -36,6 +36,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
@@ -44,9 +45,11 @@ import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * A simple outlier detection algorithm that computes the standard deviation of
@@ -57,11 +60,16 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <O> Object type
  */
-public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(DistanceStddevOutlier.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of neighbors to get.
@@ -75,7 +83,8 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
    * @param k Number of neighbors to use
    */
   public DistanceStddevOutlier(Distance<? super O> distance, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
   }
 
@@ -118,7 +127,7 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -135,21 +144,26 @@ public class DistanceStddevOutlier<O> extends AbstractDistanceBasedAlgorithm<Dis
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID for parameterization.
      */
     public static final OptionID K_ID = new OptionID("stddevout.k", "Number of neighbors to get for stddev based outlier detection.");
 
     /**
-     * Number of neighbors to get
+     * The distance function to use.
      */
-    int k;
+    protected Distance<? super O> distance;
+
+    /**
+     * Number of neighbors to use.
+     */
+    protected int k;
 
     @Override
     public void configure(Parameterization config) {
-      // The super class has the distance function parameter!
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

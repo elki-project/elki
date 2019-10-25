@@ -34,7 +34,7 @@ import elki.data.model.KMeansModel;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -51,20 +51,14 @@ public class WithinClusterMeanDistanceTest extends AbstractClusterAlgorithmTest 
   public void testOverallDistance() {
     Database db = makeSimpleDatabase(UNITTEST + "quality-measure-test.csv", 7);
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-
-    LloydKMeans<DoubleVector> kmeans = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
+    Clustering<KMeansModel> result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
         .with(KMeans.K_ID, 2) //
         .with(KMeans.INIT_ID, FirstK.class) //
-        .build();
-
-    // run KMeans on database
-    Clustering<KMeansModel> result = kmeans.run(db);
-    final NumberVectorDistance<? super DoubleVector> dist = kmeans.getDistance();
+        .build().run(db);
 
     // Test Cluster Average Overall Distance
     KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistance();
-    final double quality = overall.quality(result, dist, rel);
-
+    final double quality = overall.quality(result, SquaredEuclideanDistance.STATIC, rel);
     assertEquals("Avarage overall distance not as expected.", 0.8888888888888888, quality, 1e-10);
   }
 }

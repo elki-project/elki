@@ -20,7 +20,7 @@
  */
 package tutorial.clustering;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.clustering.hierarchical.SLINK;
@@ -35,13 +35,16 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * This tutorial will step you through implementing a well known clustering
@@ -69,7 +72,7 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
-public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -140,6 +143,11 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
   }
 
   /**
+   * Distance function used.
+   */
+  Distance<? super O> distance;
+
+  /**
    * Current linkage in use.
    */
   Linkage linkage = Linkage.WARD;
@@ -151,7 +159,8 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * @param linkage Linkage strategy
    */
   public NaiveAgglomerativeHierarchicalClustering4(Distance<? super O> distance, Linkage linkage) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.linkage = linkage;
   }
 
@@ -178,7 +187,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !getDistance().isSquared();
+    boolean square = Linkage.WARD.equals(linkage) && !distance.isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
@@ -282,7 +291,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -299,11 +308,16 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
    * 
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID for linkage parameter.
      */
     private static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Current linkage in use.
@@ -312,7 +326,8 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
           .setDefaultValue(Linkage.WARD) //
           .grab(config, x -> linkage = x);

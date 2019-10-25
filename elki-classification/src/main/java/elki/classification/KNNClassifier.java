@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import elki.AbstractAlgorithm;
-import elki.AbstractDistanceBasedAlgorithm;
 import elki.data.ClassLabel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -203,7 +202,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Void> implements Classif
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distanceFunction = x);
       new IntParameter(K_ID, 1)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

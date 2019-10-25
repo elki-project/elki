@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -33,6 +33,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -43,9 +44,11 @@ import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -69,7 +72,7 @@ import net.jafama.FastMath;
     booktitle = "TiCC TR 2012–001", //
     url = "https://www.tilburguniversity.edu/upload/b7bac5b2-9b00-402a-9261-7849aa019fbb_sostr.pdf", //
     bibkey = "tr/tilburg/JanssensHPv12")
-public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class SOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -78,12 +81,17 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
   /**
    * Threshold for optimizing perplexity.
    */
-  final static protected double PERPLEXITY_ERROR = 1e-5;
+  protected static final double PERPLEXITY_ERROR = 1e-5;
 
   /**
    * Maximum number of iterations when optimizing perplexity.
    */
-  final static protected int PERPLEXITY_MAXITER = 50;
+  protected static final int PERPLEXITY_MAXITER = 50;
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Perplexity
@@ -97,13 +105,14 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    * @param h Perplexity
    */
   public SOS(Distance<? super O> distance, double h) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.perplexity = h;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -309,20 +318,26 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, 
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify perplexity
      */
     public static final OptionID PERPLEXITY_ID = new OptionID("sos.perplexity", "Perplexity to use.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Perplexity.
      */
-    double perplexity = 4.5;
+    protected double perplexity = 4.5;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(PERPLEXITY_ID, 4.5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> perplexity = x);

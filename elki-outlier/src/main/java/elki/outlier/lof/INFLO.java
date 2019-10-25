@@ -20,7 +20,7 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
@@ -31,6 +31,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -44,10 +45,12 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Influence Outliers using Symmetric Relationship (INFLO) using two-way search,
@@ -87,11 +90,16 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1007/11731139_68", //
     bibkey = "DBLP:conf/pakdd/JinTHW06")
-public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class INFLO<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(INFLO.class);
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super O> distance;
 
   /**
    * Pruning threshold m.
@@ -101,7 +109,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
   /**
    * Number of neighbors to use.
    */
-  private int kplus1;
+  private int kplus;
 
   /**
    * Constructor with parameters.
@@ -111,9 +119,10 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param k k Parameter
    */
   public INFLO(Distance<? super O> distance, double m, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.m = m;
-    this.kplus1 = k + 1;
+    this.kplus = k + 1;
   }
 
   /**
@@ -127,7 +136,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     // Step one: find the kNN
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus1);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
 
     // Step two: find the RkNN, minus kNN.
     LOG.beginStep(stepprog, 2, "Materialize reverse NN.");
@@ -136,7 +145,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     WritableDataStore<SetDBIDs> knns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, SetDBIDs.class);
     // We first need to convert the kNN into sets, because of performance below.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      knns.put(iditer, DBIDUtil.ensureSet(knnq.getKNNForDBID(iditer, kplus1)));
+      knns.put(iditer, DBIDUtil.ensureSet(knnq.getKNNForDBID(iditer, kplus)));
     }
     // RNNS
     WritableDataStore<ModifiableDBIDs> rnnMinusKNNs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
@@ -228,7 +237,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
         LOG.incrementProcessed(prog);
         continue;
       }
-      final KNNList knn = knnq.getKNNForDBID(iter, kplus1);
+      final KNNList knn = knnq.getKNNForDBID(iter, kplus);
       if(knn.getKNNDistance() == 0.) {
         inflos.putDouble(iter, 1.);
         inflominmax.put(1.);
@@ -245,7 +254,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
-        final double kdist = knnq.getKNNForDBID(niter, kplus1).getKNNDistance();
+        final double kdist = knnq.getKNNForDBID(niter, kplus).getKNNDistance();
         if(kdist <= 0) {
           sum = Double.POSITIVE_INFINITY;
           c++;
@@ -265,7 +274,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -278,7 +287,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify if any object is a Core Object must be a double
      * greater than 0.0
@@ -294,6 +303,11 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     public static final OptionID K_ID = new OptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO score.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * M parameter
      */
     protected double m = 1.0;
@@ -305,7 +319,8 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(M_ID, 1.0)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> m = x);

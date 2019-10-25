@@ -22,7 +22,7 @@ package elki.clustering.kmedoids;
 
 import java.util.Random;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.KMeans;
@@ -35,11 +35,18 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -47,10 +54,12 @@ import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
@@ -89,31 +98,36 @@ import elki.utilities.random.RandomFactory;
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
     url = "https://doi.org/10.1109/TKDE.2002.1033770", //
     bibkey = "DBLP:journals/tkde/NgH02")
-public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class CLARANS<V> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(CLARANS.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
+
+  /**
    * Number of clusters to find.
    */
-  int k;
+  protected int k;
 
   /**
    * Number of samples to draw (i.e. restarts).
    */
-  int numlocal;
+  protected int numlocal;
 
   /**
    * Sampling rate. If less than 1, it is considered to be a relative value.
    */
-  double maxneighbor;
+  protected double maxneighbor;
 
   /**
    * Random factory for initialization.
    */
-  RandomFactory random;
+  protected RandomFactory random;
 
   /**
    * Constructor.
@@ -125,7 +139,8 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    * @param random Random generator
    */
   public CLARANS(Distance<? super V> distance, int k, int numlocal, double maxneighbor, RandomFactory random) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.numlocal = numlocal;
     this.maxneighbor = maxneighbor;
@@ -150,7 +165,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     }
     DBIDs ids = relation.getDBIDs();
     DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
-    final boolean metric = getDistance().isMetric();
+    final boolean metric = distance.isMetric();
 
     // Number of retries, relative rate, or absolute count:
     final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * k * (ids.size() - k) : maxneighbor);
@@ -432,7 +447,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -445,7 +460,7 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
    *
    * @author Erich Schubert
    */
-  public static class Par<V> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V> implements Parameterizer {
     /**
      * The number of restarts to run.
      */
@@ -483,6 +498,11 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
     RandomFactory random;
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
+
+    /**
      * Default sampling rate.
      *
      * @return Default sampling rate.
@@ -493,7 +513,8 @@ public class CLARANS<V> extends AbstractDistanceBasedAlgorithm<Distance<? super 
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

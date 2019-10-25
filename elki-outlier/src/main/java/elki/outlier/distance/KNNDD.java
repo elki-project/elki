@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -38,6 +38,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -48,9 +49,11 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Nearest Neighbor Data Description.
@@ -80,16 +83,21 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 4th Ann. Conf. Advanced School for Computing and Imaging (ASCI'98)", //
     url = "http://prlab.tudelft.nl/sites/default/files/asci_98.pdf", //
     bibkey = "conf/asci/deRidderTD98")
-public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class KNNDD<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNDD.class);
 
   /**
-   * The parameter k (including query point!)
+   * Distance function used.
    */
-  private int k;
+  protected Distance<? super O> distance;
+
+  /**
+   * The parameter k (plus query point!)
+   */
+  protected int kplus;
 
   /**
    * Constructor for a single kNN query.
@@ -98,8 +106,9 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param k Value of k (excluding query point!)
    */
   public KNNDD(Distance<? super O> distance, int k) {
-    super(distance);
-    this.k = k + 1;
+    super();
+    this.distance = distance;
+    this.kplus = k + 1;
   }
 
   /**
@@ -118,7 +127,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
+    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
     WritableDoubleDataStore knnDist = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -126,7 +135,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     DBIDVar var = DBIDUtil.newVar();
     // Find nearest neighbors, and store the distances.
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(it, k);
+      final KNNList knn = knnQuery.getKNNForDBID(it, kplus);
       knnDist.putDouble(it, knn.getKNNDistance());
       neighbor.put(it, knn.assignVar(knn.size() - 1, var));
       LOG.incrementProcessed(prog);
@@ -154,7 +163,7 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -167,13 +176,17 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the k nearest neighbor
      */
     public static final OptionID K_ID = new OptionID("knndd.k", //
-        "The k nearest neighbor, excluding the query point "//
-            + "(i.e. query point is the 0-nearest-neighbor)");
+        "The k nearest neighbor, excluding the query point (i.e. query point is the 0-nearest-neighbor)");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * k parameter
@@ -182,7 +195,8 @@ public class KNNDD<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID, 1)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

@@ -5,8 +5,7 @@
  * (e.g. compute distributions, distance distributions etc.)
  *
  * @opt include .*elki.algorithm.Algorithm
- * @opt include .*elki.algorithm.AbstractDistanceBasedAlgorithm
- * @opt include .*elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm
+ * @opt include .*elki.algorithm.AbstractAlgorithm
  */
 /*
  * This file is part of ELKI:

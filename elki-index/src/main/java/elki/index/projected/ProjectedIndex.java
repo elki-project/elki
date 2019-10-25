@@ -20,8 +20,6 @@
  */
 package elki.index.projected;
 
-import java.util.List;
-
 import elki.data.projection.Projection;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStoreFactory;

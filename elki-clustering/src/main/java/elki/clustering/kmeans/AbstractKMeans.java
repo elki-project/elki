@@ -27,10 +27,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
-import elki.data.*;
+import elki.data.Cluster;
+import elki.data.Clustering;
+import elki.data.DoubleVector;
+import elki.data.NumberVector;
+import elki.data.SparseNumberVector;
 import elki.data.model.KMeansModel;
 import elki.data.model.Model;
 import elki.data.type.CombinedTypeInformation;
@@ -57,12 +61,12 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
 import net.jafama.FastMath;
 
 /**
@@ -76,7 +80,12 @@ import net.jafama.FastMath;
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super V>, Clustering<M>> implements KMeans<V, M> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+  /**
+   * Distance function used.
+   */
+  protected NumberVectorDistance<? super V> distance = SquaredEuclideanDistance.STATIC;
+
   /**
    * Number of cluster centers to initialize.
    */
@@ -95,13 +104,25 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   /**
    * Constructor.
    *
+   * @param k k parameter
+   * @param maxiter Maxiter parameter
+   * @param initializer Function to generate the initial means
+   */
+  public AbstractKMeans(int k, int maxiter, KMeansInitialization initializer) {
+    this(SquaredEuclideanDistance.STATIC, k, maxiter, initializer);
+  }
+
+  /**
+   * Constructor.
+   *
    * @param distance distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
   public AbstractKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.maxiter = maxiter > 0 ? maxiter : Integer.MAX_VALUE;
     this.initializer = initializer;
@@ -109,7 +130,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, getDistance().getInputTypeRestriction()));
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, distance.getInputTypeRestriction()));
   }
 
   /**
@@ -121,7 +142,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    */
   protected double[][] initialMeans(Database database, Relation<V> relation) {
     Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
-    double[][] means = initializer.chooseInitialMeans(relation, k, getDistance());
+    double[][] means = initializer.chooseInitialMeans(relation, k, distance);
     getLogger().statistics(inittime.end());
     return means;
   }
@@ -293,6 +314,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   @Override
   public void setK(int k) {
     this.k = k;
+  }
+
+  @Override
+  public NumberVectorDistance<? super V> getDistance() {
+    return distance;
   }
 
   @Override
@@ -671,7 +697,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @author Erich Schubert
    */
-  public abstract static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super V>> {
+  public abstract static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * k Parameter.
      */
@@ -691,6 +717,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * Compute the final variance statistic (not used by all).
      */
     protected boolean varstat = false;
+
+    /**
+     * The distance function to use.
+     */
+    protected NumberVectorDistance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
@@ -717,7 +748,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterDistance(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super V>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
             this.distance = x;
             if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance) {

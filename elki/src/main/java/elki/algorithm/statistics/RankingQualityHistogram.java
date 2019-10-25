@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
@@ -36,6 +36,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.EvaluateClustering;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -48,9 +49,11 @@ import elki.utilities.datastructures.histogram.DoubleHistogram;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -68,11 +71,16 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<double[]>> {
+public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(RankingQualityHistogram.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Number of bins to use.
@@ -86,7 +94,8 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
    * @param numbins Number of bins
    */
   public RankingQualityHistogram(Distance<? super O> distance, int numbins) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.numbins = numbins;
   }
 
@@ -142,7 +151,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -159,11 +168,16 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option to configure the number of bins to use.
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Number of bins.
@@ -172,7 +186,8 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<D
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 100) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> numbins = x);

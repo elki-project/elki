@@ -23,7 +23,7 @@ package elki.clustering.kmedoids;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
@@ -34,11 +34,20 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.HashSetModifiableDBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
@@ -46,6 +55,7 @@ import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -108,7 +118,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of the Operational Research Society 15.3", //
     url = "https://doi.org/10.1057/jors.1964.47", //
     bibkey = "doi:10.1057/jors.1964.47")
-public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -118,6 +128,11 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
    * Key for statistics logging.
    */
   private static final String KEY = KMedoidsPark.class.getName();
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
 
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
@@ -143,7 +158,8 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
    * @param initializer Function to generate the initial means
    */
   public KMedoidsPark(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.maxiter = maxiter;
     this.initializer = initializer;
@@ -308,7 +324,7 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -321,16 +337,31 @@ public class KMedoidsPark<V> extends AbstractDistanceBasedAlgorithm<Distance<? s
    * 
    * @author Erich Schubert
    */
-  public static class Par<V> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V> implements Parameterizer {
+    /**
+     * The number of clusters to find
+     */
     protected int k;
 
+    /**
+     * The maximum number of iterations
+     */
     protected int maxiter;
 
+    /**
+     * Initialization method.
+     */
     protected KMedoidsInitialization<V> initializer;
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

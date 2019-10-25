@@ -24,7 +24,7 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -37,6 +37,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.pca.PCAResult;
@@ -51,6 +52,7 @@ import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.GreaterConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,7 +79,7 @@ import elki.utilities.optionhandling.parameters.*;
     booktitle = "Proc. IEEE Int. Conf. on Data Mining (ICDM 2012)", //
     url = "https://doi.org/10.1109/ICDM.2012.21", //
     bibkey = "DBLP:conf/icdm/KriegelKSZ12")
-public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super V>, OutlierResult> implements OutlierAlgorithm {
+public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -111,21 +113,6 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   };
 
   /**
-   * Number of neighbors to be considered.
-   */
-  int k;
-
-  /**
-   * Holds the PCA runner.
-   */
-  private PCARunner pca;
-
-  /**
-   * Expected amount of outliers.
-   */
-  double expect = 0.0001;
-
-  /**
    * Score type.
    *
    * @author Erich Schubert
@@ -142,14 +129,34 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
   }
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super V> distance;
+
+  /**
+   * Number of neighbors to be considered.
+   */
+  protected int k;
+
+  /**
+   * Holds the PCA runner.
+   */
+  protected PCARunner pca;
+
+  /**
+   * Expected amount of outliers.
+   */
+  protected double expect = 0.0001;
+
+  /**
    * Type of distribution to assume for distances.
    */
-  DistanceDist dist = DistanceDist.CHISQUARED;
+  protected DistanceDist dist = DistanceDist.CHISQUARED;
 
   /**
    * Include models in output.
    */
-  boolean models;
+  protected boolean models;
 
   /**
    * Constructor.
@@ -162,7 +169,8 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    * @param models Report models
    */
   public COP(Distance<? super V> distance, int k, PCARunner pca, double expect, DistanceDist dist, boolean models) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.pca = pca;
     this.expect = expect;
@@ -310,7 +318,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super V>> {
+  public static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * considered for computing its score, must be an integer greater than 0.
@@ -362,9 +370,15 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
      */
     boolean models = false;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super V> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(new GreaterConstraint(5)) //
           .grab(config, x -> k = x);

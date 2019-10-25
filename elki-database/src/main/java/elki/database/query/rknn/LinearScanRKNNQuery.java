@@ -20,9 +20,6 @@
  */
 package elki.database.query.rknn;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;

@@ -23,21 +23,18 @@ package elki.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialIndexTree;
@@ -54,9 +51,11 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.MissingPrerequisitesException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Joins in a given spatial database to each object its k-nearest neighbors.
@@ -83,16 +82,21 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 @Priority(Priority.DEFAULT - 10) // Mostly used inside others.
-public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<SpatialPrimitiveDistance<? super V>, Relation<KNNList>> {
+public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractAlgorithm<Relation<KNNList>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(KNNJoin.class);
 
   /**
+   * Distance function used.
+   */
+  protected SpatialPrimitiveDistance<? super V> distance;
+
+  /**
    * The k parameter.
    */
-  int k;
+  protected int k;
 
   /**
    * Constructor.
@@ -101,7 +105,8 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param k k parameter
    */
   public KNNJoin(SpatialPrimitiveDistance<? super V> distance, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
   }
 
@@ -147,8 +152,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @return Data store
    */
   public WritableDataStore<KNNList> run(SpatialIndexTree<N, E> index, DBIDs ids) {
-    SpatialPrimitiveDistance<? super V> distFunction = getDistance();
-
     // data pages
     List<E> ps_candidates = new ArrayList<>(index.getLeaves());
     // knn heaps
@@ -156,7 +159,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
     // Initialize with the page self-pairing
     for(int i = 0; i < ps_candidates.size(); i++) {
-      heaps.add(initHeaps(distFunction, index.getNode(ps_candidates.get(i))));
+      heaps.add(initHeaps(distance, index.getNode(ps_candidates.get(i))));
     }
 
     // Build priority queue
@@ -177,10 +180,10 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
         N ps = index.getNode(ps_entry);
         List<KNNHeap> ps_heaps = heaps.get(j);
         double ps_knn_distance = computeStopDistance(ps_heaps);
-        double minDist = distFunction.minDist(pr_entry, ps_entry);
+        double minDist = distance.minDist(pr_entry, ps_entry);
         // Resolve immediately:
         if(minDist <= 0.) {
-          processDataPages(distFunction, pr_heaps, ps_heaps, pr, ps);
+          processDataPages(distance, pr_heaps, ps_heaps, pr, ps);
         }
         else if(minDist <= pr_knn_distance || minDist <= ps_knn_distance) {
           pq.add(new Task(minDist, i, j));
@@ -205,13 +208,13 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
         N pr = index.getNode(ps_candidates.get(task.i));
         N ps = index.getNode(ps_candidates.get(task.j));
         if(dor && dos) {
-          processDataPages(distFunction, pr_heaps, ps_heaps, pr, ps);
+          processDataPages(distance, pr_heaps, ps_heaps, pr, ps);
         }
         else if(dor) {
-          processDataPages(distFunction, pr_heaps, null, pr, ps);
+          processDataPages(distance, pr_heaps, null, pr, ps);
         }
         else /* if(dos) */ {
-          processDataPages(distFunction, ps_heaps, null, ps, pr);
+          processDataPages(distance, ps_heaps, null, ps, pr);
         }
         LOG.incrementProcessed(fprogress);
       }
@@ -360,7 +363,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Par<SpatialPrimitiveDistance<? super V>> {
+  public static class Par<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> implements Parameterizer {
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned, must be
      * an integer greater than 0. Default value: 1.
@@ -372,14 +375,15 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
      */
     protected int k;
 
-    @Override
-    public Class<?> getDistanceRestriction() {
-      return SpatialPrimitiveDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected SpatialPrimitiveDistance<? super V> distance;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

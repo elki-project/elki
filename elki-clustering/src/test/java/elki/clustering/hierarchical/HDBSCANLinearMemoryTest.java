@@ -74,7 +74,7 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
-        .with(HDBSCANLinearMemory.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
+        .with(AbstractAlgorithm.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
   }

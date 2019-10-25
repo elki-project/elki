@@ -20,7 +20,7 @@
  */
 package elki.outlier.distance;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -28,15 +28,18 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Simple distance based outlier detection algorithms.
@@ -57,11 +60,16 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Proc. Int. Conf. on Very Large Databases (VLDB'98)", //
     url = "http://www.vldb.org/conf/1998/p392.pdf", //
     bibkey = "DBLP:conf/vldb/KnorrN98")
-public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public abstract class AbstractDBOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
   /**
    * Radius parameter d.
    */
-  private double d;
+  protected double d;
 
   /**
    * Constructor with actual parameters.
@@ -70,7 +78,8 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * @param d radius d value
    */
   public AbstractDBOutlier(Distance<? super O> distance, double d) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.d = d;
   }
 
@@ -99,7 +108,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -107,7 +116,7 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
    * 
    * @author Erich Schubert
    */
-  public abstract static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public abstract static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the size of the D-neighborhood
      */
@@ -118,18 +127,15 @@ public abstract class AbstractDBOutlier<O> extends AbstractDistanceBasedAlgorith
      */
     protected double d;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config); // Distance function
-      configD(config, distance);
-    }
-
-    /**
-     * Grab the 'd' configuration option.
-     * 
-     * @param config Parameterization
-     */
-    protected void configD(Parameterization config, Distance<?> distance) {
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(D_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> d = x);

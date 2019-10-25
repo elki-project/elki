@@ -20,7 +20,7 @@
  */
 package elki.algorithm.statistics;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
@@ -30,6 +30,7 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.scores.AveragePrecisionEvaluation;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.logging.Logging;
@@ -39,12 +40,10 @@ import elki.result.textwriter.TextWriteable;
 import elki.result.textwriter.TextWriterStream;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.random.RandomFactory;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -64,11 +63,21 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *
  * @param <O> Object type
  */
-public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
+public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(EvaluateRetrievalPerformance.class);
+
+  /**
+   * Prefix for statistics.
+   */
+  private final String PREFIX = this.getClass().getName();
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Relative number of object to use in sampling.
@@ -86,11 +95,6 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   protected boolean includeSelf;
 
   /**
-   * Prefix for statistics.
-   */
-  private final String PREFIX = this.getClass().getName();
-
-  /**
    * K nearest neighbors to use for classification evaluation.
    */
   protected int maxk = 100;
@@ -105,7 +109,8 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    * @param maxk Maximum k for kNN evaluation
    */
   public EvaluateRetrievalPerformance(Distance<? super O> distance, double sampling, RandomFactory random, boolean includeSelf, int maxk) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.sampling = sampling;
     this.random = random;
     this.includeSelf = includeSelf;
@@ -253,8 +258,8 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation cls = new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST);
-    return TypeUtil.array(getDistance().getInputTypeRestriction(), cls);
+    return TypeUtil.array(distance.getInputTypeRestriction(), //
+        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   @Override
@@ -443,7 +448,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to enable sampling.
      */
@@ -463,6 +468,11 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
      * Parameter for maximum value of k.
      */
     public static final OptionID MAXK_ID = new OptionID("map.maxk", "Maximum value of k for kNN evaluation.");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Relative amount of data to sample.
@@ -486,7 +496,8 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //

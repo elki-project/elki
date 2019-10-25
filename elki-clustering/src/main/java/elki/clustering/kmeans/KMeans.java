@@ -20,7 +20,7 @@
  */
 package elki.clustering.kmeans;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
@@ -46,7 +46,7 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
   /**
    * OptionID for the distance function.
    */
-  OptionID DISTANCE_FUNCTION_ID = AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID;
+  OptionID DISTANCE_FUNCTION_ID = AbstractAlgorithm.DISTANCE_FUNCTION_ID;
 
   /**
    * Parameter to specify the initialization method

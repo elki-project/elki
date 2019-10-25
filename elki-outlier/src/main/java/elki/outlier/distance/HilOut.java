@@ -24,7 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -94,11 +94,16 @@ import net.jafama.FastMath;
     booktitle = "Proc. European Conf. Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
     url = "https://doi.org/10.1007/3-540-45681-3_2", //
     bibkey = "DBLP:conf/pkdd/AngiulliP02")
-public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(HilOut.class);
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super O> distance;
 
   /**
    * Number of nearest neighbors
@@ -146,7 +151,10 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * @author Jonathan von Brünken
    */
   public enum ScoreType {
-    All, TopN
+    /** All scores */
+    ALL,
+    /** Top n scores only */
+    TOPN
   }
 
   /**
@@ -157,14 +165,15 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
    * @param h Number of Bits for precision to use - max 32
    * @param tn TopN or All Outlier Rank to return
    */
-  protected HilOut(LPNormDistance distfunc, int k, int n, int h, Enum<ScoreType> tn) {
-    super(distfunc);
+  public HilOut(LPNormDistance distance, int k, int n, int h, Enum<ScoreType> tn) {
+    super();
+    this.distance = distance;
     this.n = n;
     // HilOut does not count the object itself. We do in KNNWeightOutlier.
     this.k = k - 1;
     this.h = h;
     this.tn = tn;
-    this.t = distfunc.getP();
+    this.t = distance.getP();
     this.n_star = 0;
     this.omega_star = 0.0;
   }
@@ -255,7 +264,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     }
     DoubleMinMax minmax = new DoubleMinMax();
     // Return weights in out
-    if(tn == ScoreType.TopN) {
+    if(tn == ScoreType.TOPN) {
       minmax.put(0.0);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         hilout_weight.putDouble(iditer, 0.0);
@@ -961,9 +970,9 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
           .grab(config, x -> n = x);
       new IntParameter(H_ID, 32) //
           .grab(config, x -> h = x);
-      new ObjectParameter<LPNormDistance>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<LPNormDistance>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distfunc = x);
-      new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN) //
+      new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TOPN) //
           .grab(config, x -> tn = x);
     }
 

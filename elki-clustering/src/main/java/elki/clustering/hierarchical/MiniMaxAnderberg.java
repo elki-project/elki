@@ -22,19 +22,27 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
@@ -63,11 +71,16 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED - 5)
-public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxAnderberg<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(MiniMaxAnderberg.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Constructor.
@@ -75,7 +88,8 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
    * @param distance Distance function to use
    */
   public MiniMaxAnderberg(Distance<? super O> distance) {
-    super(distance);
+    super();
+    this.distance = distance;
   }
 
   /**
@@ -346,8 +360,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -364,7 +377,18 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<Distance
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    @Override
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+    }
+
     @Override
     public MiniMaxAnderberg<O> make() {
       return new MiniMaxAnderberg<>(distance);

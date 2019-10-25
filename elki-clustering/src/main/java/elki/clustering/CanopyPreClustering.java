@@ -22,7 +22,7 @@ package elki.clustering;
 
 import java.util.ArrayList;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -37,15 +37,18 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Canopy pre-clustering is a simple preprocessing step for clustering.
@@ -67,11 +70,16 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Proc. 6th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining", //
     url = "https://doi.org/10.1145/347090.347123", //
     bibkey = "DBLP:conf/kdd/McCallumNU00")
-public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class CanopyPreClustering<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(CanopyPreClustering.class);
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super O> distance;
 
   /**
    * Threshold for inclusion
@@ -91,7 +99,8 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
    * @param t2 Exclusion threshold
    */
   public CanopyPreClustering(Distance<? super O> distance, double t1, double t2) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.t1 = t1;
     this.t2 = t2;
   }
@@ -149,7 +158,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -166,7 +175,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
    * 
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for the inclusion threshold of canopy clustering.
      * <p>
@@ -191,9 +200,15 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<Dista
      */
     private double t2;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       DoubleParameter t1P = new DoubleParameter(T1_ID);
       t1P.grab(config, x -> t1 = x);
       DoubleParameter t2P = new DoubleParameter(T2_ID);

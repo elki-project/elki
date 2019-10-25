@@ -68,8 +68,8 @@ public class TopKOutlierScaling implements OutlierScaling {
   /**
    * Constructor.
    * 
-   * @param k
-   * @param binary
+   * @param k Number of elements to keep
+   * @param binary Use binary scores, or retain the top k values
    */
   public TopKOutlierScaling(int k, boolean binary) {
     super();

@@ -217,7 +217,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
               .run(relation), out);
       // Run Simplified-LOF
       runForEachK("SimplifiedLOF", 0, maxk, //
-          k -> new SimplifiedLOF<O>(k, distance) //
+          k -> new SimplifiedLOF<O>(distance, k) //
               .run(relation), out);
       // LoOP
       runForEachK("LoOP", 0, maxk, //
@@ -250,7 +250,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
               .run(relation), out);
       // Run COF
       runForEachK("COF", 0, maxksq, //
-          k -> new COF<O>(k, distance) //
+          k -> new COF<O>(distance, k) //
               .run(relation), out);
       // Run simple Intrinsic dimensionality
       runForEachK("LID", 2, maxk, //

@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
@@ -36,18 +36,17 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVarianceMinMax;
 import elki.result.CollectionResult;
 import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.random.RandomFactory;
 
 /**
@@ -59,11 +58,16 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
-public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, CollectionResult<DoubleVector>> {
+public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(AveragePrecisionAtK.class);
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super O> distance;
 
   /**
    * The parameter k - the number of neighbors to retrieve.
@@ -95,7 +99,8 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
    * @param includeSelf Include query object in evaluation
    */
   public AveragePrecisionAtK(Distance<? super O> distance, int k, double sampling, RandomFactory random, boolean includeSelf) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.k = k;
     this.sampling = sampling;
     this.random = random;
@@ -186,8 +191,8 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation cls = new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST);
-    return TypeUtil.array(getDistance().getInputTypeRestriction(), cls);
+    return TypeUtil.array(distance.getInputTypeRestriction(), //
+        new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
   @Override
@@ -204,7 +209,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter k to compute the average precision at.
      */
@@ -224,6 +229,11 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
      * Parameter to include the query object.
      */
     public static final OptionID INCLUDESELF_ID = new OptionID("avep.includeself", "Include the query object in the evaluation.");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Neighborhood size.
@@ -247,7 +257,8 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<Dista
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

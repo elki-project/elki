@@ -20,7 +20,7 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -40,6 +40,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -56,6 +57,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -101,41 +103,51 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM 2014)", //
     url = "https://doi.org/10.1137/1.9781611973440.63", //
     bibkey = "DBLP:conf/sdm/SchubertZK14")
-public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class KDEOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(KDEOS.class);
 
   /**
-   * Kernel function to use for density estimation.
+   * Significance cutoff when computing kernel density.
    */
-  KernelDensityFunction kernel;
+  private final static double CUTOFF = 1e-20;
 
   /**
-   * Minimum and maximum number of neighbors to use.
+   * Distance function used.
    */
-  int kmin, kmax;
+  protected Distance<? super O> distance;
+
+  /**
+   * Kernel function to use for density estimation.
+   */
+  protected KernelDensityFunction kernel;
+
+  /**
+   * Minimum number of neighbors to use.
+   */
+  protected int kmin;
+
+  /**
+   * Maximum number of neighbors to use.
+   */
+  protected int kmax;
 
   /**
    * Kernel scaling parameter.
    */
-  double scale;
+  protected double scale;
 
   /**
    * Kernel minimum bandwidth.
    */
-  double minBandwidth = 1e-6;
+  protected double minBandwidth = 1e-6;
 
   /**
    * Intrinsic dimensionality.
    */
-  int idim = -1;
-
-  /**
-   * Significance cutoff when computing kernel density.
-   */
-  final static double CUTOFF = 1e-20;
+  protected int idim = -1;
 
   /**
    * Constructor.
@@ -149,7 +161,8 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    * @param idim Intrinsic dimensionality (use 0 to use real dimensionality)
    */
   public KDEOS(Distance<? super O> distance, int kmin, int kmax, KernelDensityFunction kernel, double minBandwidth, double scale, int idim) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.kmin = kmin;
     this.kmax = kmax;
     this.kernel = kernel;
@@ -310,7 +323,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    TypeInformation res = getDistance().getInputTypeRestriction();
+    TypeInformation res = distance.getInputTypeRestriction();
     if(idim < 0) {
       res = new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, res);
     }
@@ -331,7 +344,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the kernel density function.
      */
@@ -363,38 +376,44 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>
     public static final OptionID IDIM_ID = new OptionID("kdeos.idim", "Intrinsic dimensionality of this data set. Use -1 for using the true data dimensionality, but values such as 0-2 often offer better performance.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Kernel function to use for density estimation.
      */
-    KernelDensityFunction kernel;
+    protected KernelDensityFunction kernel;
 
     /**
      * Minimum and maximum number of neighbors to use.
      */
-    int kmin;
+    protected int kmin;
 
     /**
      * Minimum and maximum number of neighbors to use.
      */
-    int kmax;
+    protected int kmax;
 
     /**
      * Kernel scaling parameter.
      */
-    double scale;
+    protected double scale;
 
     /**
      * Kernel minimum bandwidth.
      */
-    double minBandwidth = 0.;
+    protected double minBandwidth = 0.;
 
     /**
      * Intrinsic dimensionality.
      */
-    int idim = -1;
+    protected int idim = -1;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class) //
           .grab(config, x -> kernel = x);
       IntParameter kminP = new IntParameter(KMIN_ID) //

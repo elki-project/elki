@@ -20,7 +20,7 @@
  */
 package elki.clustering.dbscan.predicates;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
@@ -178,7 +178,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBID
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<O>>(AbstractDistanceBasedAlgorithm.Par.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distfun = x);
       // Get the epsilon parameter
       new DoubleParameter(DBSCAN.Par.EPSILON_ID) //

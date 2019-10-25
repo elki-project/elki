@@ -167,7 +167,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
     LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(relation, k_min, getDistance()));
+    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(relation, k_min, distance));
     Clustering<M> clustering = innerKMeans.run(database, relation);
 
     if(prog != null) {
@@ -239,8 +239,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     innerKMeans.setK(2);
     Clustering<M> childClustering = innerKMeans.run(proxyDB);
 
-    double parentEvaluation = informationCriterion.quality(parentClustering, getDistance(), relation);
-    double childrenEvaluation = informationCriterion.quality(childClustering, getDistance(), relation);
+    double parentEvaluation = informationCriterion.quality(parentClustering, distance, relation);
+    double childrenEvaluation = informationCriterion.quality(childClustering, distance, relation);
 
     if(LOG.isDebugging()) {
       LOG.debug("parentEvaluation: " + parentEvaluation);
@@ -263,8 +263,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     // Compute size of cluster/region
     double radius = 0.;
+    NumberVectorDistance<? super V> distance = this.distance; // localize
     for(DBIDIter it = parentCluster.getIDs().iter(); it.valid(); it.advance()) {
-      double d = getDistance().distance(relation.get(it), DoubleVector.wrap(parentCentroid));
+      double d = distance.distance(relation.get(it), DoubleVector.wrap(parentCentroid));
       radius = (d > radius) ? d : radius;
     }
 

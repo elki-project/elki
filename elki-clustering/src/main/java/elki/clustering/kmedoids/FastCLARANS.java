@@ -94,7 +94,7 @@ public class FastCLARANS<V> extends CLARANS<V> {
     }
     DBIDs ids = relation.getDBIDs();
     DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
-    final boolean metric = getDistance().isMetric();
+    final boolean metric = distance.isMetric();
 
     // Number of retries, relative rate, or absolute count:
     final int retries = (int) Math.ceil(maxneighbor < 1 ? maxneighbor * (ids.size() - k) : maxneighbor);

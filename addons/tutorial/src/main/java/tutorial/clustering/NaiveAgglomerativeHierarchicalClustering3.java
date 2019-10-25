@@ -22,7 +22,7 @@ package tutorial.clustering;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.SLINK;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Cluster;
@@ -35,16 +35,19 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
@@ -75,7 +78,7 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
     booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", //
     url = "https://doi.org/10.2307/2344237", //
     bibkey = "doi:10.2307/2344237")
-public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> {
+public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * Class logger
    */
@@ -146,6 +149,11 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
   }
 
   /**
+   * Distance function used.
+   */
+  Distance<? super O> distance;
+
+  /**
    * Threshold, how many clusters to extract.
    */
   int numclusters;
@@ -163,7 +171,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    * @param linkage Linkage strategy
    */
   public NaiveAgglomerativeHierarchicalClustering3(Distance<? super O> distance, int numclusters, Linkage linkage) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.numclusters = numclusters;
     this.linkage = linkage;
   }
@@ -191,7 +200,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !getDistance().isSquared();
+    boolean square = Linkage.WARD.equals(linkage) && !distance.isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
@@ -334,7 +343,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -351,16 +360,21 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID for linkage parameter.
      */
     private static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Desired number of clusters.
      */
-    int numclusters = 0;
+    protected int numclusters = 0;
 
     /**
      * Current linkage in use.
@@ -369,7 +383,8 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numclusters = x);

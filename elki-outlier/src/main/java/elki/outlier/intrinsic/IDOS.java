@@ -20,7 +20,7 @@
  */
 package elki.outlier.intrinsic;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -34,6 +34,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -47,6 +48,7 @@ import elki.result.outlier.QuotientOutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -74,11 +76,16 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "NII Technical Report (NII-2015-003E)", //
     url = "http://www.nii.ac.jp/TechReports/15-003E.html", //
     bibkey = "tr/nii/BrunkenHZ15")
-public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class IDOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(IDOS.class);
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * kNN for the context set (ID computation).
@@ -104,7 +111,8 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @param kr the neighborhood size to use in score computation
    */
   public IDOS(Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.estimator = estimator;
     this.k_c = kc;
     this.k_r = kr;
@@ -205,7 +213,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -219,7 +227,7 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    * @author Jonathan von Brünken
    * @author Erich Schubert
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * The class used for estimating the intrinsic dimensionality.
      */
@@ -235,6 +243,11 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
      * used for the GED computation.
      */
     public static final OptionID KC_ID = new OptionID("idos.kc", "Context set size (ID estimation).");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * Estimator for intrinsic dimensionality.
@@ -253,7 +266,8 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class) //
           .grab(config, x -> estimator = x);
       new IntParameter(KC_ID) //

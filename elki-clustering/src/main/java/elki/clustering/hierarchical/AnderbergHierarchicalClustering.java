@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
@@ -42,6 +42,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -78,16 +79,21 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED)
-public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class AnderbergHierarchicalClustering<O> extends AbstractAlgorithm<PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(AnderbergHierarchicalClustering.class);
 
   /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
+  /**
    * Current linkage method in use.
    */
-  Linkage linkage = WardLinkage.STATIC;
+  protected Linkage linkage = WardLinkage.STATIC;
 
   /**
    * Constructor.
@@ -96,7 +102,8 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    * @param linkage Linkage method
    */
   public AnderbergHierarchicalClustering(Distance<? super O> distance, Linkage linkage) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.linkage = linkage;
   }
 
@@ -226,7 +233,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, linkage.restore(mindist, getDistance().isSquared()), iy);
+    builder.add(ix, linkage.restore(mindist, distance.isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
@@ -354,8 +361,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -372,23 +378,26 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Current linkage in use.
      */
     protected Linkage linkage;
 
-    @Override
-    public Class<?> getDefaultDistance() {
-      return (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) ? SquaredEuclideanDistance.class : EuclideanDistance.class;
-    }
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<Linkage>(AGNES.Par.LINKAGE_ID, Linkage.class) //
           .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> linkage = x);
-      super.configure(config);
+      Class<? extends Distance<?>> defaultD = (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) //
+          ? SquaredEuclideanDistance.class : EuclideanDistance.class;
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, defaultD) //
+          .grab(config, x -> distance = x);
     }
 
     @Override

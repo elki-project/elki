@@ -20,7 +20,7 @@
  */
 package elki.outlier.lof;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -36,6 +36,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
@@ -48,6 +49,7 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.QuotientOutlierScoreMeta;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -65,31 +67,37 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> the type of objects handled by this algorithm
  */
-public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(SimpleKernelDensityLOF.class);
 
   /**
-   * Parameter k.
+   * Number of neighbors + the query point
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * Kernel density function
    */
-  private KernelDensityFunction kernel;
+  protected KernelDensityFunction kernel;
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Constructor.
    *
-   * @param k the value of k
+   * @param k number of neighbors
    * @param kernel Kernel function
    */
   public SimpleKernelDensityLOF(int k, Distance<? super O> distance, KernelDensityFunction kernel) {
-    super(distance);
-    this.k = k + 1; // + query point
+    super();
+    this.distance = distance;
+    this.kplus = k + 1; // + query point
     this.kernel = kernel;
   }
 
@@ -105,14 +113,14 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing densities.");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(it, k);
+      final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
       int count = 0;
       double sum = 0.0;
       // Fast version for double distances
@@ -120,7 +128,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
         if(DBIDUtil.equal(neighbor, it)) {
           continue;
         }
-        double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
+        double max = knnq.getKNNForDBID(neighbor, kplus).getKNNDistance();
         if(max == 0) {
           sum = Double.POSITIVE_INFINITY;
           break;
@@ -146,7 +154,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
       final double lrdp = dens.doubleValue(it);
       final double lof;
       if(lrdp > 0) {
-        final KNNList neighbors = knnq.getKNNForDBID(it, k);
+        final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
         double sum = 0.0;
         int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
@@ -182,7 +190,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
+    return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   @Override
@@ -199,11 +207,16 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    *
    * @param <O> vector type
    */
-  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Option ID for kernel density LOF kernel.
      */
     public static final OptionID KERNEL_ID = new OptionID("kernellof.kernel", "Kernel to use for kernel density LOF.");
+
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
 
     /**
      * The neighborhood size to use.
@@ -213,11 +226,12 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     /**
      * Kernel density function parameter
      */
-    KernelDensityFunction kernel;
+    protected KernelDensityFunction kernel;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //
           .grab(config, x -> k = x);

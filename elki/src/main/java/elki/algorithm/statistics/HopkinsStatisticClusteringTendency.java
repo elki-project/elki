@@ -23,7 +23,7 @@ package elki.algorithm.statistics;
 import java.util.Arrays;
 import java.util.Random;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -36,6 +36,7 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.statistics.DoubleStatistic;
@@ -46,11 +47,13 @@ import elki.math.statistics.distribution.BetaDistribution;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
@@ -78,7 +81,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Annals of Botany, 18(2), 213-227", //
     url = "https://doi.org/10.1093/oxfordjournals.aob.a083391", //
     bibkey = "doi:10.1093/oxfordjournals.aob.a083391")
-public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlgorithm<NumberVectorDistance<? super NumberVector>, Double> {
+public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double> {
   /**
    * The logger for this class.
    */
@@ -115,18 +118,24 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
   private double[] minima = new double[0];
 
   /**
+   * Distance function used.
+   */
+  protected NumberVectorDistance<? super NumberVector> distance;
+
+  /**
    * Constructor.
    *
    * @param distance Distance function
    * @param samplesize Sample size
    * @param random Random generator
    * @param rep Number of repetitions
-   * @param k Nearest neighbor to use
+   * @param k Nearest neighbors to use
    * @param minima Data space minima, may be {@code null} (get from data).
    * @param maxima Data space minima, may be {@code null} (get from data).
    */
   public HopkinsStatisticClusteringTendency(NumberVectorDistance<? super NumberVector> distance, int samplesize, RandomFactory random, int rep, int k, double[] minima, double[] maxima) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.sampleSize = samplesize;
     this.random = random;
     this.rep = rep;
@@ -293,7 +302,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
    *
    * @author Lisa Reichert
    */
-  public static class Par extends AbstractDistanceBasedAlgorithm.Par<NumberVectorDistance<? super NumberVector>> {
+  public static class Par implements Parameterizer {
     /**
      * Sample size.
      */
@@ -326,6 +335,11 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     public static final OptionID K_ID = new OptionID("hopkins.k", "Nearest neighbor to use for the statistic");
 
     /**
+     * The distance function to use.
+     */
+    protected NumberVectorDistance<? super NumberVector> distance;
+
+    /**
      * Sample size.
      */
     protected int sampleSize = 0;
@@ -348,21 +362,17 @@ public class HopkinsStatisticClusteringTendency extends AbstractDistanceBasedAlg
     /**
      * Stores the maximum in each dimension.
      */
-    private double[] maxima = null;
+    protected double[] maxima = null;
 
     /**
      * Stores the minimum in each dimension.
      */
-    private double[] minima = null;
-
-    @Override
-    public Class<?> getDistanceRestriction() {
-      return NumberVectorDistance.class;
-    }
+    protected double[] minima = null;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(REP_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> rep = x);

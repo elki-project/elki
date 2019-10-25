@@ -20,7 +20,7 @@
  */
 package elki.clustering;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -35,15 +35,18 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Leader clustering algorithm.
@@ -68,11 +71,16 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Clustering algorithms", // )
     url = "http://dl.acm.org/citation.cfm?id=540298", //
     bibkey = "books/wiley/Hartigan75/C3")
-public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
+
   /**
    * Maximum distance from leading object,
    */
-  private double threshold;
+  protected double threshold;
 
   /**
    * Constructor.
@@ -81,7 +89,8 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    * @param threshold Maximum distance from leading object
    */
   public Leader(Distance<? super O> distance, double threshold) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.threshold = threshold;
   }
 
@@ -129,7 +138,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -146,7 +155,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Option ID of threshold parameter.
      */
@@ -157,9 +166,15 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O
      */
     private double threshold;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new DoubleParameter(THRESHOLD_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> threshold = x);

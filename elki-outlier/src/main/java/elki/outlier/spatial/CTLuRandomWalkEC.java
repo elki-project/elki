@@ -22,8 +22,7 @@ package elki.outlier.spatial;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.AbstractDistanceBasedAlgorithm;
-import elki.outlier.OutlierAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -32,13 +31,16 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -46,10 +48,12 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -78,11 +82,16 @@ import net.jafama.FastMath;
     booktitle = "Proc. SIGSPATIAL Int. Conf. Advances in Geographic Information Systems", //
     url = "https://doi.org/10.1145/1869790.1869841", //
     bibkey = "DBLP:conf/gis/LiuLC10")
-public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance<? super P>, OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<P> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.
    */
   private static final Logging LOG = Logging.getLogger(CTLuRandomWalkEC.class);
+
+  /**
+   * Distance function used.
+   */
+  private Distance<? super P> distance;
 
   /**
    * Parameter alpha: Attribute difference exponent.
@@ -108,7 +117,8 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
    * @param k Number of neighbors
    */
   public CTLuRandomWalkEC(Distance<? super P> distance, double alpha, double c, int k) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.alpha = alpha;
     this.c = c;
     this.k = k;
@@ -122,7 +132,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
    * @return Outlier result
    */
   public OutlierResult run(Relation<P> spatial, Relation<? extends NumberVector> relation) {
-    DistanceQuery<P> distFunc = getDistance().instantiate(spatial);
+    DistanceQuery<P> distFunc = new QueryBuilder<>(spatial, distance).distanceQuery();
     WritableDataStore<double[]> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
@@ -226,7 +236,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
+    return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
   }
 
   @Override
@@ -243,7 +253,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the number of neighbors.
      */
@@ -274,9 +284,15 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<Distance
      */
     int k;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

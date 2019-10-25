@@ -22,7 +22,7 @@ package elki.clustering.dbscan;
 
 import java.util.ArrayList;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -35,12 +35,18 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.DBIDs;
+import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNQuery;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -50,11 +56,12 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.jafama.FastMath;
 
@@ -82,21 +89,26 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1007/978-3-540-71618-1_82", //
     bibkey = "DBLP:conf/icannga/BiciciY07")
 @Priority(Priority.IMPORTANT)
-public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Class logger.
    */
   private static Logging LOG = Logging.getLogger(LSDBC.class);
 
   /**
-   * kNN parameter.
+   * Number of neighbors (+ query point)
    */
-  protected int k;
+  protected int kplus;
 
   /**
    * Alpha parameter.
    */
   protected double alpha;
+
+  /**
+   * Distance function used.
+   */
+  protected Distance<? super O> distance;
 
   /**
    * Constants used internally.
@@ -112,8 +124,9 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param alpha Alpha parameter
    */
   public LSDBC(Distance<? super O> distance, int k, double alpha) {
-    super(distance);
-    this.k = k + 1; // Skip query point
+    super();
+    this.distance = distance;
+    this.kplus = k + 1; // Skip query point
     this.alpha = alpha;
   }
 
@@ -130,7 +143,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
     final DBIDs ids = relation.getDBIDs();
     LOG.beginStep(stepprog, 1, "Materializing kNN neighborhoods");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(k);
+    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
 
     LOG.beginStep(stepprog, 2, "Sorting by density");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -159,7 +172,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
         continue;
       }
       // Evaluate Neighborhood predicate
-      final KNNList neighbors = knnq.getKNNForDBID(id, k);
+      final KNNList neighbors = knnq.getKNNForDBID(id, kplus);
       // Evaluate Core-Point predicate:
       if(isLocalMaximum(neighbors.getKNNDistance(), neighbors, dens)) {
         double mindens = factor * neighbors.getKNNDistance();
@@ -260,7 +273,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
         clustersize += 1;
         // expandCluster again:
         // Evaluate Neighborhood predicate
-        final KNNList newneighbors = knnq.getKNNForDBID(id, k);
+        final KNNList newneighbors = knnq.getKNNForDBID(id, kplus);
         // Evaluate Core-Point predicate
         if(newneighbors.getKNNDistance() <= maxkdist) {
           activeSet.addDBIDs(newneighbors);
@@ -282,8 +295,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   private void fillDensities(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore dens) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
-      dens.putDouble(iter, neighbors.getKNNDistance());
+      dens.putDouble(iter, knnq.getKNNForDBID(iter, kplus).getKNNDistance());
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -291,7 +303,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -304,7 +316,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    *
    * @author Erich Schubert
    */
-  public static class Par<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Parameter for neighborhood size.
      */
@@ -325,9 +337,15 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
      */
     protected double alpha;
 
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

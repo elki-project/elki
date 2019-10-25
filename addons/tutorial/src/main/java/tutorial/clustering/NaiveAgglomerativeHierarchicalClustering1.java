@@ -22,7 +22,7 @@ package tutorial.clustering;
 
 import java.util.Arrays;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.clustering.hierarchical.SLINK;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Cluster;
@@ -35,12 +35,15 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
@@ -61,11 +64,16 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
  * 
  * @param <O> Object type
  */
-public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, Clustering<Model>> {
+public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(NaiveAgglomerativeHierarchicalClustering1.class);
+
+  /**
+   * Distance function used.
+   */
+  Distance<? super O> distance;
 
   /**
    * Threshold, how many clusters to extract.
@@ -79,7 +87,8 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    * @param numclusters Number of clusters
    */
   public NaiveAgglomerativeHierarchicalClustering1(Distance<? super O> distance, int numclusters) {
-    super(distance);
+    super();
+    this.distance = distance;
     this.numclusters = numclusters;
   }
 
@@ -190,7 +199,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // The input relation must match our distance function:
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -207,15 +216,21 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
+    /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
     /**
      * Desired number of clusters.
      */
-    int numclusters = 0;
+    protected int numclusters = 0;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> numclusters = x);

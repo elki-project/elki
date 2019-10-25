@@ -20,7 +20,7 @@
  */
 package tutorial.outlier;
 
-import elki.AbstractDistanceBasedAlgorithm;
+import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -35,6 +35,7 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
@@ -42,9 +43,11 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
@@ -68,26 +71,32 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 17th Int. Conf. Pattern Recognition (ICPR 2004)", //
     url = "https://doi.org/10.1109/ICPR.2004.1334558", //
     bibkey = "DBLP:conf/icpr/HautamakiKF04")
-public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>, OutlierResult> implements OutlierAlgorithm {
+public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(ODIN.class);
 
   /**
+   * Distance function used.
+   */
+  Distance<? super O> distance;
+
+  /**
    * Number of neighbors for kNN graph.
    */
-  int k;
+  int kplus;
 
   /**
    * Constructor.
    *
    * @param distance Distance function
-   * @param k k parameter
+   * @param k Number of neighbors
    */
   public ODIN(Distance<? super O> distance, int k) {
-    super(distance);
-    this.k = k;
+    super();
+    this.distance = distance;
+    this.kplus = k + 1; // + query point
   }
 
   /**
@@ -112,7 +121,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     // Process all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
-      KNNList neighbors = qb.kNNQuery(k).getKNNForDBID(iter, k);
+      KNNList neighbors = qb.kNNQuery(kplus).getKNNForDBID(iter, kplus);
       // For each neighbor, except ourselves, increase the in-degree:
       for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
         if(DBIDUtil.equal(iter, nei)) {
@@ -131,14 +140,14 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
     // Wrap the result and add metadata.
     // By actually specifying theoretical min, max and baseline, we get a better
     // visualization (try it out - or see the screenshots in the tutorial)!
-    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., ids.size() - 1, k);
+    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(min, max, 0., ids.size() - 1, kplus - 1);
     DoubleRelation rel = new MaterializedDoubleRelation("ODIN In-Degree", ids, scores);
     return new OutlierResult(meta, rel);
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistance().getInputTypeRestriction());
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -155,24 +164,26 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<Distance<? super O>,
    *
    * @param <O> Object type
    */
-  public static class Par<O> extends AbstractDistanceBasedAlgorithm.Par<Distance<? super O>> {
+  public static class Par<O> implements Parameterizer {
     /**
-     * Parameter for the number of nearest neighbors:
-     *
-     * <pre>
-     * -odin.k &lt;int&gt;
-     * </pre>
+     * Parameter for the number of nearest neighbors.
      */
     public static final OptionID K_ID = new OptionID("odin.k", "Number of neighbors to use for kNN graph.");
 
     /**
+     * The distance function to use.
+     */
+    protected Distance<? super O> distance;
+
+    /**
      * Number of nearest neighbors to use.
      */
-    int k;
+    protected int k;
 
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
       new IntParameter(K_ID)//
           // Since in a database context, the 1 nearest neighbor
           // will usually be the query object itself, we require
