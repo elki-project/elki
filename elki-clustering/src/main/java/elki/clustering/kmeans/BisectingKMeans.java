@@ -168,11 +168,6 @@ public class BisectingKMeans<V extends NumberVector, M extends MeanModel> extend
     innerkMeans.setInitializer(init);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

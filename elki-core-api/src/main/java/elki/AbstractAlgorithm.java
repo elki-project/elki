@@ -26,9 +26,7 @@ import java.util.Arrays;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.utilities.exceptions.APIViolationException;
-import elki.utilities.optionhandling.OptionID;
 
 /**
  * This class serves also as a model of implementing an algorithm within this
@@ -102,24 +100,4 @@ public abstract class AbstractAlgorithm<R> implements Algorithm {
       throw new APIViolationException("Invoking the real 'run' method failed.", e);
     }
   }
-
-  @Override
-  public abstract TypeInformation[] getInputTypeRestriction();
-
-  /**
-   * Get the (STATIC) logger for this class.
-   *
-   * @return the static logger
-   */
-  protected abstract Logging getLogger();
-
-  /**
-   * Parameter to specify the algorithm to run.
-   */
-  public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
-
-  /**
-   * OptionID for the distance function.
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 }

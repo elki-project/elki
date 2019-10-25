@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -288,11 +289,6 @@ public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
@@ -371,7 +367,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractAlgorithm<Double
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(REP_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

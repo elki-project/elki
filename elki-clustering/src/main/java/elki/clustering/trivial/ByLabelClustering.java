@@ -35,31 +35,36 @@ import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.*;
+import elki.database.ids.DBID;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.HashSetModifiableDBIDs;
+import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Pseudo clustering using labels.
- * 
+ * <p>
  * This "algorithm" puts elements into the same cluster when they agree in their
  * labels. I.e. it just uses a predefined clustering, and is mostly useful for
  * testing and evaluation (e.g. comparing the result of a real algorithm to a
  * reference result / golden standard).
- * 
+ * <p>
  * If an assignment of an object to multiple clusters is desired, the labels of
  * the object indicating the clusters need to be separated by blanks and the
  * flag {@link Par#MULTIPLE_ID} needs to be set.
- * 
+ * <p>
  * TODO: handling of data sets with no labels?
  * 
  * @author Erich Schubert
@@ -71,11 +76,6 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
 @Description("Cluster points by a (pre-assigned!) label. For comparing results with a reference clustering.")
 @Priority(Priority.SUPPLEMENTARY)
 public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(ByLabelClustering.class);
-
   /**
    * Allow multiple cluster assignment.
    */
@@ -218,11 +218,6 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.GUESSED_LABEL);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

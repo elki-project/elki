@@ -23,6 +23,7 @@ package elki.clustering.hierarchical;
 import java.util.Arrays;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
@@ -364,11 +365,6 @@ public class AnderbergHierarchicalClustering<O> extends AbstractAlgorithm<Pointe
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -396,7 +392,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractAlgorithm<Pointe
           .grab(config, x -> linkage = x);
       Class<? extends Distance<?>> defaultD = (linkage instanceof WardLinkage || linkage instanceof CentroidLinkage) //
           ? SquaredEuclideanDistance.class : EuclideanDistance.class;
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, defaultD) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, defaultD) //
           .grab(config, x -> distance = x);
     }
 

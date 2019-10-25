@@ -20,7 +20,6 @@
  */
 package elki.outlier.spatial;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -35,8 +34,8 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -72,11 +71,6 @@ import elki.utilities.documentation.Title;
     url = "https://doi.org/10.1007/s10115-005-0200-2", //
     bibkey = "DBLP:journals/kais/ChawlaS06")
 public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(SLOM.class);
-
   /**
    * Constructor.
    * 
@@ -193,11 +187,6 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   @Override

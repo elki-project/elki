@@ -21,6 +21,7 @@
 package tutorial.outlier;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -37,7 +38,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
 import elki.outlier.OutlierAlgorithm;
@@ -61,11 +61,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(DistanceStddevOutlier.class);
-
   /**
    * Distance function used.
    */
@@ -130,11 +125,6 @@ public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> i
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -162,7 +152,7 @@ public class DistanceStddevOutlier<O> extends AbstractAlgorithm<OutlierResult> i
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

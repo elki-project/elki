@@ -620,11 +620,6 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * OPTICS variant used by DiSH internally.
    *

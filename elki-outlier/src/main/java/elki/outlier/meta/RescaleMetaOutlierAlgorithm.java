@@ -20,7 +20,6 @@
  */
 package elki.outlier.meta;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
@@ -31,15 +30,15 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.scaling.ScalingFunction;
@@ -54,16 +53,6 @@ import elki.utilities.scaling.outlier.OutlierScaling;
  * @composed - - - OutlierAlgorithm
  */
 public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(RescaleMetaOutlierAlgorithm.class);
-
-  /**
-   * Parameter to specify a scaling function to use.
-   */
-  public static final OptionID SCALING_ID = new OptionID("metaoutlier.scaling", "Class to use as scaling function.");
-
   /**
    * Holds the algorithm to run.
    */
@@ -128,11 +117,6 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return algorithm.getInputTypeRestriction();
   }
@@ -143,6 +127,11 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
+    /**
+     * Parameter to specify a scaling function to use.
+     */
+    public static final OptionID SCALING_ID = new OptionID("metaoutlier.scaling", "Class to use as scaling function.");
+
     /**
      * Holds the algorithm to run.
      */
@@ -155,7 +144,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Algorithm>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class) //
+      new ObjectParameter<Algorithm>(Algorithm.Utils.ALGORITHM_ID, OutlierAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
           .grab(config, x -> scaling = x);

@@ -22,7 +22,6 @@ package elki.outlier.clustering;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.em.EM;
-import elki.outlier.OutlierAlgorithm;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -35,7 +34,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -65,11 +64,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 @Title("EM Outlier: Outlier Detection based on the generic EM clustering")
 @Description("The outlier score assigned is based on the highest cluster probability obtained from EM clustering.")
 public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(EMOutlier.class);
-
   /**
    * Inner algorithm.
    */
@@ -128,11 +122,6 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

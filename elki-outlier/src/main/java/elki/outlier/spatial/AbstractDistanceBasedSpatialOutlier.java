@@ -20,7 +20,7 @@
  */
 package elki.outlier.spatial;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.distance.Distance;
 import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -89,7 +89,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O> extends Abstract
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<PrimitiveDistance<O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<PrimitiveDistance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
     }
   }

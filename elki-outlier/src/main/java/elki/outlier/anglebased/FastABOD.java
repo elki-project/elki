@@ -36,7 +36,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
 import elki.result.outlier.InvertedOutlierScoreMeta;
@@ -82,11 +81,6 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/1401890.1401946", //
     bibkey = "DBLP:conf/kdd/KriegelSZ08")
 public class FastABOD<V extends NumberVector> extends ABOD<V> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(FastABOD.class);
-
   /**
    * Number of nearest neighbors.
    */
@@ -260,11 +254,6 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

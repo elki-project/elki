@@ -21,6 +21,7 @@
 package elki.algorithm.statistics;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
@@ -262,11 +263,6 @@ public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateR
         new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Evaluate kNN retrieval performance.
    *
@@ -496,7 +492,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractAlgorithm<EvaluateR
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

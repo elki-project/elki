@@ -21,6 +21,7 @@
 package elki.outlier.distance;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -304,11 +305,6 @@ public class SOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
     return FastMath.log(sumP) - mbeta * sum;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -336,7 +332,7 @@ public class SOS<O> extends AbstractAlgorithm<OutlierResult> implements OutlierA
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(PERPLEXITY_ID, 4.5) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

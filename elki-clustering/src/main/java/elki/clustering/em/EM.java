@@ -382,11 +382,6 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * @return the soft
    */

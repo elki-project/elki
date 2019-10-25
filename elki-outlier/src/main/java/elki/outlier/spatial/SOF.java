@@ -20,7 +20,6 @@
  */
 package elki.outlier.spatial;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -34,8 +33,8 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -73,11 +72,6 @@ import elki.utilities.documentation.Title;
     bibkey = "DBLP:conf/icig/HuangQ04")
 public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(SOF.class);
-
-  /**
    * Constructor.
    * 
    * @param npred Neighborhood predicate
@@ -86,11 +80,6 @@ public class SOF<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
    */
   public SOF(NeighborSetPredicate.Factory<N> npred, PrimitiveDistance<O> nonSpatialDistance) {
     super(npred, nonSpatialDistance);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

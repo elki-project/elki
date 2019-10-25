@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.NumberVector;
@@ -182,11 +183,6 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgo
     return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -214,7 +210,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractAlgo
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

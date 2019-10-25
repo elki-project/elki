@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
@@ -47,7 +47,7 @@ public class SLINKHDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
         .with(SLINKHDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, clustering, 0.686953412);

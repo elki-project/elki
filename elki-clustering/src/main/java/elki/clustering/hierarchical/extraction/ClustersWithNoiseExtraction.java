@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.extraction;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
@@ -332,7 +332,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
+      new ObjectParameter<HierarchicalClusteringAlgorithm>(Algorithm.Utils.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

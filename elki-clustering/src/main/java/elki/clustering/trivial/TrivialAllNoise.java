@@ -30,7 +30,6 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
@@ -38,7 +37,7 @@ import elki.utilities.documentation.Title;
 
 /**
  * Trivial pseudo-clustering that just considers all points to be noise.
- * 
+ * <p>
  * Useful for evaluation and testing.
  * 
  * @author Erich Schubert
@@ -48,11 +47,6 @@ import elki.utilities.documentation.Title;
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")
 @Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(TrivialAllNoise.class);
-
   /**
    * Constructor.
    */
@@ -72,10 +66,5 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

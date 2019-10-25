@@ -137,11 +137,6 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
     innerkMeans.setInitializer(init);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

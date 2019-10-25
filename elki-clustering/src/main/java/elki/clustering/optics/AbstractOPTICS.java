@@ -21,6 +21,7 @@
 package elki.clustering.optics;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.relation.Relation;
@@ -148,7 +149,7 @@ public abstract class AbstractOPTICS<O> extends AbstractAlgorithm<ClusterOrder> 
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(EPSILON_ID) //
           .setOptional(true) //

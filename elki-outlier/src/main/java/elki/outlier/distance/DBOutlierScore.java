@@ -97,11 +97,6 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
     return scores;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

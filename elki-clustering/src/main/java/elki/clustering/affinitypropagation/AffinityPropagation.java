@@ -318,11 +318,6 @@ public class AffinityPropagation<O> extends AbstractAlgorithm<Clustering<MedoidM
     return TypeUtil.array(initialization.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

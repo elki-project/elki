@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.clustering.hierarchical.linkage.*;
@@ -47,7 +47,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, SingleLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.6829722);
@@ -63,7 +63,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.93866265);
@@ -79,7 +79,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.93866265);
@@ -95,7 +95,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, WeightedAverageLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.93866265);
@@ -111,7 +111,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, CompleteLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.938167802);
@@ -127,7 +127,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.93866265);
@@ -143,7 +143,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, MedianLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9386626);
@@ -159,7 +159,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, MinimumVarianceLinkage.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.93866265);
@@ -175,7 +175,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, FlexibleBetaLinkage.class) //
         .with(FlexibleBetaLinkage.Par.BETA_ID, -.33) //
         .build().run(db);

@@ -21,6 +21,7 @@
 package elki.clustering;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -72,6 +73,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "http://dl.acm.org/citation.cfm?id=540298", //
     bibkey = "books/wiley/Hartigan75/C3")
 public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> implements ClusteringAlgorithm<Clustering<PrototypeModel<O>>> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(Leader.class);
+
   /**
    * Distance function used.
    */
@@ -131,19 +137,9 @@ public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> 
     return clustering;
   }
 
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(Leader.class);
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(distance.getInputTypeRestriction());
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**
@@ -173,7 +169,7 @@ public class Leader<O> extends AbstractAlgorithm<Clustering<PrototypeModel<O>>> 
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(THRESHOLD_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //

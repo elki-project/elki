@@ -415,11 +415,6 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     return TypeUtil.array(NumberVector.FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

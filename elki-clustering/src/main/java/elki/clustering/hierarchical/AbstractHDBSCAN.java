@@ -21,6 +21,7 @@
 package elki.clustering.hierarchical;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -297,6 +298,13 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractAlgorithm<R> {
   }
 
   /**
+   * Get the (STATIC) logger for this class.
+   *
+   * @return the static logger
+   */
+  protected abstract Logging getLogger();
+
+  /**
    * Parameterization class
    *
    * @author Erich Schubert
@@ -323,7 +331,7 @@ public abstract class AbstractHDBSCAN<O, R> extends AbstractAlgorithm<R> {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(MIN_PTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

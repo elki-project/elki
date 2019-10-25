@@ -797,11 +797,6 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

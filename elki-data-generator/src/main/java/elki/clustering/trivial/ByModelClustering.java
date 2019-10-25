@@ -36,19 +36,18 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Pseudo clustering using annotated models.
- * 
+ * <p>
  * This "algorithm" puts elements into the same cluster when they agree in their
  * model. I.e. it just uses a predefined clustering, and is mostly useful for
  * testing and evaluation (e.g. comparing the result of a real algorithm to the
@@ -63,11 +62,6 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
 @Description("Cluster points by a (pre-assigned!) model. For comparing results with a reference clustering.")
 @Priority(Priority.SUPPLEMENTARY - 5)
 public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(ByModelClustering.class);
-
   /**
    * Pattern to recognize noise clusters with.
    */
@@ -126,11 +120,6 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(Model.TYPE);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

@@ -23,6 +23,7 @@ package elki.outlier.lof;
 import java.util.Arrays;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -396,11 +397,6 @@ public class LOCI<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -449,7 +445,7 @@ public class LOCI<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(RMAX_ID) //
           .grab(config, x -> rmax = x);

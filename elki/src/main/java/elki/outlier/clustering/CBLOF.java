@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.SortMeans;
 import elki.data.Cluster;
@@ -266,11 +267,6 @@ public class CBLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -326,7 +322,7 @@ public class CBLOF<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super O>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(ALPHPA_ID)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE)//

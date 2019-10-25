@@ -63,9 +63,7 @@ public abstract class AbstractClassifier<O, R> extends AbstractAlgorithm<R> impl
     for(int i = 0; i2.hasNext();) {
       ClassLabel l = i2.next();
       int idx = l1.indexOf(l);
-      if(idx < 0 && getLogger().isDebuggingFiner()) {
-        getLogger().debugFiner("Label not found: " + l);
-      }
+      assert idx >= 0 : "Label not found: " + l;
       d2[i] = (idx >= 0) ? d1[idx] : 0.; // Default to 0 for unknown labels!
     }
     return d2;

@@ -20,7 +20,6 @@
  */
 package elki.outlier.spatial;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -34,9 +33,9 @@ import elki.database.ids.DBIDs;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -73,11 +72,6 @@ import elki.utilities.documentation.Title;
     url = "https://doi.org/10.1109/ICDM.2003.1250986", //
     bibkey = "DBLP:conf/icdm/LuCK03")
 public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(CTLuMedianAlgorithm.class);
-
   /**
    * Constructor.
    * 
@@ -142,11 +136,6 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     Metadata.hierarchyOf(or).addChild(npred);
     return or;
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   @Override

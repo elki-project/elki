@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
@@ -47,7 +47,7 @@ public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, MiniMaxAnderberg.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.938662648);
     testClusterSizes(clustering, new int[] { 200, 211, 227 });
@@ -62,7 +62,7 @@ public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, MiniMaxAnderberg.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, MiniMaxAnderberg.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.914592130);
     testClusterSizes(clustering, new int[] { 59, 112, 159 });

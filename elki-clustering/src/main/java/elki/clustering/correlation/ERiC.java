@@ -354,11 +354,6 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Class to wrap the ERiC settings.
    * 

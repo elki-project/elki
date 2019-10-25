@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
@@ -48,7 +48,7 @@ public class CLINKTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 2) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, CLINK.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, CLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.5147426);
     testClusterSizes(clustering, new int[] { 131, 507 });

@@ -21,6 +21,7 @@
 package elki.clustering.kmedoids;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.KMeans;
@@ -405,7 +406,9 @@ public class PAM<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implement
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
+  /**
+   * Get the static class logger.
+   */
   protected Logging getLogger() {
     return LOG;
   }
@@ -438,7 +441,7 @@ public class PAM<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implement
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

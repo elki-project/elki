@@ -205,11 +205,6 @@ public class NNChain<O> extends AGNES<O> {
     return -1;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

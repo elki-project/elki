@@ -23,6 +23,7 @@ package elki.algorithm.statistics;
 import java.util.*;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
@@ -395,11 +396,6 @@ public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<Collecti
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -447,7 +443,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractAlgorithm<Collecti
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

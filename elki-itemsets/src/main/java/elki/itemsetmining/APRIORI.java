@@ -582,11 +582,6 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
     return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

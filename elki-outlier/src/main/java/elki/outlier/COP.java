@@ -25,6 +25,7 @@ import static elki.math.linearalgebra.VMath.*;
 import java.util.Arrays;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -308,11 +309,6 @@ public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -377,7 +373,7 @@ public class COP<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(new GreaterConstraint(5)) //

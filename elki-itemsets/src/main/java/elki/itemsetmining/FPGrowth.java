@@ -668,11 +668,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

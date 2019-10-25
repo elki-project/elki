@@ -235,11 +235,6 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

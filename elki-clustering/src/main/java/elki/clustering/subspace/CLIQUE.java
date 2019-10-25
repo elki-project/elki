@@ -503,11 +503,6 @@ public class CLIQUE extends AbstractAlgorithm<Clustering<SubspaceModel>> impleme
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

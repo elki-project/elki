@@ -23,6 +23,7 @@ package elki.clustering;
 import java.util.ArrayList;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -227,13 +228,8 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAl
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
-   * Par.
+   * Parameterizer.
    * 
    * @author Erich Schubert
    * 
@@ -269,7 +265,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractAl
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class) //
           .grab(config, x -> kernel = x);

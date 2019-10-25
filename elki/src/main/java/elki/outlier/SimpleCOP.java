@@ -23,6 +23,7 @@ package elki.outlier;
 import static elki.math.linearalgebra.VMath.times;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.algorithm.DependencyDerivator;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
@@ -171,11 +172,6 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -216,7 +212,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractAlgorithm<Outlier
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

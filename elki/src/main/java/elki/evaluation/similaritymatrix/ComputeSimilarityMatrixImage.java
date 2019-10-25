@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.database.Database;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.ArrayModifiableDBIDs;
@@ -340,7 +340,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
           .setOptional(true) //

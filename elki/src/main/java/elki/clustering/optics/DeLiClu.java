@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.algorithm.KNNJoin;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -349,11 +350,6 @@ public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOr
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Encapsulates an entry in the cluster order.
    */
@@ -475,7 +471,7 @@ public class DeLiClu<V extends NumberVector> extends AbstractAlgorithm<ClusterOr
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

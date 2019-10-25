@@ -36,7 +36,6 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -72,11 +71,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
     url = "https://doi.org/10.1023/A:1009783824328", //
     bibkey = "DBLP:journals/datamine/ZhangRL97")
 public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(BIRCHLeafClustering.class);
-
   /**
    * CFTree factory.
    */
@@ -129,11 +123,6 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

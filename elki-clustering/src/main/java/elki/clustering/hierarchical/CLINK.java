@@ -20,6 +20,7 @@
  */
 package elki.clustering.hierarchical;
 
+import elki.Algorithm;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.ArrayDBIDs;
@@ -228,7 +229,7 @@ public class CLINK<O> extends SLINK<O> {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
     }
 

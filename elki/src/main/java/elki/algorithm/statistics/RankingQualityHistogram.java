@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.trivial.ByLabelOrAllInOneClustering;
 import elki.data.Cluster;
 import elki.data.model.Model;
@@ -154,11 +155,6 @@ public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResu
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -186,7 +182,7 @@ public class RankingQualityHistogram<O> extends AbstractAlgorithm<CollectionResu
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(HISTOGRAM_BINS_ID, 100) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

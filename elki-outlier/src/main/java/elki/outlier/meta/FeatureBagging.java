@@ -237,11 +237,6 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }

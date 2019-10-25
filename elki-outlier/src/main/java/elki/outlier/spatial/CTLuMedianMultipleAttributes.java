@@ -88,11 +88,6 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
     super(npredf);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Run the algorithm
    * 

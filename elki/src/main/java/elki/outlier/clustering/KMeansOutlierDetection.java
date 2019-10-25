@@ -42,7 +42,6 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -72,11 +71,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(KMeansOutlierDetection.class);
-
   /**
    * Clustering algorithm to use
    */
@@ -129,11 +123,6 @@ public class KMeansOutlierDetection<O extends NumberVector> extends AbstractAlgo
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(clusterer.getDistance().getInputTypeRestriction());
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

@@ -25,12 +25,11 @@ import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.PreDeConCorePredicate;
 import elki.clustering.dbscan.predicates.PreDeConNeighborPredicate;
 import elki.data.NumberVector;
-import elki.logging.Logging;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -66,22 +65,12 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     bibkey = "DBLP:conf/icdm/BohmKKK04")
 public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(PreDeCon.class);
-
-  /**
    * Constructor.
    * 
    * @param settings PreDeCon settings.
    */
   public PreDeCon(PreDeCon.Settings settings) {
     super(new PreDeConNeighborPredicate<>(settings), new PreDeConCorePredicate(settings), false);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

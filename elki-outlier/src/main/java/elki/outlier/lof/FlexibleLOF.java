@@ -21,6 +21,7 @@
 package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -300,11 +301,6 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     return TypeUtil.array(type);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Encapsulates information like the neighborhood, the LRD and LOF values of
    * the objects during a run of the {@link FlexibleLOF} algorithm.
@@ -502,7 +498,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> kreach = x);
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       reachabilityDistance = distance;
       new ObjectParameter<Distance<O>>(REACHABILITY_DISTANCE_FUNCTION_ID, Distance.class) //

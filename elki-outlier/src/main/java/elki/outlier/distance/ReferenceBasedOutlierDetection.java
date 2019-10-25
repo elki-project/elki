@@ -23,6 +23,7 @@ package elki.outlier.distance;
 import java.util.Collection;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -37,7 +38,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
@@ -87,11 +87,6 @@ import elki.utilities.referencepoints.ReferencePointsHeuristic;
     url = "https://doi.org/10.1109/ICDM.2006.17", //
     bibkey = "DBLP:conf/icdm/PeiZG06")
 public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(ReferenceBasedOutlierDetection.class);
-
   /**
    * Distance function used.
    */
@@ -270,11 +265,6 @@ public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierRes
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -309,7 +299,7 @@ public class ReferenceBasedOutlierDetection extends AbstractAlgorithm<OutlierRes
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super NumberVector>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

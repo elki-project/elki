@@ -23,6 +23,7 @@ package elki.clustering.uncertain;
 import java.util.*;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmedoids.PAM;
 import elki.data.Cluster;
@@ -313,11 +314,6 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return RepresentativeUncertainClustering.LOG;
-  }
-
   /**
    * Representativeness evaluation result.
    *
@@ -441,7 +437,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
           .grab(config, x -> distance = x);
       // Configure Distance function
       ListParameterization predef = new ListParameterization() //
-          .addParameter(AbstractAlgorithm.DISTANCE_FUNCTION_ID, distance);
+          .addParameter(Algorithm.Utils.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);

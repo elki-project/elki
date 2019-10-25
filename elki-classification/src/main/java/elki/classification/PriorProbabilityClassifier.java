@@ -28,10 +28,8 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
-
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -46,11 +44,6 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")
 public class PriorProbabilityClassifier extends AbstractClassifier<Object, Void> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(PriorProbabilityClassifier.class);
-
   /**
    * Holds the prior probabilities.
    */
@@ -123,10 +116,5 @@ public class PriorProbabilityClassifier extends AbstractClassifier<Object, Void>
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

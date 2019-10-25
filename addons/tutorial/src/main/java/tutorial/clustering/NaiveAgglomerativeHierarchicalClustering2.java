@@ -23,6 +23,7 @@ package tutorial.clustering;
 import java.util.Arrays;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.hierarchical.SLINK;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Cluster;
@@ -239,11 +240,6 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractAlgori
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -266,7 +262,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractAlgori
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

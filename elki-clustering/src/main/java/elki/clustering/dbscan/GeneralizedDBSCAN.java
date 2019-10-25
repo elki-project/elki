@@ -135,11 +135,6 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     return TypeUtil.array(npred.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Instance for a particular data set.
    *

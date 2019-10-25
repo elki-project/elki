@@ -210,11 +210,6 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     return TypeUtil.array(EuclideanDistance.STATIC.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

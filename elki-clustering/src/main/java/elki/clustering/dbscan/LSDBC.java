@@ -23,6 +23,7 @@ package elki.clustering.dbscan;
 import java.util.ArrayList;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -306,11 +307,6 @@ public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -344,7 +340,7 @@ public class LSDBC<O extends NumberVector> extends AbstractAlgorithm<Clustering<
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

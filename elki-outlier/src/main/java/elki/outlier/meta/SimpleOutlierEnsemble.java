@@ -148,11 +148,6 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     TypeInformation[] trs = new TypeInformation[algorithms.size()];
     for(int i = 0; i < trs.length; i++) {
@@ -185,7 +180,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectListParameter<OutlierAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, OutlierAlgorithm.class) //
+      new ObjectListParameter<OutlierAlgorithm>(Algorithm.Utils.ALGORITHM_ID, OutlierAlgorithm.class) //
           .grab(config, x -> algorithms = x);
       new ObjectParameter<EnsembleVoting>(VOTING_ID, EnsembleVoting.class) //
           .grab(config, x -> voting = x);

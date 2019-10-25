@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.extraction;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
@@ -441,7 +441,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<HierarchicalClusteringAlgorithm>(AbstractAlgorithm.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
+      new ObjectParameter<HierarchicalClusteringAlgorithm>(Algorithm.Utils.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new Flag(HIERARCHICAL_ID).grab(config, x -> hierarchical = x);
     }

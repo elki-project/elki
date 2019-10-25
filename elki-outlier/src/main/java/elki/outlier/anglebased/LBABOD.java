@@ -240,11 +240,6 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

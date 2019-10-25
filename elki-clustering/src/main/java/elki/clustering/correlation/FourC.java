@@ -27,13 +27,12 @@ import elki.clustering.dbscan.predicates.FourCNeighborPredicate;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.logging.Logging;
 import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -70,11 +69,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     bibkey = "DBLP:conf/sigmod/BohmKKZ04")
 public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(FourC.class);
-
-  /**
    * Constructor.
    *
    * @param settings FourC settings.
@@ -86,11 +80,6 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

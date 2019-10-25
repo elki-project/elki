@@ -316,11 +316,6 @@ public class FastCLARANS<V> extends CLARANS<V> {
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

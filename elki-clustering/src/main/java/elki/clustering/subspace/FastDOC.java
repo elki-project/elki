@@ -157,11 +157,6 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
     return (C.size() >= minClusterSize) ? makeCluster(relation, C, D) : null;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

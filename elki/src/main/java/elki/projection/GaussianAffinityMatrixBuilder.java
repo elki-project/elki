@@ -20,7 +20,7 @@
  */
 package elki.projection;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
@@ -252,7 +252,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(SIGMA_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

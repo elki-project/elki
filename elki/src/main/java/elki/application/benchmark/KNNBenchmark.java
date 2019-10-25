@@ -20,7 +20,7 @@
  */
 package elki.application.benchmark;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
@@ -241,7 +241,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      new ObjectParameter<Distance<? super O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

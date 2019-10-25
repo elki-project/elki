@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.DoubleVector;
 import elki.data.LabelList;
 import elki.data.type.AlternativeTypeInformation;
@@ -195,11 +196,6 @@ public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<D
         new AlternativeTypeInformation(TypeUtil.CLASSLABEL, TypeUtil.LABELLIST));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -257,7 +253,7 @@ public class AveragePrecisionAtK<O> extends AbstractAlgorithm<CollectionResult<D
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.Cluster;
@@ -330,6 +331,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   public void setInitializer(KMeansInitialization init) {
     this.initializer = init;
   }
+
+  /**
+   * Get the (STATIC) logger for this class.
+   *
+   * @return the static logger
+   */
+  protected abstract Logging getLogger();
 
   /**
    * Inner instance for a run, for better encapsulation, that encapsulates the
@@ -748,7 +756,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
      * @param config Parameterization
      */
     protected void getParameterDistance(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super V>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
             this.distance = x;
             if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance) {

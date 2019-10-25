@@ -35,7 +35,6 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CovarianceMatrix;
@@ -46,8 +45,8 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -81,11 +80,6 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.7916/D8C53SKF", //
     bibkey = "DBLP:conf/icml/Eskin00")
 public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(GaussianUniformMixture.class);
-
   /**
    * Maximum number of iterations to do.
    */
@@ -213,11 +207,6 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

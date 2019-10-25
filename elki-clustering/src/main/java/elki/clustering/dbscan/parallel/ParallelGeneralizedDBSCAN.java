@@ -158,11 +158,6 @@ public class ParallelGeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Mode
     return TypeUtil.array(npred.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Instance for a particular data set.
    *

@@ -22,7 +22,6 @@ package elki.workflow;
 
 import java.util.List;
 
-import elki.AbstractAlgorithm;
 import elki.Algorithm;
 import elki.database.Database;
 import elki.index.Index;
@@ -151,7 +150,7 @@ public class AlgorithmStep implements WorkflowStep {
     /**
      * Parameter to specify the algorithm to run.
      */
-    public static final OptionID ALGORITHM_ID = AbstractAlgorithm.ALGORITHM_ID;
+    public static final OptionID ALGORITHM_ID = Algorithm.Utils.ALGORITHM_ID;
 
     @Override
     public void configure(Parameterization config) {

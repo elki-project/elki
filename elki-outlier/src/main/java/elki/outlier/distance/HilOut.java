@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -421,11 +422,6 @@ public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierRes
         n_star++;
       }
     }
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   @Override
@@ -970,7 +966,7 @@ public class HilOut<O extends NumberVector> extends AbstractAlgorithm<OutlierRes
           .grab(config, x -> n = x);
       new IntParameter(H_ID, 32) //
           .grab(config, x -> h = x);
-      new ObjectParameter<LPNormDistance>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<LPNormDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distfunc = x);
       new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TOPN) //
           .grab(config, x -> tn = x);

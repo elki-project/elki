@@ -20,16 +20,15 @@
  */
 package elki.clustering.uncertain;
 
-import elki.AbstractAlgorithm;
-import elki.clustering.kmeans.KMeans;
+import elki.Algorithm;
 import elki.clustering.kmeans.HamerlyKMeans;
+import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.LloydKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.distance.NumberVectorDistance;
-import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -66,11 +65,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     bibkey = "DBLP:conf/icdm/LeeKC07")
 public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>> {
   /**
-   * CLass logger.
-   */
-  private static final Logging LOG = Logging.getLogger(CKMeans.class);
-
-  /**
    * Constructor that uses an arbitrary k-means algorithm.
    *
    * @param kmeans K-Means algorithm to use.
@@ -91,11 +85,6 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
     super(new LloydKMeans<>(distance, k, maxiter, initializer));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return CKMeans.LOG;
-  }
-
   /**
    * Parameterization class, based on k-means.
    *
@@ -109,7 +98,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<KMeans<?, KMeansModel>>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class) //
+      new ObjectParameter<KMeans<?, KMeansModel>>(Algorithm.Utils.ALGORITHM_ID, KMeans.class, HamerlyKMeans.class) //
           .grab(config, x -> kmeans = x);
     }
 

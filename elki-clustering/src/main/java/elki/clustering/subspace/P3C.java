@@ -868,11 +868,6 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

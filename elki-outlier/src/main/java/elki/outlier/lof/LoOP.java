@@ -312,11 +312,6 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     return TypeUtil.array(type);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

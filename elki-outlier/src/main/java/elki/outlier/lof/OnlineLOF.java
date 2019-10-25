@@ -371,11 +371,6 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

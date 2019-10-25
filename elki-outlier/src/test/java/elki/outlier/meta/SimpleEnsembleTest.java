@@ -25,6 +25,7 @@ import org.junit.Test;
 import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.outlier.distance.KNNOutlier;
 import elki.outlier.lof.LOF;
+import elki.Algorithm;
 import elki.database.Database;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
@@ -41,7 +42,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleMean() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingMean.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.98631);
@@ -51,7 +52,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleMin() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingMin.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.99134);
@@ -61,7 +62,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleMax() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingMax.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.97117);
@@ -71,7 +72,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleMedian() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingMedian.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.98631);
@@ -81,7 +82,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleMult() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingMultiplicative.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.98959);
@@ -91,7 +92,7 @@ public class SimpleEnsembleTest extends AbstractOutlierAlgorithmTest {
   public void testEnsembleVotingInvM() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<>(SimpleOutlierEnsemble.class) //
-        .with(SimpleOutlierEnsemble.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LOF.class.getName() + "," + KNNOutlier.class.getName()) //
         .with(SimpleOutlierEnsemble.Par.VOTING_ID, EnsembleVotingInverseMultiplicative.class) //
         .with(KNNOutlier.Par.K_ID, 1).with(LOF.Par.K_ID, 10).build().run(db);
     testAUC(db, "Noise", result, 0.1182);

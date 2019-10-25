@@ -23,6 +23,7 @@ package elki.clustering;
 import java.util.ArrayList;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.PrototypeModel;
@@ -161,11 +162,6 @@ public class CanopyPreClustering<O> extends AbstractAlgorithm<Clustering<Prototy
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    * 
@@ -207,7 +203,7 @@ public class CanopyPreClustering<O> extends AbstractAlgorithm<Clustering<Prototy
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       DoubleParameter t1P = new DoubleParameter(T1_ID);
       t1P.grab(config, x -> t1 = x);

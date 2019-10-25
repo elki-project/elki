@@ -21,6 +21,7 @@
 package elki.outlier;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.optics.AbstractOPTICS;
 import elki.clustering.optics.OPTICSTypeAlgorithm;
 import elki.data.type.TypeInformation;
@@ -40,7 +41,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MathUtil;
 import elki.result.outlier.OutlierResult;
@@ -82,11 +82,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1007/978-3-540-48247-5_28", //
     bibkey = "DBLP:conf/pkdd/BreunigKNS99")
 public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(OPTICSOF.class);
-
   /**
    * Distance function used.
    */
@@ -174,11 +169,6 @@ public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements Out
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -197,7 +187,7 @@ public class OPTICSOF<O> extends AbstractAlgorithm<OutlierResult> implements Out
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(AbstractOPTICS.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

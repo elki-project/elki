@@ -261,11 +261,6 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * SOD Model class
    * 

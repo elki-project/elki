@@ -20,7 +20,7 @@
  */
 package elki.clustering.dbscan.predicates;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStore;
@@ -193,7 +193,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
      */
     protected void configDistance(Parameterization config) {
       // Get a distance function.
-      new ObjectParameter<Distance<O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distfun = x);
     }
 

@@ -395,11 +395,6 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * BitSet that holds a contrast value as field. Used for the representation of
    * a subspace in HiCS

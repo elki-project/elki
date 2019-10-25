@@ -21,6 +21,7 @@
 package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -193,11 +194,6 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgo
     return TypeUtil.array(new CombinedTypeInformation(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -230,7 +226,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractAlgo
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT) //

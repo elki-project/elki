@@ -20,7 +20,6 @@
  */
 package elki.outlier.trivial;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -32,9 +31,9 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.Mean;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
@@ -50,11 +49,6 @@ import elki.utilities.Priority;
  */
 @Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Our logger.
-   */
-  private static final Logging logger = Logging.getLogger(TrivialAverageCoordinateOutlier.class);
-
   /**
    * Constructor.
    */
@@ -90,10 +84,5 @@ public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierRe
     DoubleRelation scoreres = new MaterializedDoubleRelation("Trivial mean score", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     return new OutlierResult(meta, scoreres);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return logger;
   }
 }

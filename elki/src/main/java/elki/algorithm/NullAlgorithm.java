@@ -24,7 +24,6 @@ import elki.AbstractAlgorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.logging.Logging;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 
@@ -39,11 +38,6 @@ import elki.utilities.documentation.Title;
 @Description("Algorithm which does nothing, just return a null object.")
 public class NullAlgorithm extends AbstractAlgorithm<Void> {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(NullAlgorithm.class);
-  
-  /**
    * Constructor.
    */
   public NullAlgorithm() {
@@ -55,11 +49,6 @@ public class NullAlgorithm extends AbstractAlgorithm<Void> {
     return null;
   }
   
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array();

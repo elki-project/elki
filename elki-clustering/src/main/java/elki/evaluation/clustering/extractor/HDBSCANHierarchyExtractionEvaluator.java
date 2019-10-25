@@ -22,7 +22,7 @@ package elki.evaluation.clustering.extractor;
 
 import java.util.ArrayList;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
 import elki.data.Clustering;
@@ -85,7 +85,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
     @Override
     public void configure(Parameterization config) {
       ListParameterization overrides = new ListParameterization();
-      overrides.addParameter(AbstractAlgorithm.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
+      overrides.addParameter(Algorithm.Utils.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
       inner = ClassGenericsUtil.parameterizeOrAbort(HDBSCANHierarchyExtraction.class, list);
     }

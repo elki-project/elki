@@ -273,11 +273,6 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends Ab
     return TypeUtil.array(VectorFieldTypeInformation.typeRequest(NumberVector.class, dim + 1, Integer.MAX_VALUE));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

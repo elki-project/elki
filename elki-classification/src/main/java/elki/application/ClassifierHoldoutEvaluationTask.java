@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.classification.Classifier;
 import elki.data.ClassLabel;
 import elki.data.type.TypeUtil;
@@ -190,7 +190,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
       new ObjectListParameter<IndexFactory<?>>(AbstractDatabase.Par.INDEX_ID, IndexFactory.class) //
           .setOptional(true) //
           .grab(config, x -> indexFactories = x);
-      new ObjectParameter<Classifier<O>>(AbstractAlgorithm.ALGORITHM_ID, Classifier.class) //
+      new ObjectParameter<Classifier<O>>(Algorithm.Utils.ALGORITHM_ID, Classifier.class) //
           .grab(config, x -> algorithm = x);
       new ObjectParameter<Holdout>(HOLDOUT_ID, Holdout.class, StratifiedCrossValidation.class) //
           .grab(config, x -> holdout = x);

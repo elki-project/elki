@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Random;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
@@ -170,11 +171,6 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -230,7 +226,7 @@ public class DistanceQuantileSampler<O> extends AbstractAlgorithm<CollectionResu
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(QUANTILE_ID, 0.1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //

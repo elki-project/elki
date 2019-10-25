@@ -705,11 +705,6 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Simple triple.
    *

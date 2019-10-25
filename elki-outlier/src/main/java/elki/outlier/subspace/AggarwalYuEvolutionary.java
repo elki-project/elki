@@ -159,11 +159,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     return new OutlierResult(meta, scoreResult);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * The inner class to handle the actual evolutionary computation.
    *

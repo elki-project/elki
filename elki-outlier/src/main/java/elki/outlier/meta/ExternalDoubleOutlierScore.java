@@ -215,11 +215,6 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
   }

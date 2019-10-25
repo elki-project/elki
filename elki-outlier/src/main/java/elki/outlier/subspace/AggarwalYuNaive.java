@@ -171,11 +171,6 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
     return new OutlierResult(meta, scoreResult);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

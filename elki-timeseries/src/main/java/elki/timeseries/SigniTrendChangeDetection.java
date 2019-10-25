@@ -34,7 +34,6 @@ import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -44,11 +43,12 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -87,11 +87,6 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/kdd/SchubertWK14")
 @Priority(Priority.RECOMMENDED)
 public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(SigniTrendChangeDetection.class);
-
   /**
    * Exponential aging parameter.
    */
@@ -238,11 +233,6 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

@@ -36,7 +36,6 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.MeanVariance;
 import elki.outlier.OutlierAlgorithm;
@@ -49,8 +48,8 @@ import elki.similarity.kernel.PolynomialKernel;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -83,11 +82,6 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/1401890.1401946", //
     bibkey = "DBLP:conf/kdd/KriegelSZ08")
 public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(ABOD.class);
-
   /**
    * Store the configured Kernel version.
    */
@@ -182,11 +176,6 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

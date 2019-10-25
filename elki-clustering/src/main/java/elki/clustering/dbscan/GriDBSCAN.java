@@ -23,6 +23,7 @@ package elki.clustering.dbscan;
 import java.util.Arrays;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.dbscan.util.Assignment;
 import elki.clustering.dbscan.util.Border;
@@ -692,11 +693,6 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Cluster
     return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, distance.getInputTypeRestriction()));
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -736,7 +732,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractAlgorithm<Cluster
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<LPNormDistance>(DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<LPNormDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, LPNormDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(DBSCAN.Par.EPSILON_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

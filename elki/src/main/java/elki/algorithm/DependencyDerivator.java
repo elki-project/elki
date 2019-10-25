@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.model.CorrelationAnalysisSolution;
 import elki.data.type.TypeInformation;
@@ -245,11 +246,6 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorit
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -306,7 +302,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractAlgorit
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super V>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(OUTPUT_ACCURACY_ID, 4) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //

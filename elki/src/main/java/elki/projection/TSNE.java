@@ -364,11 +364,6 @@ public class TSNE<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector>>
     return TypeUtil.array(affinity.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

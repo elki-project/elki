@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
@@ -327,11 +328,6 @@ public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> 
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -360,7 +356,7 @@ public class KMedoidsPark<V> extends AbstractAlgorithm<Clustering<MedoidModel>> 
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

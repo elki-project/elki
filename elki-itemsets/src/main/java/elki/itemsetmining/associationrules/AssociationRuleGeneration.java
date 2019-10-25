@@ -465,11 +465,6 @@ public class AssociationRuleGeneration extends AbstractAlgorithm<AssociationRule
     return frequentItemAlgo.getInputTypeRestriction();
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

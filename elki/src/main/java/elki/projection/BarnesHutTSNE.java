@@ -266,11 +266,6 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     return TypeUtil.array(affinity.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Quad Tree for use in a Barnes-Hut approximation.
    * <p>

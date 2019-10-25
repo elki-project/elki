@@ -21,6 +21,7 @@
 package elki.outlier.distance.parallel;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -35,7 +36,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.distance.KNNOutlier;
@@ -86,11 +86,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1007/s10618-012-0300-z", //
     bibkey = "DBLP:journals/datamine/SchubertZK14")
 public class ParallelKNNOutlier<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ParallelKNNOutlier.class);
-
   /**
    * Distance function used.
    */
@@ -153,11 +148,6 @@ public class ParallelKNNOutlier<O> extends AbstractAlgorithm<OutlierResult> impl
     return new OutlierResult(meta, scoreres);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    * 
@@ -180,7 +170,7 @@ public class ParallelKNNOutlier<O> extends AbstractAlgorithm<OutlierResult> impl
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(KNNOutlier.Par.K_ID) //
           .grab(config, x -> k = x);

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -312,11 +313,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Task in the processing queue.
    *
@@ -382,7 +378,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

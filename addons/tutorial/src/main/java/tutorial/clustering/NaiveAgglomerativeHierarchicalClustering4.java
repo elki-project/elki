@@ -21,6 +21,7 @@
 package tutorial.clustering;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import elki.clustering.hierarchical.SLINK;
@@ -294,11 +295,6 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgori
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    * 
@@ -326,7 +322,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractAlgori
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new EnumParameter<Linkage>(LINKAGE_ID, Linkage.class) //
           .setDefaultValue(Linkage.WARD) //

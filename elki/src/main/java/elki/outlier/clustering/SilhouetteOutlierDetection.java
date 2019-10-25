@@ -23,6 +23,7 @@ package elki.outlier.clustering;
 import java.util.List;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -41,7 +42,6 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.internal.EvaluateSilhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
@@ -77,11 +77,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
     bibkey = "doi:10.1016/0377-04278790125-7")
 public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(SilhouetteOutlierDetection.class);
-
   /**
    * Distance function used.
    */
@@ -216,11 +211,6 @@ public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResu
     return t2;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Par.
    * 
@@ -254,7 +244,7 @@ public class SilhouetteOutlierDetection<O> extends AbstractAlgorithm<OutlierResu
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new ObjectParameter<ClusteringAlgorithm<?>>(CLUSTERING_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> clusterer = x);

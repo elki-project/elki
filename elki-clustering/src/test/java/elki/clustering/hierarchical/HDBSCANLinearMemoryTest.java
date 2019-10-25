@@ -22,7 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
@@ -50,7 +50,7 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     testFMeasure(db, clustering, 0.686953412);
@@ -66,15 +66,15 @@ public class HDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
     db.initialize();
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
     db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(new double[][] { { 0 } }), null);
     db.initialize();
     new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, HDBSCANLinearMemory.class) //
-        .with(AbstractAlgorithm.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().run(db);
   }

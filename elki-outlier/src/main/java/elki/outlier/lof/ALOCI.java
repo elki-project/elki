@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
@@ -284,11 +285,6 @@ public class ALOCI<V extends NumberVector> extends AbstractAlgorithm<OutlierResu
     }
     double mdef = n_hat - cg.getCount();
     return mdef / sig_n_hat;
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   @Override
@@ -693,7 +689,7 @@ public class ALOCI<V extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<? super O>>(DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(NMIN_ID, 20) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

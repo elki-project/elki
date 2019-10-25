@@ -22,7 +22,6 @@ package elki.outlier.trivial;
 
 import java.util.regex.Pattern;
 
-import elki.outlier.OutlierAlgorithm;
 import elki.AbstractAlgorithm;
 import elki.data.ClassLabel;
 import elki.data.type.NoSupportedDataTypeException;
@@ -36,13 +35,13 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
+import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.result.outlier.ProbabilisticOutlierScore;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
@@ -55,11 +54,6 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  */
 @Priority(Priority.SUPPLEMENTARY)
 public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Our logger.
-   */
-  private static final Logging LOG = Logging.getLogger(ByLabelOutlier.class);
-
   /**
    * The default pattern to use.
    */
@@ -121,11 +115,6 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
     DoubleRelation scoreres = new MaterializedDoubleRelation("By label outlier scores", relation.getDBIDs(), scores);
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

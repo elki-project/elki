@@ -21,6 +21,7 @@
 package elki.outlier.lof;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -211,11 +212,6 @@ public class SimplifiedLOF<O> extends AbstractAlgorithm<OutlierResult> implement
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -238,7 +234,7 @@ public class SimplifiedLOF<O> extends AbstractAlgorithm<OutlierResult> implement
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(LOF.Par.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

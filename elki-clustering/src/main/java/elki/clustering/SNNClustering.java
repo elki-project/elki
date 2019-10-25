@@ -281,11 +281,6 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     return TypeUtil.array(similarityFunction.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

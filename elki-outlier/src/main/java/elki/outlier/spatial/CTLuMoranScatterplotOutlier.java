@@ -20,8 +20,6 @@
  */
 package elki.outlier.spatial;
 
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
-import elki.outlier.spatial.neighborhood.NeighborSetPredicate.Factory;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -34,10 +32,11 @@ import elki.database.ids.DBIDUtil;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.Mean;
 import elki.math.MeanVariance;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate;
+import elki.outlier.spatial.neighborhood.NeighborSetPredicate.Factory;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -78,11 +77,6 @@ import elki.utilities.documentation.Title;
     url = "https://doi.org/10.1023/A:1023455925009", //
     bibkey = "DBLP:journals/geoinformatica/ShekharLZ03")
 public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(CTLuMoranScatterplotOutlier.class);
-
   /**
    * Constructor.
    * 
@@ -153,11 +147,6 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

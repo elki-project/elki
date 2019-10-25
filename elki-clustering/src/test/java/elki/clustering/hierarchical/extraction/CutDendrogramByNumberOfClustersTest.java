@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.extraction;
 
 import org.junit.Test;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.SLINK;
 import elki.data.Clustering;
@@ -41,7 +41,7 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9474250948);
     testClusterSizes(clustering, new int[] { 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
@@ -53,7 +53,7 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
         .with(CutDendrogramByNumberOfClusters.Par.HIERARCHICAL_ID) //
-        .with(AbstractAlgorithm.ALGORITHM_ID, SLINK.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().run(db);
     testFMeasure(db, clustering, 0.9474250948);
     testClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });

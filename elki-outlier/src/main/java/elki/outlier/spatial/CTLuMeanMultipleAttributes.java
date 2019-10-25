@@ -87,11 +87,6 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
     super(npredf);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Run the algorithm
    * 

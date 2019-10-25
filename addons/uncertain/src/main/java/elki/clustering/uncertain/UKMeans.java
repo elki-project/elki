@@ -86,14 +86,14 @@ import elki.utilities.random.RandomFactory;
     bibkey = "DBLP:conf/pakdd/ChauCKN06")
 public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
-   * CLass logger.
+   * Class logger.
    */
-  protected static final Logging LOG = Logging.getLogger(UKMeans.class);
+  private static final Logging LOG = Logging.getLogger(UKMeans.class);
 
   /**
    * Key for statistics logging.
    */
-  protected static final String KEY = UKMeans.class.getName();
+  private static final String KEY = UKMeans.class.getName();
 
   /**
    * Number of cluster centers to initialize.
@@ -291,11 +291,6 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
     return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return UKMeans.LOG;
-  }
-
   /**
    * Log statistics on the variance sum.
    *
@@ -304,8 +299,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>> implemen
    */
   protected void logVarstat(DoubleStatistic varstat, double[] varsum) {
     if(varstat != null) {
-      double s = sum(varsum);
-      getLogger().statistics(varstat.setDouble(s));
+      LOG.statistics(varstat.setDouble(sum(varsum)));
     }
   }
 

@@ -737,11 +737,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

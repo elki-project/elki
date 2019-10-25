@@ -21,6 +21,7 @@
 package elki.outlier.distance;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -36,7 +37,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
@@ -76,11 +76,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1109/ICPR.2004.1334558", //
     bibkey = "DBLP:conf/icpr/HautamakiKF04")
 public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(ODIN.class);
-
   /**
    * Distance function used.
    */
@@ -145,11 +140,6 @@ public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *
@@ -177,7 +167,7 @@ public class ODIN<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

@@ -235,11 +235,6 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> extends Abst
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Setup logging helper for SVM.
    */

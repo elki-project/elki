@@ -435,11 +435,6 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 

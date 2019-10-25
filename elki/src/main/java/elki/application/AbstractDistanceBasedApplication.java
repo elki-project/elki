@@ -20,7 +20,7 @@
  */
 package elki.application;
 
-import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -80,7 +80,7 @@ public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplic
       // Data input
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
-      new ObjectParameter<Distance<? super O>>(AbstractAlgorithm.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
     }
   }

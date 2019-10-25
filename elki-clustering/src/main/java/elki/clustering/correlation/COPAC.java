@@ -22,7 +22,8 @@ package elki.clustering.correlation;
 
 import elki.AbstractAlgorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.dbscan.*;
+import elki.clustering.dbscan.DBSCAN;
+import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.COPACNeighborPredicate;
 import elki.clustering.dbscan.predicates.CorePredicate;
 import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
@@ -36,7 +37,6 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.math.linearalgebra.pca.PCARunner;
 import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
@@ -45,8 +45,8 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -82,11 +82,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1137/1.9781611972771.37", //
     bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
 public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<DimensionModel>> implements ClusteringAlgorithm<Clustering<DimensionModel>> {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(COPAC.class);
-
   /**
    * Settings class.
    */
@@ -131,11 +126,6 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 
   /**

@@ -464,11 +464,6 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> implements Clus
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }

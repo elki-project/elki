@@ -30,7 +30,6 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
@@ -50,11 +49,6 @@ import elki.utilities.documentation.Title;
 @Priority(Priority.SUPPLEMENTARY - 50)
 public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(TrivialAllInOne.class);
-
-  /**
    * Constructor.
    */
   public TrivialAllInOne() {
@@ -73,10 +67,5 @@ public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implem
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.ANY);
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return LOG;
   }
 }

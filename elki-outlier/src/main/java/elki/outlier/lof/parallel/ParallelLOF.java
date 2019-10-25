@@ -21,6 +21,7 @@
 package elki.outlier.lof.parallel;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -36,7 +37,6 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.lof.LOF;
@@ -99,11 +99,6 @@ public class ParallelLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     this.distance = distance;
     this.kplus = k + 1;
   }
-
-  /**
-   * Class logger
-   */
-  private static final Logging LOG = Logging.getLogger(ParallelLOF.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -177,11 +172,6 @@ public class ParallelLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
     return new OutlierResult(meta, scoreres);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    * 
@@ -204,7 +194,7 @@ public class ParallelLOF<O> extends AbstractAlgorithm<OutlierResult> implements 
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(LOF.Par.K_ID) //
           .grab(config, x -> k = x);

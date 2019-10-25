@@ -23,6 +23,7 @@ package elki.outlier.spatial;
 import static elki.math.linearalgebra.VMath.*;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -35,7 +36,6 @@ import elki.database.query.knn.KNNQuery;
 import elki.database.relation.*;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.outlier.OutlierAlgorithm;
@@ -82,11 +82,6 @@ import net.jafama.FastMath;
     url = "https://doi.org/10.1145/1835804.1835939", //
     bibkey = "DBLP:conf/kdd/ChenLB10")
 public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(CTLuGLSBackwardSearchAlgorithm.class);
-
   /**
    * Distance function used.
    */
@@ -260,11 +255,6 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     return TypeUtil.array(distance.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class
    *
@@ -302,7 +292,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super V>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new DoubleParameter(ALPHA_ID) //
           .grab(config, x1 -> alpha = x1);

@@ -185,11 +185,6 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
     }
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    *

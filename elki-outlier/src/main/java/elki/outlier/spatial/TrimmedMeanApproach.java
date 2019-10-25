@@ -191,11 +191,6 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   public TypeInformation[] getInputTypeRestriction() {
     // Get one dimensional attribute for analysis.
     return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD_1D);

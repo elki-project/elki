@@ -21,6 +21,7 @@
 package elki.outlier.intrinsic;
 
 import elki.AbstractAlgorithm;
+import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
@@ -255,11 +256,6 @@ public class ISOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     return minmax;
   }
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -297,7 +293,7 @@ public class ISOS<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
+      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(KNN_ID, 100) //
           .addConstraint(new GreaterEqualConstraint(5)) //
