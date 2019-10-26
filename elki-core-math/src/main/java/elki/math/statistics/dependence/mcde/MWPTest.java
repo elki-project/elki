@@ -104,14 +104,13 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     super();
   }
 
-  @Override
-  public <A> MWPRanking correctedRanks(NumberArrayAdapter<?, A> adapter, A data, int len) {
+  @Override public <A> MWPRanking correctedRanks(NumberArrayAdapter<?, A> adapter, A data, int len) {
     // Note: As described in Algorithm 1 of reference paper.
     int[] idx = MathUtil.sequence(0, len);
     IntegerArrayQuickSort.sort(idx, (x, y) -> Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y)));
     MWPRanking I = new MWPRanking(idx);
     long correction = 0;
-    for(int j = 0; j < len;) {
+    for(int j = 0; j < len; ) {
       final double v = adapter.getDouble(data, idx[j]);
       int k = j, t = 1, adjust = 0;
       while(k < len - 1 && adapter.getDouble(data, idx[k]) == adapter.getDouble(data, idx[k + 1])) {
@@ -145,18 +144,18 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
    * structure as described in Algorithm 3 of reference paper. Tailored to MCDE
    * Framework.
    *
-   * @param start Starting index value for statistical test
-   * @param width Width of the slice for statistical test (endindex = start + width)
-   * @param slice Return value of randomSlice() created with the index that is
-   *        not for the reference dimension
+   * @param start           Starting index value for statistical test
+   * @param width           Width of the slice for statistical test (endindex = start + width)
+   * @param slice           Return value of randomSlice() created with the index that is
+   *                        not for the reference dimension
    * @param corrected_ranks Index of the reference dimension, return value of
-   *        corrected_ranks() computed for reference dimension
+   *                        corrected_ranks() computed for reference dimension
    * @return p-value from two sided Mann-Whitney-U test
    */
   public double statisticalTest(int start, int width, boolean[] slice, MWPRanking corrected_ranks) {
     final int safeStart = getSafeCut(start, corrected_ranks);
     final int len = corrected_ranks.index.length;
-    final int sliceEndSearchStart = safeStart + width > len -1 ? len -1 : safeStart + width;
+    final int sliceEndSearchStart = safeStart + width > len - 1 ? len - 1 : safeStart + width;
     final int safeEnd = getSafeCut(sliceEndSearchStart, corrected_ranks);
 
     double R = 0.0;
@@ -193,32 +192,32 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
   /**
    * Adjusts idx so that it lies not in the middle of a tie by searching the ranks index
    *
-   * @param idx value to adjust for tie. In MCDE MWP the start and end of a slice
+   * @param idx   value to adjust for tie. In MCDE MWP the start and end of a slice
    * @param ranks the corrected ranks index
    * @return adjusted idx
    */
 
-  protected int getSafeCut(int idx, MWPRanking ranks){
+  protected int getSafeCut(int idx, MWPRanking ranks) {
     double[] ref = ranks.adjusted;
-
+    final int len = ranks.index.length;
     int i = 0;
-    while(true){
-      // principle of asking for forgiveness instead of permission, exception gets thrown very rarely
-      try {
-        if(ref[idx + i] != ref[idx + i - 1]){
-          return idx + i;
-        }
-      } catch(IndexOutOfBoundsException error) {
+    while(true) {
+      if(idx - i - 1 < 0) {
+        return idx - i;
+      }
+
+      if(idx + i == len) {
+        return idx + i - 1;
+      }
+
+      if(ref[idx + i] != ref[idx + i - 1]) {
         return idx + i;
       }
 
-      try {
-        if(ref[idx - i] != ref[idx - i - 1]){
-          return idx - i;
-        }
-      } catch(IndexOutOfBoundsException error) {
+      if(ref[idx - i] != ref[idx - i - 1]) {
         return idx - i;
       }
+
       i++;
     }
   }
