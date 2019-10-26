@@ -22,20 +22,21 @@ package elki.math.statistics.dependence.mcde;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import elki.math.statistics.dependence.mcde.MWPTest;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
+
 import java.util.Arrays;
 
 /**
  * Test for the Mann-Whitney based p-test.
- * 
+ *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
  */
 public class MWPTestTest {
-  @Test
-  public void testRanking() {
+  @Test public void testRanking() {
     MWPTest mwpTest = MWPTest.STATIC;
     DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
     double[] input_no_duplicates = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -63,17 +64,14 @@ public class MWPTestTest {
     assertEquals("ranks incorrect", output_duplicates_start_end.adjusted[12], 11.0, 0);
   }
 
-  @Test
-  public void testStatTest(){
+  @Test public void testStatTest() {
     int len = 10;
-    DoubleArrayAdapter adapter = DoubleArrayAdapter.STATIC;
-    MWPTest mwpTest = MWPTest.STATIC;
     double[] data = new double[len];
     Arrays.fill(data, 1.0);
     boolean[] slice = { false, false, true, true, true, true, true, false, false, false };
 
-    MWPTest.MWPRanking ranks = mwpTest.correctedRanks(adapter, data, len);
+    MWPTest.MWPRanking ranks = MWPTest.STATIC.correctedRanks(DoubleArrayAdapter.STATIC, data, len);
     assertEquals("MWPTest.statisticalTest() returns NaN", //
-    mwpTest.statisticalTest(0, 5, slice, ranks), 0, 0 );
+        MWPTest.STATIC.statisticalTest(0, 5, slice, ranks), 0, 0);
   }
 }

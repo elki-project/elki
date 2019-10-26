@@ -111,7 +111,7 @@ public class MCDEDependence implements Dependence {
    * @return Array of booleans that states which instances are part of the slice
    */
   protected boolean[] randomSlice(Random random, MCDETest.RankStruct nonRefIndex) {
-    int len = nonRefIndex.len;
+    int len = nonRefIndex.index.length;
     boolean slice[] = new boolean[len];
     // According to the actual formula it should be
     // Math.ceil(Math.pow(this.alpha, 1.0) * len).
@@ -134,7 +134,7 @@ public class MCDEDependence implements Dependence {
    * @return Array of booleans that states which instances are part of the slice
    */
   protected boolean[] randomSlice(Random random, MCDETest.RankStruct[] nonRefIndex, int refDim, int nDim) {
-    int len = nonRefIndex[0].len;
+    int len = nonRefIndex[0].index.length;
     boolean slice[] = new boolean[len];
     Arrays.fill(slice, true);
     final int sliceSize = (int) Math.ceil(Math.pow(this.alpha, 1.0 / (double) (nDim -1)) * len); // alpha is between 0.1 and 0.9

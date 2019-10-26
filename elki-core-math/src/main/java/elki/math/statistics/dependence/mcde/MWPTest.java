@@ -90,8 +90,8 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
      *
      * @param idx Index
      */
-    public MWPRanking(int[] idx, int len) {
-      super(idx, len);
+    public MWPRanking(int[] idx) {
+      super(idx);
       this.correction = new long[idx.length];
       this.adjusted = new double[idx.length];
     }
@@ -109,9 +109,10 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     // Note: As described in Algorithm 1 of reference paper.
     int[] idx = MathUtil.sequence(0, len);
     IntegerArrayQuickSort.sort(idx, (x, y) -> Double.compare(adapter.getDouble(data, x), adapter.getDouble(data, y)));
-    MWPRanking I = new MWPRanking(idx, len);
+    MWPRanking I = new MWPRanking(idx);
     long correction = 0;
     for(int j = 0; j < len;) {
+      final double v = adapter.getDouble(data, idx[j]);
       int k = j, t = 1, adjust = 0;
       while(k < len - 1 && adapter.getDouble(data, idx[k]) == adapter.getDouble(data, idx[k + 1])) {
         adjust += k;
@@ -122,6 +123,9 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
       if(k > j) {
         double adjusted = (adjust + k) / (double) t;
         correction += t * (t * t - 1);
+        if(correction < 0) {
+          throw new ArithmeticException("Long overflow: too many ties (>2^10)");
+        }
         for(int m = j; m <= k; m++) {
           I.adjusted[m] = adjusted;
           I.correction[m] = correction;
@@ -151,7 +155,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
    */
   public double statisticalTest(int start, int width, boolean[] slice, MWPRanking corrected_ranks) {
     final int safeStart = getSafeCut(start, corrected_ranks);
-    final int len = corrected_ranks.len;
+    final int len = corrected_ranks.index.length;
     final int sliceEndSearchStart = safeStart + width > len -1 ? len -1 : safeStart + width;
     final int safeEnd = getSafeCut(sliceEndSearchStart, corrected_ranks);
 
@@ -180,8 +184,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     final long b_start = safeStart == 0 ? 0 : corrected_ranks.correction[safeStart - 1];
     final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
     final double std = FastMath.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
-    if(std == 0) { return 0; }
-    final double Z = Math.abs((U - (0.5 * n1 * n2)) / std);
+    final double Z = std > 0 ? Math.abs((U - (0.5 * n1 * n2)) / std) : 0.;
     // Note that this is equivalent to do 1-2*(1-cdf(Z,0,1));
     return NormalDistribution.erf(Z * MathUtil.SQRTHALF);
     // erf(Z / Math.sqrt(2)) is the cdf of the half-normal distribution

@@ -49,18 +49,12 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
     public int[] index;
 
     /**
-     * Length of data
-     */
-    public int len;
-
-    /**
      * Constructor.
      *
      * @param idx Array containing index (position) values
      */
-    public RankStruct(int[] idx, int len) {
+    public RankStruct(int[] idx) {
       this.index = idx;
-      this.len = len;
     }
   }
 
