@@ -1,5 +1,6 @@
 elki.clustering.affinitypropagation.AffinityPropagation
 elki.clustering.CanopyPreClustering
+elki.clustering.CFSFDP
 elki.clustering.dbscan.DBSCAN
 elki.clustering.dbscan.GeneralizedDBSCAN
 elki.clustering.dbscan.parallel.ParallelGeneralizedDBSCAN
