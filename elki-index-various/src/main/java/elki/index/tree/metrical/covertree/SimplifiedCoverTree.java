@@ -35,7 +35,6 @@ import elki.index.DistancePriorityIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
-import elki.utilities.Priority;
 import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 
 /**
@@ -62,7 +61,6 @@ import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * @has - - - CoverTreeRangeQuery
  * @has - - - CoverTreeKNNQuery
  */
-@Priority(Priority.RECOMMENDED)
 public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements DistancePriorityIndex<O> {
   /**
    * Class logger.

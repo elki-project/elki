@@ -35,6 +35,7 @@ import elki.index.DistancePriorityIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.utilities.Priority;
 import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 import elki.utilities.documentation.Reference;
 
@@ -74,6 +75,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "In Proc. 23rd Int. Conf. Machine Learning (ICML 2006)", //
     url = "https://doi.org/10.1145/1143844.1143857", //
     bibkey = "DBLP:conf/icml/BeygelzimerKL06")
+@Priority(Priority.RECOMMENDED)
 public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriorityIndex<O> {
   /**
    * Class logger.
