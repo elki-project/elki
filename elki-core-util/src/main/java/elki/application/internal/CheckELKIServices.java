@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -68,9 +69,9 @@ public class CheckELKIServices {
   private static final Logging LOG = Logging.getLogger(CheckELKIServices.class);
 
   /**
-   * Pattern to strip comments, while keeping commented class names.
+   * Pattern to STRIP comments, while keeping commented class names.
    */
-  private Pattern strip = Pattern.compile("^[\\s#]*(?:deprecated:\\s*)?(.*?)[\\s]*$");
+  private static final Pattern STRIP = Pattern.compile("^[\\s#]*(?:deprecated:\\s*)?(.*?)[\\s]*$");
 
   /**
    * Main method.
@@ -154,15 +155,17 @@ public class CheckELKIServices {
       LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
-    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, false);
+    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, true);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
-      names.add(c2.getName());
+      if(!c2.isInterface() && !Modifier.isAbstract(c2.getModifiers())) {
+        names.add(c2.getName());
+      }
     }
 
-    Matcher m = strip.matcher("");
     try {
       Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX + cls.getName());
+      Matcher m = STRIP.matcher("");
       while(us.hasMoreElements()) {
         URL u = us.nextElement();
         boolean injar = "jar".equals(u.getProtocol());
