@@ -27,7 +27,8 @@ import elki.database.query.LinearScanQuery;
 /**
  * Default linear scan search class.
  * <p>
- * This is a fallback option - results are not returned in order.
+ * This is a fallback option - results are not returned in order, and (as
+ * always) may exceed the given cutoff threshold.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -53,11 +54,6 @@ public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySe
   private O query;
 
   /**
-   * Cutoff threshold.
-   */
-  private double threshold;
-
-  /**
    * Current distance
    */
   private double curdist;
@@ -80,39 +76,21 @@ public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySe
   @Override
   public DistancePrioritySearcher<O> search(O query) {
     this.query = query;
-    this.iter = null;
-    this.threshold = Double.POSITIVE_INFINITY;
+    this.iter = distanceQuery.getRelation().iterDBIDs();
+    this.curdist = Double.NaN;
     return this;
   }
 
   @Override
   public boolean valid() {
-    if(iter == null) {
-      iter = distanceQuery.getRelation().iterDBIDs();
-      scan();
-    }
     return iter.valid();
   }
 
   @Override
   public DBIDIter advance() {
     iter.advance();
-    scan();
-    return this;
-  }
-
-  /**
-   * Scan for the next object.
-   */
-  private void scan() {
-    while(iter.valid()) {
-      curdist = distanceQuery.distance(query, iter);
-      if(curdist <= threshold) {
-        return;
-      }
-      iter.advance();
-    }
     curdist = Double.NaN;
+    return this;
   }
 
   @Override
@@ -122,33 +100,32 @@ public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySe
 
   @Override
   public DistancePrioritySearcher<O> decreaseCutoff(double threshold) {
-    this.threshold = threshold;
     return this; // Ignored
   }
 
   @Override
   public double computeExactDistance() {
-    return curdist;
+    return curdist == curdist ? curdist : (curdist = distanceQuery.distance(query, iter));
   }
 
   @Override
   public double getApproximateAccuracy() {
-    return 0;
+    return curdist == curdist ? 0 : Double.NaN;
   }
 
   @Override
   public double getApproximateDistance() {
-    return curdist;
+    return curdist; // May be NaN, if not computed yet.
   }
 
   @Override
   public double getLowerBound() {
-    return curdist;
+    return curdist; // May be NaN, if not computed yet.
   }
 
   @Override
   public double getUpperBound() {
-    return curdist;
+    return curdist; // May be NaN, if not computed yet.
   }
 
   @Override

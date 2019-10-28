@@ -32,7 +32,8 @@ import net.jafama.FastMath;
 /**
  * Default linear scan search class, for Euclidean distance.
  * <p>
- * This is a fallback option - results are not returned in order.
+ * This is a fallback option - results are not returned in order, and (as
+ * always) may exceed the given cutoff threshold.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -58,14 +59,24 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
   private O query;
 
   /**
+   * Fake lower bound to return for cut-off values.
+   */
+  private double thresholdUp;
+
+  /**
    * Cutoff threshold.
    */
   private double thresholdsq;
 
   /**
-   * Current distance
+   * Current distance.
    */
   private double curdist;
+
+  /**
+   * Current squared distance.
+   */
+  private double curdistsq;
 
   /**
    * Squared distance
@@ -91,40 +102,22 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
   @Override
   public DistancePrioritySearcher<O> search(O query) {
     this.query = query;
-    this.iter = null;
-    this.thresholdsq = Double.POSITIVE_INFINITY;
+    this.iter = distanceQuery.getRelation().iterDBIDs();
+    this.thresholdsq = this.thresholdUp = Double.POSITIVE_INFINITY;
+    this.curdist = this.curdistsq = Double.NaN;
     return this;
   }
 
   @Override
   public boolean valid() {
-    if(iter == null) {
-      iter = distanceQuery.getRelation().iterDBIDs();
-      scan();
-    }
     return iter.valid();
   }
 
   @Override
   public DBIDIter advance() {
     iter.advance();
-    scan();
+    curdist = curdistsq = Double.NaN;
     return this;
-  }
-
-  /**
-   * Scan for the next object.
-   */
-  private void scan() {
-    while(iter.valid()) {
-      double curdistsq = SQUARED.distance(query, distanceQuery.getRelation().get(iter));
-      if(curdistsq <= thresholdsq) {
-        curdist = FastMath.sqrt(curdistsq);
-        return;
-      }
-      iter.advance();
-    }
-    curdist = Double.NaN;
   }
 
   @Override
@@ -135,32 +128,43 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
   @Override
   public DistancePrioritySearcher<O> decreaseCutoff(double threshold) {
     this.thresholdsq = threshold * threshold;
+    this.thresholdUp = Math.nextUp(threshold);
     return this; // Ignored
   }
 
   @Override
   public double computeExactDistance() {
-    return curdist;
+    return curdist == curdist ? curdist : (curdist = FastMath.sqrt(getSquaredDistance()));
+  }
+
+  /**
+   * Get the squared distance.
+   *
+   * @return squared distance
+   */
+  public double getSquaredDistance() {
+    return curdistsq == curdistsq ? curdistsq : (curdistsq = SQUARED.distance(query, distanceQuery.getRelation().get(iter)));
   }
 
   @Override
   public double getApproximateAccuracy() {
-    return 0;
+    return curdist == curdist ? 0 : Double.NaN;
   }
 
   @Override
   public double getApproximateDistance() {
-    return curdist;
+    return curdist; // May be NaN, if not computed yet.
   }
 
   @Override
   public double getLowerBound() {
-    return curdist;
+    return curdist; // May be NaN, if not computed yet.
   }
 
   @Override
   public double getUpperBound() {
-    return curdist;
+    return curdist == curdist ? curdist : //
+        thresholdsq == thresholdsq && getSquaredDistance() > thresholdsq ? thresholdUp : Double.NaN;
   }
 
   @Override

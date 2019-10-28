@@ -30,6 +30,12 @@ import elki.database.query.range.RangeQuery;
  * the hint {@link elki.database.query.QueryBuilder#optimizedOnly}, the system
  * may fall back to a slow linear scan that returns objects in arbitrary order,
  * if no suitable index is available.
+ * <p>
+ * This searcher has fairly loose guarantees because <b>it may need to fall back
+ * to a linear scan</b>. In such cases, you may be given every point in
+ * arbitrary order. But if you set some thresholds, it may even then be able to
+ * avoid some computations, such as computing the square root in Euclidean
+ * distance.
  *
  * @author Erich Schubert
  *
@@ -81,9 +87,11 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
     KNNHeap heap = DBIDUtil.newHeap(k);
     double threshold = Double.POSITIVE_INFINITY;
     for(DistancePrioritySearcher<O> iter = search(id); iter.valid(); iter.advance()) {
-      double dist = iter.computeExactDistance();
-      if(dist <= threshold) {
-        iter.decreaseCutoff(threshold = heap.insert(dist, iter));
+      if(!(iter.getLowerBound() > threshold)) {
+        double dist = iter.computeExactDistance();
+        if(dist <= threshold) {
+          iter.decreaseCutoff(threshold = heap.insert(dist, iter));
+        }
       }
     }
     return heap.toKNNList();
@@ -94,9 +102,11 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
     KNNHeap heap = DBIDUtil.newHeap(k);
     double threshold = Double.POSITIVE_INFINITY;
     for(DistancePrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
-      double dist = iter.computeExactDistance();
-      if(dist <= threshold) {
-        iter.decreaseCutoff(threshold = heap.insert(dist, iter));
+      if(!(iter.getLowerBound() > threshold)) {
+        double dist = iter.computeExactDistance();
+        if(dist <= threshold) {
+          iter.decreaseCutoff(threshold = heap.insert(dist, iter));
+        }
       }
     }
     return heap.toKNNList();
@@ -105,9 +115,11 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   @Override
   default ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
-      final double dist = iter.computeExactDistance();
-      if(dist <= range) {
-        result.add(dist, iter);
+      if(!(iter.getLowerBound() > range)) {
+        final double dist = iter.computeExactDistance();
+        if(dist <= range) {
+          result.add(dist, iter);
+        }
       }
     }
     return result;
@@ -116,9 +128,11 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   @Override
   default ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
     for(DistancePrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
-      final double dist = iter.computeExactDistance();
-      if(dist <= range) {
-        result.add(dist, iter);
+      if(!(iter.getLowerBound() > range)) {
+        final double dist = iter.computeExactDistance();
+        if(dist <= range) {
+          result.add(dist, iter);
+        }
       }
     }
     return result;
@@ -175,6 +189,9 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
 
   /**
    * Get the lower bound (if available).
+   * <p>
+   * Note: the lower bound is already checked by the cutoff of the priority
+   * search, so this is primarily useful for analyzing the search behavior.
    *
    * @return {@code Double.NaN} if not valid
    */
