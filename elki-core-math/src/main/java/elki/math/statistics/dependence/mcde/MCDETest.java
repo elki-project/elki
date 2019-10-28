@@ -36,8 +36,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
  */
 public interface MCDETest<R extends MCDETest.RankStruct> {
   /**
-   * Structure to hold return values in index creation for
-   * MCDEDependenceEstimate
+   * Structure to hold return values in index creation for MCDEDependence
    *
    * @author Alan Mazankiewicz
    * @author Edouard Fouché
@@ -60,7 +59,7 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
 
   /**
    * Compute the corrected rank index.
-   * 
+   *
    * @param <A> Input array type
    * @param adapter Array-like adapter
    * @param data Data object
@@ -74,10 +73,10 @@ public interface MCDETest<R extends MCDETest.RankStruct> {
    * the slicing scheme of MCDEDependence.
    *
    * @param start Starting index value for statistical test
-   * @param end End index value for statistical test
+   * @param width Width of the slice (endindex = start + width)
    * @param slice An array of boolean resulting from a random slice
    * @param correctedRanks the precomputed index for the reference dimension
    * @return a 1 - p-value
    */
-  double statisticalTest(int start, int end, boolean[] slice, R correctedRanks);
+  double statisticalTest(int start, int width, boolean[] slice, R correctedRanks);
 }

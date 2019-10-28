@@ -20,6 +20,7 @@
  */
 package elki.math.statistics.dependence;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -102,15 +103,15 @@ public class MCDEDependence implements Dependence {
   }
 
   /**
-   * Data slicing
+   * Bivariate data slicing
    *
    * @param random Random generator
-   * @param len No of data instances
    * @param nonRefIndex Index (see correctedRank()) computed for the dimension
    *        that is not the reference dimension
    * @return Array of booleans that states which instances are part of the slice
    */
-  protected boolean[] randomSlice(Random random, int len, MCDETest.RankStruct nonRefIndex) {
+  protected boolean[] randomSlice(Random random, MCDETest.RankStruct nonRefIndex) {
+    int len = nonRefIndex.index.length;
     boolean slice[] = new boolean[len];
     // According to the actual formula it should be
     // Math.ceil(Math.pow(this.alpha, 1.0) * len).
@@ -124,13 +125,40 @@ public class MCDEDependence implements Dependence {
     return slice;
   }
 
+  /**
+   * Multivariate data slicing
+   *
+   * @param random Random generator
+   * @param nonRefIndex Array of indices computed for each dimension
+   * @param refDim Indexvalue of reference dimension
+   * @param nDim No of dimensions
+   * @return Array of booleans that states which instances are part of the slice
+   */
+  protected boolean[] randomSlice(Random random, MCDETest.RankStruct[] nonRefIndex, int refDim, int nDim) {
+    int len = nonRefIndex[0].index.length;
+    boolean slice[] = new boolean[len];
+    Arrays.fill(slice, true);
+    // alpha is between 0.1 and 0.9
+    final int sliceSize = (int) Math.ceil(Math.pow(this.alpha, 1.0 / (double) (nDim - 1)) * len);
+
+    for(int i = 0; i < nDim; i++) {
+      if(i != refDim) {
+        final int[] idx = nonRefIndex[i].index;
+        final int start = random.nextInt(len - sliceSize);
+        for(int j = 0; j < start; j++) {
+          slice[idx[j]] = false;
+        }
+        for(int j = start + sliceSize; j < len; j++) {
+          slice[idx[j]] = false;
+        }
+      }
+    }
+    return slice;
+  }
+
   @Override
   public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2) {
-    final int len = adapter1.size(data1);
-    if(len != adapter2.size(data2)) {
-      throw new IllegalStateException("Size of both arrays must match!");
-    }
-
+    final int len = Dependence.Util.size(adapter1, data1, adapter2, data2);
     // Note: Corresponds to Algorithm 4 in source paper.
     MCDETest.RankStruct i1 = mcdeTest.correctedRanks(adapter1, data1, len);
     MCDETest.RankStruct i2 = mcdeTest.correctedRanks(adapter2, data2, len);
@@ -140,8 +168,9 @@ public class MCDEDependence implements Dependence {
       final boolean flip = random.nextInt(2) == 1;
       final int width = (int) Math.ceil(len * this.beta);
       final int start = random.nextInt(len - width);
-      boolean[] slice = randomSlice(random, len, flip ? i1 : i2);
-      mwp += mcdeTest.statisticalTest(start, start + width, slice, flip ? i2 : i1);
+
+      boolean[] slice = randomSlice(random, flip ? i1 : i2);
+      mwp += mcdeTest.statisticalTest(start, width, slice, flip ? i2 : i1);
     }
     return mwp / m;
   }
@@ -149,7 +178,7 @@ public class MCDEDependence implements Dependence {
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
     final int dims = data.size();
-    final int len = adapter.size(data.get(0));
+    final int len = Dependence.Util.size(adapter, data);
     // Build indexes:
     MCDETest.RankStruct[] idx = new MCDETest.RankStruct[dims];
     for(int i = 0; i < dims; i++) {
@@ -171,13 +200,44 @@ public class MCDEDependence implements Dependence {
           final boolean flip = random.nextInt(2) == 1;
           final int width = (int) Math.ceil(len * this.beta);
           final int start = random.nextInt(len - width);
-          boolean[] slice = randomSlice(random, len, flip ? iy : idx[x]);
-          mwp += mcdeTest.statisticalTest(start, start + width, slice, flip ? idx[x] : iy);
+
+          boolean[] slice = randomSlice(random, flip ? iy : idx[x]);
+          mwp += mcdeTest.statisticalTest(start, width, slice, flip ? idx[x] : iy);
         }
         out[o++] = mwp / m;
       }
     }
     return out;
+  }
+
+  /**
+   * Runs MCDE Algorithm with possibly more than two dimensions
+   *
+   * @param adapter Array type adapter
+   * @param data Data sets. Must have fast random access!
+   * @param <A> Array type
+   * @return Dependence Measure
+   */
+  public <A> double higherOrderDependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
+    final int dims = data.size();
+    final int len = Dependence.Util.size(adapter, data);
+    // Build indexes:
+    MCDETest.RankStruct[] idx = new MCDETest.RankStruct[dims];
+    for(int i = 0; i < dims; i++) {
+      idx[i] = mcdeTest.correctedRanks(adapter, data.get(i), len);
+    }
+
+    final Random random = rnd.getSingleThreadedRandom();
+    double mwp = 0;
+    for(int i = 0; i < m; i++) {
+      final int refDim = random.nextInt(dims);
+      final int width = (int) Math.ceil(len * this.beta);
+      final int start = random.nextInt(len - width);
+
+      boolean[] slice = randomSlice(random, idx, refDim, dims);
+      mwp += mcdeTest.statisticalTest(start, width, slice, idx[refDim]);
+    }
+    return mwp / m;
   }
 
   /**
