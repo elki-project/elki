@@ -139,7 +139,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
     WritableDataStore<double[]> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
     WritableDataStore<double[]> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
     WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
-    WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
+    WritableDataStore<CorrelationAnalysisSolution> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
       double sqrt2 = MathUtil.SQRT2;
@@ -149,7 +149,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
         nids.remove(id);
 
         // TODO: do we want to use the query point as centroid?
-        CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(relation, nids);
+        CorrelationAnalysisSolution depsol = dependencyDerivator.generateModel(relation, nids);
 
         double stddev = depsol.getStandardDeviation();
         double distance = FastMath.sqrt(depsol.squaredDistance(relation.get(id)));
@@ -172,7 +172,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
     Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP.COP_DIM, TypeUtil.INTEGER, ids, cop_dim));
     Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>(COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, ids, cop_err_v));
     Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Data vectors", TypeUtil.DOUBLE_ARRAY, ids, cop_datav));
-    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Correlation analysis", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), ids, cop_sol));
+    Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("Correlation analysis", new SimpleTypeInformation<CorrelationAnalysisSolution>(CorrelationAnalysisSolution.class), ids, cop_sol));
     return result;
   }
 

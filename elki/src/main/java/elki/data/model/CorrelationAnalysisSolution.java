@@ -46,10 +46,8 @@ import net.jafama.FastMath;
  * @since 0.2
  * 
  * @composed - - - LinearEquationSystem
- * 
- * @param <V> the type of NumberVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends NumberVector> implements TextWriteable, Model {
+public class CorrelationAnalysisSolution implements TextWriteable, Model {
   /**
    * Empty constant vector returned when no subspace was used.
    */
@@ -111,7 +109,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param centroid the centroid if the objects belonging to the hyperplane
    *        induced by the correlation
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<? extends NumberVector> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid) {
     this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
   }
 
@@ -132,7 +130,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    *        induced by the correlation
    * @param nf the number format for output accuracy
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid, NumberFormat nf) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<? extends NumberVector> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid, NumberFormat nf) {
     this.linearEquationSystem = solution;
     this.correlationDimensionality = strongEigenvectors[0].length;
     this.strongEigenvectors = strongEigenvectors;
@@ -187,7 +185,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  public double squaredDistance(V p) {
+  public double squaredDistance(NumberVector p) {
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
     double[] p_minus_a = minusEquals(p.toArray(), centroid);
@@ -200,7 +198,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public double[] errorVector(V p) {
+  public double[] errorVector(NumberVector p) {
     return weakEigenvectors.length > 0 ? times(weakEigenvectors, transposeTimes(weakEigenvectors, minusEquals(p.toArray(), centroid))) : EMPTY_VECTOR;
   }
 
@@ -210,7 +208,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public double[] dataVector(V p) {
+  public double[] dataVector(NumberVector p) {
     return strongEigenvectors.length > 0 ? times(strongEigenvectors, transposeTimes(strongEigenvectors, minusEquals(p.toArray(), centroid))) : EMPTY_VECTOR;
   }
 
@@ -291,13 +289,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     }
   }
 
-  //@Override
+  // @Override
   public String getLongName() {
     return "Correlation Analysis Solution";
-  }
-
-  //@Override
-  public String getShortName() {
-    return "correlationanalysissolution";
   }
 }

@@ -153,7 +153,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
    * @return the CorrelationAnalysisSolution computed by this
    *         DependencyDerivator
    */
-  public CorrelationAnalysisSolution<V> run(Relation<V> relation) {
+  public CorrelationAnalysisSolution run(Relation<V> relation) {
     if(LOG.isVerbose()) {
       LOG.verbose("retrieving database objects...");
     }
@@ -182,7 +182,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
    * @param ids the set of ids
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids) {
+  public CorrelationAnalysisSolution generateModel(Relation<V> db, DBIDs ids) {
     return generateModel(db, ids, Centroid.make(db, ids).getArrayRef());
   }
 
@@ -194,7 +194,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
    * @param centroid the centroid
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Relation<V> relation, DBIDs ids, double[] centroid) {
+  public CorrelationAnalysisSolution generateModel(Relation<V> relation, DBIDs ids, double[] centroid) {
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("PCA...");
     }
@@ -207,7 +207,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
 
     // TODO: what if we don't have any weak eigenvectors?
     if(transposedWeakEigenvectors.length == 0) {
-      return new CorrelationAnalysisSolution<>(null, relation, transpose(transposedStrongEigenvectors), new double[0][], pcares.similarityMatrix(), centroid);
+      return new CorrelationAnalysisSolution(null, relation, transpose(transposedStrongEigenvectors), new double[0][], pcares.similarityMatrix(), centroid);
     }
     // double[][] transposedWeakEigenvectors = transpose(weakEigenvectors);
     if(LOG.isDebugging()) {
@@ -236,7 +236,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
     LinearEquationSystem lq = new LinearEquationSystem(copy(transposedWeakEigenvectors), b);
     lq.solveByTotalPivotSearch();
 
-    CorrelationAnalysisSolution<V> sol = new CorrelationAnalysisSolution<>(lq, relation, transpose(transposedStrongEigenvectors), transpose(transposedWeakEigenvectors), pcares.similarityMatrix(), centroid);
+    CorrelationAnalysisSolution sol = new CorrelationAnalysisSolution(lq, relation, transpose(transposedStrongEigenvectors), transpose(transposedWeakEigenvectors), pcares.similarityMatrix(), centroid);
     if(LOG.isDebuggingFine()) {
       LOG.debugFine(new StringBuilder().append("Solution:\n") //
           .append("Standard deviation ").append(sol.getStandardDeviation()) //

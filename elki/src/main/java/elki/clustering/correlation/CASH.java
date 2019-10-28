@@ -611,7 +611,7 @@ public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @return a basis of the found subspace
    */
   private double[][] runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs outids) {
-    CorrelationAnalysisSolution<DoubleVector> model = new DependencyDerivator<DoubleVector>(null, FormatUtil.NF4, //
+    CorrelationAnalysisSolution model = new DependencyDerivator<DoubleVector>(null, FormatUtil.NF4, //
         new PCARunner(new StandardCovarianceMatrixBuilder()), //
         new FirstNEigenPairFilter(dim - 1), 0, false) //
             .run(buildDerivatorDB(relation, interval.getIDs()));
@@ -646,9 +646,10 @@ public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    */
   private LinearEquationSystem runDerivator(Relation<ParameterizationFunction> relation, int dimensionality, DBIDs ids) {
     try {
-      // build database for derivator
-      DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, new PCARunner(new StandardCovarianceMatrixBuilder()), new FirstNEigenPairFilter(dimensionality), 0, false);
-      CorrelationAnalysisSolution<DoubleVector> model = derivator.run(buildDerivatorDB(relation, ids));
+      CorrelationAnalysisSolution model = new DependencyDerivator<DoubleVector>(null, FormatUtil.NF4, //
+          new PCARunner(new StandardCovarianceMatrixBuilder()), //
+          new FirstNEigenPairFilter(dimensionality), 0, false) //
+              .run(buildDerivatorDB(relation, ids));
       return model.getNormalizedLinearEquationSystem(null);
     }
     catch(NonNumericFeaturesException e) {
