@@ -34,6 +34,18 @@ allprojects  {
       // Causes duplicate files, because Eclipse copies resoures to this folder
       // defaultOutputDir = "build/classes/main" as File
       downloadSources = true
+      // Duplicate entries, in particular because of test dependencies
+      file { whenMerged { cp ->
+        Map entryByPath = cp.entries.groupBy { entry -> entry.path }
+        entryByPath.each { key, values ->
+          if (values.size() > 1) {
+            def entry = values.first()
+            def index = cp.entries.indexOf entry
+            cp.entries.removeAll values
+            cp.entries.add index, entry
+          }
+        }
+      } }
     }
     jdt.file {
       withProperties {
