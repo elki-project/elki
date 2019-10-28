@@ -43,8 +43,8 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
         .with(LSDBC.Par.ALPHA_ID, 0.4) //
         .with(LSDBC.Par.K_ID, 20) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.44848979);
-    testClusterSizes(result, new int[] { 38, 38, 41, 54, 159 });
+    assertFMeasure(db, result, 0.44848979);
+    assertClusterSizes(result, new int[] { 38, 38, 41, 54, 159 });
   }
 
   @Test
@@ -54,7 +54,7 @@ public class LSDBCTest extends AbstractClusterAlgorithmTest {
         .with(LSDBC.Par.ALPHA_ID, 0.2) //
         .with(LSDBC.Par.K_ID, 120) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.95681073);
-    testClusterSizes(result, new int[] { 32, 197, 203, 206 });
+    assertFMeasure(db, result, 0.95681073);
+    assertClusterSizes(result, new int[] { 32, 197, 203, 206 });
   }
 }

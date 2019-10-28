@@ -47,8 +47,8 @@ public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
         .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().autorun(db);
     // FastCLARANS finds better solution than CLARANS in this unit test!
-    testFMeasure(db, result, .998);
-    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    assertFMeasure(db, result, .998);
+    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 
   @Test
@@ -60,7 +60,7 @@ public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
         .with(CLARANS.Par.NEIGHBORS_ID, .1) //
         .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.913858);
-    testClusterSizes(result, new int[] { 57, 115, 158 });
+    assertFMeasure(db, result, 0.913858);
+    assertClusterSizes(result, new int[] { 57, 115, 158 });
   }
 }

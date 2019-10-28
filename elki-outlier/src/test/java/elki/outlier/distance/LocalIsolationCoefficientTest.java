@@ -40,7 +40,7 @@ public class LocalIsolationCoefficientTest extends AbstractOutlierAlgorithmTest 
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<LocalIsolationCoefficient<DoubleVector>>(LocalIsolationCoefficient.class) //
         .with(LocalIsolationCoefficient.Par.K_ID, 4).build().autorun(db);
-    testSingleScore(result, 945, 1.270870005);
-    testAUC(db, "Noise", result, 0.990000);
+    assertSingleScore(result, 945, 1.270870005);
+    assertAUC(db, "Noise", result, 0.990000);
   }
 }

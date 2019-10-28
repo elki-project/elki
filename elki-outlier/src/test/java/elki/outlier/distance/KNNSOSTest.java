@@ -40,7 +40,7 @@ public class KNNSOSTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<KNNSOS<DoubleVector>>(KNNSOS.class) //
         .with(KNNSOS.Par.KNN_ID, 150).build().autorun(db);
-    testAUC(db, "Noise", result, 0.94435185);
-    testSingleScore(result, 945, 0.05163418);
+    assertAUC(db, "Noise", result, 0.94435185);
+    assertSingleScore(result, 945, 0.05163418);
   }
 }

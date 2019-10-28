@@ -49,8 +49,8 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, MiniMax.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.938662648);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.938662648);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -64,7 +64,7 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, MiniMax.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.914592130);
-    testClusterSizes(clustering, new int[] { 59, 112, 159 });
+    assertFMeasure(db, clustering, 0.914592130);
+    assertClusterSizes(clustering, new int[] { 59, 112, 159 });
   }
 }

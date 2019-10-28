@@ -44,8 +44,8 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<COP<DoubleVector>>(COP.class)//
         .with(COP.Par.K_ID, 30).build().autorun(db);
-    testAUC(db, "Noise", result, 0.89476666);
-    testSingleScore(result, 416, 0.26795866);
+    assertAUC(db, "Noise", result, 0.89476666);
+    assertSingleScore(result, 416, 0.26795866);
   }
 
   @Test
@@ -56,8 +56,8 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
         .with(COP.Par.MODELS_ID) //
         .with(COP.Par.DIST_ID, COP.DistanceDist.CHISQUARED)//
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.897);
-    testSingleScore(result, 416, 0.0080449);
+    assertAUC(db, "Noise", result, 0.897);
+    assertSingleScore(result, 416, 0.0080449);
   }
 
   @Test
@@ -69,8 +69,8 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
         .with(AutotuningPCA.Par.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class) //
         .with(WeightedCovarianceMatrixBuilder.Par.WEIGHT_ID, ErfcWeight.class) //
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.90166666);
-    testSingleScore(result, 416, 0.25705955);
+    assertAUC(db, "Noise", result, 0.90166666);
+    assertSingleScore(result, 416, 0.25705955);
   }
 
   @Test
@@ -84,7 +84,7 @@ public class COPTest extends AbstractOutlierAlgorithmTest {
         .with(RANSACCovarianceMatrixBuilder.Par.ITER_ID, 25) //
         .with(RANSACCovarianceMatrixBuilder.Par.SEED_ID, 0) //
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.8993);
-    testSingleScore(result, 416, 0.410516);
+    assertAUC(db, "Noise", result, 0.8993);
+    assertSingleScore(result, 416, 0.410516);
   }
 }

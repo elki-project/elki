@@ -43,8 +43,8 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.9474250948);
-    testClusterSizes(clustering, new int[] { 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
+    assertFMeasure(db, clustering, 0.9474250948);
+    assertClusterSizes(clustering, new int[] { 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }
 
   @Test
@@ -55,7 +55,7 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
         .with(CutDendrogramByNumberOfClusters.Par.HIERARCHICAL_ID) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.9474250948);
-    testClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
+    assertFMeasure(db, clustering, 0.9474250948);
+    assertClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }
 }

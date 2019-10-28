@@ -41,8 +41,8 @@ public class CanopyPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CanopyPreClustering.Par.T1_ID, 0.2) //
         .with(CanopyPreClustering.Par.T2_ID, 0.2) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.96691368);
-    testClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 4, 5, 55, 104, 151 });
+    assertFMeasure(db, result, 0.96691368);
+    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 4, 5, 55, 104, 151 });
   }
 
   @Test
@@ -52,7 +52,7 @@ public class CanopyPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CanopyPreClustering.Par.T1_ID, 25) //
         .with(CanopyPreClustering.Par.T2_ID, 25) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.97089);
-    testClusterSizes(result, new int[] { 22, 200, 208, 208 });
+    assertFMeasure(db, result, 0.97089);
+    assertClusterSizes(result, new int[] { 22, 200, 208, 208 });
   }
 }

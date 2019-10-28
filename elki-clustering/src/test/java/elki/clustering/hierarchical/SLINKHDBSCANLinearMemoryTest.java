@@ -50,7 +50,7 @@ public class SLINKHDBSCANLinearMemoryTest extends AbstractClusterAlgorithmTest {
         .with(Algorithm.Utils.ALGORITHM_ID, SLINKHDBSCANLinearMemory.class) //
         .with(SLINKHDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.686953412);
-    testClusterSizes(clustering, new int[] { 1, 200, 437 });
+    assertFMeasure(db, clustering, 0.686953412);
+    assertClusterSizes(clustering, new int[] { 1, 200, 437 });
   }
 }

@@ -53,7 +53,7 @@ public class SLINKTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.6829722);
-    testClusterSizes(clustering, new int[] { 9, 200, 429 });
+    assertFMeasure(db, clustering, 0.6829722);
+    assertClusterSizes(clustering, new int[] { 9, 200, 429 });
   }
 }

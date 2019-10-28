@@ -52,7 +52,7 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
    * @param result Outlier result to process
    * @param expected Expected AUC value
    */
-  protected void testAUC(Database db, String positive, OutlierResult result, double expected) {
+  protected void assertAUC(Database db, String positive, OutlierResult result, double expected) {
     OutlierROCCurve rocCurve = new ELKIBuilder<>(OutlierROCCurve.class)//
         .with(OutlierROCCurve.Par.POSITIVE_CLASS_NAME_ID, positive).build();
 
@@ -76,7 +76,7 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
    * @param id Object ID
    * @param expected expected value
    */
-  protected void testSingleScore(OutlierResult result, int id, double expected) {
+  protected void assertSingleScore(OutlierResult result, int id, double expected) {
     assertNotNull("No outlier result", result);
     assertNotNull("No score result.", result.getScores());
     DBIDs ids = result.getScores().getDBIDs();

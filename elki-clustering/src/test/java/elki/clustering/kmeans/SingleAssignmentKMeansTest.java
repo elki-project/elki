@@ -46,7 +46,7 @@ public class SingleAssignmentKMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 7) //
         .build().autorun(db);
     // Unsurprisingly, these results are much worse than normal k-means
-    testFMeasure(db, result, 0.702733122);
-    testClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
+    assertFMeasure(db, result, 0.702733122);
+    assertClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
   }
 }

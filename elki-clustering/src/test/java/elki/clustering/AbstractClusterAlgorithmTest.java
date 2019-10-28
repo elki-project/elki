@@ -64,7 +64,7 @@ public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorit
    * @param clustering Clustering result
    * @param expected Expected score
    */
-  protected <O> void testFMeasure(Database database, Clustering<?> clustering, double expected) {
+  protected <O> void assertFMeasure(Database database, Clustering<?> clustering, double expected) {
     // Run by-label as reference
     ByLabelClustering bylabel = new ByLabelClustering();
     Clustering<Model> rbl = bylabel.autorun(database);
@@ -82,7 +82,7 @@ public abstract class AbstractClusterAlgorithmTest extends AbstractSimpleAlgorit
    * @param clustering Clustering to test
    * @param expected Expected cluster sizes
    */
-  protected void testClusterSizes(Clustering<?> clustering, int[] expected) {
+  protected void assertClusterSizes(Clustering<?> clustering, int[] expected) {
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
     int[] sizes = new int[clusters.size()];
     for(int i = 0; i < sizes.length; ++i) {

@@ -47,8 +47,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Par.K_ID, 6) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.967410486);
-    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    assertFMeasure(db, result, 0.967410486);
+    assertClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
   }
 
   @Test
@@ -59,8 +59,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.PRIOR_ID, 10) //
         .with(EM.Par.K_ID, 5) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.958843);
-    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+    assertFMeasure(db, result, 0.958843);
+    assertClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
   }
 
   @Test
@@ -71,8 +71,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 6) //
         .with(EM.Par.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.967410486);
-    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    assertFMeasure(db, result, 0.967410486);
+    assertClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
   }
 
   @Test
@@ -84,8 +84,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.INIT_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.958843);
-    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+    assertFMeasure(db, result, 0.958843);
+    assertClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
   }
 
   @Test
@@ -96,8 +96,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 6) //
         .with(EM.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.967410486);
-    testClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    assertFMeasure(db, result, 0.967410486);
+    assertClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
   }
 
   @Test
@@ -109,8 +109,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.958843);
-    testClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+    assertFMeasure(db, result, 0.958843);
+    assertClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
   }
 
   @Test
@@ -121,8 +121,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.9681384);
-    testClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
+    assertFMeasure(db, result, 0.9681384);
+    assertClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
   }
 
   @Test
@@ -134,8 +134,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.949566);
-    testClusterSizes(result, new int[] { 6, 97, 98, 202, 307 });
+    assertFMeasure(db, result, 0.949566);
+    assertClusterSizes(result, new int[] { 6, 97, 98, 202, 307 });
   }
 
   @Test
@@ -146,8 +146,8 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.K_ID, 4) //
         .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.811247176);
-    testClusterSizes(result, new int[] { 8, 95, 198, 409 });
+    assertFMeasure(db, result, 0.811247176);
+    assertClusterSizes(result, new int[] { 8, 95, 198, 409 });
   }
 
   @Test
@@ -159,7 +159,7 @@ public class EMTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.9357286);
-    testClusterSizes(result, new int[] { 103, 104, 208, 295 });
+    assertFMeasure(db, result, 0.9357286);
+    assertClusterSizes(result, new int[] { 103, 104, 208, 295 });
   }
 }

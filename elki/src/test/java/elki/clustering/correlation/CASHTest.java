@@ -52,8 +52,8 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
         .with(CASH.Par.MAXLEVEL_ID, 25) //
         .with(CASH.Par.ADJUST_ID) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.50074); // with hierarchical pairs: 0.64102
-    testClusterSizes(result, new int[] { 18, 80, 252, 468 });
+    assertFMeasure(db, result, 0.50074); // with hierarchical pairs: 0.64102
+    assertClusterSizes(result, new int[] { 18, 80, 252, 468 });
   }
 
   /**
@@ -67,7 +67,7 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
         .with(CASH.Par.MINPTS_ID, 160) //
         .with(CASH.Par.MAXLEVEL_ID, 40) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.443246);
-    testClusterSizes(result, new int[] { 169, 196, 235 });
+    assertFMeasure(db, result, 0.443246);
+    assertClusterSizes(result, new int[] { 169, 196, 235 });
   }
 }

@@ -53,8 +53,8 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
         // NOTE: PROCLUS quality heavily depends on random...
         .with(PROCLUS.Par.SEED_ID, 12) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.88499877);
-    testClusterSizes(result, new int[] { 22, 36, 200, 342 });
+    assertFMeasure(db, result, 0.88499877);
+    assertClusterSizes(result, new int[] { 22, 36, 200, 342 });
   }
 
   /**
@@ -70,7 +70,7 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
         // NOTE: PROCLUS quality heavily depends on random...
         .with(PROCLUS.Par.SEED_ID, 3) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.96985144);
-    testClusterSizes(result, new int[] { 150, 288, 412 });
+    assertFMeasure(db, result, 0.96985144);
+    assertClusterSizes(result, new int[] { 150, 288, 412 });
   }
 }

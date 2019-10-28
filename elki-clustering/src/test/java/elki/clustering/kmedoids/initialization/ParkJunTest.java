@@ -49,8 +49,8 @@ public class ParkJunTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, ParkJun.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.5872566);
-    testClusterSizes(result, new int[] { 2, 9, 110, 422, 457 });
+    assertFMeasure(db, result, 0.5872566);
+    assertClusterSizes(result, new int[] { 2, 9, 110, 422, 457 });
   }
 
   /**
@@ -68,7 +68,7 @@ public class ParkJunTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.7840668);
-    testClusterSizes(result, new int[] { 78, 125, 200, 200, 397 });
+    assertFMeasure(db, result, 0.7840668);
+    assertClusterSizes(result, new int[] { 78, 125, 200, 200, 397 });
   }
 }

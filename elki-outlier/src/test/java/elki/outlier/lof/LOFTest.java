@@ -40,7 +40,7 @@ public class LOFTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<LOF<DoubleVector>>(LOF.class) //
         .with(LOF.Par.K_ID, 10).build().autorun(db);
-    testSingleScore(result, 1293, 1.1945314199156365);
-    testAUC(db, "Noise", result, 0.8921680672268908);
+    assertSingleScore(result, 1293, 1.1945314199156365);
+    assertAUC(db, "Noise", result, 0.8921680672268908);
   }
 }

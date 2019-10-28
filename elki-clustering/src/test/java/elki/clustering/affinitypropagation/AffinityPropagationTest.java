@@ -46,8 +46,8 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<MedoidModel> result = new ELKIBuilder<AffinityPropagation<DoubleVector>>(AffinityPropagation.class)//
         .build().autorun(db);
-    testFMeasure(db, result, 0.957227259);
-    testClusterSizes(result, new int[] { 5, 5, 7, 55, 105, 153 });
+    assertFMeasure(db, result, 0.957227259);
+    assertClusterSizes(result, new int[] { 5, 5, 7, 55, 105, 153 });
   }
 
   /**
@@ -59,8 +59,8 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<MedoidModel> result = new ELKIBuilder<AffinityPropagation<DoubleVector>>(AffinityPropagation.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.351689882);
-    testClusterSizes(result, new int[] { 24, 27, 29, 34, 36, 36, 37, 38, 41, 43, 43, 44, 46, 47, 56, 57 });
+    assertFMeasure(db, result, 0.351689882);
+    assertClusterSizes(result, new int[] { 24, 27, 29, 34, 36, 36, 37, 38, 41, 43, 43, 44, 46, 47, 56, 57 });
   }
 
   /**
@@ -74,7 +74,7 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
         .with(AffinityPropagation.Par.INITIALIZATION_ID, SimilarityBasedInitializationWithMedian.class) //
         .with(SimilarityBasedInitializationWithMedian.Par.SIMILARITY_ID, PolynomialKernel.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.352103);
-    testClusterSizes(result, new int[] { 20, 30, 32, 33, 34, 35, 36, 39, 39, 40, 43, 45, 45, 49, 49, 69 });
+    assertFMeasure(db, result, 0.352103);
+    assertClusterSizes(result, new int[] { 20, 30, 32, 33, 34, 35, 36, 39, 39, 40, 43, 45, 45, 49, 49, 69 });
   }
 }

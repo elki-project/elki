@@ -50,8 +50,8 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 7) //
         .with(KMeans.INIT_ID, RandomlyChosen.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.702733);
-    testClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
+    assertFMeasure(db, result, 0.702733);
+    assertClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
   }
 
   /**
@@ -70,7 +70,7 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.99602);
-    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    assertFMeasure(db, result, 0.99602);
+    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 }

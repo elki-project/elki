@@ -50,8 +50,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, SingleLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.6829722);
-    testClusterSizes(clustering, new int[] { 9, 200, 429 });
+    assertFMeasure(db, clustering, 0.6829722);
+    assertClusterSizes(clustering, new int[] { 9, 200, 429 });
   }
 
   /**
@@ -66,8 +66,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -82,8 +82,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -98,8 +98,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, WeightedAverageLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -114,8 +114,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, CompleteLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.938167802);
-    testClusterSizes(clustering, new int[] { 200, 217, 221 });
+    assertFMeasure(db, clustering, 0.938167802);
+    assertClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
 
   /**
@@ -130,8 +130,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -146,8 +146,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, MedianLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.9386626);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.9386626);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -162,8 +162,8 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
         .with(AGNES.Par.LINKAGE_ID, MinimumVarianceLinkage.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.93866265);
-    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   /**
@@ -179,7 +179,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
         .with(AGNES.Par.LINKAGE_ID, FlexibleBetaLinkage.class) //
         .with(FlexibleBetaLinkage.Par.BETA_ID, -.33) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.9277466);
-    testClusterSizes(clustering, new int[] { 196, 200, 242 });
+    assertFMeasure(db, clustering, 0.9277466);
+    assertClusterSizes(clustering, new int[] { 196, 200, 242 });
   }
 }

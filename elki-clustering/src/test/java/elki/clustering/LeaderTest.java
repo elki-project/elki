@@ -44,8 +44,8 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
         .with(Leader.Par.THRESHOLD_ID, 0.2) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.910848);
-    testClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 13, 52, 105, 141 });
+    assertFMeasure(db, result, 0.910848);
+    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 13, 52, 105, 141 });
   }
 
   /**
@@ -58,7 +58,7 @@ public class LeaderTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<Leader<DoubleVector>>(Leader.class) //
         .with(Leader.Par.THRESHOLD_ID, 25) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.61614);
-    testClusterSizes(result, new int[] { 4, 139, 147, 348 });
+    assertFMeasure(db, result, 0.61614);
+    assertClusterSizes(result, new int[] { 4, 139, 147, 348 });
   }
 }

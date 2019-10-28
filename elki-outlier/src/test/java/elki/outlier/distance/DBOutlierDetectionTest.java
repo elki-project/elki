@@ -52,8 +52,8 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(DBOutlierDetection.Par.D_ID, 0.175) //
         .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().autorun(db);
-    testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97487179);
+    assertSingleScore(result, 1025, 0.0);
+    assertAUC(db, "Noise", result, 0.97487179);
   }
 
   /**
@@ -70,8 +70,8 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(DBOutlierDetection.Par.D_ID, 0.175) //
         .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().autorun(db);
-    testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97487179);
+    assertSingleScore(result, 1025, 0.0);
+    assertAUC(db, "Noise", result, 0.97487179);
   }
 
   /**
@@ -94,7 +94,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(DBOutlierDetection.Par.D_ID, 0.175) //
         .with(DBOutlierDetection.Par.P_ID, 0.98) //
         .build().autorun(db);
-    testSingleScore(result, 1025, 0.0);
-    testAUC(db, "Noise", result, 0.97487179);
+    assertSingleScore(result, 1025, 0.0);
+    assertAUC(db, "Noise", result, 0.97487179);
   }
 }

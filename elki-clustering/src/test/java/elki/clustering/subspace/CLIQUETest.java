@@ -53,7 +53,7 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.9882);
-    testClusterSizes(result, new int[] { 200, 200, 216, 400 });
+    assertClusterSizes(result, new int[] { 200, 200, 216, 400 });
   }
 
   /**
@@ -69,7 +69,7 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
-    testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
+    assertClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
   }
 
   /**
@@ -86,6 +86,6 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
     // testFMeasure(db, result, 0.433661);
-    testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
+    assertClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
   }
 }

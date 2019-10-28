@@ -51,7 +51,7 @@ public class BisectingKMeansTest extends AbstractClusterAlgorithmTest {
         .with(BestOfMultipleKMeans.Par.KMEANS_ID, LloydKMeans.class) //
         .with(BestOfMultipleKMeans.Par.QUALITYMEASURE_ID, WithinClusterVariance.class) //
         .build().autorun(db);
-    testClusterSizes(result, new int[] { 103, 97, 100 });
+    assertClusterSizes(result, new int[] { 103, 97, 100 });
   }
 
   /**
@@ -72,6 +72,6 @@ public class BisectingKMeansTest extends AbstractClusterAlgorithmTest {
 
     // run KMedians on database
     Clustering<MeanModel> result = kmeans.autorun(db);
-    testFMeasure(db, result, 0.7408);
+    assertFMeasure(db, result, 0.7408);
   }
 }

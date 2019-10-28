@@ -59,8 +59,8 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(COPAC.Par.K_ID, 15) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.8484056);
-    testClusterSizes(result, new int[] { 54, 196, 200 });
+    assertFMeasure(db, result, 0.8484056);
+    assertClusterSizes(result, new int[] { 54, 196, 200 });
   }
 
   /**
@@ -80,7 +80,7 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class) //
         .with(PercentageEigenPairFilter.Par.ALPHA_ID, 0.8) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.86505092);
-    testClusterSizes(result, new int[] { 32, 172, 197, 249 });
+    assertFMeasure(db, result, 0.86505092);
+    assertClusterSizes(result, new int[] { 32, 172, 197, 249 });
   }
 }

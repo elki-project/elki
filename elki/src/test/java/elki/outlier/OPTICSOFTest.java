@@ -40,7 +40,7 @@ public class OPTICSOFTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<OPTICSOF<DoubleVector>>(OPTICSOF.class) //
         .with(AbstractOPTICS.Par.MINPTS_ID, 22).build().autorun(db);
-    testSingleScore(result, 416, 1.6108343626651815);
-    testAUC(db, "Noise", result, 0.9058);
+    assertSingleScore(result, 416, 1.6108343626651815);
+    assertAUC(db, "Noise", result, 0.9058);
   }
 }

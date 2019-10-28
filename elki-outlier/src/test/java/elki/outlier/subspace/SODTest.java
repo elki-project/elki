@@ -44,7 +44,7 @@ public class SODTest extends AbstractOutlierAlgorithmTest {
         .with(SharedNearestNeighborPreprocessor.Factory.NUMBER_OF_NEIGHBORS_ID, 19) //
         .with(SOD.Par.MODELS_ID) // we don't test them though.
         .build().autorun(db);
-    testSingleScore(result, 1293, 1.5167500);
-    testAUC(db, "Noise", result, 0.949131652);
+    assertSingleScore(result, 1293, 1.5167500);
+    assertAUC(db, "Noise", result, 0.949131652);
   }
 }

@@ -41,15 +41,15 @@ public class FlexibleLOFTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<FlexibleLOF<DoubleVector>>(FlexibleLOF.class) //
         .with(FlexibleLOF.Par.KREF_ID, 10).build().autorun(db);
-    testAUC(db, "Noise", result, 0.8921680672268908);
-    testSingleScore(result, 1293, 1.1945314199156365);
+    assertAUC(db, "Noise", result, 0.8921680672268908);
+    assertSingleScore(result, 1293, 1.1945314199156365);
 
     result = new ELKIBuilder<FlexibleLOF<DoubleVector>>(FlexibleLOF.class) //
         .with(FlexibleLOF.Par.KREACH_ID, 15)//
         .with(FlexibleLOF.Par.KREF_ID, 10)//
         .with(FlexibleLOF.Par.REACHABILITY_DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class)//
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.8904);
-    testSingleScore(result, 1293, 1.427456);
+    assertAUC(db, "Noise", result, 0.8904);
+    assertSingleScore(result, 1293, 1.427456);
   }
 }

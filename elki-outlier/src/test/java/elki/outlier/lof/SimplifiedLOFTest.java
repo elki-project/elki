@@ -41,7 +41,7 @@ public class SimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<SimplifiedLOF<DoubleVector>>(SimplifiedLOF.class) //
         .with(LOF.Par.K_ID, 10) //
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.8892549019);
-    testSingleScore(result, 1293, 1.3025894);
+    assertAUC(db, "Noise", result, 0.8892549019);
+    assertSingleScore(result, 1293, 1.3025894);
   }
 }

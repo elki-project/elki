@@ -40,7 +40,7 @@ public class OUTRESTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<OUTRES>(OUTRES.class) //
         .with(OUTRES.Par.D_ID, 1.) //
         .build().autorun(db);
-    testSingleScore(result, 406, 0.3659126362146687);
-    testAUC(db, "Noise$", result, 0.7919);
+    assertSingleScore(result, 406, 0.3659126362146687);
+    assertAUC(db, "Noise$", result, 0.7919);
   }
 }

@@ -48,8 +48,8 @@ public class P3CTest extends AbstractClusterAlgorithmTest {
   public void testP3CSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
     Clustering<?> result = new ELKIBuilder<P3C<DoubleVector>>(P3C.class).build().autorun(db);
-    testFMeasure(db, result, .99800101);
-    testClusterSizes(result, new int[] { 1, 200, 399 });
+    assertFMeasure(db, result, .99800101);
+    assertClusterSizes(result, new int[] { 1, 200, 399 });
   }
 
   /**
@@ -61,7 +61,7 @@ public class P3CTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<P3C<DoubleVector>>(P3C.class) //
         .with(P3C.Par.ALPHA_THRESHOLD_ID, 0.01)//
         .build().autorun(db);
-    testFMeasure(db, result, .99596185);
-    testClusterSizes(result, new int[] { 4, 148, 300, 398 });
+    assertFMeasure(db, result, .99596185);
+    assertClusterSizes(result, new int[] { 4, 148, 300, 398 });
   }
 }

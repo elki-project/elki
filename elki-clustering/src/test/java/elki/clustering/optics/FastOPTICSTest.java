@@ -44,7 +44,7 @@ public class FastOPTICSTest extends AbstractClusterAlgorithmTest {
         .with(OPTICSXi.Par.XIALG_ID, FastOPTICS.class) //
         .with(RandomProjectedNeighborsAndDensities.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.856917);
-    testClusterSizes(clustering, new int[] { 4, 4, 5, 6, 7, 7, 10, 15, 23, 25, 26, 57, 73, 191, 257 });
+    assertFMeasure(db, clustering, 0.856917);
+    assertClusterSizes(clustering, new int[] { 4, 4, 5, 6, 7, 7, 10, 15, 23, 25, 26, 57, 73, 191, 257 });
   }
 }

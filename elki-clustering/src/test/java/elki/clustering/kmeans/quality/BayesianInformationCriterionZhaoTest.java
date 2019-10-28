@@ -47,7 +47,7 @@ public class BayesianInformationCriterionZhaoTest extends AbstractClusterAlgorit
         .with(KMeans.SEED_ID, 0) // // Initializer seed
         .with(XMeans.Par.SEED_ID, 0) // // X-means seed
         .build().autorun(db);
-    testFMeasure(db, result, 0.971786);
-    testClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 5, 51, 104, 151 });
+    assertFMeasure(db, result, 0.971786);
+    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 5, 51, 104, 151 });
   }
 }

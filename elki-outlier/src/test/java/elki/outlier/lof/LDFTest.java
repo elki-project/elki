@@ -42,7 +42,7 @@ public class LDFTest extends AbstractOutlierAlgorithmTest {
         .with(LDF.Par.K_ID, 10) //
         .with(LDF.Par.H_ID, 1) //
         .build().autorun(db);
-    testSingleScore(result, 1293, 3.158819);
-    testAUC(db, "Noise", result, 0.9127619);
+    assertSingleScore(result, 1293, 3.158819);
+    assertAUC(db, "Noise", result, 0.9127619);
   }
 }

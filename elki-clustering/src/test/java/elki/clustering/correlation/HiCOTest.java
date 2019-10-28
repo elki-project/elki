@@ -47,8 +47,8 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
         .with(HiCO.Par.DELTA_ID, 0.05) //
         .with(HiCO.Par.ALPHA_ID, 0.9) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.73834);
-    testClusterSizes(result, new int[] { 0, 4, 4, 6, 30, 176, 380 });
+    assertFMeasure(db, result, 0.73834);
+    assertClusterSizes(result, new int[] { 0, 4, 4, 6, 30, 176, 380 });
   }
 
   @Test
@@ -62,7 +62,7 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
         .with(HiCO.Par.DELTA_ID, 0.25) //
         .with(HiCO.Par.ALPHA_ID, 0.95) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.78091);
-    testClusterSizes(result, new int[] { 6, 6, 20, 25, 51, 140, 201, 201 });
+    assertFMeasure(db, result, 0.78091);
+    assertClusterSizes(result, new int[] { 6, 6, 20, 25, 51, 140, 201, 201 });
   }
 }

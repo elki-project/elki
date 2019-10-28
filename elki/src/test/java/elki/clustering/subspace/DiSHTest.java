@@ -51,8 +51,8 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
         .with(DiSH.Par.EPSILON_ID, 0.005) //
         .with(DiSH.Par.MU_ID, 50) //
         .build().autorun(db);
-    testFMeasure(db, result, .99516369);
-    testClusterSizes(result, new int[] { 50, 199, 201 });
+    assertFMeasure(db, result, .99516369);
+    assertClusterSizes(result, new int[] { 50, 199, 201 });
   }
 
   /**
@@ -66,7 +66,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
         .with(DiSH.Par.MU_ID, 40) //
         .with(DiSH.Par.STRATEGY_ID, DiSH.Strategy.APRIORI) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.656432);
-    testClusterSizes(result, new int[] { 61, 84, 153, 187, 283, 332 });
+    assertFMeasure(db, result, 0.656432);
+    assertClusterSizes(result, new int[] { 61, 84, 153, 187, 283, 332 });
   }
 }

@@ -40,7 +40,7 @@ public class ISOSTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<ISOS<DoubleVector>>(ISOS.class) //
         .with(ISOS.Par.KNN_ID, 100).build().autorun(db);
-    testAUC(db, "Noise", result, 0.946333);
-    testSingleScore(result, 945, 0.05128157);
+    assertAUC(db, "Noise", result, 0.946333);
+    assertSingleScore(result, 945, 0.05128157);
   }
 }

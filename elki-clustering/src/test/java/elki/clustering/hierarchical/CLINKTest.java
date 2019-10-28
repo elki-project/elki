@@ -50,7 +50,7 @@ public class CLINKTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 2) //
         .with(Algorithm.Utils.ALGORITHM_ID, CLINK.class) //
         .build().autorun(db);
-    testFMeasure(db, clustering, 0.5147426);
-    testClusterSizes(clustering, new int[] { 131, 507 });
+    assertFMeasure(db, clustering, 0.5147426);
+    assertClusterSizes(clustering, new int[] { 131, 507 });
   }
 }

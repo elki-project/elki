@@ -49,7 +49,7 @@ public class XMeansTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 0) // // Initializer seed
         .with(XMeans.Par.SEED_ID, 0) // // X-means seed
         .build().autorun(db);
-    testFMeasure(db, result, 0.959044);
-    testClusterSizes(result, new int[] { 1, 1, 2, 2, 2, 2, 2, 3, 5, 51, 106, 153 });
+    assertFMeasure(db, result, 0.959044);
+    assertClusterSizes(result, new int[] { 1, 1, 2, 2, 2, 2, 2, 3, 5, 51, 106, 153 });
   }
 }

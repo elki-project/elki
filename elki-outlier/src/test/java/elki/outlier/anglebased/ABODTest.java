@@ -41,7 +41,7 @@ public class ABODTest extends AbstractOutlierAlgorithmTest {
   public void testABOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<ABOD<DoubleVector>>(ABOD.class).build().autorun(db);
-    testAUC(db, "Noise", result, 0.9297962962962);
-    testSingleScore(result, 945, 2.0897348547799E-5);
+    assertAUC(db, "Noise", result, 0.9297962962962);
+    assertSingleScore(result, 945, 2.0897348547799E-5);
   }
 }

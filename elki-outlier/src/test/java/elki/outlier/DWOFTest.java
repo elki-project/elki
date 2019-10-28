@@ -39,7 +39,7 @@ public class DWOFTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<DWOF<DoubleVector>>(DWOF.class)//
         .with(DWOF.Par.K_ID, 20).build().autorun(db);
-    testAUC(db, "Noise", result, 0.8098666);
-    testSingleScore(result, 416, 6.95226128);
+    assertAUC(db, "Noise", result, 0.8098666);
+    assertSingleScore(result, 416, 6.95226128);
   }
 }

@@ -42,7 +42,7 @@ public class ALOCITest extends AbstractOutlierAlgorithmTest {
         .with(ALOCI.Par.SEED_ID, 2) //
         .with(ALOCI.Par.GRIDS_ID, 3) //
         .build().autorun(db);
-    testAUC(db, "Noise", result, 0.7622222);
-    testSingleScore(result, 146, 1.1305337);
+    assertAUC(db, "Noise", result, 0.7622222);
+    assertSingleScore(result, 146, 1.1305337);
   }
 }

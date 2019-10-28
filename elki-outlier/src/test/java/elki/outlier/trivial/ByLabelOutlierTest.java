@@ -38,6 +38,6 @@ public class ByLabelOutlierTest extends AbstractOutlierAlgorithmTest {
   public void testTrivial() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<>(ByLabelOutlier.class).build().autorun(db);
-    testAUC(db, "Noise", result, 1.0);
+    assertAUC(db, "Noise", result, 1.0);
   }
 }

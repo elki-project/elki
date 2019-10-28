@@ -40,8 +40,8 @@ public class CFSFDPTest extends AbstractClusterAlgorithmTest {
         .with(CFSFDP.Par.DC_ID, 0.5) //
         .with(CFSFDP.Par.K_ID, 3) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.90353);
-    testClusterSizes(result, new int[] { 51, 117, 162 });
+    assertFMeasure(db, result, 0.90353);
+    assertClusterSizes(result, new int[] { 51, 117, 162 });
   }
 
   @Test
@@ -51,7 +51,7 @@ public class CFSFDPTest extends AbstractClusterAlgorithmTest {
         .with(CFSFDP.Par.DC_ID, 25) //
         .with(CFSFDP.Par.K_ID, 3) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.93866);
-    testClusterSizes(result, new int[] { 200, 211, 227 });
+    assertFMeasure(db, result, 0.93866);
+    assertClusterSizes(result, new int[] { 200, 211, 227 });
   }
 }

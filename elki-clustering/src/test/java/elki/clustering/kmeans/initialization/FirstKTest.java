@@ -49,8 +49,8 @@ public class FirstKTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, FirstK.class) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.62025907);
-    testClusterSizes(result, new int[] { 23, 38, 226, 258, 455 });
+    assertFMeasure(db, result, 0.62025907);
+    assertClusterSizes(result, new int[] { 23, 38, 226, 258, 455 });
   }
 
   /**
@@ -68,7 +68,7 @@ public class FirstKTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.7454859);
-    testClusterSizes(result, new int[] { 45, 155, 200, 287, 313 });
+    assertFMeasure(db, result, 0.7454859);
+    assertClusterSizes(result, new int[] { 45, 155, 200, 287, 313 });
   }
 }

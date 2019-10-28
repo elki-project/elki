@@ -46,8 +46,8 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
         .with(LMCLUS.Par.THRESHOLD_ID, 10) //
         .with(LMCLUS.Par.RANDOM_ID, 6) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.487716464);
-    testClusterSizes(result, new int[] { 30, 570 });
+    assertFMeasure(db, result, 0.487716464);
+    assertClusterSizes(result, new int[] { 30, 570 });
   }
 
   /**
@@ -61,7 +61,7 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
         .with(LMCLUS.Par.THRESHOLD_ID, 10) //
         .with(LMCLUS.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    testClusterSizes(result, new int[] { 200, 201, 249 });
-    testFMeasure(db, result, 0.921865);
+    assertClusterSizes(result, new int[] { 200, 201, 249 });
+    assertFMeasure(db, result, 0.921865);
   }
 }

@@ -63,6 +63,6 @@ public class FileBasedSparseDoubleDistanceTest extends AbstractClusterAlgorithmT
     CutDendrogramByHeight clus = new CutDendrogramByHeight(slink, 0.5, false);
     Clustering<DendrogramModel> c = clus.run(db);
 
-    testClusterSizes(c, new int[] { 2, 2 });
+    assertClusterSizes(c, new int[] { 2, 2 });
   }
 }

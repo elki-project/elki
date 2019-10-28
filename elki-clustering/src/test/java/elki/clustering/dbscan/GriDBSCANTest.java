@@ -48,8 +48,8 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .with(GriDBSCAN.Par.GRID_ID, 0.08) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.996413);
-    testClusterSizes(result, new int[] { 29, 50, 101, 150 });
+    assertFMeasure(db, result, 0.996413);
+    assertClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
 
   /**
@@ -64,8 +64,8 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .with(GriDBSCAN.Par.GRID_ID, 0.4) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.996413);
-    testClusterSizes(result, new int[] { 29, 50, 101, 150 });
+    assertFMeasure(db, result, 0.996413);
+    assertClusterSizes(result, new int[] { 29, 50, 101, 150 });
   }
 
   /**
@@ -80,7 +80,7 @@ public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
         .with(DBSCAN.Par.MINPTS_ID, 120) //
         .with(GriDBSCAN.Par.GRID_ID, 25.) //
         .build().autorun(db);
-    testFMeasure(db, result, 0.954382);
-    testClusterSizes(result, new int[] { 11, 200, 203, 224 });
+    assertFMeasure(db, result, 0.954382);
+    assertClusterSizes(result, new int[] { 11, 200, 203, 224 });
   }
 }
