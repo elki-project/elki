@@ -211,7 +211,7 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
   }
 
   /**
-   * Par.
+   * Parameterizer.
    * 
    * @author Erich Schubert
    * 

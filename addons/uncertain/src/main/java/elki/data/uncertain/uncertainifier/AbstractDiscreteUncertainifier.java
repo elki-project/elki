@@ -62,7 +62,7 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
   }
 
   /**
-   * Par.
+   * Parameterizer.
    *
    * @author Erich Schubert
    */

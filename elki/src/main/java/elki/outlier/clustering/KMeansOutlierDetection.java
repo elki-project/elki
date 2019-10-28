@@ -122,7 +122,7 @@ public class KMeansOutlierDetection<O extends NumberVector> implements OutlierAl
   }
 
   /**
-   * Par.
+   * Parameterizer.
    *
    * @author Erich Schubert
    *

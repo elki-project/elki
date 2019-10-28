@@ -197,7 +197,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   }
 
   /**
-   * Par.
+   * Parameterizer.
    * 
    * @author Ahmed Hettab
    * 

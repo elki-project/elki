@@ -335,7 +335,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     /**
-     * Par.
+     * Parameterizer.
      *
      * @author Erich Schubert
      *

@@ -298,7 +298,7 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
     }
 
     /**
-     * Par.
+     * Parameterizer.
      *
      * @author Erich Schubert
      *
