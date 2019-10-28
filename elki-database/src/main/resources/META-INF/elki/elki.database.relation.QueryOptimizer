@@ -1,2 +1,0 @@
-elki.database.relation.EmpiricalQueryOptimizer auto
-elki.database.relation.DisableQueryOptimizer no none false disable disabled

@@ -1,2 +1,2 @@
-elki.result.AutomaticVisualization de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer visualizer vis ResultVisualizer
-elki.result.ExportVisualizations de.lmu.ifi.dbs.elki.visualization.ExportVisualizations
+elki.result.AutomaticVisualization visualizer vis ResultVisualizer
+elki.result.ExportVisualizations

@@ -1,0 +1,2 @@
+elki.database.query.EmpiricalQueryOptimizer auto
+elki.database.query.DisableQueryOptimizer no none false disable disabled
