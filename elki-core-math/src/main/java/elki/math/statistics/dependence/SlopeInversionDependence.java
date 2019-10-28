@@ -60,7 +60,7 @@ public class SlopeInversionDependence extends SlopeDependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
 
     // Get attribute value range:
     final double off1, scale1, off2, scale2;

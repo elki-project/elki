@@ -31,8 +31,8 @@ import org.junit.Test;
 public class SURFINGDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
-    checkPerfectLinear(SURFINGDependence.STATIC, 1000, 0.392, 0.392, 0.001);
-    checkUniform(SURFINGDependence.STATIC, 1000, 0.1, 0.02, 0.099, 0.001);
-    checkGaussians(SURFINGDependence.STATIC, 1000, 0.13, 0.001);
+    assertPerfectLinear(SURFINGDependence.STATIC, 1000, 0.392, 0.392, 0.001);
+    assertUniform(SURFINGDependence.STATIC, 1000, 0.1, 0.02, 0.099, 0.001);
+    assertGaussians(SURFINGDependence.STATIC, 1000, 0.13, 0.001);
   }
 }

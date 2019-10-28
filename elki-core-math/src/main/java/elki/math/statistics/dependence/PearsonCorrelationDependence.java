@@ -55,7 +55,7 @@ public class PearsonCorrelationDependence implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
     // Perform two-pass estimation, which is numerically stable and often faster
     // than the Knuth-Welford approach (see PearsonCorrelationDependence class)
     double m1 = 0., m2 = 0;
@@ -81,7 +81,7 @@ public class PearsonCorrelationDependence implements Dependence {
 
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
-    final int dims = data.size(), len = Util.size(adapter, data);
+    final int dims = data.size(), len = Utils.size(adapter, data);
     double[] means = new double[dims];
     // Two passes - often faster due to the lower numerical cost
     // And accurate, don't use sum-of-squares.

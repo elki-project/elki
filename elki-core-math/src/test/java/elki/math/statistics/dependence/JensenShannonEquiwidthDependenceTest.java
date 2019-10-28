@@ -82,7 +82,7 @@ public class JensenShannonEquiwidthDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
     // This will become better with data size.
-    checkPerfectLinear(JensenShannonEquiwidthDependence.STATIC, 1000, 0.938, 0.938, 0.001);
-    checkUniform(JensenShannonEquiwidthDependence.STATIC, 1000, 0.998, 0.001, 0.267, 0.001);
+    assertPerfectLinear(JensenShannonEquiwidthDependence.STATIC, 1000, 0.938, 0.938, 0.001);
+    assertUniform(JensenShannonEquiwidthDependence.STATIC, 1000, 0.998, 0.001, 0.267, 0.001);
   }
 }

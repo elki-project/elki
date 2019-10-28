@@ -69,7 +69,7 @@ public class DCor implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
     double[] dMatrixA = computeDistances(adapter1, data1);
     double dVarA = computeDCovar(dMatrixA, dMatrixA, len);
     if(!(dVarA > 0.)) {
@@ -86,7 +86,7 @@ public class DCor implements Dependence {
 
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
-    final int dims = data.size(), len = Util.size(adapter, data);
+    final int dims = data.size(), len = Utils.size(adapter, data);
     double[][] dMatrix = new double[dims][];
     for(int i = 0; i < dims; i++) {
       dMatrix[i] = computeDistances(adapter, data.get(i));

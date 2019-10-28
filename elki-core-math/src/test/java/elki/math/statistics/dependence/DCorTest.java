@@ -55,8 +55,8 @@ public class DCorTest  extends DependenceTest {
   @Test
   public void testBasic() {
     // This will become better with data size.
-    checkPerfectLinear(DCor.STATIC, 1000, 1, 1, 1e-13);
-    checkUniform(DCor.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
+    assertPerfectLinear(DCor.STATIC, 1000, 1, 1, 1e-13);
+    assertUniform(DCor.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 
   @Test

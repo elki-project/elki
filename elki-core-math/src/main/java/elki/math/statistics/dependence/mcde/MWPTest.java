@@ -101,7 +101,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
   @Override
   public <A> MWPRanking correctedRanks(NumberArrayAdapter<?, A> adapter, A data, int len) {
     // Note: As described in Algorithm 1 of reference paper.
-    int[] idx = Dependence.Util.sortedIndex(adapter, data, len);
+    int[] idx = Dependence.Utils.sortedIndex(adapter, data, len);
     MWPRanking ranking = new MWPRanking(idx);
     long correction = 0;
     for(int j = 0; j < len;) {

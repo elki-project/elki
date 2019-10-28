@@ -31,7 +31,7 @@ import org.junit.Test;
 public class HoeffdingsDTest extends DependenceTest {
   @Test
   public void testBasic() {
-    checkPerfectLinear(HoeffdingsD.STATIC, 1000, 1., 1., 1e-15);
-    checkUniform(HoeffdingsD.STATIC, 1000, 1.0, 1e-15, 0, 0.001);
+    assertPerfectLinear(HoeffdingsD.STATIC, 1000, 1., 1., 1e-15);
+    assertUniform(HoeffdingsD.STATIC, 1000, 1.0, 1e-15, 0, 0.001);
   }
 }

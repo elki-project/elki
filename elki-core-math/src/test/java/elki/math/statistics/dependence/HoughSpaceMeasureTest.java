@@ -33,8 +33,8 @@ public class HoughSpaceMeasureTest extends DependenceTest {
   public void testBasic() {
     // These tests primarily show that this measure does not detect linear
     // relationships too well - they cause parallel lines, not intersections.
-    checkPerfectLinear(HoughSpaceMeasure.STATIC, 100, 0.725, 0.740, 0.001);
-    checkUniform(HoughSpaceMeasure.STATIC, 100, 0.655, 0.005, 0.680, 0.001);
-    checkGaussians(HoughSpaceMeasure.STATIC, 100, 0.663, 0.001);
+    assertPerfectLinear(HoughSpaceMeasure.STATIC, 100, 0.725, 0.740, 0.001);
+    assertUniform(HoughSpaceMeasure.STATIC, 100, 0.655, 0.005, 0.680, 0.001);
+    assertGaussians(HoughSpaceMeasure.STATIC, 100, 0.663, 0.001);
   }
 }

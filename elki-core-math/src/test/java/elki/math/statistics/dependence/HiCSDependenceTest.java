@@ -40,12 +40,12 @@ public class HiCSDependenceTest extends DependenceTest {
         .with(HiCSDependence.Par.TEST_ID, KolmogorovSmirnovTest.STATIC) //
         .build();
     // Linear correlations do affect marginal distributions!
-    checkPerfectLinear(cor, 1000, 0.5, 0.12, 0.08);
+    assertPerfectLinear(cor, 1000, 0.5, 0.12, 0.08);
     // Note that for HiCS, even independent uniform is related,
     // because the marginal distribution does not change.
-    checkUniform(cor, 1000, 0.5, 0.01, 0.5, 0.08);
+    assertUniform(cor, 1000, 0.5, 0.01, 0.5, 0.08);
     // Gaussian marginals are also related
-    checkGaussians(cor, 1000, 0.62, 0.08);
+    assertGaussians(cor, 1000, 0.62, 0.08);
   }
 
   @Test
@@ -56,8 +56,8 @@ public class HiCSDependenceTest extends DependenceTest {
         .build();
     // This test mostly shows that Welch-T is too aggressive for this to work:
     // Even i.i.d. distributed data frequently pass as different.
-    checkPerfectLinear(cor, 1000, 0.01, 0., 0.01);
-    checkUniform(cor, 1000, 0.01, 0.05, 0., 0.08);
-    checkGaussians(cor, 1000, 0.02, 0.08);
+    assertPerfectLinear(cor, 1000, 0.01, 0., 0.01);
+    assertUniform(cor, 1000, 0.01, 0.05, 0., 0.08);
+    assertGaussians(cor, 1000, 0.02, 0.08);
   }
 }

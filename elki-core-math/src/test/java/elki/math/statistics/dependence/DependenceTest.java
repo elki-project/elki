@@ -48,7 +48,7 @@ public class DependenceTest {
     public void testIndexing() {
       double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
       int[] indexes = { 0, 2, 1, 3, 5, 4 };
-      int[] idx = Dependence.Util.sortedIndex(DoubleArrayAdapter.STATIC, data, data.length);
+      int[] idx = Dependence.Utils.sortedIndex(DoubleArrayAdapter.STATIC, data, data.length);
       for(int i = 0; i < indexes.length; i++) {
         assertEquals("Index " + i, indexes[i], idx[i]);
       }
@@ -58,14 +58,14 @@ public class DependenceTest {
     public void testRanks() {
       double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };
       double[] ranks = { 1., 4, 2., 4, 6, 4 };
-      double[] r = Dependence.Util.ranks(DoubleArrayAdapter.STATIC, data, data.length);
+      double[] r = Dependence.Utils.ranks(DoubleArrayAdapter.STATIC, data, data.length);
       for(int i = 0; i < ranks.length; i++) {
         assertEquals("Rank " + i, ranks[i], r[i], 1e-20);
       }
     }
   }
 
-  public static void checkPerfectLinear(Dependence m, int len, double expectp, double expectn, double tol) {
+  public static void assertPerfectLinear(Dependence m, int len, double expectp, double expectn, double tol) {
     Random r = new FastNonThreadsafeRandom(0L);
     double[] x = new double[len], y = new double[len], z = new double[len];
     for(int i = 0; i < len; i++) {
@@ -80,7 +80,7 @@ public class DependenceTest {
     assertEquals("Perfect negative linear", expectn, res[2], tol);
   }
 
-  public static void checkUniform(Dependence m, int len, double expectSelf, double tolSelf, double expectCross, double tolCross) {
+  public static void assertUniform(Dependence m, int len, double expectSelf, double tolSelf, double expectCross, double tolCross) {
     Random r = new FastNonThreadsafeRandom(0L);
     double[] x = new double[len], y = new double[len];
     for(int i = 0; i < len; i++) {
@@ -92,7 +92,7 @@ public class DependenceTest {
     assertEquals("Uniform-self2", expectSelf, m.dependence(y, y), tolSelf);
   }
 
-  public static void checkGaussians(Dependence m, int len, double expect, double tol) {
+  public static void assertGaussians(Dependence m, int len, double expect, double tol) {
     Random r = new FastNonThreadsafeRandom(0L);
     double[] x = new double[len], y = new double[len];
     int halflen = len >>> 1;

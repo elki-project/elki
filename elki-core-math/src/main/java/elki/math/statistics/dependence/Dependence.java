@@ -119,8 +119,7 @@ public interface Dependence {
    *
    * @author Erich Schubert
    */
-  public class Util {
-
+  public class Utils {
     /**
      * Compute ranks of all objects, normalized to [0;1]
      * (where 0 is the smallest value, 1 is the largest).

@@ -65,8 +65,8 @@ public class MutualInformationEquiwidthDependenceTest extends DependenceTest {
 
   @Test
   public void testBasic() {
-    checkPerfectLinear(MutualInformationEquiwidthDependence.STATIC, 1000, 0.87, 0.87, 0.002);
-    checkUniform(MutualInformationEquiwidthDependence.STATIC, 1000, 1.0, 0.01, 0.163, 0.001);
+    assertPerfectLinear(MutualInformationEquiwidthDependence.STATIC, 1000, 0.87, 0.87, 0.002);
+    assertUniform(MutualInformationEquiwidthDependence.STATIC, 1000, 1.0, 0.01, 0.163, 0.001);
   }
 
   @Test

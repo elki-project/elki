@@ -31,7 +31,7 @@ import org.junit.Test;
 public class SlopeInversionDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
-    checkPerfectLinear(SlopeInversionDependence.STATIC, 1000, 1.0, 1.0, 1e-15);
-    checkUniform(SlopeInversionDependence.STATIC, 1000, 1.0, 1e-15, 0.06, 0.01);
+    assertPerfectLinear(SlopeInversionDependence.STATIC, 1000, 1.0, 1.0, 1e-15);
+    assertUniform(SlopeInversionDependence.STATIC, 1000, 1.0, 1e-15, 0.06, 0.01);
   }
 }

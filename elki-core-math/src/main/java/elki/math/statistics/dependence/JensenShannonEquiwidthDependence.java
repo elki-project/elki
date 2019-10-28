@@ -52,7 +52,7 @@ public class JensenShannonEquiwidthDependence implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
     final int bins = (int) FastMath.round(FastMath.sqrt(len));
     final int maxbin = bins - 1;
 

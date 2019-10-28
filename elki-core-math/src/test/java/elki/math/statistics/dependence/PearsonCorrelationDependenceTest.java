@@ -54,8 +54,8 @@ public class PearsonCorrelationDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
     // This will become better with data size.
-    checkPerfectLinear(PearsonCorrelationDependence.STATIC, 1000, 1, -1, 1e-14);
-    checkUniform(PearsonCorrelationDependence.STATIC, 1000, 1.0, 1e-15, 0, 0.03);
+    assertPerfectLinear(PearsonCorrelationDependence.STATIC, 1000, 1, -1, 1e-14);
+    assertUniform(PearsonCorrelationDependence.STATIC, 1000, 1.0, 1e-15, 0, 0.03);
   }
 
   @Test

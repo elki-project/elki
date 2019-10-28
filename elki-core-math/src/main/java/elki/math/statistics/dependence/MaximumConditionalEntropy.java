@@ -66,7 +66,7 @@ public class MaximumConditionalEntropy implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
     // Find a number of bins as recommended by Cheng et al.
     double p = MathUtil.log2(len / (double) TARGET);
     // As we are in 2d, take the root (*.5) But let's use at least 1, too.

@@ -31,7 +31,7 @@ import org.junit.Test;
 public class MaximumConditionalEntropyTest extends DependenceTest {
   @Test
   public void testBasic() {
-    checkPerfectLinear(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1.0, 1e-15);
-    checkUniform(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1e-15, 0.002, 0.005);
+    assertPerfectLinear(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1.0, 1e-15);
+    assertUniform(MaximumConditionalEntropy.STATIC, 1000, 1.0, 1e-15, 0.002, 0.005);
   }
 }

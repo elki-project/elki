@@ -85,7 +85,7 @@ public class SURFINGDependence implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
     final int k = Math.max(1, len / 10);
 
     double[] knns = new double[len];

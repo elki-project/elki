@@ -158,7 +158,7 @@ public class MCDEDependence implements Dependence {
 
   @Override
   public <A, B> double dependence(final NumberArrayAdapter<?, A> adapter1, final A data1, final NumberArrayAdapter<?, B> adapter2, final B data2) {
-    final int len = Dependence.Util.size(adapter1, data1, adapter2, data2);
+    final int len = Dependence.Utils.size(adapter1, data1, adapter2, data2);
     // Note: Corresponds to Algorithm 4 in source paper.
     MCDETest.RankStruct i1 = mcdeTest.correctedRanks(adapter1, data1, len);
     MCDETest.RankStruct i2 = mcdeTest.correctedRanks(adapter2, data2, len);
@@ -178,7 +178,7 @@ public class MCDEDependence implements Dependence {
   @Override
   public <A> double[] dependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
     final int dims = data.size();
-    final int len = Dependence.Util.size(adapter, data);
+    final int len = Dependence.Utils.size(adapter, data);
     // Build indexes:
     MCDETest.RankStruct[] idx = new MCDETest.RankStruct[dims];
     for(int i = 0; i < dims; i++) {
@@ -220,7 +220,7 @@ public class MCDEDependence implements Dependence {
    */
   public <A> double higherOrderDependence(NumberArrayAdapter<?, A> adapter, List<? extends A> data) {
     final int dims = data.size();
-    final int len = Dependence.Util.size(adapter, data);
+    final int len = Dependence.Utils.size(adapter, data);
     // Build indexes:
     MCDETest.RankStruct[] idx = new MCDETest.RankStruct[dims];
     for(int i = 0; i < dims; i++) {

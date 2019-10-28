@@ -53,8 +53,8 @@ public class SpearmanCorrelationDependenceTest extends DependenceTest {
 
   @Test
   public void testBasic() {
-    checkPerfectLinear(SpearmanCorrelationDependence.STATIC, 1000, 1.0, -1.0, 1e-15);
-    checkUniform(SpearmanCorrelationDependence.STATIC, 1000, 1.0, 1e-15, -0.026, 0.01);
+    assertPerfectLinear(SpearmanCorrelationDependence.STATIC, 1000, 1.0, -1.0, 1e-15);
+    assertUniform(SpearmanCorrelationDependence.STATIC, 1000, 1.0, 1e-15, -0.026, 0.01);
   }
 
   @Test

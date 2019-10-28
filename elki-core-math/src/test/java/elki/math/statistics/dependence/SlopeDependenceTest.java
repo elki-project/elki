@@ -32,7 +32,7 @@ public class SlopeDependenceTest extends DependenceTest {
   @Test
   public void testBasic() {
     // Note: only positive correlations are accepted.
-    checkPerfectLinear(SlopeDependence.STATIC, 1000, 1.0, 0.125, 0.01);
-    checkUniform(SlopeDependence.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
+    assertPerfectLinear(SlopeDependence.STATIC, 1000, 1.0, 0.125, 0.01);
+    assertUniform(SlopeDependence.STATIC, 1000, 1.0, 1e-15, 0.05, 0.01);
   }
 }

@@ -45,9 +45,9 @@ public class SpearmanCorrelationDependence implements Dependence {
 
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
-    final int len = Util.size(adapter1, data1, adapter2, data2);
-    double[] ranks1 = Util.computeNormalizedRanks(adapter1, data1, len);
-    double[] ranks2 = Util.computeNormalizedRanks(adapter2, data2, len);
+    final int len = Utils.size(adapter1, data1, adapter2, data2);
+    double[] ranks1 = Utils.computeNormalizedRanks(adapter1, data1, len);
+    double[] ranks2 = Utils.computeNormalizedRanks(adapter2, data2, len);
 
     // Second pass: variances and covariance
     double v1 = 0., v2 = 0., cov = 0.;
