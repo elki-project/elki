@@ -66,4 +66,5 @@ allprojects  {
     outputFile = "$projectDir/.settings/org.eclipse.buildship.core.prefs" as File
   }
   tasks.eclipse.dependsOn eclipseBuildshipPreferences
+  eclipse.synchronizationTasks eclipseUIPreferences, eclipseBuildshipPreferences, eclipseJdt
 }
