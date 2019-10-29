@@ -20,12 +20,9 @@
  */
 package elki.index.tree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Stack;
 
 import elki.persistent.DefaultPageHeader;
@@ -41,9 +38,9 @@ public class TreeIndexHeader extends DefaultPageHeader {
   /**
    * The size of this header in Bytes, which is 20 Bytes ( 4 Bytes for
    * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum},
-   * {@link #leafMinimum}, and {@link #emptyPagesSize}).
+   * {@link #leafMinimum}, {@link #emptyPagesSize}), and {@link #largestPageID}.
    */
-  private static int SIZE = 20;
+  private static int SIZE = 6 * 4;
 
   /**
    * The capacity of a directory node (= 1 + maximum number of entries in a
@@ -72,10 +69,12 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * the headed page file.
    */
   private int emptyPagesSize = 0;
+
   /**
    * The largest ID used so far
    */
   private int largestPageID = 0;
+
   /**
    * Empty constructor for serialization.
    */
@@ -102,20 +101,20 @@ public class TreeIndexHeader extends DefaultPageHeader {
 
   /**
    * Initializes this header from the specified file. Calls
-   * {@link elki.persistent.DefaultPageHeader#readHeader(java.io.RandomAccessFile)
+   * {@link elki.persistent.DefaultPageHeader#readHeader(FileChannel)
    * DefaultPageHeader#readHeader(file)} and reads the integer values of
    * {@link #dirCapacity}, {@link #leafCapacity}, {@link #dirMinimum},
    * {@link #leafMinimum} and {@link #emptyPagesSize} from the file.
    */
   @Override
-  public void readHeader(RandomAccessFile file) throws IOException {
-    super.readHeader(file);
-    this.dirCapacity = file.readInt();
-    this.leafCapacity = file.readInt();
-    this.dirMinimum = file.readInt();
-    this.leafMinimum = file.readInt();
-    this.emptyPagesSize = file.readInt();
-    this.largestPageID = file.readInt();
+  public void readHeader(ByteBuffer buffer) {
+    super.readHeader(buffer);
+    this.dirCapacity = buffer.getInt();
+    this.leafCapacity = buffer.getInt();
+    this.dirMinimum = buffer.getInt();
+    this.leafMinimum = buffer.getInt();
+    this.emptyPagesSize = buffer.getInt();
+    this.largestPageID = buffer.getInt();
   }
 
   /**
@@ -124,14 +123,15 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * {@link #leafMinimum} and {@link #emptyPagesSize} to the file.
    */
   @Override
-  public void writeHeader(RandomAccessFile file) throws IOException {
-    super.writeHeader(file);
-    file.writeInt(this.dirCapacity);
-    file.writeInt(this.leafCapacity);
-    file.writeInt(this.dirMinimum);
-    file.writeInt(this.leafMinimum);
-    file.writeInt(this.emptyPagesSize);
-    file.writeInt(this.largestPageID);
+  public void writeHeader(ByteBuffer buffer) {
+    super.writeHeader(buffer);
+    buffer.putInt(this.dirCapacity) //
+        .putInt(this.leafCapacity) //
+        .putInt(this.dirMinimum) //
+        .putInt(this.leafMinimum) //
+        .putInt(this.emptyPagesSize) //
+        .putInt(this.largestPageID) //
+        .flip();
   }
 
   /**
@@ -189,7 +189,6 @@ public class TreeIndexHeader extends DefaultPageHeader {
     this.emptyPagesSize = emptyPagesSize;
   }
 
-  
   public int getLargestPageID() {
     return largestPageID;
   }
@@ -211,28 +210,28 @@ public class TreeIndexHeader extends DefaultPageHeader {
 
   /**
    * Write the indices of empty pages the the end of <code>file</code>. Calling
-   * this method should be followed by a {@link #writeHeader(RandomAccessFile)}.
+   * this method should be followed by a {@link #writeHeader(FileChannel)}.
    * 
    * @param emptyPages the stack of empty page ids which remain to be filled
    * @param file File to work with
    * @throws IOException thrown on IO errors
    */
-  public void writeEmptyPages(Stack<Integer> emptyPages, RandomAccessFile file) throws IOException {
+  public void writeEmptyPages(Stack<Integer> emptyPages, FileChannel file) throws IOException {
     if(emptyPages.isEmpty()) {
       this.emptyPagesSize = 0;
       return; // nothing to write
     }
+    // FIXME: serialize this as a list of ints, not using Java serialization...
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     oos.writeObject(emptyPages);
     oos.flush();
     byte[] bytes = baos.toByteArray();
-    this.emptyPagesSize = bytes.length;
     oos.close();
     baos.close();
+    this.emptyPagesSize = bytes.length;
     if(this.emptyPagesSize > 0) {
-      file.seek(file.length());
-      file.write(bytes);
+      file.write(ByteBuffer.wrap(bytes), file.size());
     }
   }
 
@@ -246,13 +245,13 @@ public class TreeIndexHeader extends DefaultPageHeader {
    *         correctly read from file
    */
   @SuppressWarnings("unchecked")
-  public Stack<Integer> readEmptyPages(RandomAccessFile file) throws IOException, ClassNotFoundException {
+  public Stack<Integer> readEmptyPages(FileChannel file) throws IOException, ClassNotFoundException {
     if(emptyPagesSize == 0) {
       return new Stack<>();
     }
     byte[] bytes = new byte[emptyPagesSize];
-    file.seek(file.length() - emptyPagesSize);
-    file.read(bytes);
+    file.read(ByteBuffer.wrap(bytes), file.size() - emptyPagesSize);
+    // FIXME: serialize this as a list of ints, not using Java serialization...
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
     ObjectInputStream ois = new ObjectInputStream(bais);
     Stack<Integer> emptyPages = (Stack<Integer>) ois.readObject();

@@ -22,6 +22,7 @@ package elki.visualization.savedialog;
 
 import java.awt.Component;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
@@ -38,7 +39,7 @@ import elki.visualization.svg.SVGPlot;
 
 /**
  * A save dialog to save/export a SVG image to a file.
- *
+ * <p>
  * Supported formats:
  * <ul>
  * <li>SVG</li>
@@ -126,12 +127,12 @@ public final class SVGSaveDialog {
     int ret = fc.showSaveDialog(null);
     if(ret == JFileChooser.APPROVE_OPTION) {
       fc.setDialogTitle("Saving... Please wait.");
-      File file = fc.getSelectedFile();
+      Path file = fc.getSelectedFile().toPath();
       String format = optionsPanel.getSelectedFormat();
       width = optionsPanel.getSelectedWidth();
       height = optionsPanel.getSelectedHeight();
       if(format == null || AUTOMAGIC_FORMAT.equals(format)) {
-        format = guessFormat(file.getName());
+        format = guessFormat(file.getFileName().toString());
       }
       try {
         if(format == null) {

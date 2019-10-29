@@ -21,8 +21,9 @@
 package elki.application.experiments;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
 
@@ -87,7 +88,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Holds the file to print results to.
    */
-  private File out;
+  private Path out;
 
   /**
    * Image size.
@@ -117,7 +118,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * @param mode Visualization mode
    * @param model Earth model
    */
-  public VisualizeGeodesicDistances(File out, int resolution, int steps, Mode mode, EarthModel model) {
+  public VisualizeGeodesicDistances(Path out, int resolution, int steps, Mode mode, EarthModel model) {
     super();
     this.width = resolution;
     this.height = resolution >> 1;
@@ -194,7 +195,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     LOG.ensureCompleted(prog);
 
     try {
-      ImageIO.write(img, "png", out);
+      ImageIO.write(img, "png", Files.newOutputStream(out));
     }
     catch(IOException e) {
       LOG.exception(e);
@@ -264,7 +265,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     /**
      * Holds the file to print results to.
      */
-    protected File out = null;
+    protected Path out = null;
 
     /**
      * Number of steps in the color map.

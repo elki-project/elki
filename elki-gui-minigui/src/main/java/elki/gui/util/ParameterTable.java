@@ -481,7 +481,7 @@ public class ParameterTable extends JTable {
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           mode = FileParameter.FileType.INPUT_FILE.equals(fp.getFileType()) ? FileDialog.LOAD : FileDialog.SAVE;
-          textfield.setText(fp.isDefined() ? fp.getValue().getPath() : "");
+          textfield.setText(fp.isDefined() ? fp.getValue().toString() : "");
         }
       }
       textfield.requestFocus();

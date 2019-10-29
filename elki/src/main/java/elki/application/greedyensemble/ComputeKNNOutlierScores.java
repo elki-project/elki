@@ -20,9 +20,9 @@
  */
 package elki.application.greedyensemble;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
@@ -117,7 +117,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
   /**
    * Output file
    */
-  File outfile;
+  Path outfile;
 
   /**
    * By label outlier detection - reference
@@ -151,7 +151,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * @param disable Pattern for disabling methods
    * @param ksquarestop Maximum k for O(k^2) methods
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distance, IntGenerator krange, ByLabelOutlier bylabel, File outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
+  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distance, IntGenerator krange, ByLabelOutlier bylabel, Path outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
     super(inputstep, distance);
     this.krange = krange;
     this.bylabel = bylabel;
@@ -192,7 +192,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
 
     final DBIDs ids = relation.getDBIDs();
 
-    try (PrintStream fout = new PrintStream(outfile)) {
+    try (BufferedWriter fout = Files.newBufferedWriter(outfile)) {
       // Control: print the DBIDs in case we are seeing an odd iteration
       fout.append("# Data set size: " + relation.size()) //
           .append(" data type: " + relation.getDataTypeInformation()).append(FormatUtil.NEWLINE);
@@ -295,8 +295,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           k -> new ISOS<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
     }
-    catch(FileNotFoundException e) {
-      throw new AbortException("Cannot create output file.", e);
+    catch(IOException e) {
+      throw new AbortException("IO error writing output file.", e);
     }
   }
 
@@ -309,18 +309,25 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * @param scaling Scaling function
    * @param label Identification label
    */
-  void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
-    if(scaling instanceof OutlierScaling) {
-      ((OutlierScaling) scaling).prepare(result);
+  void writeResult(Appendable out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
+    try {
+      if(scaling instanceof OutlierScaling) {
+        ((OutlierScaling) scaling).prepare(result);
+      }
+      out.append(label);
+      DoubleRelation scores = result.getScores();
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        double value = scores.doubleValue(iter);
+        value = scaling != null ? scaling.getScaled(value) : value;
+        out.append(' ').append(Double.toString(value));
+      }
+      out.append(FormatUtil.NEWLINE);
     }
-    out.append(label);
-    DoubleRelation scores = result.getScores();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double value = scores.doubleValue(iter);
-      value = scaling != null ? scaling.getScaled(value) : value;
-      out.append(' ').append(Double.toString(value));
+    catch(IOException e) {
+      // Unfortunately we need to rewrap this in an unchecked exception to use
+      // this in a lambda.
+      throw new AbortException("IO Error writing to file", e);
     }
-    out.append(FormatUtil.NEWLINE);
   }
 
   /**
@@ -407,7 +414,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     /**
      * Output destination file
      */
-    File outfile;
+    Path outfile;
 
     /**
      * Pattern for disabling (skipping) methods.

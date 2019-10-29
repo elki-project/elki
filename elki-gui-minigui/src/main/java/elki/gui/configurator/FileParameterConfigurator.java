@@ -25,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Path;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -76,8 +77,8 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
     // fill with value
-    File f = fp.isDefined() ? fp.getValue() : null;
-    textfield.setText(f == null ? "" : f.getPath());
+    Path f = fp.isDefined() ? fp.getValue() : null;
+    textfield.setText(f == null ? "" : f.toString());
 
     // make a panel
     GridBagConstraints constraints = new GridBagConstraints();
@@ -99,7 +100,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     // Use a new JFileChooser. Inconsistent behaviour otherwise!
     final JFileChooser fc = new JFileChooser(new File("."));
     if(param.isDefined()) {
-      fc.setSelectedFile(param.getValue());
+      fc.setSelectedFile(param.getValue().toFile());
     }
 
     if(e.getSource() == button) {

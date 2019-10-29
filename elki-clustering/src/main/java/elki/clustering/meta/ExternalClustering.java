@@ -20,10 +20,10 @@
  */
 package elki.clustering.meta;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import elki.clustering.ClusteringAlgorithm;
@@ -34,11 +34,7 @@ import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.datasource.parser.CSVReaderFormat;
 import elki.logging.Logging;
@@ -53,12 +49,8 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntListIterator;
+
+import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
@@ -98,14 +90,14 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
   /**
    * The file to be reparsed.
    */
-  private File file;
+  private Path file;
 
   /**
    * Constructor.
    *
    * @param file File to load
    */
-  public ExternalClustering(File file) {
+  public ExternalClustering(Path file) {
     super();
     this.file = file;
   }
@@ -124,8 +116,7 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
   @Override
   public Clustering<? extends Model> autorun(Database database) {
     Clustering<? extends Model> m = null;
-    try (FileInputStream fis = new FileInputStream(file); //
-        InputStream in = FileUtil.tryGzipInput(fis); //
+    try (InputStream in = FileUtil.tryGzipInput(Files.newInputStream(file)); //
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       reader.reset(in);
@@ -212,7 +203,7 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
     /**
      * The file to be reparsed
      */
-    private File file;
+    private Path file;
 
     @Override
     public void configure(Parameterization config) {

@@ -20,10 +20,10 @@
  */
 package elki.application;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import elki.datasource.DatabaseConnection;
 import elki.datasource.FileBasedDatabaseConnection;
@@ -54,7 +54,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
   /**
    * Output filename.
    */
-  private File outfile;
+  private Path outfile;
 
   /**
    * Constructor.
@@ -62,7 +62,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
    * @param input Data source configuration
    * @param outfile Output filename
    */
-  public ConvertToBundleApplication(DatabaseConnection input, File outfile) {
+  public ConvertToBundleApplication(DatabaseConnection input, Path outfile) {
     super();
     this.input = input;
     this.outfile = outfile;
@@ -78,13 +78,9 @@ public class ConvertToBundleApplication extends AbstractApplication {
       LOG.verbose("Serializing to output file: " + outfile.toString());
     }
     // TODO: make configurable?
-    BundleWriter writer = new BundleWriter();
-    try {
-      FileOutputStream fos = new FileOutputStream(outfile);
-      FileChannel channel = fos.getChannel();
-      writer.writeBundleStream(bundle.asStream(), channel);
-      channel.close();
-      fos.close();
+    try (FileChannel channel = FileChannel.open(outfile, //
+        StandardOpenOption.WRITE)) {
+      new BundleWriter().writeBundleStream(bundle.asStream(), channel);
     }
     catch(IOException e) {
       LOG.exception("IO Error", e);
@@ -110,7 +106,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
     /**
      * Output filename.
      */
-    private File outfile;
+    private Path outfile;
 
     @Override
     public void configure(Parameterization config) {

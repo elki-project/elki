@@ -20,8 +20,8 @@
  */
 package elki.database.lucene;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -35,8 +35,8 @@ import elki.database.relation.DBIDView;
 import elki.logging.Logging;
 import elki.result.ResultUtil;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
@@ -122,7 +122,7 @@ public class LuceneDatabase extends AbstractDatabase {
     /**
      * Index folder.
      */
-    File idir;
+    Path idir;
 
     @Override
     public void configure(Parameterization config) {
@@ -133,7 +133,7 @@ public class LuceneDatabase extends AbstractDatabase {
     @Override
     public LuceneDatabase make() {
       try {
-        return new LuceneDatabase(FSDirectory.open(idir));
+        return new LuceneDatabase(FSDirectory.open(idir.toFile()));
       }
       catch(IOException e) {
         throw new AbortException("I/O error opening index.", e);

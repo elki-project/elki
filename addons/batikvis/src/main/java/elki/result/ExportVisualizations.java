@@ -20,12 +20,10 @@
  */
 package elki.result;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 import org.apache.batik.util.SVGConstants;
 
@@ -33,8 +31,8 @@ import elki.logging.Logging;
 import elki.utilities.datastructures.hierarchy.Hierarchy;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -81,7 +79,7 @@ public class ExportVisualizations implements ResultHandler {
   /**
    * Output folder
    */
-  File output;
+  Path output;
 
   /**
    * Visualization manager.
@@ -126,7 +124,7 @@ public class ExportVisualizations implements ResultHandler {
    * @param ratio Canvas ratio
    * @param format Output file format
    */
-  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio, Format format) {
+  public ExportVisualizations(Path output, VisualizerParameterizer manager, double ratio, Format format) {
     this(output, manager, ratio, format, 1000);
   }
 
@@ -139,7 +137,7 @@ public class ExportVisualizations implements ResultHandler {
    * @param format Output file format
    * @param iwidth Image width for pixel formats
    */
-  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio, Format format, int iwidth) {
+  public ExportVisualizations(Path output, VisualizerParameterizer manager, double ratio, Format format, int iwidth) {
     super();
     this.output = output;
     this.manager = manager;
@@ -150,11 +148,14 @@ public class ExportVisualizations implements ResultHandler {
 
   @Override
   public void processNewResult(Object newResult) {
-    if(output.isFile()) {
+    if(Files.isRegularFile(output)) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
-    if(!output.exists() && !output.mkdirs()) {
-      throw new AbortException("Could not create output directory.");
+    try {
+      Files.createDirectories(output);
+    }
+    catch(IOException e) {
+      throw new AbortException("Could not create output directory.", e);
     }
     if(this.baseResult == null) {
       this.baseResult = newResult;
@@ -242,36 +243,24 @@ public class ExportVisualizations implements ResultHandler {
     counter.put(prefix, count = count == null ? 1 : (count + 1));
     try {
       switch(format){
-      case SVG: {
-        File outname = new File(output, prefix + "-" + count + ".svg");
-        svgp.saveAsSVG(outname);
+      case SVG:
+        svgp.saveAsSVG(output.resolve(prefix + "-" + count + ".svg"));
         break;
-      }
-      case PNG: {
-        File outname = new File(output, prefix + "-" + count + ".png");
-        svgp.saveAsPNG(outname, (int) (iwidth * ratio), iwidth);
+      case PNG:
+        svgp.saveAsPNG(output.resolve(prefix + "-" + count + ".png"), (int) (iwidth * ratio), iwidth);
         break;
-      }
-      case PDF: {
-        File outname = new File(output, prefix + "-" + count + ".pdf");
-        svgp.saveAsPDF(outname);
+      case PDF:
+        svgp.saveAsPDF(output.resolve(prefix + "-" + count + ".pdf"));
         break;
-      }
-      case PS: {
-        File outname = new File(output, prefix + "-" + count + ".ps");
-        svgp.saveAsPS(outname);
+      case PS:
+        svgp.saveAsPS(output.resolve(prefix + "-" + count + ".ps"));
         break;
-      }
-      case EPS: {
-        File outname = new File(output, prefix + "-" + count + ".eps");
-        svgp.saveAsEPS(outname);
+      case EPS:
+        svgp.saveAsEPS(output.resolve(prefix + "-" + count + ".eps"));
         break;
-      }
-      case JPEG: {
-        File outname = new File(output, prefix + "-" + count + ".jpg");
-        svgp.saveAsJPEG(outname, (int) (iwidth * ratio), iwidth);
+      case JPEG:
+        svgp.saveAsJPEG(output.resolve(prefix + "-" + count + ".jpg"), (int) (iwidth * ratio), iwidth);
         break;
-      }
       }
     }
     catch(Exception e) {
@@ -316,7 +305,7 @@ public class ExportVisualizations implements ResultHandler {
     /**
      * Output folder
      */
-    File output;
+    Path output;
 
     /**
      * Ratio for canvas

@@ -20,7 +20,11 @@
  */
 package elki.distance.external;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
@@ -30,8 +34,8 @@ import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -74,7 +78,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
   /**
    * Input file of distance matrix
    */
-  private File matrixfile;
+  private Path matrixfile;
 
   /**
    * Minimum and maximum IDs seen.
@@ -93,7 +97,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
    * @param matrixfile input file
    * @param defaultDistance Default distance (when undefined)
    */
-  public FileBasedSparseFloatDistance(DistanceParser parser, File matrixfile, float defaultDistance) {
+  public FileBasedSparseFloatDistance(DistanceParser parser, Path matrixfile, float defaultDistance) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
@@ -104,7 +108,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
   public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> relation) {
     if(cache == null) {
       try {
-        loadCache(relation.size(), new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
+        loadCache(relation.size(), new BufferedInputStream(FileUtil.tryGzipInput(Files.newInputStream(matrixfile))));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -213,7 +217,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     /**
      * Input file.
      */
-    protected File matrixfile = null;
+    protected Path matrixfile = null;
 
     /**
      * Parser for input file.

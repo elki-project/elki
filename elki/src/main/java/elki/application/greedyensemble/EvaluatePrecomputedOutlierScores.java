@@ -21,7 +21,11 @@
 package elki.application.greedyensemble;
 
 import java.io.*;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.regex.Pattern;
 
 import elki.application.AbstractApplication;
@@ -82,7 +86,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   /**
    * The data input file.
    */
-  File infile;
+  Path infile;
 
   /**
    * Parser to read input data.
@@ -97,7 +101,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   /**
    * Output file name
    */
-  File outfile;
+  Path outfile;
 
   /**
    * Constant column to prepend (may be null)
@@ -123,7 +127,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
    * @param outfile Output file name
    * @param name Constant column to prepend
    */
-  public EvaluatePrecomputedOutlierScores(File infile, StreamingParser parser, Pattern reverse, File outfile, String name) {
+  public EvaluatePrecomputedOutlierScores(Path infile, StreamingParser parser, Pattern reverse, Path outfile, String name) {
     super();
     this.infile = infile;
     this.parser = parser;
@@ -134,11 +138,10 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   @Override
   public void run() {
-    try (FileInputStream fis = new FileInputStream(infile); //
+    try (InputStream fis = Files.newInputStream(infile); //
         InputStream is = new BufferedInputStream(FileUtil.tryGzipInput(fis)); //
-        FileOutputStream fosResult = new FileOutputStream(outfile, true);
-        PrintStream fout = new PrintStream(fosResult);
-        FileChannel chan = fosResult.getChannel()) {
+        FileChannel chan = FileChannel.open(outfile, StandardOpenOption.APPEND); //
+        PrintStream fout = new PrintStream(Channels.newOutputStream(chan))) {
       // Setup the input stream.
       parser.initStream(is);
       // Lock the output file:
@@ -304,7 +307,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     /**
      * Data source.
      */
-    File infile;
+    Path infile;
 
     /**
      * Parser to read input data.
@@ -319,7 +322,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     /**
      * Output destination file
      */
-    File outfile;
+    Path outfile;
 
     /**
      * Name column to prepend.

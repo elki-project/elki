@@ -22,16 +22,10 @@ package elki.result;
 
 import java.awt.Color;
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -49,11 +43,7 @@ import elki.data.spatial.SpatialUtil;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.DatabaseUtil;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
@@ -65,8 +55,8 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -75,6 +65,7 @@ import elki.utilities.pairs.DoubleObjPair;
 import elki.utilities.scaling.outlier.OutlierLinearScaling;
 import elki.utilities.scaling.outlier.OutlierScaling;
 import elki.workflow.OutputStep;
+
 import net.jafama.FastMath;
 
 /**
@@ -114,7 +105,7 @@ public class KMLOutputHandler implements ResultHandler {
   /**
    * Output file name
    */
-  File filename;
+  Path filename;
 
   /**
    * Scaling function
@@ -139,7 +130,7 @@ public class KMLOutputHandler implements ResultHandler {
    * @param compat Compatibility mode
    * @param autoopen Automatically open
    */
-  public KMLOutputHandler(File filename, OutlierScaling scaling, boolean compat, boolean autoopen) {
+  public KMLOutputHandler(Path filename, OutlierScaling scaling, boolean compat, boolean autoopen) {
     super();
     this.filename = filename;
     this.scaling = scaling;
@@ -158,7 +149,7 @@ public class KMLOutputHandler implements ResultHandler {
     for(OutlierResult outlierResult : ors) {
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
+        ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(filename));
         out.putNextEntry(new ZipEntry("doc.kml"));
         final XMLStreamWriter xmlw = factory.createXMLStreamWriter(out);
         writeOutlierResult(xmlw, outlierResult, database);
@@ -168,7 +159,7 @@ public class KMLOutputHandler implements ResultHandler {
         out.flush();
         out.close();
         if(autoopen) {
-          Desktop.getDesktop().open(filename);
+          Desktop.getDesktop().open(filename.toFile());
         }
       }
       catch(XMLStreamException e) {
@@ -183,7 +174,7 @@ public class KMLOutputHandler implements ResultHandler {
     for(Clustering<?> clusteringResult : crs) {
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
+        ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(filename));
         out.putNextEntry(new ZipEntry("doc.kml"));
         final XMLStreamWriter xmlw = factory.createXMLStreamWriter(out);
         @SuppressWarnings("unchecked")
@@ -195,7 +186,7 @@ public class KMLOutputHandler implements ResultHandler {
         out.flush();
         out.close();
         if(autoopen) {
-          Desktop.getDesktop().open(filename);
+          Desktop.getDesktop().open(filename.toFile());
         }
       }
       catch(XMLStreamException e) {
@@ -649,7 +640,7 @@ public class KMLOutputHandler implements ResultHandler {
     /**
      * Output file name
      */
-    File filename;
+    Path filename;
 
     /**
      * Scaling function

@@ -20,14 +20,11 @@
  */
 package elki.persistent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;
@@ -65,7 +62,7 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
   /**
    * The file name to use
    */
-  private File filename;
+  private Path filename;
 
   /**
    * The file storing the pages.
@@ -88,14 +85,10 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
    * @param pageSize page size
    * @param fileName the name of the file
    */
-  public OnDiskArrayPageFile(int pageSize, String fileName) {
+  public OnDiskArrayPageFile(int pageSize, Path filename) {
     super(pageSize);
-
-    // init the file
-    this.filename = new File(fileName);
-
-    // create from existing file
-    existed = this.filename.exists();
+    this.filename = filename;
+    existed = Files.exists(filename);
   }
 
   /**
@@ -109,7 +102,8 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
     try {
       countRead();
       return byteBufferToPage(this.file.getRecordBuffer(pageID));
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new RuntimeException("IOException occurred during reading of page " + pageID, e);
     }
   }
@@ -122,15 +116,14 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
   @Override
   public void deletePage(int pageID) {
     try {
-      // / put id to empty nodes and
-      // delete from cache
+      // put id to empty nodes and delete from cache
       super.deletePage(pageID);
-
       // delete from file
       countWrite();
       byte[] array = pageToByteArray(null);
       file.getRecordBuffer(pageID).put(array);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -143,13 +136,14 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
    */
   @Override
   public void writePage(int pageID, P page) {
-    if (page.isDirty()) {
+    if(page.isDirty()) {
       try {
         countWrite();
         byte[] array = pageToByteArray(page);
         file.getRecordBuffer(pageID).put(array);
         page.setDirty(false);
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         throw new RuntimeException(e);
       }
     }
@@ -163,7 +157,8 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
     try {
       super.close();
       file.close();
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -175,7 +170,8 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
   public void clear() {
     try {
       file.resizeFile(0);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -191,14 +187,17 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
     try (InputStream bais = new ByteBufferInputStream(buffer);
         ObjectInputStream ois = new ObjectInputStream(bais)) {
       int type = ois.readInt();
-      if (type == EMPTY_PAGE) {
+      if(type == EMPTY_PAGE) {
         return null;
-      } else if (type == FILLED_PAGE) {
+      }
+      else if(type == FILLED_PAGE) {
         return (P) ois.readObject();
-      } else {
+      }
+      else {
         throw new IllegalArgumentException("Unknown type: " + type);
       }
-    } catch (IOException|ClassNotFoundException e) {
+    }
+    catch(IOException | ClassNotFoundException e) {
       LoggingUtil.exception(e);
       return null;
     }
@@ -212,37 +211,24 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
    */
   private byte[] pageToByteArray(P page) {
     try {
-      if (page == null) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(baos);
+      if(page == null) {
         oos.writeInt(EMPTY_PAGE);
-        oos.close();
-        baos.close();
-        byte[] array = baos.toByteArray();
-        byte[] result = new byte[pageSize];
-        System.arraycopy(array, 0, result, 0, array.length);
-        return result;
-      } else {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
+      }
+      else {
         oos.writeInt(FILLED_PAGE);
         oos.writeObject(page);
-        oos.close();
-        baos.close();
-        byte[] array = baos.toByteArray();
-        if (array.length > this.pageSize) {
-          throw new IllegalArgumentException("Size of page " + page + " is greater than specified" + " pagesize: " + array.length + " > " + pageSize);
-        } else if (array.length == this.pageSize) {
-          return array;
-        }
-
-        else {
-          byte[] result = new byte[pageSize];
-          System.arraycopy(array, 0, result, 0, array.length);
-          return result;
-        }
       }
-    } catch (IOException e) {
+      oos.close();
+      baos.close();
+      byte[] array = baos.toByteArray();
+      if(array.length > this.pageSize) {
+        throw new IllegalArgumentException("Size of page " + page + " is greater than specified" + " pagesize: " + array.length + " > " + pageSize);
+      }
+      return array.length == this.pageSize ? array : Arrays.copyOf(array, pageSize);
+    }
+    catch(IOException e) {
       throw new RuntimeException("IOException occurred! ", e);
     }
   }
@@ -251,28 +237,22 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
   public boolean initialize(PageHeader header) {
     this.header = header;
     try {
-      if (existed) {
-        LoggingUtil.logExpensive(Level.INFO, "Create from existing file.");
+      if(existed) {
+        LOG.info("Create from existing file.");
         this.file = new OnDiskArray(filename, 0, header.size(), pageSize, true);
 
-        // init the header
-        {
-          ByteBuffer buffer = file.getExtraHeader();
-          byte[] bytes = new byte[buffer.remaining()];
-          buffer.get(bytes);
-          header.readHeader(bytes);
-        }
-
+        header.readHeader(file.getExtraHeader());
         // reading empty nodes in Stack
-        for (int i = 0; i < file.getNumRecords(); i++) {
+        for(int i = 0; i < file.getNumRecords(); i++) {
           ByteBuffer buffer = file.getRecordBuffer(i);
-
           int type = buffer.getInt();
-          if (type == EMPTY_PAGE) {
+          if(type == EMPTY_PAGE) {
             emptyPages.push(i);
-          } else if (type == FILLED_PAGE) {
+          }
+          else if(type == FILLED_PAGE) {
             nextPageID = i + 1;
-          } else {
+          }
+          else {
             throw new IllegalArgumentException("Unknown type: " + type);
           }
           i++;
@@ -281,17 +261,17 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
       }
       // create new file
       else {
-        LoggingUtil.logExpensive(Level.INFO, "Create a new file.");
+        LOG.info("Create a new file.");
 
         // init the file
         this.file = new OnDiskArray(filename, 0, header.size(), pageSize, 0);
 
         // write the header
-        ByteBuffer buffer = file.getExtraHeader();
-        buffer.put(header.asByteArray());
+        header.writeHeader(file.getExtraHeader());
         return false;
       }
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new RuntimeException("IOException occurred.", e);
     }
   }

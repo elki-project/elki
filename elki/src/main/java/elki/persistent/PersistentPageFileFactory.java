@@ -20,6 +20,8 @@
  */
 package elki.persistent;
 
+import java.nio.file.Path;
+
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -39,14 +41,14 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
   /**
    * File name.
    */
-  private String fileName;
+  private Path fileName;
 
   /**
    * Constructor.
    * 
    * @param pageSize Page size
    */
-  public PersistentPageFileFactory(int pageSize, String fileName) {
+  public PersistentPageFileFactory(int pageSize, Path fileName) {
     super(pageSize);
     this.fileName = fileName;
   }
@@ -72,7 +74,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     /**
      * File name.
      */
-    private String fileName;
+    private Path fileName;
 
     /**
      * Optional parameter that specifies the name of the file storing the index.
@@ -83,7 +85,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     public void configure(Parameterization config) {
       super.configure(config);
       new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> fileName = x.getPath());
+          .grab(config, x -> fileName = x);
     }
 
     @Override

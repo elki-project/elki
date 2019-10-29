@@ -20,10 +20,11 @@
  */
 package elki.result;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import elki.data.Cluster;
@@ -68,7 +69,7 @@ public class ClusteringVectorDumper implements ResultHandler {
   /**
    * Output file.
    */
-  private File outputFile;
+  private Path outputFile;
 
   /**
    * Optional label to force for this output.
@@ -87,7 +88,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * @param append Append to output file (overwrite otherwise).
    * @param forceLabel Forced label to use for the output, may be {@code null}.
    */
-  public ClusteringVectorDumper(File outputFile, boolean append, String forceLabel) {
+  public ClusteringVectorDumper(Path outputFile, boolean append, String forceLabel) {
     super();
     this.outputFile = outputFile;
     this.forceLabel = forceLabel;
@@ -100,7 +101,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * @param outputFile Output file
    * @param append Append to output file (overwrite otherwise).
    */
-  public ClusteringVectorDumper(File outputFile, boolean append) {
+  public ClusteringVectorDumper(Path outputFile, boolean append) {
     this(outputFile, append, null);
   }
 
@@ -116,8 +117,8 @@ public class ClusteringVectorDumper implements ResultHandler {
 
     // Open output stream - or use stdout.
     if(outputFile != null) {
-      try (FileOutputStream os = new FileOutputStream(outputFile, append); //
-          PrintStream writer = new PrintStream(os)) {
+      OpenOption opt = append ? StandardOpenOption.APPEND : StandardOpenOption.TRUNCATE_EXISTING;
+      try (BufferedWriter writer = Files.newBufferedWriter(outputFile, opt)) {
         // TODO: dump settings, too?
         for(Clustering<?> c : cs) {
           dumpClusteringOutput(writer, c);
@@ -130,7 +131,12 @@ public class ClusteringVectorDumper implements ResultHandler {
     }
     else {
       for(Clustering<?> c : cs) {
-        dumpClusteringOutput(System.out, c);
+        try {
+          dumpClusteringOutput(System.out, c);
+        }
+        catch(IOException e) {
+          LOG.exception("Error writing to output stream.", e);
+        }
       }
     }
   }
@@ -141,7 +147,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * @param writer Output writer
    * @param c Clustering result
    */
-  protected void dumpClusteringOutput(PrintStream writer, Clustering<?> c) {
+  protected void dumpClusteringOutput(Appendable writer, Clustering<?> c) throws IOException {
     DBIDRange ids = null;
     for(It<Relation<?>> iter = Metadata.hierarchyOf(c).iterParents().filter(Relation.class); iter.valid(); iter.advance()) {
       DBIDs pids = iter.get().getDBIDs();
@@ -216,7 +222,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     /**
      * Output file.
      */
-    private File outputFile = null;
+    private Path outputFile = null;
 
     /**
      * Optional label to force for this output.

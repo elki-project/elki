@@ -20,12 +20,12 @@
  */
 package elki.index.preprocessed.knn;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import elki.application.cache.CacheDoubleDistanceKNNLists;
 import elki.database.ids.DBIDIter;
@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Preprocessor that loads an existing cached kNN result.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  * 
@@ -52,17 +52,17 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
   /**
    * File to load.
    */
-  private File filename;
+  private Path filename;
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param distance Distance function
    * @param k K
    * @param file File to load
    */
-  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, File file) {
+  public CachedDoubleDistanceKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k, Path file) {
     super(relation, distance, k);
     this.filename = file;
   }
@@ -76,14 +76,14 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
   protected void preprocess() {
     createStorage();
     // open file.
-    try (RandomAccessFile file = new RandomAccessFile(filename, "rw");
-        FileChannel channel = file.getChannel()) {
+    try (FileChannel channel = FileChannel.open(filename, //
+        StandardOpenOption.READ);) {
+      MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 0, channel.size());
       // check magic header
-      int header = file.readInt();
+      int header = buffer.getInt();
       if(header != CacheDoubleDistanceKNNLists.KNN_CACHE_MAGIC) {
         throw new AbortException("Cache magic number does not match.");
       }
-      MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 4, file.length() - 4);
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         int dbid = ByteArrayUtil.readUnsignedVarint(buffer);
         int nnsize = ByteArrayUtil.readUnsignedVarint(buffer);
@@ -131,9 +131,9 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
 
   /**
    * The parameterizable factory.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @opt nodefillcolor LemonChiffon
    * @stereotype factory
    * @navassoc - create - MaterializeKNNPreprocessor
@@ -144,16 +144,16 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
     /**
      * Filename to load.
      */
-    private File filename;
+    private Path filename;
 
     /**
      * Index factory.
-     * 
+     *
      * @param k k parameter
      * @param distance distance function
      * @param filename Cache file
      */
-    public Factory(int k, Distance<? super O> distance, File filename) {
+    public Factory(int k, Distance<? super O> distance, Path filename) {
       super(k, distance);
       this.filename = filename;
     }
@@ -166,7 +166,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
      */
     public static class Par<O> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
@@ -178,7 +178,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
       /**
        * Filename to load.
        */
-      private File filename;
+      private Path filename;
 
       @Override
       public void configure(Parameterization config) {

@@ -20,10 +20,9 @@
  */
 package elki.datasource;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.util.List;
 
 import elki.datasource.bundle.BundleReader;
@@ -37,7 +36,7 @@ import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Class to load a database from a bundle file.
- *
+ * <p>
  * Bundle files are stored in a compact binary format along with metadata, so
  * that parsing should be simpler, albeit the focus was on using it in on-disk
  * indexes.
@@ -56,7 +55,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * File to load.
    */
-  private File infile;
+  private Path infile;
 
   /**
    * Constructor.
@@ -64,20 +63,15 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
    * @param filters Filters
    * @param infile Input file
    */
-  public BundleDatabaseConnection(List<? extends ObjectFilter> filters, File infile) {
+  public BundleDatabaseConnection(List<? extends ObjectFilter> filters, Path infile) {
     super(filters);
     this.infile = infile;
   }
 
   @Override
   public MultipleObjectsBundle loadData() {
-    try {
-      FileInputStream fis = new FileInputStream(infile);
-      FileChannel channel = fis.getChannel();
-      MultipleObjectsBundle bundle = invokeStreamFilters(new BundleReader(channel)).asMultipleObjectsBundle();
-      channel.close();
-      fis.close();
-      return bundle;
+    try (FileChannel channel = FileChannel.open(infile)) {
+      return invokeStreamFilters(new BundleReader(channel)).asMultipleObjectsBundle();
     }
     catch(IOException e) {
       throw new AbortException("IO error loading bundle", e);
@@ -103,7 +97,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * File to load.
      */
-    private File infile;
+    private Path infile;
 
     @Override
     public void configure(Parameterization config) {

@@ -20,25 +20,14 @@
  */
 package elki.application.internal;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,11 +45,7 @@ import elki.utilities.ELKIServiceRegistry;
 import elki.utilities.ELKIServiceScanner;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
-import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameterization.SerializedParameterization;
-import elki.utilities.optionhandling.parameterization.TrackParameters;
-import elki.utilities.optionhandling.parameterization.TrackedParameter;
-import elki.utilities.optionhandling.parameterization.UnParameterization;
+import elki.utilities.optionhandling.parameterization.*;
 import elki.utilities.optionhandling.parameters.ClassListParameter;
 import elki.utilities.optionhandling.parameters.ClassParameter;
 import elki.utilities.optionhandling.parameters.Parameter;
@@ -124,16 +109,16 @@ public class DocumentParameters {
       LOG.warning("Fourth file name doesn't end with .md!");
       System.exit(1);
     }
-    File byclsname = new File(args[0]);
-    File byoptname = new File(args[1]);
-    File byclsnamew = args.length >= 3 ? new File(args[2]) : null;
-    File byoptnamew = args.length >= 4 ? new File(args[3]) : null;
+    Path byclsname = Paths.get(args[0]);
+    Path byoptname = Paths.get(args[1]);
+    Path byclsnamew = args.length >= 3 ? Paths.get(args[2]) : null;
+    Path byoptnamew = args.length >= 4 ? Paths.get(args[3]) : null;
 
     try {
-      createDirectories(byclsname.toPath().getParent());
-      createDirectories(byoptname.toPath().getParent());
-      createDirectories(byclsnamew != null ? byclsnamew.toPath().getParent() : null);
-      createDirectories(byoptnamew != null ? byoptnamew.toPath().getParent() : null);
+      createDirectories(byclsname.getParent());
+      createDirectories(byoptname.getParent());
+      createDirectories(byclsnamew != null ? byclsnamew.getParent() : null);
+      createDirectories(byoptnamew != null ? byoptnamew.getParent() : null);
     }
     catch(IOException e) {
       LOG.exception(e);
@@ -150,8 +135,7 @@ public class DocumentParameters {
       System.exit(1);
     }
 
-    try (FileOutputStream byclassfo = new FileOutputStream(byclsname); //
-        OutputStream byclassstream = new BufferedOutputStream(byclassfo)) {
+    try (OutputStream byclassstream = Files.newOutputStream(byclsname)) {
       makeByClassOverview(byclass, new HTMLFormat()).writeTo(byclassstream);
     }
     catch(IOException e) {
@@ -159,7 +143,7 @@ public class DocumentParameters {
       System.exit(1);
     }
     if(byclsnamew != null) {
-      try (FileOutputStream byclassfo = new FileOutputStream(byclsnamew); //
+      try (OutputStream byclassfo = Files.newOutputStream(byclsnamew); //
           MarkdownDocStream byclassstream = new MarkdownDocStream(byclassfo)) {
         makeByClassOverview(byclass, new MarkdownFormat(byclassstream));
       }
@@ -169,8 +153,7 @@ public class DocumentParameters {
       }
     }
 
-    try (FileOutputStream byoptfo = new FileOutputStream(byoptname); //
-        OutputStream byoptstream = new BufferedOutputStream(byoptfo)) {
+    try (OutputStream byoptstream = Files.newOutputStream(byoptname)) {
       makeByOptOverview(byopt, new HTMLFormat()).writeTo(byoptstream);
     }
     catch(IOException e) {
@@ -179,7 +162,7 @@ public class DocumentParameters {
     }
 
     if(byoptnamew != null) {
-      try (FileOutputStream byoptfo = new FileOutputStream(byoptnamew); //
+      try (OutputStream byoptfo = Files.newOutputStream(byoptnamew); //
           MarkdownDocStream byoptstream = new MarkdownDocStream(byoptfo)) {
         makeByOptOverview(byopt, new MarkdownFormat(byoptstream));
       }

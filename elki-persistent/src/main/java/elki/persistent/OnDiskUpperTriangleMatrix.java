@@ -20,16 +20,16 @@
  */
 package elki.persistent;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 /**
  * Class representing an upper triangle matrix backed by an on-disk array of
  * O((n+1)*n/2) size
- * 
+ *
  * @composed - - - OnDiskArray
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -56,7 +56,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Constructor to access an existing array.
-   * 
+   *
    * @param filename File name
    * @param magicseed Magic number
    * @param extraheadersize Size of extra header data
@@ -64,7 +64,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
    * @param writable flag to open writable
    * @throws IOException on IO errors
    */
-  public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
+  public OnDiskUpperTriangleMatrix(Path filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
     array = new OnDiskArray(filename, OnDiskArray.mixMagic((int) serialVersionUID, magicseed), extraheadersize + TRIANGLE_HEADER_SIZE, recordsize, writable);
     ByteBuffer header = array.getExtraHeader();
     this.matrixsize = header.getInt();
@@ -75,7 +75,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Constructor to access a new array.
-   * 
+   *
    * @param filename File name
    * @param magicseed Magic number
    * @param extraheadersize Size of extra header data
@@ -83,7 +83,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
    * @param matrixsize Size of matrix to store
    * @throws IOException on IO errors
    */
-  public OnDiskUpperTriangleMatrix(File filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
+  public OnDiskUpperTriangleMatrix(Path filename, int magicseed, int extraheadersize, int recordsize, int matrixsize) throws IOException {
     if(matrixsize >= 0xFFFF) {
       throw new RuntimeException("Matrix size is too big and will overflow the integer datatype.");
     }
@@ -95,7 +95,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Resize the matrix to cover newsize x newsize.
-   * 
+   *
    * @param newsize New matrix size.
    * @throws IOException on IO errors
    */
@@ -114,7 +114,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Compute the size of the needed backing array from the matrix dimensions.
-   * 
+   *
    * @param matrixsize size of the matrix
    * @return size of the array
    */
@@ -124,7 +124,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Compute the offset within the file.
-   * 
+   *
    * @param x First coordinate
    * @param y Second coordinate
    * @return Linear offset
@@ -138,7 +138,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Get a record buffer
-   * 
+   *
    * @param x First coordinate
    * @param y Second coordinate
    * @return Byte buffer for the record
@@ -153,7 +153,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
   
   /**
    * Close the matrix file.
-   * 
+   *
    * @throws IOException on IO errors
    */
   public synchronized void close() throws IOException {
@@ -162,7 +162,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
 
   /**
    * Query the size of the matrix.
-   * 
+   *
    * @return size of the matrix
    */
   public int getMatrixSize() {

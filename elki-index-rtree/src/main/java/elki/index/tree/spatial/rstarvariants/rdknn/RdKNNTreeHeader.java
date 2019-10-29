@@ -20,8 +20,8 @@
  */
 package elki.index.tree.spatial.rstarvariants.rdknn;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 import elki.index.tree.TreeIndexHeader;
 
@@ -67,25 +67,25 @@ class RdKNNTreeHeader extends TreeIndexHeader {
 
   /**
    * Initializes this header from the specified file. Calls
-   * {@link elki.index.tree.TreeIndexHeader#readHeader(java.io.RandomAccessFile)
+   * {@link elki.index.tree.TreeIndexHeader#readHeader(FileChannel)
    * TreeIndexHeader#readHeader(file)} and reads additionally the integer value
    * of {@link #k_max} from the file.
    */
   @Override
-  public void readHeader(RandomAccessFile file) throws IOException {
-    super.readHeader(file);
-    this.k_max = file.readInt();
+  public void readHeader(ByteBuffer buffer) {
+    super.readHeader(buffer);
+    this.k_max = buffer.getInt();
   }
 
   /**
    * Writes this header to the specified file. Calls
-   * {@link elki.index.tree.TreeIndexHeader#writeHeader(java.io.RandomAccessFile)}
+   * {@link elki.index.tree.TreeIndexHeader#writeHeader(FileChannel)}
    * and writes additionally the integer value of {@link #k_max} to the file.
    */
   @Override
-  public void writeHeader(RandomAccessFile file) throws IOException {
-    super.writeHeader(file);
-    file.writeInt(this.k_max);
+  public void writeHeader(ByteBuffer buffer) {
+    super.writeHeader(buffer);
+    buffer.putInt(this.k_max);
   }
 
   /**

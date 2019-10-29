@@ -20,13 +20,12 @@
  */
 package elki.persistent;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import elki.index.tree.TreeIndexHeader;
 import elki.logging.Logging;
@@ -64,7 +63,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   /**
    * The file storing the pages.
    */
-  private final RandomAccessFile file;
+  private final FileChannel file;
 
   /**
    * The header of this page file.
@@ -87,16 +86,13 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
    * @param pageSize the page size
    * @param pageclass the class of pages to be used
    */
-  public PersistentPageFile(int pageSize, String fileName, Class<P> pageclass) {
+  public PersistentPageFile(int pageSize, Path filename, Class<P> pageclass) {
     super(pageSize);
     this.pageclass = pageclass;
-    // init the file
-    File f = new File(fileName);
-
     // create from existing file
-    existed = f.exists();
+    existed = Files.exists(filename);
     try {
-      file = new RandomAccessFile(f, "rw");
+      file = FileChannel.open(filename, StandardOpenOption.READ, StandardOpenOption.WRITE);
     }
     catch(IOException e) {
       throw new AbortException("IO error in loading persistent page file.", e);
@@ -115,8 +111,10 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       countRead();
       long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       byte[] buffer = new byte[pageSize];
-      file.seek(offset);
-      file.read(buffer);
+      int read = file.read(ByteBuffer.wrap(buffer), offset);
+      if(read != pageSize) {
+        throw new IOException("Incomplete read at offset " + offset + " read " + read + " bytes, expected " + pageSize);
+      }
       return byteArrayToPage(buffer);
     }
     catch(IOException e) {
@@ -138,9 +136,11 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       // delete from file
       countWrite();
       byte[] array = pageToByteArray(null);
-      long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
-      file.seek(offset);
-      file.write(array);
+      long offset = (header.getReservedPages() + pageID) * (long) pageSize;
+      int written = file.write(ByteBuffer.wrap(array), offset);
+      if(written != pageSize) {
+        throw new IOException("Incomplete write at offset " + offset + " wrote " + written + " bytes, expected " + array.length);
+      }
     }
     catch(IOException e) {
       throw new RuntimeException(e);
@@ -160,8 +160,10 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       byte[] array = pageToByteArray(page);
       long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       assert offset >= 0 : header.getReservedPages() + " " + pageID + " " + pageSize + " " + offset;
-      file.seek(offset);
-      file.write(array);
+      int written = file.write(ByteBuffer.wrap(array), offset);
+      if(written != pageSize) {
+        throw new IOException("Incomplete write at offset " + offset + " wrote " + written + " bytes, expected " + array.length);
+      }
       page.setDirty(false);
     }
     catch(IOException e) {
@@ -195,7 +197,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   @Override
   public void clear() {
     try {
-      file.setLength(header.size());
+      file.truncate(header.size());
     }
     catch(IOException e) {
       throw new RuntimeException(e);
@@ -222,7 +224,8 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
           page = pageclass.newInstance();
           page.readExternal(ois);
         }
-        catch(InstantiationException|IllegalAccessException|ClassNotFoundException e) {
+        catch(InstantiationException | IllegalAccessException
+            | ClassNotFoundException e) {
           throw new AbortException("Error instanciating an index page", e);
         }
         return page;
@@ -283,7 +286,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   }
 
   /** @return the random access file storing the pages. */
-  public RandomAccessFile getFile() {
+  public FileChannel getFile() {
     return file;
   }
 
@@ -336,11 +339,12 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
         }
         else { // must scan complete file
           int i = 0;
-          while(file.getFilePointer() + pageSize <= file.length()) {
+          while(file.position() + pageSize <= file.size()) {
             long offset = ((long) (header.getReservedPages() + i)) * (long) pageSize;
             byte[] buffer = new byte[pageSize];
-            file.seek(offset);
-            file.read(buffer);
+            if(file.read(ByteBuffer.wrap(buffer), offset) != pageSize) {
+              throw new IOException("Incomplete read at position " + offset);
+            }
 
             ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
             ObjectInputStream ois = new ObjectInputStream(bais);

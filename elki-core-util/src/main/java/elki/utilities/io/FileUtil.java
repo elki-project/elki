@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -39,7 +40,6 @@ import java.util.zip.GZIPInputStream;
 public final class FileUtil {
   /**
    * Fake Constructor. Use static methods.
-   * 
    */
   private FileUtil() {
     // Do not instantiate.
@@ -47,20 +47,20 @@ public final class FileUtil {
 
   /**
    * Returns the lower case extension of the selected file.
-   * 
+   * <p>
    * If no file is selected, <code>null</code> is returned.
    * 
    * @param file File object
    * @return Returns the extension of the selected file in lower case or
    *         <code>null</code>
    */
-  public static String getFilenameExtension(File file) {
-    return getFilenameExtension(file.getName());
+  public static String getFilenameExtension(Path file) {
+    return getFilenameExtension(file.getFileName());
   }
 
   /**
    * Returns the lower case extension of the selected file.
-   * 
+   * <p>
    * If no file is selected, <code>null</code> is returned.
    * 
    * @param name File name
@@ -194,6 +194,7 @@ public final class FileUtil {
    */
   public static String slurp(InputStream is) throws IOException {
     StringBuilder buf = new StringBuilder();
+    // FIXME: use byte buffers? New Java APIs?
     final byte[] b = new byte[4096];
     for(int n; (n = is.read(b)) != -1;) {
       buf.append(new String(b, 0, n));

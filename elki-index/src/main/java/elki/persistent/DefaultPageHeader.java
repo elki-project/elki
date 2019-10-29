@@ -20,10 +20,7 @@
  */
 package elki.persistent;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
-import elki.utilities.io.ByteArrayUtil;
+import java.nio.ByteBuffer;
 
 /**
  * Default implementation of a page header.
@@ -64,63 +61,32 @@ public class DefaultPageHeader implements PageHeader {
     this.pageSize = pageSize;
   }
 
-  /**
-   * Returns the value of {@link #SIZE}).
-   * 
-   */
   @Override
   public int size() {
     return SIZE;
   }
 
   /**
-   * Initializes this header from the specified file. Looks for the right
-   * version and reads the integer value of {@link #pageSize} from the file.
-   * 
-   */
-  @Override
-  public void readHeader(RandomAccessFile file) throws IOException {
-    file.seek(0);
-    if(file.readInt() != FILE_VERSION) {
-      throw new RuntimeException("File " + file + " is not a PersistentPageFile or wrong version!");
-    }
-
-    this.pageSize = file.readInt();
-  }
-
-  /**
    * Initializes this header from the given Byte array. Looks for the right
    * version and reads the integer value of {@link #pageSize} from the file.
-   * 
    */
   @Override
-  public void readHeader(byte[] data) {
-    if(ByteArrayUtil.readInt(data, 0) != FILE_VERSION) {
+  public void readHeader(ByteBuffer data) {
+    if(data.getInt() != FILE_VERSION) {
       throw new RuntimeException("PersistentPageFile version does not match!");
     }
-
-    this.pageSize = ByteArrayUtil.readInt(data, 4);
+    this.pageSize = data.getInt();
   }
 
   /**
    * Writes this header to the specified file. Writes the {@link #FILE_VERSION
    * version} of this header and the integer value of {@link #pageSize} to the
    * file.
-   * 
    */
   @Override
-  public void writeHeader(RandomAccessFile file) throws IOException {
-    file.seek(0);
-    file.writeInt(FILE_VERSION);
-    file.writeInt(this.pageSize);
-  }
-
-  @Override
-  public byte[] asByteArray() {
-    byte[] header = new byte[SIZE];
-    ByteArrayUtil.writeInt(header, 0, FILE_VERSION);
-    ByteArrayUtil.writeInt(header, 4, this.pageSize);
-    return header;
+  public void writeHeader(ByteBuffer buffer) {
+    buffer.putInt(FILE_VERSION) //
+        .putInt(pageSize);
   }
 
   /**

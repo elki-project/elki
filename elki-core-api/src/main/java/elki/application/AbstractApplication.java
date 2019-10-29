@@ -20,7 +20,7 @@
  */
 package elki.application;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
@@ -371,7 +371,7 @@ public abstract class AbstractApplication {
      * @param config Options
      * @return Output file
      */
-    protected File getParameterOutputFile(Parameterization config) {
+    protected Path getParameterOutputFile(Parameterization config) {
       return getParameterOutputFile(config, "Output filename.");
     }
 
@@ -382,7 +382,7 @@ public abstract class AbstractApplication {
      * @param description Short description
      * @return Output file
      */
-    protected File getParameterOutputFile(Parameterization config, String description) {
+    protected Path getParameterOutputFile(Parameterization config, String description) {
       FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
       return outputP.grab(config, null) ? outputP.getValue() : null;
     }
@@ -393,7 +393,7 @@ public abstract class AbstractApplication {
      * @param config Options
      * @return Input file
      */
-    protected File getParameterInputFile(Parameterization config) {
+    protected Path getParameterInputFile(Parameterization config) {
       return getParameterInputFile(config, "Input filename.");
     }
 
@@ -404,7 +404,7 @@ public abstract class AbstractApplication {
      * @param description Description
      * @return Input file
      */
-    protected File getParameterInputFile(Parameterization config, String description) {
+    protected Path getParameterInputFile(Parameterization config, String description) {
       FileParameter inputP = new FileParameter(new OptionID(INPUT_ID.getName(), description), FileParameter.FileType.INPUT_FILE);
       return inputP.grab(config, null) ? inputP.getValue() : null;
     }

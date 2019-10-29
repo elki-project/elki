@@ -20,10 +20,10 @@
  */
 package elki.application;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
   /**
    * Output file.
    */
-  private File outputFile;
+  private Path outputFile;
 
   /**
    * The original data source.
@@ -77,7 +77,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
    * @param output Output file
    * @param generator GeneratorXMLDatabaseConnection
    */
-  public GeneratorXMLSpec(File output, GeneratorXMLDatabaseConnection generator) {
+  public GeneratorXMLSpec(Path output, GeneratorXMLDatabaseConnection generator) {
     super();
     this.outputFile = output;
     this.generator = generator;
@@ -93,11 +93,11 @@ public class GeneratorXMLSpec extends AbstractApplication {
       LOG.verbose("Writing output ...");
     }
     try {
-      if(outputFile.exists() && LOG.isVerbose()) {
+      if(Files.exists(outputFile) && LOG.isVerbose()) {
         LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be APPENDED.");
       }
-
-      try (OutputStreamWriter outStream = new FileWriter(outputFile, true)) {
+      try (
+          BufferedWriter outStream = Files.newBufferedWriter(outputFile, StandardOpenOption.APPEND)) {
         writeClusters(outStream, data);
       }
     }
@@ -116,7 +116,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
    * @param data Generated data
    * @throws IOException thrown on write errors
    */
-  public void writeClusters(OutputStreamWriter outStream, MultipleObjectsBundle data) throws IOException {
+  public void writeClusters(BufferedWriter outStream, MultipleObjectsBundle data) throws IOException {
     int modelcol = -1;
     { // Find model column
       for(int i = 0; i < data.metaLength(); i++) {
@@ -166,7 +166,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
         double[] cmax = cursclus.getClipmax();
         if(cmin != null && cmax != null) {
           outStream.append("## Clipping: ").append(FormatUtil.format(cmin))//
-          .append(" - ").append(FormatUtil.format(cmax)).append(LINE_SEPARATOR);
+              .append(" - ").append(FormatUtil.format(cmax)).append(LINE_SEPARATOR);
         }
         outStream.append("## Density correction factor: " + cursclus.getDensityCorrection()).append(LINE_SEPARATOR);
         outStream.append("## Generators:").append(LINE_SEPARATOR);
@@ -207,7 +207,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
     /**
      * Output file.
      */
-    private File outputFile = null;
+    private Path outputFile = null;
 
     /**
      * Data generator

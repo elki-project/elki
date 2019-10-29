@@ -20,10 +20,7 @@
  */
 package elki.application.internal;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 
 /**
  * Helper to write documentation to a Markdown file.
@@ -60,7 +57,7 @@ public class MarkdownDocStream implements AutoCloseable {
    * @param of Output stream
    * @throws IOException On buffer open errors
    */
-  public MarkdownDocStream(FileOutputStream of) throws IOException {
+  public MarkdownDocStream(OutputStream of) throws IOException {
     this.out = new PrintStream(new BufferedOutputStream(of), false, "UTF-8"); //
     this.newline = Newline.NONE;
   }

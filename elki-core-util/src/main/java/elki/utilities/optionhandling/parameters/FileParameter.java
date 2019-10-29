@@ -21,7 +21,9 @@
 package elki.utilities.optionhandling.parameters;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import elki.utilities.optionhandling.OptionID;
@@ -38,7 +40,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.3
  */
 // TODO: turn FileType into a Constraint?
-public class FileParameter extends AbstractParameter<FileParameter, File> {
+public class FileParameter extends AbstractParameter<FileParameter, Path> {
   /**
    * Available file types: {@link #INPUT_FILE} denotes an input file,
    * {@link #OUTPUT_FILE} denotes an output file.
@@ -73,42 +75,40 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
 
   @Override
   public String getValueAsString() {
-    try {
-      return getValue().getCanonicalPath();
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e);
-    }
+    return getValue().normalize().toString();
   }
 
   @Override
-  protected File parseValue(Object obj) throws ParameterException {
+  protected Path parseValue(Object obj) throws ParameterException {
     if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
+    if(obj instanceof Path) {
+      return (Path) obj;
+    }
     if(obj instanceof File) {
-      return (File) obj;
+      return ((File) obj).toPath();
     }
     if(obj instanceof String) {
-      return new File((String) obj);
+      return Paths.get((String) obj);
     }
     throw new WrongParameterValueException("Parameter \"" + getOptionID().getName() + "\": Unsupported value given!");
   }
 
   @Override
-  protected boolean validate(File obj) throws ParameterException {
+  protected boolean validate(Path obj) throws ParameterException {
     if(!super.validate(obj)) {
       return false;
     }
     if(fileType.equals(FileType.INPUT_FILE)) {
       try {
-        if(obj.exists()) {
+        if(Files.exists(obj)) {
           return true;
         }
-        throw new WrongParameterValueException("Given file " + obj.getPath() + " for parameter \"" + getOptionID().getName() + "\" does not exist!\n");
+        throw new WrongParameterValueException("Given file " + obj + " for parameter \"" + getOptionID().getName() + "\" does not exist!\n");
       }
       catch(SecurityException e) {
-        throw new WrongParameterValueException("Given file \"" + obj.getPath() + "\" cannot be read, access denied!\n" + e.getMessage());
+        throw new WrongParameterValueException("Given file \"" + obj + "\" cannot be read, access denied!\n" + e.getMessage());
       }
     }
     return true;
@@ -140,7 +140,7 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
    * @param consumer Output consumer
    * @return {@code true} if valid
    */
-  public boolean grab(Parameterization config, Consumer<File> consumer) {
+  public boolean grab(Parameterization config, Consumer<Path> consumer) {
     if(config.grab(this)) {
       if(consumer != null) {
         consumer.accept(getValue());

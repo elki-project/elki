@@ -20,10 +20,9 @@
  */
 package elki.application.lucene;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -35,6 +34,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import elki.application.AbstractApplication;
+import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
 import elki.utilities.optionhandling.OptionID;
@@ -49,9 +49,14 @@ import elki.utilities.optionhandling.parameters.FileParameter;
  */
 public class SimpleTextLoader extends AbstractApplication {
   /**
+   * Class loader.
+   */
+  public static final Logging LOG = Logging.getLogger(SimpleTextLoader.class);
+
+  /**
    * Index and source folders.
    */
-  File index, source;
+  Path index, source;
 
   /**
    * Constructor.
@@ -59,7 +64,7 @@ public class SimpleTextLoader extends AbstractApplication {
    * @param index Index folder
    * @param source Source folder
    */
-  public SimpleTextLoader(File index, File source) {
+  public SimpleTextLoader(Path index, Path source) {
     super();
     this.index = index;
     this.source = source;
@@ -68,21 +73,26 @@ public class SimpleTextLoader extends AbstractApplication {
   @Override
   public void run() {
     try {
-      final Directory dir = FSDirectory.open(index);
+      final Directory dir = FSDirectory.open(index.toFile());
       IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36));
       IndexWriter writer = new IndexWriter(dir, config);
 
-      final URI suri = source.toURI();
-      for (File inf : source.listFiles()) {
-        Document doc = new Document();
-        String id = suri.relativize(inf.toURI()).getPath();
-        String text = FileUtil.slurp(new FileInputStream(inf));
-        doc.add(new Field("id", id, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("contents", text, Field.Store.YES, Field.Index.ANALYZED));
-        writer.addDocument(doc);
-      }
+      Files.list(source).forEach(inf -> {
+        String id = source.relativize(inf).toString();
+        try {
+          String text = FileUtil.slurp(Files.newInputStream(inf));
+          Document doc = new Document();
+          doc.add(new Field("id", id, Field.Store.YES, Field.Index.NOT_ANALYZED));
+          doc.add(new Field("contents", text, Field.Store.YES, Field.Index.ANALYZED));
+          writer.addDocument(doc);
+        }
+        catch(IOException e) {
+          LOG.error("IO error reading file " + id, e);
+        }
+      });
       writer.close();
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       throw new AbortException("I/O error in lucene.", e);
     }
   }
@@ -98,7 +108,7 @@ public class SimpleTextLoader extends AbstractApplication {
      */
     public static final OptionID SOURCE_ID = new OptionID("lucene.source", "Source file folder.");
 
-    File index, source;
+    Path index, source;
 
     @Override
     public void configure(Parameterization config) {

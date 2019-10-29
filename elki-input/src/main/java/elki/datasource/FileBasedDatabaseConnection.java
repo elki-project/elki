@@ -21,6 +21,8 @@
 package elki.datasource;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import elki.datasource.filter.ObjectFilter;
@@ -51,10 +53,10 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param infile File to load the data from
    */
-  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, File infile) {
+  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, Path infile) {
     super(() -> {
       try {
-        return new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
+        return new BufferedInputStream(FileUtil.tryGzipInput(Files.newInputStream(infile)));
       }
       catch(IOException e) {
         throw new AbortException("Could not load input file: " + infile, e);
@@ -105,7 +107,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
     /**
      * Input stream to process.
      */
-    protected File infile;
+    protected Path infile;
 
     @Override
     public void configure(Parameterization config) {
@@ -113,7 +115,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
       new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> infile = x);
       Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
-      if(infile != null && (infile.getName().endsWith(".arff") || infile.getName().endsWith(".arff.gz"))) {
+      if(infile != null && (infile.getFileName().endsWith(".arff") || infile.getFileName().endsWith(".arff.gz"))) {
         defaultParser = ArffParser.class;
       }
       configParser(config, Parser.class, defaultParser);

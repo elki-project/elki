@@ -23,8 +23,9 @@ package elki.persistent;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.Test;
 
@@ -43,8 +44,8 @@ public class OnDiskUpperTriangleMatrixTest {
    */
   @Test
   public void testUpperTriangleMatrix() throws IOException {
-    File file = File.createTempFile("ELKIUnitTest", null);
-    file.deleteOnExit();
+    Path file = Files.createTempFile("ELKIUnitTest", null);
+    file.toFile().deleteOnExit();
 
     final int extraheadersize = 2;
     final int recsize = 3;
@@ -67,7 +68,7 @@ public class OnDiskUpperTriangleMatrixTest {
     array.close();
 
     // validate file size
-    assertEquals("File size doesn't match.", ODR_HEADER_SIZE + extraheadersize + recsize * matsize * (matsize + 1) / 2, file.length());
+    assertEquals("File size doesn't match.", ODR_HEADER_SIZE + extraheadersize + recsize * matsize * (matsize + 1) / 2, Files.size(file));
 
     OnDiskUpperTriangleMatrix roarray = new OnDiskUpperTriangleMatrix(file, 1, extraheadersize, recsize, false);
     assertEquals("Number of records incorrect.", matsize, roarray.getMatrixSize());
@@ -89,7 +90,7 @@ public class OnDiskUpperTriangleMatrixTest {
     assertArrayEquals("Record 2,2 doesn't match.", record1, buf);
     roarray.close();
 
-    file.delete(); // Note: probably fails on Windows.
+    Files.delete(file); // Note: probably fails on Windows.
     // We cannot reliably delete mmaped files on Windows, apparently.
   }
 }

@@ -20,11 +20,11 @@
  */
 package elki.application.cache;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPOutputStream;
 
 import elki.application.AbstractApplication;
@@ -46,11 +46,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Application to precompute pairwise distances into an ascii file.
- * 
+ * <p>
  * IDs in the output file will always begin at 0.
- *
+ * <p>
  * The result can then be used with the DoubleDistanceParse.
- *
+ * <p>
  * Symmetry is assumed.
  * 
  * @author Erich Schubert
@@ -87,7 +87,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
   /**
    * Output file.
    */
-  private File out;
+  private Path out;
 
   /**
    * Constructor.
@@ -96,7 +96,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public PrecomputeDistancesAsciiApplication(Database database, Distance<? super O> distance, File out) {
+  public PrecomputeDistancesAsciiApplication(Database database, Distance<? super O> distance, Path out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -150,10 +150,9 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
    * @return Output stream
    * @throws IOException
    */
-  private static PrintStream openStream(File out) throws IOException {
-    OutputStream os = new FileOutputStream(out);
-    os = out.getName().endsWith(GZIP_POSTFIX) ? new GZIPOutputStream(os) : os;
-    return new PrintStream(os);
+  private static PrintStream openStream(Path out) throws IOException {
+    OutputStream os = Files.newOutputStream(out);
+    return new PrintStream(out.getFileName().endsWith(GZIP_POSTFIX) ? new GZIPOutputStream(os) : os);
   }
 
   /**
@@ -180,7 +179,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
     /**
      * Output file.
      */
-    private File out = null;
+    private Path out = null;
 
     @Override
     public void configure(Parameterization config) {

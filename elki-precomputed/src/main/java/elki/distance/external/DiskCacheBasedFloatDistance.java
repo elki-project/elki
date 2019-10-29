@@ -20,16 +20,16 @@
  */
 package elki.distance.external;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import elki.database.ids.DBIDRange;
 import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.persistent.OnDiskUpperTriangleMatrix;
 import elki.utilities.io.ByteArrayUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -73,7 +73,7 @@ public class DiskCacheBasedFloatDistance extends AbstractDBIDRangeDistance {
    * @param matrixfile File name
    * @throws IOException
    */
-  public DiskCacheBasedFloatDistance(File matrixfile) throws IOException {
+  public DiskCacheBasedFloatDistance(Path matrixfile) throws IOException {
     super();
     this.cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, false);
   }

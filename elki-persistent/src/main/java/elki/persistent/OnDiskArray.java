@@ -20,13 +20,16 @@
  */
 package elki.persistent;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import elki.utilities.io.ByteArrayUtil;
 
@@ -78,12 +81,12 @@ public class OnDiskArray implements AutoCloseable {
   /**
    * File name.
    */
-  private File filename;
+  private Path filename;
 
   /**
    * Random Access File object.
    */
-  final private RandomAccessFile file;
+  final private FileChannel file;
 
   /**
    * Lock for the file that will be kept while writing.
@@ -120,48 +123,32 @@ public class OnDiskArray implements AutoCloseable {
    * @param initialsize Initial file size (in records)
    * @throws IOException on IO errors
    */
-  public OnDiskArray(File filename, int magicseed, int extraheadersize, int recordsize, int initialsize) throws IOException {
+  public OnDiskArray(Path filename, int magicseed, int extraheadersize, int recordsize, int initialsize) throws IOException {
     this.magic = mixMagic((int) serialVersionUID, magicseed);
     this.headersize = extraheadersize + INTERNAL_HEADER_SIZE;
     this.recordsize = recordsize;
     this.filename = filename;
     this.writable = true;
 
-    // do not allow overwriting, unless empty
-    if (filename.exists() && filename.length() > 0) {
-      throw new IOException("File already exists");
+    // do not allow overwriting, unless empty (for pre-created temp files)
+    if(Files.exists(filename) && Files.size(filename) != 0) {
+      throw new IOException("File already exists: " + filename);
     }
 
     // open file.
-    file = new RandomAccessFile(filename, "rw");
+    file = FileChannel.open(filename, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
     // and acquire a file write lock
-    lock = file.getChannel().lock();
+    lock = file.lock();
 
-    // write magic header
-    file.writeInt(this.magic);
-
-    // write header size
-    file.writeInt(this.headersize);
-
-    // write size of a single record
-    file.writeInt(this.recordsize);
-
-    // write number of records
-    // verify position.
-    if (file.getFilePointer() != HEADER_POS_SIZE) {
-      // TODO: more appropriate exception class?
-      throw new IOException("File position doesn't match when writing file size.");
-    }
-    file.writeInt(initialsize);
-
-    // we should have written the complete internal header now.
-    if (file.getFilePointer() != INTERNAL_HEADER_SIZE) {
-      // TODO: more appropriate exception class?
-      throw new IOException("File position doesn't match header size after writing header.");
-    }
+    ByteBuffer bbuf = ByteBuffer.allocateDirect(INTERNAL_HEADER_SIZE);
+    bbuf.putInt(this.magic) // write magic header
+        .putInt(this.headersize) // write header size
+        .putInt(this.recordsize) // write size of a single record
+        .putInt(initialsize) // write number of records
+        .flip();
+    file.write(bbuf, 0);
     // resize file
     resizeFile(initialsize);
-
     // map array
     mapArray();
   }
@@ -179,20 +166,17 @@ public class OnDiskArray implements AutoCloseable {
    * @param writable flag to open the file writable
    * @throws IOException on IO errors
    */
-  public OnDiskArray(File filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
+  public OnDiskArray(Path filename, int magicseed, int extraheadersize, int recordsize, boolean writable) throws IOException {
     this.magic = mixMagic((int) serialVersionUID, magicseed);
     this.headersize = extraheadersize + INTERNAL_HEADER_SIZE;
     this.recordsize = recordsize;
     this.filename = filename;
     this.writable = writable;
 
-    String mode = writable ? "rw" : "r";
-
-    file = new RandomAccessFile(filename, mode);
-    if (writable) {
-      // acquire a file write lock
-      lock = file.getChannel().lock();
-    }
+    file = FileChannel.open(filename, writable //
+        ? new OpenOption[] { StandardOpenOption.READ, StandardOpenOption.WRITE } //
+        : new OpenOption[] { StandardOpenOption.READ });
+    lock = writable ? file.lock() : null;
 
     validateHeader(true);
     mapArray();
@@ -208,19 +192,16 @@ public class OnDiskArray implements AutoCloseable {
    * @param writable flag to open the file writable
    * @throws IOException on IO errors
    */
-  public OnDiskArray(File filename, int magicseed, int extraheadersize, boolean writable) throws IOException {
+  public OnDiskArray(Path filename, int magicseed, int extraheadersize, boolean writable) throws IOException {
     this.magic = mixMagic((int) serialVersionUID, magicseed);
     this.headersize = extraheadersize + INTERNAL_HEADER_SIZE;
     this.filename = filename;
     this.writable = writable;
 
-    String mode = writable ? "rw" : "r";
-
-    file = new RandomAccessFile(filename, mode);
-    if (writable) {
-      // acquire a file write lock
-      lock = file.getChannel().lock();
-    }
+    file = FileChannel.open(filename, writable //
+        ? new OpenOption[] { StandardOpenOption.READ, StandardOpenOption.WRITE } //
+        : new OpenOption[] { StandardOpenOption.READ });
+    lock = writable ? file.lock() : null;
 
     validateHeader(false);
     mapArray();
@@ -232,12 +213,12 @@ public class OnDiskArray implements AutoCloseable {
    * @throws IOException on mapping error.
    */
   private synchronized void mapArray() throws IOException {
-    if (map != null) {
+    if(map != null) {
       ByteArrayUtil.unmapByteBuffer(map);
       map = null;
     }
     MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
-    map = file.getChannel().map(mode, headersize, recordsize * numrecs);
+    map = file.map(mode, headersize, recordsize * numrecs);
   }
 
   /**
@@ -250,41 +231,39 @@ public class OnDiskArray implements AutoCloseable {
    * @throws IOException
    */
   private void validateHeader(boolean validateRecordSize) throws IOException {
-    int readmagic = file.readInt();
+    ByteBuffer bbuf = ByteBuffer.allocateDirect(INTERNAL_HEADER_SIZE);
+    if(file.read(bbuf, 0) != INTERNAL_HEADER_SIZE) {
+      throw new IOException("Incomplete read validating the header");
+    }
+    bbuf.flip();
+    int readmagic = bbuf.getInt();
     // Validate magic number
-    if (readmagic != this.magic) {
+    if(readmagic != this.magic) {
       file.close();
       throw new IOException("Magic in LinearDiskCache does not match: " + readmagic + " instead of " + this.magic);
     }
     // Validate header size
-    if (file.readInt() != this.headersize) {
+    if(bbuf.getInt() != this.headersize) {
       file.close();
       throw new IOException("Header size in LinearDiskCache does not match.");
     }
 
-    if (validateRecordSize) {
+    if(validateRecordSize) {
       // Validate record size
-      if (file.readInt() != this.recordsize) {
+      if(bbuf.getInt() != this.recordsize) {
         file.close();
         throw new IOException("Recordsize in LinearDiskCache does not match.");
       }
-    } else {
+    }
+    else {
       // or just read it from file
-      this.recordsize = file.readInt();
+      this.recordsize = bbuf.getInt();
     }
 
     // read the number of records and validate with file size.
-    if (file.getFilePointer() != HEADER_POS_SIZE) {
-      throw new IOException("Incorrect file position when reading header.");
-    }
-    this.numrecs = file.readInt();
-    if (numrecs < 0 || file.length() != indexToFileposition(numrecs)) {
+    this.numrecs = bbuf.getInt();
+    if(numrecs < 0 || file.size() != indexToFileposition(numrecs)) {
       throw new IOException("File size and number of records do not agree.");
-    }
-    // yet another sanity check. We should have read all of our internal header
-    // now.
-    if (file.getFilePointer() != INTERNAL_HEADER_SIZE) {
-      throw new IOException("Incorrect file position after reading header.");
     }
   }
 
@@ -322,16 +301,17 @@ public class OnDiskArray implements AutoCloseable {
    * @throws IOException on IO errors
    */
   public synchronized void resizeFile(int newsize) throws IOException {
-    if (!writable) {
+    if(!writable) {
       throw new IOException("File is not writeable!");
     }
     // update the number of records
     this.numrecs = newsize;
-    file.seek(HEADER_POS_SIZE);
-    file.writeInt(numrecs);
+    ByteBuffer bbuf = ByteBuffer.allocateDirect(4);
+    bbuf.putInt(numrecs).flip();
+    file.write(bbuf, HEADER_POS_SIZE);
 
     // resize file
-    file.setLength(indexToFileposition(numrecs));
+    file.truncate(indexToFileposition(numrecs));
     mapArray();
   }
 
@@ -343,11 +323,11 @@ public class OnDiskArray implements AutoCloseable {
    * @throws IOException on IO errors
    */
   public synchronized ByteBuffer getRecordBuffer(int index) throws IOException {
-    if (index < 0 || index >= numrecs) {
+    if(index < 0 || index >= numrecs) {
       throw new IOException("Access beyond end of file.");
     }
     // Adjust buffer view
-    synchronized (map) {
+    synchronized(map) {
       map.limit(recordsize * (index + 1));
       map.position(recordsize * index);
       return map.slice();
@@ -372,7 +352,7 @@ public class OnDiskArray implements AutoCloseable {
   public synchronized ByteBuffer getExtraHeader() throws IOException {
     final int size = headersize - INTERNAL_HEADER_SIZE;
     final MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
-    return file.getChannel().map(mode, INTERNAL_HEADER_SIZE, size);
+    return file.map(mode, INTERNAL_HEADER_SIZE, size);
   }
 
   /**
@@ -389,7 +369,7 @@ public class OnDiskArray implements AutoCloseable {
    * 
    * @return File name
    */
-  public File getFilename() {
+  public Path getFilename() {
     return filename;
   }
 
@@ -410,11 +390,11 @@ public class OnDiskArray implements AutoCloseable {
    */
   public synchronized void close() throws IOException {
     writable = false;
-    if (map != null) {
+    if(map != null) {
       ByteArrayUtil.unmapByteBuffer(map);
       map = null;
     }
-    if (lock != null) {
+    if(lock != null) {
       lock.release();
       lock = null;
     }
@@ -437,7 +417,7 @@ public class OnDiskArray implements AutoCloseable {
    * @throws IOException
    */
   public void ensureSize(int size) throws IOException {
-    if (size > getNumRecords()) {
+    if(size > getNumRecords()) {
       resizeFile(size);
     }
   }

@@ -23,8 +23,9 @@ package elki.visualization.batikutil;
 import java.awt.image.renderable.RenderableImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 
@@ -118,7 +119,7 @@ public class CloneInlineImages extends SVGCloneVisible {
     try {
       os.write(SVGSyntax.DATA_PROTOCOL_PNG_PREFIX.getBytes());
       Base64EncoderStream encoder = new Base64EncoderStream(os);
-      FileInputStream instream = new FileInputStream(in);
+      InputStream instream = Files.newInputStream(in.toPath());
       byte[] buf = new byte[4096];
       while(true) {
         int read = instream.read(buf, 0, buf.length);

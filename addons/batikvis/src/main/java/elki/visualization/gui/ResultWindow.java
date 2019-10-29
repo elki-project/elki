@@ -28,6 +28,7 @@ import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -79,7 +80,7 @@ import elki.visualization.svg.SVGPlot;
 
 /**
  * Swing window to manage a particular result visualization.
- *
+ * <p>
  * Yes, this is very basic and ad-hoc. Feel free to contribute something more
  * advanced to ELKI!
  *
@@ -568,7 +569,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     fc.setAccessory(optionsPanel);
     int ret = fc.showSaveDialog(null);
     if(ret == JFileChooser.APPROVE_OPTION) {
-      File file = fc.getSelectedFile();
+      Path file = fc.getSelectedFile().toPath();
       boolean gzip = optionsPanel.compress.isSelected();
       String filtertext = optionsPanel.filterField.getText();
       try {

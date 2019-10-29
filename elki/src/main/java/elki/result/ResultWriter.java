@@ -20,8 +20,9 @@
  */
 package elki.result;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import elki.logging.Logging;
@@ -31,8 +32,8 @@ import elki.result.textwriter.StreamFactory;
 import elki.result.textwriter.TextWriter;
 import elki.utilities.Priority;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -57,7 +58,7 @@ public class ResultWriter implements ResultHandler {
   /**
    * Holds the file to print results to.
    */
-  private File out;
+  private Path out;
 
   /**
    * Whether or not to do gzip compression on output.
@@ -82,7 +83,7 @@ public class ResultWriter implements ResultHandler {
    * @param warnoverwrite Warn before overwriting files
    * @param filter Filter pattern
    */
-  public ResultWriter(File out, boolean gzip, boolean warnoverwrite, Pattern filter) {
+  public ResultWriter(Path out, boolean gzip, boolean warnoverwrite, Pattern filter) {
     super();
     this.out = out;
     this.gzip = gzip;
@@ -108,18 +109,18 @@ public class ResultWriter implements ResultHandler {
     }
     // If it does not exist, make a folder.
     final String ext = FileUtil.getFilenameExtension(out);
-    if(!(out.exists() || "gz".equals(ext) || "csv".equals(ext) || "ascii".equals(ext) || "txt".equals(ext))) {
+    if(!(Files.exists(out) || "gz".equals(ext) || "csv".equals(ext) || "ascii".equals(ext) || "txt".equals(ext))) {
       LOG.info("Creating output directory: " + out);
-      out.mkdirs();
+      Files.createDirectories(out);
     }
-    if(out.isDirectory()) {
-      if(warnoverwrite && out.listFiles().length > 0) {
+    if(Files.isDirectory(out)) {
+      if(warnoverwrite && Files.list(out).findFirst().isPresent()) {
         LOG.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
       }
       return new MultipleFilesOutput(out, gzip);
     }
     else {
-      if(warnoverwrite && out.exists() && out.length() > 0) {
+      if(warnoverwrite && Files.exists(out) && Files.size(out) > 0) {
         LOG.warning("Output file exists and will be overwritten!");
       }
       return new SingleStreamOutput(out, gzip);
@@ -150,7 +151,7 @@ public class ResultWriter implements ResultHandler {
     /**
      * Holds the file to print results to.
      */
-    private File out = null;
+    private Path out = null;
 
     /**
      * Whether or not to do gzip compression on output.

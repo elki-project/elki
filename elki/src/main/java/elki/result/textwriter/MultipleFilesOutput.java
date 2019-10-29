@@ -20,11 +20,9 @@
  */
 package elki.result.textwriter;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPOutputStream;
 
 import elki.logging.Logging;
@@ -49,7 +47,7 @@ public class MultipleFilesOutput implements StreamFactory {
   /**
    * Base file name.
    */
-  private File basename;
+  private Path basename;
 
   /**
    * Control gzip compression of output.
@@ -66,7 +64,7 @@ public class MultipleFilesOutput implements StreamFactory {
    * 
    * @param base Base file name (folder name)
    */
-  public MultipleFilesOutput(File base) {
+  public MultipleFilesOutput(Path base) {
     this(base, false);
   }
 
@@ -76,7 +74,7 @@ public class MultipleFilesOutput implements StreamFactory {
    * @param base Base file name (folder name)
    * @param gzip Use gzip compression.
    */
-  public MultipleFilesOutput(File base, boolean gzip) {
+  public MultipleFilesOutput(Path base, boolean gzip) {
     this.basename = base;
     this.usegzip = gzip;
   }
@@ -93,16 +91,11 @@ public class MultipleFilesOutput implements StreamFactory {
       LOG.debugFiner("Requested stream: " + name);
     }
     // Ensure the directory exists:
-    if(!basename.exists()) {
-      basename.mkdirs();
-    }
-    String fn = basename.getAbsolutePath() + File.separator + name + EXTENSION;
-    fn = usegzip ? fn + GZIP_EXTENSION : fn;
-    OutputStream os = new FileOutputStream(fn);
-    if(usegzip) {
-      // wrap into gzip stream.
-      os = new GZIPOutputStream(os);
-    }
+    Files.createDirectories(basename);
+    Path fn = basename.resolve(name + (usegzip ? GZIP_EXTENSION : EXTENSION));
+    OutputStream os = Files.newOutputStream(fn);
+    // wrap into gzip stream.
+    os = usegzip ? new GZIPOutputStream(os) : os;
     PrintStream res = new PrintStream(os);
     if(LOG.isDebuggingFiner()) {
       LOG.debugFiner("Opened new output stream:" + fn);

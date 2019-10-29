@@ -23,9 +23,10 @@ package elki.persistent;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.junit.Test;
 
@@ -44,8 +45,8 @@ public class OnDiskArrayTest {
    */
   @Test
   public void dotestOnDiskArray() throws IOException {
-    File file = File.createTempFile("ELKIUnitTest", null);
-    file.deleteOnExit();
+    Path file = Files.createTempFile("ELKIUnitTest", null);
+    file.toFile().deleteOnExit();
 
     final int extraheadersize = 2;
     final int recsize = 3;
@@ -67,7 +68,7 @@ public class OnDiskArrayTest {
     array.close();
 
     // validate file size
-    assertEquals("File size doesn't match.", ODR_HEADER_SIZE + extraheadersize + recsize * numrec, file.length());
+    assertEquals("File size doesn't match.", ODR_HEADER_SIZE + extraheadersize + recsize * numrec, Files.size(file));
 
     OnDiskArray roarray = new OnDiskArray(file, 1, 2, 3, false);
     assertEquals("Number of records incorrect.", numrec, roarray.getNumRecords());
@@ -89,7 +90,7 @@ public class OnDiskArrayTest {
     assertArrayEquals("Record 3 doesn't match.", record1, buf);
     roarray.close();
 
-    file.delete(); // Note: probably fails on Windows.
+    Files.delete(file); // Note: probably fails on Windows.
     // We cannot reliably delete mmaped files on Windows, apparently.
   }
 }

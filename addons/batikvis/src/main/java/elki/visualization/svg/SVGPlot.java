@@ -22,36 +22,24 @@ package elki.visualization.svg;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.batik.transcoder.Transcoder;
-import org.apache.batik.transcoder.TranscoderException;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.XMLAbstractTranscoder;
+import org.apache.batik.transcoder.*;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
@@ -391,8 +379,8 @@ public class SVGPlot {
    * @throws TransformerFactoryConfigurationError Transformation error
    * @throws TransformerException Transformation error
    */
-  public void saveAsSVG(File file) throws IOException, TransformerFactoryConfigurationError, TransformerException {
-    OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+  public void saveAsSVG(Path file) throws IOException, TransformerFactoryConfigurationError, TransformerException {
+    OutputStream out = new BufferedOutputStream(Files.newOutputStream(file));
     // TODO embed linked images.
     javax.xml.transform.Result result = new StreamResult(out);
     SVGDocument doc = cloneDocument();
@@ -412,12 +400,12 @@ public class SVGPlot {
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors
    */
-  protected void transcode(File file, Transcoder transcoder) throws IOException, TranscoderException {
+  protected void transcode(Path file, Transcoder transcoder) throws IOException, TranscoderException {
     // Disable validation, performance is more important here (thumbnails!)
     transcoder.addTranscodingHint(XMLAbstractTranscoder.KEY_XML_PARSER_VALIDATING, Boolean.FALSE);
     SVGDocument doc = cloneDocument();
     TranscoderInput input = new TranscoderInput(doc);
-    OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+    OutputStream out = new BufferedOutputStream(Files.newOutputStream(file));
     TranscoderOutput output = new TranscoderOutput(out);
     transcoder.transcode(input, output);
     out.flush();
@@ -458,7 +446,7 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    * @throws ClassNotFoundException PDF transcoder not installed
    */
-  public void saveAsPDF(File file) throws IOException, TranscoderException, ClassNotFoundException {
+  public void saveAsPDF(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
       Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").newInstance();
       transcode(file, (Transcoder) t);
@@ -476,7 +464,7 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    * @throws ClassNotFoundException PS transcoder not installed
    */
-  public void saveAsPS(File file) throws IOException, TranscoderException, ClassNotFoundException {
+  public void saveAsPS(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
       Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
@@ -494,7 +482,7 @@ public class SVGPlot {
    * @throws TranscoderException On input/parsing errors.
    * @throws ClassNotFoundException EPS transcoder not installed
    */
-  public void saveAsEPS(File file) throws IOException, TranscoderException, ClassNotFoundException {
+  public void saveAsEPS(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
       Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
@@ -513,7 +501,7 @@ public class SVGPlot {
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
    */
-  public void saveAsPNG(File file, int width, int height) throws IOException, TranscoderException {
+  public void saveAsPNG(Path file, int width, int height) throws IOException, TranscoderException {
     PNGTranscoder t = new PNGTranscoder();
     t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
@@ -530,7 +518,7 @@ public class SVGPlot {
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
    */
-  public void saveAsJPEG(File file, int width, int height, float quality) throws IOException, TranscoderException {
+  public void saveAsJPEG(Path file, int width, int height, float quality) throws IOException, TranscoderException {
     JPEGTranscoder t = new JPEGTranscoder();
     t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(width));
     t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(height));
@@ -547,7 +535,7 @@ public class SVGPlot {
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
    */
-  public void saveAsJPEG(File file, int width, int height) throws IOException, TranscoderException {
+  public void saveAsJPEG(Path file, int width, int height) throws IOException, TranscoderException {
     saveAsJPEG(file, width, height, DEFAULT_QUALITY);
   }
 
@@ -564,7 +552,7 @@ public class SVGPlot {
    * @throws TransformerException on transcoding errors
    * @throws ClassNotFoundException when the transcoder was not installed
    */
-  public void saveAsANY(File file, int width, int height, float quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
+  public void saveAsANY(Path file, int width, int height, float quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
     String extension = FileUtil.getFilenameExtension(file);
     if("svg".equals(extension)) {
       saveAsSVG(file);
@@ -611,10 +599,10 @@ public class SVGPlot {
    */
   public void dumpDebugFile() {
     try {
-      File f = File.createTempFile("elki-debug", ".svg");
-      f.deleteOnExit();
+      Path f = Files.createTempFile("elki-debug", ".svg");
+      f.toFile().deleteOnExit();
       this.saveAsSVG(f);
-      LoggingUtil.warning("Saved debug file to: " + f.getAbsolutePath());
+      LoggingUtil.warning("Saved debug file to: " + f.normalize());
     }
     catch(Throwable err) {
       // Ignore.

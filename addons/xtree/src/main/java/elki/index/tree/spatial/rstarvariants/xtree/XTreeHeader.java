@@ -20,8 +20,7 @@
  */
 package elki.index.tree.spatial.rstarvariants.xtree;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import elki.index.tree.TreeIndexHeader;
 
@@ -34,13 +33,13 @@ import elki.index.tree.TreeIndexHeader;
  */
 public class XTreeHeader extends TreeIndexHeader {
   /**
-   * The size of this header in bytes, which is 32 Bytes. We have the integers
+   * The size of this header in bytes, which is 28 Bytes. We have the integers
    * {@link #min_fanout} and {@link #dimensionality} (each 4 bytes), the floats
    * {@link #max_overlap} (each 4 bytes) and the
    * 8 bytes each for the longs {@link #num_elements} and
    * {@link #supernode_offset}.
    */
-  private static int SIZE = 32;
+  private static int SIZE = 28;
 
   /**
    * Minimum size to be allowed for page sizes after a split in case of a
@@ -86,13 +85,13 @@ public class XTreeHeader extends TreeIndexHeader {
    * from the file.
    */
   @Override
-  public void readHeader(RandomAccessFile file) throws IOException {
-    super.readHeader(file);
-    this.min_fanout = file.readInt();
-    this.num_elements = file.readLong();
-    this.dimensionality = file.readInt();
-    this.max_overlap = file.readFloat();
-    this.supernode_offset = file.readLong();
+  public void readHeader(ByteBuffer buffer) {
+    super.readHeader(buffer);
+    this.min_fanout = buffer.getInt();
+    this.num_elements = buffer.getLong();
+    this.dimensionality = buffer.getInt();
+    this.max_overlap = buffer.getFloat();
+    this.supernode_offset = buffer.getLong();
   }
 
   /**
@@ -104,13 +103,13 @@ public class XTreeHeader extends TreeIndexHeader {
    * <code>long</code> {@link #supernode_offset}.
    */
   @Override
-  public void writeHeader(RandomAccessFile file) throws IOException {
-    super.writeHeader(file);
-    file.writeInt(min_fanout);
-    file.writeLong(num_elements);
-    file.writeInt(dimensionality);
-    file.writeFloat(max_overlap);
-    file.writeLong(supernode_offset);
+  public void writeHeader(ByteBuffer buffer) {
+    super.writeHeader(buffer);
+    buffer.putInt(min_fanout);
+    buffer.putLong(num_elements);
+    buffer.putInt(dimensionality);
+    buffer.putFloat(max_overlap);
+    buffer.putLong(supernode_offset);
   }
 
   /**

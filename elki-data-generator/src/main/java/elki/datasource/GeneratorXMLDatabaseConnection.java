@@ -20,10 +20,11 @@
  */
 package elki.datasource;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -47,20 +48,12 @@ import elki.data.synthetic.bymodel.GeneratorStatic;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.datasource.filter.ObjectFilter;
 import elki.logging.Logging;
-import elki.math.statistics.distribution.Distribution;
-import elki.math.statistics.distribution.GammaDistribution;
-import elki.math.statistics.distribution.HaltonUniformDistribution;
-import elki.math.statistics.distribution.NormalDistribution;
-import elki.math.statistics.distribution.UniformDistribution;
+import elki.math.statistics.distribution.*;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.ParseUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
-import elki.utilities.optionhandling.parameters.FileParameter;
-import elki.utilities.optionhandling.parameters.Flag;
-import elki.utilities.optionhandling.parameters.PatternParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.random.RandomFactory;
 import elki.utilities.xml.XMLNodeIterator;
 
@@ -174,7 +167,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * The configuration file.
    */
-  File specfile;
+  Path specfile;
 
   /**
    * Parameter for scaling the cluster sizes.
@@ -211,7 +204,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @param reassignByDistance Reassign objects by distance instead of density
    * @param clusterRandom Random number generator
    */
-  public GeneratorXMLDatabaseConnection(List<? extends ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
+  public GeneratorXMLDatabaseConnection(List<? extends ObjectFilter> filters, Path specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
     super(filters);
     this.specfile = specfile;
     this.sizescale = sizescale;
@@ -260,7 +253,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       else {
         LOG.warning("Could not set up XML Schema validation for specification file.");
       }
-      Document doc = dbf.newDocumentBuilder().parse(specfile);
+      Document doc = dbf.newDocumentBuilder().parse(Files.newInputStream(specfile));
       Node root = doc.getDocumentElement();
       if(TAG_DATASET.equals(root.getNodeName())) {
         GeneratorMain gen = new GeneratorMain();
@@ -743,7 +736,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * The configuration file.
      */
-    File specfile = null;
+    Path specfile = null;
 
     /**
      * Parameter for scaling the cluster sizes.

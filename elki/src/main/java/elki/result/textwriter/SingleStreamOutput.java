@@ -20,17 +20,15 @@
  */
 package elki.result.textwriter;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * Class to output all result data to a single stream (e.g. Stdout, single file)
- * 
+ * Class to output all result data to a single stream (e.g., Stdout, single
+ * file)
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -42,7 +40,7 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Constructor using stdout.
-   * 
+   *
    * @throws IOException on IO error
    */
   public SingleStreamOutput() throws IOException {
@@ -51,7 +49,7 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Constructor using stdout
-   * 
+   *
    * @param gzip Use gzip compression
    * @throws IOException on IO error
    */
@@ -61,28 +59,28 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Constructor with given file name.
-   * 
+   *
    * @param out filename
    * @throws IOException on IO error
    */
-  public SingleStreamOutput(File out) throws IOException {
-    this(new FileOutputStream(out));
+  public SingleStreamOutput(Path out) throws IOException {
+    this(Files.newOutputStream(out));
   }
 
   /**
    * Constructor with given file name.
-   * 
+   *
    * @param out filename
    * @param gzip Use gzip compression
    * @throws IOException on IO error
    */
-  public SingleStreamOutput(File out, boolean gzip) throws IOException {
-    this(new FileOutputStream(out), gzip);
+  public SingleStreamOutput(Path out, boolean gzip) throws IOException {
+    this(Files.newOutputStream(out), gzip);
   }
 
   /**
    * Constructor with given FileDescriptor
-   * 
+   *
    * @param out file descriptor
    * @throws IOException on IO error
    */
@@ -92,7 +90,7 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Constructor with given FileDescriptor
-   * 
+   *
    * @param out file descriptor
    * @param gzip Use gzip compression
    * @throws IOException on IO error
@@ -103,28 +101,23 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Constructor with given FileOutputStream.
-   * 
+   *
    * @param out File output stream
    * @throws IOException on IO error
    */
-  public SingleStreamOutput(FileOutputStream out) throws IOException {
+  public SingleStreamOutput(OutputStream out) throws IOException {
     this(out, false);
   }
 
   /**
    * Constructor with given FileOutputStream.
-   * 
+   *
    * @param out File output stream
    * @param gzip Use gzip compression
    * @throws IOException on IO error
    */
-  public SingleStreamOutput(FileOutputStream out, boolean gzip) throws IOException {
-    OutputStream os = out;
-    if(gzip) {
-      // wrap into gzip stream.
-      os = new GZIPOutputStream(os);
-    }
-    this.stream = new PrintStream(os);
+  public SingleStreamOutput(OutputStream out, boolean gzip) throws IOException {
+    this.stream = new PrintStream(gzip ? new GZIPOutputStream(out) : out);
   }
 
   /**
@@ -138,7 +131,7 @@ public class SingleStreamOutput implements StreamFactory {
 
   /**
    * Return the objects shared print stream.
-   * 
+   *
    * @param filename ignored filename for SingleStreamOutput, as the name
    *        suggests
    */

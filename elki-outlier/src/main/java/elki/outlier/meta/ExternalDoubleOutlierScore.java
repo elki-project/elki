@@ -20,10 +20,10 @@
  */
 package elki.outlier.meta;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,7 +93,7 @@ public class ExternalDoubleOutlierScore implements OutlierAlgorithm {
   /**
    * The file to be reparsed
    */
-  private File file;
+  private Path file;
 
   /**
    * object id pattern
@@ -124,7 +124,7 @@ public class ExternalDoubleOutlierScore implements OutlierAlgorithm {
    * @param inverted Inversion flag
    * @param scaling Score scaling function
    */
-  public ExternalDoubleOutlierScore(File file, Pattern idpattern, Pattern scorepattern, boolean inverted, ScalingFunction scaling) {
+  public ExternalDoubleOutlierScore(Path file, Pattern idpattern, Pattern scorepattern, boolean inverted, ScalingFunction scaling) {
     super();
     this.file = file;
     this.idpattern = idpattern;
@@ -149,8 +149,7 @@ public class ExternalDoubleOutlierScore implements OutlierAlgorithm {
 
     DoubleMinMax minmax = new DoubleMinMax();
 
-    try (FileInputStream fis = new FileInputStream(file); //
-        InputStream in = FileUtil.tryGzipInput(fis); //
+    try (InputStream in = FileUtil.tryGzipInput(Files.newInputStream(file)); //
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       CharSequence buf = reader.getBuffer();
@@ -250,7 +249,7 @@ public class ExternalDoubleOutlierScore implements OutlierAlgorithm {
     /**
      * The file to be reparsed
      */
-    private File file;
+    private Path file;
 
     /**
      * object id pattern

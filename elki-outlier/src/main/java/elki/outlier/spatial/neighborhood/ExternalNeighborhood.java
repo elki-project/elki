@@ -20,7 +20,12 @@
  */
 package elki.outlier.spatial.neighborhood;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,8 +43,8 @@ import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
@@ -81,14 +86,14 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     /**
      * The input file.
      */
-    private File file;
+    private Path file;
 
     /**
      * Constructor.
      * 
      * @param file File to load
      */
-    public Factory(File file) {
+    public Factory(Path file) {
       super();
       this.file = file;
     }
@@ -146,8 +151,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       if(LOG.isDebugging()) {
         LOG.verbose("Loading neighborhood file.");
       }
-      try (FileInputStream fis = new FileInputStream(file);
-          InputStream in = FileUtil.tryGzipInput(fis);
+      try (InputStream in = FileUtil.tryGzipInput(Files.newInputStream(file));
           BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
         for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
@@ -194,7 +198,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       /**
        * The input file.
        */
-      File file;
+      Path file;
 
       @Override
       public void configure(Parameterization config) {

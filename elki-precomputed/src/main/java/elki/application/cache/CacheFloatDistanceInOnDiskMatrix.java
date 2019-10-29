@@ -20,8 +20,8 @@
  */
 package elki.application.cache;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import elki.application.AbstractApplication;
 import elki.database.Database;
@@ -78,7 +78,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Output file.
    */
-  private File out;
+  private Path out;
 
   /**
    * Constructor.
@@ -87,7 +87,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(Database database, Distance<? super O> distance, File out) {
+  public CacheFloatDistanceInOnDiskMatrix(Database database, Distance<? super O> distance, Path out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -153,7 +153,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
     /**
      * Output file.
      */
-    private File out = null;
+    private Path out = null;
 
     @Override
     public void configure(Parameterization config) {

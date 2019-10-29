@@ -20,16 +20,16 @@
  */
 package elki.distance.external;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import elki.database.ids.DBIDRange;
 import elki.distance.AbstractDBIDRangeDistance;
 import elki.logging.Logging;
 import elki.persistent.OnDiskUpperTriangleMatrix;
 import elki.utilities.io.ByteArrayUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
@@ -73,7 +73,7 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
    * @param matrixfile File name
    * @throws IOException
    */
-  public DiskCacheBasedDoubleDistance(File matrixfile) throws IOException {
+  public DiskCacheBasedDoubleDistance(Path matrixfile) throws IOException {
     super();
     this.cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
   }
@@ -84,7 +84,6 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
     if(i1 > i2) {
       return distance(i2, i1);
     }
-
     try {
       return cache.getRecordBuffer(i1, i2).getDouble();
     }
