@@ -29,7 +29,7 @@ import elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Parameterization handler that doesn't set any parameters.
- * 
+ * <p>
  * This is mostly useful for documentation purposes, listing all parameters
  * in a non-recursive way.
  * 

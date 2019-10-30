@@ -21,7 +21,7 @@
 package elki.visualization.style;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -130,13 +130,13 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     InputStream stream = null;
     try {
       stream = FileUtil.openSystemFile(filename);
-    } catch (FileNotFoundException e) {
+    } catch (IOException e) {
       try {
         stream = FileUtil.openSystemFile(filename + DEFAULT_PROPERTIES_EXTENSION);
-      } catch (FileNotFoundException e2) {
+      } catch (IOException e2) {
         try {
           stream = FileUtil.openSystemFile(DEFAULT_PROPERTIES_PATH + filename + DEFAULT_PROPERTIES_EXTENSION);
-        } catch (FileNotFoundException e3) {
+        } catch (IOException e3) {
           throw new AbortException("Could not find style scheme file '" + filename + "' for scheme '" + name + "'!");
         }
       }

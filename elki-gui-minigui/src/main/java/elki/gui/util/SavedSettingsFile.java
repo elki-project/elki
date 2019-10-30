@@ -20,21 +20,19 @@
  */
 package elki.gui.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import elki.utilities.io.FormatUtil;
 import elki.utilities.pairs.Pair;
 
 /**
  * Class to manage saved settings in a text file.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
@@ -47,8 +45,8 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * File to read and write
    */
-  private File file;
-  
+  private Path file;
+
   /**
    * Data store
    */
@@ -56,60 +54,55 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Constructor.
-   * 
+   *
    * @param filename Filename
    */
   public SavedSettingsFile(String filename) {
     super();
-    this.file = new File(filename);
+    this.file = Paths.get(filename);
     this.store = new ArrayList<>();
   }
-  
+
   /**
    * Save the current data to the given file.
-   * 
-   * @throws FileNotFoundException thrown on output errors.
    */
-  public void save() throws FileNotFoundException {
-    PrintStream p = new PrintStream(file);
-    p.println(COMMENT_PREFIX + "Saved ELKI settings. First line is title, remaining lines are parameters.");
-    for (Pair<String, ArrayList<String>> settings : store) {
-      p.println(settings.first);
-      for (String str : settings.second) {
-        p.println(str);
+  public void save() throws IOException {
+    BufferedWriter p = Files.newBufferedWriter(file);
+    p.append(COMMENT_PREFIX).append("Saved ELKI settings. First line is title, remaining lines are parameters.").append(FormatUtil.NEWLINE);
+    for(Pair<String, ArrayList<String>> settings : store) {
+      p.append(settings.first).append(FormatUtil.NEWLINE);
+      for(String str : settings.second) {
+        p.append(str).append(FormatUtil.NEWLINE);
       }
-      p.println();
+      p.append(FormatUtil.NEWLINE);
     }
     p.close();
   }
-  
+
   /**
    * Read the current file
-   * 
+   *
    * @throws FileNotFoundException thrown when file not found
-   * @throws IOException thrown on IO errprs
+   * @throws IOException thrown on IO errors
    */
   public void load() throws FileNotFoundException, IOException {
-    BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-    ArrayList<String> buf = new ArrayList<>();
-    while (is.ready()) {
-      String line = is.readLine();
+    BufferedReader is = Files.newBufferedReader(file);
+    String line;
+    ArrayList<String> buf = null;
+    while((line = is.readLine()) != null) {
       // skip comments
-      if (line.startsWith(COMMENT_PREFIX)) {
+      if(line.startsWith(COMMENT_PREFIX)) {
         continue;
       }
-      if (line.length() == 0 && !buf.isEmpty()) {
-        String title = buf.remove(0);
-        store.add(new Pair<>(title, buf));
-        buf = new ArrayList<>();
-      } else {
+      if(line.length() == 0) {
+        buf = null;
+      }
+      else if(buf == null) {
+        store.add(new Pair<>(line, buf = new ArrayList<>()));
+      }
+      else {
         buf.add(line);
       }
-    }
-    if (!buf.isEmpty()) {
-      String title = buf.remove(0);
-      store.add(new Pair<>(title, buf));
-      buf = new ArrayList<>();
     }
     is.close();
   }
@@ -121,31 +114,31 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Remove a given key from the file.
-   * 
+   *
    * @param key Key to remove
    */
   public void remove(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
-    while (it.hasNext()) {
+    while(it.hasNext()) {
       String thisKey = it.next().first;
-      if (key.equals(thisKey)) {
+      if(key.equals(thisKey)) {
         it.remove();
         break;
       }
     }
   }
-  
+
   /**
    * Find a saved setting by key.
-   * 
+   *
    * @param key Key to search for
    * @return saved settings for this key
    */
   public ArrayList<String> get(String key) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
-    while (it.hasNext()) {
+    while(it.hasNext()) {
       Pair<String, ArrayList<String>> pair = it.next();
-      if (key.equals(pair.first)) {
+      if(key.equals(pair.first)) {
         return pair.second;
       }
     }
@@ -161,15 +154,15 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Add/Replace a saved setting
-   * 
+   *
    * @param key Key
    * @param value (New) value.
    */
   public void put(String key, ArrayList<String> value) {
     Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
-    while (it.hasNext()) {
+    while(it.hasNext()) {
       Pair<String, ArrayList<String>> pair = it.next();
-      if (key.equals(pair.first)) {
+      if(key.equals(pair.first)) {
         pair.second = value;
         return;
       }
@@ -179,7 +172,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Return number of saved settings profiles.
-   * 
+   *
    * @return Number of saved settings profiles
    */
   public int size() {
@@ -188,7 +181,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Array access.
-   * 
+   *
    * @param index settings index
    * @return pair at this index
    */

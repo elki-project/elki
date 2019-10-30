@@ -22,6 +22,7 @@ package elki.datasource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -117,7 +118,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
         close();
       }
       catch(IOException e) {
-        throw new RuntimeException(e);
+        throw new UncheckedIOException(e);
       }
       if(duration != null) {
         LOG.statistics(duration.end());
@@ -134,7 +135,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
         close();
       }
       catch(IOException e) {
-        throw new RuntimeException(e);
+        throw new UncheckedIOException(e);
       }
       if(duration != null) {
         LOG.statistics(duration.end());

@@ -219,15 +219,21 @@ public class EvaluateClustering implements Evaluator {
       g.addMeasure("Recall", paircount.recall(), 0, 1, false);
       g.addMeasure("Rand", paircount.randIndex(), 0, 1, false);
       g.addMeasure("ARI", paircount.adjustedRandIndex(), 0, 1, false);
-      g.addMeasure("FowlkesMallows", paircount.fowlkesMallows(), 0, 1, false);
+      g.addMeasure("Fowlkes-Mallows", paircount.fowlkesMallows(), 0, 1, false);
 
       Entropy entropy = contmat.getEntropy();
       g = newGroup("Entropy based measures");
-      g.addMeasure("NMI Joint", entropy.entropyNMIJoint(), 0, 1, false);
-      g.addMeasure("NMI Sqrt", entropy.entropyNMISqrt(), 0, 1, false);
+      g.addMeasure("MI", entropy.mutualInformation(), 0, entropy.upperBoundMI(), true);
+      g.addMeasure("VI", entropy.variationOfInformation(), 0, entropy.upperBoundVI(), true);
+      g.addMeasure("Homogeneity", entropy.mutualInformation() / entropy.entropyFirst(), 0, 1, false);
+      g.addMeasure("Completeness", entropy.mutualInformation() / entropy.entropySecond(), 0, 1, false);
+      g.addMeasure("Arithmetic NMI", entropy.arithmeticNMI(), 0, 1, false);
+      g.addMeasure("Geometric NMI", entropy.geometricNMI(), 0, 1, false);
+      g.addMeasure("Joint NMI", entropy.jointNMI(), 0, 1, false);
+      g.addMeasure("NVI", entropy.normalizedVariationOfInformation(), 0, 1, true);
 
       BCubed bcubed = contmat.getBCubed();
-      g = newGroup("BCubed-based measures");
+      g = newGroup("B3 measures");
       g.addMeasure("F1-Measure", bcubed.f1Measure(), 0, 1, false);
       g.addMeasure("Recall", bcubed.recall(), 0, 1, false);
       g.addMeasure("Precision", bcubed.precision(), 0, 1, false);
@@ -247,6 +253,7 @@ public class EvaluateClustering implements Evaluator {
       MeanVariance gini = contmat.averageSymmetricGini();
       g = newGroup("Gini measures");
       g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), gini.getMean(), 0, 1, false);
+      // FIXME: Adjusted Gini?
     }
 
     /**

@@ -20,21 +20,16 @@
  */
 package elki.application.internal;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -83,9 +78,8 @@ public class DocumentReferences {
     }
 
     List<Map.Entry<Reference, TreeSet<Object>>> refs = sortedReferences();
-    File references = new File(args[0]);
-    try (FileOutputStream reffo = new FileOutputStream(references); //
-        OutputStream refstream = new BufferedOutputStream(reffo)) {
+    Path references = Paths.get(args[0]);
+    try (OutputStream refstream = Files.newOutputStream(references)) {
       documentReferences(refs, new HTMLFormat()).writeTo(refstream);
     }
     catch(IOException e) {

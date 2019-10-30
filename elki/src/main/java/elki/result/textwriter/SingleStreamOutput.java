@@ -48,16 +48,6 @@ public class SingleStreamOutput implements StreamFactory {
   }
 
   /**
-   * Constructor using stdout
-   *
-   * @param gzip Use gzip compression
-   * @throws IOException on IO error
-   */
-  public SingleStreamOutput(boolean gzip) throws IOException {
-    this(FileDescriptor.out, gzip);
-  }
-
-  /**
    * Constructor with given file name.
    *
    * @param out filename
@@ -76,27 +66,6 @@ public class SingleStreamOutput implements StreamFactory {
    */
   public SingleStreamOutput(Path out, boolean gzip) throws IOException {
     this(Files.newOutputStream(out), gzip);
-  }
-
-  /**
-   * Constructor with given FileDescriptor
-   *
-   * @param out file descriptor
-   * @throws IOException on IO error
-   */
-  public SingleStreamOutput(FileDescriptor out) throws IOException {
-    this(new FileOutputStream(out));
-  }
-
-  /**
-   * Constructor with given FileDescriptor
-   *
-   * @param out file descriptor
-   * @param gzip Use gzip compression
-   * @throws IOException on IO error
-   */
-  public SingleStreamOutput(FileDescriptor out, boolean gzip) throws IOException {
-    this(new FileOutputStream(out), gzip);
   }
 
   /**

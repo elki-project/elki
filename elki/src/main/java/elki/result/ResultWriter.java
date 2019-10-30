@@ -35,6 +35,7 @@ import elki.utilities.io.FileUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameterization.UnParameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.PatternParameter;
@@ -105,7 +106,7 @@ public class ResultWriter implements ResultHandler {
 
   private StreamFactory openStreamFactory() throws IOException {
     if(out == null) {
-      return new SingleStreamOutput(gzip);
+      return new SingleStreamOutput();
     }
     // If it does not exist, make a folder.
     final String ext = FileUtil.getFilenameExtension(out);
@@ -173,8 +174,10 @@ public class ResultWriter implements ResultHandler {
       new FileParameter(OutputStep.Par.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
           .setOptional(true) //
           .grab(config, x -> out = x);
-      new Flag(GZIP_OUTPUT_ID).grab(config, x -> gzip = x);
-      new Flag(OVERWRITE_OPTION_ID).grab(config, x -> warnoverwrite = !x);
+      if(out != null || config instanceof UnParameterization /* for documentation */) {
+        new Flag(GZIP_OUTPUT_ID).grab(config, x -> gzip = x);
+        new Flag(OVERWRITE_OPTION_ID).grab(config, x -> warnoverwrite = !x);
+      }
       new PatternParameter(FILTER_PATTERN_ID) //
           .setOptional(true) //
           .grab(config, x -> filter = x);

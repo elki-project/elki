@@ -21,12 +21,14 @@
 package elki.logging;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -132,7 +134,7 @@ public final class LoggingConfiguration {
 
       logger.info("Logging configuration read.");
     }
-    catch(FileNotFoundException e) {
+    catch(FileNotFoundException | NoSuchFileException e) {
       logger.log(Level.SEVERE, "Could not find logging configuration file: " + cfgfile, e);
     }
     catch(Exception e) {
@@ -146,13 +148,12 @@ public final class LoggingConfiguration {
    *
    * @param filename File name in system notation
    * @return Input stream
-   * @throws FileNotFoundException When no file was found.
    */
-  private static InputStream openSystemFile(String filename) throws FileNotFoundException {
+  private static InputStream openSystemFile(String filename) throws IOException {
     try {
-      return new FileInputStream(filename);
+      return Files.newInputStream(Paths.get(filename));
     }
-    catch(FileNotFoundException e) {
+    catch(FileNotFoundException | NoSuchFileException e) {
       // try with classloader
       String resname = File.separatorChar != '/' ? filename.replace(File.separatorChar, '/') : filename;
       ClassLoader cl = LoggingConfiguration.class.getClassLoader();
