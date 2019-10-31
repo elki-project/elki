@@ -39,7 +39,7 @@ public class PartialVAFileTest extends AbstractIndexStructureTest {
   public void testPartialVAFile() {
     PartialVAFile.Factory<?> factory = new ELKIBuilder<>(PartialVAFile.Factory.class) //
         .with(PartialVAFile.Factory.PARTITIONS_ID, 4).build();
-    testExactEuclidean(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
-    testSinglePoint(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    assertExactEuclidean(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    assertSinglePoint(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
   }
 }

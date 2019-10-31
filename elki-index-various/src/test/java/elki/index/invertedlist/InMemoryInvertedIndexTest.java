@@ -40,6 +40,6 @@ public class InMemoryInvertedIndexTest extends AbstractIndexStructureTest {
     // We could have used "new InMemoryInvertedIndex.Factory()", but we also
     // want to test the parameterizer code.
     InMemoryInvertedIndex.Factory<?> factory = new ELKIBuilder<>(InMemoryInvertedIndex.Factory.class).build();
-    testExactCosine(factory, InMemoryInvertedIndex.CosineKNNQuery.class, InMemoryInvertedIndex.CosineRangeQuery.class);
+    assertExactCosine(factory, InMemoryInvertedIndex.CosineKNNQuery.class, InMemoryInvertedIndex.CosineRangeQuery.class);
   }
 }

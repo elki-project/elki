@@ -42,7 +42,7 @@ public class IDistanceTest extends AbstractIndexStructureTest {
         .with(InMemoryIDistanceIndex.Factory.Par.DISTANCE_ID, EuclideanDistance.class) //
         .with(InMemoryIDistanceIndex.Factory.Par.REFERENCE_ID, FarthestPoints.class) //
         .build();
-    testExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
-    testSinglePoint(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
+    assertExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
+    assertSinglePoint(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
   }
 }

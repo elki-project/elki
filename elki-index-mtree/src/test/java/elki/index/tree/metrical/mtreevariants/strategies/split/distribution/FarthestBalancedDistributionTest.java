@@ -45,8 +45,8 @@ public class FarthestBalancedDistributionTest extends AbstractIndexStructureTest
         .with(MTreeFactory.Par.SPLIT_STRATEGY_ID, MLBDistSplit.class) //
         .with(MLBDistSplit.Par.DISTRIBUTOR_ID, FarthestBalancedDistribution.class) //
         .build();
-    testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
     // TODO: test that the tree is indeed balanced!
   }
 }

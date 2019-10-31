@@ -43,7 +43,7 @@ public class MTreeTest extends AbstractIndexStructureTest {
   public void testEuclidean() {
     MTreeFactory<DoubleVector> factory = new ELKIBuilder<>(MTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300).build();
-    testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
   }
 }

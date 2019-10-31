@@ -46,6 +46,6 @@ public class XTreeTest extends AbstractIndexStructureTest {
   public void testXTree() {
     XTreeFactory<?> factory = new ELKIBuilder<>(XTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300).build();
-    testExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
   }
 }

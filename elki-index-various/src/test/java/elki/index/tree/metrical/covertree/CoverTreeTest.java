@@ -40,8 +40,8 @@ public class CoverTreeTest extends AbstractIndexStructureTest {
   public void testCovertree() {
     CoverTree.Factory<?> factory = new ELKIBuilder<>(CoverTree.Factory.class) //
         .with(CoverTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
-    testExactEuclidean(factory, CoverTree.CoverTreeKNNQuery.class, CoverTree.CoverTreeRangeQuery.class);
-    testPrioritySearchEuclidean(factory, CoverTree.PrioritySearcher.class);
-    testSinglePoint(factory, CoverTree.CoverTreeKNNQuery.class, CoverTree.CoverTreeRangeQuery.class);
+    assertExactEuclidean(factory, CoverTree.CoverTreeKNNQuery.class, CoverTree.CoverTreeRangeQuery.class);
+    assertPrioritySearchEuclidean(factory, CoverTree.PrioritySearcher.class);
+    assertSinglePoint(factory, CoverTree.CoverTreeKNNQuery.class, CoverTree.CoverTreeRangeQuery.class);
   }
 }

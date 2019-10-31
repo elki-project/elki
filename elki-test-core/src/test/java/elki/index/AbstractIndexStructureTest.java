@@ -46,29 +46,28 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 /**
  * Test case to validate some index structures for accuracy. For a known data
  * set and query point, the top 10 nearest neighbors are queried and verified.
- *
+ * <p>
  * Note that the internal operation of the index structure is not tested this
  * way, only whether the database object with the index still returns reasonable
  * results.
+ * <p>
+ * TODO: rather than inheriting from this, simply call the static methods.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
 public abstract class AbstractIndexStructureTest {
   // the following values depend on the data set used!
-  String dataset = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
+  final static String dataset = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
 
   // size of the data set
-  int shoulds = 600;
+  final static int shoulds = 600;
 
   // query point
-  double[] querypoint = new double[] { 0.5, 0.5, 0.5 };
+  final static double[] querypoint = new double[] { 0.5, 0.5, 0.5 };
 
-  // number of kNN to query
-  int k = 10;
-
-  // the 10 next neighbors of the query point
-  double[][] shouldc = new double[][] { //
+  // coordinates the 10 next neighbors of the query point
+  final static double[][] shouldc = new double[][] { //
       { 0.45000428746088883, 0.484504234161508, 0.5538595167151342 }, //
       { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
       { 0.4758477631164003, 0.6021538103067177, 0.5556807408692025 }, //
@@ -78,17 +77,16 @@ public abstract class AbstractIndexStructureTest {
       { 0.40283109564192643, 0.6301433694690401, 0.44313571161129883 }, //
       { 0.6545840114867083, 0.4919617658889418, 0.5905461546078652 }, //
       { 0.6011097673869055, 0.6562921241634017, 0.44830647520493694 }, //
-      { 0.5127485678175534, 0.29708449200895504, 0.561722374659424 }, //
-  };
+      { 0.5127485678175534, 0.29708449200895504, 0.561722374659424 } };
 
   // and their distances
-  double[] shouldd = new double[] { //
+  final static double[] shouldd = new double[] { //
       0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, //
       0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, //
       0.19319066655063877, 0.21247795391113142 };
 
   // the 10 next neighbors of the query point
-  double[][] cosshouldc = new double[][] { //
+  final static double[][] cosshouldc = new double[][] { //
       { 0.9388918784671444, 0.9369194808634538, 0.9516174288228975 }, //
       { 0.7935657901929466, 0.8267149570739274, 0.8272559426355307 }, //
       { 0.8890643793450695, 0.8437901951504767, 0.8829882896201193 }, //
@@ -98,25 +96,102 @@ public abstract class AbstractIndexStructureTest {
       { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
       { 0.9361084305156224, 0.8005811202045534, 0.8467431187531834 }, //
       { 0.769186011075896, 0.7004483428021823, 0.834918908745398 }, //
-      { 0.8616135674236818, 0.7527587616292614, 0.9089966965471046 }, //
-  };
+      { 0.8616135674236818, 0.7527587616292614, 0.9089966965471046 } };
 
   // and their distances
-  double[] cosshouldd = new double[] { //
+  final static double[] cosshouldd = new double[] { //
       2.388222990501454E-5, 1.8642729910156586E-4, 2.646439281461799E-4, 6.560940454963804E-4, //
       8.847811747589862E-4, 0.0013998753062922642, 0.0015284394211749763, 0.002127161867922056, //
       0.002544219809804127, 0.003009950345141843 };
 
-  double eps = shouldd[shouldd.length - 1];
+  // ids the 10 next neighbors of the query point
+  final static int[] shouldc2 = new int[] { //
+      1, 40, 130, 72, 116, 170, 41, 60, 159, 193 };
 
-  double coseps = cosshouldd[cosshouldd.length - 1];
+  // and their distances
+  final static double[] shouldd2 = new double[] { //
+      0.0, 0.056828785196424696, 0.07104616739223207, 0.07666738211759327, //
+      0.08788356409628115, 0.08849507874738852, 0.09155789916886654, //
+      0.09289490783235752, 0.09533239116740204, 0.09648661162968246 };
+
+  // the 10 next neighbors of the query point
+  final static int[] cosshouldc2 = new int[] { //
+      1, 130, 72, 7, 40, 191, 170, 41, 57, 60 };
+
+  // and their distances
+  final static double[] cosshouldd2 = new double[] { //
+      0.0, 0.0013434324976777656, 0.0015118568667449317, 0.0016961681026059772, //
+      0.0019224617419847378, 0.001922677208946122, 0.0022000876433134753, //
+      0.0022407268615245446, 0.0022821610749839127, 0.00270862943612582 };
+
+  // number of kNN to query
+  final static int k = shouldd.length;
+
+  final static double eps = shouldd[shouldd.length - 1];
+
+  final static double eps2 = shouldd2[shouldd2.length - 1];
+
+  final static double coseps = cosshouldd[cosshouldd.length - 1];
+
+  final static double coseps2 = cosshouldd2[cosshouldd2.length - 1];
 
   /**
-   * Actual test routine.
+   * Verify the neighbors.
    *
-   * @param inputparams
+   * @param rel Data relation
+   * @param dist Distance function
+   * @param results Results
+   * @param refd Reference distances
+   * @param refc Reference vectors
    */
-  protected void testExactEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  private static void verifyNeighbors(Relation<DoubleVector> rel, DistanceQuery<? super DoubleVector> dist, DoubleDBIDList results, double[] refd, double[][] refc) {
+    assertEquals("Result size does not match expectation!", results.size(), refd.length);
+    for(DoubleDBIDListIter res = results.iter(); res.valid(); res.advance()) {
+      int o = res.getOffset();
+      assertEquals("Expected distance at offset " + o + " doesn't match.", refd[o], res.doubleValue(), 1e-12);
+      double distance = dist.distance(rel.get(res), DoubleVector.wrap(refc[o]));
+      assertEquals("Expected vector at offset " + o + " doesn't match: " + rel.get(res).toString(), 0.0, distance, 0.);
+    }
+  }
+
+  /**
+   * Verify the neighbors.
+   *
+   * @param q Query
+   * @param results Results
+   * @param refd Reference distances
+   * @param refid Reference ids
+   */
+  private static void verifyNeighbors(DoubleDBIDList results, double[] refd, int[] refid) {
+    assertEquals("Result size does not match expectation!", results.size(), refd.length);
+    int shift = DBIDUtil.asInteger(results.iter()) - refid[0];
+    for(DoubleDBIDListIter res = results.iter(); res.valid(); res.advance()) {
+      int o = res.getOffset();
+      assertEquals("Expected distance at offset " + o + " doesn't match.", refd[o], res.doubleValue(), 1e-12);
+      assertEquals("Expected id at offset " + o + " doesn't match.", refid[o], DBIDUtil.asInteger(res) - shift);
+    }
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   */
+  protected static void assertExactEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    assertExactEuclidean(factory, expectKNNQuery, expectRangeQuery, false);
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
+   */
+  protected static void assertExactEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery, boolean dbidonly) {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
@@ -128,51 +203,46 @@ public abstract class AbstractIndexStructureTest {
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
+    DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectKNNQuery != null) {
       KNNQuery<DoubleVector> knnq = qb.kNNQuery(k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      // get the 10 next neighbors
-      KNNList ids = knnq.getKNNForObject(DoubleVector.wrap(querypoint), k);
-      assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
-
-      // verify that the neighbors match.
-      int i = 0;
-      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-        // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
-        // verify vector
-        DoubleVector c = relation.get(res);
-        DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+      if(!dbidonly) {
+        verifyNeighbors(relation, dist, knnq.getKNNForObject(DoubleVector.wrap(querypoint), k), shouldd, shouldc);
       }
+      verifyNeighbors(knnq.getKNNForDBID(second, k), shouldd2, shouldc2);
     }
     if(expectRangeQuery != null) {
       RangeQuery<DoubleVector> rangeq = qb.rangeQuery(eps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      // Do a range query
-      DoubleDBIDList ids = rangeq.getRangeForObject(DoubleVector.wrap(querypoint), eps);
-      assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
-
-      // verify that the neighbors match.
-      int i = 0;
-      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-        // Verify distance
-        assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
-        // verify vector
-        DoubleVector c = relation.get(res);
-        DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+      if(!dbidonly) {
+        verifyNeighbors(relation, dist, rangeq.getRangeForObject(DoubleVector.wrap(querypoint), eps), shouldd, shouldc);
       }
+      verifyNeighbors(rangeq.getRangeForDBID(second, eps2), shouldd2, shouldc2);
     }
   }
 
   /**
-   * Actual test routine, for cosine distance
-   *
-   * @param inputparams
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
    */
-  protected void testExactCosine(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  protected static void assertExactCosine(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    assertExactCosine(factory, expectKNNQuery, expectRangeQuery, false);
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   */
+  protected static void assertExactCosine(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery, boolean dbidonly) {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
@@ -184,56 +254,40 @@ public abstract class AbstractIndexStructureTest {
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, CosineDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
+    DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectKNNQuery != null) {
       KNNQuery<DoubleVector> knnq = qb.cheapOnly().kNNQuery(k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      // get the 10 next neighbors
-      KNNList ids = knnq.getKNNForObject(DoubleVector.wrap(querypoint), k);
-      assertEquals("Result size does not match expectation!", cosshouldd.length, ids.size());
-
-      // verify that the neighbors match.
-      int i = 0;
-      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-        // Verify distance
-        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
-        // verify vector
-        DoubleVector c = relation.get(res);
-        DoubleVector c2 = DoubleVector.wrap(cosshouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+      if(!dbidonly) {
+        verifyNeighbors(relation, dist, knnq.getKNNForObject(DoubleVector.wrap(querypoint), k), cosshouldd, cosshouldc);
       }
+      verifyNeighbors(knnq.getKNNForDBID(second, k), cosshouldd2, cosshouldc2);
     }
     if(expectRangeQuery != null) {
       RangeQuery<DoubleVector> rangeq = qb.cheapOnly().rangeQuery(coseps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      // Do a range query
-      DoubleDBIDList ids = rangeq.getRangeForObject(DoubleVector.wrap(querypoint), coseps);
-      assertEquals("Result size does not match expectation!", cosshouldd.length, ids.size());
-
-      // verify that the neighbors match.
-      int i = 0;
-      for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-        // Verify distance
-        assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
-        // verify vector
-        DoubleVector c = relation.get(res);
-        DoubleVector c2 = DoubleVector.wrap(cosshouldc[i]);
-        assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
+      if(!dbidonly) {
+        verifyNeighbors(relation, dist, rangeq.getRangeForObject(DoubleVector.wrap(querypoint), coseps), cosshouldd, cosshouldc);
       }
+      verifyNeighbors(rangeq.getRangeForDBID(second, coseps2), cosshouldd2, cosshouldc2);
     }
   }
 
   /**
-   * Test degenerate case: single point.
+   * Test helper
    * 
-   * @param factory
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
    */
-  protected void testSinglePoint(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+  protected static void assertSinglePoint(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     ArrayAdapterDatabaseConnection dbc = new ArrayAdapterDatabaseConnection(new double[][] { { 1, 0 } });
     Database db = new StaticArrayDatabase(dbc, factory != null ? Arrays.asList(factory) : null);
     db.initialize();
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DBIDRef first = relation.iterDBIDs();
     if(expectKNNQuery != null) {
       KNNQuery<DoubleVector> knnq = qb.kNNQuery(1);
@@ -252,11 +306,26 @@ public abstract class AbstractIndexStructureTest {
   }
 
   /**
-   * Actual test routine.
-   *
-   * @param inputparams
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
    */
-  protected void testPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery) {
+  protected static void assertPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery) {
+    assertPrioritySearchEuclidean(factory, expectQuery, false);
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
+   */
+  protected static void assertPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery, boolean dbidonly) {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
@@ -268,17 +337,39 @@ public abstract class AbstractIndexStructureTest {
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
+    DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectQuery != null) {
       DistancePrioritySearcher<DoubleVector> prioq = qb.prioritySearcher();
       assertTrue("Returned priority search is not of expected class: expected " + expectQuery + " got " + prioq.getClass(), expectQuery.isAssignableFrom(prioq.getClass()));
 
+      if(!dbidonly) {
+        // get the 10 next neighbors
+        DoubleVector dv = DoubleVector.wrap(querypoint);
+        { // verify the knn result:
+          ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
+          for(prioq.search(dv); prioq.valid(); prioq.advance()) {
+            double approx = prioq.getApproximateDistance(); // May be NaN
+            double atol = prioq.getApproximateAccuracy(); // May be NaN
+            double lb = prioq.getLowerBound(); // May be NaN
+            double ub = prioq.getUpperBound(); // May be NaN
+            double exact = prioq.computeExactDistance();
+            ids.add(exact, prioq);
+            assertFalse("Lower bound incorrect", exact < lb);
+            assertFalse("Upper bound incorrect", exact > ub);
+            assertFalse("Lower tolerance incorrect", exact < approx - atol);
+            assertFalse("Upper tolerance incorrect", exact > approx + atol);
+          }
+          ids.sort();
+          verifyNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
+        }
+        verifyNeighbors(relation, dist, prioq.getKNNForObject(dv, k), shouldd, shouldc);
+        verifyNeighbors(relation, dist, prioq.getRangeForObject(dv, eps), shouldd, shouldc);
+      }
       // get the 10 next neighbors
-      DoubleVector dv = DoubleVector.wrap(querypoint);
       { // verify the knn result:
-        int i = 0;
         ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
-        for(prioq.search(dv); prioq.valid(); prioq.advance()) {
+        for(prioq.search(second); prioq.valid(); prioq.advance()) {
           double approx = prioq.getApproximateDistance(); // May be NaN
           double atol = prioq.getApproximateAccuracy(); // May be NaN
           double lb = prioq.getLowerBound(); // May be NaN
@@ -291,43 +382,10 @@ public abstract class AbstractIndexStructureTest {
           assertFalse("Upper tolerance incorrect", exact > approx + atol);
         }
         ids.sort();
-        for(DoubleDBIDListIter res = ids.iter(); res.valid() && i < shouldd.length; res.advance(), i++) {
-          // Verify distance
-          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
-          // verify vector
-          DoubleVector c = relation.get(res);
-          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
-          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
-        }
+        verifyNeighbors(ids.slice(0, k), shouldd2, shouldc2);
       }
-      { // verify the knn result:
-        KNNList ids = prioq.getKNNForObject(dv, k);
-        assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
-
-        // verify that the neighbors match.
-        int i = 0;
-        for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-          // Verify distance
-          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
-          // verify vector
-          DoubleVector c = relation.get(res);
-          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
-          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
-        }
-      }
-      { // verify the range query result:
-        DoubleDBIDList ids = prioq.getRangeForObject(dv, eps);
-        assertEquals("Result size does not match expectation!", shouldd.length, ids.size(), 1e-15);
-        int i = 0;
-        for(DoubleDBIDListIter res = ids.iter(); res.valid(); res.advance(), i++) {
-          // Verify distance
-          assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
-          // verify vector
-          DoubleVector c = relation.get(res);
-          DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
-          assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
-        }
-      }
+      verifyNeighbors(prioq.getKNNForDBID(second, k), shouldd2, shouldc2);
+      verifyNeighbors(prioq.getRangeForDBID(second, eps2), shouldd2, shouldc2);
     }
   }
 }

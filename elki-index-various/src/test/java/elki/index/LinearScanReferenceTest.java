@@ -40,9 +40,9 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExact() {
-    testExactEuclidean(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
-    testPrioritySearchEuclidean(null, LinearScanEuclideanDistancePrioritySearcher.class);
-    testSinglePoint(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
+    assertExactEuclidean(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
+    assertPrioritySearchEuclidean(null, LinearScanEuclideanDistancePrioritySearcher.class);
+    assertSinglePoint(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
   }
 
   /**
@@ -50,6 +50,6 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExactCosine() {
-    testExactCosine(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    assertExactCosine(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 }

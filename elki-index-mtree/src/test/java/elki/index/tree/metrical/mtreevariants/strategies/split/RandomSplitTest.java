@@ -44,7 +44,7 @@ public class RandomSplitTest extends AbstractIndexStructureTest {
         .with(MTreeFactory.Par.SPLIT_STRATEGY_ID, RandomSplit.class) //
         .with(RandomSplit.Par.RANDOM_ID, 0) //
         .build();
-    testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
   }
 }

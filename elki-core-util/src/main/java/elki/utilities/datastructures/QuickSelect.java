@@ -190,6 +190,7 @@ public class QuickSelect {
         adapter.swap(data, j, j - 1);
       }
     }
+    adapter.isSorted(data, start, end);
   }
 
   /**
@@ -219,6 +220,16 @@ public class QuickSelect {
      *         or greater than that at position j.
      */
     int compare(T data, int i, int j);
+
+    /**
+     * Notification callback that an array is completely sorted.
+     *
+     * @param data Data structure
+     * @param begin Begin of sorted interval
+     * @param end End of sorted interval
+     */
+    default void isSorted(T data, int begin, int end) {
+    };
   }
 
   /**

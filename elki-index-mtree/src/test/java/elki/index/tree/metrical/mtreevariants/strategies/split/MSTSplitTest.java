@@ -43,7 +43,7 @@ public class MSTSplitTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(MTreeFactory.Par.SPLIT_STRATEGY_ID, MSTSplit.class) //
         .build();
-    testExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    testSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
   }
 }
