@@ -223,7 +223,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
-    return idx.getPriorityQuery(distanceQuery, maxrange, flags);
+    return idx.getPrioritySearcher(distanceQuery, maxrange, flags);
   }
 
   private <O> Index makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {

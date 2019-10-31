@@ -542,7 +542,7 @@ public class QueryBuilder<O> {
     DistanceQuery<O> distanceQuery = distanceQuery();
     flags ^= precompute; // Restore
     for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
-      DistancePrioritySearcher<O> q = it.get().getPriorityQuery(distanceQuery, maxrange, flags);
+      DistancePrioritySearcher<O> q = it.get().getPrioritySearcher(distanceQuery, maxrange, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
       }

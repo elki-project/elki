@@ -265,7 +265,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
         new PrioritySearcher() : null;
   }

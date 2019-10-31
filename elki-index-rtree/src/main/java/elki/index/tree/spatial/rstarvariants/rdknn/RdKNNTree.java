@@ -522,7 +522,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPriorityQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getDistancePrioritySearcher(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
