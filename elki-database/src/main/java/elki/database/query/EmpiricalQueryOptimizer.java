@@ -27,6 +27,7 @@ import elki.data.type.FieldTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDRange;
+import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNQuery;
 import elki.database.query.range.RangeQuery;
@@ -34,10 +35,7 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.index.DistanceIndex;
-import elki.index.Index;
-import elki.index.KNNIndex;
-import elki.index.RangeIndex;
+import elki.index.*;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.Alias;
@@ -216,6 +214,18 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return idx.getRangeQuery(distanceQuery, maxrange, flags);
   }
 
+  @Override
+  public <O> DistancePrioritySearcher<O> getPrioritySearcher(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null) {
+      return null;
+    }
+    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+      Metadata.hierarchyOf(relation).addWeakChild(idx);
+    }
+    return idx.getPriorityQuery(distanceQuery, maxrange, flags);
+  }
+
   private <O> Index makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
     if(matrixIndex == null || relation.size() > 65536) {
       return null;
@@ -244,13 +254,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
   }
 
-  private <O> Index makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance) {
+  private <O> DistancePriorityIndex<O> makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance) {
     if(coverIndex == null || !distance.isMetric()) {
       return null;
     }
     // TODO: auto-tune parameters based on dimensionality or sample?
     try {
-      Index idx = coverIndex.newInstance(relation, distance);
+      @SuppressWarnings("unchecked")
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance);
       LOG.verbose("Optimizer: automatically adding a cover tree index.");
       idx.initialize();
       return idx;
