@@ -83,7 +83,7 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
    * Creates a new OnDiskArrayPageFile from an existing file.
    * 
    * @param pageSize page size
-   * @param fileName the name of the file
+   * @param filename the name of the file
    */
   public OnDiskArrayPageFile(int pageSize, Path filename) {
     super(pageSize);

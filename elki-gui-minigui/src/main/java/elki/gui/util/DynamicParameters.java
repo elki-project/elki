@@ -206,7 +206,7 @@ public class DynamicParameters {
    */
   public synchronized void serializeParameters(ArrayList<String> p) {
     for(Node t : parameters) {
-      if(t.param != null) {
+      if(t.param != null && t.value != null) {
         if(t.param instanceof RemainingOptions) {
           for(String str : t.value.split(" ")) {
             if(str.length() > 0) {
@@ -219,7 +219,7 @@ public class DynamicParameters {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
           }
         }
-        else if(t.value != null && t.value.length() > 0) {
+        else if(t.value.length() > 0) {
           if(!t.value.startsWith(STRING_USE_DEFAULT) && !STRING_OPTIONAL.equals(t.value)) {
             p.add(SerializedParameterization.OPTION_PREFIX + t.param.getOptionID().getName());
             p.add(t.value);

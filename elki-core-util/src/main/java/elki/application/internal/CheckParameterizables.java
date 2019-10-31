@@ -219,7 +219,7 @@ public class CheckParameterizables {
       final Method[] methods = par.getDeclaredMethods();
       for(int i = 0; i < methods.length; ++i) {
         final Method meth = methods[i];
-        if(meth.getName().equals("makeInstance")) {
+        if(meth.getName().equals("make")) {
           // Check for empty signature
           if(meth.getParameterTypes().length == 0) {
             // And check for proper return type.
@@ -237,11 +237,11 @@ public class CheckParameterizables {
       }
     }
     catch(Exception e) {
-      LOG.warning("No proper Par.makeInstance for " + cls.getName() + ": " + e);
+      LOG.warning("No proper Par.make for " + cls.getName() + ": " + e);
       return false;
     }
     if(checkResult > 1) {
-      LOG.warning("No proper Par.makeInstance for " + cls.getName() + " found!");
+      LOG.warning("No proper Par.make for " + cls.getName() + " found!");
     }
     return checkResult == 1;
   }

@@ -218,7 +218,11 @@ public class OnDiskArray implements AutoCloseable {
       map = null;
     }
     MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
-    map = file.map(mode, headersize, recordsize * numrecs);
+    long size = recordsize * (long) numrecs;
+    if(size > Integer.MAX_VALUE) {
+      throw new ArrayIndexOutOfBoundsException("OnDiskArray currently has a maximum size of: " + Integer.MAX_VALUE + " (see Java FileChannel#map).");
+    }
+    map = file.map(mode, headersize, size);
   }
 
   /**
@@ -277,10 +281,7 @@ public class OnDiskArray implements AutoCloseable {
    */
   public static final int mixMagic(int magic1, int magic2) {
     final long prime = 2654435761L;
-    long result = 1;
-    result = prime * result + magic1;
-    result = prime * result + magic2;
-    return (int) result;
+    return (int) (prime * (prime + magic1) + magic2);
   }
 
   /**
@@ -290,8 +291,7 @@ public class OnDiskArray implements AutoCloseable {
    * @return file position
    */
   private long indexToFileposition(long index) {
-    long pos = headersize + index * recordsize;
-    return pos;
+    return headersize + index * recordsize;
   }
 
   /**

@@ -1,0 +1,2 @@
+elki.outlier.spatial.neighborhood.weighted.UnweightedNeighborhoodAdapter$Factory
+elki.outlier.spatial.neighborhood.weighted.LinearWeightedExtendedNeighborhood$Factory
