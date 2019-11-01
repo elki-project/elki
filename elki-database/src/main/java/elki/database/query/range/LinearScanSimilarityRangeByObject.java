@@ -21,7 +21,6 @@
 package elki.database.query.range;
 
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.similarity.SimilarityQuery;
@@ -34,32 +33,27 @@ import elki.database.query.similarity.SimilarityQuery;
  *
  * @has - - - SimilarityQuery
  *
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanSimilarityRangeQuery<O> extends AbstractSimilarityRangeQuery<O> implements LinearScanQuery {
+public class LinearScanSimilarityRangeByObject<O> implements RangeSearcher<O>, LinearScanQuery {
+  /**
+   * Hold the similarity function to be used.
+   */
+  final protected SimilarityQuery<O> simQuery;
+
   /**
    * Constructor.
    *
    * @param simQuery Similarity function to use
    */
-  public LinearScanSimilarityRangeQuery(SimilarityQuery<O> simQuery) {
-    super(simQuery);
+  public LinearScanSimilarityRangeByObject(SimilarityQuery<O> simQuery) {
+    super();
+    this.simQuery = simQuery;
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      final double currentSim = simQuery.similarity(id, iter);
-      if(currentSim >= range) {
-        result.add(currentSim, iter);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+    for(DBIDIter iter = simQuery.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
       final double currentSim = simQuery.similarity(obj, iter);
       if(currentSim >= range) {
         result.add(currentSim, iter);

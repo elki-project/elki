@@ -26,7 +26,7 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -79,7 +79,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -141,7 +141,7 @@ public class INFLO<O> implements OutlierAlgorithm {
 
     // Step one: find the kNN
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     // Step two: find the RkNN, minus kNN.
     LOG.beginStep(stepprog, 2, "Materialize reverse NN.");
@@ -150,7 +150,7 @@ public class INFLO<O> implements OutlierAlgorithm {
     WritableDataStore<SetDBIDs> knns = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, SetDBIDs.class);
     // We first need to convert the kNN into sets, because of performance below.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      knns.put(iditer, DBIDUtil.ensureSet(knnq.getKNNForDBID(iditer, kplus)));
+      knns.put(iditer, DBIDUtil.ensureSet(knnq.getKNN(iditer, kplus)));
     }
     // RNNS
     WritableDataStore<ModifiableDBIDs> rnnMinusKNNs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
@@ -232,7 +232,7 @@ public class INFLO<O> implements OutlierAlgorithm {
    * @param inflos INFLO score storage
    * @param inflominmax Output of minimum and maximum
    */
-  protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, KNNQuery<O> knnq, WritableDataStore<ModifiableDBIDs> rNNminuskNNs, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
+  protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, KNNSearcher<DBIDRef> knnq, WritableDataStore<ModifiableDBIDs> rNNminuskNNs, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing INFLOs", relation.size(), LOG) : null;
     HashSetModifiableDBIDs set = DBIDUtil.newHashSet();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -242,7 +242,7 @@ public class INFLO<O> implements OutlierAlgorithm {
         LOG.incrementProcessed(prog);
         continue;
       }
-      final KNNList knn = knnq.getKNNForDBID(iter, kplus);
+      final KNNList knn = knnq.getKNN(iter, kplus);
       if(knn.getKNNDistance() == 0.) {
         inflos.putDouble(iter, 1.);
         inflominmax.put(1.);
@@ -259,7 +259,7 @@ public class INFLO<O> implements OutlierAlgorithm {
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
-        final double kdist = knnq.getKNNForDBID(niter, kplus).getKNNDistance();
+        final double kdist = knnq.getKNN(niter, kplus).getKNNDistance();
         if(kdist <= 0) {
           sum = Double.POSITIVE_INFINITY;
           c++;

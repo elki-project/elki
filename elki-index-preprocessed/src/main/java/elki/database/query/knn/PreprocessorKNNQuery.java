@@ -25,7 +25,6 @@ import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import elki.logging.Logging;
-import elki.utilities.exceptions.AbortException;
 
 /**
  * Instance for a particular database, invoking the preprocessor.
@@ -35,7 +34,7 @@ import elki.utilities.exceptions.AbortException;
  *
  * @param <O> Data object type
  */
-public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
+public class PreprocessorKNNQuery<O> implements KNNSearcher<DBIDRef> {
   /**
    * Class logger
    */
@@ -69,18 +68,13 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
+  public KNNList getKNN(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
       getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
       warned = true;
     }
     final KNNList knnList = preprocessor.get(id);
     return knnList != null ? knnList.subList(k) : null;
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
-    throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 
   /**

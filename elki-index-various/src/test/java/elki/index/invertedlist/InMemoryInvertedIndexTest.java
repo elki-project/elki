@@ -26,15 +26,12 @@ import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for the iDistance index.
+ * Unit test for the {@link InMemoryInvertedIndex} index.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
 public class InMemoryInvertedIndexTest extends AbstractIndexStructureTest {
-  /**
-   * Test {@link InMemoryInvertedIndex}.
-   */
   @Test
   public void testInvertedIndex() {
     // We could have used "new InMemoryInvertedIndex.Factory()", but we also

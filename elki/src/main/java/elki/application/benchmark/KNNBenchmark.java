@@ -26,7 +26,7 @@ import elki.data.type.TypeInformation;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
@@ -57,7 +57,7 @@ import elki.workflow.InputStep;
  *
  * @param <O> Object type
  *
- * @assoc - - - KNNQuery
+ * @assoc - - - KNNSearcher
  */
 public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
   /**
@@ -110,16 +110,15 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    // Get a kNN query instance.
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
     // No query set - use original database.
     if(queries == null) {
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k);
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       int hash = 0;
       MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        KNNList knns = knnQuery.getKNNForDBID(iditer, k);
+        KNNList knns = knnQuery.getKNN(iditer, k);
         int ichecksum = 0;
         for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
           ichecksum += DBIDUtil.asInteger(it);
@@ -138,8 +137,8 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
         }
       }
     }
-    else {
-      // Separate query set.
+    else { // Separate query set.
+      KNNSearcher<O> knnQuery = new QueryBuilder<>(relation, distance).kNNByObject(k);
       TypeInformation res = distance.getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
       int col = -1;
@@ -164,7 +163,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
         assert (off >= 0);
         @SuppressWarnings("unchecked")
         O o = (O) bundle.data(off, col);
-        KNNList knns = knnQuery.getKNNForObject(o, k);
+        KNNList knns = knnQuery.getKNN(o, k);
         int ichecksum = 0;
         for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
           ichecksum += DBIDUtil.asInteger(it);

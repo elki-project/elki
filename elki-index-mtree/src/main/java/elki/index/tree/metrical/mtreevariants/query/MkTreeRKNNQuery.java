@@ -23,9 +23,8 @@ package elki.index.tree.metrical.mtreevariants.query;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.rknn.AbstractRKNNQuery;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import elki.utilities.exceptions.AbortException;
 
 /**
  * Instance of a rKNN query for a particular spatial index.
@@ -35,7 +34,12 @@ import elki.utilities.exceptions.AbortException;
  *
  * @assoc - - - AbstractMkTree
  */
-public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
+public class MkTreeRKNNQuery<O> implements RKNNSearcher<DBIDRef> {
+  /**
+   * Distance query
+   */
+  protected DistanceQuery<O> distanceQuery;
+
   /**
    * The index to use
    */
@@ -48,17 +52,13 @@ public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
    * @param distanceQuery Distance query used
    */
   public MkTreeRKNNQuery(AbstractMkTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
-    super(distanceQuery);
+    super();
+    this.distanceQuery = distanceQuery;
     this.index = index;
   }
 
   @Override
-  public DoubleDBIDList getRKNNForObject(O obj, int k) {
-    throw new AbortException("Preprocessor KNN query only supports ID queries.");
-  }
-
-  @Override
-  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
+  public DoubleDBIDList getRKNN(DBIDRef id, int k) {
     return index.reverseKNNQuery(id, k);
   }
 }

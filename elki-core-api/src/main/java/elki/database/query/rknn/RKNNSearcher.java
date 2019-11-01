@@ -18,38 +18,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query.knn;
+package elki.database.query.rknn;
 
-import elki.database.ids.DBIDRef;
-import elki.database.ids.KNNList;
+import elki.database.ids.DoubleDBIDList;
 
 /**
- * The interface of an actual instance.
+ * Abstract reverse kNN Query interface.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @opt nodefillcolor LemonChiffon
- * @navhas - create - KNNList
+ * @navassoc - create - DoubleDBIDList
  * 
  * @param <O> Object type
  */
-public interface KNNQuery<O> {
+public interface RKNNSearcher<O> {
   /**
-   * Get the k nearest neighbors for a particular id.
+   * Get the reverse k nearest neighbors for a particular object.
    * 
-   * @param id query object ID
-   * @param k Number of neighbors requested
-   * @return neighbors
+   * @param query query object
+   * @param k number of neighbors requested
+   * @return reverse k nearest neighbors
    */
-  KNNList getKNNForDBID(DBIDRef id, int k);
-
-  /**
-   * Get the k nearest neighbors for a particular id.
-   * 
-   * @param obj Query object
-   * @param k Number of neighbors requested
-   * @return neighbors
-   */
-  KNNList getKNNForObject(O obj, int k);
+  DoubleDBIDList getRKNN(O query, int k);
 }

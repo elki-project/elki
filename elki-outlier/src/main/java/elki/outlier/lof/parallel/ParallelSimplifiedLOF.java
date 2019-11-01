@@ -30,7 +30,6 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -115,13 +114,13 @@ public class ParallelSimplifiedLOF<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
 
     // Phase one: KNN and k-dist
     WritableDataStore<KNNList> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
-      KNNProcessor<O> knnm = new KNNProcessor<>(kplus, knnq);
+      KNNProcessor knnm = new KNNProcessor(kplus, () -> qb.kNNByDBID(kplus));
       SharedObject<KNNList> knnv = new SharedObject<>();
       WriteDataStoreProcessor<KNNList> storek = new WriteDataStoreProcessor<>(knns);
       knnm.connectKNNOutput(knnv);

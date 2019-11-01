@@ -27,10 +27,10 @@ import elki.data.type.FieldTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDRange;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.LPNormDistance;
@@ -152,13 +152,10 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <O> KNNQuery<O> getKNNQuery(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
     KNNIndex<O> idx = (KNNIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = (KNNIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
-    }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && (relation.getDBIDs() instanceof DBIDRange)) {
-      idx = (KNNIndex<O>) makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
@@ -166,7 +163,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       }
       // Precomputation can be useful additionally!
       if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-        return idx.getKNNQuery(distanceQuery, maxk, flags);
+        return idx.kNNByObject(distanceQuery, maxk, flags);
       }
     }
     // Next try adding a preprocessor:
@@ -186,7 +183,52 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
-      return idx.getKNNQuery(distanceQuery, maxk, flags);
+      return idx.kNNByObject(distanceQuery, maxk, flags);
+    }
+    catch(InstantiationException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      LOG.exception("Automatic knn preprocessor creation failed.", e);
+    }
+    return null;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    KNNIndex<O> idx = (KNNIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
+      idx = (KNNIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && (relation.getDBIDs() instanceof DBIDRange)) {
+      idx = (KNNIndex<O>) makeMatrixIndex(relation, distanceQuery.getDistance());
+    }
+    if(idx != null) {
+      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+        Metadata.hierarchyOf(relation).addWeakChild(idx);
+      }
+      // Precomputation can be useful additionally!
+      if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
+        return idx.kNNByDBID(distanceQuery, maxk, flags);
+      }
+    }
+    // Next try adding a preprocessor:
+    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 || maxk <= relation.size()) {
+      return null;
+    }
+    long freeMemory = getFreeMemory();
+    final long msize = maxk * 12L * relation.size();
+    if(msize > 0.8 * freeMemory) {
+      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
+      return null;
+    }
+    try {
+      idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
+      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
+      idx.initialize();
+      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+        Metadata.hierarchyOf(relation).addWeakChild(idx);
+      }
+      return idx.kNNByDBID(distanceQuery, maxk, flags);
     }
     catch(InstantiationException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
@@ -197,7 +239,23 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <O> RangeQuery<O> getRangeQuery(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+  public <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    RangeIndex<O> idx = (RangeIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
+      idx = (RangeIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) {
+      return null;
+    }
+    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+      Metadata.hierarchyOf(relation).addWeakChild(idx);
+    }
+    return idx.rangeByObject(distanceQuery, maxrange, flags);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     RangeIndex<O> idx = (RangeIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = (RangeIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
@@ -211,11 +269,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
-    return idx.getRangeQuery(distanceQuery, maxrange, flags);
+    return idx.rangeByDBID(distanceQuery, maxrange, flags);
   }
 
   @Override
-  public <O> DistancePrioritySearcher<O> getPrioritySearcher(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+  public <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) {
       return null;
@@ -223,10 +281,25 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
-    return idx.getPrioritySearcher(distanceQuery, maxrange, flags);
+    return idx.priorityByObject(distanceQuery, maxrange, flags);
   }
 
-  private <O> Index makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
+  @Override
+  public <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      idx = makeMatrixIndex(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) {
+      return null;
+    }
+    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+      Metadata.hierarchyOf(relation).addWeakChild(idx);
+    }
+    return idx.priorityByDBID(distanceQuery, maxrange, flags);
+  }
+
+  private <O> DistancePriorityIndex<O> makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
     if(matrixIndex == null || relation.size() > 65536) {
       return null;
     }
@@ -242,7 +315,8 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       return null;
     }
     try {
-      Index idx = matrixIndex.newInstance(relation, (DBIDRange) relation.getDBIDs(), distance);
+      @SuppressWarnings("unchecked")
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, (DBIDRange) relation.getDBIDs(), distance);
       LOG.verbose("Optimizer: automatically adding a distance matrix.");
       idx.initialize();
       return idx;

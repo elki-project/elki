@@ -34,7 +34,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.minkowski.SquaredEuclideanDistance;
@@ -130,7 +130,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     }
     final QueryBuilder<V> qb = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC);
     DistanceQuery<V> distFunc = qb.distanceQuery();
-    RangeQuery<V> rangeQuery = qb.rangeQuery();
+    RangeSearcher<DBIDRef> rangeQuery = qb.rangeByDBID();
     final Random random = rnd.getSingleThreadedRandom();
 
     // TODO: use a StepProgress!
@@ -329,7 +329,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param distance the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<V> distance, RangeQuery<V> rangeQuery) {
+  private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<V> distance, RangeSearcher<DBIDRef> rangeQuery) {
     WritableDataStore<DBIDs> result = DataStoreUtil.makeStorage(medoids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, DBIDs.class);
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
@@ -348,7 +348,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
       // determine points in sphere centered at m with radius minDist
       assert minDist != Double.POSITIVE_INFINITY;
-      result.put(iter, rangeQuery.getRangeForDBID(iter, minDist));
+      result.put(iter, rangeQuery.getRange(iter, minDist));
     }
 
     return result;
@@ -364,7 +364,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */
-  private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> relation, DistanceQuery<V> distance, RangeQuery<V> rangeQuery) {
+  private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> relation, DistanceQuery<V> distance, RangeSearcher<DBIDRef> rangeQuery) {
     // get localities
     DataStore<DBIDs> localities = getLocalities(medoids, distance, rangeQuery);
 

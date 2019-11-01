@@ -20,7 +20,6 @@
  */
 package elki.database.query.range;
 
-import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
@@ -29,57 +28,35 @@ import elki.database.ids.ModifiableDoubleDBIDList;
  * The interface for range queries, that can return all objects within the
  * specified radius.
  * <p>
- * Do not confuse this with rectangular window queries, which are also commonly
+ * Do not confuse this with rectangular window queries, which are also sometimes
  * called "range queries".
  *
  * @author Erich Schubert
- * @since 0.4.0
  *
  * @opt nodefillcolor LemonChiffon
  * @navassoc - create - DoubleDBIDList
  *
  * @param <O> Object type
  */
-public interface RangeQuery<O> {
+public interface RangeSearcher<O> {
   /**
-   * Get the neighbors for a particular id in a given query range
+   * Get the neighbors for a particular object in a given query range.
    *
-   * @param id query object ID
+   * @param query query object
    * @param range Query range
    * @return neighbors
    */
-  default DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
-    return getRangeForDBID(id, range, DBIDUtil.newDistanceDBIDList()).sort();
+  default DoubleDBIDList getRange(O query, double range) {
+    return getRange(query, range, DBIDUtil.newDistanceDBIDList()).sort();
   }
 
   /**
-   * Get the neighbors for a particular id in a given query range
+   * Get the neighbors for a particular id in a given query range.
    *
-   * @param id query object ID
+   * @param query query object ID
    * @param range Query range
    * @param result Output data structure
    * @return neighbors
    */
-  ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
-
-  /**
-   * Get the neighbors for a particular object in a given query range
-   *
-   * @param obj Query object
-   * @param range Query range
-   * @return neighbors
-   */
-  default DoubleDBIDList getRangeForObject(O obj, double range) {
-    return getRangeForObject(obj, range, DBIDUtil.newDistanceDBIDList()).sort();
-  }
-
-  /**
-   * Get the neighbors for a particular object in a given query range
-   *
-   * @param obj Query object
-   * @param range Query range
-   * @param result Output data structure
-   * @return neighbors
-   */
-  ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
+  ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result);
 }

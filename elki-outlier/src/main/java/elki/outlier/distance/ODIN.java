@@ -27,10 +27,11 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -110,7 +111,7 @@ public class ODIN<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     // Get the query functions:
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
 
     // Get the objects to process, and a data storage for counting and output:
     DBIDs ids = relation.getDBIDs();
@@ -121,7 +122,7 @@ public class ODIN<O> implements OutlierAlgorithm {
     // Process all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       // Find the nearest neighbors (using an index, if available!)
-      DBIDs neighbors = knnq.getKNNForDBID(iter, kplus);
+      DBIDs neighbors = knnq.getKNN(iter, kplus);
       // For each neighbor, except ourselves, increase the in-degree:
       for(DBIDIter nei = neighbors.iter(); nei.valid(); nei.advance()) {
         if(DBIDUtil.equal(iter, nei)) {

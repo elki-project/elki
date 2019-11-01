@@ -28,10 +28,12 @@ import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
+import elki.database.ids.DBIDRef;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.knn.LinearScanDistanceKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.LinearScanKNNByDBID;
+import elki.database.query.knn.LinearScanKNNByObject;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.result.Metadata;
@@ -66,7 +68,7 @@ public class NNDescentTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    KNNSearcher<DBIDRef> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     NNDescent<DoubleVector> preproc = new ELKIBuilder<NNDescent.Factory<DoubleVector>>(NNDescent.Factory.class) //
@@ -76,10 +78,10 @@ public class NNDescentTest {
         .with(NNDescent.Factory.Par.DELTA_ID, 0.1) //
         .with(NNDescent.Factory.Par.RHO_ID, 0.5) //
         .build().instantiate(relation);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByObject);
 
     // test queries
     MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k, 16);

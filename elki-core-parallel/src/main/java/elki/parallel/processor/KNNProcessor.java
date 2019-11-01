@@ -20,9 +20,11 @@
  */
 package elki.parallel.processor;
 
+import java.util.function.Supplier;
+
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.parallel.Executor;
 import elki.parallel.variables.SharedObject;
 
@@ -35,11 +37,11 @@ import elki.parallel.variables.SharedObject;
  * @param <O> Object type
  *
  * @has - - - Instance
- * @assoc - - - KNNQuery
+ * @assoc - - - KNNSearcher
  * @assoc - - - SharedObject
  * @has - - - KNNList
  */
-public class KNNProcessor<O> implements Processor {
+public class KNNProcessor implements Processor {
   /**
    * K parameter
    */
@@ -48,7 +50,7 @@ public class KNNProcessor<O> implements Processor {
   /**
    * KNN query object
    */
-  KNNQuery<O> knnq;
+  Supplier<KNNSearcher<DBIDRef>> knnq;
 
   /**
    * Output channel to write to
@@ -61,7 +63,7 @@ public class KNNProcessor<O> implements Processor {
    * @param k K parameter
    * @param knnq Distance query to use
    */
-  public KNNProcessor(int k, KNNQuery<O> knnq) {
+  public KNNProcessor(int k, Supplier<KNNSearcher<DBIDRef>> knnq) {
     super();
     this.k = k;
     this.knnq = knnq;
@@ -77,8 +79,8 @@ public class KNNProcessor<O> implements Processor {
   }
 
   @Override
-  public Instance<O> instantiate(Executor executor) {
-    return new Instance<>(k, knnq, executor.getInstance(out));
+  public Instance instantiate(Executor executor) {
+    return new Instance(k, knnq.get(), executor.getInstance(out));
   }
 
   @Override
@@ -91,7 +93,7 @@ public class KNNProcessor<O> implements Processor {
    * 
    * @author Erich Schubert
    */
-  public static class Instance<O> implements Processor.Instance {
+  public static class Instance implements Processor.Instance {
     /**
      * k Parameter
      */
@@ -100,7 +102,7 @@ public class KNNProcessor<O> implements Processor {
     /**
      * kNN query
      */
-    KNNQuery<O> knnq;
+    KNNSearcher<DBIDRef> knnq;
 
     /**
      * Output data store
@@ -114,7 +116,7 @@ public class KNNProcessor<O> implements Processor {
      * @param knnq KNN query
      * @param out Output channel to write to
      */
-    protected Instance(int k, KNNQuery<O> knnq, SharedObject.Instance<KNNList> out) {
+    protected Instance(int k, KNNSearcher<DBIDRef> knnq, SharedObject.Instance<KNNList> out) {
       super();
       this.k = k;
       this.knnq = knnq;
@@ -123,7 +125,7 @@ public class KNNProcessor<O> implements Processor {
 
     @Override
     public void map(DBIDRef id) {
-      out.set(knnq.getKNNForDBID(id, k));
+      out.set(knnq.getKNN(id, k));
     }
   }
 }

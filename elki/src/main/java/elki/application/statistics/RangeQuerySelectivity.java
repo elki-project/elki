@@ -23,10 +23,11 @@ package elki.application.statistics;
 import elki.application.AbstractDistanceBasedApplication;
 import elki.data.NumberVector;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -91,13 +92,13 @@ public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDista
   @Override
   public void run() {
     Relation<V> relation = inputstep.getDatabase().getRelation(distance.getInputTypeRestriction());
-    RangeQuery<V> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(radius);
+    RangeSearcher<DBIDRef> rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID(radius);
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     MeanVariance numres = new MeanVariance();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Performing range queries", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      numres.put(rangeQuery.getRangeForDBID(iter, radius).size());
+      numres.put(rangeQuery.getRange(iter, radius).size());
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);

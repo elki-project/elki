@@ -38,7 +38,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -123,7 +123,7 @@ public class EvaluateRankingQuality<V extends NumberVector> implements Algorithm
    * @return Histogram
    */
   public HistogramResult run(Database database, Relation<V> relation) {
-    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(relation.size());
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -161,7 +161,7 @@ public class EvaluateRankingQuality<V extends NumberVector> implements Algorithm
       cmem.sort();
 
       for(DBIDArrayIter it = cmem.iter(); it.valid(); it.advance()) {
-        KNNList knn = knnQuery.getKNNForDBID(it, relation.size());
+        KNNList knn = knnQuery.getKNN(it, relation.size());
         double result = EvaluateClustering.evaluateRanking(roc, clus, knn);
         hist.get(((double) it.getOffset()) / clus.size()).put(result);
 

@@ -23,6 +23,7 @@ package elki.database.query.distance;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.query.LinearScanQuery;
+import elki.database.query.PrioritySearcher;
 
 /**
  * Default linear scan search class.
@@ -35,46 +36,47 @@ import elki.database.query.LinearScanQuery;
  *
  * @has - - - DistanceQuery
  *
- * @param <O> Database object type
+ * @param <Q> Query type
+ * @param <O> Relation object type
  */
-public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySearcher<O>, LinearScanQuery {
+public abstract class LinearScanPrioritySearcher<Q, O> implements PrioritySearcher<Q>, LinearScanQuery {
   /**
    * Distance to use.
    */
-  private DistanceQuery<O> distanceQuery;
+  protected DistanceQuery<O> distanceQuery;
 
   /**
    * Iterator.
    */
-  private DBIDIter iter;
+  protected DBIDIter iter;
 
   /**
    * Current query object.
    */
-  private O query;
+  protected O query;
 
   /**
    * Current distance
    */
-  private double curdist;
+  protected double curdist;
 
   /**
    * Constructor.
    *
    * @param distanceQuery Distance function to use
    */
-  public LinearScanDistancePrioritySearcher(DistanceQuery<O> distanceQuery) {
+  public LinearScanPrioritySearcher(DistanceQuery<O> distanceQuery) {
     super();
     this.distanceQuery = distanceQuery;
   }
 
-  @Override
-  public DistancePrioritySearcher<O> search(DBIDRef query) {
-    return search(distanceQuery.getRelation().get(query));
-  }
-
-  @Override
-  public DistancePrioritySearcher<O> search(O query) {
+  /**
+   * Implementation of the search function.
+   *
+   * @param query Query object
+   * @return this
+   */
+  protected PrioritySearcher<Q> realSearch(O query) {
     this.query = query;
     this.iter = distanceQuery.getRelation().iterDBIDs();
     this.curdist = Double.NaN;
@@ -99,7 +101,7 @@ public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySe
   }
 
   @Override
-  public DistancePrioritySearcher<O> decreaseCutoff(double threshold) {
+  public PrioritySearcher<Q> decreaseCutoff(double threshold) {
     return this; // Ignored
   }
 
@@ -128,8 +130,49 @@ public class LinearScanDistancePrioritySearcher<O> implements DistancePrioritySe
     return curdist; // May be NaN, if not computed yet.
   }
 
-  @Override
-  public O getCandidate() {
-    return distanceQuery.getRelation().get(iter);
+  /**
+   * Search by Object.
+   *
+   * @author Erich Schubert
+   *
+   * @param <O> Relation type
+   */
+  public static class ByObject<O> extends LinearScanPrioritySearcher<O, O> {
+    /**
+     * Constructor.
+     *
+     * @param distanceQuery distance query
+     */
+    public ByObject(DistanceQuery<O> distanceQuery) {
+      super(distanceQuery);
+    }
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      return realSearch(query);
+    }
+  }
+
+  /**
+   * Search by DBID.
+   *
+   * @author Erich Schubert
+   *
+   * @param <O> Relation type
+   */
+  public static class ByDBID<O> extends LinearScanPrioritySearcher<DBIDRef, O> {
+    /**
+     * Constructor.
+     *
+     * @param distanceQuery distance query
+     */
+    public ByDBID(DistanceQuery<O> distanceQuery) {
+      super(distanceQuery);
+    }
+
+    @Override
+    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
+      return realSearch(distanceQuery.getRelation().get(query));
+    }
   }
 }

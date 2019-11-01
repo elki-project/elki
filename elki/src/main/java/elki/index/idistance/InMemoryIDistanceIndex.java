@@ -26,8 +26,8 @@ import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.index.AbstractRefiningIndex;
@@ -39,8 +39,8 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MeanVarianceMinMax;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -76,8 +76,8 @@ import elki.utilities.pairs.DoubleIntPair;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - IDistanceKNNQuery
- * @has - - - IDistanceRangeQuery
+ * @has - - - IDistanceKNNSearcher
+ * @has - - - IDistanceRangeSearcher
  *
  * @param <O> Object type
  */
@@ -173,15 +173,15 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new IDistanceKNNQuery(distanceQuery) : null;
+        new IDistanceKNNSearcher(distanceQuery) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new IDistanceRangeQuery(distanceQuery) : null;
+        new IDistanceRangeSearcher(distanceQuery) : null;
   }
 
   /**
@@ -275,23 +275,18 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    */
-  protected class IDistanceKNNQuery extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements KNNQuery<O> {
+  protected class IDistanceKNNSearcher extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements KNNSearcher<O> {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query
      */
-    public IDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
+    public IDistanceKNNSearcher(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(O obj, int k) {
+    public KNNList getKNN(O obj, int k) {
       DoubleIntPair[] priority = rankReferencePoints(distanceQuery, obj, referencepoints);
       // Approximate kNN search. We do not check _every_ list.
       KNNHeap heap = DBIDUtil.newHeap(k);
@@ -353,23 +348,18 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * 
    * @author Erich Schubert
    */
-  protected class IDistanceRangeQuery extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements RangeQuery<O> {
+  protected class IDistanceRangeSearcher extends AbstractRefiningIndex<O>.AbstractRefiningQuery implements RangeSearcher<O> {
     /**
      * Constructor.
      * 
      * @param distanceQuery Distance query
      */
-    public IDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
+    public IDistanceRangeSearcher(DistanceQuery<O> distanceQuery) {
       super(distanceQuery);
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
       DoubleIntPair[] priority = rankReferencePoints(distanceQuery, obj, referencepoints);
       for(DoubleIntPair pair : priority) {
         final ModifiableDoubleDBIDList nindex = index[pair.second];

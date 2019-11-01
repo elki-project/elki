@@ -29,7 +29,7 @@ import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -134,7 +134,7 @@ public class IDOS<O> implements OutlierAlgorithm {
     if(stepprog != null) {
       stepprog.beginStep(1, "Precomputing neighborhoods", LOG);
     }
-    KNNQuery<O> knnQ = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(Math.max(k_c, k_r) + 1);
+    KNNSearcher<DBIDRef> knnQ = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(Math.max(k_c, k_r) + 1);
     DBIDs ids = relation.getDBIDs();
 
     if(stepprog != null) {
@@ -161,7 +161,7 @@ public class IDOS<O> implements OutlierAlgorithm {
    * @param knnQ the KNN query
    * @return The computed intrinsic dimensionalities.
    */
-  protected DoubleDataStore computeIDs(DBIDs ids, KNNQuery<O> knnQ) {
+  protected DoubleDataStore computeIDs(DBIDs ids, KNNSearcher<DBIDRef> knnQ) {
     WritableDoubleDataStore intDims = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Intrinsic dimensionality", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -188,11 +188,11 @@ public class IDOS<O> implements OutlierAlgorithm {
    * @param idosminmax Output of minimum and maximum, for metadata
    * @return ID scores
    */
-  protected DoubleDataStore computeIDOS(DBIDs ids, KNNQuery<O> knnQ, DoubleDataStore intDims, DoubleMinMax idosminmax) {
+  protected DoubleDataStore computeIDOS(DBIDs ids, KNNSearcher<DBIDRef> knnQ, DoubleDataStore intDims, DoubleMinMax idosminmax) {
     WritableDoubleDataStore ldms = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("ID Outlier Scores for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnQ.getKNNForDBID(iter, k_r);
+      final KNNList neighbors = knnQ.getKNN(iter, k_r);
       double sum = 0.;
       int cnt = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

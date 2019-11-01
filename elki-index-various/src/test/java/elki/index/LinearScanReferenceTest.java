@@ -22,11 +22,13 @@ package elki.index;
 
 import org.junit.Test;
 
-import elki.database.query.distance.LinearScanEuclideanDistancePrioritySearcher;
-import elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
-import elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
-import elki.database.query.range.LinearScanEuclideanDistanceRangeQuery;
-import elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
+import elki.database.query.distance.LinearScanEuclideanPrioritySearcher;
+import elki.database.query.knn.LinearScanEuclideanKNNByObject;
+import elki.database.query.knn.LinearScanPrimitiveKNNByObject;
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.range.LinearScanEuclideanRangeByObject;
+import elki.database.query.range.LinearScanPrimitiveDistanceRangeByObject;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
 
 /**
  * This unit test verifies that the linear scan produces the reference result.
@@ -40,9 +42,9 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExact() {
-    assertExactEuclidean(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
-    assertPrioritySearchEuclidean(null, LinearScanEuclideanDistancePrioritySearcher.class);
-    assertSinglePoint(null, LinearScanEuclideanDistanceKNNQuery.class, LinearScanEuclideanDistanceRangeQuery.class);
+    assertExactEuclidean(null, LinearScanEuclideanKNNByObject.class, LinearScanEuclideanRangeByObject.class);
+    assertPrioritySearchEuclidean(null, LinearScanEuclideanPrioritySearcher.class);
+    assertSinglePoint(null, WrappedKNNDBIDByLookup.Linear.class, WrappedRangeDBIDByLookup.Linear.class);
   }
 
   /**
@@ -50,6 +52,6 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExactCosine() {
-    assertExactCosine(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    assertExactCosine(null, LinearScanPrimitiveKNNByObject.class, LinearScanPrimitiveDistanceRangeByObject.class);
   }
 }

@@ -28,7 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -63,7 +63,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of data objects handled by this algorithm
  */
@@ -116,7 +116,7 @@ public class SimplifiedLOF<O> implements OutlierAlgorithm {
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing densities.");
@@ -146,10 +146,10 @@ public class SimplifiedLOF<O> implements OutlierAlgorithm {
    * @param knnq kNN query class
    * @param lrds Density output
    */
-  private void computeSimplifiedLRDs(DBIDs ids, KNNQuery<O> knnq, WritableDoubleDataStore lrds) {
+  private void computeSimplifiedLRDs(DBIDs ids, KNNSearcher<DBIDRef> knnq, WritableDoubleDataStore lrds) {
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, kplus);
+      final KNNList neighbors = knnq.getKNN(iter, kplus);
       double sum = 0.0;
       int count = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
@@ -176,12 +176,12 @@ public class SimplifiedLOF<O> implements OutlierAlgorithm {
    * @param lofs SLOF output storage
    * @param lofminmax Minimum and maximum scores
    */
-  private void computeSimplifiedLOFs(DBIDs ids, KNNQuery<O> knnq, WritableDoubleDataStore slrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
+  private void computeSimplifiedLOFs(DBIDs ids, KNNSearcher<DBIDRef> knnq, WritableDoubleDataStore slrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simplified LOF scores", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lof;
       final double lrdp = slrds.doubleValue(iter);
-      final KNNList neighbors = knnq.getKNNForDBID(iter, kplus);
+      final KNNList neighbors = knnq.getKNN(iter, kplus);
       if(!Double.isInfinite(lrdp)) {
         double sum = 0.;
         int count = 0;

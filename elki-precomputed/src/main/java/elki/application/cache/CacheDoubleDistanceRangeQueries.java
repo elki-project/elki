@@ -30,12 +30,9 @@ import java.nio.file.StandardOpenOption;
 import elki.application.AbstractApplication;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -113,7 +110,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    RangeQuery<O> rangeQ = new QueryBuilder<>(relation, distance).rangeQuery();
+    RangeSearcher<DBIDRef> rangeQ = new QueryBuilder<>(relation, distance).rangeByDBID();
 
     LOG.verbose("Performing range queries with radius " + radius);
 
@@ -134,7 +131,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList();
       DoubleDBIDListIter ni = nn.iter();
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        rangeQ.getRangeForDBID(it, radius, nn.clear()).sort();
+        rangeQ.getRange(it, radius, nn.clear()).sort();
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:

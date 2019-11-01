@@ -26,7 +26,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.rknn.PreprocessorRKNNQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.index.RKNNIndex;
@@ -99,7 +99,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
 
     // knn query
     for(DBIDArrayIter id = ids.iter(); id.valid(); id.advance()) {
-      KNNList kNNs = knnQuery.getKNNForDBID(id, k);
+      KNNList kNNs = knnQuery.getKNN(id, k);
       storage.put(id, kNNs);
       // inverse rkNN index:
       for(DoubleDBIDListIter iter = kNNs.iter(); iter.valid(); iter.advance()) {
@@ -240,7 +240,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
     // Recompute the kNN for affected objects (in rkNN lists)
     {
       for(DBIDIter reknn = rkNNs.iter(); reknn.valid(); reknn.advance()) {
-        KNNList rknnlist = knnQuery.getKNNForDBID(reknn, k);
+        KNNList rknnlist = knnQuery.getKNN(reknn, k);
         if(rknnlist == null) {
           LOG.warning("BUG in online kNN/RkNN maintainance: " + DBIDUtil.toString(reknn) + " no longer in database.");
           continue;
@@ -283,7 +283,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null; // not possible
+  }
+
+  @Override
+  public RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return relation == distanceQuery.getRelation() && distance.equals(distanceQuery.getDistance()) //
         && maxk == k ? new PreprocessorRKNNQuery<>(relation, this) : null;
   }

@@ -20,44 +20,45 @@
  */
 package elki.database.query.range;
 
-import elki.database.ids.DBIDRef;
-import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.similarity.SimilarityQuery;
-import elki.database.relation.Relation;
+import elki.database.ids.*;
+import elki.database.query.LinearScanQuery;
+import elki.database.query.distance.DistanceQuery;
 
 /**
- * Abstract base class for range queries that use a similarity query in their
- * instance.
+ * Default linear scan range query class.
  *
  * @author Erich Schubert
- * @since 0.7.5
+ * @since 0.4.0
  *
- * @param <O> Database object type
+ * @has - - - DistanceQuery
+ *
+ * @param <O> relation object type
  */
-public abstract class AbstractSimilarityRangeQuery<O> implements RangeQuery<O> {
+public class LinearScanDistanceRangeByObject<O> implements RangeSearcher<O>, LinearScanQuery {
   /**
-   * The data to use for this query
+   * Distance to use.
    */
-  final protected Relation<? extends O> relation;
-
-  /**
-   * Hold the similarity function to be used.
-   */
-  final protected SimilarityQuery<O> simQuery;
+  private DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
    *
-   * @param simQuery Similarity query
+   * @param distanceQuery Distance function to use
    */
-  public AbstractSimilarityRangeQuery(SimilarityQuery<O> simQuery) {
+  public LinearScanDistanceRangeByObject(DistanceQuery<O> distanceQuery) {
     super();
-    this.relation = simQuery.getRelation();
-    this.simQuery = simQuery;
+    this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForObject(relation.get(id), range, result);
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+    final DistanceQuery<O> dq = distanceQuery;
+    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+      final double currentDistance = dq.distance(obj, iter);
+      if(currentDistance <= range) {
+        result.add(currentDistance, iter);
+      }
+    }
+    return result;
   }
 }

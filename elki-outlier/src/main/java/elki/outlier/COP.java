@@ -29,12 +29,9 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.*;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -191,7 +188,7 @@ public class COP<V extends NumberVector> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k + 1);
 
     final int dim = RelationUtil.dimensionality(relation);
     if(k <= dim + 1) {
@@ -209,7 +206,7 @@ public class COP<V extends NumberVector> implements OutlierAlgorithm {
     ModifiableDBIDs nids = DBIDUtil.newHashSet(k + 10);
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       nids.clear();
-      nids.addDBIDs(knnQuery.getKNNForDBID(id, k + 1));
+      nids.addDBIDs(knnQuery.getKNN(id, k + 1));
       nids.remove(id); // Do not use query object
 
       computeCentroid(centroid, relation, nids);

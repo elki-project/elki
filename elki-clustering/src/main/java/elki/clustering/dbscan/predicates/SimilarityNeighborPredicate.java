@@ -29,7 +29,7 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 import elki.utilities.documentation.Reference;
@@ -89,7 +89,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
   @Override
   public Instance instantiate(Database database) {
     Relation<O> relation = database.getRelation(simFunc.getInputTypeRestriction());
-    RangeQuery<O> rq = new QueryBuilder<>(relation, simFunc).similarityRangeQuery(epsilon);
+    RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, simFunc).similarityRangeByDBID(epsilon);
     return new Instance(epsilon, rq, relation.getDBIDs());
   }
 
@@ -117,7 +117,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
     /**
      * Range query to use on the database.
      */
-    protected RangeQuery<?> rq;
+    protected RangeSearcher<DBIDRef> rq;
 
     /**
      * DBIDs to process
@@ -131,7 +131,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
      * @param rq Range query to use
      * @param ids DBIDs to process
      */
-    public Instance(double epsilon, RangeQuery<?> rq, DBIDs ids) {
+    public Instance(double epsilon, RangeSearcher<DBIDRef> rq, DBIDs ids) {
       super();
       this.epsilon = epsilon;
       this.rq = rq;
@@ -145,7 +145,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
 
     @Override
     public DoubleDBIDList getNeighbors(DBIDRef reference) {
-      return rq.getRangeForDBID(reference, epsilon);
+      return rq.getRange(reference, epsilon);
     }
 
     @Override

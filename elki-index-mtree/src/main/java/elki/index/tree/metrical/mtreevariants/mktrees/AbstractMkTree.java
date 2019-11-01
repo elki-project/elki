@@ -25,13 +25,13 @@ import java.util.Map;
 
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import elki.index.tree.metrical.mtreevariants.MTreeSettings;
-import elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByDBID;
 import elki.persistent.PageFile;
 
 /**
@@ -50,7 +50,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
   /**
    * Internal class for performing knn queries
    */
-  protected KNNQuery<O> knnq;
+  protected KNNSearcher<DBIDRef> knnq;
 
   /**
    * Distance query to use.
@@ -68,7 +68,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
     super(pagefile, settings);
     // TODO: any way to un-tie MkTrees from relations?
     this.distanceQuery = getDistance().instantiate(relation);
-    this.knnq = new MTreeKNNQuery<>(this, distanceQuery);
+    this.knnq = new MTreeKNNByDBID<>(this, distanceQuery);
   }
 
   @Override
@@ -108,7 +108,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
     Map<DBID, KNNList> res = new HashMap<>(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      res.put(id, knnq.getKNNForDBID(id, kmax));
+      res.put(id, knnq.getKNN(id, kmax));
     }
     return res;
   }

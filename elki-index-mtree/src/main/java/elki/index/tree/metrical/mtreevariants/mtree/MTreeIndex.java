@@ -26,19 +26,20 @@ import java.util.List;
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.Distance;
 import elki.index.DynamicIndex;
 import elki.index.KNNIndex;
 import elki.index.RangeIndex;
 import elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import elki.index.tree.metrical.mtreevariants.MTreeSettings;
-import elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
-import elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByObject;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByObject;
 import elki.persistent.PageFile;
 import elki.utilities.exceptions.NotImplementedException;
 import elki.utilities.io.ByteArrayUtil;
@@ -192,33 +193,27 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return new MTreeKNNQuery<>(this, dq);
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeKNNByObject<>(this, distanceQuery) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
-      return null;
-    }
-    Distance<? super O> distanceFunction = (Distance<? super O>) distanceQuery.getDistance();
-    if(!this.getDistance().equals(distanceFunction)) {
-      getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
-      return null;
-    }
-    DistanceQuery<O> dq = distanceFunction.instantiate(relation);
-    return new MTreeRangeQuery<>(this, dq);
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeKNNByDBID<>(this, distanceQuery) : null;
+  }
+
+  @Override
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeRangeByObject<>(this, distanceQuery) : null;
+  }
+
+  @Override
+  public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeRangeByDBID<>(this, distanceQuery) : null;
   }
 
   @Override

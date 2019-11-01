@@ -20,11 +20,11 @@
  */
 package elki.database.query;
 
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -74,9 +74,23 @@ public interface QueryOptimizer {
    * @param flags Optimizer flags
    * @return optimized query, if possible
    */
-  default <O> KNNQuery<O> getKNNQuery(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  default <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return null;
-  };
+  }
+
+  /**
+   * Optimize a kNN query for this relation.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param maxk Maximum k
+   * @param flags Optimizer flags
+   * @return optimized query, if possible
+   */
+  default <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null;
+  }
 
   /**
    * Optimize a range query for this relation.
@@ -88,9 +102,23 @@ public interface QueryOptimizer {
    * @param flags Optimizer flags
    * @return optimized query, if possible
    */
-  default <O> RangeQuery<O> getRangeQuery(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+  default <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     return null;
-  };
+  }
+
+  /**
+   * Optimize a range query for this relation.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param maxrange Maximum range
+   * @param flags Optimizer flags
+   * @return optimized query, if possible
+   */
+  default <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return null;
+  }
 
   /**
    * Optimize a range query for this relation.
@@ -102,9 +130,23 @@ public interface QueryOptimizer {
    * @param flags Optimizer flags
    * @return optimized query, if possible
    */
-  default <O> RangeQuery<O> getSimilarityRangeQuery(Relation<? extends O> relation, SimilarityQuery<O> simQuery, double maxrange, int flags) {
+  default <O> RangeSearcher<O> similarityRangeByObject(Relation<? extends O> relation, SimilarityQuery<O> simQuery, double maxrange, int flags) {
     return null;
-  };
+  }
+
+  /**
+   * Optimize a range query for this relation.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param simQuery similarity query
+   * @param maxrange Maximum range
+   * @param flags Optimizer flags
+   * @return optimized query, if possible
+   */
+  default <O> RangeSearcher<DBIDRef> similarityRangeByDBID(Relation<? extends O> relation, SimilarityQuery<O> simQuery, double maxrange, int flags) {
+    return null;
+  }
 
   /**
    * Optimize a reverse nearest neighbors query for this relation.
@@ -116,9 +158,23 @@ public interface QueryOptimizer {
    * @param maxk Maximum k to query
    * @return optimized query, if possible
    */
-  default <O> RKNNQuery<O> getRKNNQuery(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  default <O> RKNNSearcher<O> rkNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return null;
-  };
+  }
+
+  /**
+   * Optimize a reverse nearest neighbors query for this relation.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param flags Optimizer flags
+   * @param maxk Maximum k to query
+   * @return optimized query, if possible
+   */
+  default <O> RKNNSearcher<DBIDRef> rkNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null;
+  }
 
   /**
    * Optimize a distance priority search for this relation.
@@ -130,7 +186,21 @@ public interface QueryOptimizer {
    * @param flags Optimizer flags
    * @return optimized query, if possible
    */
-  default <O> DistancePrioritySearcher<O> getPrioritySearcher(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+  default <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return null;
+  }
+
+  /**
+   * Optimize a distance priority search for this relation.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param maxrange Maximum range
+   * @param flags Optimizer flags
+   * @return optimized query, if possible
+   */
+  default <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     return null;
   };
 }

@@ -22,7 +22,7 @@ package elki.index.tree.metrical.mtreevariants.query;
 
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -38,7 +38,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @param <O> Object type
  */
-public class MTreeRangeQuery<O> implements RangeQuery<O> {
+public class MTreeRangeByObject<O> implements RangeSearcher<O> {
   /**
    * The index to use
    */
@@ -55,7 +55,7 @@ public class MTreeRangeQuery<O> implements RangeQuery<O> {
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MTreeRangeQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
+  public MTreeRangeByObject(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super();
     this.index = index;
     this.distanceQuery = distanceQuery;
@@ -109,13 +109,7 @@ public class MTreeRangeQuery<O> implements RangeQuery<O> {
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    // TODO: allow searching with IDs only
-    return getRangeForObject(distanceQuery.getRelation().get(id), range, result);
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
     index.statistics.countRangeQuery();
     doRangeQuery(null, index.getRoot(), obj, range, result);
     return result;

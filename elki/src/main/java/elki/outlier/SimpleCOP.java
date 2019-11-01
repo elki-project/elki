@@ -32,7 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
@@ -132,7 +132,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
    * @return Outlier result
    */
   public OutlierResult run(Relation<V> relation) {
-    KNNQuery<V> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
     DBIDs ids = relation.getDBIDs();
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -144,7 +144,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", relation.size(), LOG) : null;
       double sqrt2 = MathUtil.SQRT2;
       for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-        KNNList neighbors = knnQuery.getKNNForDBID(id, kplus);
+        KNNList neighbors = knnQuery.getKNN(id, kplus);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 

@@ -28,8 +28,8 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -120,7 +120,7 @@ public class CFSFDP<O> implements ClusteringAlgorithm<Clustering<SimplePrototype
    * @return clustering
    */
   public Clustering<SimplePrototypeModel<DBID>> run(Relation<O> relation) {
-    DistancePrioritySearcher<O> searcher = new QueryBuilder<>(relation, distance).prioritySearcher();
+    PrioritySearcher<DBIDRef> searcher = new QueryBuilder<>(relation, distance).priorityByDBID();
 
     // Compute densities
     DBIDs ids = relation.getDBIDs();

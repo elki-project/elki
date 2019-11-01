@@ -25,7 +25,7 @@ import javax.swing.event.EventListenerList;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -48,7 +48,7 @@ import elki.utilities.documentation.Title;
  * @since 0.2
  *
  * @has - - - Distance
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  * @has - - - KNNListener
  *
  * @param <O> the type of database objects the preprocessor can be applied to
@@ -62,9 +62,9 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   private static final Logging LOG = Logging.getLogger(MaterializeKNNPreprocessor.class);
 
   /**
-   * KNNQuery instance to use.
+   * KNNSearcher instance to use.
    */
-  protected final KNNQuery<O> knnQuery;
+  protected final KNNSearcher<DBIDRef> knnQuery;
 
   /**
    * Holds the listener.
@@ -80,7 +80,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
    */
   public MaterializeKNNPreprocessor(Relation<O> relation, Distance<? super O> distance, int k) {
     super(relation, distance, k);
-    this.knnQuery = new QueryBuilder<>(distanceQuery).noCache().kNNQuery(k);
+    this.knnQuery = new QueryBuilder<>(distanceQuery).noCache().kNNByDBID(k);
     assert !(knnQuery instanceof PreprocessorKNNQuery) : knnQuery.toString();
   }
 
@@ -95,7 +95,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   public MaterializeKNNPreprocessor(Relation<O> relation, DistanceQuery<O> distanceQuery, int k, boolean noopt) {
     super(relation, distanceQuery, k);
     QueryBuilder<O> qb = new QueryBuilder<>(distanceQuery).noCache();
-    this.knnQuery = (noopt ? qb.cheapOnly() : qb).kNNQuery(k);
+    this.knnQuery = (noopt ? qb.cheapOnly() : qb).kNNByDBID(k);
     assert !(knnQuery instanceof PreprocessorKNNQuery) : knnQuery.toString();
   }
 
@@ -121,7 +121,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
         log.incrementProcessed(progress);
         continue; // Previously computed (duplicate point?)
       }
-      KNNList knn = knnQuery.getKNNForDBID(iter, k);
+      KNNList knn = knnQuery.getKNN(iter, k);
       storage.put(iter, knn);
       if(ismetric) {
         for(DoubleDBIDListIter it = knn.iter(); it.valid() && it.doubleValue() == 0.; it.advance()) {
@@ -176,7 +176,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
     log.beginStep(stepprog, 1, "New insertions ocurred, materialize their new kNNs.");
     // Store in storage
     for(DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
-      storage.put(iter, knnQuery.getKNNForDBID(iter, k));
+      storage.put(iter, knnQuery.getKNN(iter, k));
     }
 
     // update the affected kNNs
@@ -242,7 +242,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
     // update the kNNs of the RkNNs
     for(DBIDIter iter = rkNN_ids.iter(); iter.valid(); iter.advance()) {
-      storage.put(iter, knnQuery.getKNNForDBID(iter, k));
+      storage.put(iter, knnQuery.getKNN(iter, k));
     }
 
     return rkNN_ids;

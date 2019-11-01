@@ -27,8 +27,8 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -130,8 +130,8 @@ public class DWOF<O> implements OutlierAlgorithm {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     DistanceQuery<O> distFunc = qb.distanceQuery();
     // Get k nearest neighbor and range query on the relation.
-    KNNQuery<O> knnq = qb.kNNQuery(kplus);
-    RangeQuery<O> rnnQuery = qb.rangeQuery();
+    KNNSearcher<DBIDRef> knnq = qb.kNNByDBID(kplus);
+    RangeSearcher<DBIDRef> rnnQuery = qb.rangeByDBID();
 
     StepProgress stepProg = LOG.isVerbose() ? new StepProgress("DWOF", 2) : null;
     // DWOF output score storage.
@@ -197,7 +197,7 @@ public class DWOF<O> implements OutlierAlgorithm {
    * @param knnq kNN search function
    * @param radii WritableDoubleDataStore to store radii
    */
-  private void initializeRadii(DBIDs ids, KNNQuery<O> knnq, DistanceQuery<O> distFunc, WritableDoubleDataStore radii) {
+  private void initializeRadii(DBIDs ids, KNNSearcher<DBIDRef> knnq, DistanceQuery<O> distFunc, WritableDoubleDataStore radii) {
     FiniteProgress avgDistProgress = LOG.isVerbose() ? new FiniteProgress("Calculating average kNN distances-", ids.size(), LOG) : null;
     double absoluteMinDist = Double.POSITIVE_INFINITY;
     double minAvgDist = Double.POSITIVE_INFINITY;
@@ -205,7 +205,7 @@ public class DWOF<O> implements OutlierAlgorithm {
     Mean mean = new Mean();
     // Iterate over all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList iterNeighbors = knnq.getKNNForDBID(iter, kplus);
+      KNNList iterNeighbors = knnq.getKNN(iter, kplus);
       // skip the point itself
       mean.reset();
       for(DBIDIter neighbor1 = iterNeighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
@@ -252,7 +252,7 @@ public class DWOF<O> implements OutlierAlgorithm {
    * @param radii Radii to cluster accordingly
    * @param labels Label storage.
    */
-  private void clusterData(DBIDs ids, RangeQuery<O> rnnQuery, WritableDoubleDataStore radii, WritableDataStore<ModifiableDBIDs> labels) {
+  private void clusterData(DBIDs ids, RangeSearcher<DBIDRef> rnnQuery, WritableDoubleDataStore radii, WritableDataStore<ModifiableDBIDs> labels) {
     FiniteProgress clustProg = LOG.isVerbose() ? new FiniteProgress("Density-Based Clustering", ids.size(), LOG) : null;
     // Iterate over all objects
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -270,7 +270,7 @@ public class DWOF<O> implements OutlierAlgorithm {
       // iterate over nChain
       for(DBIDIter toGetNeighbors = nChain.iter(); toGetNeighbors.valid(); toGetNeighbors.advance()) {
         double range = radii.doubleValue(toGetNeighbors);
-        DoubleDBIDList nNeighbors = rnnQuery.getRangeForDBID(toGetNeighbors, range);
+        DoubleDBIDList nNeighbors = rnnQuery.getRange(toGetNeighbors, range);
         for(DoubleDBIDListIter iter2 = nNeighbors.iter(); iter2.valid(); iter2.advance()) {
           if(DBIDUtil.equal(toGetNeighbors, iter2)) {
             continue;

@@ -20,10 +20,12 @@
  */
 package elki.index;
 
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.ids.DBIDRef;
+import elki.database.query.PrioritySearcher;
+import elki.database.query.WrappedPrioritySearchDBIDByLookup;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 
 /**
  * Interface for incremental priority-based search using distance functions.
@@ -34,22 +36,36 @@ import elki.database.query.range.RangeQuery;
  */
 public interface DistancePriorityIndex<O> extends KNNIndex<O>, RangeIndex<O> {
   @Override
-  default KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return getPrioritySearcher(distanceQuery, Double.POSITIVE_INFINITY, flags);
+  default KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return priorityByObject(distanceQuery, Double.POSITIVE_INFINITY, flags);
   }
 
   @Override
-  default RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    return getPrioritySearcher(distanceQuery, maxrange, flags);
+  default RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return priorityByObject(distanceQuery, maxrange, flags);
   }
 
   /**
    * Get a priority search object.
    *
    * @param distanceQuery Distance query
-   * @param maxrange Maximum search range (may be {@code Double.POSITIVE_INFINITY}
+   * @param maxrange Maximum search range (may be
+   *        {@code Double.POSITIVE_INFINITY}
    * @param flags Optimizer hints
    * @return Priority searcher
    */
-  DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxrange, int flags);
+  PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags);
+
+  /**
+   * Get a priority search object.
+   *
+   * @param distanceQuery Distance query
+   * @param maxrange Maximum search range (may be
+   *        {@code Double.POSITIVE_INFINITY}
+   * @param flags Optimizer hints
+   * @return Priority searcher
+   */
+  default PrioritySearcher<DBIDRef> priorityByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return WrappedPrioritySearchDBIDByLookup.wrap(distanceQuery.getRelation(), priorityByObject(distanceQuery, maxrange, flags));
+  }
 }

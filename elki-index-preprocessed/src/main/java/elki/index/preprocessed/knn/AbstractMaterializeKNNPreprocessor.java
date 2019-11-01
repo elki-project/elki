@@ -27,7 +27,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -163,7 +163,12 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> implements KNNIndex<
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distQ, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null; // not possible
+  }
+
+  @Override
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distQ, int maxk, int flags) {
     return relation == distQ.getRelation() && distance.equals(distQ.getDistance()) //
         && (maxk == Integer.MAX_VALUE || maxk <= k) ? //
             new PreprocessorKNNQuery<O>(relation, this) : null;

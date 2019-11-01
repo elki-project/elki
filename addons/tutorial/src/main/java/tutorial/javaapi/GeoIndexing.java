@@ -32,7 +32,7 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
@@ -96,11 +96,11 @@ public class GeoIndexing {
     // This distance function returns meters.
     LatLngDistance df = new LatLngDistance(WGS84SpheroidEarthModel.STATIC);
     // k nearest neighbor query:
-    KNNQuery<NumberVector> knnq = new QueryBuilder<>(rel, df).kNNQuery();
+    KNNSearcher<NumberVector> knnq = new QueryBuilder<>(rel, df).kNNByObject();
 
     // Let's find the closest points to New York:
     DoubleVector newYork = DoubleVector.wrap(new double[] { 40.730610, -73.935242 });
-    KNNList knns = knnq.getKNNForObject(newYork, 10);
+    KNNList knns = knnq.getKNN(newYork, 10);
     // Iterate over all results.
     System.out.println("Close to New York:");
     for(DoubleDBIDListIter it = knns.iter(); it.valid(); it.advance()) {
@@ -110,7 +110,7 @@ public class GeoIndexing {
 
     // Many other indexes will fail if we search close to the date line.
     DoubleVector tuvalu = DoubleVector.wrap(new double[] { -7.4784205, 178.679924 });
-    knns = knnq.getKNNForObject(tuvalu, 10);
+    knns = knnq.getKNN(tuvalu, 10);
     // Iterate over all results.
     System.out.println("Close to Tuvalu:");
     for(DoubleDBIDListIter it = knns.iter(); it.valid(); it.advance()) {

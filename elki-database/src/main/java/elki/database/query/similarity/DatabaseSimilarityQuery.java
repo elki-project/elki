@@ -28,7 +28,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @param <O> Database object type.
+ * @param <O> relation object type.
  */
 public interface DatabaseSimilarityQuery<O> extends SimilarityQuery<O> {
   @Override

@@ -23,7 +23,7 @@ package elki.database.query.rknn;
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 
 /**
  * Default linear scan RKNN query class.
@@ -31,15 +31,20 @@ import elki.database.query.knn.KNNQuery;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements LinearScanQuery {
+public class LinearScanRKNNByObject<O> implements RKNNSearcher<O>, LinearScanQuery {
+  /**
+   * Hold the distance function to be used.
+   */
+  private DistanceQuery<O> distanceQuery;
+
   /**
    * KNN query we use.
    */
-  protected final KNNQuery<O> knnQuery;
+  private KNNSearcher<DBIDRef> knnQuery;
 
   /**
    * Constructor.
@@ -48,36 +53,23 @@ public class LinearScanRKNNQuery<O> extends AbstractRKNNQuery<O> implements Line
    * @param knnQuery kNN query to use.
    * @param maxk k to use
    */
-  public LinearScanRKNNQuery(DistanceQuery<O> distanceQuery, KNNQuery<O> knnQuery, Integer maxk) {
-    super(distanceQuery);
+  public LinearScanRKNNByObject(DistanceQuery<O> distanceQuery, KNNSearcher<DBIDRef> knnQuery, Integer maxk) {
+    super();
+    this.distanceQuery = distanceQuery;
     this.knnQuery = knnQuery;
   }
 
   @Override
-  public DoubleDBIDList getRKNNForObject(O obj, int k) {
+  public DoubleDBIDList getRKNN(O obj, int k) {
     ModifiableDoubleDBIDList rNNlist = DBIDUtil.newDistanceDBIDList();
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList knn = knnQuery.getKNNForDBID(iter, k);
+    for(DBIDIter iter = distanceQuery.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList knn = knnQuery.getKNN(iter, k);
       final double dist = distanceQuery.distance(obj, iter);
-      final int last = Math.min(k - 1, knn.size() - 1);
+      final int last = Math.min(k, knn.size()) - 1;
       if(last < k - 1 || dist <= knn.doubleValue(last)) {
         rNNlist.add(dist, iter);
       }
     }
     return rNNlist.sort();
-  }
-
-  @Override
-  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
-    ModifiableDoubleDBIDList rNNList = DBIDUtil.newDistanceDBIDList();
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList knn = knnQuery.getKNNForDBID(iter, k);
-      for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
-        if(DBIDUtil.equal(n, id)) {
-          rNNList.add(n.doubleValue(), iter);
-        }
-      }
-    }
-    return rNNList.sort();
   }
 }

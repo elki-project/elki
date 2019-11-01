@@ -26,7 +26,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -109,12 +109,12 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
       LOG.verbose("Assigning nearest neighbor lists to database objects");
     }
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, ArrayDBIDs.class);
-    KNNQuery<O> knnquery = new QueryBuilder<>(relation, distance).kNNQuery(numberOfNeighbors);
+    KNNSearcher<DBIDRef> knnquery = new QueryBuilder<>(relation, distance).kNNByDBID(numberOfNeighbors);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
-      DBIDs kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
+      DBIDs kNN = knnquery.getKNN(iditer, numberOfNeighbors);
       for(DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
         neighbors.add(iter);
         // Size limitation to exactly numberOfNeighbors

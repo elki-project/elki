@@ -23,8 +23,8 @@ package elki.math.statistics.intrinsicdimensionality;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.utilities.datastructures.arraylike.DoubleArray;
 import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -81,17 +81,17 @@ public interface IntrinsicDimensionalityEstimator {
   }
 
   /**
-   * Estimate from a Reference Point, a KNNQuery and the neighborhood size k.
+   * Estimate from a Reference Point, a KNNSearcher and the neighborhood size k.
    * 
-   * @param knnq KNNQuery
+   * @param knnq KNNSearcher
    * @param cur reference point
    * @param k neighborhood size
    * @return Estimated intrinsic dimensionality
    */
-  default double estimate(KNNQuery<?> knnq, DBIDRef cur, int k) {
+  default double estimate(KNNSearcher<DBIDRef> knnq, DBIDRef cur, int k) {
     double[] buf = new double[k];
     int p = 0;
-    for(DoubleDBIDListIter it = knnq.getKNNForDBID(cur, k).iter(); it.valid() && p < k; it.advance()) {
+    for(DoubleDBIDListIter it = knnq.getKNN(cur, k).iter(); it.valid() && p < k; it.advance()) {
       if(it.doubleValue() == 0. || DBIDUtil.equal(cur, it)) {
         continue;
       }
@@ -106,15 +106,15 @@ public interface IntrinsicDimensionalityEstimator {
   /**
    * Estimate from a distance list.
    * 
-   * @param rnq RangeQuery
+   * @param rnq RangeSearcher
    * @param cur reference point
    * @param range neighborhood radius
    * @return Estimated intrinsic dimensionality
    */
-  default double estimate(RangeQuery<?> rnq, DBIDRef cur, double range) {
+  default double estimate(RangeSearcher<DBIDRef> rnq, DBIDRef cur, double range) {
     DoubleArray buf = new DoubleArray();
     int p = 0;
-    for(DoubleDBIDListIter it = rnq.getRangeForDBID(cur, range).iter(); it.valid(); it.advance()) {
+    for(DoubleDBIDListIter it = rnq.getRange(cur, range).iter(); it.valid(); it.advance()) {
       if(it.doubleValue() == 0. || DBIDUtil.equal(cur, it)) {
         continue;
       }

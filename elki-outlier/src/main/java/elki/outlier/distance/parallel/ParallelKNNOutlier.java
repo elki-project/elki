@@ -29,7 +29,6 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDs;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -121,10 +120,9 @@ public class ParallelKNNOutlier<O> implements OutlierAlgorithm {
   public OutlierResult run(Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
-
+    final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     // Compute the kNN
-    KNNProcessor<O> knnm = new KNNProcessor<>(kplus, knnq);
+    KNNProcessor knnm = new KNNProcessor(kplus, () -> qb.kNNByDBID(kplus));
     SharedObject<KNNList> knnv = new SharedObject<>();
     knnm.connectKNNOutput(knnv);
     // Extract the k-distance

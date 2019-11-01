@@ -24,6 +24,7 @@ import elki.data.NumberVector;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.query.LinearScanQuery;
+import elki.database.query.PrioritySearcher;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 
@@ -40,13 +41,14 @@ import net.jafama.FastMath;
  *
  * @has - - - DistanceQuery
  *
- * @param <O> Database object type
+ * @param <Q> Query type
+ * @param <O> Relation object type
  */
-public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector> implements DistancePrioritySearcher<O>, LinearScanQuery {
+public abstract class LinearScanEuclideanPrioritySearcher<Q, O extends NumberVector> implements PrioritySearcher<Q>, LinearScanQuery {
   /**
    * Distance to use.
    */
-  private DistanceQuery<O> distanceQuery;
+  protected DistanceQuery<O> distanceQuery;
 
   /**
    * Iterator.
@@ -88,19 +90,19 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
    *
    * @param distanceQuery Distance function to use
    */
-  public LinearScanEuclideanDistancePrioritySearcher(DistanceQuery<O> distanceQuery) {
+  public LinearScanEuclideanPrioritySearcher(DistanceQuery<O> distanceQuery) {
     super();
     this.distanceQuery = distanceQuery;
     assert (EuclideanDistance.STATIC.equals(distanceQuery.getDistance()));
   }
 
-  @Override
-  public DistancePrioritySearcher<O> search(DBIDRef query) {
-    return search(distanceQuery.getRelation().get(query));
-  }
-
-  @Override
-  public DistancePrioritySearcher<O> search(O query) {
+  /**
+   * The real search function.
+   *
+   * @param query Query object
+   * @return this
+   */
+  public PrioritySearcher<Q> realSearch(O query) {
     this.query = query;
     this.iter = distanceQuery.getRelation().iterDBIDs();
     this.thresholdsq = this.thresholdUp = Double.POSITIVE_INFINITY;
@@ -126,7 +128,7 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
   }
 
   @Override
-  public DistancePrioritySearcher<O> decreaseCutoff(double threshold) {
+  public PrioritySearcher<Q> decreaseCutoff(double threshold) {
     this.thresholdsq = threshold * threshold;
     this.thresholdUp = Math.nextUp(threshold);
     return this; // Ignored
@@ -167,8 +169,49 @@ public class LinearScanEuclideanDistancePrioritySearcher<O extends NumberVector>
         thresholdsq == thresholdsq && getSquaredDistance() > thresholdsq ? thresholdUp : Double.NaN;
   }
 
-  @Override
-  public O getCandidate() {
-    return distanceQuery.getRelation().get(iter);
+  /**
+   * Search by Object.
+   *
+   * @author Erich Schubert
+   *
+   * @param <O> Relation type
+   */
+  public static class ByObject<O extends NumberVector> extends LinearScanEuclideanPrioritySearcher<O, O> {
+    /**
+     * Constructor.
+     *
+     * @param distanceQuery distance query
+     */
+    public ByObject(DistanceQuery<O> distanceQuery) {
+      super(distanceQuery);
+    }
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      return realSearch(query);
+    }
+  }
+
+  /**
+   * Search by DBID.
+   *
+   * @author Erich Schubert
+   *
+   * @param <O> Relation type
+   */
+  public static class ByDBID<O extends NumberVector> extends LinearScanEuclideanPrioritySearcher<DBIDRef, O> {
+    /**
+     * Constructor.
+     *
+     * @param distanceQuery distance query
+     */
+    public ByDBID(DistanceQuery<O> distanceQuery) {
+      super(distanceQuery);
+    }
+
+    @Override
+    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
+      return realSearch(distanceQuery.getRelation().get(query));
+    }
   }
 }

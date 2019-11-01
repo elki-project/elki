@@ -24,8 +24,10 @@ import org.junit.Test;
 
 import elki.data.DoubleVector;
 import elki.index.AbstractIndexStructureTest;
-import elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
-import elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByObject;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByObject;
 import elki.persistent.AbstractPageFileFactory;
 import elki.utilities.ELKIBuilder;
 
@@ -43,7 +45,7 @@ public class MTreeTest extends AbstractIndexStructureTest {
   public void testEuclidean() {
     MTreeFactory<DoubleVector> factory = new ELKIBuilder<>(MTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300).build();
-    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNByObject.class, MTreeRangeByObject.class);
+    assertSinglePoint(factory, MTreeKNNByDBID.class, MTreeRangeByDBID.class);
   }
 }

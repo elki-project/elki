@@ -22,7 +22,7 @@ package elki.index.tree.metrical.mtreevariants.query;
 
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.index.tree.DirectoryEntry;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -40,7 +40,7 @@ import elki.utilities.datastructures.heap.ComparableMinHeap;
  * 
  * @param <O> Object type
  */
-public class MTreeKNNQuery<O> implements KNNQuery<O> {
+public class MTreeKNNByDBID<O> implements KNNSearcher<DBIDRef> {
   /**
    * The index to use
    */
@@ -57,19 +57,14 @@ public class MTreeKNNQuery<O> implements KNNQuery<O> {
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MTreeKNNQuery(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
+  public MTreeKNNByDBID(AbstractMTree<O, ?, ?, ?> index, DistanceQuery<O> distanceQuery) {
     super();
     this.index = index;
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(distanceQuery.getRelation().get(id), k);
-  }
-
-  @Override
-  public KNNList getKNNForObject(O q, int k) {
+  public KNNList getKNN(DBIDRef q, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }

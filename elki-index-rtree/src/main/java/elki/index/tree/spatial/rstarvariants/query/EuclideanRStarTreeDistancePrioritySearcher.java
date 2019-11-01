@@ -21,8 +21,7 @@
 package elki.index.tree.spatial.rstarvariants.query;
 
 import elki.data.spatial.SpatialComparable;
-import elki.database.ids.DBIDRef;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.query.PrioritySearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -42,7 +41,7 @@ import net.jafama.FastMath;
  * @assoc - - - SpatialPrimitiveDistance
  * @assoc - - - DoubleDistanceSearchCandidate
  */
-public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialComparable> implements DistancePrioritySearcher<O> {
+public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialComparable> implements PrioritySearcher<O> {
   /**
    * The index to use
    */
@@ -102,11 +101,6 @@ public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialCompara
   }
 
   @Override
-  public EuclideanRStarTreeDistancePrioritySearcher<O> search(DBIDRef query) {
-    return search(relation.get(query));
-  }
-
-  @Override
   public EuclideanRStarTreeDistancePrioritySearcher<O> search(O query) {
     this.query = query;
     this.threshold = Double.POSITIVE_INFINITY;
@@ -125,11 +119,6 @@ public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialCompara
     assert threshold <= this.threshold;
     this.threshold = threshold;
     return this;
-  }
-
-  @Override
-  public O getCandidate() {
-    return relation.get(this);
   }
 
   @Override

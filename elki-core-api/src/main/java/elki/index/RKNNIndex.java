@@ -20,8 +20,9 @@
  */
 package elki.index;
 
+import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.rknn.RKNNSearcher;
 
 /**
  * Index with support for kNN queries.
@@ -30,7 +31,7 @@ import elki.database.query.rknn.RKNNQuery;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @navhas - provides - RKNNQuery
+ * @navhas - provides - RKNNSearcher
  * 
  * @param <O> Database Object type
  */
@@ -45,5 +46,17 @@ public interface RKNNIndex<O> extends Index {
    * @param flags Hints for the optimizer
    * @return RKNN Query object or {@code null}
    */
-  RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags);
+  RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags);
+
+  /**
+   * Get a RKNN query object for the given distance query and k.
+   * <p>
+   * This function MAY return null, when the given distance is not supported!
+   * 
+   * @param distanceQuery Distance query
+   * @param maxk Maximum k for RkNN query
+   * @param flags Hints for the optimizer
+   * @return RKNN Query object or {@code null}
+   */
+  RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags);
 }

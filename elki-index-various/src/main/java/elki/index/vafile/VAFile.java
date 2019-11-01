@@ -29,8 +29,8 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
@@ -238,13 +238,13 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<V> kNNByObject(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof LPNormDistance ? new VAFileKNNQuery(distanceQuery, ((LPNormDistance) df).getP()) : null;
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<V> rangeByObject(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof LPNormDistance ? new VAFileRangeQuery(distanceQuery, ((LPNormDistance) df).getP()) : null;
   }
@@ -254,7 +254,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @author Erich Schubert
    */
-  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeQuery<V> {
+  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeSearcher<V> {
     /**
      * LP Norm p parameter.
      */
@@ -273,12 +273,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(V query, double eps, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(V query, double eps, ModifiableDoubleDBIDList result) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 
@@ -315,7 +310,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * 
    * @author Erich Schubert
    */
-  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNQuery<V> {
+  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNSearcher<V> {
     /**
      * LP Norm p parameter.
      */
@@ -333,12 +328,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(V query, int k) {
+    public KNNList getKNN(V query, int k) {
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
 

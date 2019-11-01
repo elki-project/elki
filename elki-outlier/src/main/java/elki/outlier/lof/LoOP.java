@@ -26,12 +26,9 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -85,7 +82,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> type of objects handled by this algorithm
  */
@@ -160,15 +157,15 @@ public class LoOP<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(5) : null;
-    KNNQuery<O> knnComp, knnReach;
+    KNNSearcher<DBIDRef> knnComp, knnReach;
     if(comparisonDistance == reachabilityDistance || comparisonDistance.equals(reachabilityDistance)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnReach = knnComp = new QueryBuilder<>(relation, comparisonDistance).precomputed().kNNQuery(MathUtil.max(kcomp, kreach) + 1);
+      knnReach = knnComp = new QueryBuilder<>(relation, comparisonDistance).precomputed().kNNByDBID(MathUtil.max(kcomp, kreach) + 1);
     }
     else {
       LOG.beginStep(stepprog, 1, "Not materializing distance functions, since we request each DBID once only.");
-      knnComp = new QueryBuilder<>(relation, comparisonDistance).kNNQuery(kreach + 1);
-      knnReach = new QueryBuilder<>(relation, reachabilityDistance).kNNQuery(kcomp + 1);
+      knnComp = new QueryBuilder<>(relation, comparisonDistance).kNNByDBID(kreach + 1);
+      knnReach = new QueryBuilder<>(relation, reachabilityDistance).kNNByDBID(kcomp + 1);
     }
 
     // Assert we got something
@@ -221,11 +218,11 @@ public class LoOP<O> implements OutlierAlgorithm {
    * @param knn kNN query
    * @param pdists Storage for distances
    */
-  protected void computePDists(Relation<O> relation, KNNQuery<O> knn, WritableDoubleDataStore pdists) {
+  protected void computePDists(Relation<O> relation, KNNSearcher<DBIDRef> knn, WritableDoubleDataStore pdists) {
     // computing PRDs
     FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1); // +
+      final KNNList neighbors = knn.getKNN(iditer, kreach + 1); // +
                                                                        // query
                                                                        // point
       // use first kref neighbors as reference set
@@ -255,11 +252,11 @@ public class LoOP<O> implements OutlierAlgorithm {
    * @param plofs Storage for PLOFs.
    * @return Normalization factor.
    */
-  protected double computePLOFs(Relation<O> relation, KNNQuery<O> knn, WritableDoubleDataStore pdists, WritableDoubleDataStore plofs) {
+  protected double computePLOFs(Relation<O> relation, KNNSearcher<DBIDRef> knn, WritableDoubleDataStore pdists, WritableDoubleDataStore plofs) {
     FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
     double nplof = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1); // + query
+      final KNNList neighbors = knn.getKNN(iditer, kcomp + 1); // + query
                                                                       // point
       // use first kref neighbors as comparison set.
       int ks = 0;

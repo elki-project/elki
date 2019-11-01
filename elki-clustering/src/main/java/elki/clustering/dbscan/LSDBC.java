@@ -37,7 +37,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
@@ -144,7 +144,7 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
 
     final DBIDs ids = relation.getDBIDs();
     LOG.beginStep(stepprog, 1, "Materializing kNN neighborhoods");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     LOG.beginStep(stepprog, 2, "Sorting by density");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -173,7 +173,7 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
         continue;
       }
       // Evaluate Neighborhood predicate
-      final KNNList neighbors = knnq.getKNNForDBID(id, kplus);
+      final KNNList neighbors = knnq.getKNN(id, kplus);
       // Evaluate Core-Point predicate:
       if(isLocalMaximum(neighbors.getKNNDistance(), neighbors, dens)) {
         double mindens = factor * neighbors.getKNNDistance();
@@ -251,10 +251,9 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
    * @param neighbors Neighbors acquired by initial getNeighbors call.
    * @param maxkdist Maximum k-distance
    * @param progress Progress logging
-   *
    * @return cluster size
    */
-  protected int expandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final KNNQuery<O> knnq, final DBIDs neighbors, final double maxkdist, final FiniteProgress progress) {
+  protected int expandCluster(int clusterid, WritableIntegerDataStore clusterids, KNNSearcher<DBIDRef> knnq, DBIDs neighbors, double maxkdist, FiniteProgress progress) {
     int clustersize = 1; // initial seed!
     final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
     activeSet.addDBIDs(neighbors);
@@ -274,7 +273,7 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
         clustersize += 1;
         // expandCluster again:
         // Evaluate Neighborhood predicate
-        final KNNList newneighbors = knnq.getKNNForDBID(id, kplus);
+        final KNNList newneighbors = knnq.getKNN(id, kplus);
         // Evaluate Core-Point predicate
         if(newneighbors.getKNNDistance() <= maxkdist) {
           activeSet.addDBIDs(newneighbors);
@@ -293,10 +292,10 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
    * @param ids DBIDs to process
    * @param dens Density storage
    */
-  private void fillDensities(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore dens) {
+  private void fillDensities(KNNSearcher<DBIDRef> knnq, DBIDs ids, WritableDoubleDataStore dens) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      dens.putDouble(iter, knnq.getKNNForDBID(iter, kplus).getKNNDistance());
+      dens.putDouble(iter, knnq.getKNN(iter, kplus).getKNNDistance());
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);

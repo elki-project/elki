@@ -30,7 +30,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -73,7 +73,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  * @has - - - KernelDensityFunction
  *
  * @param <O> the type of objects handled by this algorithm
@@ -150,14 +150,14 @@ public class LDF<O extends NumberVector> implements OutlierAlgorithm {
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     // Compute LDEs
     LOG.beginStep(stepprog, 2, "Computing LDEs.");
     WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
+      final KNNList neighbors = knnq.getKNN(it, kplus);
       double sum = 0.0;
       int count = 0;
       // Fast version for double distances
@@ -165,7 +165,7 @@ public class LDF<O extends NumberVector> implements OutlierAlgorithm {
         if(DBIDUtil.equal(neighbor, it)) {
           continue;
         }
-        final double nkdist = knnq.getKNNForDBID(neighbor, kplus).getKNNDistance();
+        final double nkdist = knnq.getKNN(neighbor, kplus).getKNNDistance();
         if(!(nkdist > 0.) || nkdist == Double.POSITIVE_INFINITY) {
           sum = Double.POSITIVE_INFINITY;
           count++;
@@ -189,7 +189,7 @@ public class LDF<O extends NumberVector> implements OutlierAlgorithm {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Density Factors", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = ldes.doubleValue(it);
-      final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
+      final KNNList neighbors = knnq.getKNN(it, kplus);
       double sum = 0.0;
       int count = 0;
       for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

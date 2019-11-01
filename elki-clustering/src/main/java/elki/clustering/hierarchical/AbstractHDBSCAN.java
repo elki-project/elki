@@ -28,14 +28,9 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
@@ -105,12 +100,12 @@ public abstract class AbstractHDBSCAN<O, R> implements Algorithm {
    * @param minPts Minimum neighborhood size
    * @return Data store with core distances
    */
-  protected WritableDoubleDataStore computeCoreDists(DBIDs ids, KNNQuery<O> knnQ, int minPts) {
+  protected WritableDoubleDataStore computeCoreDists(DBIDs ids, KNNSearcher<DBIDRef> knnQ, int minPts) {
     final Logging LOG = getLogger();
     final WritableDoubleDataStore coredists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Computing core sizes", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      coredists.put(iter, knnQ.getKNNForDBID(iter, minPts).getKNNDistance());
+      coredists.put(iter, knnQ.getKNN(iter, minPts).getKNNDistance());
       LOG.incrementProcessed(cprog);
     }
     LOG.ensureCompleted(cprog);

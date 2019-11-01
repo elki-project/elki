@@ -21,8 +21,11 @@
 package elki.index.tree.spatial.rstarvariants.query;
 
 import elki.data.spatial.SpatialComparable;
-import elki.database.ids.*;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.KNNHeap;
+import elki.database.ids.KNNList;
+import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.query.PrioritySearcher;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -40,7 +43,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
  * @assoc - - - SpatialPrimitiveDistance
  * @assoc - - - DoubleDistanceSearchCandidate
  */
-public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> implements DistancePrioritySearcher<O> {
+public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> implements PrioritySearcher<O> {
   /**
    * The index to use
    */
@@ -102,15 +105,10 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
+  public KNNList getKNN(O obj, int k) {
     KNNHeap heap = DBIDUtil.newHeap(k);
     double threshold = Double.POSITIVE_INFINITY;
-    for(DistancePrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
+    for(PrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
       double dist = iter.computeExactDistance();
       if(dist <= threshold) {
         iter.decreaseCutoff(threshold = heap.insert(dist, iter));
@@ -120,30 +118,14 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+    for(PrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
       double dist = iter.computeExactDistance();
       if(dist <= range) {
         result.add(dist, iter);
       }
     }
     return result;
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    for(DistancePrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
-      double dist = iter.computeExactDistance();
-      if(dist <= range) {
-        result.add(dist, iter);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public RStarTreeDistancePrioritySearcher<O> search(DBIDRef query) {
-    return search(relation.get(query));
   }
 
   @Override
@@ -164,11 +146,6 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
     assert threshold <= this.threshold;
     this.threshold = threshold;
     return this;
-  }
-
-  @Override
-  public O getCandidate() {
-    return relation.get(this);
   }
 
   @Override

@@ -23,9 +23,8 @@ package elki.index.tree.spatial.rstarvariants.query;
 import java.util.Arrays;
 
 import elki.data.spatial.SpatialComparable;
-import elki.database.ids.DBIDRef;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -54,7 +53,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", //
     url = "https://doi.org/10.1109/ICICS.1997.652114", //
     bibkey = "doi:10.1109/ICICS.1997.652114")
-public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQuery<O> {
+public class RStarTreeRangeSearcher<O extends SpatialComparable> implements RangeSearcher<O> {
   /**
    * The index to use
    */
@@ -77,7 +76,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
    * @param relation Data relation to query
    * @param distance Distance function
    */
-  public RStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
+  public RStarTreeRangeSearcher(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
     super();
     this.relation = relation;
     this.tree = tree;
@@ -85,12 +84,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForObject(relation.get(id), range, result);
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
     tree.statistics.countRangeQuery();
     // Processing queue.
     int[] pq = new int[101];

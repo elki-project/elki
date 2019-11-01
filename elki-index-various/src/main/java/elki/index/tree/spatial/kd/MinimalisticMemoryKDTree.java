@@ -27,8 +27,8 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
@@ -241,7 +241,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
@@ -252,7 +252,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
@@ -267,7 +267,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @author Erich Schubert
    */
-  public class KDTreeKNNQuery implements KNNQuery<O> {
+  public class KDTreeKNNQuery implements KNNSearcher<O> {
     /**
      * Norm to use.
      */
@@ -283,12 +283,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(O obj, int k) {
+    public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
       kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), Double.POSITIVE_INFINITY);
       return knns.toKNNList();
@@ -394,7 +389,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @author Erich Schubert
    */
-  public class KDTreeRangeQuery implements RangeQuery<O> {
+  public class KDTreeRangeQuery implements RangeSearcher<O> {
     /**
      * Norm to use.
      */
@@ -411,12 +406,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
       kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), range);
       return result;
     }

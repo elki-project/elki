@@ -29,8 +29,9 @@ import elki.data.DoubleVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDRef;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.relation.Relation;
 import elki.distance.CosineDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -71,7 +72,7 @@ public class PrecomputedDistanceMatrixTest extends AbstractIndexStructureTest {
         .addParameter(PrecomputedDistanceMatrix.Factory.Par.DISTANCE_ID, EuclideanDistance.class);
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistancePrioritySearcher<DoubleVector> prioq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly().prioritySearcher();
+    PrioritySearcher<DBIDRef> prioq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly().priorityByDBID();
     double lastd = 0.0;
     int i = 0;
     for(prioq.search(relation.iterDBIDs()); prioq.valid(); prioq.advance(), i++) {

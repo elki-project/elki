@@ -25,10 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import elki.database.ids.*;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.index.DistancePriorityIndex;
@@ -253,21 +253,21 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
         new CoverTreeRangeQuery() : null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
         new CoverTreeKNNQuery() : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new PrioritySearcher() : null;
+        new CoverTreePrioritySearcher() : null;
   }
 
   @Override
@@ -280,14 +280,9 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery implements RangeQuery<O> {
+  public class CoverTreeRangeQuery implements RangeSearcher<O> {
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
       ArrayList<Node> open = new ArrayList<Node>(); // LIFO stack
       open.add(root);
       DBIDVar r = DBIDUtil.newVar();
@@ -328,14 +323,9 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery implements KNNQuery<O> {
+  public class CoverTreeKNNQuery implements KNNSearcher<O> {
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(O obj, int k) {
+    public KNNList getKNN(O obj, int k) {
       if(k < 1) {
         throw new IllegalArgumentException("At least one object has to be requested!");
       }
@@ -397,7 +387,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class PrioritySearcher implements DistancePrioritySearcher<O> {
+  public class CoverTreePrioritySearcher implements PrioritySearcher<O> {
     /**
      * Query object
      */
@@ -431,12 +421,12 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Constructor.
      */
-    public PrioritySearcher() {
+    public CoverTreePrioritySearcher() {
       super();
     }
 
     @Override
-    public PrioritySearcher search(O query) {
+    public CoverTreePrioritySearcher search(O query) {
       this.query = query;
       this.threshold = Double.POSITIVE_INFINITY;
       pq.clear();
@@ -448,13 +438,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     }
 
     @Override
-    public PrioritySearcher search(DBIDRef query) {
-      // FIXME: support using DBIDs only.
-      return search(relation.get(query));
-    }
-
-    @Override
-    public PrioritySearcher decreaseCutoff(double threshold) {
+    public CoverTreePrioritySearcher decreaseCutoff(double threshold) {
       assert threshold <= this.threshold;
       this.threshold = threshold;
       return this;
@@ -466,7 +450,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     }
 
     @Override
-    public PrioritySearcher advance() {
+    public CoverTreePrioritySearcher advance() {
       // Advance the main iterator, if defined:
       if(candidates.valid()) {
         candidates.advance();
@@ -547,11 +531,6 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     @Override
     public int internalGetIndex() {
       return candidates.internalGetIndex();
-    }
-
-    @Override
-    public O getCandidate() {
-      return relation.get(this);
     }
   }
 

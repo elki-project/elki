@@ -55,7 +55,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", //
     url = "https://doi.org/10.1109/ICICS.1997.652114", //
     bibkey = "doi:10.1109/ICICS.1997.652114")
-public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarTreeRangeQuery<O> {
+public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarTreeRangeSearcher<O> {
   /**
    * Squared euclidean distance function.
    */
@@ -72,7 +72,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O object, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRange(O object, double range, ModifiableDoubleDBIDList result) {
     final SquaredEuclideanDistance squared = SQUARED;
     final double sqepsilon = range * range;
     tree.statistics.countRangeQuery();

@@ -31,7 +31,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -91,13 +91,13 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
    * @param query Range query
    * @return Precomputed models
    */
-  public DataStore<M> preprocess(Class<? super M> modelcls, Relation<O> relation, RangeQuery<O> query) {
+  public DataStore<M> preprocess(Class<? super M> modelcls, Relation<O> relation, RangeSearcher<DBIDRef> query) {
     WritableDataStore<M> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, modelcls);
 
     Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DoubleDBIDList neighbors = query.getRangeForDBID(iditer, epsilon);
+      DoubleDBIDList neighbors = query.getRange(iditer, epsilon);
       storage.put(iditer, computeLocalModel(iditer, neighbors, relation));
       getLogger().incrementProcessed(progress);
     }

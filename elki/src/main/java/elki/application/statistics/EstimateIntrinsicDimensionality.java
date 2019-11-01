@@ -23,10 +23,11 @@ package elki.application.statistics;
 import elki.application.AbstractDistanceBasedApplication;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -100,7 +101,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     int kk = 1 + (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
     DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(kk);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(kk);
 
     double[] idim = new double[ssize];
     int samples = 0;

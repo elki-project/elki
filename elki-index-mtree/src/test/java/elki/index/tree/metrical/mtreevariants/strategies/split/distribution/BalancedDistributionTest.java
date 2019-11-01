@@ -25,8 +25,10 @@ import org.junit.Test;
 import elki.data.DoubleVector;
 import elki.index.AbstractIndexStructureTest;
 import elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
-import elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
-import elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeKNNByObject;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByDBID;
+import elki.index.tree.metrical.mtreevariants.query.MTreeRangeByObject;
 import elki.index.tree.metrical.mtreevariants.strategies.split.MLBDistSplit;
 import elki.persistent.AbstractPageFileFactory;
 import elki.utilities.ELKIBuilder;
@@ -45,8 +47,8 @@ public class BalancedDistributionTest extends AbstractIndexStructureTest {
         .with(MTreeFactory.Par.SPLIT_STRATEGY_ID, MLBDistSplit.class) //
         .with(MLBDistSplit.Par.DISTRIBUTOR_ID, BalancedDistribution.class) //
         .build();
-    assertExactEuclidean(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
-    assertSinglePoint(factory, MTreeKNNQuery.class, MTreeRangeQuery.class);
+    assertExactEuclidean(factory, MTreeKNNByObject.class, MTreeRangeByObject.class);
+    assertSinglePoint(factory, MTreeKNNByDBID.class, MTreeRangeByDBID.class);
     // TODO: test that the tree is indeed balanced!
   }
 }

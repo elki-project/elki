@@ -28,12 +28,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -82,7 +79,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of data objects handled by this algorithm
  */
@@ -136,7 +133,7 @@ public class VarianceOfVolume<O extends SpatialComparable> implements OutlierAlg
     int dim = RelationUtil.dimensionality(relation);
 
     LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     // Compute Volumes
     LOG.beginStep(stepprog, 2, "Computing Volumes.");
@@ -166,13 +163,13 @@ public class VarianceOfVolume<O extends SpatialComparable> implements OutlierAlg
    * @param ids IDs to process
    * @param vols Volume storage
    */
-  private void computeVolumes(KNNQuery<O> knnq, int dim, DBIDs ids, WritableDoubleDataStore vols) {
+  private void computeVolumes(KNNSearcher<DBIDRef> knnq, int dim, DBIDs ids, WritableDoubleDataStore vols) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Volume", ids.size(), LOG) : null;
     double scaleconst = MathUtil.SQRTPI * FastMath.pow(GammaDistribution.gamma(1 + dim * .5), -1. / dim);
     boolean warned = false;
     double sum = 0.;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double dk = knnq.getKNNForDBID(iter, kplus).getKNNDistance();
+      double dk = knnq.getKNN(iter, kplus).getKNNDistance();
       double vol = dk > 0 ? MathUtil.powi(dk * scaleconst, dim) : 0.;
       if(vol == Double.POSITIVE_INFINITY && !warned) {
         LOG.warning("Variance of Volumes has hit double precision limits, results are not reliable.");
@@ -198,11 +195,11 @@ public class VarianceOfVolume<O extends SpatialComparable> implements OutlierAlg
    * @param vovs Variance of Volume storage
    * @param vovminmax Score minimum/maximum tracker
    */
-  private void computeVOVs(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore vols, WritableDoubleDataStore vovs, DoubleMinMax vovminmax) {
+  private void computeVOVs(KNNSearcher<DBIDRef> knnq, DBIDs ids, DoubleDataStore vols, WritableDoubleDataStore vovs, DoubleMinMax vovminmax) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Variance of Volume", ids.size(), LOG) : null;
     boolean warned = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList knns = knnq.getKNNForDBID(iter, kplus);
+      KNNList knns = knnq.getKNN(iter, kplus);
       DoubleDBIDListIter it = knns.iter();
       double vbar = 0.;
       for(; it.valid(); it.advance()) {

@@ -41,8 +41,8 @@ import elki.database.UpdatableDatabase;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.knn.LinearScanDistanceKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.LinearScanKNNByDBID;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.datasource.InputStreamDatabaseConnection;
@@ -102,7 +102,7 @@ public class MaterializedKNNPreprocessorTest {
     assertEquals("Data set size doesn't match parameters.", shoulds, relation.size());
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    KNNSearcher<DBIDRef> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     MaterializeKNNPreprocessor<DoubleVector> preproc = //
@@ -110,7 +110,7 @@ public class MaterializedKNNPreprocessorTest {
             .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
             .with(MaterializeKNNPreprocessor.Factory.K_ID, k) //
             .build().instantiate(relation);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
 
@@ -142,11 +142,11 @@ public class MaterializedKNNPreprocessorTest {
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
   }
 
-  public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
+  public static void testKNNQueries(Relation<DoubleVector> rep, KNNSearcher<DBIDRef> lin_knn_query, KNNSearcher<DBIDRef> preproc_knn_query, int k) {
     assertNotEquals("Preprocessor knn query class incorrect.", lin_knn_query.getClass(), preproc_knn_query.getClass());
     for(DBIDIter iter = rep.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList lin_knn = lin_knn_query.getKNNForDBID(iter, k);
-      KNNList pre_knn = preproc_knn_query.getKNNForDBID(iter, k);
+      KNNList lin_knn = lin_knn_query.getKNN(iter, k);
+      KNNList pre_knn = preproc_knn_query.getKNN(iter, k);
       DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
         if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {
@@ -164,10 +164,10 @@ public class MaterializedKNNPreprocessorTest {
     }
   }
 
-  public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k, int allowed_errors) {
+  public static void testKNNQueries(Relation<DoubleVector> rep, KNNSearcher<DBIDRef> lin_knn_query, KNNSearcher<DBIDRef> preproc_knn_query, int k, int allowed_errors) {
     for(DBIDIter iter = rep.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList lin_knn = lin_knn_query.getKNNForDBID(iter, k);
-      KNNList pre_knn = preproc_knn_query.getKNNForDBID(iter, k);
+      KNNList lin_knn = lin_knn_query.getKNN(iter, k);
+      KNNList pre_knn = preproc_knn_query.getKNN(iter, k);
       DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
         if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {

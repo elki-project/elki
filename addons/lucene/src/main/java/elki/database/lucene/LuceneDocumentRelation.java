@@ -31,8 +31,8 @@ import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.index.KNNIndex;
 import elki.index.RangeIndex;
@@ -121,15 +121,25 @@ public class LuceneDocumentRelation implements Relation<Document> {
     }
 
     @Override
-    public RangeQuery<Document> getRangeQuery(DistanceQuery<Document> distanceQuery, double maxradius, int flags) {
-      return distanceQuery.getDistance().getClass() == LuceneDistance.class && distanceQuery.getRelation() == this ? //
-          (RangeQuery<Document>) new LuceneDistanceRangeQuery(reader, ids) : null;
+    public RangeSearcher<Document> rangeByObject(DistanceQuery<Document> distanceQuery, double maxrange, int flags) {
+      return null; // FIXME: currently not supported.
     }
 
     @Override
-    public KNNQuery<Document> getKNNQuery(DistanceQuery<Document> distanceQuery, int maxk, int flags) {
+    public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<Document> distanceQuery, double maxradius, int flags) {
       return distanceQuery.getDistance().getClass() == LuceneDistance.class && distanceQuery.getRelation() == this ? //
-          (KNNQuery<Document>) new LuceneDistanceKNNQuery(reader, ids) : null;
+          new LuceneDistanceRangeSearcher(reader, ids) : null;
+    }
+
+    @Override
+    public KNNSearcher<Document> kNNByObject(DistanceQuery<Document> distanceQuery, int maxk, int flags) {
+      return null; // FIXME: currently not supported.
+    }
+
+    @Override
+    public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<Document> distanceQuery, int maxk, int flags) {
+      return distanceQuery.getDistance().getClass() == LuceneDistance.class && distanceQuery.getRelation() == this ? //
+          new LuceneDistanceKNNSearcher(reader, ids) : null;
     }
 
     @Override

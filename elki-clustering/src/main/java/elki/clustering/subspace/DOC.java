@@ -285,7 +285,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
 
     // TODO: add filtering capabilities into query API!
     // Until then, using the range query API will be unnecessarily slow.
-    // RangeQuery<V> rq = relation.getRangeQuery(df, DatabaseQuery.HINT_SINGLE);
+    // RangeSearcher<V> rq = relation.getRangeQuery(df, DatabaseQuery.HINT_SINGLE);
     ArrayModifiableDBIDs nC = DBIDUtil.newArray();
     for(DBIDIter it = S.iter(); it.valid(); it.advance()) {
       if(dq.distance(q, it) <= w) {

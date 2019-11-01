@@ -31,9 +31,9 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.query.knn.PreprocessorKNNQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -87,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.2
  *
  * @navhas - computes - LOFResult
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -157,7 +157,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
     DistanceQuery<O> distQ = new QueryBuilder<>(relation, reachabilityDistance).distanceQuery();
     // "HEAVY" flag for knnReach since it is used more than once
-    KNNQuery<O> knnReach = new QueryBuilder<>(distQ).optimizedOnly().kNNQuery(kreach);
+    KNNSearcher<DBIDRef> knnReach = new QueryBuilder<>(distQ).optimizedOnly().kNNByDBID(kreach);
     // No optimized kNN query - use a preprocessor!
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
@@ -165,15 +165,15 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
             "Materializing neighborhoods w.r.t. reference neighborhood distance." //
             : "Not materializing neighborhoods w.r.t. reference neighborhood distance, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
       }
-      knnReach = new QueryBuilder<>(relation, reachabilityDistance).precomputed().kNNQuery(//
+      knnReach = new QueryBuilder<>(relation, reachabilityDistance).precomputed().kNNByDBID(//
           (referenceDistance.equals(reachabilityDistance)) ? Math.max(kreach, krefer) : kreach);
     }
 
     // knnReach is only used once
-    KNNQuery<O> knnRefer = knnReach;
+    KNNSearcher<DBIDRef> knnRefer = knnReach;
     if(!referenceDistance.equals(reachabilityDistance)) {
       // do not materialize the first neighborhood, since it is used only once
-      knnRefer = new QueryBuilder<>(relation, referenceDistance).kNNQuery(krefer);
+      knnRefer = new QueryBuilder<>(relation, referenceDistance).kNNByDBID(krefer);
     }
     return doRunInTime(relation.getDBIDs(), knnRefer, knnReach, stepprog).getResult();
   }
@@ -190,7 +190,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
    * @param stepprog Progress logger
    * @return LOF result
    */
-  protected LOFResult<O> doRunInTime(DBIDs ids, KNNQuery<O> kNNRefer, KNNQuery<O> kNNReach, StepProgress stepprog) {
+  protected LOFResult<O> doRunInTime(DBIDs ids, KNNSearcher<DBIDRef> kNNRefer, KNNSearcher<DBIDRef> kNNReach, StepProgress stepprog) {
     // Assert we got something
     if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
@@ -228,17 +228,17 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
    * @param ids the ids of the objects
    * @param lrds Reachability storage
    */
-  protected void computeLRDs(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
+  protected void computeLRDs(KNNSearcher<DBIDRef> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, kreach);
+      final KNNList neighbors = knnq.getKNN(iter, kreach);
       double sum = 0.0;
       int count = 0;
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         if(DBIDUtil.equal(neighbor, iter)) {
           continue;
         }
-        KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, kreach);
+        KNNList neighborsNeighbors = knnq.getKNN(neighbor, kreach);
         sum += MathUtil.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
         count++;
       }
@@ -260,11 +260,11 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
    * @param lofs Local outlier factor storage
    * @param lofminmax Score minimum/maximum tracker
    */
-  protected void computeLOFs(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
+  protected void computeLOFs(KNNSearcher<DBIDRef> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lof, lrdp = lrds.doubleValue(iter);
-      final KNNList neighbors = knnq.getKNNForDBID(iter, krefer);
+      final KNNList neighbors = knnq.getKNN(iter, krefer);
       if(!Double.isInfinite(lrdp)) {
         double sum = 0.;
         int count = 0;
@@ -309,22 +309,22 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
     /**
      * The kNN query w.r.t. the reference neighborhood distance.
      */
-    private final KNNQuery<O> kNNRefer;
+    private final KNNSearcher<DBIDRef> kNNRefer;
 
     /**
      * The kNN query w.r.t. the reachability distance.
      */
-    private final KNNQuery<O> kNNReach;
+    private final KNNSearcher<DBIDRef> kNNReach;
 
     /**
      * The RkNN query w.r.t. the reference neighborhood distance.
      */
-    private RKNNQuery<O> rkNNRefer;
+    private RKNNSearcher<DBIDRef> rkNNRefer;
 
     /**
      * The rkNN query w.r.t. the reachability distance.
      */
-    private RKNNQuery<O> rkNNReach;
+    private RKNNSearcher<DBIDRef> rkNNReach;
 
     /**
      * The LRD values of the objects.
@@ -346,7 +346,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      * @param lrds the LRD values of the objects
      * @param lofs the LOF values of the objects
      */
-    public LOFResult(OutlierResult result, KNNQuery<O> kNNRefer, KNNQuery<O> kNNReach, WritableDoubleDataStore lrds, WritableDoubleDataStore lofs) {
+    public LOFResult(OutlierResult result, KNNSearcher<DBIDRef> kNNRefer, KNNSearcher<DBIDRef> kNNReach, WritableDoubleDataStore lrds, WritableDoubleDataStore lofs) {
       this.result = result;
       this.kNNRefer = kNNRefer;
       this.kNNReach = kNNReach;
@@ -359,7 +359,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @return the kNN query w.r.t. the reference neighborhood distance
      */
-    public KNNQuery<O> getKNNRefer() {
+    public KNNSearcher<DBIDRef> getKNNRefer() {
       return kNNRefer;
     }
 
@@ -368,7 +368,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @return the kNN query w.r.t. the reachability distance
      */
-    public KNNQuery<O> getKNNReach() {
+    public KNNSearcher<DBIDRef> getKNNReach() {
       return kNNReach;
     }
 
@@ -404,7 +404,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @param rkNNRefer the query to set
      */
-    public void setRkNNRefer(RKNNQuery<O> rkNNRefer) {
+    public void setRkNNRefer(RKNNSearcher<DBIDRef> rkNNRefer) {
       this.rkNNRefer = rkNNRefer;
     }
 
@@ -413,7 +413,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
-    public RKNNQuery<O> getRkNNRefer() {
+    public RKNNSearcher<DBIDRef> getRkNNRefer() {
       return rkNNRefer;
     }
 
@@ -422,7 +422,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @return the RkNN query w.r.t. the reachability distance
      */
-    public RKNNQuery<O> getRkNNReach() {
+    public RKNNSearcher<DBIDRef> getRkNNReach() {
       return rkNNReach;
     }
 
@@ -431,7 +431,7 @@ public class FlexibleLOF<O> implements OutlierAlgorithm {
      *
      * @param rkNNReach the query to set
      */
-    public void setRkNNReach(RKNNQuery<O> rkNNReach) {
+    public void setRkNNReach(RKNNSearcher<DBIDRef> rkNNReach) {
       this.rkNNReach = rkNNReach;
     }
   }

@@ -28,11 +28,11 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.index.DistancePriorityIndex;
 import elki.index.DynamicIndex;
@@ -156,21 +156,21 @@ public class RStarTreeIndex<O extends NumberVector> extends RStarTree implements
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxk, flags) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getRangeQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getDistancePrioritySearcher(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;

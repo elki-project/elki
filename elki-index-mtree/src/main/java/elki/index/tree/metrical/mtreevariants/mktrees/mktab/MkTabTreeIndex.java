@@ -25,17 +25,15 @@ import java.util.List;
 
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.index.KNNIndex;
 import elki.index.RKNNIndex;
 import elki.index.RangeIndex;
 import elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
-import elki.index.tree.metrical.mtreevariants.query.MTreeKNNQuery;
-import elki.index.tree.metrical.mtreevariants.query.MTreeRangeQuery;
-import elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
+import elki.index.tree.metrical.mtreevariants.query.*;
 import elki.persistent.PageFile;
 
 /**
@@ -72,7 +70,7 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
    */
-  protected MkTabEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
+  protected MkTabEntry createNewLeafEntry(DBID id, DBIDRef object, double parentDistance) {
     return new MkTabLeafEntry(id, parentDistance, knnDistances(object));
   }
 
@@ -82,8 +80,8 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
    * @param object the query object
    * @return the knn distance of the object with the specified id
    */
-  private double[] knnDistances(O object) {
-    KNNList knns = knnq.getKNNForObject(object, getKmax() - 1);
+  private double[] knnDistances(DBIDRef object) {
+    KNNList knns = knnq.getKNN(object, getKmax() - 1);
     double[] distances = new double[getKmax()];
     int i = 0;
     for(DoubleDBIDListIter iter = knns.iter(); iter.valid() && i < getKmax(); iter.advance(), i++) {
@@ -97,27 +95,43 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
     super.initialize();
     List<MkTabEntry> objs = new ArrayList<>(relation.size());
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter); // FIXME: expensive
-      final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, Double.NaN));
+      DBID id = DBIDUtil.deref(iter);
+      objs.add(createNewLeafEntry(id, id, Double.NaN));
     }
     insertAll(objs);
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeKNNQuery<>(this, distanceQuery) : null;
+        new MTreeKNNByObject<>(this, distanceQuery) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeRangeQuery<>(this, distanceQuery) : null;
+        new MTreeKNNByDBID<>(this, distanceQuery) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeRangeByObject<>(this, distanceQuery) : null;
+  }
+
+  @Override
+  public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+        new MTreeRangeByDBID<>(this, distanceQuery) : null;
+  }
+
+  @Override
+  public RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null;
+  }
+
+  @Override
+  public RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
         new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }

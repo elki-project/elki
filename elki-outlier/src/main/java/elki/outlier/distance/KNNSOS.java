@@ -27,10 +27,11 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -139,14 +140,14 @@ public class KNNSOS<O> implements OutlierAlgorithm {
   public OutlierResult run(Relation<O> relation) {
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(k1);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(k1);
     final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("KNNSOS scores", relation.size(), LOG) : null;
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, 1.);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      KNNList knns = knnq.getKNNForDBID(it, k1);
+      KNNList knns = knnq.getKNN(it, k1);
       if(p.length < knns.size() + 1) {
         p = new double[knns.size() + 10];
       }

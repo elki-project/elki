@@ -42,7 +42,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -329,14 +329,14 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
     private int runDBSCANOnCell(DBIDs cellids, Relation<V> relation, ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, int clusterid) {
       temporary.clear(); // Reset to "UNPROCESSED"
       ProxyView<V> rel = new ProxyView<>(cellids, relation);
-      RangeQuery<V> rq = new QueryBuilder<>(rel, distance).rangeQuery(epsilon);
+      RangeSearcher<DBIDRef> rq = new QueryBuilder<>(rel, distance).rangeByDBID(epsilon);
       FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Running DBSCAN", cellids.size(), LOG) : null;
       for(DBIDIter id = cellids.iter(); id.valid(); id.advance()) {
         // Skip already processed ids.
         if(temporary.intValue(id) != UNPROCESSED) {
           continue;
         }
-        rq.getRangeForDBID(id, epsilon, neighbors.clear());
+        rq.getRange(id, epsilon, neighbors.clear());
         if(neighbors.size() >= minpts) {
           expandCluster(id, clusterid, temporary, neighbors, activeSet, rq, pprog);
           ++clusterid;
@@ -512,7 +512,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
      * @param pprog Object progress
      * @return cluster size
      */
-    protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, RangeQuery<V> rq, FiniteProgress pprog) {
+    protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, RangeSearcher<DBIDRef> rq, FiniteProgress pprog) {
       assert (activeSet.size() == 0);
       int clustersize = 1 + processCorePoint(seed, neighbors, clusterid, clusterids, activeSet);
       LOG.incrementProcessed(pprog);
@@ -521,7 +521,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
       while(!activeSet.isEmpty()) {
         activeSet.pop(id);
         // Evaluate Neighborhood predicate
-        rq.getRangeForDBID(id, epsilon, neighbors.clear());
+        rq.getRange(id, epsilon, neighbors.clear());
         // Evaluate Core-Point predicate
         if(neighbors.size() >= minpts) {
           clustersize += processCorePoint(id, neighbors, clusterid, clusterids, activeSet);

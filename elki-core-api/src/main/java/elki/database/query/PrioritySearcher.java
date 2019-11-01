@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query.distance;
+package elki.database.query;
 
 import elki.database.ids.*;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 
 /**
  * Distance priority-based searcher. When used with an index, this will return
@@ -43,7 +43,7 @@ import elki.database.query.range.RangeQuery;
  *
  * @param <O> Object type
  */
-public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>, DBIDIter {
+public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, DBIDIter {
   /**
    * Priority search function.
    *
@@ -51,18 +51,7 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
    * @param threshold Initial distance threshold
    * @return {@code this}, for chaining
    */
-  default DistancePrioritySearcher<O> search(O query, double threshold) {
-    return search(query).decreaseCutoff(threshold);
-  }
-
-  /**
-   * Start search with a new object and threshold.
-   *
-   * @param query Query object
-   * @param threshold Distance threshold
-   * @return {@code this}, for chaining
-   */
-  default DistancePrioritySearcher<O> search(DBIDRef query, double threshold) {
+  default PrioritySearcher<O> search(O query, double threshold) {
     return search(query).decreaseCutoff(threshold);
   }
 
@@ -72,21 +61,13 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
    * @param query Query object
    * @return {@code this}, for chaining
    */
-  DistancePrioritySearcher<O> search(DBIDRef query);
-
-  /**
-   * Start search with a new object.
-   *
-   * @param query Query object
-   * @return {@code this}, for chaining
-   */
-  DistancePrioritySearcher<O> search(O query);
+  PrioritySearcher<O> search(O query);
 
   @Override
-  default KNNList getKNNForDBID(DBIDRef id, int k) {
+  default KNNList getKNN(O obj, int k) {
     KNNHeap heap = DBIDUtil.newHeap(k);
     double threshold = Double.POSITIVE_INFINITY;
-    for(DistancePrioritySearcher<O> iter = search(id); iter.valid(); iter.advance()) {
+    for(PrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
       if(!(iter.getLowerBound() > threshold)) {
         double dist = iter.computeExactDistance();
         if(dist <= threshold) {
@@ -98,36 +79,8 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
   }
 
   @Override
-  default KNNList getKNNForObject(O obj, int k) {
-    KNNHeap heap = DBIDUtil.newHeap(k);
-    double threshold = Double.POSITIVE_INFINITY;
-    for(DistancePrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
-      if(!(iter.getLowerBound() > threshold)) {
-        double dist = iter.computeExactDistance();
-        if(dist <= threshold) {
-          iter.decreaseCutoff(threshold = heap.insert(dist, iter));
-        }
-      }
-    }
-    return heap.toKNNList();
-  }
-
-  @Override
-  default ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    for(DistancePrioritySearcher<O> iter = search(id, range); iter.valid(); iter.advance()) {
-      if(!(iter.getLowerBound() > range)) {
-        final double dist = iter.computeExactDistance();
-        if(dist <= range) {
-          result.add(dist, iter);
-        }
-      }
-    }
-    return result;
-  }
-
-  @Override
-  default ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    for(DistancePrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
+  default ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+    for(PrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
       if(!(iter.getLowerBound() > range)) {
         final double dist = iter.computeExactDistance();
         if(dist <= range) {
@@ -147,14 +100,7 @@ public interface DistancePrioritySearcher<O> extends KNNQuery<O>, RangeQuery<O>,
    * @param threshold Threshold parameter
    * @return this, for chaining
    */
-  DistancePrioritySearcher<O> decreaseCutoff(double threshold);
-
-  /**
-   * Get the current object.
-   *
-   * @return Object
-   */
-  O getCandidate();
+  PrioritySearcher<O> decreaseCutoff(double threshold);
 
   /**
    * Compute the <em>exact</em> distance to the current candidate.

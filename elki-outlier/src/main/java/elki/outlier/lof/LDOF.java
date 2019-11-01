@@ -26,13 +26,10 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -71,7 +68,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -129,7 +126,7 @@ public class LDOF<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
-    KNNQuery<O> knnQuery = qb.kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnQuery = qb.kNNByDBID(kplus);
     DistanceQuery<O> distFunc = qb.distanceQuery();
 
     // track the maximum value for normalization
@@ -145,7 +142,7 @@ public class LDOF<O> implements OutlierAlgorithm {
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList neighbors = knnQuery.getKNNForDBID(iditer, kplus);
+      KNNList neighbors = knnQuery.getKNN(iditer, kplus);
       dxp.reset();
       Dxp.reset();
       DoubleDBIDListIter neighbor1 = neighbors.iter(),

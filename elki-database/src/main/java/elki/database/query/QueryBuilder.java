@@ -23,14 +23,16 @@ package elki.database.query;
 import java.util.Objects;
 
 import elki.data.NumberVector;
-import elki.database.query.distance.*;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.knn.LinearScanDistanceKNNQuery;
-import elki.database.query.knn.LinearScanEuclideanDistanceKNNQuery;
-import elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
+import elki.database.ids.DBIDRef;
+import elki.database.query.distance.DistanceQuery;
+import elki.database.query.distance.LinearScanEuclideanPrioritySearcher;
+import elki.database.query.distance.LinearScanPrioritySearcher;
+import elki.database.query.distance.PrimitiveDistanceQuery;
+import elki.database.query.knn.*;
 import elki.database.query.range.*;
-import elki.database.query.rknn.LinearScanRKNNQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.rknn.LinearScanRKNNByDBID;
+import elki.database.query.rknn.LinearScanRKNNByObject;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
@@ -265,7 +267,7 @@ public class QueryBuilder<O> {
       return distQuery;
     }
     if(distance == null) {
-      throw new AbortException("Distance query requested for 'null' distance!");
+      throw new IllegalStateException("Distance query requested for 'null' distance!");
     }
     for(It<DistanceIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistanceIndex.class); it.valid(); it.advance()) {
       distQuery = it.get().getDistanceQuery(distance);
@@ -300,7 +302,7 @@ public class QueryBuilder<O> {
       return simQuery;
     }
     if(similarity == null) {
-      throw new AbortException("Similarity query requested for 'null' similarity!");
+      throw new IllegalStateException("Similarity query requested for 'null' similarity!");
     }
     for(It<SimilarityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityIndex.class); it.valid(); it.advance()) {
       simQuery = it.get().getSimilarityQuery(similarity);
@@ -327,8 +329,8 @@ public class QueryBuilder<O> {
    *
    * @return knn query
    */
-  public KNNQuery<O> kNNQuery() {
-    return kNNQuery(Integer.MAX_VALUE);
+  public KNNSearcher<O> kNNByObject() {
+    return kNNByObject(Integer.MAX_VALUE);
   }
 
   /**
@@ -338,13 +340,13 @@ public class QueryBuilder<O> {
    * @return knn query
    */
   @SuppressWarnings("unchecked")
-  public KNNQuery<O> kNNQuery(int maxk) {
+  public KNNSearcher<O> kNNByObject(int maxk) {
     int precompute = flags & FLAG_PRECOMPUTE;
     flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
     flags ^= precompute; // Restore
     for(It<KNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
-      KNNQuery<O> q = it.get().getKNNQuery(distanceQuery, maxk, flags);
+      KNNSearcher<O> q = it.get().kNNByObject(distanceQuery, maxk, flags);
       logUsing(it.get(), "kNN", q != null);
       if(q != null) {
         return q;
@@ -352,7 +354,7 @@ public class QueryBuilder<O> {
     }
     // Use optimizer
     if((flags & FLAGS_NO_OPTIMIZER) == 0) {
-      KNNQuery<O> q = OPTIMIZER.getKNNQuery(relation, distanceQuery, maxk, flags);
+      KNNSearcher<O> q = OPTIMIZER.kNNByObject(relation, distanceQuery, maxk, flags);
       if(q != null) {
         return q;
       }
@@ -366,11 +368,62 @@ public class QueryBuilder<O> {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
       if(EuclideanDistance.STATIC.equals(pdq.getDistance())) {
         final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
-        return (KNNQuery<O>) new LinearScanEuclideanDistanceKNNQuery<>(ndq);
+        return (KNNSearcher<O>) new LinearScanEuclideanKNNByObject<>(ndq);
       }
-      return new LinearScanPrimitiveDistanceKNNQuery<>(pdq);
+      return new LinearScanPrimitiveKNNByObject<>(pdq);
     }
-    return new LinearScanDistanceKNNQuery<>(distanceQuery);
+    return new LinearScanKNNByObject<>(distanceQuery);
+  }
+
+  /**
+   * Build a k-nearest-neighbors query; if possible also give a maximum k.
+   *
+   * @return knn query
+   */
+  public KNNSearcher<DBIDRef> kNNByDBID() {
+    return kNNByDBID(Integer.MAX_VALUE);
+  }
+
+  /**
+   * Build a k-nearest-neighbors query.
+   * 
+   * @param maxk Maximum k that will be used later.
+   * @return knn query
+   */
+  @SuppressWarnings("unchecked")
+  public KNNSearcher<DBIDRef> kNNByDBID(int maxk) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
+    for(It<KNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
+      KNNSearcher<DBIDRef> q = it.get().kNNByDBID(distanceQuery, maxk, flags);
+      logUsing(it.get(), "kNN", q != null);
+      if(q != null) {
+        return q;
+      }
+    }
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      KNNSearcher<DBIDRef> q = OPTIMIZER.kNNByDBID(relation, distanceQuery, maxk, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("knn");
+    // Slight optimizations of linear scans for primitive functions
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
+      if(EuclideanDistance.STATIC.equals(pdq.getDistance())) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
+        return WrappedKNNDBIDByLookup.wrap(ndq.getRelation(), new LinearScanEuclideanKNNByObject<>(ndq));
+      }
+      return WrappedKNNDBIDByLookup.wrap(pdq.getRelation(), new LinearScanPrimitiveKNNByObject<>(pdq));
+    }
+    return new LinearScanKNNByDBID<>(distanceQuery);
   }
 
   /**
@@ -378,8 +431,8 @@ public class QueryBuilder<O> {
    *
    * @return range query
    */
-  public RangeQuery<O> rangeQuery() {
-    return rangeQuery(Double.POSITIVE_INFINITY);
+  public RangeSearcher<O> rangeByObject() {
+    return rangeByObject(Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -389,13 +442,13 @@ public class QueryBuilder<O> {
    * @return range query
    */
   @SuppressWarnings("unchecked")
-  public RangeQuery<O> rangeQuery(double maxrange) {
+  public RangeSearcher<O> rangeByObject(double maxrange) {
     int precompute = flags & FLAG_PRECOMPUTE;
     flags ^= precompute; // Mask
     DistanceQuery<O> distanceQuery = distanceQuery();
     flags ^= precompute; // Restore
     for(It<RangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
-      RangeQuery<O> q = it.get().getRangeQuery(distanceQuery, maxrange, flags);
+      RangeSearcher<O> q = it.get().rangeByObject(distanceQuery, maxrange, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
       }
@@ -406,7 +459,7 @@ public class QueryBuilder<O> {
 
     // Use optimizer
     if((flags & FLAGS_NO_OPTIMIZER) == 0) {
-      RangeQuery<O> q = OPTIMIZER.getRangeQuery(relation, distanceQuery, maxrange, flags);
+      RangeSearcher<O> q = OPTIMIZER.rangeByObject(relation, distanceQuery, maxrange, flags);
       if(q != null) {
         return q;
       }
@@ -420,37 +473,36 @@ public class QueryBuilder<O> {
       final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
       if(EuclideanDistance.STATIC.equals(distance)) {
         final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
-        return (RangeQuery<O>) new LinearScanEuclideanDistanceRangeQuery<>(ndq);
+        return (RangeSearcher<O>) new LinearScanEuclideanRangeByObject<>(ndq);
       }
-      return new LinearScanPrimitiveDistanceRangeQuery<>(pdq);
+      return new LinearScanPrimitiveDistanceRangeByObject<>(pdq);
     }
-    return new LinearScanDistanceRangeQuery<>(distanceQuery);
+    return new LinearScanDistanceRangeByObject<>(distanceQuery);
   }
 
   /**
-   * Build a similarity range query; if possible also specify the least
-   * selective
-   * threshold.
+   * Build a range query; if possible also give a maximum query radius.
    *
-   * @return Similarity range query
+   * @return range query
    */
-  public RangeQuery<O> similarityRangeQuery() {
-    return this.similarityRangeQuery(Double.NEGATIVE_INFINITY);
+  public RangeSearcher<DBIDRef> rangeByDBID() {
+    return rangeByDBID(Double.POSITIVE_INFINITY);
   }
 
   /**
-   * Build a similarity range query.
+   * Build a range query with maximum radius.
    *
-   * @param threshold smallest similarity that will be queried later
-   * @return Similarity range query
+   * @param maxrange Maximum radius that will be used.
+   * @return range query
    */
-  public RangeQuery<O> similarityRangeQuery(double threshold) {
+  @SuppressWarnings("unchecked")
+  public RangeSearcher<DBIDRef> rangeByDBID(double maxrange) {
     int precompute = flags & FLAG_PRECOMPUTE;
     flags ^= precompute; // Mask
-    SimilarityQuery<O> simQuery = similarityQuery();
+    DistanceQuery<O> distanceQuery = distanceQuery();
     flags ^= precompute; // Restore
-    for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
-      RangeQuery<O> q = it.get().getSimilarityRangeQuery(simQuery, threshold, flags);
+    for(It<RangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
+      RangeSearcher<DBIDRef> q = it.get().rangeByDBID(distanceQuery, maxrange, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
       }
@@ -461,7 +513,62 @@ public class QueryBuilder<O> {
 
     // Use optimizer
     if((flags & FLAGS_NO_OPTIMIZER) == 0) {
-      RangeQuery<O> q = OPTIMIZER.getSimilarityRangeQuery(relation, simQuery, threshold, flags);
+      RangeSearcher<DBIDRef> q = OPTIMIZER.rangeByDBID(relation, distanceQuery, maxrange, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("range");
+    // Slight optimizations of linear scans
+    if(distanceQuery instanceof PrimitiveDistanceQuery) {
+      final PrimitiveDistanceQuery<O> pdq = (PrimitiveDistanceQuery<O>) distanceQuery;
+      if(EuclideanDistance.STATIC.equals(distance)) {
+        final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) pdq;
+        return WrappedRangeDBIDByLookup.wrap(ndq.getRelation(), new LinearScanEuclideanRangeByObject<>(ndq));
+      }
+      return WrappedRangeDBIDByLookup.wrap(pdq.getRelation(), new LinearScanPrimitiveDistanceRangeByObject<>(pdq));
+    }
+    return new LinearScanDistanceRangeByDBID<>(distanceQuery);
+  }
+
+  /**
+   * Build a similarity range query; if possible also specify the least
+   * selective
+   * threshold.
+   *
+   * @return Similarity range query
+   */
+  public RangeSearcher<O> similarityRangeByObject() {
+    return this.similarityRangeByObject(Double.NEGATIVE_INFINITY);
+  }
+
+  /**
+   * Build a similarity range query.
+   *
+   * @param threshold smallest similarity that will be queried later
+   * @return Similarity range query
+   */
+  public RangeSearcher<O> similarityRangeByObject(double threshold) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    SimilarityQuery<O> simQuery = similarityQuery();
+    flags ^= precompute; // Restore
+    for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
+      RangeSearcher<O> q = it.get().similarityRangeByObject(simQuery, threshold, flags);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RangeSearcher<O> q = OPTIMIZER.similarityRangeByObject(relation, simQuery, threshold, flags);
       if(q != null) {
         return q;
       }
@@ -472,77 +579,34 @@ public class QueryBuilder<O> {
     logNotAccelerated("simrange");
     // Slight optimizations of linear scans
     return simQuery instanceof PrimitiveSimilarityQuery ? //
-        new LinearScanPrimitiveSimilarityRangeQuery<>((PrimitiveSimilarityQuery<O>) simQuery) : //
-        new LinearScanSimilarityRangeQuery<>(simQuery);
+        new LinearScanPrimitiveSimilarityRangeByObject<>((PrimitiveSimilarityQuery<O>) simQuery) : //
+        new LinearScanSimilarityRangeByObject<>(simQuery);
   }
 
   /**
-   * Build a reverse k-nearest neighbors query.
+   * Build a similarity range query; if possible also specify the least
+   * selective
+   * threshold.
    *
-   * @return rkNN query
+   * @return Similarity range query
    */
-  public RKNNQuery<O> rKNNQuery() {
-    return rKNNQuery(Integer.MAX_VALUE);
+  public RangeSearcher<DBIDRef> similarityRangeByDBID() {
+    return this.similarityRangeByDBID(Double.NEGATIVE_INFINITY);
   }
 
   /**
-   * Build a reverse k-nearest neighbors query.
+   * Build a similarity range query.
    *
-   * @param k k to be used; many indexes cannot support arbitrary k.
-   * @return rkNN query
+   * @param threshold smallest similarity that will be queried later
+   * @return Similarity range query
    */
-  public RKNNQuery<O> rKNNQuery(int k) {
+  public RangeSearcher<DBIDRef> similarityRangeByDBID(double threshold) {
     int precompute = flags & FLAG_PRECOMPUTE;
     flags ^= precompute; // Mask
-    DistanceQuery<O> distanceQuery = distanceQuery();
+    SimilarityQuery<O> simQuery = similarityQuery();
     flags ^= precompute; // Restore
-    for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
-      RKNNQuery<O> q = it.get().getRKNNQuery(distanceQuery, k, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
-      }
-      if(q != null) {
-        return q;
-      }
-    }
-
-    // Use optimizer
-    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
-      RKNNQuery<O> q = OPTIMIZER.getRKNNQuery(relation, distanceQuery, k, flags);
-      if(q != null) {
-        return q;
-      }
-    }
-    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
-      return null;
-    }
-    logNotAccelerated("rknn");
-    return new LinearScanRKNNQuery<>(distanceQuery, kNNQuery(), k); // Default
-  }
-
-  /**
-   * Build a priority searcher.
-   *
-   * @return priority searcher
-   */
-  public DistancePrioritySearcher<O> prioritySearcher() {
-    return prioritySearcher(Double.POSITIVE_INFINITY);
-  }
-
-  /**
-   * Build a priority searcher.
-   *
-   * @param maxrange maximum cut-off
-   * @return priority searcher
-   */
-  @SuppressWarnings("unchecked")
-  public DistancePrioritySearcher<O> prioritySearcher(double maxrange) {
-    int precompute = flags & FLAG_PRECOMPUTE;
-    flags ^= precompute; // Mask
-    DistanceQuery<O> distanceQuery = distanceQuery();
-    flags ^= precompute; // Restore
-    for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
-      DistancePrioritySearcher<O> q = it.get().getPrioritySearcher(distanceQuery, maxrange, flags);
+    for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
+      RangeSearcher<DBIDRef> q = it.get().similarityRangeByDBID(simQuery, threshold, flags);
       if(LOG.isDebuggingFinest()) {
         LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
       }
@@ -553,7 +617,143 @@ public class QueryBuilder<O> {
 
     // Use optimizer
     if((flags & FLAGS_NO_OPTIMIZER) == 0) {
-      DistancePrioritySearcher<O> q = OPTIMIZER.getPrioritySearcher(relation, distanceQuery, maxrange, flags);
+      RangeSearcher<DBIDRef> q = OPTIMIZER.similarityRangeByDBID(relation, simQuery, threshold, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("simrange");
+    // Slight optimizations of linear scans
+    return simQuery instanceof PrimitiveSimilarityQuery ? //
+        WrappedRangeDBIDByLookup.wrap(simQuery.getRelation(), new LinearScanPrimitiveSimilarityRangeByObject<>((PrimitiveSimilarityQuery<O>) simQuery)) : //
+        new LinearScanSimilarityRangeByDBID<>(simQuery);
+  }
+
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @return rkNN query
+   */
+  public RKNNSearcher<O> rKNNByObject() {
+    return rKNNByObject(Integer.MAX_VALUE);
+  }
+
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @param k k to be used; many indexes cannot support arbitrary k.
+   * @return rkNN query
+   */
+  public RKNNSearcher<O> rKNNByObject(int k) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
+    for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
+      RKNNSearcher<O> q = it.get().rkNNByObject(distanceQuery, k, flags);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RKNNSearcher<O> q = OPTIMIZER.rkNNByObject(relation, distanceQuery, k, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("rknn");
+    return new LinearScanRKNNByObject<>(distanceQuery, kNNByDBID(), k); // Default
+  }
+
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @return rkNN query
+   */
+  public RKNNSearcher<DBIDRef> rKNNByDBID() {
+    return rKNNByDBID(Integer.MAX_VALUE);
+  }
+
+  /**
+   * Build a reverse k-nearest neighbors query.
+   *
+   * @param k k to be used; many indexes cannot support arbitrary k.
+   * @return rkNN query
+   */
+  public RKNNSearcher<DBIDRef> rKNNByDBID(int k) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
+    for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
+      RKNNSearcher<DBIDRef> q = it.get().rkNNByDBID(distanceQuery, k, flags);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      RKNNSearcher<DBIDRef> q = OPTIMIZER.rkNNByDBID(relation, distanceQuery, k, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("rknn");
+    return new LinearScanRKNNByDBID<>(distanceQuery, kNNByDBID(), k); // Default
+  }
+
+  /**
+   * Build a priority searcher.
+   *
+   * @return priority searcher
+   */
+  public PrioritySearcher<O> priorityByObject() {
+    return priorityByObject(Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Build a priority searcher.
+   *
+   * @param maxrange maximum cut-off
+   * @return priority searcher
+   */
+  @SuppressWarnings("unchecked")
+  public PrioritySearcher<O> priorityByObject(double maxrange) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
+    for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
+      PrioritySearcher<O> q = it.get().priorityByObject(distanceQuery, maxrange, flags);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      PrioritySearcher<O> q = OPTIMIZER.priorityByObject(relation, distanceQuery, maxrange, flags);
       if(q != null) {
         return q;
       }
@@ -562,11 +762,60 @@ public class QueryBuilder<O> {
       return null;
     }
     logNotAccelerated("priority");
-    if(EuclideanDistance.STATIC.equals(distance)) {
-      final PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) distanceQuery;
-      return (DistancePrioritySearcher<O>) new LinearScanEuclideanDistancePrioritySearcher<>(ndq);
+    if(distanceQuery instanceof PrimitiveDistanceQuery && EuclideanDistance.STATIC.equals(distance)) {
+      PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) distanceQuery;
+      return (PrioritySearcher<O>) new LinearScanEuclideanPrioritySearcher.ByObject<>(ndq);
     }
-    return new LinearScanDistancePrioritySearcher<>(distanceQuery);
+    return new LinearScanPrioritySearcher.ByObject<>(distanceQuery);
+  }
+
+  /**
+   * Build a priority searcher.
+   *
+   * @return priority searcher
+   */
+  public PrioritySearcher<DBIDRef> priorityByDBID() {
+    return priorityByDBID(Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Build a priority searcher.
+   *
+   * @param maxrange maximum cut-off
+   * @return priority searcher
+   */
+  @SuppressWarnings("unchecked")
+  public PrioritySearcher<DBIDRef> priorityByDBID(double maxrange) {
+    int precompute = flags & FLAG_PRECOMPUTE;
+    flags ^= precompute; // Mask
+    DistanceQuery<O> distanceQuery = distanceQuery();
+    flags ^= precompute; // Restore
+    for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
+      PrioritySearcher<DBIDRef> q = it.get().priorityByDBID(distanceQuery, maxrange, flags);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
+      }
+      if(q != null) {
+        return q;
+      }
+    }
+
+    // Use optimizer
+    if((flags & FLAGS_NO_OPTIMIZER) == 0) {
+      PrioritySearcher<DBIDRef> q = OPTIMIZER.priorityByDBID(relation, distanceQuery, maxrange, flags);
+      if(q != null) {
+        return q;
+      }
+    }
+    if((flags & FLAG_OPTIMIZED_ONLY) != 0) {
+      return null;
+    }
+    logNotAccelerated("priority");
+    if(distanceQuery instanceof PrimitiveDistanceQuery && EuclideanDistance.STATIC.equals(distance)) {
+      PrimitiveDistanceQuery<NumberVector> ndq = (PrimitiveDistanceQuery<NumberVector>) distanceQuery;
+      return (PrioritySearcher<DBIDRef>) new LinearScanEuclideanPrioritySearcher.ByDBID<>(ndq);
+    }
+    return new LinearScanPrioritySearcher.ByDBID<>(distanceQuery);
   }
 
   /**

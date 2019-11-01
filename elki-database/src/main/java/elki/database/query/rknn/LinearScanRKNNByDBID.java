@@ -18,59 +18,58 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query.range;
+package elki.database.query.rknn;
 
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.query.knn.KNNSearcher;
 
 /**
- * Default linear scan range query class.
+ * Default linear scan RKNN query class.
  *
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @has - - - DistanceQuery
+ * @has - - - KNNSearcher
  *
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanDistanceRangeQuery<O> implements RangeQuery<O>, LinearScanQuery {
+public class LinearScanRKNNByDBID<O> implements RKNNSearcher<DBIDRef>, LinearScanQuery {
   /**
-   * Distance to use.
+   * Hold the distance function to be used.
    */
   private DistanceQuery<O> distanceQuery;
 
   /**
-   * Constructor.
-   *
-   * @param distanceQuery Distance function to use
+   * KNN query we use.
    */
-  public LinearScanDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
+  private KNNSearcher<DBIDRef> knnQuery;
+
+  /**
+   * Constructor.
+   * 
+   * @param distanceQuery Distance function to use
+   * @param knnQuery kNN query to use.
+   * @param maxk k to use
+   */
+  public LinearScanRKNNByDBID(DistanceQuery<O> distanceQuery, KNNSearcher<DBIDRef> knnQuery, Integer maxk) {
     super();
     this.distanceQuery = distanceQuery;
+    this.knnQuery = knnQuery;
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    final DistanceQuery<O> dq = distanceQuery;
-    for(DBIDIter iter = dq.getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
-      final double currentDistance = dq.distance(id, iter);
-      if(currentDistance <= range) {
-        result.add(currentDistance, iter);
+  public DoubleDBIDList getRKNN(DBIDRef id, int k) {
+    ModifiableDoubleDBIDList rNNList = DBIDUtil.newDistanceDBIDList();
+    for(DBIDIter iter = distanceQuery.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+      KNNList knn = knnQuery.getKNN(iter, k);
+      for(DoubleDBIDListIter n = knn.iter(); n.valid(); n.advance()) {
+        if(DBIDUtil.equal(n, id)) {
+          rNNList.add(n.doubleValue(), iter);
+        }
       }
     }
-    return result;
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    final DistanceQuery<O> dq = distanceQuery;
-    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
-      final double currentDistance = dq.distance(obj, iter);
-      if(currentDistance <= range) {
-        result.add(currentDistance, iter);
-      }
-    }
-    return result;
+    return rNNList.sort();
   }
 }

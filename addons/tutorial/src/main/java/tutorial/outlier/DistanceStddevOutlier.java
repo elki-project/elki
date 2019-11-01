@@ -26,12 +26,9 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -95,7 +92,7 @@ public class DistanceStddevOutlier<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     // Get a nearest neighbor query on the relation.
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).kNNQuery(k);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(k);
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     // Track minimum and maximum scores
@@ -103,7 +100,7 @@ public class DistanceStddevOutlier<O> implements OutlierAlgorithm {
 
     // Iterate over all objects
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      KNNList neighbors = knnq.getKNN(iter, k);
       // Aggregate distances
       MeanVariance mv = new MeanVariance();
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

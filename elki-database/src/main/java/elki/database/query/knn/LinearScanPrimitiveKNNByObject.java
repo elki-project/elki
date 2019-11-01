@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query.range;
+package elki.database.query.knn;
 
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
@@ -27,19 +27,20 @@ import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
 
 /**
- * Default linear scan range query class.
+ * Instance of this query for a particular database.
  * <p>
- * Subtle optimization: for primitive distances, retrieve the query object only
- * once from the relation.
+ * This is a subtle optimization: for primitive queries, it is clearly faster to
+ * retrieve the query object from the relation only once!
  * 
  * @author Erich Schubert
  * @since 0.4.0
  * 
  * @assoc - - - PrimitiveDistanceQuery
+ * @assoc - - - PrimitiveDistance
  * 
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O> implements RangeQuery<O>, LinearScanQuery {
+public class LinearScanPrimitiveKNNByObject<O> implements KNNSearcher<O>, LinearScanQuery {
   /**
    * Unboxed distance function.
    */
@@ -48,34 +49,29 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> implements RangeQuery<O>, 
   /**
    * Relation to query.
    */
-  private Relation<? extends O> relation;
+  protected Relation<? extends O> relation;
 
   /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O> distanceQuery) {
+  public LinearScanPrimitiveKNNByObject(PrimitiveDistanceQuery<O> distanceQuery) {
     super();
-    this.relation = distanceQuery.getRelation();
     rawdist = distanceQuery.getDistance();
+    relation = distanceQuery.getRelation();
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForObject(relation.get(id), range, result);
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    final Relation<? extends O> relation = this.relation;
+  public KNNList getKNN(O obj, int k) {
     final PrimitiveDistance<? super O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = this.relation;
+    KNNHeap heap = DBIDUtil.newHeap(k);
+    double max = Double.POSITIVE_INFINITY;
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      final double distance = rawdist.distance(obj, relation.get(iter));
-      if(distance <= range) {
-        result.add(distance, iter);
-      }
+      final double dist = rawdist.distance(obj, relation.get(iter));
+      max = dist <= max ? heap.insert(dist, iter) : max;
     }
-    return result;
+    return heap.toKNNList();
   }
 }

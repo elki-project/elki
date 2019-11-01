@@ -28,8 +28,8 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
@@ -221,7 +221,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<V> kNNByObject(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof SubspaceLPNormDistance ? //
         new PartialVAFileKNNQuery(distanceQuery, ((SubspaceLPNormDistance) df).getP(), //
@@ -233,7 +233,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<V> rangeByObject(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof SubspaceLPNormDistance ? //
         new PartialVAFileRangeQuery(distanceQuery, ((SubspaceLPNormDistance) df).getP(), //
@@ -429,7 +429,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeQuery<V> {
+  public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements RangeSearcher<V> {
     /**
      * Lp-Norm p.
      */
@@ -454,12 +454,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(V query, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(V query, double range, ModifiableDoubleDBIDList result) {
       stats.incrementIssuedQueries();
       long t = System.nanoTime();
 
@@ -533,7 +528,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNQuery<V> {
+  public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractRefiningQuery implements KNNSearcher<V> {
     /**
      * Lp-Norm p.
      */
@@ -558,12 +553,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(V query, int k) {
+    public KNNList getKNN(V query, int k) {
       stats.incrementIssuedQueries();
       long t = System.nanoTime();
 

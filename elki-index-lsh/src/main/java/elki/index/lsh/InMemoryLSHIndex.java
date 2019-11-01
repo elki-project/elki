@@ -26,8 +26,8 @@ import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.index.AbstractRefiningIndex;
 import elki.index.IndexFactory;
@@ -208,14 +208,14 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     }
 
     @Override
-    public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
+    public KNNSearcher<V> kNNByObject(DistanceQuery<V> distanceQuery, int maxk, int flags) {
       return (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0 && // approximate
           family.isCompatible(distanceQuery.getDistance()) ? // compatible
               new LSHKNNQuery(distanceQuery) : null;
     }
 
     @Override
-    public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
+    public RangeSearcher<V> rangeByObject(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
       return (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0 && // approximate
           !family.isCompatible(distanceQuery.getDistance()) ? // compatible
               new LSHRangeQuery(distanceQuery) : null;
@@ -254,7 +254,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      */
-    protected class LSHKNNQuery extends AbstractRefiningQuery implements KNNQuery<V> {
+    protected class LSHKNNQuery extends AbstractRefiningQuery implements KNNSearcher<V> {
       /**
        * Constructor.
        *
@@ -265,12 +265,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
       }
 
       @Override
-      public KNNList getKNNForDBID(DBIDRef id, int k) {
-        return getKNNForObject(relation.get(id), k);
-      }
-
-      @Override
-      public KNNList getKNNForObject(V obj, int k) {
+      public KNNList getKNN(V obj, int k) {
         DBIDs candidates = getCandidates(obj);
         // Refine.
         KNNHeap heap = DBIDUtil.newHeap(k);
@@ -288,7 +283,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @author Erich Schubert
      */
-    protected class LSHRangeQuery extends AbstractRefiningQuery implements RangeQuery<V> {
+    protected class LSHRangeQuery extends AbstractRefiningQuery implements RangeSearcher<V> {
       /**
        * Constructor.
        *
@@ -299,12 +294,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
       }
 
       @Override
-      public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-        return getRangeForObject(relation.get(id), range, result);
-      }
-
-      @Override
-      public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+      public ModifiableDoubleDBIDList getRange(V obj, double range, ModifiableDoubleDBIDList result) {
         DBIDs candidates = getCandidates(obj);
         // Refine.
         for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {

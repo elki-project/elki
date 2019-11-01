@@ -28,7 +28,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -96,10 +96,10 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
 
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
-      KNNQuery<?> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k);
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k);
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBIDs.class);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
+        KNNList neighbors = knnQuery.getKNN(iditer, k);
         ArrayModifiableDBIDs neighbours = DBIDUtil.newArray(neighbors.size());
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           neighbours.add(neighbor);

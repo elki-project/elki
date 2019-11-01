@@ -168,8 +168,8 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
       ids = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, RandomFactory.DEFAULT);
     }
     else {
-      ids = new QueryBuilder<>(relation, distance).cheapOnly().kNNQuery(sampleSize) //
-          .getKNNForObject(centroidDV, sampleSize);
+      ids = new QueryBuilder<>(relation, distance).cheapOnly().kNNByObject(sampleSize) //
+          .getKNN(centroidDV, sampleSize);
     }
     return generateModel(relation, ids, centroid.getArrayRef());
   }

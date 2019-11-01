@@ -22,7 +22,7 @@ package elki.index.distancematrix;
 
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
 import elki.index.AbstractIndex;
@@ -180,8 +180,13 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
   }
 
   @Override
-  public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, double maxradius, int flags) {
+  public RangeSearcher<DBIDRef> similarityRangeByDBID(SimilarityQuery<O> simQuery, double maxradius, int flags) {
     return this.similarityFunction.equals(simQuery.getSimilarity()) ? new PrecomputedSimilarityRangeQuery() : null;
+  }
+
+  @Override
+  public RangeSearcher<O> similarityRangeByObject(SimilarityQuery<O> simQuery, double maxrange, int flags) {
+    return null; // Not supported
   }
 
   /**
@@ -227,9 +232,9 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
    *
    * @author Erich Schubert
    */
-  private class PrecomputedSimilarityRangeQuery implements RangeQuery<O> {
+  private class PrecomputedSimilarityRangeQuery implements RangeSearcher<DBIDRef> {
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
       result.add(0., id);
       DBIDArrayIter it = ids.iter();
 
@@ -254,11 +259,6 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
         pos += y;
       }
       return result;
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-      throw new AbortException("Preprocessor KNN query only supports ID queries.");
     }
   }
 

@@ -21,11 +21,10 @@
 package elki.index.tree.spatial.rstarvariants.query;
 
 import elki.data.spatial.SpatialComparable;
-import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.KNNHeap;
 import elki.database.ids.KNNList;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
@@ -55,7 +54,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "4th Symp. Advances in Spatial Databases (SSD'95)", //
     url = "https://doi.org/10.1007/3-540-60159-7_6", //
     bibkey = "DBLP:conf/ssd/HjaltasonS95")
-public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<O> {
+public class RStarTreeKNNSearcher<O extends SpatialComparable> implements KNNSearcher<O> {
   /**
    * The index to use
    */
@@ -78,7 +77,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
    * @param relation Data relation to query
    * @param distance Distance function
    */
-  public RStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
+  public RStarTreeKNNSearcher(AbstractRStarTree<?, ?, ?> tree, Relation<? extends O> relation, SpatialPrimitiveDistance<? super O> distance) {
     super();
     this.relation = relation;
     this.tree = tree;
@@ -86,12 +85,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
+  public KNNList getKNN(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one neighbor has to be requested!");
     }

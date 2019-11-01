@@ -24,8 +24,8 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -56,10 +56,10 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   public static final ALIDEstimator STATIC = new ALIDEstimator();
 
   @Override
-  public double estimate(KNNQuery<?> knnq, DBIDRef cur, int k) {
+  public double estimate(KNNSearcher<DBIDRef> knnq, DBIDRef cur, int k) {
     int a = 0;
     double sum = 0;
-    final KNNList kl = knnq.getKNNForDBID(cur, k);
+    final KNNList kl = knnq.getKNN(cur, k);
     final double w = kl.getKNNDistance();
     final double halfw = 0.5 * w;
     for(DoubleDBIDListIter it = kl.iter(); it.valid(); it.advance()) {
@@ -71,7 +71,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
       ++a;
       final double nw = w - v;
       final double halfnw = 0.5 * nw;
-      for(DoubleDBIDListIter it2 = knnq.getKNNForDBID(it, k).iter(); it2.valid() && it2.doubleValue() <= nw; it2.advance()) {
+      for(DoubleDBIDListIter it2 = knnq.getKNN(it, k).iter(); it2.valid() && it2.doubleValue() <= nw; it2.advance()) {
         if(it2.doubleValue() <= 0. || DBIDUtil.equal(it, it2)) {
           continue;
         }
@@ -84,11 +84,11 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   }
 
   @Override
-  public double estimate(RangeQuery<?> rnq, DBIDRef cur, double range) {
+  public double estimate(RangeSearcher<DBIDRef> rnq, DBIDRef cur, double range) {
     int a = 0;
     double sum = 0;
     final double halfw = 0.5 * range;
-    for(DoubleDBIDListIter it = rnq.getRangeForDBID(cur, range).iter(); it.valid(); it.advance()) {
+    for(DoubleDBIDListIter it = rnq.getRange(cur, range).iter(); it.valid(); it.advance()) {
       if(it.doubleValue() == 0. || DBIDUtil.equal(cur, it)) {
         continue;
       }
@@ -97,7 +97,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
       ++a;
       final double nw = range - v;
       final double halfnw = 0.5 * nw;
-      for(DoubleDBIDListIter it2 = rnq.getRangeForDBID(it, nw).iter(); it.valid(); it.advance()) {
+      for(DoubleDBIDListIter it2 = rnq.getRange(it, nw).iter(); it.valid(); it.advance()) {
         if(it2.doubleValue() <= 0. || DBIDUtil.equal(it, it2)) {
           continue;
         }

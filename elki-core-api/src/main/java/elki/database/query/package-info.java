@@ -29,16 +29,16 @@
  * {@link elki.database.query.similarity.SimilarityQuery
  * SimilarityQuery}</li>
  * <li>kNN (k-nearest-neighbors) queries:
- * {@link elki.database.query.knn.KNNQuery KNNQuery}</li>
+ * {@link elki.database.query.knn.KNNSearcher KNNSearcher}</li>
  * <li>&epsilon;-range queries:
- * {@link elki.database.query.range.RangeQuery RangeQuery}</li>
+ * {@link elki.database.query.range.RangeSearcher RangeSearcher}</li>
  * <li>rkNN (reverse k-nearest-neighbors) queries:
- * {@link elki.database.query.rknn.RKNNQuery RKNNQuery}</li>
+ * {@link elki.database.query.rknn.RKNNSearcher RKNNSearcher}</li>
  * </ul>
  * with a quite similar API. In addition, there are the more complicated
  * distance priority searchers:
- * {@link elki.database.query.distance.DistancePrioritySearcher
- * DistancePrioritySearcher} that allow incremental search.
+ * {@link elki.database.query.PrioritySearcher
+ * PrioritySearcher} that allow incremental search.
  * 
  * <h2>Obtaining query objects</h2>
  * The general process of obtaining a query is to retrieve it using the QueryBuilder:
@@ -75,7 +75,7 @@
  * 
  * <pre>
  * // Get a kNN query with maxk = 10
- * KNNQuery&lt;V, DoubleDistance&gt; knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, 10);
+ * KNNSearcher&lt;V, DoubleDistance&gt; knnQuery = relation.getKNNQuery(EuclideanDistance.STATIC, 10);
  * // run a 10NN query for each point, discarding the results
  * for(DBID id : database) {
  *   knnQuery.getKNNForDBID(id, 10);
@@ -84,9 +84,9 @@
  *
  * @opt include .*elki.database.query.distance.DistanceQuery
  * @opt include .*elki.database.query.similarity.SimilarityQuery
- * @opt include .*elki.database.query.knn.KNNQuery
- * @opt include .*elki.database.query.rknn.RKNNQuery
- * @opt include .*elki.database.query.range.RangeQuery
+ * @opt include .*elki.database.query.knn.KNNSearcher
+ * @opt include .*elki.database.query.rknn.RKNNSearcher
+ * @opt include .*elki.database.query.range.RangeSearcher
  */
 /*
  * This file is part of ELKI:

@@ -23,7 +23,6 @@ package elki.database.lucene;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
@@ -35,7 +34,7 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -44,7 +43,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class LuceneDistanceRangeQuery implements RangeQuery<Document> {
+public class LuceneDistanceRangeSearcher implements RangeSearcher<DBIDRef> {
   /**
    * Lucene search function.
    */
@@ -66,7 +65,7 @@ public class LuceneDistanceRangeQuery implements RangeQuery<Document> {
    * @param ir Index reader
    * @param ids ID range
    */
-  public LuceneDistanceRangeQuery(IndexReader ir, DBIDRange ids) {
+  public LuceneDistanceRangeSearcher(IndexReader ir, DBIDRange ids) {
     super();
     this.ids = ids;
     this.mlt = new MoreLikeThis(ir);
@@ -75,12 +74,7 @@ public class LuceneDistanceRangeQuery implements RangeQuery<Document> {
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForObject(Document obj, double range, ModifiableDoubleDBIDList result) {
-    throw new UnsupportedOperationException("More-like-this only works on IDs right now.");
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRange(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
     try {
       is.search(mlt.like(ids.getOffset(id)), new DocumentsCollector(ids, result, range));
       return result;

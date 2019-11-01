@@ -36,7 +36,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.index.IndexFactory;
@@ -47,7 +47,6 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.Mean;
 import elki.math.spacefillingcurves.SpatialSorter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -339,7 +338,12 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return null; // FIXME: can we add this?
+  }
+
+  @Override
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
         new SpaceFillingKNNQuery(distanceQuery);
   }
@@ -349,7 +353,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
    *
    * @author Erich Schubert
    */
-  protected class SpaceFillingKNNQuery implements KNNQuery<O> {
+  protected class SpaceFillingKNNQuery implements KNNSearcher<DBIDRef> {
     /**
      * Distance query to use for refinement
      */
@@ -366,7 +370,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
+    public KNNList getKNN(DBIDRef id, int k) {
       final int wsize = (int) Math.ceil(window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(2 * wsize * curves.size());
@@ -389,11 +393,6 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
       }
       mean.put(distc / (double) k);
       return heap.toKNNList();
-    }
-
-    @Override
-    public KNNList getKNNForObject(O obj, int k) {
-      throw new AbortException("Not yet implemented");
     }
   }
 

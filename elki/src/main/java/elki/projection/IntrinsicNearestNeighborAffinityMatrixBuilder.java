@@ -23,7 +23,7 @@ package elki.projection;
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
@@ -101,7 +101,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
     final int numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
-    KNNQuery<T> knnq = new QueryBuilder<>(relation, distance).kNNQuery(numberOfNeighbours + 1);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
     }
@@ -130,7 +130,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param indices Output of indexes
    * @param initialScale Initial scaling factor
    */
-  protected void computePij(DBIDRange ids, KNNQuery<?> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
+  protected void computePij(DBIDRange ids, KNNSearcher<DBIDRef> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
     Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
     final double logPerp = FastMath.log(perplexity);
     // Scratch arrays, resizable
@@ -143,7 +143,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     for(DBIDArrayIter ix = ids.iter(); ix.valid(); ix.advance()) {
       dists.clear();
       inds.clear();
-      KNNList neighbours = knnq.getKNNForDBID(ix, numberOfNeighbours + 1);
+      KNNList neighbours = knnq.getKNN(ix, numberOfNeighbours + 1);
       convertNeighbors(ids, ix, square, neighbours, dists, inds, mid);
       double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
           pij[ix.getOffset()] = new double[dists.size()]);

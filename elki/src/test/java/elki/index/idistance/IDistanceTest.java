@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import elki.clustering.kmeans.initialization.FarthestPoints;
 import elki.data.NumberVector;
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
@@ -42,7 +44,7 @@ public class IDistanceTest extends AbstractIndexStructureTest {
         .with(InMemoryIDistanceIndex.Factory.Par.DISTANCE_ID, EuclideanDistance.class) //
         .with(InMemoryIDistanceIndex.Factory.Par.REFERENCE_ID, FarthestPoints.class) //
         .build();
-    assertExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
-    assertSinglePoint(factory, InMemoryIDistanceIndex.IDistanceKNNQuery.class, InMemoryIDistanceIndex.IDistanceRangeQuery.class);
+    assertExactEuclidean(factory, InMemoryIDistanceIndex.IDistanceKNNSearcher.class, InMemoryIDistanceIndex.IDistanceRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

@@ -30,11 +30,11 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.*;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.ArrayAdapterDatabaseConnection;
@@ -144,7 +144,7 @@ public abstract class AbstractIndexStructureTest {
    * @param refd Reference distances
    * @param refc Reference vectors
    */
-  private static void verifyNeighbors(Relation<DoubleVector> rel, DistanceQuery<? super DoubleVector> dist, DoubleDBIDList results, double[] refd, double[][] refc) {
+  private static void assertNeighbors(Relation<DoubleVector> rel, DistanceQuery<? super DoubleVector> dist, DoubleDBIDList results, double[] refd, double[][] refc) {
     assertEquals("Result size does not match expectation!", results.size(), refd.length);
     for(DoubleDBIDListIter res = results.iter(); res.valid(); res.advance()) {
       int o = res.getOffset();
@@ -162,7 +162,7 @@ public abstract class AbstractIndexStructureTest {
    * @param refd Reference distances
    * @param refid Reference ids
    */
-  private static void verifyNeighbors(DoubleDBIDList results, double[] refd, int[] refid) {
+  private static void assertNeighbors(DoubleDBIDList results, double[] refd, int[] refid) {
     assertEquals("Result size does not match expectation!", results.size(), refd.length);
     int shift = DBIDUtil.asInteger(results.iter()) - refid[0];
     for(DoubleDBIDListIter res = results.iter(); res.valid(); res.advance()) {
@@ -170,6 +170,20 @@ public abstract class AbstractIndexStructureTest {
       assertEquals("Expected distance at offset " + o + " doesn't match.", refd[o], res.doubleValue(), 1e-12);
       assertEquals("Expected id at offset " + o + " doesn't match.", refid[o], DBIDUtil.asInteger(res) - shift);
     }
+  }
+
+  /**
+   * Check the class of a query.
+   *
+   * @param expect Expected class
+   * @param obj observed instance
+   * @param obj2 observed other instance
+   */
+  private static void assertClass(Class<?> expect, Object obj, Object obj2) {
+    assertTrue("Expected " + expect + //
+        " got: " + (obj != null ? obj.getClass().getName() : "null") + //
+        " and " + (obj2 != null ? obj2.getClass().getName() : "null"), //
+        expect == null || expect.isInstance(obj) || expect.isInstance(obj2));
   }
 
   /**
@@ -195,31 +209,33 @@ public abstract class AbstractIndexStructureTest {
     // Use a fixed DBID - historically, we used 1 indexed - to reduce random
     // variation in results due to different hash codes everywhere.
     ListParameterization inputparams = new ListParameterization() //
-        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(0));
     if(factory != null) {
       inputparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
     }
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    final QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
     DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectKNNQuery != null) {
-      KNNQuery<DoubleVector> knnq = qb.kNNQuery(k);
-      assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
+      KNNSearcher<DoubleVector> knnq = qb.kNNByObject(k);
+      KNNSearcher<DBIDRef> knnq2 = qb.kNNByDBID(k);
+      assertClass(expectKNNQuery, knnq, knnq2);
       if(!dbidonly) {
-        verifyNeighbors(relation, dist, knnq.getKNNForObject(DoubleVector.wrap(querypoint), k), shouldd, shouldc);
+        assertNeighbors(relation, dist, knnq.getKNN(DoubleVector.wrap(querypoint), k), shouldd, shouldc);
       }
-      verifyNeighbors(knnq.getKNNForDBID(second, k), shouldd2, shouldc2);
+      assertNeighbors(knnq2.getKNN(second, k), shouldd2, shouldc2);
     }
     if(expectRangeQuery != null) {
-      RangeQuery<DoubleVector> rangeq = qb.rangeQuery(eps);
-      assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
+      RangeSearcher<DoubleVector> rangeq = qb.rangeByObject(eps);
+      RangeSearcher<DBIDRef> rangeq2 = qb.rangeByDBID(eps2);
+      assertClass(expectRangeQuery, rangeq, rangeq2);
       if(!dbidonly) {
-        verifyNeighbors(relation, dist, rangeq.getRangeForObject(DoubleVector.wrap(querypoint), eps), shouldd, shouldc);
+        assertNeighbors(relation, dist, rangeq.getRange(DoubleVector.wrap(querypoint), eps), shouldd, shouldc);
       }
-      verifyNeighbors(rangeq.getRangeForDBID(second, eps2), shouldd2, shouldc2);
+      assertNeighbors(rangeq2.getRange(second, eps2), shouldd2, shouldc2);
     }
   }
 
@@ -257,20 +273,22 @@ public abstract class AbstractIndexStructureTest {
     DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectKNNQuery != null) {
-      KNNQuery<DoubleVector> knnq = qb.cheapOnly().kNNQuery(k);
-      assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
+      KNNSearcher<DoubleVector> knnq = qb.cheapOnly().kNNByObject(k);
+      KNNSearcher<DBIDRef> knnq2 = qb.cheapOnly().kNNByDBID(k);
+      assertClass(expectKNNQuery, knnq, knnq2);
       if(!dbidonly) {
-        verifyNeighbors(relation, dist, knnq.getKNNForObject(DoubleVector.wrap(querypoint), k), cosshouldd, cosshouldc);
+        assertNeighbors(relation, dist, knnq.getKNN(DoubleVector.wrap(querypoint), k), cosshouldd, cosshouldc);
       }
-      verifyNeighbors(knnq.getKNNForDBID(second, k), cosshouldd2, cosshouldc2);
+      assertNeighbors(knnq2.getKNN(second, k), cosshouldd2, cosshouldc2);
     }
     if(expectRangeQuery != null) {
-      RangeQuery<DoubleVector> rangeq = qb.cheapOnly().rangeQuery(coseps);
-      assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
+      RangeSearcher<DoubleVector> rangeq = qb.cheapOnly().rangeByObject(coseps);
+      RangeSearcher<DBIDRef> rangeq2 = qb.cheapOnly().rangeByDBID(coseps);
+      assertClass(expectRangeQuery, rangeq, rangeq2);
       if(!dbidonly) {
-        verifyNeighbors(relation, dist, rangeq.getRangeForObject(DoubleVector.wrap(querypoint), coseps), cosshouldd, cosshouldc);
+        assertNeighbors(relation, dist, rangeq.getRange(DoubleVector.wrap(querypoint), coseps), cosshouldd, cosshouldc);
       }
-      verifyNeighbors(rangeq.getRangeForDBID(second, coseps2), cosshouldd2, cosshouldc2);
+      assertNeighbors(rangeq2.getRange(second, coseps2), cosshouldd2, cosshouldc2);
     }
   }
 
@@ -290,16 +308,16 @@ public abstract class AbstractIndexStructureTest {
     QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, EuclideanDistance.STATIC).cheapOnly();
     DBIDRef first = relation.iterDBIDs();
     if(expectKNNQuery != null) {
-      KNNQuery<DoubleVector> knnq = qb.kNNQuery(1);
-      assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
-      KNNList knn = knnq.getKNNForDBID(first, 1);
+      KNNSearcher<DBIDRef> knnq = qb.kNNByDBID(1);
+      assertClass(expectKNNQuery, knnq, null);
+      KNNList knn = knnq.getKNN(first, 1);
       assertEquals("Wrong number of knn results", 1, knn.size());
       assertTrue("Wrong knn result", DBIDUtil.equal(knn.iter(), first));
     }
     if(expectRangeQuery != null) {
-      RangeQuery<DoubleVector> rangeq = qb.rangeQuery(0.);
-      assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      DoubleDBIDList range = rangeq.getRangeForDBID(first, 0);
+      RangeSearcher<DBIDRef> rangeq = qb.rangeByDBID(0.);
+      assertClass(expectRangeQuery, rangeq, null);
+      DoubleDBIDList range = rangeq.getRange(first, 0);
       assertEquals("Wrong number of range results", 1, range.size());
       assertTrue("Wrong range result", DBIDUtil.equal(range.iter(), first));
     }
@@ -321,8 +339,7 @@ public abstract class AbstractIndexStructureTest {
    * Test helper
    * 
    * @param factory Index factory
-   * @param expectKNNQuery expected knn query class
-   * @param expectRangeQuery expected range query class
+   * @param expectQuery expected knn query class
    * @param dbidonly test DBID queries only
    */
   protected static void assertPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery, boolean dbidonly) {
@@ -340,9 +357,9 @@ public abstract class AbstractIndexStructureTest {
     DBIDRef second = relation.iterDBIDs().advance();
 
     if(expectQuery != null) {
-      DistancePrioritySearcher<DoubleVector> prioq = qb.prioritySearcher();
-      assertTrue("Returned priority search is not of expected class: expected " + expectQuery + " got " + prioq.getClass(), expectQuery.isAssignableFrom(prioq.getClass()));
-
+      PrioritySearcher<DoubleVector> prioq = qb.priorityByObject();
+      PrioritySearcher<DBIDRef> prioq2 = qb.priorityByDBID();
+      assertClass(expectQuery, prioq, prioq2);
       if(!dbidonly) {
         // get the 10 next neighbors
         DoubleVector dv = DoubleVector.wrap(querypoint);
@@ -361,31 +378,31 @@ public abstract class AbstractIndexStructureTest {
             assertFalse("Upper tolerance incorrect", exact > approx + atol);
           }
           ids.sort();
-          verifyNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
+          assertNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
         }
-        verifyNeighbors(relation, dist, prioq.getKNNForObject(dv, k), shouldd, shouldc);
-        verifyNeighbors(relation, dist, prioq.getRangeForObject(dv, eps), shouldd, shouldc);
+        assertNeighbors(relation, dist, prioq.getKNN(dv, k), shouldd, shouldc);
+        assertNeighbors(relation, dist, prioq.getRange(dv, eps), shouldd, shouldc);
       }
       // get the 10 next neighbors
       { // verify the knn result:
         ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
-        for(prioq.search(second); prioq.valid(); prioq.advance()) {
-          double approx = prioq.getApproximateDistance(); // May be NaN
-          double atol = prioq.getApproximateAccuracy(); // May be NaN
-          double lb = prioq.getLowerBound(); // May be NaN
-          double ub = prioq.getUpperBound(); // May be NaN
-          double exact = prioq.computeExactDistance();
-          ids.add(exact, prioq);
+        for(prioq2.search(second); prioq2.valid(); prioq2.advance()) {
+          double approx = prioq2.getApproximateDistance(); // May be NaN
+          double atol = prioq2.getApproximateAccuracy(); // May be NaN
+          double lb = prioq2.getLowerBound(); // May be NaN
+          double ub = prioq2.getUpperBound(); // May be NaN
+          double exact = prioq2.computeExactDistance();
+          ids.add(exact, prioq2);
           assertFalse("Lower bound incorrect", exact < lb);
           assertFalse("Upper bound incorrect", exact > ub);
           assertFalse("Lower tolerance incorrect", exact < approx - atol);
           assertFalse("Upper tolerance incorrect", exact > approx + atol);
         }
         ids.sort();
-        verifyNeighbors(ids.slice(0, k), shouldd2, shouldc2);
+        assertNeighbors(ids.slice(0, k), shouldd2, shouldc2);
       }
-      verifyNeighbors(prioq.getKNNForDBID(second, k), shouldd2, shouldc2);
-      verifyNeighbors(prioq.getRangeForDBID(second, eps2), shouldd2, shouldc2);
+      assertNeighbors(prioq2.getKNN(second, k), shouldd2, shouldc2);
+      assertNeighbors(prioq2.getRange(second, eps2), shouldd2, shouldc2);
     }
   }
 }

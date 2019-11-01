@@ -22,57 +22,41 @@ package elki.database.query.knn;
 
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
-import elki.database.query.distance.PrimitiveDistanceQuery;
-import elki.database.relation.Relation;
-import elki.distance.PrimitiveDistance;
+import elki.database.query.distance.DistanceQuery;
 
 /**
  * Instance of this query for a particular database.
- * <p>
- * This is a subtle optimization: for primitive queries, it is clearly faster to
- * retrieve the query object from the relation only once!
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
+ *
+ * @has - - - DistanceQuery
  * 
- * @assoc - - - PrimitiveDistanceQuery
- * @assoc - - - PrimitiveDistance
+ * @param <O> relation object type
  */
-public class LinearScanPrimitiveDistanceKNNQuery<O> implements KNNQuery<O>, LinearScanQuery {
+public class LinearScanKNNByDBID<O> implements KNNSearcher<DBIDRef>, LinearScanQuery {
   /**
-   * Unboxed distance function.
+   * Hold the distance function to be used.
    */
-  private PrimitiveDistance<? super O> rawdist;
-
-  /**
-   * Relation to query.
-   */
-  protected Relation<? extends O> relation;
+  private final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceQuery Distance function to use
    */
-  public LinearScanPrimitiveDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
+  public LinearScanKNNByDBID(DistanceQuery<O> distanceQuery) {
     super();
-    rawdist = distanceQuery.getDistance();
-    relation = distanceQuery.getRelation();
+    this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
-    final PrimitiveDistance<? super O> rawdist = this.rawdist;
-    final Relation<? extends O> relation = this.relation;
+  public KNNList getKNN(DBIDRef id, int k) {
+    final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      final double dist = rawdist.distance(obj, relation.get(iter));
+    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+      final double dist = dq.distance(id, iter);
       max = dist <= max ? heap.insert(dist, iter) : max;
     }
     return heap.toKNNList();

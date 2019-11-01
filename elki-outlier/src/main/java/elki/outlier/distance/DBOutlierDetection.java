@@ -25,12 +25,13 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -61,7 +62,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -103,8 +104,8 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     DistanceQuery<O> distFunc = qb.distanceQuery();
     // Prefer kNN query if available, as this will usually stop earlier.
-    KNNQuery<O> knnQuery = qb.optimizedOnly().kNNQuery(m);
-    RangeQuery<O> rangeQuery = knnQuery == null ? qb.rangeQuery(d) : null;
+    KNNSearcher<DBIDRef> knnQuery = qb.optimizedOnly().kNNByDBID(m);
+    RangeSearcher<DBIDRef> rangeQuery = knnQuery == null ? qb.rangeByDBID(d) : null;
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
 
@@ -116,7 +117,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
         LOG.veryverbose("Using kNN query: " + knnQuery.toString());
       }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNList knns = knnQuery.getKNNForDBID(iditer, m);
+        KNNList knns = knnQuery.getKNN(iditer, m);
         scores.putDouble(iditer, (knns.getKNNDistance() > d) ? 1. : 0.);
         LOG.incrementProcessed(prog);
       }
@@ -126,7 +127,7 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
         LOG.veryverbose("Using range query: " + rangeQuery.toString());
       }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, d);
+        DoubleDBIDList neighbors = rangeQuery.getRange(iditer, d);
         scores.putDouble(iditer, (neighbors.size() < m) ? 1. : 0.);
         LOG.incrementProcessed(prog);
       }

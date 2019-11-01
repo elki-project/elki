@@ -27,12 +27,9 @@ import elki.data.model.PrototypeModel;
 import elki.data.model.SimplePrototypeModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -111,7 +108,7 @@ public class Leader<O> implements ClusteringAlgorithm<Clustering<PrototypeModel<
    * @return Clustering result
    */
   public Clustering<PrototypeModel<O>> run(Relation<O> relation) {
-    RangeQuery<O> rq = new QueryBuilder<>(relation, distance).rangeQuery(threshold);
+    RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, distance).rangeByDBID(threshold);
 
     ModifiableDBIDs seen = DBIDUtil.newHashSet(relation.size());
     Clustering<PrototypeModel<O>> clustering = new Clustering<>();
@@ -123,7 +120,7 @@ public class Leader<O> implements ClusteringAlgorithm<Clustering<PrototypeModel<
       if(seen.contains(it)) {
         continue;
       }
-      DoubleDBIDList res = rq.getRangeForDBID(it, threshold);
+      DoubleDBIDList res = rq.getRange(it, threshold);
       ++queries;
       ModifiableDBIDs ids = DBIDUtil.newArray(res.size());
       for(DBIDIter cand = res.iter(); cand.valid(); cand.advance()) {

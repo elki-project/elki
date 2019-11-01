@@ -26,10 +26,11 @@ import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -140,7 +141,7 @@ public class KNNDistancesSampler<O> implements Algorithm {
    * @return Result
    */
   public KNNDistanceOrderResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k + 1);
     final int size = (int) ((sample <= 1.) ? Math.ceil(relation.size() * sample) : sample);
     DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), size, rnd);
 
@@ -148,7 +149,7 @@ public class KNNDistancesSampler<O> implements Algorithm {
     double[] knnDistances = new double[size];
     int i = 0;
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-      knnDistances[i++] = knnQuery.getKNNForDBID(iditer, k + 1).getKNNDistance();
+      knnDistances[i++] = knnQuery.getKNN(iditer, k + 1).getKNNDistance();
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);

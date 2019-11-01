@@ -29,10 +29,11 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -157,7 +158,9 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
    */
   public Double run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    KNNQuery<NumberVector> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(k + 1);
+    final QueryBuilder<NumberVector> qb = new QueryBuilder<>(relation, distance);
+    KNNSearcher<NumberVector> knnQuery = qb.kNNByObject(k + 1);
+    KNNSearcher<DBIDRef> intQuery = qb.kNNByDBID(k + 1);
 
     final double[] min = new double[dim], extend = new double[dim];
     initializeDataExtends(relation, dim, min, extend);
@@ -172,7 +175,7 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
     // more stable result
     for(int j = 0; j < this.rep; j++) {
       // Compute NN distances for random objects from within the database
-      double w = computeNNForRealData(knnQuery, relation, dim);
+      double w = computeNNForRealData(intQuery, relation, dim);
       // Compute NN distances for randomly created new uniform objects
       double u = computeNNForUniformData(knnQuery, min, extend);
       // compute hopkins statistik
@@ -209,11 +212,11 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
    * @param relation Data relation
    * @return Aggregated 1NN distances
    */
-  protected double computeNNForRealData(final KNNQuery<NumberVector> knnQuery, Relation<NumberVector> relation, final int dim) {
+  protected double computeNNForRealData(final KNNSearcher<DBIDRef> knnQuery, Relation<NumberVector> relation, final int dim) {
     double w = 0.;
     ModifiableDBIDs dataSampleIds = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random);
     for(DBIDIter iter = dataSampleIds.iter(); iter.valid(); iter.advance()) {
-      final double kdist = knnQuery.getKNNForDBID(iter, k + 1).getKNNDistance();
+      final double kdist = knnQuery.getKNN(iter, k + 1).getKNNDistance();
       w += MathUtil.powi(kdist, dim);
     }
     return w;
@@ -227,7 +230,7 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
    * @param extend Data extend
    * @return Aggregated 1NN distances
    */
-  protected double computeNNForUniformData(final KNNQuery<NumberVector> knnQuery, final double[] min, final double[] extend) {
+  protected double computeNNForUniformData(final KNNSearcher<NumberVector> knnQuery, final double[] min, final double[] extend) {
     final Random rand = random.getSingleThreadedRandom();
     final int dim = min.length;
 
@@ -239,7 +242,7 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
       for(int d = 0; d < buf.length; d++) {
         buf[d] = min[d] + (rand.nextDouble() * extend[d]);
       }
-      double kdist = knnQuery.getKNNForObject(DoubleVector.wrap(buf), k).getKNNDistance();
+      double kdist = knnQuery.getKNN(DoubleVector.wrap(buf), k).getKNNDistance();
       u += MathUtil.powi(kdist, dim);
     }
     return u;

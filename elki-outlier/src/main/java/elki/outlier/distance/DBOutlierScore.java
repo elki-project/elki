@@ -25,8 +25,9 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -51,7 +52,7 @@ import elki.utilities.documentation.Title;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @has - - - RangeQuery
+ * @has - - - RangeSearcher
  *
  * @param <O> Database object type
  */
@@ -81,7 +82,7 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
 
   @Override
   protected DoubleDataStore computeOutlierScores(Relation<O> relation, double d) {
-    RangeQuery<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(d);
+    RangeSearcher<DBIDRef> rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID(d);
     final int size = relation.size();
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -89,7 +90,7 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
     // TODO: use bulk when implemented.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // compute percentage of neighbors in the given neighborhood with size d
-      double n = rangeQuery.getRangeForDBID(iditer, d).size() / (double) size;
+      double n = rangeQuery.getRange(iditer, d).size() / (double) size;
       scores.putDouble(iditer, 1.0 - n);
       LOG.incrementProcessed(prog);
     }

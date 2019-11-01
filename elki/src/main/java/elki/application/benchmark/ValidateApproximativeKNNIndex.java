@@ -29,7 +29,7 @@ import elki.database.DatabaseUtil;
 import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
@@ -55,7 +55,7 @@ import elki.workflow.InputStep;
  * 
  * @param <O> Object type
  * 
- * @assoc - - - KNNQuery
+ * @assoc - - - KNNSearcher
  */
 public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedApplication<O> {
   /**
@@ -122,24 +122,24 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    // Approximate query:
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().kNNQuery(k);
-    if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
-      throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
-    }
-    // Exact query:
-    KNNQuery<O> truekNNQuery = forcelinear ? new QueryBuilder<>(relation, distance).linearOnly().kNNQuery(k) //
-        : new QueryBuilder<>(relation, distance).exactOnly().kNNQuery(k);
-    if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
-      LOG.warning("Query classes are the same. This experiment may be invalid!");
-    }
-
     MeanVariance mv = new MeanVariance(), mvrec = new MeanVariance(),
         mvdist = new MeanVariance(), mvdaerr = new MeanVariance(),
         mvdrerr = new MeanVariance();
     int misses = 0;
     // No query set - use original database.
     if(queries == null || pattern != null) {
+      // Approximate query:
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().kNNByDBID(k);
+      if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
+        throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
+      }
+      // Exact query:
+      KNNSearcher<DBIDRef> truekNNQuery = forcelinear ? new QueryBuilder<>(relation, distance).linearOnly().kNNByDBID(k) //
+          : new QueryBuilder<>(relation, distance).exactOnly().kNNByDBID(k);
+      if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
+        LOG.warning("Query classes are the same. This experiment may be invalid!");
+      }
+
       // Relation to filter on
       Relation<String> lrel = (pattern != null) ? DatabaseUtil.guessLabelRepresentation(database) : null;
 
@@ -148,9 +148,9 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
       for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         if(pattern == null || pattern.matcher(lrel.get(iditer)).find()) {
           // Query index:
-          KNNList knns = knnQuery.getKNNForDBID(iditer, k);
+          KNNList knns = knnQuery.getKNN(iditer, k);
           // Query reference:
-          KNNList trueknns = truekNNQuery.getKNNForDBID(iditer, k);
+          KNNList trueknns = truekNNQuery.getKNN(iditer, k);
 
           // Put adjusted knn size:
           mv.put(knns.size() * k / (double) trueknns.size());
@@ -177,6 +177,18 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
       LOG.ensureCompleted(prog);
     }
     else {
+      // Approximate query:
+      KNNSearcher<O> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().kNNByObject(k);
+      if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
+        throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
+      }
+      // Exact query:
+      KNNSearcher<O> truekNNQuery = forcelinear ? new QueryBuilder<>(relation, distance).linearOnly().kNNByObject(k) //
+          : new QueryBuilder<>(relation, distance).exactOnly().kNNByObject(k);
+      if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
+        LOG.warning("Query classes are the same. This experiment may be invalid!");
+      }
+
       // Separate query set.
       TypeInformation res = distance.getInputTypeRestriction();
       MultipleObjectsBundle bundle = queries.loadData();
@@ -202,9 +214,9 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
         O o = (O) bundle.data(off, col);
 
         // Query index:
-        KNNList knns = knnQuery.getKNNForObject(o, k);
+        KNNList knns = knnQuery.getKNN(o, k);
         // Query reference:
-        KNNList trueknns = truekNNQuery.getKNNForObject(o, k);
+        KNNList trueknns = truekNNQuery.getKNN(o, k);
 
         // Put adjusted knn size:
         mv.put(knns.size() * k / (double) trueknns.size());

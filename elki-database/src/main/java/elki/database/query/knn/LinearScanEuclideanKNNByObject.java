@@ -41,25 +41,22 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
  * @assoc - - - PrimitiveDistanceQuery
  * @assoc - - - EuclideanDistance
  * @assoc - - - SquaredEuclideanDistance
+ * 
+ * @param <O> relation object type
  */
-public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> {
+public class LinearScanEuclideanKNNByObject<O extends NumberVector> extends LinearScanPrimitiveKNNByObject<O> {
   /**
    * Constructor.
    *
    * @param distanceQuery Distance function to use
    */
-  public LinearScanEuclideanDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
+  public LinearScanEuclideanKNNByObject(PrimitiveDistanceQuery<O> distanceQuery) {
     super(distanceQuery);
     assert (EuclideanDistance.STATIC.equals(distanceQuery.getDistance()));
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
+  public KNNList getKNN(O obj, int k) {
     final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
     final Relation<? extends O> relation = this.relation;
     final KNNHeap heap = DBIDUtil.newHeap(k);

@@ -33,7 +33,7 @@ import elki.data.type.VectorFieldTypeInformation;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
@@ -701,9 +701,9 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
       final int dim = RelationUtil.dimensionality(relation);
-      ArrayList<RangeQuery<V>> rangeQueries = new ArrayList<>(dim);
+      ArrayList<RangeSearcher<DBIDRef>> rangeQueries = new ArrayList<>(dim);
       for(int d = 0; d < dim; d++) {
-        rangeQueries.add(new QueryBuilder<>(relation, new OnedimensionalDistance(d)).rangeQuery(epsilon));
+        rangeQueries.add(new QueryBuilder<>(relation, new OnedimensionalDistance(d)).rangeByDBID(epsilon));
       }
 
       StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
@@ -718,7 +718,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
         // determine neighbors in each dimension
         ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
         for(int d = 0; d < dim; d++) {
-          allNeighbors[d] = DBIDUtil.newHashSet(rangeQueries.get(d).getRangeForDBID(it, epsilon));
+          allNeighbors[d] = DBIDUtil.newHashSet(rangeQueries.get(d).getRange(it, epsilon));
         }
 
         if(msg != null) {

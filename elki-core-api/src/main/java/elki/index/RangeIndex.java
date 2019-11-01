@@ -20,8 +20,10 @@
  */
 package elki.index;
 
+import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
+import elki.database.query.range.RangeSearcher;
 
 /**
  * Index with support for range queries (<i>radius</i> queries).
@@ -30,7 +32,7 @@ import elki.database.query.range.RangeQuery;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @navhas - provides - RangeQuery
+ * @navhas - provides - RangeSearcher
  *
  * @param <O> Database Object type
  */
@@ -45,5 +47,19 @@ public interface RangeIndex<O> extends Index {
    * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxrange, int flags);
+  RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags);
+
+  /**
+   * Get a range query object for the given distance query and k.
+   * <p>
+   * This function MAY return null, when the given distance is not supported!
+   *
+   * @param distanceQuery Distance query
+   * @param maxrange Maximum range
+   * @param flags Hints for the optimizer
+   * @return KNN Query object or {@code null}
+   */
+  default RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return WrappedRangeDBIDByLookup.wrap(distanceQuery.getRelation(), rangeByObject(distanceQuery, maxrange, flags));
+  }
 }

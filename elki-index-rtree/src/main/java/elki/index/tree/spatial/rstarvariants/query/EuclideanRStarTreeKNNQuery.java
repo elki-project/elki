@@ -54,7 +54,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "4th Symp. Advances in Spatial Databases (SSD'95)", //
     url = "https://doi.org/10.1007/3-540-60159-7_6", //
     bibkey = "DBLP:conf/ssd/HjaltasonS95")
-public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNQuery<O> {
+public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNSearcher<O> {
   /**
    * Squared Euclidean distance function.
    */
@@ -71,7 +71,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
   }
 
   @Override
-  public KNNList getKNNForObject(O obj, int k) {
+  public KNNList getKNN(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one neighbor has to be requested!");
     }

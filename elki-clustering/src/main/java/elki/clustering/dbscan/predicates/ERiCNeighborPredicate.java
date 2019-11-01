@@ -34,7 +34,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
@@ -110,13 +110,13 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
    * @return Instance
    */
   public Instance instantiate(Relation<V> relation) {
-    KNNQuery<V> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(settings.k);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(settings.k);
     WritableDataStore<PCAFilteredResult> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DoubleDBIDList ref = knnq.getKNNForDBID(iditer, settings.k);
+      DoubleDBIDList ref = knnq.getKNN(iditer, settings.k);
       PCAResult pcares = settings.pca.processQueryResult(ref, relation);
       storage.put(iditer, new PCAFilteredResult(pcares.getEigenPairs(), settings.filter.filter(pcares.getEigenvalues()), 1., 0.));
       LOG.incrementProcessed(progress);

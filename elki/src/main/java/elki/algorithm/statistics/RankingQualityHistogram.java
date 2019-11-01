@@ -31,9 +31,10 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -111,7 +112,7 @@ public class RankingQualityHistogram<O> implements Algorithm {
    * @return Histogram of ranking qualities
    */
   public HistogramResult run(Database database, Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(relation.size());
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(relation.size());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
@@ -131,7 +132,7 @@ public class RankingQualityHistogram<O> implements Algorithm {
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        KNNList knn = knnQuery.getKNNForDBID(iter, relation.size());
+        KNNList knn = knnQuery.getKNN(iter, relation.size());
         double result = EvaluateClustering.evaluateRanking(roc, clus, knn);
 
         mv.put(result);

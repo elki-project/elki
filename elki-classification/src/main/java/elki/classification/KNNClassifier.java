@@ -31,7 +31,7 @@ import elki.database.Database;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -69,7 +69,7 @@ public class KNNClassifier<O> implements Classifier<O> {
   /**
    * kNN query class.
    */
-  protected KNNQuery<O> knnq;
+  protected KNNSearcher<O> knnq;
 
   /**
    * Class label representation.
@@ -101,14 +101,14 @@ public class KNNClassifier<O> implements Classifier<O> {
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labels) {
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    this.knnq = new QueryBuilder<>(relation, distance).kNNQuery(k);
+    this.knnq = new QueryBuilder<>(relation, distance).kNNByObject(k);
     this.labelrep = labels;
   }
 
   @Override
   public ClassLabel classify(O instance) {
     Object2IntOpenHashMap<ClassLabel> count = new Object2IntOpenHashMap<>();
-    KNNList query = knnq.getKNNForObject(instance, k);
+    KNNList query = knnq.getKNN(instance, k);
     for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
       count.addTo(labelrep.get(neighbor), 1);
     }
@@ -128,7 +128,7 @@ public class KNNClassifier<O> implements Classifier<O> {
   public double[] classProbabilities(O instance, ArrayList<ClassLabel> labels) {
     int[] occurences = new int[labels.size()];
 
-    KNNList query = knnq.getKNNForObject(instance, k);
+    KNNList query = knnq.getKNN(instance, k);
     for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
       int index = Collections.binarySearch(labels, labelrep.get(neighbor));
       if(index >= 0) {

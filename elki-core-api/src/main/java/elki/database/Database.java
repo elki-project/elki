@@ -40,9 +40,9 @@ import elki.datasource.bundle.SingleObjectBundle;
  *
  * @opt nodefillcolor LemonChiffon
  * @navhas - provides - DistanceQuery
- * @navhas - provides - KNNQuery
- * @navhas - provides - RangeQuery
- * @navhas - provides - RKNNQuery
+ * @navhas - provides - KNNSearcher
+ * @navhas - provides - RangeSearcher
+ * @navhas - provides - RKNNSearcher
  * @navhas - contains - Relation
  * @navhas - invokes - DataStoreListener
  */

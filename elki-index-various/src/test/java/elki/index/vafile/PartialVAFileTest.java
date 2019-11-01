@@ -22,24 +22,23 @@ package elki.index.vafile;
 
 import org.junit.Test;
 
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for the partial VAfile index.
+ * Unit test for the {@link PartialVAFile} index.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
 public class PartialVAFileTest extends AbstractIndexStructureTest {
-  /**
-   * Test {@link PartialVAFile} using a file based database connection.
-   */
   @Test
   public void testPartialVAFile() {
     PartialVAFile.Factory<?> factory = new ELKIBuilder<>(PartialVAFile.Factory.class) //
         .with(PartialVAFile.Factory.PARTITIONS_ID, 4).build();
     assertExactEuclidean(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
-    assertSinglePoint(factory, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

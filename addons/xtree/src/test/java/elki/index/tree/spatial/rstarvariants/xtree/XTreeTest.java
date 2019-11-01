@@ -23,8 +23,8 @@ package elki.index.tree.spatial.rstarvariants.xtree;
 import org.junit.Test;
 
 import elki.index.AbstractIndexStructureTest;
-import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
-import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
+import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNSearcher;
+import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeSearcher;
 import elki.persistent.AbstractPageFileFactory;
 import elki.utilities.ELKIBuilder;
 
@@ -46,6 +46,6 @@ public class XTreeTest extends AbstractIndexStructureTest {
   public void testXTree() {
     XTreeFactory<?> factory = new ELKIBuilder<>(XTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300).build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
   }
 }

@@ -27,8 +27,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -74,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -126,7 +127,7 @@ public class KNNOutlier<O> implements OutlierAlgorithm {
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
     DoubleMinMax minmax = new DoubleMinMax();
@@ -135,7 +136,7 @@ public class KNNOutlier<O> implements OutlierAlgorithm {
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       // distance to the kth nearest neighbor
       // (assuming the query point is always included, with distance 0)
-      final double dkn = knnQuery.getKNNForDBID(it, kplus).getKNNDistance();
+      final double dkn = knnQuery.getKNN(it, kplus).getKNNDistance();
       knno_score.putDouble(it, dkn);
       minmax.put(dkn);
       LOG.incrementProcessed(prog);

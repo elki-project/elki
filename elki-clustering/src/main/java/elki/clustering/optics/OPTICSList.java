@@ -35,7 +35,7 @@ import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -142,7 +142,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
     /**
      * Range query.
      */
-    RangeQuery<O> rangeQuery;
+    RangeSearcher<DBIDRef> rangeQuery;
 
     /**
      * Constructor for a single data set.
@@ -158,7 +158,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       clusterOrder = new ClusterOrder(ids);
       Metadata.of(clusterOrder).setLongName("OPTICS Clusterorder");
       progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", ids.size(), LOG) : null;
-      rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery(epsilon);
+      rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID(epsilon);
     }
 
     /**
@@ -198,7 +198,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
         clusterOrder.add(cur, reachability.doubleValue(cur), predecessor.assignVar(cur, prev));
         LOG.incrementProcessed(progress);
 
-        rangeQuery.getRangeForDBID(cur, epsilon, neighbors.clear());
+        rangeQuery.getRange(cur, epsilon, neighbors.clear());
         if(neighbors.size() >= minpts) {
           neighbors.sort(); // A quick select would be enough, but its cheap.
           final double coreDistance = neighbor.seek(minpts - 1).doubleValue();

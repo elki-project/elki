@@ -29,12 +29,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -92,7 +89,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  * @has - - - KernelDensityFunction
  *
  * @param <O> Object type
@@ -187,7 +184,7 @@ public class KDEOS<O> implements OutlierAlgorithm {
   public OutlierResult run(Relation<O> rel) {
     final DBIDs ids = rel.getDBIDs();
     LOG.verbose("Running kNN preprocessor.");
-    KNNQuery<O> knnq = new QueryBuilder<>(rel, distance).precomputed().kNNQuery(kmax + 1);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(rel, distance).precomputed().kNNByDBID(kmax + 1);
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);
@@ -211,7 +208,7 @@ public class KDEOS<O> implements OutlierAlgorithm {
    * @param ids IDs to process
    * @param densities Density storage
    */
-  protected void estimateDensities(Relation<O> rel, KNNQuery<O> knnq, final DBIDs ids, WritableDataStore<double[]> densities) {
+  protected void estimateDensities(Relation<O> rel, KNNSearcher<DBIDRef> knnq, final DBIDs ids, WritableDataStore<double[]> densities) {
     final int dim = dimensionality(rel);
     final int knum = kmax + 1 - kmin;
     // Initialize storage:
@@ -222,7 +219,7 @@ public class KDEOS<O> implements OutlierAlgorithm {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing densities", ids.size(), LOG) : null;
     double iminbw = (minBandwidth > 0.) ? 1. / (minBandwidth * scale) : Double.POSITIVE_INFINITY;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
+      KNNList neighbors = knnq.getKNN(iter, kmax + 1);
       int k = 1, idx = 0;
       double sum = 0.;
       for(DoubleDBIDListIter kneighbor = neighbors.iter(); k <= kmax && kneighbor.valid(); kneighbor.advance(), k++) {
@@ -283,7 +280,7 @@ public class KDEOS<O> implements OutlierAlgorithm {
    * @param kdeos Score outputs
    * @param minmax Minimum and maximum scores
    */
-  protected void computeOutlierScores(KNNQuery<O> knnq, final DBIDs ids, WritableDataStore<double[]> densities, WritableDoubleDataStore kdeos, DoubleMinMax minmax) {
+  protected void computeOutlierScores(KNNSearcher<DBIDRef> knnq, final DBIDs ids, WritableDataStore<double[]> densities, WritableDoubleDataStore kdeos, DoubleMinMax minmax) {
     final int knum = kmax + 1 - kmin;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing KDEOS scores", ids.size(), LOG) : null;
 
@@ -292,7 +289,7 @@ public class KDEOS<O> implements OutlierAlgorithm {
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double[] dens = densities.get(iter);
-      KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
+      KNNList neighbors = knnq.getKNN(iter, kmax + 1);
       if(scratch[0].length < neighbors.size()) {
         // Resize scratch. Add some extra margin again.
         scratch = new double[knum][neighbors.size() + 5];

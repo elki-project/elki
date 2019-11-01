@@ -29,10 +29,11 @@ import elki.data.type.AlternativeTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -121,7 +122,7 @@ public class AveragePrecisionAtK<O> implements Algorithm {
    */
   public CollectionResult<double[]> run(Relation<O> relation, Relation<?> lrelation) {
     final int qk = k + (includeSelf ? 0 : 1);
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(qk);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(qk);
     final DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
 
     MeanVarianceMinMax[] mvs = MeanVarianceMinMax.newArray(k);
@@ -130,7 +131,7 @@ public class AveragePrecisionAtK<O> implements Algorithm {
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       Object label = lrelation.get(iter);
       int positive = 0, i = 0;
-      for(DBIDIter ri = knnQuery.getKNNForDBID(iter, qk).iter(); i < k && ri.valid(); ri.advance()) {
+      for(DBIDIter ri = knnQuery.getKNN(iter, qk).iter(); i < k && ri.valid(); ri.advance()) {
         if(!includeSelf && DBIDUtil.equal(iter, ri)) {
           // Do not increment i.
           continue;

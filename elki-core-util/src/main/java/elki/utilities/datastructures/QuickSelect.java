@@ -229,6 +229,7 @@ public class QuickSelect {
      * @param end End of sorted interval
      */
     default void isSorted(T data, int begin, int end) {
+      // nothing to do by default
     };
   }
 

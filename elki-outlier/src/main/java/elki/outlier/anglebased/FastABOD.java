@@ -29,7 +29,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -136,11 +136,11 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
   private boolean kNNABOD(Relation<V> relation, DBIDs ids, WritableDoubleDataStore abodvalues, DoubleMinMax minmaxabod) {
     int k1 = k + 1; // We will get the query point back by the knnq.
     DistanceQuery<V> dq = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC).distanceQuery();
-    KNNQuery<V> knnq = new QueryBuilder<>(dq).optimizedOnly().kNNQuery(k1);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(dq).optimizedOnly().kNNByDBID(k1);
     boolean squared = true;
     if(knnq == null) {
       dq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
-      if((knnq = new QueryBuilder<>(dq).optimizedOnly().kNNQuery(k1)) == null) {
+      if((knnq = new QueryBuilder<>(dq).optimizedOnly().kNNByDBID(k1)) == null) {
         return false;
       }
       squared = false;
@@ -149,7 +149,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
 
     MeanVariance s = new MeanVariance();
     for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
-      KNNList nl = knnq.getKNNForDBID(pA, k1);
+      KNNList nl = knnq.getKNN(pA, k1);
       double simAA = lk.similarity(pA, pA);
 
       s.reset();

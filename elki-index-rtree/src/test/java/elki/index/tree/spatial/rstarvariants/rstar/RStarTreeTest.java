@@ -23,11 +23,13 @@ package elki.index.tree.spatial.rstarvariants.rstar;
 import org.junit.Test;
 
 import elki.data.NumberVector;
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.index.AbstractIndexStructureTest;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.query.EuclideanRStarTreeDistancePrioritySearcher;
-import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNQuery;
-import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeQuery;
+import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNSearcher;
+import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeSearcher;
 import elki.index.tree.spatial.rstarvariants.strategies.bulk.*;
 import elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
 import elki.index.tree.spatial.rstarvariants.strategies.split.AngTanLinearSplit;
@@ -56,10 +58,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -74,10 +76,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractRStarTreeFactory.Par.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class) //
         .with(ApproximativeLeastOverlapInsertionStrategy.Par.INSERTION_CANDIDATES_ID, 1) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -89,10 +91,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -104,10 +106,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -119,10 +121,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, GreeneSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -134,10 +136,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -149,10 +151,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -164,10 +166,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -179,10 +181,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -196,10 +198,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
         .with(SpatialSortBulkSplit.Par.SORTER_ID, ZCurveSpatialSorter.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -213,10 +215,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
         .with(SpatialSortBulkSplit.Par.SORTER_ID, HilbertSpatialSorter.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -230,10 +232,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
         .with(SpatialSortBulkSplit.Par.SORTER_ID, PeanoSpatialSorter.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -247,10 +249,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
         .with(SpatialSortBulkSplit.Par.SORTER_ID, BinarySplitSpatialSorter.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -262,10 +264,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -278,10 +280,10 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 
   /**
@@ -294,9 +296,9 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
-    assertSinglePoint(factory, RStarTreeKNNQuery.class, RStarTreeRangeQuery.class);
+    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

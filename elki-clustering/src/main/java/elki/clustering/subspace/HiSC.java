@@ -32,7 +32,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.minkowski.EuclideanDistance;
@@ -173,12 +173,12 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     public CorrelationClusterOrder run() {
       final int usek = k > 0 ? k : 3 * RelationUtil.dimensionality(relation);
       preferenceVectors = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
-      KNNQuery<V> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(usek);
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(usek);
 
       Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        preferenceVectors.put(it, determinePreferenceVector(it, knnQuery.getKNNForDBID(it, usek)));
+        preferenceVectors.put(it, determinePreferenceVector(it, knnQuery.getKNN(it, usek)));
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);

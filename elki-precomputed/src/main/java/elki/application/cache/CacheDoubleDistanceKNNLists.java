@@ -31,10 +31,11 @@ import elki.application.AbstractApplication;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -112,7 +113,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   public void run() {
     database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    KNNQuery<O> knnQ = new QueryBuilder<>(relation, distance).noCache().kNNQuery(k);
+    KNNSearcher<DBIDRef> knnQ = new QueryBuilder<>(relation, distance).noCache().kNNByDBID(k);
 
     // open file.
     try (FileChannel channel = FileChannel.open(out, //
@@ -129,7 +130,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
 
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing kNN", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final KNNList nn = knnQ.getKNNForDBID(it, k);
+        final KNNList nn = knnQ.getKNN(it, k);
         final int nnsize = nn.size();
 
         // Grow the buffer when needed:

@@ -22,10 +22,10 @@ package elki.index.tree.spatial.rstarvariants.query;
 
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
-import elki.database.query.distance.DistancePrioritySearcher;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.SpatialDistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -42,10 +42,10 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * @assoc - - - AbstractRStarTree
  * @assoc - - - EuclideanRStarTreeKNNQuery
  * @assoc - - - EuclideanRStarTreeRangeQuery
- * @assoc - - - RStarTreeKNNQuery
- * @assoc - - - RStarTreeRangeQuery
- * @has - - - RangeQuery
- * @has - - - KNNQuery
+ * @assoc - - - RStarTreeKNNSearcher
+ * @assoc - - - RStarTreeRangeSearcher
+ * @has - - - RangeSearcher
+ * @has - - - KNNSearcher
  */
 public final class RStarTreeUtil {
   /**
@@ -66,13 +66,13 @@ public final class RStarTreeUtil {
    * @return Query object
    */
   @SuppressWarnings("unchecked")
-  public static <O extends SpatialComparable> RangeQuery<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
+  public static <O extends SpatialComparable> RangeSearcher<O> getRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
     if(EuclideanDistance.STATIC.equals(df)) {
-      return (RangeQuery<O>) new EuclideanRStarTreeRangeQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
+      return (RangeSearcher<O>) new EuclideanRStarTreeRangeQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
     }
-    return new RStarTreeRangeQuery<>(tree, distanceQuery.getRelation(), df);
+    return new RStarTreeRangeSearcher<>(tree, distanceQuery.getRelation(), df);
   }
 
   /**
@@ -85,13 +85,13 @@ public final class RStarTreeUtil {
    * @return Query object
    */
   @SuppressWarnings("unchecked")
-  public static <O extends SpatialComparable> KNNQuery<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
+  public static <O extends SpatialComparable> KNNSearcher<O> getKNNQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
     if(EuclideanDistance.STATIC.equals(df)) {
-      return (KNNQuery<O>) new EuclideanRStarTreeKNNQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
+      return (KNNSearcher<O>) new EuclideanRStarTreeKNNQuery<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
     }
-    return new RStarTreeKNNQuery<>(tree, distanceQuery.getRelation(), df);
+    return new RStarTreeKNNSearcher<>(tree, distanceQuery.getRelation(), df);
   }
 
   /**
@@ -104,11 +104,11 @@ public final class RStarTreeUtil {
    * @return Query object
    */
   @SuppressWarnings("unchecked")
-  public static <O extends SpatialComparable> DistancePrioritySearcher<O> getDistancePrioritySearcher(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
+  public static <O extends SpatialComparable> PrioritySearcher<O> getDistancePrioritySearcher(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O> distanceQuery, Object... hints) {
     // Can we support this distance function - spatial distances only!
     SpatialPrimitiveDistance<? super O> df = distanceQuery.getDistance();
     if(EuclideanDistance.STATIC.equals(df)) {
-      return (DistancePrioritySearcher<O>) new EuclideanRStarTreeDistancePrioritySearcher<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
+      return (PrioritySearcher<O>) new EuclideanRStarTreeDistancePrioritySearcher<>(tree, (Relation<NumberVector>) distanceQuery.getRelation());
     }
     return new RStarTreeDistancePrioritySearcher<>(tree, distanceQuery.getRelation(), df);
   }

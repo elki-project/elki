@@ -31,7 +31,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.*;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -168,7 +168,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> implements O
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
-    KNNQuery<V> knnQuery = new QueryBuilder<>(relationx, distance).kNNQuery(k + 1);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relationx, distance).kNNByDBID(k + 1);
 
     // We need stable indexed DBIDs
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relationx.getDBIDs());
@@ -206,7 +206,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> implements O
 
         // Fill the neighborhood matrix F:
         {
-          KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
+          KNNList neighbors = knnQuery.getKNN(id, k + 1);
           ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
           for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(DBIDUtil.equal(id, neighbor)) {

@@ -30,7 +30,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -112,7 +112,7 @@ public class COF<O> implements OutlierAlgorithm {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("COF", 3) : null;
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     LOG.beginStep(stepprog, 1, "Materializing COF neighborhoods.");
-    KNNQuery<O> knnq = new QueryBuilder<>(dq).precomputed().kNNQuery(k);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(dq).precomputed().kNNByDBID(k);
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 2, "Computing Average Chaining Distances.");
@@ -148,13 +148,13 @@ public class COF<O> implements OutlierAlgorithm {
    * @param ids IDs to process
    * @param acds Storage for average chaining distances
    */
-  protected void computeAverageChainingDistances(KNNQuery<O> knnq, DistanceQuery<O> dq, DBIDs ids, WritableDoubleDataStore acds) {
+  protected void computeAverageChainingDistances(KNNSearcher<DBIDRef> knnq, DistanceQuery<O> dq, DBIDs ids, WritableDoubleDataStore acds) {
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("Computing average chaining distances", ids.size(), LOG) : null;
 
     // Compute the chaining distances.
     // We do <i>not</i> bother to materialize the chaining order.
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      final KNNList neighbors = knnq.getKNN(iter, k);
       final int r = neighbors.size();
       DoubleDBIDListIter it1 = neighbors.iter(), it2 = neighbors.iter();
       // Store the current lowest reachability.
@@ -207,10 +207,10 @@ public class COF<O> implements OutlierAlgorithm {
    * @param cofs Connectivity outlier factor storage
    * @param cofminmax Score minimum/maximum tracker
    */
-  private void computeCOFScores(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore acds, WritableDoubleDataStore cofs, DoubleMinMax cofminmax) {
+  private void computeCOFScores(KNNSearcher<DBIDRef> knnq, DBIDs ids, DoubleDataStore acds, WritableDoubleDataStore cofs, DoubleMinMax cofminmax) {
     FiniteProgress progressCOFs = LOG.isVerbose() ? new FiniteProgress("COF for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
+      final KNNList neighbors = knnq.getKNN(iter, k);
       // Aggregate the average chaining distances of all neighbors:
       double sum = 0.;
       for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

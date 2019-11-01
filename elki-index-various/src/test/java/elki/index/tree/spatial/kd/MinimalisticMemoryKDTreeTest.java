@@ -22,24 +22,22 @@ package elki.index.tree.spatial.kd;
 
 import org.junit.Test;
 
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for the k-d-tree index.
+ * Unit test for the {@link MinimalisticMemoryKDTree} index.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
 public class MinimalisticMemoryKDTreeTest extends AbstractIndexStructureTest {
-  /**
-   * Test {@link MinimalisticMemoryKDTree} using a file based database
-   * connection.
-   */
   @Test
   public void testMinimalisticMemoryKDTree() {
     MinimalisticMemoryKDTree.Factory<?> factory = new ELKIBuilder<>(MinimalisticMemoryKDTree.Factory.class).build();
     assertExactEuclidean(factory, MinimalisticMemoryKDTree.KDTreeKNNQuery.class, MinimalisticMemoryKDTree.KDTreeRangeQuery.class);
-    assertSinglePoint(factory, MinimalisticMemoryKDTree.KDTreeKNNQuery.class, MinimalisticMemoryKDTree.KDTreeRangeQuery.class);
+    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

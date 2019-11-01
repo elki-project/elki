@@ -21,7 +21,8 @@
 package elki.database.query.range;
 
 import elki.data.NumberVector;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -37,9 +38,9 @@ import net.jafama.FastMath;
  * 
  * @assoc - - - SquaredEuclideanDistance
  * 
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> implements RangeQuery<O>, LinearScanQuery {
+public class LinearScanEuclideanRangeByObject<O extends NumberVector> implements RangeSearcher<O>, LinearScanQuery {
   /**
    * Relation to scan.
    */
@@ -50,18 +51,13 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> imple
    * 
    * @param distanceQuery Distance function to use
    */
-  public LinearScanEuclideanDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
+  public LinearScanEuclideanRangeByObject(DistanceQuery<O> distanceQuery) {
     super();
     this.relation = distanceQuery.getRelation();
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForObject(relation.get(id), range, result);
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
     final Relation<? extends O> relation = this.relation;
     final SquaredEuclideanDistance squared = SquaredEuclideanDistance.STATIC;
     float frange = Math.nextUp((float) range);

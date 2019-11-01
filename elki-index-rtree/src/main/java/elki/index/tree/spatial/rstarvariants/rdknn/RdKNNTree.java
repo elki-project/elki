@@ -27,13 +27,13 @@ import java.util.List;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.database.ids.*;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistancePrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialDistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.index.DistancePriorityIndex;
@@ -55,7 +55,7 @@ import elki.utilities.pairs.DoubleObjPair;
  * supporting efficient processing of reverse k nearest neighbor queries. The
  * k-nn distance is stored in each entry of a node.
  * <p>
- * TODO: noch nicht fertig!!!
+ * FIXME: currently does not have a RkNN implementation!
  *
  * @author Elke Achtert
  * @since 0.1
@@ -66,7 +66,7 @@ import elki.utilities.pairs.DoubleObjPair;
  *
  * @param <O> Object type
  */
-// FIXME: currently does not yet return RKNNQuery objects!
+// FIXME: currently does not yet return RKNNSearcher objects!
 public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNode, RdKNNEntry, RdkNNSettings> implements DistancePriorityIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
@@ -81,7 +81,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   /**
    * Internal knn query object, for updating the rKNN.
    */
-  protected KNNQuery<O> knnQuery;
+  protected KNNSearcher<DBIDRef> knnQuery;
 
   /**
    * The relation we query.
@@ -99,7 +99,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     super(pagefile, settings);
     this.relation = relation;
     this.distanceQuery = settings.distance.instantiate(relation);
-    this.knnQuery = new QueryBuilder<>(distanceQuery).kNNQuery();
+    this.knnQuery = new QueryBuilder<>(distanceQuery).kNNByDBID();
   }
 
   /**
@@ -126,7 +126,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     ids.sort(); // Sort by ID, not by distance!
     double[] kdists = new double[ids.size()];
     for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      kdists[iter.getOffset()] = knnQuery.getKNNForDBID(iter, settings.k_max).getKNNDistance();
+      kdists[iter.getOffset()] = knnQuery.getKNN(iter, settings.k_max).getKNNDistance();
     }
 
     adjustKNNDistances(getRootEntry(), ids, kdists);
@@ -148,7 +148,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     ids.sort();
     double[] kdists = new double[ids.size()];
     for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      kdists[iter.getOffset()] = knnQuery.getKNNForDBID(iter, settings.k_max).getKNNDistance();
+      kdists[iter.getOffset()] = knnQuery.getKNN(iter, settings.k_max).getKNNDistance();
     }
 
     adjustKNNDistances(getRootEntry(), ids, kdists);
@@ -156,7 +156,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     doExtraIntegrityChecks();
   }
 
-  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distance, KNNQuery<O> knnQuery) {
+  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distance) {
     checkDistance(distance);
     if(k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
@@ -173,7 +173,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     // refinement of candidates, if k < k_max
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-      for(DoubleDBIDListIter qr = knnQuery.getKNNForDBID(iter, k).iter(); qr.valid(); qr.advance()) {
+      for(DoubleDBIDListIter qr = knnQuery.getKNN(iter, k).iter(); qr.valid(); qr.advance()) {
         if(DBIDUtil.equal(oid, qr)) {
           result.add(qr.doubleValue(), iter);
           break;
@@ -295,7 +295,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq <= p.getKnnDistance()) {
-          KNNList knns_without_q = knnQuery.getKNNForObject(relation.get(p.getDBID()), settings.k_max);
+          KNNList knns_without_q = knnQuery.getKNN(p.getDBID(), settings.k_max);
           p.setKnnDistance(knns_without_q.size() + 1 < settings.k_max ? Double.NaN : //
               Math.min(knns_without_q.doubleValue(knns_without_q.size() - 1), dist_pq));
         }
@@ -508,28 +508,34 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getKNNQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxk, flags) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getRangeQuery(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public DistancePrioritySearcher<O> getPrioritySearcher(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     // Can we support this distance function - spatial distances only!
     return distanceQuery.getRelation() == relation && distanceQuery instanceof SpatialDistanceQuery ? //
         RStarTreeUtil.getDistancePrioritySearcher(this, (SpatialDistanceQuery<O>) distanceQuery, maxradius, flags) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    // FIXME: re-add
+    return null;
+  }
+
+  @Override
+  public RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     // FIXME: re-add
     return null;
   }

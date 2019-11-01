@@ -29,7 +29,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.ids.DBIDRange;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
@@ -84,7 +84,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistance.STATIC) {
       @Override
-      public KNNQuery<NumberVector> getKNNQuery(DistanceQuery<NumberVector> distanceQuery, int maxk, int flags) {
+      public KNNSearcher<NumberVector> kNNByObject(DistanceQuery<NumberVector> distanceQuery, int maxk, int flags) {
         return null; // Disable kNN queries, to force range queries to be tested.
       }
     };

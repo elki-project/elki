@@ -28,9 +28,9 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ProjectedView;
 import elki.database.relation.Relation;
@@ -47,25 +47,25 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Class to index data in an arbitrary projection only.
- * 
+ * Index data in an arbitrary projection.
+ * <p>
  * Note: be <b>careful</b> when using this class, as it may/will yield incorrect
  * distances, depending on your projection! It may be desirable to use a
  * modified index that corrects for this error, or supports specific
- * combiantions only.
- * 
+ * combinations only.
+ * <p>
  * See {@link LatLngAsECEFIndex} and {@link LngLatAsECEFIndex} for example
  * indexes that support only a specific (good) combination.
- * 
+ * <p>
  * FIXME: add refinement to bulk queries!
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
  * @composed - - - Projection
- * @has - - - ProjectedKNNQuery
- * @has - - - ProjectedRangeQuery
- * @has - - - ProjectedRKNNQuery
+ * @has - - - ProjectedKNNByObject
+ * @has - - - ProjectedRangeByObject
+ * @has - - - ProjectedRKNNByObject
  * 
  * @param <O> Outer object type.
  * @param <I> Inner object type.
@@ -165,7 +165,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     if(!(inner instanceof KNNIndex) || distanceQuery.getRelation() != relation || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
@@ -173,12 +173,25 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    KNNQuery<I> innerq = ((KNNIndex<I>) inner).getKNNQuery(innerQuery, maxk, flags);
-    return innerq != null ? new ProjectedKNNQuery(distanceQuery, innerq) : null;
+    KNNSearcher<I> innerq = ((KNNIndex<I>) inner).kNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedKNNByObject(distanceQuery, innerq) : null;
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(!(inner instanceof KNNIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
+    @SuppressWarnings("unchecked")
+    KNNSearcher<I> innerq = ((KNNIndex<I>) inner).kNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedKNNByDBID(distanceQuery, innerq) : null;
+  }
+
+  @Override
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     if(!(inner instanceof RangeIndex) || distanceQuery.getRelation() != relation || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
@@ -186,12 +199,25 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    RangeQuery<I> innerq = ((RangeIndex<I>) inner).getRangeQuery(innerQuery, maxradius, flags);
-    return innerq != null ? new ProjectedRangeQuery(distanceQuery, innerq) : null;
+    RangeSearcher<I> innerq = ((RangeIndex<I>) inner).rangeByObject(innerQuery, maxradius, flags);
+    return innerq != null ? new ProjectedRangeByObject(distanceQuery, innerq) : null;
   }
 
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    if(!(inner instanceof RangeIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
+    @SuppressWarnings("unchecked")
+    RangeSearcher<I> innerq = ((RangeIndex<I>) inner).rangeByObject(innerQuery, maxradius, flags);
+    return innerq != null ? new ProjectedRangeByDBID(distanceQuery, innerq) : null;
+  }
+
+  @Override
+  public RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     if(!(inner instanceof RKNNIndex) || distanceQuery.getRelation() != relation || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
@@ -199,22 +225,33 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     @SuppressWarnings("unchecked")
     DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
     @SuppressWarnings("unchecked")
-    RKNNQuery<I> innerq = ((RKNNIndex<I>) inner).getRKNNQuery(innerQuery, maxk, flags);
-    return innerq != null ? new ProjectedRKNNQuery(distanceQuery, innerq) : null;
+    RKNNSearcher<I> innerq = ((RKNNIndex<I>) inner).rkNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedRKNNByObject(distanceQuery, innerq) : null;
+  }
+
+  @Override
+  public RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(!(inner instanceof RKNNIndex) || distanceQuery.getRelation() != relation || //
+        (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    DistanceQuery<I> innerQuery = ((Distance<? super I>) distanceQuery.getDistance()).instantiate(view);
+    @SuppressWarnings("unchecked")
+    RKNNSearcher<I> innerq = ((RKNNIndex<I>) inner).rkNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedRKNNByDBID(distanceQuery, innerq) : null;
   }
 
   /**
    * Class to proxy kNN queries.
    * 
    * @author Erich Schubert
-   * 
-   * @param Distance type
    */
-  class ProjectedKNNQuery implements KNNQuery<O> {
+  class ProjectedKNNByObject implements KNNSearcher<O> {
     /**
      * Inner kNN query.
      */
-    KNNQuery<I> inner;
+    KNNSearcher<I> inner;
 
     /**
      * Distance query for refinement.
@@ -226,25 +263,63 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * 
      * @param inner Inner kNN query.
      */
-    public ProjectedKNNQuery(DistanceQuery<O> distanceQuery, KNNQuery<I> inner) {
+    public ProjectedKNNByObject(DistanceQuery<O> distanceQuery, KNNSearcher<I> inner) {
       super();
       this.inner = inner;
       this.distq = distanceQuery;
     }
 
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      // So we have to project the query point only once:
-      return getKNNForObject(relation.get(id), k);
+    public KNNList getKNN(O obj, int k) {
+      final I pobj = proj.project(obj);
+      if(norefine) {
+        return inner.getKNN(pobj, k);
+      }
+      KNNList ilist = inner.getKNN(pobj, (int) Math.ceil(k * kmulti));
+      KNNHeap heap = DBIDUtil.newHeap(k);
+      for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
+        heap.insert(distq.distance(obj, iter), iter);
+        countRefinement();
+      }
+      return heap.toKNNList();
+    }
+  }
+
+  /**
+   * Class to proxy kNN queries.
+   * 
+   * @author Erich Schubert
+   */
+  class ProjectedKNNByDBID implements KNNSearcher<DBIDRef> {
+    /**
+     * Inner kNN query.
+     */
+    KNNSearcher<I> inner;
+
+    /**
+     * Distance query for refinement.
+     */
+    DistanceQuery<O> distq;
+
+    /**
+     * Constructor.
+     * 
+     * @param inner Inner kNN query.
+     */
+    public ProjectedKNNByDBID(DistanceQuery<O> distanceQuery, KNNSearcher<I> inner) {
+      super();
+      this.inner = inner;
+      this.distq = distanceQuery;
     }
 
     @Override
-    public KNNList getKNNForObject(O obj, int k) {
+    public KNNList getKNN(DBIDRef id, int k) {
+      final O obj = relation.get(id);
       final I pobj = proj.project(obj);
       if(norefine) {
-        return inner.getKNNForObject(pobj, k);
+        return inner.getKNN(pobj, k);
       }
-      KNNList ilist = inner.getKNNForObject(pobj, (int) Math.ceil(k * kmulti));
+      KNNList ilist = inner.getKNN(pobj, (int) Math.ceil(k * kmulti));
       KNNHeap heap = DBIDUtil.newHeap(k);
       for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
         heap.insert(distq.distance(obj, iter), iter);
@@ -261,7 +336,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * 
    * @param Distance type
    */
-  class ProjectedRangeQuery implements RangeQuery<O> {
+  class ProjectedRangeByObject implements RangeSearcher<O> {
     /**
      * Hold the distance function to be used.
      */
@@ -270,7 +345,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     /**
      * Inner range query.
      */
-    RangeQuery<I> inner;
+    RangeSearcher<I> inner;
 
     /**
      * Constructor.
@@ -278,21 +353,67 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * @param distanceQuery Distance query to use
      * @param inner Inner range query
      */
-    public ProjectedRangeQuery(DistanceQuery<O> distanceQuery, RangeQuery<I> inner) {
+    public ProjectedRangeByObject(DistanceQuery<O> distanceQuery, RangeSearcher<I> inner) {
       super();
       this.distanceQuery = distanceQuery;
       this.inner = inner;
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
+    public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+      DoubleDBIDList ilist = inner.getRange(proj.project(obj), range);
+      if(norefine) {
+        // Copy without refinement:
+        for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
+          result.add(iter.doubleValue(), iter);
+        }
+        return result;
+      }
+      for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
+        double dist = distanceQuery.distance(obj, iter);
+        countRefinement();
+        if(range <= dist) {
+          result.add(dist, iter);
+        }
+      }
+      return result;
+    }
+  }
+
+  /**
+   * Class to proxy range queries.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param Distance type
+   */
+  class ProjectedRangeByDBID implements RangeSearcher<DBIDRef> {
+    /**
+     * Hold the distance function to be used.
+     */
+    protected final DistanceQuery<O> distanceQuery;
+
+    /**
+     * Inner range query.
+     */
+    RangeSearcher<I> inner;
+
+    /**
+     * Constructor.
+     * 
+     * @param distanceQuery Distance query to use
+     * @param inner Inner range query
+     */
+    public ProjectedRangeByDBID(DistanceQuery<O> distanceQuery, RangeSearcher<I> inner) {
+      super();
+      this.distanceQuery = distanceQuery;
+      this.inner = inner;
     }
 
     @Override
-    public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-      final I pobj = proj.project(obj);
-      DoubleDBIDList ilist = inner.getRangeForObject(pobj, range);
+    public ModifiableDoubleDBIDList getRange(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      final O obj = relation.get(id);
+      DoubleDBIDList ilist = inner.getRange(proj.project(obj), range);
       if(norefine) {
         // Copy without refinement:
         for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
@@ -318,11 +439,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * 
    * @param Distance type
    */
-  class ProjectedRKNNQuery implements RKNNQuery<O> {
+  class ProjectedRKNNByObject implements RKNNSearcher<O> {
     /**
      * Inner RkNN query.
      */
-    RKNNQuery<I> inner;
+    RKNNSearcher<I> inner;
 
     /**
      * Distance query for refinement.
@@ -334,25 +455,66 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
      * 
      * @param inner Inner RkNN query.
      */
-    public ProjectedRKNNQuery(DistanceQuery<O> distanceQuery, RKNNQuery<I> inner) {
+    public ProjectedRKNNByObject(DistanceQuery<O> distanceQuery, RKNNSearcher<I> inner) {
       super();
       this.inner = inner;
       this.distq = distanceQuery;
     }
 
     @Override
-    public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
-      // So we have to project the query point only once:
-      return getRKNNForObject(relation.get(id), k);
+    public DoubleDBIDList getRKNN(O obj, int k) {
+      final I pobj = proj.project(obj);
+      if(norefine) {
+        return inner.getRKNN(pobj, k);
+      }
+      DoubleDBIDList ilist = inner.getRKNN(pobj, (int) Math.ceil(k * kmulti));
+      ModifiableDoubleDBIDList olist = DBIDUtil.newDistanceDBIDList(ilist.size());
+      for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
+        double dist = distq.distance(obj, iter);
+        countRefinement();
+        olist.add(dist, iter);
+      }
+      return olist;
+    }
+  }
+
+  /**
+   * Class to proxy RkNN queries.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param Distance type
+   */
+  class ProjectedRKNNByDBID implements RKNNSearcher<DBIDRef> {
+    /**
+     * Inner RkNN query.
+     */
+    RKNNSearcher<I> inner;
+
+    /**
+     * Distance query for refinement.
+     */
+    DistanceQuery<O> distq;
+
+    /**
+     * Constructor.
+     * 
+     * @param inner Inner RkNN query.
+     */
+    public ProjectedRKNNByDBID(DistanceQuery<O> distanceQuery, RKNNSearcher<I> inner) {
+      super();
+      this.inner = inner;
+      this.distq = distanceQuery;
     }
 
     @Override
-    public DoubleDBIDList getRKNNForObject(O obj, int k) {
+    public DoubleDBIDList getRKNN(DBIDRef id, int k) {
+      final O obj = relation.get(id);
       final I pobj = proj.project(obj);
       if(norefine) {
-        return inner.getRKNNForObject(pobj, k);
+        return inner.getRKNN(pobj, k);
       }
-      DoubleDBIDList ilist = inner.getRKNNForObject(pobj, (int) Math.ceil(k * kmulti));
+      DoubleDBIDList ilist = inner.getRKNN(pobj, (int) Math.ceil(k * kmulti));
       ModifiableDoubleDBIDList olist = DBIDUtil.newDistanceDBIDList(ilist.size());
       for(DoubleDBIDListIter iter = ilist.iter(); iter.valid(); iter.advance()) {
         double dist = distq.distance(obj, iter);

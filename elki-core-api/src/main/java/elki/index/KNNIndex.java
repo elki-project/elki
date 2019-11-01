@@ -20,8 +20,10 @@
  */
 package elki.index;
 
+import elki.database.ids.DBIDRef;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
+import elki.database.query.knn.KNNSearcher;
 
 /**
  * Index with support for kNN queries.
@@ -30,7 +32,7 @@ import elki.database.query.knn.KNNQuery;
  * @since 0.4.0
  * 
  * @opt nodefillcolor LemonChiffon
- * @navhas - provides - KNNQuery
+ * @navhas - provides - KNNSearcher
  * 
  * @param <O> Object type
  */
@@ -45,5 +47,19 @@ public interface KNNIndex<O> extends Index {
    * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags);
+  KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags);
+
+  /**
+   * Get a KNN query object for the given distance query and k.
+   * <p>
+   * This function MAY return null, when the given distance is not supported!
+   * 
+   * @param distanceQuery Distance query
+   * @param maxk Maximum value of k
+   * @param flags Hints for the optimizer
+   * @return KNN Query object or {@code null}
+   */
+  default KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return WrappedKNNDBIDByLookup.wrap(distanceQuery.getRelation(), kNNByObject(distanceQuery, maxk, flags));
+  }
 }

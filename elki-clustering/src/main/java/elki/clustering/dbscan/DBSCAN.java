@@ -33,7 +33,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -142,7 +142,7 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
     }
 
     Instance dbscan = new Instance();
-    dbscan.run(relation, new QueryBuilder<>(relation, distance).rangeQuery(epsilon));
+    dbscan.run(relation, new QueryBuilder<>(relation, distance).rangeByDBID(epsilon));
 
     double averagen = dbscan.ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
@@ -201,19 +201,19 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
     /**
      * Range query to use.
      */
-    protected RangeQuery<O> rangeQuery;
+    protected RangeSearcher<DBIDRef> rangeQuery;
 
     /**
      * Run the DBSCAN algorithm
      *
      * @param relation Data relation
-     * @param rangeQuery Range query class
+     * @param rangeSearcher Range query class
      */
-    protected void run(Relation<O> relation, RangeQuery<O> rangeQuery) {
+    protected void run(Relation<O> relation, RangeSearcher<DBIDRef> rangeSearcher) {
       final int size = relation.size();
       this.objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
       this.clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
-      this.rangeQuery = rangeQuery;
+      this.rangeQuery = rangeSearcher;
 
       resultList = new ArrayList<>();
       noise = DBIDUtil.newHashSet();
@@ -245,7 +245,7 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
      * @param seeds Array to store the current seeds
      */
     protected void expandCluster(DBIDRef startObjectID, ArrayModifiableDBIDs seeds) {
-      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+      DoubleDBIDList neighbors = rangeQuery.getRange(startObjectID, epsilon);
       processedIDs.add(startObjectID);
       LOG.incrementProcessed(objprog);
       ncounter += neighbors.size();
@@ -264,7 +264,7 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
       while(!seeds.isEmpty()) {
         // Note: we could reuse the neighbors list here,
         // but at least on JDK8 this was much slower!
-        neighbors = rangeQuery.getRangeForDBID(seeds.pop(o), epsilon);
+        neighbors = rangeQuery.getRange(seeds.pop(o), epsilon);
         ncounter += neighbors.size(); // statistics for assistance
         if(neighbors.size() >= minpts) { // neighbor is core
           processNeighbors(neighbors, currentCluster, seeds);

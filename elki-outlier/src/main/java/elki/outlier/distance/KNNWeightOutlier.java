@@ -26,12 +26,9 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -81,7 +78,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Lisa Reichert
  * @since 0.3
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects handled by this algorithm
  */
@@ -132,13 +129,13 @@ public class KNNWeightOutlier<O> implements OutlierAlgorithm {
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, kplus);
+      final KNNList knn = knnQuery.getKNN(iditer, kplus);
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); neighbor.getOffset() < kplus && neighbor.valid(); neighbor.advance()) {

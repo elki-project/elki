@@ -34,8 +34,8 @@ import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.knn.LinearScanDistanceKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.LinearScanKNNByDBID;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.math.spacefillingcurves.BinarySplitSpatialSorter;
@@ -78,7 +78,7 @@ public class SpacefillingKNNPreprocessorTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    LinearScanKNNByDBID<DoubleVector> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
@@ -96,8 +96,8 @@ public class SpacefillingKNNPreprocessorTest {
     preproc.initialize();
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByDBID);
 
     // test queries
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
@@ -113,7 +113,7 @@ public class SpacefillingKNNPreprocessorTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    LinearScanKNNByDBID<DoubleVector> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
@@ -131,8 +131,8 @@ public class SpacefillingKNNPreprocessorTest {
     preproc.initialize();
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByDBID);
 
     // test queries
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
@@ -148,7 +148,7 @@ public class SpacefillingKNNPreprocessorTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    LinearScanKNNByDBID<DoubleVector> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
@@ -166,8 +166,8 @@ public class SpacefillingKNNPreprocessorTest {
     preproc.initialize();
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByDBID);
 
     // test queries
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
@@ -183,7 +183,7 @@ public class SpacefillingKNNPreprocessorTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    LinearScanKNNByDBID<DoubleVector> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
@@ -201,8 +201,8 @@ public class SpacefillingKNNPreprocessorTest {
     preproc.initialize();
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByDBID);
 
     // test queries
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
@@ -218,7 +218,7 @@ public class SpacefillingKNNPreprocessorTest {
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();
 
     // get linear queries
-    LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
+    KNNSearcher<DBIDRef> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
 
     // get preprocessed queries
     SpacefillingKNNPreprocessor<DoubleVector> preproc = //
@@ -236,8 +236,8 @@ public class SpacefillingKNNPreprocessorTest {
     preproc.initialize();
     // add as index
     Metadata.hierarchyOf(relation).addChild(preproc);
-    KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k, 0);
-    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    KNNSearcher<DBIDRef> preproc_knn_query = preproc.kNNByDBID(distanceQuery, k, 0);
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByDBID);
 
     // test queries
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k);
@@ -245,11 +245,11 @@ public class SpacefillingKNNPreprocessorTest {
     testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2);
   }
 
-  public static void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {
+  public static void testKNNQueries(Relation<DoubleVector> rep, KNNSearcher<DBIDRef> lin_knn_query, KNNSearcher<DBIDRef> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
     for(DBIDIter it = sample.iter(); it.valid(); it.advance()) {
-      KNNList lin_knn = lin_knn_query.getKNNForDBID(it, k);
-      KNNList pre_knn = preproc_knn_query.getKNNForDBID(it, k);
+      KNNList lin_knn = lin_knn_query.getKNN(it, k);
+      KNNList pre_knn = preproc_knn_query.getKNN(it, k);
       DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance()) {
         if(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue()) {

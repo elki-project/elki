@@ -18,41 +18,47 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database.query.rknn;
+package elki.database.query.range;
 
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DoubleDBIDList;
+import elki.database.ids.*;
+import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 
 /**
- * Instance for the query on a particular database.
- * 
+ * Default linear scan range query class.
+ *
  * @author Erich Schubert
  * @since 0.4.0
+ *
+ * @has - - - DistanceQuery
+ *
+ * @param <O> relation object type
  */
-public abstract class AbstractRKNNQuery<O> implements RKNNQuery<O> {
+public class LinearScanDistanceRangeByDBID<O> implements RangeSearcher<DBIDRef>, LinearScanQuery {
   /**
-   * The data to use for this query
+   * Distance to use.
    */
-  final protected Relation<? extends O> relation;
-
-  /**
-   * Hold the distance function to be used.
-   */
-  final protected DistanceQuery<O> distanceQuery;
+  private DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
-   * 
-   * @param distanceQuery distance query
+   *
+   * @param distanceQuery Distance function to use
    */
-  public AbstractRKNNQuery(DistanceQuery<O> distanceQuery) {
+  public LinearScanDistanceRangeByDBID(DistanceQuery<O> distanceQuery) {
     super();
-    this.relation = distanceQuery.getRelation();
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  abstract public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k);
+  public ModifiableDoubleDBIDList getRange(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+    final DistanceQuery<O> dq = distanceQuery;
+    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
+      final double currentDistance = dq.distance(id, iter);
+      if(currentDistance <= range) {
+        result.add(currentDistance, iter);
+      }
+    }
+    return result;
+  }
 }

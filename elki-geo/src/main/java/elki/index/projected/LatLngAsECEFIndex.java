@@ -31,9 +31,9 @@ import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
-import elki.database.query.rknn.RKNNQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
+import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.ProjectedView;
 import elki.database.relation.Relation;
@@ -99,41 +99,41 @@ public class LatLngAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
 
   @SuppressWarnings("unchecked")
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     if(!(inner instanceof KNNIndex) || distanceQuery.getRelation() != relation || //
         !LatLngDistance.class.isInstance(distanceQuery.getDistance()) || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
     }
     SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
-    KNNQuery<O> innerq = ((KNNIndex<O>) inner).getKNNQuery(innerQuery, maxk, flags);
-    return innerq != null ? new ProjectedKNNQuery(distanceQuery, innerq) : null;
+    KNNSearcher<O> innerq = ((KNNIndex<O>) inner).kNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedKNNByObject(distanceQuery, innerq) : null;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     if(!(inner instanceof RangeIndex) || distanceQuery.getRelation() != relation || //
         !LatLngDistance.class.isInstance(distanceQuery.getDistance()) || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
     }
     SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
-    RangeQuery<O> innerq = ((RangeIndex<O>) inner).getRangeQuery(innerQuery, maxradius, flags);
-    return innerq != null ? new ProjectedRangeQuery(distanceQuery, innerq) : null;
+    RangeSearcher<O> innerq = ((RangeIndex<O>) inner).rangeByObject(innerQuery, maxradius, flags);
+    return innerq != null ? new ProjectedRangeByObject(distanceQuery, innerq) : null;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+  public RKNNSearcher<O> rkNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     if(!(inner instanceof RKNNIndex) || distanceQuery.getRelation() != relation || //
         !LatLngDistance.class.isInstance(distanceQuery.getDistance()) || //
         (flags & QueryBuilder.FLAG_EXACT_ONLY) == 0) {
       return null;
     }
     SpatialPrimitiveDistanceQuery<O> innerQuery = EuclideanDistance.STATIC.instantiate(view);
-    RKNNQuery<O> innerq = ((RKNNIndex<O>) inner).getRKNNQuery(innerQuery, maxk, flags);
-    return innerq != null ? new ProjectedRKNNQuery(distanceQuery, innerq) : null;
+    RKNNSearcher<O> innerq = ((RKNNIndex<O>) inner).rkNNByObject(innerQuery, maxk, flags);
+    return innerq != null ? new ProjectedRKNNByObject(distanceQuery, innerq) : null;
   }
 
   /**

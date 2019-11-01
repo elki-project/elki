@@ -31,8 +31,8 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.ArcCosineDistance;
 import elki.distance.CosineDistance;
@@ -253,14 +253,14 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
   }
 
   @Override
-  public KNNQuery<V> getKNNQuery(DistanceQuery<V> distanceQuery, int maxk, int flags) {
+  public KNNSearcher<V> kNNByObject(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof CosineDistance ? new CosineKNNQuery() : //
         df instanceof ArcCosineDistance ? new ArcCosineKNNQuery() : null;
   }
 
   @Override
-  public RangeQuery<V> getRangeQuery(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<V> rangeByObject(DistanceQuery<V> distanceQuery, double maxradius, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof CosineDistance ? new CosineRangeQuery() : //
         df instanceof ArcCosineDistance ? new ArcCosineRangeQuery() : null;
@@ -281,14 +281,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class CosineKNNQuery implements KNNQuery<V> {
+  protected class CosineKNNQuery implements KNNSearcher<V> {
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(V obj, int k) {
+    public KNNList getKNN(V obj, int k) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
@@ -301,7 +296,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
           heap.insert(dist, n);
         }
       }
-
       return heap.toKNNList();
     }
   }
@@ -311,14 +305,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class ArcCosineKNNQuery implements KNNQuery<V> {
+  protected class ArcCosineKNNQuery implements KNNSearcher<V> {
     @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
-    }
-
-    @Override
-    public KNNList getKNNForObject(V obj, int k) {
+    public KNNList getKNN(V obj, int k) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
@@ -331,7 +320,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
           heap.insert(dist, n);
         }
       }
-
       return heap.toKNNList();
     }
   }
@@ -341,14 +329,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class CosineRangeQuery implements RangeQuery<V> {
+  protected class CosineRangeQuery implements RangeSearcher<V> {
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
@@ -370,14 +353,9 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * 
    * @author Erich Schubert
    */
-  protected class ArcCosineRangeQuery implements RangeQuery<V> {
+  protected class ArcCosineRangeQuery implements RangeSearcher<V> {
     @Override
-    public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-      return getRangeForObject(relation.get(id), range, result);
-    }
-
-    @Override
-    public ModifiableDoubleDBIDList getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
+    public ModifiableDoubleDBIDList getRange(V obj, double range, ModifiableDoubleDBIDList result) {
       HashSetModifiableDBIDs cands = DBIDUtil.newHashSet();
       WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(cands, //
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);

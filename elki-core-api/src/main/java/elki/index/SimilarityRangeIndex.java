@@ -20,7 +20,8 @@
  */
 package elki.index;
 
-import elki.database.query.range.RangeQuery;
+import elki.database.ids.DBIDRef;
+import elki.database.query.range.RangeSearcher;
 import elki.database.query.similarity.SimilarityQuery;
 
 /**
@@ -30,7 +31,7 @@ import elki.database.query.similarity.SimilarityQuery;
  * @since 0.4.0
  *
  * @opt nodefillcolor LemonChiffon
- * @navhas - provides - RangeQuery
+ * @navhas - provides - RangeSearcher
  *
  * @param <O> Database Object type
  */
@@ -45,5 +46,17 @@ public interface SimilarityRangeIndex<O> extends Index {
    * @param flags Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, double maxrange, int flags);
+  RangeSearcher<O> similarityRangeByObject(SimilarityQuery<O> simQuery, double maxrange, int flags);
+
+  /**
+   * Get a range query object for the given distance query and k.
+   * <p>
+   * This function MAY return null, when the given distance is not supported!
+   *
+   * @param simQuery Similarity query
+   * @param maxrange Maximum range
+   * @param flags Hints for the optimizer
+   * @return KNN Query object or {@code null}
+   */
+  RangeSearcher<DBIDRef> similarityRangeByDBID(SimilarityQuery<O> simQuery, double maxrange, int flags);
 }

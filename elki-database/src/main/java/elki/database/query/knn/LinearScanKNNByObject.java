@@ -31,37 +31,27 @@ import elki.database.query.distance.DistanceQuery;
  * @since 0.4.0
  *
  * @has - - - DistanceQuery
+ * 
+ * @param <O> relation object type
  */
-public class LinearScanDistanceKNNQuery<O> implements KNNQuery<O>, LinearScanQuery {
+public class LinearScanKNNByObject<O> implements KNNSearcher<O>, LinearScanQuery {
   /**
    * Hold the distance function to be used.
    */
-  protected final DistanceQuery<O> distanceQuery;
+  private final DistanceQuery<O> distanceQuery;
 
   /**
    * Constructor.
    *
    * @param distanceQuery Distance function to use
    */
-  public LinearScanDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
+  public LinearScanKNNByObject(DistanceQuery<O> distanceQuery) {
     super();
     this.distanceQuery = distanceQuery;
   }
 
   @Override
-  public KNNList getKNNForDBID(DBIDRef id, int k) {
-    final DistanceQuery<O> dq = distanceQuery;
-    KNNHeap heap = DBIDUtil.newHeap(k);
-    double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = dq.getRelation().iterDBIDs(); iter.valid(); iter.advance()) {
-      final double dist = dq.distance(id, iter);
-      max = dist <= max ? heap.insert(dist, iter) : max;
-    }
-    return heap.toKNNList();
-  }
-
-  @Override
-  public KNNList getKNNForObject(O obj, int k) {
+  public KNNList getKNN(O obj, int k) {
     final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;

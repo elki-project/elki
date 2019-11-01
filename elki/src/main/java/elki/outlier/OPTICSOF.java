@@ -29,12 +29,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -68,8 +65,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Ahmed Hettab
  * @since 0.3
  *
- * @has - - - KNNQuery
- * @has - - - RangeQuery
+ * @has - - - KNNSearcher
+ * @has - - - RangeSearcher
  *
  * @param <O> DatabaseObject
  */
@@ -115,7 +112,7 @@ public class OPTICSOF<O> implements OutlierAlgorithm {
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(minpts);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(minpts);
     DBIDs ids = relation.getDBIDs();
 
     // FIXME: implicit preprocessor.
@@ -126,7 +123,7 @@ public class OPTICSOF<O> implements OutlierAlgorithm {
     // N_minpts(id) and core-distance(id)
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList minptsNeighbours = knnQuery.getKNNForDBID(iditer, minpts);
+      KNNList minptsNeighbours = knnQuery.getKNN(iditer, minpts);
       double d = minptsNeighbours.getKNNDistance();
       nMinPts.put(iditer, minptsNeighbours);
       coreDistance.putDouble(iditer, d);

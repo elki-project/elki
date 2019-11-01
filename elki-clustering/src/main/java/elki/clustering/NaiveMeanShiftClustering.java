@@ -32,7 +32,7 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
@@ -134,7 +134,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> implements Cluster
    */
   public Clustering<MeanModel> run(Relation<V> relation) {
     final QueryBuilder<V> qb = new QueryBuilder<>(relation, distance);
-    final RangeQuery<V> rangeq = qb.rangeQuery(bandwidth);
+    final RangeSearcher<V> rangeq = qb.rangeByObject(bandwidth);
     final DistanceQuery<V> distq = qb.distanceQuery();
     final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     final int dim = RelationUtil.dimensionality(relation);
@@ -155,7 +155,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> implements Cluster
         // Compute new position:
         V newvec = null;
         {
-          DoubleDBIDList neigh = rangeq.getRangeForObject(position, bandwidth);
+          DoubleDBIDList neigh = rangeq.getRange(position, bandwidth);
           boolean okay = (neigh.size() > 1) || (neigh.size() >= 1 && j > 1);
           if(okay) {
             Centroid newpos = new Centroid(dim);

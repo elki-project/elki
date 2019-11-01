@@ -30,7 +30,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  * @has - - - KernelDensityFunction
  *
  * @param <O> the type of objects handled by this algorithm
@@ -119,14 +119,14 @@ public class SimpleKernelDensityLOF<O extends NumberVector> implements OutlierAl
     DBIDs ids = relation.getDBIDs();
 
     LOG.beginStep(stepprog, 1, "Materializing neighborhoods w.r.t. distance function.");
-    KNNQuery<O> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kplus);
 
     // Compute LRDs
     LOG.beginStep(stepprog, 2, "Computing densities.");
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
+      final KNNList neighbors = knnq.getKNN(it, kplus);
       int count = 0;
       double sum = 0.0;
       // Fast version for double distances
@@ -134,7 +134,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> implements OutlierAl
         if(DBIDUtil.equal(neighbor, it)) {
           continue;
         }
-        double max = knnq.getKNNForDBID(neighbor, kplus).getKNNDistance();
+        double max = knnq.getKNN(neighbor, kplus).getKNNDistance();
         if(max == 0) {
           sum = Double.POSITIVE_INFINITY;
           break;
@@ -160,7 +160,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> implements OutlierAl
       final double lrdp = dens.doubleValue(it);
       final double lof;
       if(lrdp > 0) {
-        final KNNList neighbors = knnq.getKNNForDBID(it, kplus);
+        final KNNList neighbors = knnq.getKNN(it, kplus);
         double sum = 0.0;
         int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

@@ -29,12 +29,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.range.RangeQuery;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -78,7 +75,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.2
  *
- * @has - - - RangeQuery
+ * @has - - - RangeSearcher
  *
  * @param <O> Object type
  */
@@ -143,7 +140,7 @@ public class LOCI<O> implements OutlierAlgorithm {
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    RangeQuery<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeQuery();
+    RangeSearcher<DBIDRef> rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID();
     DBIDs ids = relation.getDBIDs();
 
     // LOCI preprocessing step
@@ -167,7 +164,7 @@ public class LOCI<O> implements OutlierAlgorithm {
       double maxnormr = 0;
       if(maxneig >= nmin) {
         // Compute the largest neighborhood we will need.
-        DoubleDBIDList maxneighbors = rangeQuery.getRangeForDBID(iditer, maxdist);
+        DoubleDBIDList maxneighbors = rangeQuery.getRange(iditer, maxdist);
         // TODO: Ensure the result is sorted. This is currently implied.
 
         // For any critical distance, compute the normalized MDEF score.
@@ -231,10 +228,10 @@ public class LOCI<O> implements OutlierAlgorithm {
    * @param rangeQuery Range query
    * @param interestingDistances Distances of interest
    */
-  protected void precomputeInterestingRadii(DBIDs ids, RangeQuery<O> rangeQuery, WritableDataStore<DoubleIntArrayList> interestingDistances) {
+  protected void precomputeInterestingRadii(DBIDs ids, RangeSearcher<DBIDRef> rangeQuery, WritableDataStore<DoubleIntArrayList> interestingDistances) {
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", ids.size(), LOG) : null;
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-      DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
+      DoubleDBIDList neighbors = rangeQuery.getRange(iditer, rmax);
       // build list of critical distances
       DoubleIntArrayList cdist = new DoubleIntArrayList(neighbors.size() << 1);
       {

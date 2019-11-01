@@ -27,9 +27,10 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.ManhattanDistance;
@@ -73,22 +74,22 @@ public class KNNJoinTest {
 
     // Euclidean
     {
-      KNNQuery<NumberVector> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).linearOnly().kNNQuery();
+      KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).linearOnly().kNNByDBID();
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        meansize.put(knnq.getKNNForDBID(iditer, 2).size());
+        meansize.put(knnq.getKNN(iditer, 2).size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
     }
     // Manhattan
     {
-      KNNQuery<NumberVector> knnq = new QueryBuilder<NumberVector>(relation, ManhattanDistance.STATIC).linearOnly().kNNQuery();
+      KNNSearcher<DBIDRef> knnq = new QueryBuilder<NumberVector>(relation, ManhattanDistance.STATIC).linearOnly().kNNByDBID();
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        meansize.put(knnq.getKNNForDBID(iditer, 2).size());
+        meansize.put(knnq.getKNN(iditer, 2).size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);
       org.junit.Assert.assertEquals("Manhattan variance 2NN", var2nnManhattan, meansize.getSampleVariance(), 0.00001);

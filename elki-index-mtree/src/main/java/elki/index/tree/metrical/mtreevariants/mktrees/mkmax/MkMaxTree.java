@@ -227,7 +227,7 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if (dist_pq <= p.getKnnDistance()) {
-          KNNList knns_p = knnq.getKNNForDBID(p.getRoutingObjectID(), getKmax() - 1);
+          KNNList knns_p = knnq.getKNN(p.getRoutingObjectID(), getKmax() - 1);
 
           if (knns_p.size() + 1 < getKmax()) {
             p.setKnnDistance(Double.NaN);

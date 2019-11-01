@@ -25,7 +25,6 @@ import elki.database.ids.DoubleDBIDList;
 import elki.database.relation.Relation;
 import elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import elki.logging.LoggingUtil;
-import elki.utilities.exceptions.AbortException;
 
 /**
  * Instance for a particular database, invoking the preprocessor.
@@ -33,7 +32,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Elke Achtert
  * @since 0.4.0
  */
-public class PreprocessorRKNNQuery<O> implements RKNNQuery<O> {
+public class PreprocessorRKNNQuery<O> implements RKNNSearcher<DBIDRef> {
   /**
    * The data to use for this query
    */
@@ -72,15 +71,10 @@ public class PreprocessorRKNNQuery<O> implements RKNNQuery<O> {
   }
 
   @Override
-  public DoubleDBIDList getRKNNForDBID(DBIDRef id, int k) {
+  public DoubleDBIDList getRKNN(DBIDRef id, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     return preprocessor.getRKNN(id);
-  }
-
-  @Override
-  public DoubleDBIDList getRKNNForObject(O obj, int k) {
-    throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 }

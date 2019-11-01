@@ -27,12 +27,9 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
@@ -72,7 +69,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @has - - - KNNQuery
+ * @has - - - KNNSearcher
  *
  * @param <O> the type of objects processed by this algorithm
  */
@@ -121,7 +118,7 @@ public class KNNDD<O> implements OutlierAlgorithm {
    * @param relation Data relation
    */
   public OutlierResult run(Relation<O> relation) {
-    KNNQuery<O> knnQuery = new QueryBuilder<>(relation, distance).kNNQuery(kplus);
+    KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
     WritableDoubleDataStore knnDist = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
@@ -129,7 +126,7 @@ public class KNNDD<O> implements OutlierAlgorithm {
     DBIDVar var = DBIDUtil.newVar();
     // Find nearest neighbors, and store the distances.
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(it, kplus);
+      final KNNList knn = knnQuery.getKNN(it, kplus);
       knnDist.putDouble(it, knn.getKNNDistance());
       neighbor.put(it, knn.assignVar(knn.size() - 1, var));
       LOG.incrementProcessed(prog);

@@ -34,7 +34,7 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNQuery;
+import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.minkowski.EuclideanDistance;
@@ -242,13 +242,13 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
         LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
       }
       localPCAs = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
-      KNNQuery<V> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNQuery(k);
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(k);
 
       Duration dur = new MillisTimeDuration(this.getClass() + ".preprocessing-time").begin();
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Performing local PCA", relation.size(), LOG) : null;
 
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        PCAResult epairs = pca.processIds(knnQuery.getKNNForDBID(iditer, k), relation);
+        PCAResult epairs = pca.processIds(knnQuery.getKNN(iditer, k), relation);
         int numstrong = filter.filter(epairs.getEigenvalues());
         localPCAs.put(iditer, new PCAFilteredResult(epairs.getEigenPairs(), numstrong, 1., 0.));
         LOG.incrementProcessed(progress);

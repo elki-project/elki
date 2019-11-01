@@ -20,7 +20,9 @@
  */
 package elki.database.query.range;
 
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.query.LinearScanQuery;
 import elki.database.query.similarity.PrimitiveSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.similarity.PrimitiveSimilarity;
@@ -36,33 +38,28 @@ import elki.similarity.PrimitiveSimilarity;
  *
  * @assoc - - - PrimitiveSimilarityQuery
  *
- * @param <O> Database object type
+ * @param <O> relation object type
  */
-public class LinearScanPrimitiveSimilarityRangeQuery<O> extends AbstractSimilarityRangeQuery<O> {
+public class LinearScanPrimitiveSimilarityRangeByObject<O> implements RangeSearcher<O>, LinearScanQuery {
   /**
-   * Unboxed similarity function.
+   * Similarity query.
    */
-  private PrimitiveSimilarity<? super O> rawsim;
+  private PrimitiveSimilarityQuery<O> sim;
 
   /**
    * Constructor.
    *
    * @param similarityQuery Similarity function to use
    */
-  public LinearScanPrimitiveSimilarityRangeQuery(PrimitiveSimilarityQuery<O> similarityQuery) {
-    super(similarityQuery);
-    rawsim = similarityQuery.getSimilarity();
+  public LinearScanPrimitiveSimilarityRangeByObject(PrimitiveSimilarityQuery<O> similarityQuery) {
+    super();
+    this.sim = similarityQuery;
   }
 
   @Override
-  public ModifiableDoubleDBIDList getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
-    return getRangeForObject(relation.get(id), range, result);
-  }
-
-  @Override
-  public ModifiableDoubleDBIDList getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-    final PrimitiveSimilarity<? super O> sim = this.rawsim;
-    final Relation<? extends O> relation = this.relation;
+  public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
+    final PrimitiveSimilarity<? super O> sim = this.sim.getSimilarity();
+    final Relation<? extends O> relation = this.sim.getRelation();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double similarity = sim.similarity(obj, relation.get(iter));
       if(similarity >= range) {
