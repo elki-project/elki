@@ -22,8 +22,6 @@ package elki.index.tree.metrical.covertree;
 
 import org.junit.Test;
 
-import elki.database.query.knn.WrappedKNNDBIDByLookup;
-import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
@@ -39,8 +37,8 @@ public class CoverTreeTest extends AbstractIndexStructureTest {
   public void testCovertree() {
     CoverTree.Factory<?> factory = new ELKIBuilder<>(CoverTree.Factory.class) //
         .with(CoverTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
-    assertExactEuclidean(factory, CoverTree.CoverTreeKNNQuery.class, CoverTree.CoverTreeRangeQuery.class);
+    assertExactEuclidean(factory, CoverTree.CoverTreeKNNSearcher.class, CoverTree.CoverTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, CoverTree.CoverTreePrioritySearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
+    assertSinglePoint(factory, CoverTree.CoverTreeKNNSearcher.class, CoverTree.CoverTreeRangeSearcher.class);
   }
 }

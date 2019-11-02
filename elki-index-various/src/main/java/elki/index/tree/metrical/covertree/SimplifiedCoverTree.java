@@ -58,8 +58,8 @@ import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - CoverTreeRangeQuery
- * @has - - - CoverTreeKNNQuery
+ * @has - - - CoverTreeRangeSearcher
+ * @has - - - CoverTreeKNNSearcher
  */
 public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements DistancePriorityIndex<O> {
   /**
@@ -255,19 +255,37 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeRangeQuery() : null;
+        new CoverTreeRangeObjectSearcher() : null;
+  }
+
+  @Override
+  public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new CoverTreeRangeDBIDSearcher() : null;
   }
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeKNNQuery() : null;
+        new CoverTreeKNNObjectSearcher() : null;
+  }
+
+  @Override
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new CoverTreeKNNDBIDSearcher() : null;
   }
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreePrioritySearcher() : null;
+        new CoverTreePriorityObjectSearcher() : null;
+  }
+
+  @Override
+  public PrioritySearcher<DBIDRef> priorityByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+        new CoverTreePriorityDBIDSearcher() : null;
   }
 
   @Override
@@ -280,17 +298,39 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreeRangeQuery implements RangeSearcher<O> {
-    @Override
-    public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
-      ArrayList<Node> open = new ArrayList<Node>(); // LIFO stack
+  public abstract class CoverTreeRangeSearcher {
+    /**
+     * LIFO stack of open nodes.
+     */
+    private ArrayList<Node> open = new ArrayList<Node>();
+
+    /**
+     * Temporary storage.
+     */
+    private DBIDVar tmp = DBIDUtil.newVar();
+
+    /**
+     * Compute distance to query object.
+     *
+     * @param it Candidate
+     * @return Distance
+     */
+    abstract protected double queryDistance(DBIDRef it);
+
+    /**
+     * Perform the actual search.
+     *
+     * @param range Query range
+     * @param result Output storage
+     * @return result
+     */
+    protected ModifiableDoubleDBIDList doSearch(double range, ModifiableDoubleDBIDList result) {
+      open.clear();
       open.add(root);
-      DBIDVar r = DBIDUtil.newVar();
       while(!open.isEmpty()) {
         final Node cur = open.remove(open.size() - 1); // pop()
-        cur.singletons.assignVar(0, r);
-        final double d = distance(obj, r);
-        // Covered area not in range (metric assumption!):
+        final double d = queryDistance(cur.singletons.assignVar(0, tmp));
+        // Covered area not in range (metric assumption):
         if(d - cur.maxDist > range) {
           continue;
         }
@@ -302,15 +342,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
         else { // Leaf node
           // Consider routing object, too:
           if(d <= range) {
-            result.add(d, r); // First element is a candidate now
+            result.add(d, tmp); // First element is a candidate now
           }
         }
         // For remaining singletons, compute the distances:
         for(int i = 1, l = cur.singletons.size(); i < l; i++) {
-          cur.singletons.assignVar(i, r);
-          final double d2 = distance(obj, r);
+          final double d2 = queryDistance(cur.singletons.assignVar(i, tmp));
           if(d2 <= range) {
-            result.add(d2, r);
+            result.add(d2, tmp);
           }
         }
       }
@@ -319,44 +358,97 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
   }
 
   /**
+   * Range query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreeRangeObjectSearcher extends CoverTreeRangeSearcher implements RangeSearcher<O> {
+    /**
+     * Query object.
+     */
+    private O query;
+
+    @Override
+    public ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result) {
+      this.query = query;
+      return doSearch(range, result);
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
+    }
+  }
+
+  /**
+   * Range query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreeRangeDBIDSearcher extends CoverTreeRangeSearcher implements RangeSearcher<DBIDRef> {
+    /**
+     * Query reference.
+     */
+    private DBIDRef query;
+
+    @Override
+    public ModifiableDoubleDBIDList getRange(DBIDRef query, double range, ModifiableDoubleDBIDList result) {
+      this.query = query;
+      return doSearch(range, result);
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
+    }
+  }
+
+  /**
    * KNN Query class.
    *
    * @author Erich Schubert
    */
-  public class CoverTreeKNNQuery implements KNNSearcher<O> {
-    @Override
-    public KNNList getKNN(O obj, int k) {
-      if(k < 1) {
-        throw new IllegalArgumentException("At least one object has to be requested!");
-      }
+  public abstract class CoverTreeKNNSearcher {
+    /**
+     * Priority queue of candidates
+     */
+    private DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
 
+    /**
+     * Temporary storage.
+     */
+    private DBIDVar tmp = DBIDUtil.newVar();
+
+    /**
+     * Do the main search
+     *
+     * @param k Number of neighbors to collect.
+     * @return results
+     */
+    protected KNNList doSearch(int k) {
       KNNHeap knnList = DBIDUtil.newHeap(k);
       double d_k = Double.POSITIVE_INFINITY;
-
-      final DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
-
-      // Push the root node
-      final double rootdist = distance(obj, root.singletons.iter());
-      pq.add(rootdist - root.maxDist, root);
+      pq.clear();
+      pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
 
       // search in tree
       while(!pq.isEmpty()) {
         final Node cur = pq.peekValue();
         final double prio = pq.peekKey(); // Minimum distance to cover
-        final double d = prio + cur.maxDist; // Restore distance to center.
         pq.poll(); // Remove
 
         if(knnList.size() >= k && prio > d_k) {
           continue;
         }
+        final double d = prio + cur.maxDist; // Restore distance to center.
 
         final DBIDIter it = cur.singletons.iter();
-
         if(!cur.children.isEmpty()) { // Inner node:
           for(Node c : cur.children) {
-            final DBIDIter f = c.singletons.iter();
-            final double dist = DBIDUtil.equal(f, it) ? d : distance(obj, f);
-            final double newprio = dist - c.maxDist; // Minimum distance
+            // Reuse distance if the previous routing object is the same:
+            double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), it) //
+                ? d : queryDistance(tmp)) //
+                - c.maxDist; // Minimum distance
             if(newprio <= d_k) {
               pq.add(newprio, c);
             }
@@ -371,7 +463,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
         it.advance(); // Skip routing object.
         // For remaining singletons, compute the distances:
         while(it.valid()) {
-          final double d2 = distance(obj, it);
+          final double d2 = queryDistance(it);
           if(d2 <= d_k) {
             d_k = knnList.insert(d2, it);
           }
@@ -380,38 +472,95 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       }
       return knnList.toKNNList();
     }
+
+    /**
+     * Compute distance to query object.
+     *
+     * @param it Candidate
+     * @return Distance
+     */
+    abstract protected double queryDistance(DBIDRef it);
+  }
+
+  /**
+   * KNN Query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreeKNNObjectSearcher extends CoverTreeKNNSearcher implements KNNSearcher<O> {
+    /**
+     * Query object.
+     */
+    private O query;
+
+    @Override
+    public KNNList getKNN(O obj, int k) {
+      this.query = obj;
+      return doSearch(k);
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
+    }
+  }
+
+  /**
+   * KNN Query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreeKNNDBIDSearcher extends CoverTreeKNNSearcher implements KNNSearcher<DBIDRef> {
+    /**
+     * Query reference.
+     */
+    private DBIDRef query;
+
+    @Override
+    public KNNList getKNN(DBIDRef query, int k) {
+      this.query = query;
+      return doSearch(k);
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
+    }
   }
 
   /**
    * Priority query class.
    *
    * @author Erich Schubert
+   * 
+   * @param <T> this type
+   * @param <Q> query type
    */
-  public class CoverTreePrioritySearcher implements PrioritySearcher<O> {
-    /**
-     * Query object
-     */
-    O query;
-
+  public abstract class CoverTreePrioritySearcher<T extends PrioritySearcher<Q>, Q> implements PrioritySearcher<Q> {
     /**
      * Stopping distance threshold
      */
     double threshold = Double.POSITIVE_INFINITY;
 
     /**
+     * Temporary storage.
+     */
+    private DBIDVar tmp = DBIDUtil.newVar();
+
+    /**
      * Priority queue
      */
-    DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
+    private DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
 
     /**
      * Candidates
      */
-    DBIDArrayIter candidates = EmptyDBIDs.EMPTY_ITERATOR;
+    private DBIDArrayIter candidates = EmptyDBIDs.EMPTY_ITERATOR;
 
     /**
      * Distance to routing object.
      */
-    double routingDist;
+    private double routingDist;
 
     /**
      * Maximum distance of current node.
@@ -425,23 +574,32 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       super();
     }
 
-    @Override
-    public CoverTreePrioritySearcher search(O query) {
-      this.query = query;
+    /**
+     * Compute distance to query object.
+     *
+     * @param it Candidate
+     * @return Distance
+     */
+    abstract protected double queryDistance(DBIDRef it);
+
+    /**
+     * Start the search.
+     *
+     * @return this.
+     */
+    protected T doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
       pq.clear();
-      // Push the root node to the heap.
-      final double rootdist = distance(query, root.singletons.iter());
-      pq.add(rootdist - root.maxDist, root);
-      advance(); // Find first
-      return this;
+      pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
+      return advance(); // Find first
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public CoverTreePrioritySearcher decreaseCutoff(double threshold) {
+    public T decreaseCutoff(double threshold) {
       assert threshold <= this.threshold;
       this.threshold = threshold;
-      return this;
+      return (T) this;
     }
 
     @Override
@@ -449,8 +607,9 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       return candidates.valid();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public CoverTreePrioritySearcher advance() {
+    public T advance() {
       // Advance the main iterator, if defined:
       if(candidates.valid()) {
         candidates.advance();
@@ -460,13 +619,12 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       // manage them and their bounds in the heap. If we do this locally, we get
       // upper and lower bounds easily.
       do {
-        // Pruning with lower bound:
         if(candidates.valid()) {
-          return this;
+          return (T) this;
         }
       }
       while(advanceQueue()); // Try next node
-      return this;
+      return (T) this;
     }
 
     /**
@@ -484,15 +642,16 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       }
       final Node cur = pq.peekValue();
       routingDist = prio + cur.maxDist; // Restore distance to center.
-      maxDist = cur.maxDist; // Accuracy for bounds
+      maxDist = cur.maxDist; // Store accuracy for bounds
       candidates = cur.singletons.iter(); // Routing object initially
       pq.poll(); // Remove
 
       // Add child nodes to priority queue:
       for(Node c : cur.children) {
-        final DBIDIter f = c.singletons.iter(); // Routing object
-        final double dist = DBIDUtil.equal(f, candidates) ? routingDist : distance(query, f);
-        final double newprio = dist - c.maxDist; // Minimum distance
+        // Reuse distance if the previous routing object is the same:
+        double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
+            ? routingDist : queryDistance(tmp)) //
+            - c.maxDist; // Minimum distance
         if(newprio <= threshold) {
           pq.add(newprio, c);
         }
@@ -525,12 +684,60 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     @Override
     public double computeExactDistance() {
-      return candidates.getOffset() == 0 ? routingDist : distance(query, candidates);
+      return candidates.getOffset() == 0 ? routingDist : queryDistance(candidates);
     }
 
     @Override
     public int internalGetIndex() {
       return candidates.internalGetIndex();
+    }
+  }
+
+  /**
+   * Priority query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreePriorityObjectSearcher extends CoverTreePrioritySearcher<CoverTreePriorityObjectSearcher, O> {
+    /**
+     * Query object
+     */
+    private O query;
+
+    @Override
+    public CoverTreePriorityObjectSearcher search(O query) {
+      this.query = query;
+      doSearch();
+      return this;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
+    }
+  }
+
+  /**
+   * Priority query class.
+   *
+   * @author Erich Schubert
+   */
+  public class CoverTreePriorityDBIDSearcher extends CoverTreePrioritySearcher<CoverTreePriorityDBIDSearcher, DBIDRef> {
+    /**
+     * Query object
+     */
+    private DBIDRef query;
+
+    @Override
+    public CoverTreePriorityDBIDSearcher search(DBIDRef query) {
+      this.query = query;
+      doSearch();
+      return this;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef it) {
+      return distance(query, it);
     }
   }
 

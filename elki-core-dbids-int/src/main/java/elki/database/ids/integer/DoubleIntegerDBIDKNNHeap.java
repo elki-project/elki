@@ -101,14 +101,13 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
       return (heap.size() >= k) ? kdist = heap.peekKey() : kdist;
     }
     // Tied with top:
-    if(distance >= kdist) {
-      if(distance == kdist) {
-        addToTies(id.internalGetIndex());
-      }
-      return kdist;
+    if(distance < kdist) {
+      // Old top element: (kdist, previd)
+      updateHeap(distance, id.internalGetIndex());
     }
-    // Old top element: (kdist, previd)
-    updateHeap(distance, id.internalGetIndex());
+    else if(distance == kdist) {
+      addToTies(id.internalGetIndex());
+    }
     return kdist;
   }
 
