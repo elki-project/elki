@@ -108,7 +108,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
 
     // get linear queries
     KNNSearcher<DBIDRef> lin_knn_query = new LinearScanKNNByDBID<>(distanceQuery);
-    RKNNSearcher<DBIDRef> lin_rknn_query = new LinearScanRKNNByDBID<>(distanceQuery, lin_knn_query, k);
+    RKNNSearcher<DBIDRef> lin_rknn_query = new LinearScanRKNNByDBID<>(distanceQuery, lin_knn_query);
 
     // get preprocessed queries
     MaterializeKNNAndRKNNPreprocessor<DoubleVector> preproc = //

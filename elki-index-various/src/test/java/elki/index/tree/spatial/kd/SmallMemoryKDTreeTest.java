@@ -37,7 +37,7 @@ public class SmallMemoryKDTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testSmallMemoryKDTree() {
     SmallMemoryKDTree.Factory<?> factory = new ELKIBuilder<>(SmallMemoryKDTree.Factory.class).build();
-    assertExactEuclidean(factory, SmallMemoryKDTree.KDTreeKNNQuery.class, SmallMemoryKDTree.KDTreeRangeQuery.class);
+    assertExactEuclidean(factory, SmallMemoryKDTree.KDTreeKNNSearcher.class, SmallMemoryKDTree.KDTreeRangeSearcher.class);
     assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

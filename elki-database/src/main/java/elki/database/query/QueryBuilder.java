@@ -673,7 +673,7 @@ public class QueryBuilder<O> {
       return null;
     }
     logNotAccelerated("rknn");
-    return new LinearScanRKNNByObject<>(distanceQuery, kNNByDBID(), k); // Default
+    return new LinearScanRKNNByObject<>(distanceQuery, kNNByDBID()); // Default
   }
 
   /**
@@ -717,7 +717,7 @@ public class QueryBuilder<O> {
       return null;
     }
     logNotAccelerated("rknn");
-    return new LinearScanRKNNByDBID<>(distanceQuery, kNNByDBID(), k); // Default
+    return new LinearScanRKNNByDBID<>(distanceQuery, kNNByDBID()); // Default
   }
 
   /**

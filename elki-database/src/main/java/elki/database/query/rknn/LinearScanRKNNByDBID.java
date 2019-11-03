@@ -51,9 +51,8 @@ public class LinearScanRKNNByDBID<O> implements RKNNSearcher<DBIDRef>, LinearSca
    * 
    * @param distanceQuery Distance function to use
    * @param knnQuery kNN query to use.
-   * @param maxk k to use
    */
-  public LinearScanRKNNByDBID(DistanceQuery<O> distanceQuery, KNNSearcher<DBIDRef> knnQuery, Integer maxk) {
+  public LinearScanRKNNByDBID(DistanceQuery<O> distanceQuery, KNNSearcher<DBIDRef> knnQuery) {
     super();
     this.distanceQuery = distanceQuery;
     this.knnQuery = knnQuery;

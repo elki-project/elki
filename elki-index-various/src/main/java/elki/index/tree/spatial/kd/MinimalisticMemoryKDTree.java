@@ -32,7 +32,7 @@ import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
-import elki.distance.Norm;
+import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.distance.minkowski.SparseLPNormDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
@@ -44,8 +44,8 @@ import elki.logging.Logging;
 import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -72,8 +72,8 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @has - - - KDTreeKNNQuery
- * @has - - - KDTreeRangeQuery
+ * @has - - - KDTreeKNNSearcher
+ * @has - - - KDTreeRangeSearcher
  *
  * @param <O> Vector type
  */
@@ -149,7 +149,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   }
 
   /**
-   * Class to count object accesses during construnction.
+   * Class to count object accesses during construction.
    *
    * @author Erich Schubert
    */
@@ -192,7 +192,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     comp.setDimension(axis);
     QuickSelectDBIDs.quickSelect(sorted, comp, left, right, middle);
 
-    final int next = (axis + 1) % dims;
+    final int next = next(axis);
     if(left + leafsize < middle) {
       buildTree(left, middle, next, comp);
     }
@@ -202,14 +202,24 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
   }
 
+  /**
+   * Next axis.
+   *
+   * @param axis Current axis
+   * @return Next axis
+   */
+  private int next(int axis) {
+    return ++axis == dims ? 0 : axis;
+  }
+
   @Override
   public String getLongName() {
-    return "kd-tree";
+    return "k-d-tree";
   }
 
   @Override
   public String getShortName() {
-    return "kd-tree";
+    return "k-d-tree";
   }
 
   @Override
@@ -246,7 +256,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
         || df instanceof SparseLPNormDistance) {
-      return new KDTreeKNNQuery((Norm<? super O>) df);
+      return new KDTreeKNNSearcher((PrimitiveDistance<? super O>) df);
     }
     return null;
   }
@@ -257,7 +267,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
         || df instanceof SparseLPNormDistance) {
-      return new KDTreeRangeQuery((Norm<? super O>) df);
+      return new KDTreeRangeSearcher((PrimitiveDistance<? super O>) df);
     }
     return null;
   }
@@ -267,19 +277,20 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @author Erich Schubert
    */
-  public class KDTreeKNNQuery implements KNNSearcher<O> {
+  public class KDTreeKNNSearcher implements KNNSearcher<O> {
     /**
-     * Norm to use.
+     * Distance to use.
      */
-    private Norm<? super O> norm;
+    private PrimitiveDistance<? super O> distance;
 
     /**
      * Constructor.
      *
-     * @param norm Norm to use
+     * @param distance Distance to use
      */
-    public KDTreeKNNQuery(Norm<? super O> norm) {
-      this.norm = norm;
+    public KDTreeKNNSearcher(PrimitiveDistance<? super O> distance) {
+      super();
+      this.distance = distance;
     }
 
     @Override
@@ -290,7 +301,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
 
     /**
-     * Perform a kNN search on the kd-tree.
+     * Perform a kNN search on the k-d-tree.
      *
      * @param left Subtree begin
      * @param right Subtree end (exclusive)
@@ -304,7 +315,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     private double kdKNNSearch(int left, int right, int axis, O query, KNNHeap knns, DBIDArrayIter iter, double maxdist) {
       if(right - left <= leafsize) {
         for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
-          double dist = norm.distance(query, relation.get(iter));
+          double dist = distance.distance(query, relation.get(iter));
           countObjectAccess();
           countDistanceComputation();
           if(dist <= maxdist) {
@@ -321,16 +332,15 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
       // Distance to axis:
       final double delta = split.doubleValue(axis) - query.doubleValue(axis);
-      final boolean onleft = (delta >= 0);
-      final boolean onright = (delta <= 0);
+      final boolean onleft = (delta >= 0), onright = (delta <= 0);
 
       // Next axis:
-      final int next = (axis + 1) % dims;
+      final int next = next(axis);
 
       // Exact match chance (delta == 0)!
       // process first, then descend both sides.
       if(onleft && onright) {
-        double dist = norm.distance(query, split);
+        double dist = distance.distance(query, split);
         countDistanceComputation();
         if(dist <= maxdist) {
           assert (iter.getOffset() == middle);
@@ -345,20 +355,21 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
         }
       }
       else {
+        final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
         if(onleft) {
           if(left < middle) {
             maxdist = kdKNNSearch(left, middle, next, query, knns, iter, maxdist);
           }
           // Look at splitting element (unless already above):
-          if(Math.abs(delta) <= maxdist) {
-            double dist = norm.distance(query, split);
+          if(mindist <= maxdist) {
+            double dist = distance.distance(query, split);
             countDistanceComputation();
             if(dist <= maxdist) {
               knns.insert(dist, iter.seek(middle));
               maxdist = knns.getKNNDistance();
             }
           }
-          if((middle + 1 < right) && (Math.abs(delta) <= maxdist)) {
+          if(middle + 1 < right && mindist <= maxdist) {
             maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, maxdist);
           }
         }
@@ -367,15 +378,15 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
             maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, maxdist);
           }
           // Look at splitting element (unless already above):
-          if(Math.abs(delta) <= maxdist) {
-            double dist = norm.distance(query, split);
+          if(mindist <= maxdist) {
+            double dist = distance.distance(query, split);
             countDistanceComputation();
             if(dist <= maxdist) {
               knns.insert(dist, iter.seek(middle));
               maxdist = knns.getKNNDistance();
             }
           }
-          if((left < middle) && (Math.abs(delta) <= maxdist)) {
+          if(left < middle && mindist <= maxdist) {
             maxdist = kdKNNSearch(left, middle, next, query, knns, iter, maxdist);
           }
         }
@@ -385,24 +396,24 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   }
 
   /**
-   * kNN query for the k-d-tree.
+   * Range query for the k-d-tree.
    *
    * @author Erich Schubert
    */
-  public class KDTreeRangeQuery implements RangeSearcher<O> {
+  public class KDTreeRangeSearcher implements RangeSearcher<O> {
     /**
-     * Norm to use.
+     * Distance to use.
      */
-    private Norm<? super O> norm;
+    private PrimitiveDistance<? super O> distance;
 
     /**
      * Constructor.
      *
-     * @param norm Norm to use
+     * @param distance Distance to use
      */
-    public KDTreeRangeQuery(Norm<? super O> norm) {
+    public KDTreeRangeSearcher(PrimitiveDistance<? super O> distance) {
       super();
-      this.norm = norm;
+      this.distance = distance;
     }
 
     @Override
@@ -412,7 +423,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     }
 
     /**
-     * Perform a kNN search on the kd-tree.
+     * Perform a range search on the k-d-tree.
      *
      * @param left Subtree begin
      * @param right Subtree end (exclusive)
@@ -425,7 +436,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
     private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double radius) {
       if(right - left <= leafsize) {
         for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
-          double dist = norm.distance(query, relation.get(iter));
+          double dist = distance.distance(query, relation.get(iter));
           countObjectAccess();
           countDistanceComputation();
           if(dist <= radius) {
@@ -443,14 +454,15 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
       final double delta = split.doubleValue(axis) - query.doubleValue(axis);
       final boolean onleft = (delta >= 0);
       final boolean onright = (delta <= 0);
-      final boolean close = (Math.abs(delta) <= radius);
+      final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
+      final boolean close = (mindist <= radius);
 
       // Next axis:
-      final int next = (axis + 1) % dims;
+      final int next = next(axis);
 
       // Current object:
       if(close) {
-        double dist = norm.distance(query, split);
+        double dist = distance.distance(query, split);
         countDistanceComputation();
         if(dist <= radius) {
           assert (iter.getOffset() == middle);
