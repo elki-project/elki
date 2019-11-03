@@ -38,6 +38,7 @@ public class MinimalisticMemoryKDTreeTest extends AbstractIndexStructureTest {
   public void testMinimalisticMemoryKDTree() {
     MinimalisticMemoryKDTree.Factory<?> factory = new ELKIBuilder<>(MinimalisticMemoryKDTree.Factory.class).build();
     assertExactEuclidean(factory, MinimalisticMemoryKDTree.KDTreeKNNSearcher.class, MinimalisticMemoryKDTree.KDTreeRangeSearcher.class);
+    assertPrioritySearchEuclidean(factory, MinimalisticMemoryKDTree.KDTreePrioritySearcher.class);
     assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }
 }

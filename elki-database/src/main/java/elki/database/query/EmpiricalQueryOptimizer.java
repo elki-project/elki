@@ -153,9 +153,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   @Override
   @SuppressWarnings("unchecked")
   public <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = (KNNIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = (KNNIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
@@ -195,12 +195,12 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   @Override
   @SuppressWarnings("unchecked")
   public <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = (KNNIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = (KNNIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && (relation.getDBIDs() instanceof DBIDRange)) {
-      idx = (KNNIndex<O>) makeMatrixIndex(relation, distanceQuery.getDistance());
+      idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
@@ -237,12 +237,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = (RangeIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = (RangeIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
       return null;
@@ -253,15 +252,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return idx.rangeByObject(distanceQuery, maxrange, flags);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = (RangeIndex<O>) makeCoverTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = (RangeIndex<O>) makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
-      idx = (RangeIndex<O>) makeMatrixIndex(relation, distanceQuery.getDistance());
+      idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
       return null;
@@ -275,6 +273,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   @Override
   public <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
+      idx = makeKDTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) {
       return null;
     }
@@ -287,6 +288,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   @Override
   public <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
+      idx = makeKDTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
@@ -347,7 +351,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
-  private <O> Index makeKDTree(Relation<? extends O> relation, Distance<? super O> distance) {
+  private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance) {
     TypeInformation type = relation.getDataTypeInformation();
     if(kdIndex == null // not available
         || !TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type) //
@@ -356,7 +360,8 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       return null;
     }
     try {
-      Index idx = kdIndex.newInstance(relation, 5);
+      @SuppressWarnings("unchecked")
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, 5);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
       return idx;

@@ -24,6 +24,7 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -35,12 +36,12 @@ import elki.distance.minkowski.LPNormDistance;
 import elki.distance.minkowski.SparseLPNormDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.AbstractIndex;
+import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
-import elki.index.KNNIndex;
-import elki.index.RangeIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
+import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -79,7 +80,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Communications of the ACM 18(9)", //
     url = "https://doi.org/10.1145/361002.361007", //
     bibkey = "DBLP:journals/cacm/Bentley75")
-public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
+public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements DistancePriorityIndex<O> {
   /**
    * Class logger
    */
@@ -239,6 +240,17 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
         || df instanceof SparseLPNormDistance) {
       return new KDTreeRangeSearcher((PrimitiveDistance<? super O>) df);
+    }
+    return null;
+  }
+
+  @Override
+  public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    Distance<? super O> df = distanceQuery.getDistance();
+    // TODO: if we know this works for other distance functions, add them, too!
+    if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
+        || df instanceof SparseLPNormDistance) {
+      return new KDTreePrioritySearcher((PrimitiveDistance<? super O>) df);
     }
     return null;
   }
@@ -451,6 +463,189 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
       if(middle + 1 < right && (onright || close)) {
         kdRangeSearch(middle + 1, right, next, query, res, iter, radius);
       }
+    }
+  }
+
+  /**
+   * Search position for priority search.
+   *
+   * @author Erich Schubert
+   */
+  private static class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
+    /**
+     * Minimum distance
+     */
+    double mindist;
+
+    /**
+     * Interval begin
+     */
+    int left;
+
+    /**
+     * Interval end
+     */
+    int right;
+
+    /**
+     * Next splitting axis
+     */
+    int axis;
+
+    /**
+     * Constructor.
+     *
+     * @param mindist Minimum distance
+     * @param left Interval begin
+     * @param right Interval end (exclusive)
+     * @param axis Next axis
+     */
+    public PrioritySearchBranch(double mindist, int left, int right, int axis) {
+      this.mindist = mindist;
+      this.left = left;
+      this.right = right;
+      this.axis = axis;
+    }
+
+    @Override
+    public int compareTo(PrioritySearchBranch o) {
+      return Double.compare(this.mindist, o.mindist);
+    }
+  }
+
+  /**
+   * Priority search for the k-d-tree.
+   *
+   * @author Erich Schubert
+   */
+  public class KDTreePrioritySearcher implements PrioritySearcher<O> {
+    /**
+     * Distance to use.
+     */
+    private PrimitiveDistance<? super O> distance;
+
+    /**
+     * Min heap for searching.
+     */
+    private ComparableMinHeap<PrioritySearchBranch> heap = new ComparableMinHeap<>();
+
+    /**
+     * Search iterator.
+     */
+    private DoubleDBIDListIter iter = sorted.iter();
+
+    /**
+     * Current query object.
+     */
+    private O query;
+
+    /**
+     * Stopping threshold.
+     */
+    private double threshold;
+
+    /**
+     * Position within leaf.
+     */
+    private int pos;
+
+    /**
+     * Current search position.
+     */
+    private PrioritySearchBranch cur;
+
+    /**
+     * Constructor.
+     *
+     * @param distance Distance to use
+     */
+    public KDTreePrioritySearcher(PrimitiveDistance<? super O> distance) {
+      super();
+      this.distance = distance;
+    }
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      this.query = query;
+      this.threshold = Double.POSITIVE_INFINITY;
+      this.pos = Integer.MIN_VALUE;
+      this.heap.clear();
+      this.heap.add(new PrioritySearchBranch(0, 0, sorted.size(), 0));
+      return advance();
+    }
+
+    @Override
+    public PrioritySearcher<O> advance() {
+      // Iteration within current leaf:
+      if(cur != null && cur.right - cur.left <= leafsize) {
+        assert pos >= cur.left;
+        if(++pos < cur.right) {
+          return this;
+        }
+        assert pos == cur.right;
+      }
+      if(heap.isEmpty()) {
+        cur = null;
+        pos = Integer.MIN_VALUE;
+        return this;
+      }
+      // Get next
+      cur = heap.poll();
+      if(cur.mindist > threshold) {
+        cur = null;
+        pos = Integer.MIN_VALUE;
+        return this;
+      }
+      // Leaf:
+      if(cur.right - cur.left <= leafsize) {
+        pos = cur.left;
+        return this;
+      }
+      pos = (cur.left + cur.right) >>> 1; // middle element
+      // Distance to axis:
+      final double delta = iter.seek(pos).doubleValue() - query.doubleValue(cur.axis);
+      final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
+
+      // Next axis:
+      final int next = next(cur.axis);
+      final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+      if(cur.left < pos && ldist <= threshold) {
+        heap.add(new PrioritySearchBranch(ldist, cur.left, pos, next));
+      }
+      final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+      if(pos + 1 < cur.right && rdist <= threshold) {
+        heap.add(new PrioritySearchBranch(rdist, pos + 1, cur.right, next));
+      }
+      return this;
+    }
+
+    @Override
+    public boolean valid() {
+      return pos >= 0;
+    }
+
+    @Override
+    public double getLowerBound() {
+      return cur.mindist;
+    }
+
+    @Override
+    public double computeExactDistance() {
+      countDistanceComputation();
+      countObjectAccess();
+      return distance.distance(query, relation.get(iter.seek(pos)));
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return iter.seek(pos).internalGetIndex();
+    }
+
+    @Override
+    public PrioritySearcher<O> decreaseCutoff(double threshold) {
+      assert threshold <= this.threshold : "Thresholds must only decreasee.";
+      this.threshold = threshold;
+      return this;
     }
   }
 
