@@ -274,6 +274,44 @@ public class ClusterContingencyTable {
   }
 
   /**
+   * Compute the adjusted average Gini for each cluster (in both clusterings -
+   * symmetric).
+   * 
+   * @return Mean and variance of Gini
+   */
+  public MeanVariance adjustedSymmetricGini() {
+    MeanVariance mv = new MeanVariance();
+    final double total = contingency[size1][size2];
+    for(int i1 = 0; i1 < size1; i1++) {
+      double purity = 0.0, exp = 0.0;
+      if(contingency[i1][size2] > 0) {
+        final double cs = contingency[i1][size2]; // sum, as double.
+        for(int i2 = 0; i2 < size2; i2++) {
+          double rel = contingency[i1][i2] / cs;
+          purity += rel * rel;
+          double e = contingency[size1][i2] / total;
+          exp += e * e;
+        }
+        mv.put((purity - exp) / (1 - exp), cs);
+      }
+    }
+    for(int i2 = 0; i2 < size2; i2++) {
+      double purity = 0.0, exp = 0.0;
+      if(contingency[size1][i2] > 0) {
+        final double cs = contingency[size1][i2]; // sum, as double.
+        for(int i1 = 0; i1 < size1; i1++) {
+          double rel = contingency[i1][i2] / cs;
+          purity += rel * rel;
+          double e = contingency[i1][size2] / total;
+          exp += e * e;
+        }
+        mv.put((purity - exp) / (1 - exp), cs);
+      }
+    }
+    return mv;
+  }
+
+  /**
    * Utility class.
    * 
    * @author Erich Schubert

@@ -223,7 +223,7 @@ public class EvaluateClustering implements Evaluator {
 
       Entropy entropy = contmat.getEntropy();
       g = newGroup("Entropy based measures");
-      g.addMeasure("MI", entropy.mutualInformation(), 0, entropy.upperBoundMI(), true);
+      g.addMeasure("MI", entropy.mutualInformation(), 0, entropy.upperBoundMI(), false);
       g.addMeasure("VI", entropy.variationOfInformation(), 0, entropy.upperBoundVI(), true);
       g.addMeasure("Homogeneity", entropy.mutualInformation() / entropy.entropyFirst(), 0, 1, false);
       g.addMeasure("Completeness", entropy.mutualInformation() / entropy.entropySecond(), 0, 1, false);
@@ -250,10 +250,11 @@ public class EvaluateClustering implements Evaluator {
       g.addMeasure("Precision", edit.editDistanceFirst(), 0, 1, false);
       g.addMeasure("Recall", edit.editDistanceSecond(), 0, 1, false);
 
-      MeanVariance gini = contmat.averageSymmetricGini();
       g = newGroup("Gini measures");
-      g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 1. ? gini.getSampleStddev() : 0.), gini.getMean(), 0, 1, false);
-      // FIXME: Adjusted Gini?
+      MeanVariance gini = contmat.averageSymmetricGini();
+      g.addMeasure("Mean +-" + FormatUtil.NF4.format(gini.getCount() > 0. ? gini.getSampleStddev() : 0.), gini.getMean(), 0, 1, false);
+      MeanVariance agini = contmat.adjustedSymmetricGini();
+      g.addMeasure("Mean +-" + FormatUtil.NF4.format(agini.getCount() > 0. ? agini.getSampleStddev() : 0.), agini.getMean(), 0, 1, false);
     }
 
     /**
