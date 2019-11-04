@@ -40,19 +40,19 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
   @Test
   public void testPDF() {
     load("emg.ascii.gz");
-    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_scipy_1_3_05", 1e-15);
-    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_scipy_1_3_01", 1e-15);
-    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_gnur_1_3_05", 1e-15);
-    checkPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_gnur_1_3_01", 1e-15);
+    assertPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_scipy_1_3_05", 1e-15);
+    assertPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_scipy_1_3_01", 1e-15);
+    assertPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "pdf_gnur_1_3_05", 1e-15);
+    assertPDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "pdf_gnur_1_3_01", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("emg.ascii.gz");
-    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_scipy_1_3_05", 1e-14);
-    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_scipy_1_3_01", 1e-14);
-    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_gnur_1_3_05", 1e-14);
-    checkCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_gnur_1_3_01", 1e-14);
+    assertCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_scipy_1_3_05", 1e-14);
+    assertCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_scipy_1_3_01", 1e-14);
+    assertCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .5), "cdf_gnur_1_3_05", 1e-14);
+    assertCDF(new ExponentiallyModifiedGaussianDistribution(1., 3., .1), "cdf_gnur_1_3_01", 1e-14);
   }
 
   // TODO: once quantile() is implemented, add a test.
@@ -65,13 +65,13 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
     params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.SCALE_ID, 3);
     params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.RATE_ID, .5);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentiallyModifiedGaussianDistribution.class, params);
-    checkPDF(dist, "pdf_gnur_1_3_05", 1e-15);
+    assertPDF(dist, "pdf_gnur_1_3_05", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new ExponentiallyModifiedGaussianDistribution(0.1, 0.9, 1.), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExponentiallyModifiedGaussianDistribution(1.41, 3.14, 2.), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExponentiallyModifiedGaussianDistribution(3.14, 1.41, 3.), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentiallyModifiedGaussianDistribution(0.1, 0.9, 1.), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentiallyModifiedGaussianDistribution(1.41, 3.14, 2.), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentiallyModifiedGaussianDistribution(3.14, 1.41, 3.), new Random(0L), 10000, 1e-2);
   }
 }

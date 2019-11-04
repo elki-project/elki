@@ -47,45 +47,45 @@ public class NormalDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("norm.ascii.gz");
-    checkPDF(new NormalDistribution(0., 1.), "pdf_scipy_0_1", 1e-15);
-    checkPDF(new NormalDistribution(1., 3.), "pdf_scipy_1_3", 1e-15);
-    checkPDF(new NormalDistribution(.1, .1), "pdf_scipy_01_01", 1e-15);
-    checkPDF(new NormalDistribution(0., 1.), "pdf_gnur_0_1", 1e-15);
-    checkPDF(new NormalDistribution(1., 3.), "pdf_gnur_1_3", 1e-15);
-    checkPDF(new NormalDistribution(.1, .1), "pdf_gnur_01_01", 1e-15);
+    assertPDF(new NormalDistribution(0., 1.), "pdf_scipy_0_1", 1e-15);
+    assertPDF(new NormalDistribution(1., 3.), "pdf_scipy_1_3", 1e-15);
+    assertPDF(new NormalDistribution(.1, .1), "pdf_scipy_01_01", 1e-15);
+    assertPDF(new NormalDistribution(0., 1.), "pdf_gnur_0_1", 1e-15);
+    assertPDF(new NormalDistribution(1., 3.), "pdf_gnur_1_3", 1e-15);
+    assertPDF(new NormalDistribution(.1, .1), "pdf_gnur_01_01", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("norm.ascii.gz");
-    checkLogPDF(new NormalDistribution(0., 1.), "logpdf_scipy_0_1", 1e-15);
-    checkLogPDF(new NormalDistribution(1., 3.), "logpdf_scipy_1_3", 1e-15);
-    checkLogPDF(new NormalDistribution(.1, .1), "logpdf_scipy_01_01", 1e-15);
-    checkLogPDF(new NormalDistribution(0., 1.), "logpdf_gnur_0_1", 1e-15);
-    checkLogPDF(new NormalDistribution(1., 3.), "logpdf_gnur_1_3", 1e-15);
-    checkLogPDF(new NormalDistribution(.1, .1), "logpdf_gnur_01_01", 1e-15);
+    assertLogPDF(new NormalDistribution(0., 1.), "logpdf_scipy_0_1", 1e-15);
+    assertLogPDF(new NormalDistribution(1., 3.), "logpdf_scipy_1_3", 1e-15);
+    assertLogPDF(new NormalDistribution(.1, .1), "logpdf_scipy_01_01", 1e-15);
+    assertLogPDF(new NormalDistribution(0., 1.), "logpdf_gnur_0_1", 1e-15);
+    assertLogPDF(new NormalDistribution(1., 3.), "logpdf_gnur_1_3", 1e-15);
+    assertLogPDF(new NormalDistribution(.1, .1), "logpdf_gnur_01_01", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("norm.ascii.gz");
-    checkCDF(new NormalDistribution(0., 1.), "cdf_scipy_0_1", 1e-15);
-    checkCDF(new NormalDistribution(1., 3.), "cdf_scipy_1_3", 1e-15);
-    checkCDF(new NormalDistribution(.1, .1), "cdf_scipy_01_01", 1e-15);
-    checkCDF(new NormalDistribution(0., 1.), "cdf_gnur_0_1", 1e-15);
-    checkCDF(new NormalDistribution(1., 3.), "cdf_gnur_1_3", 1e-15);
-    checkCDF(new NormalDistribution(.1, .1), "cdf_gnur_01_01", 1e-15);
+    assertCDF(new NormalDistribution(0., 1.), "cdf_scipy_0_1", 1e-15);
+    assertCDF(new NormalDistribution(1., 3.), "cdf_scipy_1_3", 1e-15);
+    assertCDF(new NormalDistribution(.1, .1), "cdf_scipy_01_01", 1e-15);
+    assertCDF(new NormalDistribution(0., 1.), "cdf_gnur_0_1", 1e-15);
+    assertCDF(new NormalDistribution(1., 3.), "cdf_gnur_1_3", 1e-15);
+    assertCDF(new NormalDistribution(.1, .1), "cdf_gnur_01_01", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("norm.ascii.gz");
-    checkQuantile(new NormalDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
-    checkQuantile(new NormalDistribution(1., 3.), "quant_scipy_1_3", 1e-15);
-    checkQuantile(new NormalDistribution(.1, .1), "quant_scipy_01_01", 1e-15);
-    checkQuantile(new NormalDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
-    checkQuantile(new NormalDistribution(1., 3.), "quant_gnur_1_3", 1e-15);
-    checkQuantile(new NormalDistribution(.1, .1), "quant_gnur_01_01", 1e-15);
+    assertQuantile(new NormalDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
+    assertQuantile(new NormalDistribution(1., 3.), "quant_scipy_1_3", 1e-15);
+    assertQuantile(new NormalDistribution(.1, .1), "quant_scipy_01_01", 1e-15);
+    assertQuantile(new NormalDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
+    assertQuantile(new NormalDistribution(1., 3.), "quant_gnur_1_3", 1e-15);
+    assertQuantile(new NormalDistribution(.1, .1), "quant_gnur_01_01", 1e-15);
   }
 
   @Test
@@ -95,12 +95,12 @@ public class NormalDistributionTest extends AbstractDistributionTest {
     params.addParameter(NormalDistribution.Par.LOCATION_ID, 1.);
     params.addParameter(NormalDistribution.Par.SCALE_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(NormalDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_1_3", 1e-15);
+    assertPDF(dist, "pdf_scipy_1_3", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new NormalDistribution(-1, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new NormalDistribution(1, 4), new Random(1L), 10000, 1e-2);
+    assertRandom(new NormalDistribution(-1, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new NormalDistribution(1, 4), new Random(1L), 10000, 1e-2);
   }
 }

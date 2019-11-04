@@ -38,37 +38,37 @@ public class UniformDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("unif.ascii.gz");
-    checkPDF(new UniformDistribution(0., 1.), "pdf_gnur_0_1", 1e-15);
-    checkPDF(new UniformDistribution(-1., 2.), "pdf_gnur_M1_2", 1e-15);
-    checkPDF(new UniformDistribution(0., 1.), "pdf_scipy_0_1", 1e-15);
-    checkPDF(new UniformDistribution(-1., 2.), "pdf_scipy_M1_2", 1e-15);
+    assertPDF(new UniformDistribution(0., 1.), "pdf_gnur_0_1", 1e-15);
+    assertPDF(new UniformDistribution(-1., 2.), "pdf_gnur_M1_2", 1e-15);
+    assertPDF(new UniformDistribution(0., 1.), "pdf_scipy_0_1", 1e-15);
+    assertPDF(new UniformDistribution(-1., 2.), "pdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("unif.ascii.gz");
-    checkLogPDF(new UniformDistribution(0., 1.), "logpdf_gnur_0_1", 1e-15);
-    checkLogPDF(new UniformDistribution(-1., 2.), "logpdf_gnur_M1_2", 1e-15);
-    checkLogPDF(new UniformDistribution(0., 1.), "logpdf_scipy_0_1", 1e-15);
-    checkLogPDF(new UniformDistribution(-1., 2.), "logpdf_scipy_M1_2", 1e-15);
+    assertLogPDF(new UniformDistribution(0., 1.), "logpdf_gnur_0_1", 1e-15);
+    assertLogPDF(new UniformDistribution(-1., 2.), "logpdf_gnur_M1_2", 1e-15);
+    assertLogPDF(new UniformDistribution(0., 1.), "logpdf_scipy_0_1", 1e-15);
+    assertLogPDF(new UniformDistribution(-1., 2.), "logpdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("unif.ascii.gz");
-    checkCDF(new UniformDistribution(0., 1.), "cdf_gnur_0_1", 1e-15);
-    checkCDF(new UniformDistribution(-1., 2.), "cdf_gnur_M1_2", 1e-15);
-    checkCDF(new UniformDistribution(0., 1.), "cdf_scipy_0_1", 1e-15);
-    checkCDF(new UniformDistribution(-1., 2.), "cdf_scipy_M1_2", 1e-15);
+    assertCDF(new UniformDistribution(0., 1.), "cdf_gnur_0_1", 1e-15);
+    assertCDF(new UniformDistribution(-1., 2.), "cdf_gnur_M1_2", 1e-15);
+    assertCDF(new UniformDistribution(0., 1.), "cdf_scipy_0_1", 1e-15);
+    assertCDF(new UniformDistribution(-1., 2.), "cdf_scipy_M1_2", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("unif.ascii.gz");
-    checkQuantile(new UniformDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
-    checkQuantile(new UniformDistribution(-1., 2.), "quant_gnur_M1_2", 1e-15);
-    checkQuantile(new UniformDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
-    checkQuantile(new UniformDistribution(-1., 2.), "quant_scipy_M1_2", 1e-15);
+    assertQuantile(new UniformDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
+    assertQuantile(new UniformDistribution(-1., 2.), "quant_gnur_M1_2", 1e-15);
+    assertQuantile(new UniformDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
+    assertQuantile(new UniformDistribution(-1., 2.), "quant_scipy_M1_2", 1e-15);
   }
 
   @Test
@@ -78,12 +78,12 @@ public class UniformDistributionTest extends AbstractDistributionTest {
     params.addParameter(UniformDistribution.Par.MIN_ID, 0.);
     params.addParameter(UniformDistribution.Par.MAX_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(UniformDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_0_1", 1e-15);
+    assertPDF(dist, "pdf_scipy_0_1", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new UniformDistribution(-1, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new UniformDistribution(1, 4), new Random(1L), 10000, 1e-2);
+    assertRandom(new UniformDistribution(-1, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new UniformDistribution(1, 4), new Random(1L), 10000, 1e-2);
   }
 }

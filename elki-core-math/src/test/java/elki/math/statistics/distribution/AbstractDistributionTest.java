@@ -67,7 +67,7 @@ public class AbstractDistributionTest {
     }
   }
 
-  public void checkPDF(Distribution d, String key, double err) {
+  public void assertPDF(Distribution d, String key, double err) {
     // Also check that toString is meaningful.
     assertEquals("No meaningful toString()", -1, d.toString().indexOf('@'));
     double[] data = this.data.get(key);
@@ -96,7 +96,7 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
-  public void checkLogPDF(Distribution d, String key, double err) {
+  public void assertLogPDF(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
     assertNotNull("Key not in test data: " + key, data);
     assertEquals("Not NaN for NaN", Double.NaN, d.logpdf(Double.NaN), 0.);
@@ -123,7 +123,7 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
-  public void checkCDF(Distribution d, String key, double err) {
+  public void assertCDF(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
     assertNotNull("Key not in test data: " + key, data);
     assertEquals("Not NaN for NaN", Double.NaN, d.cdf(Double.NaN), 0.);
@@ -150,7 +150,7 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
-  public void checkQuantile(Distribution d, String key, double err) {
+  public void assertQuantile(Distribution d, String key, double err) {
     double[] data = this.data.get(key);
     assertEquals("Not NaN for NaN", Double.NaN, d.quantile(Double.NaN), 0.);
     assertEquals("Not NaN for -inf", Double.NaN, d.quantile(Double.NEGATIVE_INFINITY), 0.);
@@ -180,7 +180,7 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
-  public void checkRandom(Distribution d, Random rnd, int size, double err) {
+  public void assertRandom(Distribution d, Random rnd, int size, double err) {
     double[] data = new double[size];
     for(int i = 0; i < size; i++) {
       data[i] = d.nextRandom(rnd);

@@ -40,65 +40,65 @@ public class ExponentialDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("exp.ascii.gz");
-    checkPDF(new ExponentialDistribution(.1), "pdf_scipy_01", 1e-15);
-    checkPDF(new ExponentialDistribution(.5), "pdf_scipy_05", 1e-15);
-    checkPDF(new ExponentialDistribution(1.), "pdf_scipy_1", 1e-15);
-    checkPDF(new ExponentialDistribution(2.), "pdf_scipy_2", 1e-15);
-    checkPDF(new ExponentialDistribution(4.), "pdf_scipy_4", 1e-15);
+    assertPDF(new ExponentialDistribution(.1), "pdf_scipy_01", 1e-15);
+    assertPDF(new ExponentialDistribution(.5), "pdf_scipy_05", 1e-15);
+    assertPDF(new ExponentialDistribution(1.), "pdf_scipy_1", 1e-15);
+    assertPDF(new ExponentialDistribution(2.), "pdf_scipy_2", 1e-15);
+    assertPDF(new ExponentialDistribution(4.), "pdf_scipy_4", 1e-15);
 
-    checkPDF(new ExponentialDistribution(.1), "pdf_gnur_01", 1e-15);
-    checkPDF(new ExponentialDistribution(.5), "pdf_gnur_05", 1e-15);
-    checkPDF(new ExponentialDistribution(1.), "pdf_gnur_1", 1e-15);
-    checkPDF(new ExponentialDistribution(2.), "pdf_gnur_2", 1e-15);
-    checkPDF(new ExponentialDistribution(4.), "pdf_gnur_4", 1e-15);
+    assertPDF(new ExponentialDistribution(.1), "pdf_gnur_01", 1e-15);
+    assertPDF(new ExponentialDistribution(.5), "pdf_gnur_05", 1e-15);
+    assertPDF(new ExponentialDistribution(1.), "pdf_gnur_1", 1e-15);
+    assertPDF(new ExponentialDistribution(2.), "pdf_gnur_2", 1e-15);
+    assertPDF(new ExponentialDistribution(4.), "pdf_gnur_4", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("exp.ascii.gz");
-    checkLogPDF(new ExponentialDistribution(.1), "logpdf_scipy_01", 1e-15);
-    checkLogPDF(new ExponentialDistribution(.5), "logpdf_scipy_05", 1e-15);
-    checkLogPDF(new ExponentialDistribution(1.), "logpdf_scipy_1", 1e-15);
-    checkLogPDF(new ExponentialDistribution(2.), "logpdf_scipy_2", 1e-15);
-    checkLogPDF(new ExponentialDistribution(4.), "logpdf_scipy_4", 1e-15);
+    assertLogPDF(new ExponentialDistribution(.1), "logpdf_scipy_01", 1e-15);
+    assertLogPDF(new ExponentialDistribution(.5), "logpdf_scipy_05", 1e-15);
+    assertLogPDF(new ExponentialDistribution(1.), "logpdf_scipy_1", 1e-15);
+    assertLogPDF(new ExponentialDistribution(2.), "logpdf_scipy_2", 1e-15);
+    assertLogPDF(new ExponentialDistribution(4.), "logpdf_scipy_4", 1e-15);
 
-    checkLogPDF(new ExponentialDistribution(.1), "logpdf_gnur_01", 1e-15);
-    checkLogPDF(new ExponentialDistribution(.5), "logpdf_gnur_05", 1e-15);
-    checkLogPDF(new ExponentialDistribution(1.), "logpdf_gnur_1", 1e-15);
-    checkLogPDF(new ExponentialDistribution(2.), "logpdf_gnur_2", 1e-15);
-    checkLogPDF(new ExponentialDistribution(4.), "logpdf_gnur_4", 1e-15);
+    assertLogPDF(new ExponentialDistribution(.1), "logpdf_gnur_01", 1e-15);
+    assertLogPDF(new ExponentialDistribution(.5), "logpdf_gnur_05", 1e-15);
+    assertLogPDF(new ExponentialDistribution(1.), "logpdf_gnur_1", 1e-15);
+    assertLogPDF(new ExponentialDistribution(2.), "logpdf_gnur_2", 1e-15);
+    assertLogPDF(new ExponentialDistribution(4.), "logpdf_gnur_4", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("exp.ascii.gz");
-    checkCDF(new ExponentialDistribution(.1), "cdf_scipy_01", 1e-15);
-    checkCDF(new ExponentialDistribution(.5), "cdf_scipy_05", 1e-15);
-    checkCDF(new ExponentialDistribution(1.), "cdf_scipy_1", 1e-15);
-    checkCDF(new ExponentialDistribution(2.), "cdf_scipy_2", 1e-15);
-    checkCDF(new ExponentialDistribution(4.), "cdf_scipy_4", 1e-15);
+    assertCDF(new ExponentialDistribution(.1), "cdf_scipy_01", 1e-15);
+    assertCDF(new ExponentialDistribution(.5), "cdf_scipy_05", 1e-15);
+    assertCDF(new ExponentialDistribution(1.), "cdf_scipy_1", 1e-15);
+    assertCDF(new ExponentialDistribution(2.), "cdf_scipy_2", 1e-15);
+    assertCDF(new ExponentialDistribution(4.), "cdf_scipy_4", 1e-15);
 
-    checkCDF(new ExponentialDistribution(.1), "cdf_gnur_01", 1e-15);
-    checkCDF(new ExponentialDistribution(.5), "cdf_gnur_05", 1e-15);
-    checkCDF(new ExponentialDistribution(1.), "cdf_gnur_1", 1e-15);
-    checkCDF(new ExponentialDistribution(2.), "cdf_gnur_2", 1e-15);
-    checkCDF(new ExponentialDistribution(4.), "cdf_gnur_4", 1e-15);
+    assertCDF(new ExponentialDistribution(.1), "cdf_gnur_01", 1e-15);
+    assertCDF(new ExponentialDistribution(.5), "cdf_gnur_05", 1e-15);
+    assertCDF(new ExponentialDistribution(1.), "cdf_gnur_1", 1e-15);
+    assertCDF(new ExponentialDistribution(2.), "cdf_gnur_2", 1e-15);
+    assertCDF(new ExponentialDistribution(4.), "cdf_gnur_4", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("exp.ascii.gz");
-    checkQuantile(new ExponentialDistribution(.1), "quant_gnur_01", 1e-15);
-    checkQuantile(new ExponentialDistribution(.5), "quant_gnur_05", 1e-15);
-    checkQuantile(new ExponentialDistribution(1.), "quant_gnur_1", 1e-15);
-    checkQuantile(new ExponentialDistribution(2.), "quant_gnur_2", 1e-15);
-    checkQuantile(new ExponentialDistribution(4.), "quant_gnur_4", 1e-15);
+    assertQuantile(new ExponentialDistribution(.1), "quant_gnur_01", 1e-15);
+    assertQuantile(new ExponentialDistribution(.5), "quant_gnur_05", 1e-15);
+    assertQuantile(new ExponentialDistribution(1.), "quant_gnur_1", 1e-15);
+    assertQuantile(new ExponentialDistribution(2.), "quant_gnur_2", 1e-15);
+    assertQuantile(new ExponentialDistribution(4.), "quant_gnur_4", 1e-15);
 
-    checkQuantile(new ExponentialDistribution(.1), "quant_scipy_01", 1e-15);
-    checkQuantile(new ExponentialDistribution(.5), "quant_scipy_05", 1e-15);
-    checkQuantile(new ExponentialDistribution(1.), "quant_scipy_1", 1e-15);
-    checkQuantile(new ExponentialDistribution(2.), "quant_scipy_2", 1e-15);
-    checkQuantile(new ExponentialDistribution(4.), "quant_scipy_4", 1e-15);
+    assertQuantile(new ExponentialDistribution(.1), "quant_scipy_01", 1e-15);
+    assertQuantile(new ExponentialDistribution(.5), "quant_scipy_05", 1e-15);
+    assertQuantile(new ExponentialDistribution(1.), "quant_scipy_1", 1e-15);
+    assertQuantile(new ExponentialDistribution(2.), "quant_scipy_2", 1e-15);
+    assertQuantile(new ExponentialDistribution(4.), "quant_scipy_4", 1e-15);
   }
 
   @Test
@@ -108,13 +108,13 @@ public class ExponentialDistributionTest extends AbstractDistributionTest {
     params.addParameter(ExponentialDistribution.Par.LOCATION_ID, 0.);
     params.addParameter(ExponentialDistribution.Par.RATE_ID, .1);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentialDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_01", 1e-15);
+    assertPDF(dist, "pdf_scipy_01", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new ExponentialDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExponentialDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExponentialDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentialDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentialDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExponentialDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

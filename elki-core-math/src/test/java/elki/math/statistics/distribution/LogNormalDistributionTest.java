@@ -40,45 +40,45 @@ public class LogNormalDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("lognorm.ascii.gz");
-    checkPDF(new LogNormalDistribution(0., 1., 0), "pdf_gnur_0_1", 1e-15);
-    checkPDF(new LogNormalDistribution(1., 3., 0), "pdf_gnur_1_3", 1e-15);
-    checkPDF(new LogNormalDistribution(.1, .1, 0), "pdf_gnur_01_01", 1e-15);
-    checkPDF(new LogNormalDistribution(0., 1., 0), "pdf_scipy_0_1", 1e-14);
-    checkPDF(new LogNormalDistribution(1., 3., 0), "pdf_scipy_1_3", 1e-14);
-    checkPDF(new LogNormalDistribution(.1, .1, 0), "pdf_scipy_01_01", 1e-14);
+    assertPDF(new LogNormalDistribution(0., 1., 0), "pdf_gnur_0_1", 1e-15);
+    assertPDF(new LogNormalDistribution(1., 3., 0), "pdf_gnur_1_3", 1e-15);
+    assertPDF(new LogNormalDistribution(.1, .1, 0), "pdf_gnur_01_01", 1e-15);
+    assertPDF(new LogNormalDistribution(0., 1., 0), "pdf_scipy_0_1", 1e-14);
+    assertPDF(new LogNormalDistribution(1., 3., 0), "pdf_scipy_1_3", 1e-14);
+    assertPDF(new LogNormalDistribution(.1, .1, 0), "pdf_scipy_01_01", 1e-14);
   }
 
   @Test
   public void testLogPDF() {
     load("lognorm.ascii.gz");
-    checkLogPDF(new LogNormalDistribution(0., 1., 0), "logpdf_gnur_0_1", 1e-15);
-    checkLogPDF(new LogNormalDistribution(1., 3., 0), "logpdf_gnur_1_3", 1e-15);
-    checkLogPDF(new LogNormalDistribution(.1, .1, 0), "logpdf_gnur_01_01", 1e-15);
-    checkLogPDF(new LogNormalDistribution(0., 1., 0), "logpdf_scipy_0_1", 1e-14);
-    checkLogPDF(new LogNormalDistribution(1., 3., 0), "logpdf_scipy_1_3", 1e-14);
-    checkLogPDF(new LogNormalDistribution(.1, .1, 0), "logpdf_scipy_01_01", 1e-14);
+    assertLogPDF(new LogNormalDistribution(0., 1., 0), "logpdf_gnur_0_1", 1e-15);
+    assertLogPDF(new LogNormalDistribution(1., 3., 0), "logpdf_gnur_1_3", 1e-15);
+    assertLogPDF(new LogNormalDistribution(.1, .1, 0), "logpdf_gnur_01_01", 1e-15);
+    assertLogPDF(new LogNormalDistribution(0., 1., 0), "logpdf_scipy_0_1", 1e-14);
+    assertLogPDF(new LogNormalDistribution(1., 3., 0), "logpdf_scipy_1_3", 1e-14);
+    assertLogPDF(new LogNormalDistribution(.1, .1, 0), "logpdf_scipy_01_01", 1e-14);
   }
 
   @Test
   public void testCDF() {
     load("lognorm.ascii.gz");
-    checkCDF(new LogNormalDistribution(0., 1., 0), "cdf_gnur_0_1", 1e-15);
-    checkCDF(new LogNormalDistribution(1., 3., 0), "cdf_gnur_1_3", 1e-15);
-    checkCDF(new LogNormalDistribution(.1, .1, 0), "cdf_gnur_01_01", 1e-15);
-    checkCDF(new LogNormalDistribution(0., 1., 0), "cdf_scipy_0_1", 1e-12);
-    checkCDF(new LogNormalDistribution(1., 3., 0), "cdf_scipy_1_3", 1e-12);
-    checkCDF(new LogNormalDistribution(.1, .1, 0), "cdf_scipy_01_01", 1e-15);
+    assertCDF(new LogNormalDistribution(0., 1., 0), "cdf_gnur_0_1", 1e-15);
+    assertCDF(new LogNormalDistribution(1., 3., 0), "cdf_gnur_1_3", 1e-15);
+    assertCDF(new LogNormalDistribution(.1, .1, 0), "cdf_gnur_01_01", 1e-15);
+    assertCDF(new LogNormalDistribution(0., 1., 0), "cdf_scipy_0_1", 1e-12);
+    assertCDF(new LogNormalDistribution(1., 3., 0), "cdf_scipy_1_3", 1e-12);
+    assertCDF(new LogNormalDistribution(.1, .1, 0), "cdf_scipy_01_01", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("lognorm.ascii.gz");
-    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_gnur_0_1", 1e-15);
-    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_gnur_1_3", 1e-14);
-    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_gnur_01_01", 1e-15);
-    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_scipy_0_1", 1e-15);
-    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_scipy_1_3", 1e-14);
-    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_scipy_01_01", 1e-15);
+    assertQuantile(new LogNormalDistribution(0., 1., 0), "quant_gnur_0_1", 1e-15);
+    assertQuantile(new LogNormalDistribution(1., 3., 0), "quant_gnur_1_3", 1e-14);
+    assertQuantile(new LogNormalDistribution(.1, .1, 0), "quant_gnur_01_01", 1e-15);
+    assertQuantile(new LogNormalDistribution(0., 1., 0), "quant_scipy_0_1", 1e-15);
+    assertQuantile(new LogNormalDistribution(1., 3., 0), "quant_scipy_1_3", 1e-14);
+    assertQuantile(new LogNormalDistribution(.1, .1, 0), "quant_scipy_01_01", 1e-15);
   }
 
   @Test
@@ -88,13 +88,13 @@ public class LogNormalDistributionTest extends AbstractDistributionTest {
     params.addParameter(LogNormalDistribution.Par.LOGMEAN_ID, 1.);
     params.addParameter(LogNormalDistribution.Par.LOGSTDDEV_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogNormalDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_1_3", 1e-15);
+    assertPDF(dist, "pdf_scipy_1_3", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new LogNormalDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
-    checkRandom(new LogNormalDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new LogNormalDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogNormalDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogNormalDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogNormalDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

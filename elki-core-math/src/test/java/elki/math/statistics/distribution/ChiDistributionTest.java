@@ -40,49 +40,49 @@ public class ChiDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("chi.ascii.gz");
-    checkPDF(new ChiDistribution(1.), "pdf_scipy_1", 1e-15);
-    checkPDF(new ChiDistribution(2.), "pdf_scipy_2", 1e-15);
-    checkPDF(new ChiDistribution(4.), "pdf_scipy_4", 1e-15);
-    checkPDF(new ChiDistribution(10.), "pdf_scipy_10", 1e-15);
-    checkPDF(new ChiDistribution(.1), "pdf_scipy_01", 1e-15);
+    assertPDF(new ChiDistribution(1.), "pdf_scipy_1", 1e-15);
+    assertPDF(new ChiDistribution(2.), "pdf_scipy_2", 1e-15);
+    assertPDF(new ChiDistribution(4.), "pdf_scipy_4", 1e-15);
+    assertPDF(new ChiDistribution(10.), "pdf_scipy_10", 1e-15);
+    assertPDF(new ChiDistribution(.1), "pdf_scipy_01", 1e-15);
 
-    checkPDF(new ChiDistribution(1.), "pdf_gnur_1", 1e-14);
-    checkPDF(new ChiDistribution(2.), "pdf_gnur_2", 1e-15);
-    checkPDF(new ChiDistribution(4.), "pdf_gnur_4", 1e-15);
-    checkPDF(new ChiDistribution(10.), "pdf_gnur_10", 1e-15);
-    checkPDF(new ChiDistribution(.1), "pdf_gnur_01", 1e-14);
+    assertPDF(new ChiDistribution(1.), "pdf_gnur_1", 1e-14);
+    assertPDF(new ChiDistribution(2.), "pdf_gnur_2", 1e-15);
+    assertPDF(new ChiDistribution(4.), "pdf_gnur_4", 1e-15);
+    assertPDF(new ChiDistribution(10.), "pdf_gnur_10", 1e-15);
+    assertPDF(new ChiDistribution(.1), "pdf_gnur_01", 1e-14);
   }
 
   @Test
   public void testLogPDF() {
     load("chi.ascii.gz");
-    checkLogPDF(new ChiDistribution(1.), "logpdf_scipy_1", 1e-15);
-    checkLogPDF(new ChiDistribution(2.), "logpdf_scipy_2", 1e-15);
-    checkLogPDF(new ChiDistribution(4.), "logpdf_scipy_4", 1e-15);
-    checkLogPDF(new ChiDistribution(10.), "logpdf_scipy_10", 1e-15);
-    checkLogPDF(new ChiDistribution(.1), "logpdf_scipy_01", 1e-15);
+    assertLogPDF(new ChiDistribution(1.), "logpdf_scipy_1", 1e-15);
+    assertLogPDF(new ChiDistribution(2.), "logpdf_scipy_2", 1e-15);
+    assertLogPDF(new ChiDistribution(4.), "logpdf_scipy_4", 1e-15);
+    assertLogPDF(new ChiDistribution(10.), "logpdf_scipy_10", 1e-15);
+    assertLogPDF(new ChiDistribution(.1), "logpdf_scipy_01", 1e-15);
 
-    checkLogPDF(new ChiDistribution(1.), "logpdf_gnur_1", 1e-15);
-    checkLogPDF(new ChiDistribution(2.), "logpdf_gnur_2", 1e-15);
-    checkLogPDF(new ChiDistribution(4.), "logpdf_gnur_4", 1e-15);
-    checkLogPDF(new ChiDistribution(10.), "logpdf_gnur_10", 1e-15);
-    checkLogPDF(new ChiDistribution(.1), "logpdf_gnur_01", 1e-15);
+    assertLogPDF(new ChiDistribution(1.), "logpdf_gnur_1", 1e-15);
+    assertLogPDF(new ChiDistribution(2.), "logpdf_gnur_2", 1e-15);
+    assertLogPDF(new ChiDistribution(4.), "logpdf_gnur_4", 1e-15);
+    assertLogPDF(new ChiDistribution(10.), "logpdf_gnur_10", 1e-15);
+    assertLogPDF(new ChiDistribution(.1), "logpdf_gnur_01", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("chi.ascii.gz");
-    checkCDF(new ChiDistribution(1.), "cdf_scipy_1", 1e-14);
-    checkCDF(new ChiDistribution(2.), "cdf_scipy_2", 1e-15);
-    checkCDF(new ChiDistribution(4.), "cdf_scipy_4", 1e-15);
-    checkCDF(new ChiDistribution(10.), "cdf_scipy_10", 1e-14);
-    checkCDF(new ChiDistribution(.1), "cdf_scipy_01", 1e-14);
+    assertCDF(new ChiDistribution(1.), "cdf_scipy_1", 1e-14);
+    assertCDF(new ChiDistribution(2.), "cdf_scipy_2", 1e-15);
+    assertCDF(new ChiDistribution(4.), "cdf_scipy_4", 1e-15);
+    assertCDF(new ChiDistribution(10.), "cdf_scipy_10", 1e-14);
+    assertCDF(new ChiDistribution(.1), "cdf_scipy_01", 1e-14);
 
-    checkCDF(new ChiDistribution(1.), "cdf_gnur_1", 1e-14);
-    checkCDF(new ChiDistribution(2.), "cdf_gnur_2", 1e-15);
-    checkCDF(new ChiDistribution(4.), "cdf_gnur_4", 1e-15);
-    checkCDF(new ChiDistribution(10.), "cdf_gnur_10", 1e-14);
-    checkCDF(new ChiDistribution(.1), "cdf_gnur_01", 1e-15);
+    assertCDF(new ChiDistribution(1.), "cdf_gnur_1", 1e-14);
+    assertCDF(new ChiDistribution(2.), "cdf_gnur_2", 1e-15);
+    assertCDF(new ChiDistribution(4.), "cdf_gnur_4", 1e-15);
+    assertCDF(new ChiDistribution(10.), "cdf_gnur_10", 1e-14);
+    assertCDF(new ChiDistribution(.1), "cdf_gnur_01", 1e-15);
   }
 
   @Test
@@ -91,13 +91,13 @@ public class ChiDistributionTest extends AbstractDistributionTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(ChiDistribution.Par.DOF_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ChiDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2", 1e-15);
+    assertPDF(dist, "pdf_scipy_2", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new ChiDistribution(0.1), new Random(0L), 10000, 1e-2);
-    checkRandom(new ChiDistribution(1.41), new Random(0L), 10000, 1e-2);
-    checkRandom(new ChiDistribution(3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new ChiDistribution(0.1), new Random(0L), 10000, 1e-2);
+    assertRandom(new ChiDistribution(1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new ChiDistribution(3.14), new Random(0L), 10000, 1e-2);
   }
 }

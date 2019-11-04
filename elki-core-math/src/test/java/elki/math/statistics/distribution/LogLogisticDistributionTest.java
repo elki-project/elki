@@ -40,33 +40,33 @@ public class LogLogisticDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("loglogistic.ascii.gz");
-    checkPDF(new LogLogisticDistribution(1., 0., 1.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new LogLogisticDistribution(2., 0., .5), "pdf_scipy_2_05", 1e-15);
-    checkPDF(new LogLogisticDistribution(.5, 0., .5), "pdf_scipy_05_05", 1e-14);
+    assertPDF(new LogLogisticDistribution(1., 0., 1.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new LogLogisticDistribution(2., 0., .5), "pdf_scipy_2_05", 1e-15);
+    assertPDF(new LogLogisticDistribution(.5, 0., .5), "pdf_scipy_05_05", 1e-14);
   }
 
   @Test
   public void testLogPDF() {
     load("loglogistic.ascii.gz");
-    checkLogPDF(new LogLogisticDistribution(1., 0., 1.), "logpdf_scipy_1_1", 1e-15);
-    checkLogPDF(new LogLogisticDistribution(2., 0., .5), "logpdf_scipy_2_05", 1e-15);
-    checkLogPDF(new LogLogisticDistribution(.5, 0., .5), "logpdf_scipy_05_05", 1e-15);
+    assertLogPDF(new LogLogisticDistribution(1., 0., 1.), "logpdf_scipy_1_1", 1e-15);
+    assertLogPDF(new LogLogisticDistribution(2., 0., .5), "logpdf_scipy_2_05", 1e-15);
+    assertLogPDF(new LogLogisticDistribution(.5, 0., .5), "logpdf_scipy_05_05", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("loglogistic.ascii.gz");
-    checkCDF(new LogLogisticDistribution(1., 0., 1.), "cdf_scipy_1_1", 1e-15);
-    checkCDF(new LogLogisticDistribution(2., 0., .5), "cdf_scipy_2_05", 1e-15);
-    checkCDF(new LogLogisticDistribution(.5, 0., .5), "cdf_scipy_05_05", 1e-15);
+    assertCDF(new LogLogisticDistribution(1., 0., 1.), "cdf_scipy_1_1", 1e-15);
+    assertCDF(new LogLogisticDistribution(2., 0., .5), "cdf_scipy_2_05", 1e-15);
+    assertCDF(new LogLogisticDistribution(.5, 0., .5), "cdf_scipy_05_05", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("loglogistic.ascii.gz");
-    checkQuantile(new LogLogisticDistribution(1., 0., 1.), "quant_scipy_1_1", 1e-12);
-    checkQuantile(new LogLogisticDistribution(2., 0., .5), "quant_scipy_2_05", 1e-12);
-    checkQuantile(new LogLogisticDistribution(.5, 0., .5), "quant_scipy_05_05", 1e-11);
+    assertQuantile(new LogLogisticDistribution(1., 0., 1.), "quant_scipy_1_1", 1e-12);
+    assertQuantile(new LogLogisticDistribution(2., 0., .5), "quant_scipy_2_05", 1e-12);
+    assertQuantile(new LogLogisticDistribution(.5, 0., .5), "quant_scipy_05_05", 1e-11);
   }
 
   @Test
@@ -77,13 +77,13 @@ public class LogLogisticDistributionTest extends AbstractDistributionTest {
     params.addParameter(LogLogisticDistribution.Par.LOCATION_ID, 0.);
     params.addParameter(LogLogisticDistribution.Par.SCALE_ID, .5);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogLogisticDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2_05", 1e-15);
+    assertPDF(dist, "pdf_scipy_2_05", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new LogLogisticDistribution(0.9, 1, 0.1), new Random(0L), 10000, 1e-2);
-    checkRandom(new LogLogisticDistribution(3.14, 2, 1.41), new Random(0L), 10000, 1e-2);
-    checkRandom(new LogLogisticDistribution(1.41, 3, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogLogisticDistribution(0.9, 1, 0.1), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogLogisticDistribution(3.14, 2, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new LogLogisticDistribution(1.41, 3, 3.14), new Random(0L), 10000, 1e-2);
   }
 }

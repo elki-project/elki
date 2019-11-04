@@ -40,45 +40,45 @@ public class GeneralizedLogisticDistributionTest extends AbstractDistributionTes
   @Test
   public void testPDF() {
     load("logistic.ascii.gz");
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "pdf_scipy_05", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "pdf_gnur_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "pdf_scipy_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "pdf_gnur_05", 1e-15);
     load("glogistic.ascii.gz");
-    checkPDF(new GeneralizedLogisticDistribution(1., 1., 1.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "pdf_scipy_2_05", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., .5), "pdf_scipy_05_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(1., 1., 1.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "pdf_scipy_2_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., .5), "pdf_scipy_05_05", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("logistic.ascii.gz");
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "logpdf_scipy_05", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "logpdf_gnur_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "logpdf_scipy_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "logpdf_gnur_05", 1e-15);
     load("glogistic.ascii.gz");
-    checkPDF(new GeneralizedLogisticDistribution(1., 1., 1.), "logpdf_scipy_1_1", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "logpdf_scipy_2_05", 1e-15);
-    checkPDF(new GeneralizedLogisticDistribution(.5, 1., .5), "logpdf_scipy_05_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(1., 1., 1.), "logpdf_scipy_1_1", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "logpdf_scipy_2_05", 1e-15);
+    assertPDF(new GeneralizedLogisticDistribution(.5, 1., .5), "logpdf_scipy_05_05", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("logistic.ascii.gz");
-    checkCDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "cdf_scipy_05", 1e-15);
-    checkCDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "cdf_gnur_05", 1e-15);
+    assertCDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "cdf_scipy_05", 1e-15);
+    assertCDF(new GeneralizedLogisticDistribution(.5, 1., 1.), "cdf_gnur_05", 1e-15);
     load("glogistic.ascii.gz");
-    checkCDF(new GeneralizedLogisticDistribution(1., 1., 1.), "cdf_scipy_1_1", 1e-15);
-    checkCDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "cdf_scipy_2_05", 1e-15);
-    checkCDF(new GeneralizedLogisticDistribution(.5, 1., .5), "cdf_scipy_05_05", 1e-15);
+    assertCDF(new GeneralizedLogisticDistribution(1., 1., 1.), "cdf_scipy_1_1", 1e-15);
+    assertCDF(new GeneralizedLogisticDistribution(.5, 1., 2.), "cdf_scipy_2_05", 1e-15);
+    assertCDF(new GeneralizedLogisticDistribution(.5, 1., .5), "cdf_scipy_05_05", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("logistic.ascii.gz");
-    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_scipy_05", 1e-13);
-    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_gnur_05", 1e-13);
+    assertQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_scipy_05", 1e-13);
+    assertQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_gnur_05", 1e-13);
     load("glogistic.ascii.gz");
-    checkQuantile(new GeneralizedLogisticDistribution(1., 1., 1.), "quant_scipy_1_1", 1e-13);
-    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 2.), "quant_scipy_2_05", 1e-14);
-    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., .5), "quant_scipy_05_05", 1e-13);
+    assertQuantile(new GeneralizedLogisticDistribution(1., 1., 1.), "quant_scipy_1_1", 1e-13);
+    assertQuantile(new GeneralizedLogisticDistribution(.5, 1., 2.), "quant_scipy_2_05", 1e-14);
+    assertQuantile(new GeneralizedLogisticDistribution(.5, 1., .5), "quant_scipy_05_05", 1e-13);
   }
 
   @Test
@@ -89,13 +89,13 @@ public class GeneralizedLogisticDistributionTest extends AbstractDistributionTes
     params.addParameter(GeneralizedLogisticDistribution.Par.SCALE_ID, 1);
     params.addParameter(GeneralizedLogisticDistribution.Par.SHAPE_ID, 2.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedLogisticDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2_05", 1e-15);
+    assertPDF(dist, "pdf_scipy_2_05", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new GeneralizedLogisticDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
-    checkRandom(new GeneralizedLogisticDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new GeneralizedLogisticDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
+    assertRandom(new GeneralizedLogisticDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    assertRandom(new GeneralizedLogisticDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new GeneralizedLogisticDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

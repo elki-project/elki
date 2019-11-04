@@ -40,32 +40,32 @@ public class SkewGeneralizedNormalDistributionTest extends AbstractDistributionT
   @Test
   public void testPDF() {
     load("norm.ascii.gz");
-    checkPDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "pdf_gnur_1_3", 1e-15);
+    assertPDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "pdf_gnur_1_3", 1e-15);
     load("skewnorm.ascii.gz");
-    checkPDF(new SkewGeneralizedNormalDistribution(1., 2., 3.), "pdf_gnur_1_2_3", 1e-15);
+    assertPDF(new SkewGeneralizedNormalDistribution(1., 2., 3.), "pdf_gnur_1_2_3", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("norm.ascii.gz");
-    checkLogPDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "logpdf_gnur_1_3", 1e-15);
+    assertLogPDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "logpdf_gnur_1_3", 1e-15);
     // TODO: add logspace test of skewed case
   }
 
   @Test
   public void testCDF() {
     load("norm.ascii.gz");
-    checkCDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "cdf_gnur_1_3", 1e-15);
+    assertCDF(new SkewGeneralizedNormalDistribution(1., 3., 0.), "cdf_gnur_1_3", 1e-15);
     load("skewnorm.ascii.gz");
-    checkCDF(new SkewGeneralizedNormalDistribution(1., 2., 3), "cdf_gnur_1_2_3", 1e-15);
+    assertCDF(new SkewGeneralizedNormalDistribution(1., 2., 3), "cdf_gnur_1_2_3", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("norm.ascii.gz");
-    checkQuantile(new SkewGeneralizedNormalDistribution(1., 3., 0.), "quant_gnur_1_3", 1e-15);
+    assertQuantile(new SkewGeneralizedNormalDistribution(1., 3., 0.), "quant_gnur_1_3", 1e-15);
     load("skewnorm.ascii.gz");
-    checkQuantile(new SkewGeneralizedNormalDistribution(1., 2., 3.), "quant_gnur_1_2_3", 1e-15);
+    assertQuantile(new SkewGeneralizedNormalDistribution(1., 2., 3.), "quant_gnur_1_2_3", 1e-15);
   }
 
   @Test
@@ -76,13 +76,13 @@ public class SkewGeneralizedNormalDistributionTest extends AbstractDistributionT
     params.addParameter(SkewGeneralizedNormalDistribution.Par.SCALE_ID, 2.);
     params.addParameter(SkewGeneralizedNormalDistribution.Par.SKEW_ID, 3.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(SkewGeneralizedNormalDistribution.class, params);
-    checkPDF(dist, "pdf_gnur_1_2_3", 1e-15);
+    assertPDF(dist, "pdf_gnur_1_2_3", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new SkewGeneralizedNormalDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
-    checkRandom(new SkewGeneralizedNormalDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new SkewGeneralizedNormalDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
+    assertRandom(new SkewGeneralizedNormalDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    assertRandom(new SkewGeneralizedNormalDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new SkewGeneralizedNormalDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

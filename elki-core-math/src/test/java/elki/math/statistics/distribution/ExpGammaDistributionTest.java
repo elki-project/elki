@@ -42,51 +42,51 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("expgamma.ascii.gz");
-    checkPDF(new ExpGammaDistribution(1., 1., 0.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new ExpGammaDistribution(2., 1., 0.), "pdf_scipy_2_1", 1e-15);
-    checkPDF(new ExpGammaDistribution(4., 1., 0.), "pdf_scipy_4_1", 1e-14);
-    checkPDF(new ExpGammaDistribution(4., 10, 0.), "pdf_scipy_4_10", 1e-15);
-    checkPDF(new ExpGammaDistribution(.1, 10, 0.), "pdf_scipy_01_10", 1e-15);
-    checkPDF(new ExpGammaDistribution(.1, 20, 0.), "pdf_scipy_01_20", 1e-15);
-    checkPDF(new ExpGammaDistribution(.1, 4., 0.), "pdf_scipy_01_4", 1e-15);
-    checkPDF(new ExpGammaDistribution(.1, 1., 0.), "pdf_scipy_01_1", 1e-15);
+    assertPDF(new ExpGammaDistribution(1., 1., 0.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new ExpGammaDistribution(2., 1., 0.), "pdf_scipy_2_1", 1e-15);
+    assertPDF(new ExpGammaDistribution(4., 1., 0.), "pdf_scipy_4_1", 1e-14);
+    assertPDF(new ExpGammaDistribution(4., 10, 0.), "pdf_scipy_4_10", 1e-15);
+    assertPDF(new ExpGammaDistribution(.1, 10, 0.), "pdf_scipy_01_10", 1e-15);
+    assertPDF(new ExpGammaDistribution(.1, 20, 0.), "pdf_scipy_01_20", 1e-15);
+    assertPDF(new ExpGammaDistribution(.1, 4., 0.), "pdf_scipy_01_4", 1e-15);
+    assertPDF(new ExpGammaDistribution(.1, 1., 0.), "pdf_scipy_01_1", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("expgamma.ascii.gz");
-    checkLogPDF(new ExpGammaDistribution(1., 1., 0.), "logpdf_scipy_1_1", 1e-15);
-    checkLogPDF(new ExpGammaDistribution(2., 1., 0.), "logpdf_scipy_2_1", 1e-15);
-    checkLogPDF(new ExpGammaDistribution(4., 1., 0.), "logpdf_scipy_4_1", 1e-15);
+    assertLogPDF(new ExpGammaDistribution(1., 1., 0.), "logpdf_scipy_1_1", 1e-15);
+    assertLogPDF(new ExpGammaDistribution(2., 1., 0.), "logpdf_scipy_2_1", 1e-15);
+    assertLogPDF(new ExpGammaDistribution(4., 1., 0.), "logpdf_scipy_4_1", 1e-15);
     // For the following, SciPy appears to lose numerical precision and returns inf values:
     // checkLogPDF(new LogGammaAlternateDistribution(4., 10, 0.), "logpdf_scipy_4_10", 1e-14);
     // checkLogPDF(new LogGammaAlternateDistribution(.1, 10, 0.), "logpdf_scipy_01_10", 1e-15);
     // checkLogPDF(new LogGammaAlternateDistribution(.1, 20, 0.), "logpdf_scipy_01_20", 1e-14);
     // checkLogPDF(new LogGammaAlternateDistribution(.1, 4., 0.), "logpdf_scipy_01_4", 1e-15);
-    checkLogPDF(new ExpGammaDistribution(.1, 1., 0.), "logpdf_scipy_01_1", 1e-15);
+    assertLogPDF(new ExpGammaDistribution(.1, 1., 0.), "logpdf_scipy_01_1", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("expgamma.ascii.gz");
-    checkCDF(new ExpGammaDistribution(1., 1., 0.), "cdf_scipy_1_1", 1e-15);
-    checkCDF(new ExpGammaDistribution(2., 1., 0.), "cdf_scipy_2_1", 1e-15);
-    checkCDF(new ExpGammaDistribution(4., 1., 0.), "cdf_scipy_4_1", 1e-15);
-    checkCDF(new ExpGammaDistribution(4., 10, 0.), "cdf_scipy_4_10", 1e-15);
-    checkCDF(new ExpGammaDistribution(.1, 10, 0.), "cdf_scipy_01_10", 1e-15);
-    checkCDF(new ExpGammaDistribution(.1, 20, 0.), "cdf_scipy_01_20", 1e-15);
-    checkCDF(new ExpGammaDistribution(.1, 4., 0.), "cdf_scipy_01_4", 1e-15);
-    checkCDF(new ExpGammaDistribution(.1, 1., 0.), "cdf_scipy_01_1", 1e-15);
+    assertCDF(new ExpGammaDistribution(1., 1., 0.), "cdf_scipy_1_1", 1e-15);
+    assertCDF(new ExpGammaDistribution(2., 1., 0.), "cdf_scipy_2_1", 1e-15);
+    assertCDF(new ExpGammaDistribution(4., 1., 0.), "cdf_scipy_4_1", 1e-15);
+    assertCDF(new ExpGammaDistribution(4., 10, 0.), "cdf_scipy_4_10", 1e-15);
+    assertCDF(new ExpGammaDistribution(.1, 10, 0.), "cdf_scipy_01_10", 1e-15);
+    assertCDF(new ExpGammaDistribution(.1, 20, 0.), "cdf_scipy_01_20", 1e-15);
+    assertCDF(new ExpGammaDistribution(.1, 4., 0.), "cdf_scipy_01_4", 1e-15);
+    assertCDF(new ExpGammaDistribution(.1, 1., 0.), "cdf_scipy_01_1", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("expgamma.ascii.gz");
-    checkQuantile(new ExpGammaDistribution(1., 1., 0.), "quant_scipy_1_1", 1e-14);
-    checkQuantile(new ExpGammaDistribution(2., 1., 0.), "quant_scipy_2_1", 1e-13);
-    checkQuantile(new ExpGammaDistribution(4., 1., 0.), "quant_scipy_4_1", 1e-14);
+    assertQuantile(new ExpGammaDistribution(1., 1., 0.), "quant_scipy_1_1", 1e-14);
+    assertQuantile(new ExpGammaDistribution(2., 1., 0.), "quant_scipy_2_1", 1e-13);
+    assertQuantile(new ExpGammaDistribution(4., 1., 0.), "quant_scipy_4_1", 1e-14);
     // Here, sklearn appears to have numeric problems (inf) again
-    checkQuantile(new ExpGammaDistribution(4., 10, 0.), "quant_scipy_4_10", 1e0);
+    assertQuantile(new ExpGammaDistribution(4., 10, 0.), "quant_scipy_4_10", 1e0);
     // checkQuantile(new ExpGammaDistribution(.1, 10, 0.), "quant_scipy_01_10", 1e-14);
     // checkQuantile(new ExpGammaDistribution(.1, 20, 0.), "quant_scipy_01_20", 1e-14);
     // checkQuantile(new ExpGammaDistribution(.1, 4., 0.), "quant_scipy_01_4", 1e-14);
@@ -101,15 +101,15 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
     params.addParameter(ExpGammaDistribution.Par.THETA_ID, 1.);
     params.addParameter(ExpGammaDistribution.Par.SHIFT_ID, 0.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExpGammaDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
+    assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 
 
   @Test
   public void testRandom() {
-    checkRandom(new ExpGammaDistribution(1, 1, 0), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
-    checkRandom(new ExpGammaDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExpGammaDistribution(1, 1, 0), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExpGammaDistribution(0.1, 0.9, 1), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExpGammaDistribution(1.41, 3.14, 2), new Random(0L), 10000, 1e-2);
+    assertRandom(new ExpGammaDistribution(3.14, 1.41, 3), new Random(0L), 10000, 1e-2);
   }
 }

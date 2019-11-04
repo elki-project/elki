@@ -40,41 +40,41 @@ public class CauchyDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("cauchy.ascii.gz");
-    checkPDF(new CauchyDistribution(.5, 1.), "pdf_gnur_05_1", 1e-15);
-    checkPDF(new CauchyDistribution(1., .5), "pdf_gnur_1_05", 1e-15);
+    assertPDF(new CauchyDistribution(.5, 1.), "pdf_gnur_05_1", 1e-15);
+    assertPDF(new CauchyDistribution(1., .5), "pdf_gnur_1_05", 1e-15);
 
-    checkPDF(new CauchyDistribution(.5, 1.), "pdf_scipy_05_1", 1e-15);
-    checkPDF(new CauchyDistribution(1., .5), "pdf_scipy_1_05", 1e-15);
+    assertPDF(new CauchyDistribution(.5, 1.), "pdf_scipy_05_1", 1e-15);
+    assertPDF(new CauchyDistribution(1., .5), "pdf_scipy_1_05", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("cauchy.ascii.gz");
-    checkLogPDF(new CauchyDistribution(.5, 1.), "logpdf_gnur_05_1", 1e-15);
-    checkLogPDF(new CauchyDistribution(1., .5), "logpdf_gnur_1_05", 1e-15);
+    assertLogPDF(new CauchyDistribution(.5, 1.), "logpdf_gnur_05_1", 1e-15);
+    assertLogPDF(new CauchyDistribution(1., .5), "logpdf_gnur_1_05", 1e-15);
 
-    checkLogPDF(new CauchyDistribution(.5, 1.), "logpdf_scipy_05_1", 1e-15);
-    checkLogPDF(new CauchyDistribution(1., .5), "logpdf_scipy_1_05", 1e-14);
+    assertLogPDF(new CauchyDistribution(.5, 1.), "logpdf_scipy_05_1", 1e-15);
+    assertLogPDF(new CauchyDistribution(1., .5), "logpdf_scipy_1_05", 1e-14);
   }
 
   @Test
   public void testCDF() {
     load("cauchy.ascii.gz");
-    checkCDF(new CauchyDistribution(1., .5), "cdf_gnur_1_05", 1e-15);
-    checkCDF(new CauchyDistribution(.5, 1.), "cdf_gnur_05_1", 1e-15);
+    assertCDF(new CauchyDistribution(1., .5), "cdf_gnur_1_05", 1e-15);
+    assertCDF(new CauchyDistribution(.5, 1.), "cdf_gnur_05_1", 1e-15);
 
-    checkCDF(new CauchyDistribution(1., .5), "cdf_scipy_1_05", 1e-15);
-    checkCDF(new CauchyDistribution(.5, 1.), "cdf_scipy_05_1", 1e-15);
+    assertCDF(new CauchyDistribution(1., .5), "cdf_scipy_1_05", 1e-15);
+    assertCDF(new CauchyDistribution(.5, 1.), "cdf_scipy_05_1", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("cauchy.ascii.gz");
-    checkQuantile(new CauchyDistribution(1., .5), "quant_gnur_1_05", 1e-15);
-    checkQuantile(new CauchyDistribution(.5, 1.), "quant_gnur_05_1", 1e-15);
+    assertQuantile(new CauchyDistribution(1., .5), "quant_gnur_1_05", 1e-15);
+    assertQuantile(new CauchyDistribution(.5, 1.), "quant_gnur_05_1", 1e-15);
 
-    checkQuantile(new CauchyDistribution(1., .5), "quant_scipy_1_05", 1e-12);
-    checkQuantile(new CauchyDistribution(.5, 1.), "quant_scipy_05_1", 1e-12);
+    assertQuantile(new CauchyDistribution(1., .5), "quant_scipy_1_05", 1e-12);
+    assertQuantile(new CauchyDistribution(.5, 1.), "quant_scipy_05_1", 1e-12);
   }
 
   @Test
@@ -84,13 +84,13 @@ public class CauchyDistributionTest extends AbstractDistributionTest {
     params.addParameter(CauchyDistribution.Par.LOCATION_ID, .5);
     params.addParameter(CauchyDistribution.Par.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(CauchyDistribution.class, params);
-    checkPDF(dist, "pdf_gnur_05_1", 1e-15);
+    assertPDF(dist, "pdf_gnur_05_1", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new CauchyDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
-    checkRandom(new CauchyDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new CauchyDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new CauchyDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    assertRandom(new CauchyDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new CauchyDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

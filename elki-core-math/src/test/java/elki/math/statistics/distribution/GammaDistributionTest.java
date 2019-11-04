@@ -40,89 +40,89 @@ public class GammaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("gamma.ascii.gz");
-    checkPDF(new GammaDistribution(1., 1.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new GammaDistribution(2., 1.), "pdf_scipy_2_1", 1e-15);
-    checkPDF(new GammaDistribution(4., 1.), "pdf_scipy_4_1", 1e-15);
-    checkPDF(new GammaDistribution(4., 10), "pdf_scipy_4_10", 1e-15);
-    checkPDF(new GammaDistribution(.1, 10), "pdf_scipy_01_10", 1e-15);
-    checkPDF(new GammaDistribution(.1, 20), "pdf_scipy_01_20", 1e-15);
-    checkPDF(new GammaDistribution(.1, 4.), "pdf_scipy_01_4", 1e-15);
-    checkPDF(new GammaDistribution(.1, 1.), "pdf_scipy_01_1", 1e-15);
+    assertPDF(new GammaDistribution(1., 1.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new GammaDistribution(2., 1.), "pdf_scipy_2_1", 1e-15);
+    assertPDF(new GammaDistribution(4., 1.), "pdf_scipy_4_1", 1e-15);
+    assertPDF(new GammaDistribution(4., 10), "pdf_scipy_4_10", 1e-15);
+    assertPDF(new GammaDistribution(.1, 10), "pdf_scipy_01_10", 1e-15);
+    assertPDF(new GammaDistribution(.1, 20), "pdf_scipy_01_20", 1e-15);
+    assertPDF(new GammaDistribution(.1, 4.), "pdf_scipy_01_4", 1e-15);
+    assertPDF(new GammaDistribution(.1, 1.), "pdf_scipy_01_1", 1e-15);
 
-    checkPDF(new GammaDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
-    checkPDF(new GammaDistribution(2., 1.), "pdf_gnur_2_1", 1e-15);
-    checkPDF(new GammaDistribution(4., 1.), "pdf_gnur_4_1", 1e-14);
-    checkPDF(new GammaDistribution(4., 10), "pdf_gnur_4_10", 1e-14);
-    checkPDF(new GammaDistribution(.1, 10), "pdf_gnur_01_10", 1e-15);
-    checkPDF(new GammaDistribution(.1, 20), "pdf_gnur_01_20", 1e-14);
-    checkPDF(new GammaDistribution(.1, 4.), "pdf_gnur_01_4", 1e-15);
-    checkPDF(new GammaDistribution(.1, 1.), "pdf_gnur_01_1", 1e-15);
+    assertPDF(new GammaDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
+    assertPDF(new GammaDistribution(2., 1.), "pdf_gnur_2_1", 1e-15);
+    assertPDF(new GammaDistribution(4., 1.), "pdf_gnur_4_1", 1e-14);
+    assertPDF(new GammaDistribution(4., 10), "pdf_gnur_4_10", 1e-14);
+    assertPDF(new GammaDistribution(.1, 10), "pdf_gnur_01_10", 1e-15);
+    assertPDF(new GammaDistribution(.1, 20), "pdf_gnur_01_20", 1e-14);
+    assertPDF(new GammaDistribution(.1, 4.), "pdf_gnur_01_4", 1e-15);
+    assertPDF(new GammaDistribution(.1, 1.), "pdf_gnur_01_1", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("gamma.ascii.gz");
-    checkLogPDF(new GammaDistribution(1., 1.), "logpdf_scipy_1_1", 1e-15);
-    checkLogPDF(new GammaDistribution(2., 1.), "logpdf_scipy_2_1", 1e-15);
-    checkLogPDF(new GammaDistribution(4., 1.), "logpdf_scipy_4_1", 1e-15);
-    checkLogPDF(new GammaDistribution(4., 10), "logpdf_scipy_4_10", 1e-14);
-    checkLogPDF(new GammaDistribution(.1, 10), "logpdf_scipy_01_10", 1e-15);
-    checkLogPDF(new GammaDistribution(.1, 20), "logpdf_scipy_01_20", 1e-15);
-    checkLogPDF(new GammaDistribution(.1, 4.), "logpdf_scipy_01_4", 1e-15);
-    checkLogPDF(new GammaDistribution(.1, 1.), "logpdf_scipy_01_1", 1e-15);
+    assertLogPDF(new GammaDistribution(1., 1.), "logpdf_scipy_1_1", 1e-15);
+    assertLogPDF(new GammaDistribution(2., 1.), "logpdf_scipy_2_1", 1e-15);
+    assertLogPDF(new GammaDistribution(4., 1.), "logpdf_scipy_4_1", 1e-15);
+    assertLogPDF(new GammaDistribution(4., 10), "logpdf_scipy_4_10", 1e-14);
+    assertLogPDF(new GammaDistribution(.1, 10), "logpdf_scipy_01_10", 1e-15);
+    assertLogPDF(new GammaDistribution(.1, 20), "logpdf_scipy_01_20", 1e-15);
+    assertLogPDF(new GammaDistribution(.1, 4.), "logpdf_scipy_01_4", 1e-15);
+    assertLogPDF(new GammaDistribution(.1, 1.), "logpdf_scipy_01_1", 1e-15);
 
-    checkLogPDF(new GammaDistribution(1., 1.), "logpdf_gnur_1_1", 1e-15);
-    checkLogPDF(new GammaDistribution(2., 1.), "logpdf_gnur_2_1", 1e-16);
-    checkLogPDF(new GammaDistribution(4., 1.), "logpdf_gnur_4_1", 1e-14);
-    checkLogPDF(new GammaDistribution(4., 10), "logpdf_gnur_4_10", 1e-14);
-    checkLogPDF(new GammaDistribution(.1, 10), "logpdf_gnur_01_10", 1e-15);
-    checkLogPDF(new GammaDistribution(.1, 20), "logpdf_gnur_01_20", 1e-14);
-    checkLogPDF(new GammaDistribution(.1, 4.), "logpdf_gnur_01_4", 1e-15);
-    checkLogPDF(new GammaDistribution(.1, 1.), "logpdf_gnur_01_1", 1e-15);
+    assertLogPDF(new GammaDistribution(1., 1.), "logpdf_gnur_1_1", 1e-15);
+    assertLogPDF(new GammaDistribution(2., 1.), "logpdf_gnur_2_1", 1e-16);
+    assertLogPDF(new GammaDistribution(4., 1.), "logpdf_gnur_4_1", 1e-14);
+    assertLogPDF(new GammaDistribution(4., 10), "logpdf_gnur_4_10", 1e-14);
+    assertLogPDF(new GammaDistribution(.1, 10), "logpdf_gnur_01_10", 1e-15);
+    assertLogPDF(new GammaDistribution(.1, 20), "logpdf_gnur_01_20", 1e-14);
+    assertLogPDF(new GammaDistribution(.1, 4.), "logpdf_gnur_01_4", 1e-15);
+    assertLogPDF(new GammaDistribution(.1, 1.), "logpdf_gnur_01_1", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("gamma.ascii.gz");
-    checkCDF(new GammaDistribution(1., 1.), "cdf_scipy_1_1", 1e-15);
-    checkCDF(new GammaDistribution(2., 1.), "cdf_scipy_2_1", 1e-15);
-    checkCDF(new GammaDistribution(4., 1.), "cdf_scipy_4_1", 1e-15);
-    checkCDF(new GammaDistribution(4., 10), "cdf_scipy_4_10", 1e-15);
-    checkCDF(new GammaDistribution(.1, 10), "cdf_scipy_01_10", 1e-15);
-    checkCDF(new GammaDistribution(.1, 20), "cdf_scipy_01_20", 1e-15);
-    checkCDF(new GammaDistribution(.1, 4.), "cdf_scipy_01_4", 1e-15);
-    checkCDF(new GammaDistribution(.1, 1.), "cdf_scipy_01_1", 1e-15);
+    assertCDF(new GammaDistribution(1., 1.), "cdf_scipy_1_1", 1e-15);
+    assertCDF(new GammaDistribution(2., 1.), "cdf_scipy_2_1", 1e-15);
+    assertCDF(new GammaDistribution(4., 1.), "cdf_scipy_4_1", 1e-15);
+    assertCDF(new GammaDistribution(4., 10), "cdf_scipy_4_10", 1e-15);
+    assertCDF(new GammaDistribution(.1, 10), "cdf_scipy_01_10", 1e-15);
+    assertCDF(new GammaDistribution(.1, 20), "cdf_scipy_01_20", 1e-15);
+    assertCDF(new GammaDistribution(.1, 4.), "cdf_scipy_01_4", 1e-15);
+    assertCDF(new GammaDistribution(.1, 1.), "cdf_scipy_01_1", 1e-15);
 
-    checkCDF(new GammaDistribution(1., 1.), "cdf_gnur_1_1", 1e-15);
-    checkCDF(new GammaDistribution(2., 1.), "cdf_gnur_2_1", 1e-15);
-    checkCDF(new GammaDistribution(4., 1.), "cdf_gnur_4_1", 1e-14);
-    checkCDF(new GammaDistribution(4., 10), "cdf_gnur_4_10", 1e-15);
-    checkCDF(new GammaDistribution(.1, 10), "cdf_gnur_01_10", 1e-15);
-    checkCDF(new GammaDistribution(.1, 20), "cdf_gnur_01_20", 1e-15);
-    checkCDF(new GammaDistribution(.1, 4.), "cdf_gnur_01_4", 1e-15);
-    checkCDF(new GammaDistribution(.1, 1.), "cdf_gnur_01_1", 1e-15);
+    assertCDF(new GammaDistribution(1., 1.), "cdf_gnur_1_1", 1e-15);
+    assertCDF(new GammaDistribution(2., 1.), "cdf_gnur_2_1", 1e-15);
+    assertCDF(new GammaDistribution(4., 1.), "cdf_gnur_4_1", 1e-14);
+    assertCDF(new GammaDistribution(4., 10), "cdf_gnur_4_10", 1e-15);
+    assertCDF(new GammaDistribution(.1, 10), "cdf_gnur_01_10", 1e-15);
+    assertCDF(new GammaDistribution(.1, 20), "cdf_gnur_01_20", 1e-15);
+    assertCDF(new GammaDistribution(.1, 4.), "cdf_gnur_01_4", 1e-15);
+    assertCDF(new GammaDistribution(.1, 1.), "cdf_gnur_01_1", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("gamma.ascii.gz");
-    checkQuantile(new GammaDistribution(1., 1.), "quant_scipy_1_1", 1e-14);
-    checkQuantile(new GammaDistribution(2., 1.), "quant_scipy_2_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 1.), "quant_scipy_4_1", 1e-14);
-    checkQuantile(new GammaDistribution(4., 10), "quant_scipy_4_10", 1e-14);
-    checkQuantile(new GammaDistribution(.1, 10), "quant_scipy_01_10", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 20), "quant_scipy_01_20", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 4.), "quant_scipy_01_4", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 1.), "quant_scipy_01_1", 1e-13);
+    assertQuantile(new GammaDistribution(1., 1.), "quant_scipy_1_1", 1e-14);
+    assertQuantile(new GammaDistribution(2., 1.), "quant_scipy_2_1", 1e-13);
+    assertQuantile(new GammaDistribution(4., 1.), "quant_scipy_4_1", 1e-14);
+    assertQuantile(new GammaDistribution(4., 10), "quant_scipy_4_10", 1e-14);
+    assertQuantile(new GammaDistribution(.1, 10), "quant_scipy_01_10", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 20), "quant_scipy_01_20", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 4.), "quant_scipy_01_4", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 1.), "quant_scipy_01_1", 1e-13);
 
-    checkQuantile(new GammaDistribution(1., 1.), "quant_gnur_1_1", 1e-14);
-    checkQuantile(new GammaDistribution(2., 1.), "quant_gnur_2_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 1.), "quant_gnur_4_1", 1e-14);
-    checkQuantile(new GammaDistribution(4., 10), "quant_gnur_4_10", 1e-14);
-    checkQuantile(new GammaDistribution(.1, 10), "quant_gnur_01_10", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
-    checkQuantile(new GammaDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
+    assertQuantile(new GammaDistribution(1., 1.), "quant_gnur_1_1", 1e-14);
+    assertQuantile(new GammaDistribution(2., 1.), "quant_gnur_2_1", 1e-13);
+    assertQuantile(new GammaDistribution(4., 1.), "quant_gnur_4_1", 1e-14);
+    assertQuantile(new GammaDistribution(4., 10), "quant_gnur_4_10", 1e-14);
+    assertQuantile(new GammaDistribution(.1, 10), "quant_gnur_01_10", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
+    assertQuantile(new GammaDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
   }
 
   @Test
@@ -132,15 +132,15 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     params.addParameter(GammaDistribution.Par.K_ID, 2.);
     params.addParameter(GammaDistribution.Par.THETA_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GammaDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
+    assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new GammaDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
-    checkRandom(new GammaDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new GammaDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
-    checkRandom(new GammaDistribution(10, 1.41), new Random(0L), 10000, 1e-2);
-    checkRandom(new GammaDistribution(20, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new GammaDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    assertRandom(new GammaDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new GammaDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new GammaDistribution(10, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new GammaDistribution(20, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

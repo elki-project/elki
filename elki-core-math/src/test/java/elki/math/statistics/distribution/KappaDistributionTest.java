@@ -40,119 +40,119 @@ public class KappaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("kappa.ascii.gz");
-    checkPDF(new KappaDistribution(.1, .2, .3, .4), "pdf_scipy_01_02_03_04", 1e-14);
-    checkPDF(new KappaDistribution(.1, .2, .3, .4), "pdf_gnur_01_02_03_04", 1e-14);
+    assertPDF(new KappaDistribution(.1, .2, .3, .4), "pdf_scipy_01_02_03_04", 1e-14);
+    assertPDF(new KappaDistribution(.1, .2, .3, .4), "pdf_gnur_01_02_03_04", 1e-14);
 
     load("logistic.ascii.gz");
-    checkPDF(new KappaDistribution(.1, 1., 0., -1.), "pdf_scipy_01", 1e-15);
-    checkPDF(new KappaDistribution(.5, 1., 0., -1.), "pdf_scipy_05", 1e-15);
-    checkPDF(new KappaDistribution(.1, 1., 0., -1.), "pdf_gnur_01", 1e-15);
-    checkPDF(new KappaDistribution(.5, 1., 0., -1.), "pdf_gnur_05", 1e-15);
+    assertPDF(new KappaDistribution(.1, 1., 0., -1.), "pdf_scipy_01", 1e-15);
+    assertPDF(new KappaDistribution(.5, 1., 0., -1.), "pdf_scipy_05", 1e-15);
+    assertPDF(new KappaDistribution(.1, 1., 0., -1.), "pdf_gnur_01", 1e-15);
+    assertPDF(new KappaDistribution(.5, 1., 0., -1.), "pdf_gnur_05", 1e-15);
 
     load("gumbel.ascii.gz");
-    checkPDF(new KappaDistribution(1., 1., 0., 0.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new KappaDistribution(2., 1., 0., 0.), "pdf_scipy_2_1", 1e-15);
-    checkPDF(new KappaDistribution(4., 1., 0., 0.), "pdf_scipy_4_1", 1e-15);
-    checkPDF(new KappaDistribution(4., 10., 0., 0.), "pdf_scipy_4_10", 1e-15);
-    checkPDF(new KappaDistribution(.1, 1., 0., 0.), "pdf_scipy_01_1", 1e-15);
-    checkPDF(new KappaDistribution(.1, 4., 0., 0.), "pdf_scipy_01_4", 1e-15);
-    checkPDF(new KappaDistribution(.1, 10., 0., 0.), "pdf_scipy_01_10", 1e-15);
-    checkPDF(new KappaDistribution(.1, 20., 0., 0.), "pdf_scipy_01_20", 1e-15);
+    assertPDF(new KappaDistribution(1., 1., 0., 0.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new KappaDistribution(2., 1., 0., 0.), "pdf_scipy_2_1", 1e-15);
+    assertPDF(new KappaDistribution(4., 1., 0., 0.), "pdf_scipy_4_1", 1e-15);
+    assertPDF(new KappaDistribution(4., 10., 0., 0.), "pdf_scipy_4_10", 1e-15);
+    assertPDF(new KappaDistribution(.1, 1., 0., 0.), "pdf_scipy_01_1", 1e-15);
+    assertPDF(new KappaDistribution(.1, 4., 0., 0.), "pdf_scipy_01_4", 1e-15);
+    assertPDF(new KappaDistribution(.1, 10., 0., 0.), "pdf_scipy_01_10", 1e-15);
+    assertPDF(new KappaDistribution(.1, 20., 0., 0.), "pdf_scipy_01_20", 1e-15);
 
-    checkPDF(new KappaDistribution(1., 1., 0., 0.), "pdf_gnur_1_1", 1e-15);
-    checkPDF(new KappaDistribution(2., 1., 0., 0.), "pdf_gnur_2_1", 1e-15);
-    checkPDF(new KappaDistribution(4., 1., 0., 0.), "pdf_gnur_4_1", 1e-15);
-    checkPDF(new KappaDistribution(4., 10., 0., 0.), "pdf_gnur_4_10", 1e-15);
-    checkPDF(new KappaDistribution(.1, 1., 0., 0.), "pdf_gnur_01_1", 1e-15);
-    checkPDF(new KappaDistribution(.1, 4., 0., 0.), "pdf_gnur_01_4", 1e-15);
-    checkPDF(new KappaDistribution(.1, 10., 0., 0.), "pdf_gnur_01_10", 1e-15);
-    checkPDF(new KappaDistribution(.1, 20., 0., 0.), "pdf_gnur_01_20", 1e-15);
+    assertPDF(new KappaDistribution(1., 1., 0., 0.), "pdf_gnur_1_1", 1e-15);
+    assertPDF(new KappaDistribution(2., 1., 0., 0.), "pdf_gnur_2_1", 1e-15);
+    assertPDF(new KappaDistribution(4., 1., 0., 0.), "pdf_gnur_4_1", 1e-15);
+    assertPDF(new KappaDistribution(4., 10., 0., 0.), "pdf_gnur_4_10", 1e-15);
+    assertPDF(new KappaDistribution(.1, 1., 0., 0.), "pdf_gnur_01_1", 1e-15);
+    assertPDF(new KappaDistribution(.1, 4., 0., 0.), "pdf_gnur_01_4", 1e-15);
+    assertPDF(new KappaDistribution(.1, 10., 0., 0.), "pdf_gnur_01_10", 1e-15);
+    assertPDF(new KappaDistribution(.1, 20., 0., 0.), "pdf_gnur_01_20", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("kappa.ascii.gz");
-    checkLogPDF(new KappaDistribution(.1, .2, .3, .4), "logpdf_scipy_01_02_03_04", 1e-14);
+    assertLogPDF(new KappaDistribution(.1, .2, .3, .4), "logpdf_scipy_01_02_03_04", 1e-14);
 
     load("logistic.ascii.gz");
-    checkLogPDF(new KappaDistribution(.1, 1., 0., -1.), "logpdf_scipy_01", 1e-15);
-    checkLogPDF(new KappaDistribution(.5, 1., 0., -1.), "logpdf_scipy_05", 1e-15);
-    checkLogPDF(new KappaDistribution(.1, 1., 0., -1.), "logpdf_gnur_01", 1e-15);
-    checkLogPDF(new KappaDistribution(.5, 1., 0., -1.), "logpdf_gnur_05", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 1., 0., -1.), "logpdf_scipy_01", 1e-15);
+    assertLogPDF(new KappaDistribution(.5, 1., 0., -1.), "logpdf_scipy_05", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 1., 0., -1.), "logpdf_gnur_01", 1e-15);
+    assertLogPDF(new KappaDistribution(.5, 1., 0., -1.), "logpdf_gnur_05", 1e-15);
 
     load("gumbel.ascii.gz");
-    checkLogPDF(new KappaDistribution(1., 1., 0., 0.), "logpdf_scipy_1_1", 1e-15);
-    checkLogPDF(new KappaDistribution(2., 1., 0., 0.), "logpdf_scipy_2_1", 1e-15);
-    checkLogPDF(new KappaDistribution(4., 1., 0., 0.), "logpdf_scipy_4_1", 1e-15);
-    checkLogPDF(new KappaDistribution(4., 10., 0., 0.), "logpdf_scipy_4_10", 1e-15);
-    checkLogPDF(new KappaDistribution(.1, 1., 0., 0.), "logpdf_scipy_01_1", 1e-15);
-    checkLogPDF(new KappaDistribution(.1, 4., 0., 0.), "logpdf_scipy_01_4", 1e-15);
-    checkLogPDF(new KappaDistribution(.1, 10., 0., 0.), "logpdf_scipy_01_10", 1e-15);
-    checkLogPDF(new KappaDistribution(.1, 20., 0., 0.), "logpdf_scipy_01_20", 1e-15);
+    assertLogPDF(new KappaDistribution(1., 1., 0., 0.), "logpdf_scipy_1_1", 1e-15);
+    assertLogPDF(new KappaDistribution(2., 1., 0., 0.), "logpdf_scipy_2_1", 1e-15);
+    assertLogPDF(new KappaDistribution(4., 1., 0., 0.), "logpdf_scipy_4_1", 1e-15);
+    assertLogPDF(new KappaDistribution(4., 10., 0., 0.), "logpdf_scipy_4_10", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 1., 0., 0.), "logpdf_scipy_01_1", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 4., 0., 0.), "logpdf_scipy_01_4", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 10., 0., 0.), "logpdf_scipy_01_10", 1e-15);
+    assertLogPDF(new KappaDistribution(.1, 20., 0., 0.), "logpdf_scipy_01_20", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("kappa.ascii.gz");
-    checkCDF(new KappaDistribution(.1, .2, .3, .4), "cdf_gnur_01_02_03_04", 1e-14);
-    checkCDF(new KappaDistribution(.1, .2, .3, .4), "cdf_scipy_01_02_03_04", 1e-14);
+    assertCDF(new KappaDistribution(.1, .2, .3, .4), "cdf_gnur_01_02_03_04", 1e-14);
+    assertCDF(new KappaDistribution(.1, .2, .3, .4), "cdf_scipy_01_02_03_04", 1e-14);
 
     load("logistic.ascii.gz");
-    checkCDF(new KappaDistribution(.1, 1., 0., -1.), "cdf_scipy_01", 1e-15);
-    checkCDF(new KappaDistribution(.5, 1., 0., -1.), "cdf_scipy_05", 1e-15);
-    checkCDF(new KappaDistribution(.1, 1., 0., -1.), "cdf_gnur_01", 1e-15);
-    checkCDF(new KappaDistribution(.5, 1., 0., -1.), "cdf_gnur_05", 1e-15);
+    assertCDF(new KappaDistribution(.1, 1., 0., -1.), "cdf_scipy_01", 1e-15);
+    assertCDF(new KappaDistribution(.5, 1., 0., -1.), "cdf_scipy_05", 1e-15);
+    assertCDF(new KappaDistribution(.1, 1., 0., -1.), "cdf_gnur_01", 1e-15);
+    assertCDF(new KappaDistribution(.5, 1., 0., -1.), "cdf_gnur_05", 1e-15);
 
     load("gumbel.ascii.gz");
-    checkCDF(new KappaDistribution(1., 1., 0., 0.), "cdf_scipy_1_1", 1e-15);
-    checkCDF(new KappaDistribution(2., 1., 0., 0.), "cdf_scipy_2_1", 1e-15);
-    checkCDF(new KappaDistribution(4., 1., 0., 0.), "cdf_scipy_4_1", 1e-15);
-    checkCDF(new KappaDistribution(4., 10., 0., 0.), "cdf_scipy_4_10", 1e-15);
-    checkCDF(new KappaDistribution(.1, 1., 0., 0.), "cdf_scipy_01_1", 1e-15);
-    checkCDF(new KappaDistribution(.1, 4., 0., 0.), "cdf_scipy_01_4", 1e-15);
-    checkCDF(new KappaDistribution(.1, 10., 0., 0.), "cdf_scipy_01_10", 1e-15);
-    checkCDF(new KappaDistribution(.1, 20., 0., 0.), "cdf_scipy_01_20", 1e-15);
+    assertCDF(new KappaDistribution(1., 1., 0., 0.), "cdf_scipy_1_1", 1e-15);
+    assertCDF(new KappaDistribution(2., 1., 0., 0.), "cdf_scipy_2_1", 1e-15);
+    assertCDF(new KappaDistribution(4., 1., 0., 0.), "cdf_scipy_4_1", 1e-15);
+    assertCDF(new KappaDistribution(4., 10., 0., 0.), "cdf_scipy_4_10", 1e-15);
+    assertCDF(new KappaDistribution(.1, 1., 0., 0.), "cdf_scipy_01_1", 1e-15);
+    assertCDF(new KappaDistribution(.1, 4., 0., 0.), "cdf_scipy_01_4", 1e-15);
+    assertCDF(new KappaDistribution(.1, 10., 0., 0.), "cdf_scipy_01_10", 1e-15);
+    assertCDF(new KappaDistribution(.1, 20., 0., 0.), "cdf_scipy_01_20", 1e-15);
 
-    checkCDF(new KappaDistribution(1., 1., 0., 0.), "cdf_gnur_1_1", 1e-15);
-    checkCDF(new KappaDistribution(2., 1., 0., 0.), "cdf_gnur_2_1", 1e-15);
-    checkCDF(new KappaDistribution(4., 1., 0., 0.), "cdf_gnur_4_1", 1e-15);
-    checkCDF(new KappaDistribution(4., 10., 0., 0.), "cdf_gnur_4_10", 1e-15);
-    checkCDF(new KappaDistribution(.1, 1., 0., 0.), "cdf_gnur_01_1", 1e-15);
-    checkCDF(new KappaDistribution(.1, 4., 0., 0.), "cdf_gnur_01_4", 1e-15);
-    checkCDF(new KappaDistribution(.1, 10., 0., 0.), "cdf_gnur_01_10", 1e-15);
-    checkCDF(new KappaDistribution(.1, 20., 0., 0.), "cdf_gnur_01_20", 1e-15);
+    assertCDF(new KappaDistribution(1., 1., 0., 0.), "cdf_gnur_1_1", 1e-15);
+    assertCDF(new KappaDistribution(2., 1., 0., 0.), "cdf_gnur_2_1", 1e-15);
+    assertCDF(new KappaDistribution(4., 1., 0., 0.), "cdf_gnur_4_1", 1e-15);
+    assertCDF(new KappaDistribution(4., 10., 0., 0.), "cdf_gnur_4_10", 1e-15);
+    assertCDF(new KappaDistribution(.1, 1., 0., 0.), "cdf_gnur_01_1", 1e-15);
+    assertCDF(new KappaDistribution(.1, 4., 0., 0.), "cdf_gnur_01_4", 1e-15);
+    assertCDF(new KappaDistribution(.1, 10., 0., 0.), "cdf_gnur_01_10", 1e-15);
+    assertCDF(new KappaDistribution(.1, 20., 0., 0.), "cdf_gnur_01_20", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("kappa.ascii.gz");
-    checkQuantile(new KappaDistribution(.1, .2, .3, .4), "quant_gnur_01_02_03_04", 1e-15);
-    checkQuantile(new KappaDistribution(.1, .2, .3, .4), "quant_scipy_01_02_03_04", 1e-14);
+    assertQuantile(new KappaDistribution(.1, .2, .3, .4), "quant_gnur_01_02_03_04", 1e-15);
+    assertQuantile(new KappaDistribution(.1, .2, .3, .4), "quant_scipy_01_02_03_04", 1e-14);
 
     load("logistic.ascii.gz");
-    checkQuantile(new KappaDistribution(.1, 1., 0., -1.), "quant_scipy_01", 1e-13);
-    checkQuantile(new KappaDistribution(.5, 1., 0., -1.), "quant_scipy_05", 1e-13);
-    checkQuantile(new KappaDistribution(.1, 1., 0., -1.), "quant_gnur_01", 1e-13);
-    checkQuantile(new KappaDistribution(.5, 1., 0., -1.), "quant_gnur_05", 1e-13);
+    assertQuantile(new KappaDistribution(.1, 1., 0., -1.), "quant_scipy_01", 1e-13);
+    assertQuantile(new KappaDistribution(.5, 1., 0., -1.), "quant_scipy_05", 1e-13);
+    assertQuantile(new KappaDistribution(.1, 1., 0., -1.), "quant_gnur_01", 1e-13);
+    assertQuantile(new KappaDistribution(.5, 1., 0., -1.), "quant_gnur_05", 1e-13);
 
     load("gumbel.ascii.gz");
-    checkQuantile(new KappaDistribution(1., 1., 0., 0.), "quant_scipy_1_1", 1e-15);
-    checkQuantile(new KappaDistribution(2., 1., 0., 0.), "quant_scipy_2_1", 1e-15);
-    checkQuantile(new KappaDistribution(4., 1., 0., 0.), "quant_scipy_4_1", 1e-15);
-    checkQuantile(new KappaDistribution(4., 10., 0., 0.), "quant_scipy_4_10", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 1., 0., 0.), "quant_scipy_01_1", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 4., 0., 0.), "quant_scipy_01_4", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 10., 0., 0.), "quant_scipy_01_10", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 20., 0., 0.), "quant_scipy_01_20", 1e-15);
+    assertQuantile(new KappaDistribution(1., 1., 0., 0.), "quant_scipy_1_1", 1e-15);
+    assertQuantile(new KappaDistribution(2., 1., 0., 0.), "quant_scipy_2_1", 1e-15);
+    assertQuantile(new KappaDistribution(4., 1., 0., 0.), "quant_scipy_4_1", 1e-15);
+    assertQuantile(new KappaDistribution(4., 10., 0., 0.), "quant_scipy_4_10", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 1., 0., 0.), "quant_scipy_01_1", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 4., 0., 0.), "quant_scipy_01_4", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 10., 0., 0.), "quant_scipy_01_10", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 20., 0., 0.), "quant_scipy_01_20", 1e-15);
 
-    checkQuantile(new KappaDistribution(1., 1., 0., 0.), "quant_gnur_1_1", 1e-15);
-    checkQuantile(new KappaDistribution(2., 1., 0., 0.), "quant_gnur_2_1", 1e-15);
-    checkQuantile(new KappaDistribution(4., 1., 0., 0.), "quant_gnur_4_1", 1e-15);
-    checkQuantile(new KappaDistribution(4., 10., 0., 0.), "quant_gnur_4_10", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 1., 0., 0.), "quant_gnur_01_1", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 4., 0., 0.), "quant_gnur_01_4", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 10., 0., 0.), "quant_gnur_01_10", 1e-15);
-    checkQuantile(new KappaDistribution(.1, 20., 0., 0.), "quant_gnur_01_20", 1e-15);
+    assertQuantile(new KappaDistribution(1., 1., 0., 0.), "quant_gnur_1_1", 1e-15);
+    assertQuantile(new KappaDistribution(2., 1., 0., 0.), "quant_gnur_2_1", 1e-15);
+    assertQuantile(new KappaDistribution(4., 1., 0., 0.), "quant_gnur_4_1", 1e-15);
+    assertQuantile(new KappaDistribution(4., 10., 0., 0.), "quant_gnur_4_10", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 1., 0., 0.), "quant_gnur_01_1", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 4., 0., 0.), "quant_gnur_01_4", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 10., 0., 0.), "quant_gnur_01_10", 1e-15);
+    assertQuantile(new KappaDistribution(.1, 20., 0., 0.), "quant_gnur_01_20", 1e-15);
   }
 
   @Test
@@ -164,13 +164,13 @@ public class KappaDistributionTest extends AbstractDistributionTest {
     params.addParameter(KappaDistribution.Par.SHAPE1_ID, .3);
     params.addParameter(KappaDistribution.Par.SHAPE2_ID, .4);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(KappaDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_01_02_03_04", 1e-14);
+    assertPDF(dist, "pdf_scipy_01_02_03_04", 1e-14);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new KappaDistribution(1, 2, 0.1, 0.9), new Random(0L), 10000, 1e-2);
-    checkRandom(new KappaDistribution(3, 4, 1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new KappaDistribution(5, 6, 3.14, 4.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new KappaDistribution(1, 2, 0.1, 0.9), new Random(0L), 10000, 1e-2);
+    assertRandom(new KappaDistribution(3, 4, 1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new KappaDistribution(5, 6, 3.14, 4.41), new Random(0L), 10000, 1e-2);
   }
 }

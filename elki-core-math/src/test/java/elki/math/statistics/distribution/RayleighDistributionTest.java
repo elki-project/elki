@@ -41,49 +41,49 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("weibull.ascii.gz");
-    checkPDF(new RayleighDistribution(MathUtil.SQRTHALF), "pdf_scipy_2_1", 1e-15);
-    checkPDF(new RayleighDistribution(MathUtil.SQRTHALF), "pdf_gnur_2_1", 1e-15);
+    assertPDF(new RayleighDistribution(MathUtil.SQRTHALF), "pdf_scipy_2_1", 1e-15);
+    assertPDF(new RayleighDistribution(MathUtil.SQRTHALF), "pdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
-    checkPDF(new RayleighDistribution(1), "pdf_scipy_1", 1e-15);
-    checkPDF(new RayleighDistribution(2), "pdf_scipy_2", 1e-15);
-    checkPDF(new RayleighDistribution(1), "pdf_gnur_1", 1e-15);
-    checkPDF(new RayleighDistribution(2), "pdf_gnur_2", 1e-15);
+    assertPDF(new RayleighDistribution(1), "pdf_scipy_1", 1e-15);
+    assertPDF(new RayleighDistribution(2), "pdf_scipy_2", 1e-15);
+    assertPDF(new RayleighDistribution(1), "pdf_gnur_1", 1e-15);
+    assertPDF(new RayleighDistribution(2), "pdf_gnur_2", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("weibull.ascii.gz");
-    checkLogPDF(new RayleighDistribution(MathUtil.SQRTHALF), "logpdf_scipy_2_1", 1e-15);
-    checkLogPDF(new RayleighDistribution(MathUtil.SQRTHALF), "logpdf_gnur_2_1", 1e-15);
+    assertLogPDF(new RayleighDistribution(MathUtil.SQRTHALF), "logpdf_scipy_2_1", 1e-15);
+    assertLogPDF(new RayleighDistribution(MathUtil.SQRTHALF), "logpdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
-    checkLogPDF(new RayleighDistribution(1), "logpdf_scipy_1", 1e-15);
-    checkLogPDF(new RayleighDistribution(2), "logpdf_scipy_2", 1e-15);
-    checkLogPDF(new RayleighDistribution(1), "logpdf_gnur_1", 1e-15);
-    checkLogPDF(new RayleighDistribution(2), "logpdf_gnur_2", 1e-15);
+    assertLogPDF(new RayleighDistribution(1), "logpdf_scipy_1", 1e-15);
+    assertLogPDF(new RayleighDistribution(2), "logpdf_scipy_2", 1e-15);
+    assertLogPDF(new RayleighDistribution(1), "logpdf_gnur_1", 1e-15);
+    assertLogPDF(new RayleighDistribution(2), "logpdf_gnur_2", 1e-15);
   }
 
   @Test
   public void testCDF() {
     load("weibull.ascii.gz");
-    checkCDF(new RayleighDistribution(MathUtil.SQRTHALF), "cdf_scipy_2_1", 1e-15);
-    checkCDF(new RayleighDistribution(MathUtil.SQRTHALF), "cdf_gnur_2_1", 1e-15);
+    assertCDF(new RayleighDistribution(MathUtil.SQRTHALF), "cdf_scipy_2_1", 1e-15);
+    assertCDF(new RayleighDistribution(MathUtil.SQRTHALF), "cdf_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
-    checkCDF(new RayleighDistribution(1), "cdf_scipy_1", 1e-14);
-    checkCDF(new RayleighDistribution(2), "cdf_scipy_2", 1e-14);
-    checkCDF(new RayleighDistribution(1), "cdf_gnur_1", 1e-15);
-    checkCDF(new RayleighDistribution(2), "cdf_gnur_2", 1e-15);
+    assertCDF(new RayleighDistribution(1), "cdf_scipy_1", 1e-14);
+    assertCDF(new RayleighDistribution(2), "cdf_scipy_2", 1e-14);
+    assertCDF(new RayleighDistribution(1), "cdf_gnur_1", 1e-15);
+    assertCDF(new RayleighDistribution(2), "cdf_gnur_2", 1e-15);
   }
 
   @Test
   public void testQuantile() {
     load("weibull.ascii.gz");
-    checkQuantile(new RayleighDistribution(MathUtil.SQRTHALF), "quant_scipy_2_1", 1e-15);
-    checkQuantile(new RayleighDistribution(MathUtil.SQRTHALF), "quant_gnur_2_1", 1e-15);
+    assertQuantile(new RayleighDistribution(MathUtil.SQRTHALF), "quant_scipy_2_1", 1e-15);
+    assertQuantile(new RayleighDistribution(MathUtil.SQRTHALF), "quant_gnur_2_1", 1e-15);
     load("ray.ascii.gz");
-    checkQuantile(new RayleighDistribution(1), "quant_scipy_1", 1e-14);
-    checkQuantile(new RayleighDistribution(2), "quant_scipy_2", 1e-14);
-    checkQuantile(new RayleighDistribution(1), "quant_gnur_1", 1e-14);
-    checkQuantile(new RayleighDistribution(2), "quant_gnur_2", 1e-14);
+    assertQuantile(new RayleighDistribution(1), "quant_scipy_1", 1e-14);
+    assertQuantile(new RayleighDistribution(2), "quant_scipy_2", 1e-14);
+    assertQuantile(new RayleighDistribution(1), "quant_gnur_1", 1e-14);
+    assertQuantile(new RayleighDistribution(2), "quant_gnur_2", 1e-14);
   }
 
   @Test
@@ -92,19 +92,19 @@ public class RayleighDistributionTest extends AbstractDistributionTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(RayleighDistribution.Par.SCALE_ID, MathUtil.SQRTHALF);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(RayleighDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2_1", 1e-15);
+    assertPDF(dist, "pdf_scipy_2_1", 1e-15);
 
     load("ray.ascii.gz");
     params = new ListParameterization();
     params.addParameter(RayleighDistribution.Par.SCALE_ID, 2);
     dist = ClassGenericsUtil.parameterizeOrAbort(RayleighDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_2", 1e-15);
+    assertPDF(dist, "pdf_scipy_2", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new RayleighDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
-    checkRandom(new RayleighDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new RayleighDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new RayleighDistribution(0.1, 0.9), new Random(0L), 10000, 1e-2);
+    assertRandom(new RayleighDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new RayleighDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
   }
 }

@@ -40,37 +40,37 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
   @Test
   public void testPDF() {
     load("invgauss.ascii.gz");
-    checkPDF(new InverseGaussianDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
-    checkPDF(new InverseGaussianDistribution(.5, 1.), "pdf_gnur_05_1", 1e-15);
-    checkPDF(new InverseGaussianDistribution(1., .5), "pdf_gnur_1_05", 1e-15);
+    assertPDF(new InverseGaussianDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
+    assertPDF(new InverseGaussianDistribution(.5, 1.), "pdf_gnur_05_1", 1e-15);
+    assertPDF(new InverseGaussianDistribution(1., .5), "pdf_gnur_1_05", 1e-15);
 
-    checkPDF(new InverseGaussianDistribution(1., 1.), "pdf_scipy_1_1", 1e-15);
-    checkPDF(new InverseGaussianDistribution(.5, 1.), "pdf_scipy_05_1", 1e-15);
-    checkPDF(new InverseGaussianDistribution(1., .5), "pdf_scipy_1_05", 1e-15);
+    assertPDF(new InverseGaussianDistribution(1., 1.), "pdf_scipy_1_1", 1e-15);
+    assertPDF(new InverseGaussianDistribution(.5, 1.), "pdf_scipy_05_1", 1e-15);
+    assertPDF(new InverseGaussianDistribution(1., .5), "pdf_scipy_1_05", 1e-15);
   }
 
   @Test
   public void testLogPDF() {
     load("invgauss.ascii.gz");
-    checkLogPDF(new InverseGaussianDistribution(1., 1.), "logpdf_gnur_1_1", 1e-15);
-    checkLogPDF(new InverseGaussianDistribution(.5, 1.), "logpdf_gnur_05_1", 1e-15);
-    checkLogPDF(new InverseGaussianDistribution(1., .5), "logpdf_gnur_1_05", 1e-15);
+    assertLogPDF(new InverseGaussianDistribution(1., 1.), "logpdf_gnur_1_1", 1e-15);
+    assertLogPDF(new InverseGaussianDistribution(.5, 1.), "logpdf_gnur_05_1", 1e-15);
+    assertLogPDF(new InverseGaussianDistribution(1., .5), "logpdf_gnur_1_05", 1e-15);
 
-    checkLogPDF(new InverseGaussianDistribution(1., 1.), "logpdf_scipy_1_1", 1e-15);
-    checkLogPDF(new InverseGaussianDistribution(.5, 1.), "logpdf_scipy_05_1", 1e-15);
-    checkLogPDF(new InverseGaussianDistribution(1., .5), "logpdf_scipy_1_05", 1e-14);
+    assertLogPDF(new InverseGaussianDistribution(1., 1.), "logpdf_scipy_1_1", 1e-15);
+    assertLogPDF(new InverseGaussianDistribution(.5, 1.), "logpdf_scipy_05_1", 1e-15);
+    assertLogPDF(new InverseGaussianDistribution(1., .5), "logpdf_scipy_1_05", 1e-14);
   }
 
   @Test
   public void testCDF() {
     load("invgauss.ascii.gz");
-    checkCDF(new InverseGaussianDistribution(1., 1.), "cdf_gnur_1_1", 1e-14);
-    checkCDF(new InverseGaussianDistribution(.5, 1.), "cdf_gnur_05_1", 1e-13);
-    checkCDF(new InverseGaussianDistribution(1., .5), "cdf_gnur_1_05", 1e-14);
+    assertCDF(new InverseGaussianDistribution(1., 1.), "cdf_gnur_1_1", 1e-14);
+    assertCDF(new InverseGaussianDistribution(.5, 1.), "cdf_gnur_05_1", 1e-13);
+    assertCDF(new InverseGaussianDistribution(1., .5), "cdf_gnur_1_05", 1e-14);
 
-    checkCDF(new InverseGaussianDistribution(1., 1.), "cdf_scipy_1_1", 1e-13);
-    checkCDF(new InverseGaussianDistribution(.5, 1.), "cdf_scipy_05_1", 1e-12);
-    checkCDF(new InverseGaussianDistribution(1., .5), "cdf_scipy_1_05", 1e-14);
+    assertCDF(new InverseGaussianDistribution(1., 1.), "cdf_scipy_1_1", 1e-13);
+    assertCDF(new InverseGaussianDistribution(.5, 1.), "cdf_scipy_05_1", 1e-12);
+    assertCDF(new InverseGaussianDistribution(1., .5), "cdf_scipy_1_05", 1e-14);
   }
 
   @Test
@@ -80,13 +80,13 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
     params.addParameter(InverseGaussianDistribution.Par.LOCATION_ID, .5);
     params.addParameter(InverseGaussianDistribution.Par.SHAPE_ID, 1.);
     Distribution dist = ClassGenericsUtil.parameterizeOrAbort(InverseGaussianDistribution.class, params);
-    checkPDF(dist, "pdf_scipy_05_1", 1e-15);
+    assertPDF(dist, "pdf_scipy_05_1", 1e-15);
   }
 
   @Test
   public void testRandom() {
-    checkRandom(new InverseGaussianDistribution(0.1, 0.9), new Random(0L), 10000, 1e-3);
-    checkRandom(new InverseGaussianDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
-    checkRandom(new InverseGaussianDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
+    assertRandom(new InverseGaussianDistribution(0.1, 0.9), new Random(0L), 10000, 1e-3);
+    assertRandom(new InverseGaussianDistribution(1.41, 3.14), new Random(0L), 10000, 1e-2);
+    assertRandom(new InverseGaussianDistribution(3.14, 1.41), new Random(0L), 10000, 1e-2);
   }
 }
