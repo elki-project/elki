@@ -355,4 +355,24 @@ public class Entropy {
   public double normalizedVariationOfInformation() {
     return 1.0 - mutualInformation / entropyJoint;
   }
+
+  /**
+   * Get the normalized information distance (normalized, small values are
+   * good). This is {@code 1-maxNMI()}.
+   * <p>
+   * X. V. Nguyen, J. Epps, J. Bailey<br>
+   * Information theoretic measures for clusterings comparison:
+   * is a correction for chance necessary?<br>
+   * Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)
+   *
+   * @return Normalized Variation of information
+   */
+  @Reference(authors = "X. V. Nguyen, J. Epps, J. Bailey", //
+      title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
+      booktitle = "Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)", //
+      url = "https://doi.org/10.1145/1553374.1553511", //
+      bibkey = "DBLP:conf/icml/NguyenEB09")
+  public double normalizedInformationDistance() {
+    return 1.0 - mutualInformation / Math.max(entropyFirst, entropySecond);
+  }
 }

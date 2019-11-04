@@ -231,6 +231,7 @@ public class EvaluateClustering implements Evaluator {
       g.addMeasure("Geometric NMI", entropy.geometricNMI(), 0, 1, false);
       g.addMeasure("Joint NMI", entropy.jointNMI(), 0, 1, false);
       g.addMeasure("NVI", entropy.normalizedVariationOfInformation(), 0, 1, true);
+      g.addMeasure("NID", entropy.normalizedInformationDistance(), 0, 1, true);
 
       BCubed bcubed = contmat.getBCubed();
       g = newGroup("B3 measures");
