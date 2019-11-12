@@ -216,7 +216,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
-    MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
     Metadata.hierarchyOf(c).addChild(ev);
     // FIXME: notify of changes, if reused!

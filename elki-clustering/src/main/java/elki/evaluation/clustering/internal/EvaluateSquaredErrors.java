@@ -142,7 +142,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
-    MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);

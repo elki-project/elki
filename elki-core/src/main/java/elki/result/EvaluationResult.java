@@ -43,7 +43,7 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
   /**
    * Measurements.
    */
-  ArrayList<EvaluationResult.MeasurementGroup> groups = new ArrayList<>();
+  ArrayList<MeasurementGroup> groups = new ArrayList<>();
 
   /**
    * Header lines.
@@ -63,8 +63,8 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
    * @param string Group name
    * @return Measurement group.
    */
-  public EvaluationResult.MeasurementGroup newGroup(String string) {
-    EvaluationResult.MeasurementGroup g = new MeasurementGroup(string);
+  public MeasurementGroup newGroup(String string) {
+    MeasurementGroup g = new MeasurementGroup(string);
     groups.add(g);
     return g;
   }
@@ -75,8 +75,8 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
    * @param label Group name
    * @return Measurement group.
    */
-  public EvaluationResult.MeasurementGroup findOrCreateGroup(String label) {
-    for(EvaluationResult.MeasurementGroup g : groups) {
+  public MeasurementGroup findOrCreateGroup(String label) {
+    for(MeasurementGroup g : groups) {
       if(label.equals(g.getName())) {
         return g;
       }
@@ -86,11 +86,11 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    for(EvaluationResult.MeasurementGroup g : groups) {
+    for(MeasurementGroup g : groups) {
       out.commentPrintLn(g.getName());
       out.flush();
       for(Measurement m : g) {
-        out.inlinePrintNoQuotes(m.name);
+        out.inlinePrintNoQuotes(g.getName() + " " +m.name);
         out.inlinePrintNoQuotes(m.val);
         out.flush();
       }
@@ -249,8 +249,6 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
 
   /**
    * Class representing a single measurement.
-   *
-   * TODO: indicate whether high or low is better.
    *
    * @author Erich Schubert
    */
