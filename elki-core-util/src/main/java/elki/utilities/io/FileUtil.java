@@ -55,7 +55,7 @@ public final class FileUtil {
    *         <code>null</code>
    */
   public static String getFilenameExtension(Path file) {
-    return getFilenameExtension(file.getFileName());
+    return file == null ? null : getFilenameExtension(file.getFileName().toString());
   }
 
   /**
