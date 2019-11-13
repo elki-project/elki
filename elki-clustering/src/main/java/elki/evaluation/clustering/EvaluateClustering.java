@@ -229,6 +229,9 @@ public class EvaluateClustering implements Evaluator {
           .addMeasure("Arithmetic NMI", entropy.arithmeticNMI(), 0, 1, false) //
           .addMeasure("Geometric NMI", entropy.geometricNMI(), 0, 1, false) //
           .addMeasure("Joint NMI", entropy.jointNMI(), 0, 1, false) //
+          .addMeasure("Arithmetic AMI", entropy.adjustedArithmeticMI(), 0, 1, false) //
+          .addMeasure("Geometric AMI", entropy.adjustedGeometricMI(), 0, 1, false) //
+          .addMeasure("Joint AMI", entropy.adjustedJointMI(), 0, 1, false) //
           .addMeasure("NVI", entropy.normalizedVariationOfInformation(), 0, 1, true) //
           .addMeasure("NID", entropy.normalizedInformationDistance(), 0, 1, true);
 

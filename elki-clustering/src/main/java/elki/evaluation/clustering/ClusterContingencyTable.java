@@ -162,19 +162,13 @@ public class ClusterContingencyTable {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(size1 * size2 * 10 + 10);
     if(contingency != null) {
-      for(int i1 = 0; i1 < size1 + 2; i1++) {
-        if(i1 >= size1) {
-          buf.append("------\n");
+      for(int i1 = 0; i1 <= size1; i1++) {
+        for(int i2 = 0; i2 <= size2; i2++) {
+          buf.append(contingency[i1][i2]).append(i2 < size2 ? " " : "| ");
         }
-        for(int i2 = 0; i2 < size2 + 2; i2++) {
-          if(i2 >= size2) {
-            buf.append("| ");
-          }
-          buf.append(contingency[i1][i2]).append(' ');
-        }
-        buf.append('\n');
+        buf.append(i1 < size1 ? "\n" : "------\n");
       }
     }
     return buf.toString();
@@ -186,10 +180,7 @@ public class ClusterContingencyTable {
    * @return Pair counting measures
    */
   public PairCounting getPaircount() {
-    if(paircount == null) {
-      paircount = new PairCounting(this);
-    }
-    return paircount;
+    return paircount != null ? paircount : (paircount = new PairCounting(this));
   }
 
   /**
@@ -198,10 +189,7 @@ public class ClusterContingencyTable {
    * @return Entropy based measures
    */
   public Entropy getEntropy() {
-    if(entropy == null) {
-      entropy = new Entropy(this);
-    }
-    return entropy;
+    return entropy != null ? entropy : (entropy = new Entropy(this));
   }
 
   /**
@@ -210,10 +198,7 @@ public class ClusterContingencyTable {
    * @return Edit-distance based measures
    */
   public EditDistance getEdit() {
-    if(edit == null) {
-      edit = new EditDistance(this);
-    }
-    return edit;
+    return edit != null ? edit : (edit = new EditDistance(this));
   }
 
   /**
@@ -222,10 +207,7 @@ public class ClusterContingencyTable {
    * @return BCubed measures
    */
   public BCubed getBCubed() {
-    if(bcubed == null) {
-      bcubed = new BCubed(this);
-    }
-    return bcubed;
+    return bcubed != null ? bcubed : (bcubed = new BCubed(this));
   }
 
   /**
@@ -234,10 +216,7 @@ public class ClusterContingencyTable {
    * @return Set-Matching measures
    */
   public SetMatchingPurity getSetMatching() {
-    if(smp == null) {
-      smp = new SetMatchingPurity(this);
-    }
-    return smp;
+    return smp != null ? smp : (smp = new SetMatchingPurity(this));
   }
 
   /**

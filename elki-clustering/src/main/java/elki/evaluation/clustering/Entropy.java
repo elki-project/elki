@@ -20,20 +20,30 @@
  */
 package elki.evaluation.clustering;
 
+import static elki.math.statistics.distribution.GammaDistribution.logGamma;
+import static net.jafama.FastMath.log;
+
+import elki.logging.LoggingUtil;
 import elki.utilities.documentation.Reference;
 
 import net.jafama.FastMath;
 
 /**
- * Entropy based measures, implemented using base 2 logarithms.
+ * Entropy based measures, implemented using natural logarithms.
  * <p>
- * References:
+ * Key References:
  * <p>
  * M. Meilă<br>
  * Comparing clusterings by the variation of information<br>
  * Learning theory and kernel machines
+ * <p>
+ * X. V. Nguyen, J. Epps, J. Bailey<br>
+ * Information theoretic measures for clusterings comparison:
+ * is a correction for chance necessary?<br>
+ * Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)
  *
  * @author Sascha Goldhofer
+ * @author Erich Schubert
  * @since 0.5.0
  */
 @Reference(authors = "M. Meilă", //
@@ -41,6 +51,11 @@ import net.jafama.FastMath;
     booktitle = "Learning theory and kernel machines", //
     url = "https://doi.org/10.1007/978-3-540-45167-9_14", //
     bibkey = "DBLP:conf/colt/Meila03")
+@Reference(authors = "X. V. Nguyen, J. Epps, J. Bailey", //
+    title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
+    booktitle = "Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)", //
+    url = "https://doi.org/10.1145/1553374.1553511", //
+    bibkey = "DBLP:conf/icml/NguyenEB09")
 public class Entropy {
   /**
    * Entropy in first
@@ -68,68 +83,164 @@ public class Entropy {
   protected double variationOfInformation;
 
   /**
+   * Expected mutual information
+   */
+  protected double expectedMutualInformation;
+
+  /**
    * log(n), for bounding VI
    */
   protected double vibound;
 
   /**
    * Constructor.
-   * 
+   *
    * @param table Contingency table
    */
   protected Entropy(ClusterContingencyTable table) {
     super();
-    final int total = table.contingency[table.size1][table.size2];
-    final double[] logmarg1 = new double[table.size1];
-    final double[] logmarg2 = new double[table.size2];
-    final double norm = -1.0 / total;
-    final double logtotal = FastMath.log(total);
-    double entropyFirst = 0.0;
-    // iterate over first clustering marginals
-    for(int i1 = 0; i1 < table.size1; i1++) {
-      int v = table.contingency[i1][table.size2];
-      if(v > 0) {
-        final double logp = logmarg1[i1] = FastMath.log(v) - logtotal;
-        entropyFirst += v * /* negative */ norm * logp;
-      }
+    final int r = table.size1, c = table.size2;
+    final int[][] contingency = table.contingency;
+    final int n = contingency[r][c];
+    if(table.contingency[table.size1][table.size2 + 1] != n || table.contingency[table.size1 + 1][table.size2] != n) {
+      LoggingUtil.warning("Entropy measure are not well defined for overlapping and incomplete clusterings. The number of elements are: " + table.contingency[table.size1][table.size2 + 1] + " != " + table.contingency[table.size1 + 1][table.size2] + " elements.");
     }
-    double entropySecond = 0.0;
-    // iterate over second clustering marginals
-    int[] lastrow = table.contingency[table.size1];
-    for(int i2 = 0; i2 < table.size2; i2++) {
-      int v = lastrow[i2];
-      if(v > 0) {
-        final double logp = logmarg2[i2] = FastMath.log(v) - logtotal;
-        entropySecond += v * /* negative */ norm * logp;
-      }
+    final double byn = 1.0 / n;
+    // -log(N) and log(fac(N))
+    final double mlogn = -log(n), lfacN = logFac(n);
+    // Maximum cluster size, and cluster sizes:
+    final int m = maxClusterSize(contingency, r, c);
+    // Precompute necessary logarithms and factorials:
+    // -log(i), log(factorial(i)), log(factorial(N-i))
+    double[] mlog = new double[m + 1];
+    double[] lfac = new double[m + 1], lfacNm = new double[m + 1];
+    for(int i = 0, Nmi = n; i <= m; i++, Nmi--) {
+      mlog[i] = -log(i);
+      lfac[i] = logFac(i);
+      lfacNm[i] = Nmi > m ? logFac(Nmi) : lfac[Nmi];
     }
-    double entropyJoint = 0.0, mi = 0.0, vi = 0.0;
-    for(int i1 = 0; i1 < table.size1; i1++) {
-      final int[] row1 = table.contingency[i1];
-      final double logmarg1i1 = logmarg1[i1];
-      for(int i2 = 0; i2 < table.size2; i2++) {
-        int v = row1[i2];
-        if(v > 0) {
-          final double logp = FastMath.log(v) - logtotal;
-          entropyJoint += v * /* negative */ norm * logp;
-          mi += v * /* negative */ norm * (logmarg1i1 + logmarg2[i2] - logp);
-          vi += v * /* negative */ norm * (logp - logmarg1i1 + logp - logmarg2[i2]);
+
+    final double entropyFirst = computeEntropyFirst(contingency, r, c, byn, mlogn, mlog);
+    final double entropySecond = computeEntropySecond(contingency, r, c, byn, mlogn, mlog);
+    final int[] lastrow = contingency[r];
+    double entropyJoint = 0.0, mi = 0.0, vi = 0.0, emi = 0.0;
+    for(int i = 0; i < r; i++) {
+      final int[] rowi = contingency[i];
+      final int ai = rowi[c];
+      final double mlogain = mlog[ai] - mlogn; // -log(ai/N)=log(N/ai)
+      final double lfacai = lfac[ai], lfacNmai = lfacNm[ai];
+      for(int j = 0; j < c; j++) {
+        final int bj = lastrow[j];
+        final int vij = rowi[j];
+        final double mlogbjn = mlog[bj] - mlogn; // -log(bj/N)=log(N/bj)
+        // Joint Entropy, Mutual Information, Variation of Information:
+        if(vij > 0) {
+          final double p = vij * byn, mlogp = mlog[vij] - mlogn;
+          entropyJoint += p * mlogp;
+          mi += p * (mlogain + mlogbjn - mlogp);
+          vi += p * (mlogp - mlogain + mlogp - mlogbjn);
+        }
+        // Expected Mutual Information:
+        for(int nij = Math.max(ai + bj - n, 1), end = Math.min(ai, bj); nij <= end; nij++) {
+          // Note that we have -log a/N = log N/a here from above.
+          emi += nij * byn * (mlogain + mlogbjn + mlogn - mlog[nij]) * FastMath.exp( //
+              lfacai + lfac[bj] + lfacNmai + lfacNm[bj] //
+                  - lfacN - lfac[nij] - lfac[ai - nij] - lfac[bj - nij] - logFac(n - ai - bj + nij));
         }
       }
     }
-    // Store in fields
+
+    // Store output in fields
     this.entropyFirst = entropyFirst;
     this.entropySecond = entropySecond;
     this.entropyJoint = entropyJoint;
     this.mutualInformation = mi;
     this.variationOfInformation = vi;
-    this.vibound = Math.min(logtotal, 2 * FastMath.log(Math.max(table.size1, table.size2)));
+    this.expectedMutualInformation = emi;
+    this.vibound = Math.min(-mlogn, 2 * log(Math.max(r, c)));
+  }
+
+  /**
+   * Get the maximum cluster size of a contingency table.
+   *
+   * @param contingency Contingency table
+   * @param r Rows
+   * @param c Columns
+   * @return Maximum
+   */
+  private static int maxClusterSize(final int[][] contingency, final int r, final int c) {
+    int maxc = 0;
+    final int[] lastrow = contingency[r];
+    for(int j = 0; j < c; j++) {
+      final int v = lastrow[j];
+      maxc = maxc > v ? maxc : v;
+    }
+    for(int i = 0; i < r; i++) {
+      final int v = contingency[i][c];
+      maxc = maxc > v ? maxc : v;
+    }
+    return maxc;
+  }
+
+  /**
+   * Compute log(factorial(i)) = log(Gamma(i + 1))
+   *
+   * @param i Input value
+   * @return log factorial
+   */
+  private static double logFac(double i) {
+    return logGamma(i + 1);
+  }
+
+  /**
+   * Compute entropy of first clustering.
+   *
+   * @param contingency Contingency table
+   * @param r Rows
+   * @param c Columns
+   * @param byn 1 / N
+   * @param mlogn -log(N)
+   * @param mlog precomputed -log values
+   * @return entropy of first clustering
+   */
+  private static double computeEntropyFirst(final int[][] contingency, final int r, final int c, final double byn, final double mlogn, double[] mlog) {
+    double entropyFirst = 0.0;
+    for(int i = 0; i < r; i++) {
+      final int v = contingency[i][c];
+      if(v > 0) {
+        entropyFirst += v * byn * (mlog[v] - mlogn);
+      }
+    }
+    return entropyFirst;
+  }
+
+  /**
+   * Compute entropy of second clustering.
+   *
+   * @param contingency Contingency table
+   * @param r Rows
+   * @param c Columns
+   * @param byn 1 / N
+   * @param mlogn -log(N)
+   * @param mlog precomputed -log values
+   * @return entropy of second clustering
+   */
+  private static double computeEntropySecond(final int[][] contingency, final int r, final int c, final double byn, final double mlogn, double[] mlog) {
+    double entropySecond = 0.0;
+    int[] lastrow = contingency[r];
+    for(int j = 0; j < c; j++) {
+      final int v = lastrow[j];
+      if(v > 0) {
+        entropySecond += v * byn * (mlog[v] - mlogn);
+      }
+    }
+    return entropySecond;
   }
 
   /**
    * Get the entropy of the first clustering
    * (not normalized, 0 = equal).
-   * 
+   *
    * @return Entropy of first clustering
    */
   public double entropyFirst() {
@@ -139,7 +250,7 @@ public class Entropy {
   /**
    * Get the entropy of the second clustering
    * (not normalized, 0 = equal).
-   * 
+   *
    * @return Entropy of second clustering
    */
   public double entropySecond() {
@@ -149,7 +260,7 @@ public class Entropy {
   /**
    * Get the joint entropy of both clusterings
    * (not normalized, 0 = equal).
-   * 
+   *
    * @return Joint entropy of both clusterings
    */
   public double entropyJoint() {
@@ -159,7 +270,7 @@ public class Entropy {
   /**
    * Get the conditional entropy of the first clustering
    * (not normalized, 0 = equal).
-   * 
+   *
    * @return Conditional entropy of first clustering
    */
   public double conditionalEntropyFirst() {
@@ -169,7 +280,7 @@ public class Entropy {
   /**
    * Get the conditional entropy of the first clustering
    * (not normalized, 0 = equal).
-   * 
+   *
    * @return Conditional entropy of second clustering
    */
   public double conditionalEntropySecond() {
@@ -339,19 +450,9 @@ public class Entropy {
   /**
    * Get the normalized variation of information (normalized, small values are
    * good). This is {@code 1-jointNMI()}.
-   * <p>
-   * X. V. Nguyen, J. Epps, J. Bailey<br>
-   * Information theoretic measures for clusterings comparison:
-   * is a correction for chance necessary?<br>
-   * Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)
    *
    * @return Normalized Variation of information
    */
-  @Reference(authors = "X. V. Nguyen, J. Epps, J. Bailey", //
-      title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
-      booktitle = "Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)", //
-      url = "https://doi.org/10.1145/1553374.1553511", //
-      bibkey = "DBLP:conf/icml/NguyenEB09")
   public double normalizedVariationOfInformation() {
     return 1.0 - mutualInformation / entropyJoint;
   }
@@ -359,20 +460,65 @@ public class Entropy {
   /**
    * Get the normalized information distance (normalized, small values are
    * good). This is {@code 1-maxNMI()}.
-   * <p>
-   * X. V. Nguyen, J. Epps, J. Bailey<br>
-   * Information theoretic measures for clusterings comparison:
-   * is a correction for chance necessary?<br>
-   * Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)
    *
    * @return Normalized Variation of information
    */
-  @Reference(authors = "X. V. Nguyen, J. Epps, J. Bailey", //
-      title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
-      booktitle = "Proc. 26th Ann. Int. Conf. on Machine Learning (ICML '09)", //
-      url = "https://doi.org/10.1145/1553374.1553511", //
-      bibkey = "DBLP:conf/icml/NguyenEB09")
   public double normalizedInformationDistance() {
     return 1.0 - mutualInformation / Math.max(entropyFirst, entropySecond);
+  }
+
+  /**
+   * Get the expected mutual information.
+   *
+   * @return Expected mutual information
+   */
+  public double expectedMutualInformation() {
+    return expectedMutualInformation;
+  }
+
+  /**
+   * Get the adjusted mutual information using the joint version.
+   *
+   * @return Adjusted mutual information
+   */
+  public double adjustedJointMI() {
+    return (mutualInformation - expectedMutualInformation) / (entropyJoint - expectedMutualInformation);
+  }
+
+  /**
+   * Get the adjusted mutual information using the arithmetic version.
+   *
+   * @return Adjusted mutual information
+   */
+  public double adjustedArithmeticMI() {
+    return (mutualInformation - expectedMutualInformation) / (0.5 * (entropyFirst + entropySecond) - expectedMutualInformation);
+  }
+
+  /**
+   * Get the adjusted mutual information using the geometric version.
+   *
+   * @return Adjusted mutual information
+   */
+  public double adjustedGeometricMI() {
+    return entropyFirst * entropySecond <= 0 ? mutualInformation - expectedMutualInformation : //
+        (mutualInformation - expectedMutualInformation) / (FastMath.sqrt(entropyFirst * entropySecond) - expectedMutualInformation);
+  }
+
+  /**
+   * Get the adjusted mutual information using the min version.
+   *
+   * @return Adjusted mutual information
+   */
+  public double adjustedMinMI() {
+    return (mutualInformation - expectedMutualInformation) / (Math.min(entropyFirst, entropySecond) - expectedMutualInformation);
+  }
+
+  /**
+   * Get the adjusted mutual information using the max version.
+   *
+   * @return Adjusted mutual information
+   */
+  public double adjustedMaxMI() {
+    return (mutualInformation - expectedMutualInformation) / (Math.max(entropyFirst, entropySecond) - expectedMutualInformation);
   }
 }
