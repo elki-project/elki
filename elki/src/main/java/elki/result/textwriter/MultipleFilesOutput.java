@@ -94,9 +94,8 @@ public class MultipleFilesOutput implements StreamFactory {
     Files.createDirectories(basename);
     Path fn = basename.resolve(name + (usegzip ? GZIP_EXTENSION : EXTENSION));
     OutputStream os = Files.newOutputStream(fn);
-    // wrap into gzip stream.
-    os = usegzip ? new GZIPOutputStream(os) : os;
-    PrintStream res = new PrintStream(os);
+    // Both PrintStream and GZIPOutputStream call close()
+    PrintStream res = new PrintStream(usegzip ? new GZIPOutputStream(os) : os);
     if(LOG.isDebuggingFiner()) {
       LOG.debugFiner("Opened new output stream:" + fn);
     }

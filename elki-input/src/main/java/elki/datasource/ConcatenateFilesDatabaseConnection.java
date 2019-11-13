@@ -87,7 +87,8 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     for(Path file : files) {
       String filestr = file.toString();
       try (InputStream fis = Files.newInputStream(file); //
-          InputStream inputStream = FileUtil.tryGzipInput(new BufferedInputStream(fis))) {
+          BufferedInputStream bis = new BufferedInputStream(fis); //
+          InputStream inputStream = FileUtil.tryGzipInput(bis)) {
         final BundleStreamSource source;
         if(parser instanceof StreamingParser) {
           final StreamingParser streamParser = (StreamingParser) parser;
