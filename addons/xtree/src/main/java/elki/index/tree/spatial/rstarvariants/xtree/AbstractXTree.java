@@ -21,7 +21,6 @@
 package elki.index.tree.spatial.rstarvariants.xtree;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -1118,13 +1117,9 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
    */
   @Override
   public String toString() {
-    long dirNodes = 0;
-    long superNodes = 0;
-    long leafNodes = 0;
-    long objects = 0;
-    long maxSuperCapacity = -1;
-    long minSuperCapacity = Long.MAX_VALUE;
-    BigInteger totalCapacity = BigInteger.ZERO;
+    long dirNodes = 0, superNodes = 0, leafNodes = 0, objects = 0;
+    long maxSuperCapacity = -1, minSuperCapacity = Long.MAX_VALUE;
+    long totalCapacity = 0;
     int levels = 0;
 
     N node = getRoot();
@@ -1163,7 +1158,10 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
             dirNodes++;
           }
         }
-        totalCapacity = totalCapacity.add(BigInteger.valueOf(node.getCapacity()));
+        totalCapacity += node.getCapacity();
+        if(totalCapacity < 0) {
+          throw new ArithmeticException("long overflow");
+        }
       }
     }
     assert objects == num_elements : "objects=" + objects + ", size=" + num_elements;
@@ -1175,7 +1173,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
         .append("min_fanout = ").append(settings.min_fanout).append(", max_overlap = ").append(settings.max_overlap).append((settings.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n") //
         // PageFileUtil.appendPageFileStatistics(result,
         // getPageFileStatistics());
-        .append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n") //
+        .append("Storage Quota ").append((objects + dirNodes + superNodes + leafNodes) * 100 / totalCapacity).append("%\n") //
         .toString();
   }
 }
