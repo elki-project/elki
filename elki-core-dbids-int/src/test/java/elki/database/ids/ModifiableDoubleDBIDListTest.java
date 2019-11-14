@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database;
+package elki.database.ids;
 
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ import elki.database.ids.ModifiableDoubleDBIDList;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class SortingDuplicatesTest {
+public class ModifiableDoubleDBIDListTest {
   @Test(timeout = 100)
   public void testDuplicateKeys() {
     // We need an ide, but no real data.

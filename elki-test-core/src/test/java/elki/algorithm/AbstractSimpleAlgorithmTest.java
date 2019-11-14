@@ -30,7 +30,6 @@ import elki.data.type.TypeUtil;
 import elki.database.AbstractDatabase;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
-import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.filter.FixedDBIDsFilter;
@@ -92,9 +91,8 @@ public abstract class AbstractSimpleAlgorithmTest {
 
       db.initialize();
       // Check the relation has the expected size:
-      Relation<?> rel = db.getRelation(TypeUtil.ANY);
       if(expectedSize > 0) {
-        assertEquals("Database size does not match.", expectedSize, rel.size());
+        assertEquals("Database size does not match.", expectedSize, db.getRelation(TypeUtil.ANY).size());
       }
       return db;
     }

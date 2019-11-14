@@ -18,23 +18,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.database;
+package elki.database.relation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.util.Random;
+
 import org.junit.Test;
 
-import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.type.TypeUtil;
+import elki.database.Database;
+import elki.database.StaticArrayDatabase;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
-import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
+import elki.datasource.ArrayAdapterDatabaseConnection;
 
 /**
  * Unit test that loads a data file and sorts it. This tests some key parts of
@@ -42,18 +45,21 @@ import elki.database.relation.RelationUtil;
  * 
  * @author Erich Schubert
  * @since 0.7.0
- * 
  */
-public class RelationSortingTest {
-  public static final String filename = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
-
+public class MaterializedRelationTest {
   @Test
-  public void testSorting() {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(filename, -1);
+  public void testSorting() throws IOException {
+    Random rnd = new Random(0L);
+    double[][] data = new double[1000][];
+    for(int i = 0; i < data.length; i++) {
+      // ints are intentional, to have duplicate values.
+      data[i] = new double[] { rnd.nextDouble(), rnd.nextInt(100), rnd.nextDouble(), rnd.nextInt(10) };
+    }
+    Database db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(data));
+    db.initialize();
     Relation<? extends NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rel.getDBIDs());
-    final int size = rel.size();
 
     int dims = RelationUtil.dimensionality(rel);
     SortDBIDsBySingleDimension sorter = new VectorUtil.SortDBIDsBySingleDimension(rel);
@@ -61,7 +67,7 @@ public class RelationSortingTest {
     for(int d = 0; d < dims; d++) {
       sorter.setDimension(d);
       ids.sort(sorter);
-      assertEquals("Lost some DBID during sorting?!?", size, DBIDUtil.newHashSet(ids).size());
+      assertEquals("Lost some DBID during sorting?!?", rel.size(), DBIDUtil.newHashSet(ids).size());
 
       DBIDArrayIter it = ids.iter();
       double prev = rel.get(it).doubleValue(d);

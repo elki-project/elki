@@ -28,9 +28,9 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
  * Unit test for angle computations in ELKI.
- *
+ * <p>
  * TODO: add numerically difficult test cases.
- *
+ * <p>
  * TODO: add tests for the other functions as well.
  *
  * @author Erich Schubert

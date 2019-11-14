@@ -2,5 +2,6 @@ description = 'ELKI - Database'
 dependencies {
   // compile project(':elki-core-distance') // For Euclidean distance optimizations
   compile project(':elki-input')
+  testCompile project(':elki-core-dbids-int')
+  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }
-

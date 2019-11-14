@@ -88,4 +88,22 @@ public class PolygonTest {
     Polygon t = new Polygon(Arrays.asList(new double[][] { { 1, 0 }, { 0, 1 }, { 0, 0 } }));
     assertEquals("Hull size not as expected.", .5, t.areaShoelace(), 0.);
   }
+
+  @Test
+  public void testPolygonContainment() {
+    Polygon p1 = new Polygon(Arrays.asList(new double[][] { { 0, 0 }, { .9, 0 }, { 0, .9 } }));
+    Polygon p2 = new Polygon(Arrays.asList(new double[][] { { 1, 1 }, { 1, .1 }, { .1, 1 } }));
+    Polygon p3 = new Polygon(Arrays.asList(new double[][] { { .1, .1 }, { .1, .9 }, { .9, .9 }, { .9, .1 } }));
+    double[] pou = new double[] { -1, -1 };
+    double[] p22 = new double[] { .2, .2 };
+    assertFalse("P2 not in p1", p1.containsPoint2D(pou));
+    assertFalse("P2 not in p2", p2.containsPoint2D(pou));
+    assertFalse("P2 not in p3", p3.containsPoint2D(pou));
+    assertTrue("P2 not in p1", p1.containsPoint2D(p22));
+    assertFalse("P2 in p2", p2.containsPoint2D(p22));
+    assertTrue("P2 not in p3", p3.containsPoint2D(p22));
+    assertFalse("Polygons p1 and p2 must not intersect.", p1.intersects2DIncomplete(p2));
+    assertTrue("Polygons p1 and p3 must intersect.", p1.intersects2DIncomplete(p3));
+    assertTrue("Polygons p2 and p3 must intersect.", p2.intersects2DIncomplete(p3));
+  }
 }

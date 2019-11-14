@@ -133,7 +133,7 @@ public class Entropy {
       computeMIFull(contingency, r, c, n, m, byn, mlogn, logs);
     }
     else {
-      computeMILarge(contingency, r, c, n, byn, mlogn);
+      computeMILarge(contingency, r, c, byn, mlogn);
     }
   }
 
@@ -144,11 +144,10 @@ public class Entropy {
    * @param contingency Contingency table
    * @param r Rows
    * @param c Columns
-   * @param n Total size
    * @param byn 1/N factor
    * @param mlogn -log(N)
    */
-  private void computeMILarge(int[][] contingency, int r, int c, int n, double byn, double mlogn) {
+  private void computeMILarge(int[][] contingency, int r, int c, double byn, double mlogn) {
     final int[] lastrow = contingency[r];
     final double[] logs = new double[14]; // Small cache only.
     final double[] mlogbn = new double[c]; // Log cluster sizes
