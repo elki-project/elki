@@ -28,14 +28,14 @@ task generateCodeArrays(description: "Generate code from templates") {
         // Because otherwise, it would not run in eclipse buildship at all.
 
         //// Primitive arrays
-        def tpl = new File(inp, "PArray.java")
+        def tpl = new File(inp, "PArray.javat")
         generate(tpl, new File(out, "IntegerArray.java"),
             [type: "int", boxedtype: "Integer", classname: "IntegerArray"])
         generate(tpl, new File(out, "DoubleArray.java"),
             [type: "double", boxedtype: "Double", classname: "DoubleArray"])
 
         //// Primitive array adapters
-        tpl = new File(inp, "PArrayAdapter.java")
+        tpl = new File(inp, "PArrayAdapter.javat")
         generate(tpl, new File(out, "FloatArrayAdapter.java"),
             [type: "float", boxedtype: "Float", classname: "FloatArrayAdapter"])
         generate(tpl, new File(out, "DoubleArrayAdapter.java"),
@@ -68,7 +68,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
                                     init:"this.comparator = (java.util.Comparator<Object>) comparator;"]
 
         //// Key-only Heap interfaces
-        def tpl = new File(inp, "KHeap.java")
+        def tpl = new File(inp, "KHeap.javat")
         generate(tpl, new File(out, "DoubleHeap.java"),
             [classname: "DoubleHeap"] + tdbl)
         generate(tpl, new File(out, "IntegerHeap.java"),
@@ -76,7 +76,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
         generate(tpl, new File(out, "ObjectHeap.java"),
             [classname: "ObjectHeap"] + kobj)
         //// Key-only min heaps
-        tpl = new File(inp, "KMinHeap.java")
+        tpl = new File(inp, "KMinHeap.javat")
         generate(tpl, new File(out, "DoubleMinHeap.java"),
             [classname: "DoubleMinHeap", extra: null] + tdbl)
         generate(tpl, new File(out, "IntegerMinHeap.java"),
@@ -86,7 +86,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
         generate(tpl, new File(out, "ComparatorMinHeap.java"),
             [classname: "ComparatorMinHeap", extra: ecmp] + kobj)
         //// Key-only max heaps
-        tpl = new File(inp, "KMaxHeap.java")
+        tpl = new File(inp, "KMaxHeap.javat")
         generate(tpl, new File(out, "DoubleMaxHeap.java"),
             [classname: "DoubleMaxHeap", extra: null] + tdbl)
         generate(tpl, new File(out, "IntegerMaxHeap.java"),
@@ -100,7 +100,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
         //// Because it usually makes more sense to use a ObjectHeap instead.
 
         //// Key-Value heap interfaces
-        tpl = new File(inp, "KVHeap.java")
+        tpl = new File(inp, "KVHeap.javat")
         generate(tpl, new File(out, "DoubleIntegerHeap.java"),
             [classname: "DoubleIntegerHeap", key: tdbl, val: tint])
         generate(tpl, new File(out, "DoubleLongHeap.java"),
@@ -110,7 +110,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
         generate(tpl, new File(out, "IntegerObjectHeap.java"),
             [classname: "IntegerObjectHeap", key: tint, val: vobj])
         //// Key-Value min heaps
-        tpl = new File(inp, "KVMinHeap.java")
+        tpl = new File(inp, "KVMinHeap.javat")
         generate(tpl, new File(out, "DoubleIntegerMinHeap.java"),
             [classname: "DoubleIntegerMinHeap", key: tdbl, val: tint])
         generate(tpl, new File(out, "DoubleLongMinHeap.java"),
@@ -120,7 +120,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
         generate(tpl, new File(out, "IntegerObjectMinHeap.java"),
             [classname: "IntegerObjectMinHeap", key: tint, val: vobj])
         //// Key-Value max heaps
-        tpl = new File(inp, "KVMaxHeap.java")
+        tpl = new File(inp, "KVMaxHeap.javat")
         generate(tpl, new File(out, "DoubleIntegerMaxHeap.java"),
             [classname: "DoubleIntegerMaxHeap", key: tdbl, val: tint])
         generate(tpl, new File(out, "DoubleLongMaxHeap.java"),
