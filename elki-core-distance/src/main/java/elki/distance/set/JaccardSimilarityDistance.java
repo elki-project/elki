@@ -109,7 +109,7 @@ public class JaccardSimilarityDistance extends AbstractSetDistance<FeatureVector
         ++union;
       }
     }
-    return intersection / (double) union;
+    return union == 0? 1: intersection / (double) union;
   }
 
   /**
@@ -145,7 +145,7 @@ public class JaccardSimilarityDistance extends AbstractSetDistance<FeatureVector
         ++union;
       }
     }
-    return intersection / (double) union;
+    return union == 0? 1: intersection / (double) union;
   }
 
   @Override
