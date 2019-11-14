@@ -20,6 +20,8 @@
  */
 package elki.database.ids;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 import elki.database.ids.DBID;
@@ -33,17 +35,24 @@ import elki.database.ids.ModifiableDoubleDBIDList;
  * @since 0.7.0
  */
 public class ModifiableDoubleDBIDListTest {
+  // Needs to be outside of the timeout below
+  // Because this may involve scanning for DBIDFactory implementations
+  private static final DBID id = DBIDUtil.importInteger(1);
+
   @Test(timeout = 100)
   public void testDuplicateKeys() {
-    // We need an ide, but no real data.
-    DBID id = DBIDUtil.importInteger(1);
+    // We need an id, but no real data.
     int size = 100000;
 
     ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList(size);
     for(int i = 0; i < size; i++) {
-      double distance = 0. + (i % 2);
-      list.add(distance, id);
+      list.add(i & 0x1, id);
     }
     list.sort();
+    double last = Double.NEGATIVE_INFINITY;
+    for(DoubleDBIDListIter it = list.iter(); it.valid(); it.advance()) {
+      assertTrue("Not sorted", last <= it.doubleValue());
+      last = it.doubleValue();
+    }
   }
 }
