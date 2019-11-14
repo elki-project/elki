@@ -212,7 +212,8 @@ public class BitVector implements SparseNumberVector {
    * @return Jaccard similarity (intersection / union)
    */
   public double jaccardSimilarity(BitVector v2) {
-    return BitsUtil.intersectionSize(bits, v2.bits) / (double) BitsUtil.unionSize(bits, v2.bits);
+    final int union = BitsUtil.unionSize(bits, v2.bits);
+    return union > 0 ? BitsUtil.intersectionSize(bits, v2.bits) / (double) union : 1.;
   }
 
   /**
