@@ -67,41 +67,36 @@ public class SetMatchingPurity {
    */
   protected SetMatchingPurity(ClusterContingencyTable table) {
     super();
-    int numobj = table.contingency[table.size1][table.size2];
-    {
-      smPurity = 0.0;
-      smFFirst = 0.0;
-      // iterate first clustering
-      for(int i1 = 0; i1 < table.size1; i1++) {
-        double precisionMax = 0.0;
-        double fMax = 0.0;
-        for(int i2 = 0; i2 < table.size2; i2++) {
-          precisionMax = Math.max(precisionMax, (1.0 * table.contingency[i1][i2]));
-          fMax = Math.max(fMax, (2.0 * table.contingency[i1][i2]) / (table.contingency[i1][table.size2] + table.contingency[table.size1][i2]));
-          // / numobj));
-        }
-        smPurity += (precisionMax / numobj);
-        smFFirst += (table.contingency[i1][table.size2] / (double) table.contingency[table.size1][table.size2]) * fMax;
-        // * contingency[i1][size2]/numobj;
+    final int[][] contingency = table.contingency;
+    final int r = table.size1, c = table.size2;
+    double smPurity = 0.0, smFFirst = 0.0;
+    // iterate first clustering
+    for(int i = 0; i < r; i++) {
+      double precisionMax = 0.0, fMax = 0.0;
+      for(int j = 0; j < c; j++) {
+        precisionMax = Math.max(precisionMax, contingency[i][j]);
+        fMax = Math.max(fMax, (2.0 * contingency[i][j]) / (contingency[i][c] + contingency[r][j]));
       }
+      smPurity += precisionMax;
+      smFFirst += contingency[i][c] * fMax;
     }
-    {
-      smInversePurity = 0.0;
-      smFSecond = 0.0;
-      // iterate second clustering
-      for(int i2 = 0; i2 < table.size2; i2++) {
-        double recallMax = 0.0;
-        double fMax = 0.0;
-        for(int i1 = 0; i1 < table.size1; i1++) {
-          recallMax = Math.max(recallMax, (1.0 * table.contingency[i1][i2]));
-          fMax = Math.max(fMax, (2.0 * table.contingency[i1][i2]) / (table.contingency[i1][table.size2] + table.contingency[table.size1][i2]));
-          // / numobj));
-        }
-        smInversePurity += (recallMax / numobj);
-        smFSecond += (table.contingency[table.size1][i2] / (double) table.contingency[table.size1][table.size2]) * fMax;
-        // * contingency[i1][size2]/numobj;
+    double smInversePurity = 0.0, smFSecond = 0.0;
+    // iterate second clustering
+    for(int i = 0; i < c; i++) {
+      double recallMax = 0.0, fMax = 0.0;
+      for(int j = 0; j < r; j++) {
+        recallMax = Math.max(recallMax, contingency[j][i]);
+        fMax = Math.max(fMax, (2.0 * contingency[j][i]) / (contingency[j][c] + contingency[r][i]));
       }
+      smInversePurity += recallMax;
+      smFSecond += contingency[r][i] * fMax;
     }
+    final int numobj = contingency[r][c];
+    // Store and scale
+    this.smPurity = smPurity / numobj;
+    this.smFFirst = smFFirst / numobj;
+    this.smInversePurity = smInversePurity / numobj;
+    this.smFSecond = smFSecond / numobj;
   }
 
   /**

@@ -24,13 +24,18 @@ import elki.evaluation.clustering.ClusterContingencyTable.Util;
 import elki.utilities.documentation.Reference;
 
 /**
- * BCubed measures.
+ * BCubed measures for cluster evaluation.
  * <p>
  * Reference:
  * <p>
  * A. Bagga, B. Baldwin<br>
  * Entity-based cross-document coreferencing using the Vector Space Model<br>
  * Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)
+ * <p>
+ * E. Amigó, J. Gonzalo, J. Artiles, F. Verdejo<br>
+ * A comparison of extrinsic clustering evaluation metrics based on formal
+ * constraints<br>
+ * Information Retrieval 12(4)
  *
  * @author Sascha Goldhofer
  * @since 0.5.0
@@ -40,6 +45,11 @@ import elki.utilities.documentation.Reference;
     booktitle = "Proc. 17th Int. Conf. on Computational Linguistics (COLING '98)", //
     url = "https://doi.org/10.3115/980451.980859", //
     bibkey = "doi:10.3115/980451.980859")
+@Reference(authors = "E. Amigó, J. Gonzalo, J. Artiles, F. Verdejo", //
+    title = "A comparison of extrinsic clustering evaluation metrics based on formal constraints", //
+    booktitle = "Information Retrieval 12(4)", //
+    url = "https://doi.org/10.1007/s10791-008-9066-8", //
+    bibkey = "DBLP:journals/ir/AmigoGAV09")
 public class BCubed {
   /**
    * Result cache
@@ -53,29 +63,21 @@ public class BCubed {
    */
   protected BCubed(ClusterContingencyTable table) {
     super();
-    bCubedPrecision = 0.0;
-    bCubedRecall = 0.0;
-
+    double bCubedPrecision = 0.0, bCubedRecall = 0.0;
+    final int selfpair = table.selfPairing ? 1 : 0;
     for(int i1 = 0; i1 < table.size1; i1++) {
-      final int[] row = table.contingency[i1];
+      final int[] sumrow = table.contingency[i1];
       for(int i2 = 0; i2 < table.size2; i2++) {
-        final int c = row[i2];
-        if(c > 0) {
-          // precision of one item
-          double precision = 1.0 * c / row[table.size2];
-          // precision for all items in cluster
-          bCubedPrecision += (precision * c);
-
-          // recall of one item
-          double recall = 1.0 * c / table.contingency[table.size1][i2];
-          // recall for all items in cluster
-          bCubedRecall += (recall * c);
+        final int c = sumrow[i2];
+        if(c > selfpair) {
+          bCubedPrecision += c * (c - selfpair) / (double) (table.contingency[table.size1][i2] - selfpair);
+          bCubedRecall += c * (c - selfpair) / (double) (sumrow[table.size2] - selfpair);
         }
       }
     }
     final int total = table.contingency[table.size1][table.size2];
-    bCubedPrecision = bCubedPrecision / total;
-    bCubedRecall = bCubedRecall / total;
+    this.bCubedPrecision = bCubedPrecision / total;
+    this.bCubedRecall = bCubedRecall / total;
   }
 
   /**
@@ -102,6 +104,6 @@ public class BCubed {
    * @return BCubed F1-Measure
    */
   public double f1Measure() {
-    return Util.f1Measure(precision(), recall());
+    return Util.f1Measure(bCubedPrecision, bCubedRecall);
   }
 }

@@ -240,8 +240,8 @@ public class EvaluateClustering implements Evaluator {
       BCubed bcubed = contmat.getBCubed();
       newGroup("B3") //
           .addMeasure("F1-Measure", bcubed.f1Measure(), 0, 1, false) //
-          .addMeasure("Recall", bcubed.recall(), 0, 1, false) //
-          .addMeasure("Precision", bcubed.precision(), 0, 1, false);
+          .addMeasure("Precision", bcubed.precision(), 0, 1, false) //
+          .addMeasure("Recall", bcubed.recall(), 0, 1, false);
 
       SetMatchingPurity setm = contmat.getSetMatching();
       newGroup("Set matching") //

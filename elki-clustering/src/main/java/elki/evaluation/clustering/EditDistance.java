@@ -57,47 +57,43 @@ public class EditDistance {
 
   protected EditDistance(ClusterContingencyTable table) {
     super();
-    editOperationsBaseline = table.contingency[table.size1][table.size2];
-    {
-      editFirst = 0;
-
-      // iterate over first clustering
-      for(int i1 = 0; i1 < table.size1; i1++) {
-        // get largest cell
+    final int[][] contingency = table.contingency;
+    final int r = table.size1, c = table.size2;
+    int editFirst = 0, editSecond = 0;
+    // We perform the editing the opposite way as in the original paper, hence
+    // we switch the output variables. This is minimally simpler, as we do not
+    // need to store the target label.
+    for(int i = 0; i < c; i++) {
+      final int csize = contingency[r][i];
+      if(csize > 0) {
+        // get largest cell in column
         int largestLabelSet = 0;
-        for(int i2 = 0; i2 < table.size2; i2++) {
-          largestLabelSet = Math.max(largestLabelSet, table.contingency[i1][i2]);
+        for(int j = 0; j < r; j++) {
+          largestLabelSet = Math.max(largestLabelSet, contingency[j][i]);
         }
-
-        // merge: found (largest) cluster to second clusterings cluster
-        editFirst++;
-        // move: wrong objects from this cluster to correct cluster (of second
-        // clustering)
-        editFirst += table.contingency[i1][table.size2] - largestLabelSet;
+        // Merge, move remaining objects
+        editFirst += 1 + csize - largestLabelSet;
       }
     }
-    {
-      editSecond = 0;
-
-      // iterate over second clustering
-      for(int i2 = 0; i2 < table.size2; i2++) {
-        // get largest cell
+    for(int i = 0; i < r; i++) {
+      final int csize = contingency[i][c];
+      if(csize > 0) {
+        // get largest cell in row
         int largestLabelSet = 0;
-        for(int i1 = 0; i1 < table.size1; i1++) {
-          largestLabelSet = Math.max(largestLabelSet, table.contingency[i1][i2]);
+        for(int j = 0; j < c; j++) {
+          largestLabelSet = Math.max(largestLabelSet, contingency[i][j]);
         }
-
-        // merge: found (largest) cluster to second clusterings cluster
-        editSecond++;
-        // move: wrong objects from this cluster to correct cluster (of second
-        // clustering)
-        editSecond += table.contingency[table.size1][i2] - largestLabelSet;
+        // Merge, move remaining objects
+        editSecond += 1 + csize - largestLabelSet;
       }
     }
+    this.editFirst = editFirst;
+    this.editSecond = editSecond;
+    this.editOperationsBaseline = contingency[r][c];
   }
 
   /**
-   * Get the baseline editing Operations ( = total Objects)
+   * Get the baseline editing Operations (= total objects)
    * 
    * @return worst case amount of operations
    */
@@ -132,7 +128,7 @@ public class EditDistance {
    * @return Editing distance first into second clustering
    */
   public double editDistanceFirst() {
-    return 1.0 - (1.0 * editOperationsFirst() / editOperationsBaseline());
+    return 1.0 - editOperationsFirst() / (double) editOperationsBaseline();
   }
 
   /**
@@ -142,7 +138,7 @@ public class EditDistance {
    * @return Editing distance second into first clustering
    */
   public double editDistanceSecond() {
-    return 1.0 - (1.0 * editOperationsSecond() / editOperationsBaseline());
+    return 1.0 - editOperationsSecond() / (double) editOperationsBaseline();
   }
 
   /**
