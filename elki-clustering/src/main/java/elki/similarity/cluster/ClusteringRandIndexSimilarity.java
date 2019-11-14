@@ -61,16 +61,12 @@ public class ClusteringRandIndexSimilarity implements ClusteringDistanceSimilari
 
   @Override
   public double similarity(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return ct.getPaircount().randIndex();
+    return new ClusterContingencyTable(false, true, o1, o2).getPaircount().randIndex();
   }
 
   @Override
   public double distance(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return 1. - ct.getPaircount().randIndex();
+    return 1. - new ClusterContingencyTable(false, true, o1, o2).getPaircount().randIndex();
   }
 
   @Override

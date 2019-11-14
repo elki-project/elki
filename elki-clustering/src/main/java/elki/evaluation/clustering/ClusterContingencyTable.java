@@ -101,20 +101,13 @@ public class ClusterContingencyTable {
    * 
    * @param selfPairing Build self-pairs
    * @param breakNoiseClusters Break noise clusters into individual objects
-   */
-  public ClusterContingencyTable(boolean selfPairing, boolean breakNoiseClusters) {
-    super();
-    this.selfPairing = selfPairing;
-    this.breakNoiseClusters = breakNoiseClusters;
-  }
-
-  /**
-   * Process two clustering results.
-   * 
    * @param result1 First clustering
    * @param result2 Second clustering
    */
-  public void process(Clustering<?> result1, Clustering<?> result2) {
+  public ClusterContingencyTable(boolean selfPairing, boolean breakNoiseClusters, Clustering<?> result1, Clustering<?> result2) {
+    super();
+    this.selfPairing = selfPairing;
+    this.breakNoiseClusters = breakNoiseClusters;
     // Get the clusters
     final List<? extends Cluster<?>> cs1 = result1.getAllClusters();
     final List<? extends Cluster<?>> cs2 = result2.getAllClusters();

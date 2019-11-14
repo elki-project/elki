@@ -46,16 +46,14 @@ public class EntropyTest {
     int[] a = { 0, 0, 1, 1, 2, 2 };
     int[] b = { 2, 2, 1, 1, 0, 0 };
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, false);
-    ct.process(makeClustering(ids.iter(), a), makeClustering(ids.iter(), b));
-    Entropy e = new Entropy(ct);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), a), makeClustering(ids.iter(), b)).getEntropy();
     assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
-    assertEquals("EMI not as expected", 0.5441, e.expectedMutualInformation(), 1e-5);
     assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 1e-15);
     assertEquals("minNMI not as expected", 1, e.minNMI(), 1e-15);
     assertEquals("maxNMI not as expected", 1, e.maxNMI(), 1e-15);
     assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 1e-15);
     assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 1e-15);
+    assertEquals("EMI not as expected", 0.5441, e.expectedMutualInformation(), 1e-5);
     assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
   }
 
@@ -65,9 +63,7 @@ public class EntropyTest {
     int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
     int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, false);
-    ct.process(makeClustering(ids.iter(), a), makeClustering(ids.iter(), b));
-    Entropy e = new Entropy(ct);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), a), makeClustering(ids.iter(), b)).getEntropy();
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
     assertEquals("EMI not as expected", 0.15042, e.expectedMutualInformation(), 1e-5);
     assertEquals("AMI not as expected", 0.27821, e.adjustedArithmeticMI(), 1e-5);

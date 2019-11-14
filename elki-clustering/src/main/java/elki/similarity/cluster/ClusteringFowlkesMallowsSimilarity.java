@@ -62,16 +62,12 @@ public class ClusteringFowlkesMallowsSimilarity implements ClusteringDistanceSim
 
   @Override
   public double similarity(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return ct.getPaircount().fowlkesMallows();
+    return new ClusterContingencyTable(false, true, o1, o2).getPaircount().fowlkesMallows();
   }
 
   @Override
   public double distance(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return 1. - ct.getPaircount().fowlkesMallows();
+    return 1. - new ClusterContingencyTable(false, true, o1, o2).getPaircount().fowlkesMallows();
   }
 
   @Override

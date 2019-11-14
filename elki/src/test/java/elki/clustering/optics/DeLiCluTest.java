@@ -60,9 +60,7 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     // Test F-Measure
     Clustering<Model> rbl = new ByLabelClustering().autorun(db);
-    ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
-    ct.process(clustering, rbl);
-    double score = ct.getPaircount().f1Measure();
+    double score = new ClusterContingencyTable(true, false, clustering, rbl).getPaircount().f1Measure();
     // We cannot test exactly - due to Hashing, DeLiClu sequence is not
     // identical each time, the results will vary.
     assertEquals("Score does not match.", 0.891033, score, 1e-5);

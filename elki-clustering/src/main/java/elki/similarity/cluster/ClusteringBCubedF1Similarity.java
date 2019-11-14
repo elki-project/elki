@@ -62,16 +62,12 @@ public class ClusteringBCubedF1Similarity implements ClusteringDistanceSimilarit
 
   @Override
   public double similarity(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return ct.getBCubed().f1Measure();
+    return new ClusterContingencyTable(false, true, o1, o2).getBCubed().f1Measure();
   }
 
   @Override
   public double distance(Clustering<?> o1, Clustering<?> o2) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
-    ct.process(o1, o2);
-    return 1. - ct.getBCubed().f1Measure();
+    return 1. - new ClusterContingencyTable(false, true, o1, o2).getBCubed().f1Measure();
   }
 
   @Override

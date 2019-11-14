@@ -71,8 +71,6 @@ public class ClusterContingencyTableTest {
   }
 
   private double computeFMeasure(Clustering<?> c1, Clustering<?> c2, boolean noise) {
-    ClusterContingencyTable ct = new ClusterContingencyTable(true, noise);
-    ct.process(c1, c2);
-    return ct.getPaircount().f1Measure();
+    return new ClusterContingencyTable(true, noise, c1, c2).getPaircount().f1Measure();
   }
 }

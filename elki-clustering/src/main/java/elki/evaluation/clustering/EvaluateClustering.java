@@ -169,8 +169,7 @@ public class EvaluateClustering implements Evaluator {
    * @param refc Reference clustering
    */
   protected void evaluteResult(Database db, Clustering<?> c, Clustering<?> refc) {
-    ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
-    contmat.process(refc, c);
+    ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling, refc, c);
 
     ScoreResult sr = new ScoreResult(contmat);
     sr.addHeader(Metadata.of(c).getLongName());
@@ -221,7 +220,7 @@ public class EvaluateClustering implements Evaluator {
           .addMeasure("Fowlkes-Mallows", paircount.fowlkesMallows(), 0, 1, false);
 
       Entropy entropy = contmat.getEntropy();
-      newGroup("Entropy based") //
+      MeasurementGroup g = newGroup("Entropy based") //
           .addMeasure("MI", entropy.mutualInformation(), 0, entropy.upperBoundMI(), false) //
           .addMeasure("VI", entropy.variationOfInformation(), 0, entropy.upperBoundVI(), true) //
           .addMeasure("Homogeneity", entropy.mutualInformation() / entropy.entropyFirst(), 0, 1, false) //
@@ -229,11 +228,14 @@ public class EvaluateClustering implements Evaluator {
           .addMeasure("Arithmetic NMI", entropy.arithmeticNMI(), 0, 1, false) //
           .addMeasure("Geometric NMI", entropy.geometricNMI(), 0, 1, false) //
           .addMeasure("Joint NMI", entropy.jointNMI(), 0, 1, false) //
-          .addMeasure("Arithmetic AMI", entropy.adjustedArithmeticMI(), 0, 1, false) //
-          .addMeasure("Geometric AMI", entropy.adjustedGeometricMI(), 0, 1, false) //
-          .addMeasure("Joint AMI", entropy.adjustedJointMI(), 0, 1, false) //
           .addMeasure("NVI", entropy.normalizedVariationOfInformation(), 0, 1, true) //
           .addMeasure("NID", entropy.normalizedInformationDistance(), 0, 1, true);
+      // For large data sets, we do not compute EMI/AMI values.
+      if(entropy.expectedMutualInformation() > 0) {
+        g.addMeasure("Arithmetic AMI", entropy.adjustedArithmeticMI(), 0, 1, false) //
+            .addMeasure("Geometric AMI", entropy.adjustedGeometricMI(), 0, 1, false) //
+            .addMeasure("Joint AMI", entropy.adjustedJointMI(), 0, 1, false); //
+      }
 
       BCubed bcubed = contmat.getBCubed();
       newGroup("B3") //
