@@ -37,6 +37,6 @@ public class SparseMaximumDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     SparseMaximumDistance dist = new ELKIBuilder<>(SparseMaximumDistance.class).build();
     basicChecks(dist);
-    sparseBasic(0, dist, 1, 0, 1, 1, 1, 1);
+    assertSparseBasic(0, dist, 1, 0, 1, 1, 1, 1);
   }
 }

@@ -47,8 +47,8 @@ public class ArcCosineUnitlengthDistanceTest extends AbstractDistanceTest {
     ArcCosineUnitlengthDistance dist = new ELKIBuilder<>(ArcCosineUnitlengthDistance.class).build();
     basicChecks(dist);
     // Note: some of these are not well defined, as we have zero vectors.
-    varyingLengthBasic(0, dist, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI);
-    nonnegativeSpatialConsistency(dist);
+    assertVaryingLengthBasic(0, dist, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI, MathUtil.HALFPI);
+    assertNonnegativeSpatialConsistency(dist);
   }
 
   @Test

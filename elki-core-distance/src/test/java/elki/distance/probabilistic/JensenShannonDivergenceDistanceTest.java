@@ -41,7 +41,7 @@ public class JensenShannonDivergenceDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     JensenShannonDivergenceDistance df = new ELKIBuilder<>(JensenShannonDivergenceDistance.class).build();
     basicChecks(df);
-    nonnegativeSpatialConsistency(df);
+    assertNonnegativeSpatialConsistency(df);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class JensenShannonDivergenceDistanceTest extends AbstractDistanceTest {
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
         assertEquals("Distance " + i + "," + j, 0.5 * distances[i][j], df.distance(vi, vj), 1e-15);
-        compareDistances(vj, vi, mbri, df);
+        assertMBRDistances(vj, vi, mbri, df);
       }
     }
   }

@@ -48,15 +48,15 @@ public class WeightedLPNormDistanceTest extends AbstractDistanceTest {
         .build();
     assertFalse("Not metric", dist.isMetric());
     basicChecks(dist);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(WeightedLPNormDistance.class) //
         .with(LPNormDistance.Par.P_ID, 3)//
         .with(WeightedNumberVectorDistance.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     assertTrue("Not metric", dist.isMetric());
     basicChecks(dist);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

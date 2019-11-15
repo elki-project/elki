@@ -44,8 +44,8 @@ public class HellingerDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     HellingerDistance df = new ELKIBuilder<>(HellingerDistance.class).build();
     basicChecks(df);
-    varyingLengthBasic(1e-15, df, MathUtil.SQRTHALF, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
-    nonnegativeSpatialConsistency(df);
+    assertVaryingLengthBasic(1e-15, df, MathUtil.SQRTHALF, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
+    assertNonnegativeSpatialConsistency(df);
   }
 
   @Test
@@ -98,7 +98,7 @@ public class HellingerDistanceTest extends AbstractDistanceTest {
         assertEquals("Similarity " + i + "," + j, 1 - pow(distances[i][j], 2), df.similarity(vi, vj), 1e-15);
         assertEquals("Distance " + i + "," + j, sqrt(1 - similarities[i][j]), df.distance(vi, vj), 1e-15);
         assertEquals("Similarity " + i + "," + j, similarities[i][j], df.similarity(vi, vj), 1e-15);
-        compareDistances(vj, vi, mbri, df);
+        assertMBRDistances(vj, vi, mbri, df);
       }
     }
   }

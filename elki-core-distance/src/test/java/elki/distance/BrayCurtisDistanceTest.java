@@ -36,7 +36,7 @@ public class BrayCurtisDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     BrayCurtisDistance dist = new ELKIBuilder<>(BrayCurtisDistance.class).build();
     basicChecks(dist);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

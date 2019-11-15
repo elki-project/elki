@@ -37,8 +37,8 @@ public class ManhattanDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     ManhattanDistance dist = new ELKIBuilder<>(ManhattanDistance.class).build();
     basicChecks(dist);
-    varyingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

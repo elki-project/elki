@@ -43,8 +43,8 @@ public class FisherRaoDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     FisherRaoDistance df = new ELKIBuilder<>(FisherRaoDistance.class).build();
     basicChecks(df);
-    varyingLengthBasic(0, df, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI);
-    nonnegativeSpatialConsistency(df);
+    assertVaryingLengthBasic(0, df, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI);
+    assertNonnegativeSpatialConsistency(df);
   }
 
   @Test
@@ -71,7 +71,7 @@ public class FisherRaoDistanceTest extends AbstractDistanceTest {
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
         assertEquals("Distance " + i + "," + j, distances[i][j], df.distance(vi, vj), 1e-15);
-        compareDistances(vj, vi, mbri, df);
+        assertMBRDistances(vj, vi, mbri, df);
       }
     }
   }

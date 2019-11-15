@@ -37,6 +37,6 @@ public class HistogramIntersectionDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     HistogramIntersectionDistance dist = new ELKIBuilder<>(HistogramIntersectionDistance.class).build();
     basicChecks(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

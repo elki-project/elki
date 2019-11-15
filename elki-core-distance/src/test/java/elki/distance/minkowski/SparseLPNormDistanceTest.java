@@ -40,13 +40,13 @@ public class SparseLPNormDistanceTest extends AbstractDistanceTest {
         .with(LPNormDistance.Par.P_ID, .5) //
         .build();
     basicChecks(dist);
-    sparseBasic(0, dist, 1, 0, 1, 1, 4, 1);
+    assertSparseBasic(0, dist, 1, 0, 1, 1, 4, 1);
 
     // Also test the builder - we could have just used .STATIC
     dist = new ELKIBuilder<>(SparseLPNormDistance.class) //
         .with(LPNormDistance.Par.P_ID, 3) //
         .build();
     basicChecks(dist);
-    sparseBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
+    assertSparseBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
   }
 }

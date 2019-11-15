@@ -44,7 +44,7 @@ public class HistogramMatchDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     HistogramMatchDistance dist = new ELKIBuilder<>(HistogramMatchDistance.class).build();
     basicChecks(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 
   /**

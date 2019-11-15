@@ -37,7 +37,7 @@ public class MinimumDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     MinimumDistance dist = new ELKIBuilder<>(MinimumDistance.class).build();
     basicChecks(dist);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

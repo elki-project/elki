@@ -43,8 +43,8 @@ public class ChiDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     ChiDistance df = new ELKIBuilder<>(ChiDistance.class).build();
     basicChecks(df);
-    varyingLengthBasic(0, df, MathUtil.SQRT2, 0, MathUtil.SQRT2, MathUtil.SQRT2, 2, MathUtil.SQRT2);
-    nonnegativeSpatialConsistency(df);
+    assertVaryingLengthBasic(0, df, MathUtil.SQRT2, 0, MathUtil.SQRT2, MathUtil.SQRT2, 2, MathUtil.SQRT2);
+    assertNonnegativeSpatialConsistency(df);
   }
 
   @Test
@@ -60,7 +60,7 @@ public class ChiDistanceTest extends AbstractDistanceTest {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
         assertEquals("Distance " + i + "," + j, sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
         assertEquals("Distance " + i + "," + j, distances[i][j], df2.distance(vi, vj), 1e-15);
-        compareDistances(vj, vi, mbri, df);
+        assertMBRDistances(vj, vi, mbri, df);
       }
     }
   }

@@ -41,7 +41,7 @@ public class TriangularDiscriminationDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     TriangularDiscriminationDistance df = new ELKIBuilder<>(TriangularDiscriminationDistance.class).build();
     basicChecks(df);
-    nonnegativeSpatialConsistency(df);
+    assertNonnegativeSpatialConsistency(df);
   }
 
   static double[][] TOY_DISTANCES;
@@ -74,7 +74,7 @@ public class TriangularDiscriminationDistanceTest extends AbstractDistanceTest {
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
         assertEquals("Distance " + i + "," + j, TOY_DISTANCES[i][j], df.distance(vi, vj), 1e-15);
-        compareDistances(vj, vi, mbri, df);
+        assertMBRDistances(vj, vi, mbri, df);
       }
     }
   }

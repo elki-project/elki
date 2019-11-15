@@ -41,7 +41,7 @@ public class WeightedCanberraDistanceTest extends AbstractDistanceTest {
         .with(WeightedNumberVectorDistance.WEIGHTS_ID, MathUtil.randomDoubleArray(TEST_DIM, new Random(0L))) //
         .build();
     basicChecks(dist);
-    spatialConsistency(dist);
-    nonnegativeSpatialConsistency(dist);
+    assertSpatialConsistency(dist);
+    assertNonnegativeSpatialConsistency(dist);
   }
 }

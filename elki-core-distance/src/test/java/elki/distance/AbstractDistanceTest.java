@@ -32,6 +32,7 @@ import elki.data.NumberVector;
 import elki.data.SparseDoubleVector;
 import elki.data.SparseNumberVector;
 import elki.data.spatial.SpatialComparable;
+import elki.data.spatial.SpatialUtil;
 import elki.data.type.VectorTypeInformation;
 import elki.utilities.random.FastNonThreadsafeRandom;
 
@@ -79,7 +80,7 @@ public abstract class AbstractDistanceTest {
    * @param dist Distance function
    * @param ds Correct vectors
    */
-  public static void varyingLengthBasic(double tolerance, PrimitiveDistance<? super NumberVector> dist, double... ds) {
+  public static void assertVaryingLengthBasic(double tolerance, PrimitiveDistance<? super NumberVector> dist, double... ds) {
     // Should accept variable lengths in the API:
     assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(DoubleVector.class, 1, 2)));
 
@@ -103,8 +104,8 @@ public abstract class AbstractDistanceTest {
     }
     if(dist instanceof SpatialPrimitiveDistance) {
       SpatialPrimitiveDistance<? super NumberVector> sdf = (SpatialPrimitiveDistance<? super NumberVector>) dist;
-      compareDistances(BASIC[0], BASIC[3], new HyperBoundingBox(BASIC[3].toArray(), BASIC[3].toArray()), sdf);
-      compareDistances(BASIC[2], BASIC[1], new HyperBoundingBox(BASIC[1].toArray(), BASIC[1].toArray()), sdf);
+      assertMBRDistances(BASIC[0], BASIC[3], new HyperBoundingBox(BASIC[3].toArray(), BASIC[3].toArray()), sdf);
+      assertMBRDistances(BASIC[2], BASIC[1], new HyperBoundingBox(BASIC[1].toArray(), BASIC[1].toArray()), sdf);
     }
     if(dist.isMetric()) {
       assertTrue("Trivial metric test failed.", dist.distance(BASIC[4], BASIC[6]) <= dist.distance(BASIC[4], BASIC[5]) + dist.distance(BASIC[5], BASIC[6]));
@@ -131,7 +132,7 @@ public abstract class AbstractDistanceTest {
    * @param dist Distance function
    * @param ds Correct vectors
    */
-  public static void sparseBasic(double tolerance, PrimitiveDistance<? super SparseNumberVector> dist, double... ds) {
+  public static void assertSparseBasic(double tolerance, PrimitiveDistance<? super SparseNumberVector> dist, double... ds) {
     // Should accept variable lengths in the API:
     assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(SparseDoubleVector.class, 1, 2)));
 
@@ -217,7 +218,7 @@ public abstract class AbstractDistanceTest {
    *
    * @param dist Distance function to check
    */
-  public static void spatialConsistency(SpatialPrimitiveDistance<? super NumberVector> dist) {
+  public static void assertSpatialConsistency(SpatialPrimitiveDistance<? super NumberVector> dist) {
     final Random rnd = new FastNonThreadsafeRandom(0);
     final int dim = TEST_DIM, iters = 1000;
 
@@ -225,7 +226,7 @@ public abstract class AbstractDistanceTest {
         d4 = new double[dim];
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
-    compareDistances(v1, v2, mbr, dist);
+    assertMBRDistances(v1, v2, mbr, dist);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
@@ -233,7 +234,7 @@ public abstract class AbstractDistanceTest {
         d3[d] = m - rnd.nextDouble() * 1E4;
         d4[d] = m + rnd.nextDouble() * 1E4;
       }
-      compareDistances(v1, v2, mbr, dist);
+      assertMBRDistances(v1, v2, mbr, dist);
     }
   }
 
@@ -242,7 +243,7 @@ public abstract class AbstractDistanceTest {
    * 
    * @param dist Distance function to test
    */
-  public static void nonnegativeSpatialConsistency(SpatialPrimitiveDistance<? super NumberVector> dist) {
+  public static void assertNonnegativeSpatialConsistency(SpatialPrimitiveDistance<? super NumberVector> dist) {
     final Random rnd = new FastNonThreadsafeRandom(1);
     final int dim = TEST_DIM, iters = 10000;
     double[] d1 = new double[dim], d2 = new double[dim], d3 = new double[dim],
@@ -250,7 +251,7 @@ public abstract class AbstractDistanceTest {
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
     d1[0] = d2[1] = d4[1] = d4[2] = 1.; // Trivial sitations, with many zeros.
-    compareDistances(v1, v2, mbr, dist);
+    assertMBRDistances(v1, v2, mbr, dist);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;
@@ -258,14 +259,23 @@ public abstract class AbstractDistanceTest {
         d3[d] = rnd.nextDouble() * v;
         d4[d] = rnd.nextDouble() * (2E4 - v) + v;
       }
-      compareDistances(v1, v2, mbr, dist);
+      assertMBRDistances(v1, v2, mbr, dist);
     }
   }
 
-  public static void compareDistances(NumberVector v1, NumberVector v2, HyperBoundingBox mbr2, SpatialPrimitiveDistance<? super NumberVector> dist) {
+  /**
+   * Assert that the minDist to the MBR is less than the exact distance
+   *
+   * @param v1 First test vector
+   * @param v2 Second test vector
+   * @param mbr2 Bounding box containing v2
+   * @param dist Distance function
+   */
+  public static void assertMBRDistances(NumberVector v1, NumberVector v2, HyperBoundingBox mbr2, SpatialPrimitiveDistance<? super NumberVector> dist) {
     double exact = dist.distance(v1, v2), mind = dist.minDist(v1, v2),
         mbrd = dist.minDist(v1, mbr2), zero = dist.minDist(v2, mbr2),
         mbrd2 = dist.minDist(mbr2, v1), zero2 = dist.minDist(mbr2, v2);
+    assertTrue("Test setup incorrect.", SpatialUtil.contains(mbr2, v2));
     assertEquals("Not same: " + dist.toString(), exact, mind, 1e-10);
     assertTrue("Not smaller:" + dist.toString() + " " + mbrd + " > " + exact + " " + mbr2 + " " + v1, mbrd <= exact);
     assertTrue("Not smaller:" + dist.toString() + " " + mbrd2 + " > " + exact + " " + mbr2 + " " + v1, mbrd2 <= exact);

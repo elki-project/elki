@@ -37,6 +37,6 @@ public class SparseSquaredEuclideanDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     SparseSquaredEuclideanDistance dist = new ELKIBuilder<>(SparseSquaredEuclideanDistance.class).build();
     basicChecks(dist);
-    sparseBasic(0, dist, 1, 0, 1, 1, 2, 1);
+    assertSparseBasic(0, dist, 1, 0, 1, 1, 2, 1);
   }
 }
