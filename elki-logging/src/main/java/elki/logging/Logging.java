@@ -255,8 +255,7 @@ public class Logging {
    * @param message Message to log.
    */
   public void log(java.util.logging.Level level, CharSequence message) {
-    LogRecord rec = new ELKILogRecord(level, message);
-    logger.log(rec);
+    logger.log(new ELKILogRecord(level, message));
   }
 
   /**
@@ -339,7 +338,9 @@ public class Logging {
    * @param message Informational log message.
    */
   public void statistics(CharSequence message) {
-    log(Level.STATISTICS, message);
+    if(logger.isLoggable(Level.STATISTICS)) {
+      log(Level.STATISTICS, message);
+    }
   }
 
   /**

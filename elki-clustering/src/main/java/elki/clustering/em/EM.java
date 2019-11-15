@@ -202,7 +202,7 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
 
   /**
    * Performs the EM clustering algorithm on the given database.
-   *
+   * <p>
    * Finally a hard clustering is provided where each clusters gets assigned the
    * points exhibiting the highest probability to belong to this cluster. But
    * still, the database objects hold associated the complete probability-vector
@@ -219,10 +219,8 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
     List<? extends EMClusterModel<M>> models = mfactory.buildInitialModels(relation, k, SquaredEuclideanDistance.STATIC);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
-    DoubleStatistic likestat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".loglikelihood") : null;
-    if(LOG.isStatistics()) {
-      LOG.statistics(likestat.setDouble(loglikelihood));
-    }
+    DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
+    LOG.statistics(likestat.setDouble(loglikelihood));
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
@@ -233,9 +231,7 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
       // reassign probabilities
       loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
-      if(LOG.isStatistics()) {
-        LOG.statistics(likestat.setDouble(loglikelihood));
-      }
+      LOG.statistics(likestat.setDouble(loglikelihood));
       if(loglikelihood - bestloglikelihood > delta) {
         lastimprovement = it;
         bestloglikelihood = loglikelihood;
@@ -244,9 +240,7 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
         break;
       }
     }
-    if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(KEY + ".iterations", it));
-    }
+    LOG.statistics(new LongStatistic(KEY + ".iterations", it));
 
     // fill result with clusters and models
     List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
@@ -326,7 +320,7 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
   /**
    * Assigns the current probability values to the instances in the database and
    * compute the expectation value of the current mixture of distributions.
-   * 
+   * <p>
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 

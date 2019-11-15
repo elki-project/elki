@@ -119,7 +119,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     double[][] dmat = new double[size][size];
     final boolean square = !dq.getDistance().isSquared();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.distancematrix").begin() : null;
+    Duration timer = LOG.newDuration(this.getClass().getName() + ".runtime.distancematrix").begin();
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     for(ix.seek(0); ix.valid(); ix.advance()) {
       double[] dmat_x = dmat[ix.getOffset()];
@@ -133,9 +133,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
       }
     }
     LOG.ensureCompleted(prog);
-    if(timer != null) {
-      LOG.statistics(timer.end());
-    }
+    LOG.statistics(timer.end());
     return dmat;
   }
 
@@ -152,7 +150,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     final double msigmasq = -.5 / (sigma * sigma);
     double[][] pij = new double[size][size];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing affinities", size, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(GaussianAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin() : null;
+    Duration timer = LOG.newDuration(GaussianAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin();
     MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
     for(int i = 0; i < size; i++) {
       double logP = computeH(i, dist[i], pij[i], msigmasq);
@@ -162,8 +160,8 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    if(LOG.isStatistics()) { // timer != null, mv != null
-      LOG.statistics(timer.end());
+    LOG.statistics(timer.end());
+    if(mv != null && LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(GaussianAffinityMatrixBuilder.class.getName() + ".perplexity.average", mv.getMean()));
       LOG.statistics(new DoubleStatistic(GaussianAffinityMatrixBuilder.class.getName() + ".perplexity.stddev", mv.getSampleStddev()));
     }

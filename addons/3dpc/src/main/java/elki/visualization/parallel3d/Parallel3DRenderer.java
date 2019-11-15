@@ -255,8 +255,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
       // Buffer for coordinates.
       gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbi[0]);
       gl.glBufferData(GL.GL_ARRAY_BUFFER, shared.rel.size() // Number of lines *
-          * 2 // 2 Points *
-          * 5 // 2 coordinates + 3 color
+          * 10L // 2 Points * (2 coordinates + 3 color)
           * ByteArrayUtil.SIZE_FLOAT, null, GL2.GL_DYNAMIC_DRAW);
     }
     else {

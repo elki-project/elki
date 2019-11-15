@@ -752,11 +752,8 @@ public class Metadata extends WeakReference<Object> {
       @Override
       public Object get() {
         lookahead(); // In case someone did not call valid()
-        if(extra != null) {
-          return extra;
-        }
-        assert subiter != null && subiter.valid();
-        return subiter.get();
+        return extra != null ? extra : //
+            subiter != null ? subiter.get() : null;
       }
     }
 
@@ -833,11 +830,8 @@ public class Metadata extends WeakReference<Object> {
       @Override
       public Object get() {
         lookahead(); // In case someone did not call valid()
-        if(extra != null) {
-          return extra;
-        }
-        assert subiter != null && subiter.valid();
-        return subiter.get();
+        return extra != null ? extra : //
+            subiter != null ? subiter.get() : null;
       }
     }
   }

@@ -127,7 +127,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param initialScale Initial scaling factor
    */
   protected void computePij(DBIDRange ids, KNNSearcher<DBIDRef> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
+    Duration timer = LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin();
     final double logPerp = FastMath.log(perplexity);
     // Scratch arrays, resizable
     DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
@@ -179,8 +179,8 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
         }
       }
     }
-    if(LOG.isStatistics()) { // timer != null, mv != null
-      LOG.statistics(timer.end());
+    LOG.statistics(timer.end());
+    if(mv != null && LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.average", mv.getMean()));
       LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.stddev", mv.getSampleStddev()));
     }

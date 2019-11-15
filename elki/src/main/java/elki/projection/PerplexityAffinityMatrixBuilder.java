@@ -127,7 +127,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     final double logPerp = FastMath.log(perplexity);
     double[][] pij = new double[size][size];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Optimizing perplexities", size, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(PerplexityAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin() : null;
+    Duration timer = LOG.newDuration(PerplexityAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin();
     MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
     for(int i = 0; i < size; i++) {
       double beta = computePi(i, dist[i], pij[i], perplexity, logPerp);
@@ -137,8 +137,8 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    if(LOG.isStatistics()) { // timer != null, mv != null
-      LOG.statistics(timer.end());
+    LOG.statistics(timer.end());
+    if(mv != null && LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(PerplexityAffinityMatrixBuilder.class.getName() + ".sigma.average", mv.getMean()));
       LOG.statistics(new DoubleStatistic(PerplexityAffinityMatrixBuilder.class.getName() + ".sigma.stddev", mv.getSampleStddev()));
     }
@@ -194,7 +194,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
 
   /**
    * Estimate beta from the distances in a row.
-   * 
+   * <p>
    * This lacks a mathematical argument, but is a handcrafted heuristic to avoid
    * numerical problems. The average distance is usually too large, so we scale
    * the average distance by 2*N/perplexity. Then estimate beta as 1/x.

@@ -222,11 +222,10 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       double[] o = database.get(it).toArray();
 
-      double minDist = Double.POSITIVE_INFINITY;
-      ORCLUSCluster minCluster = null;
-
-      // determine projected distance between o and cluster
-      for(int i = 0; i < clusters.size(); i++) {
+      // determine projected distance between o and clusters
+      ORCLUSCluster minCluster = clusters.get(0);
+      double minDist = distFunc.distance(DoubleVector.wrap(project(minCluster, o)), projectedCentroids.get(0));
+      for(int i = 1; i < clusters.size(); i++) {
         ORCLUSCluster c = clusters.get(i);
         NumberVector o_proj = DoubleVector.wrap(project(c, o));
         double dist = distFunc.distance(o_proj, projectedCentroids.get(i));
