@@ -22,8 +22,9 @@ package elki.index.vafile;
 
 import java.util.Arrays;
 
-import elki.database.ids.DBID;
-import elki.utilities.io.ByteArrayUtil;
+import elki.database.ids.DBIDRef;
+import elki.math.MathUtil;
+
 import net.jafama.FastMath;
 
 /**
@@ -33,16 +34,16 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class VectorApproximation {
+public class VectorApproximation implements DBIDRef {
   /**
    * approximation (va cell ids)
    */
   int[] approximation;
 
   /**
-   * Object represented by this approximation
+   * Object id.
    */
-  protected DBID id;
+  int id;
 
   /**
    * Constructor.
@@ -50,17 +51,10 @@ public class VectorApproximation {
    * @param id Object represented (may be <code>null</code> for query objects)
    * @param approximation Approximation
    */
-  public VectorApproximation(DBID id, int[] approximation) {
+  public VectorApproximation(DBIDRef id, int[] approximation) {
     super();
-    this.id = id;
+    this.id = id != null ? id.internalGetIndex() : Integer.MIN_VALUE;
     this.approximation = approximation;
-  }
-
-  /**
-   * @return the id
-   */
-  public DBID getId() {
-    return id;
   }
 
   /**
@@ -81,6 +75,11 @@ public class VectorApproximation {
   public int getApproximation(int dim) {
     return approximation[dim];
   }
+  
+  @Override
+  public int internalGetIndex() {
+    return id;
+  }
 
   @Override
   public String toString() {
@@ -95,10 +94,8 @@ public class VectorApproximation {
    * @param numberOfPartitions the number of relevant partitions
    * @return the cost values (in bytes)
    */
-  // nicht gleich in bytes umwandeln, sonst rundungsfehler erst nachdem *anzahl
-  // objekte
   public static int byteOnDisk(int numberOfDimensions, int numberOfPartitions) {
     // (partition*dimension+id) alles in Bit 32bit für 4 byte id
-    return (int) (Math.ceil(numberOfDimensions * ((FastMath.log(numberOfPartitions) / FastMath.log(2))) + 32) / ByteArrayUtil.SIZE_DOUBLE);
+    return numberOfDimensions * ((int) Math.ceil(FastMath.log(numberOfPartitions) * MathUtil.ONE_BY_LOG2) + 4);
   }
 }

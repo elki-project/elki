@@ -40,7 +40,7 @@ public class VAFileTest extends AbstractIndexStructureTest {
   @Test
   public void testVAFile() {
     VAFile.Factory<?> factory = new ELKIBuilder<>(VAFile.Factory.class) //
-        .with(VAFile.Factory.PARTITIONS_ID, 4).build();
+        .with(VAFile.Factory.Par.PARTITIONS_ID, 4).build();
     assertExactEuclidean(factory, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
     assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
   }

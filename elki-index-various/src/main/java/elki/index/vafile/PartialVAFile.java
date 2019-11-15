@@ -66,6 +66,8 @@ import net.jafama.FastMath;
  * Approximations<br>
  * Proc. 18th Int. Conf. on Scientific and Statistical Database Management
  * (SSDBM 06)
+ * <p>
+ * TODO: This needs to be optimized more low-level.
  *
  * @author Thomas Bernecker
  * @author Erich Schubert
@@ -139,13 +141,11 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     if(splitPartitions != null) {
       throw new IllegalStateException("Data already inserted.");
     }
-
     if(MathUtil.log2(partitions) != (int) MathUtil.log2(partitions)) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
     final int dimensions = RelationUtil.dimensionality(relation);
-
     splitPartitions = new double[dimensions][];
     daFiles = new ArrayList<>(dimensions);
     for(int d = 0; d < dimensions; d++) {
@@ -156,10 +156,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
 
     vectorApprox = new ArrayList<>();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      V dv = relation.get(id);
-      VectorApproximation va = calculateFullApproximation(id, dv);
-      vectorApprox.add(va);
+      vectorApprox.add(calculateFullApproximation(iter, relation.get(iter)));
     }
   }
 
@@ -190,7 +187,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @param dv Data vector
    * @return Vector approximation
    */
-  protected VectorApproximation calculateFullApproximation(DBID id, V dv) {
+  protected VectorApproximation calculateFullApproximation(DBIDRef id, V dv) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPartitions.length; d++) {
       double[] split = daFiles.get(d).getSplitPositions();
@@ -256,7 +253,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
 
-    VectorApproximation queryApprox = calculatePartialApproximation(null, query, daFiles);
+    VectorApproximation queryApprox = calculatePartialApproximation(query, daFiles);
 
     for(int i = 0; i < dimensions; i++) {
       final double val = query.doubleValue(i);
@@ -265,10 +262,10 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     }
 
     DoubleVector lowerEpsilon = DoubleVector.wrap(lowerVals);
-    VectorApproximation lowerEpsilonPartitions = calculatePartialApproximation(null, lowerEpsilon, daFiles);
+    VectorApproximation lowerEpsilonPartitions = calculatePartialApproximation(lowerEpsilon, daFiles);
 
     DoubleVector upperEpsilon = DoubleVector.wrap(upperVals);
-    VectorApproximation upperEpsilonPartitions = calculatePartialApproximation(null, upperEpsilon, daFiles);
+    VectorApproximation upperEpsilonPartitions = calculatePartialApproximation(upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.size(); i++) {
       int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
@@ -279,12 +276,11 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   /**
    * Calculate partial vector approximation.
    * 
-   * @param id Object ID
    * @param dv Object vector
    * @param daFiles List of approximations to use
    * @return Vector approximation
    */
-  protected static VectorApproximation calculatePartialApproximation(DBID id, NumberVector dv, List<DoubleObjPair<DAFile>> daFiles) {
+  protected static VectorApproximation calculatePartialApproximation(NumberVector dv, List<DoubleObjPair<DAFile>> daFiles) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int i = 0; i < daFiles.size(); i++) {
       double val = dv.doubleValue(i);
@@ -307,7 +303,17 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
         }
       }
     }
-    return new VectorApproximation(id, approximation);
+    return new VectorApproximation(null, approximation);
+  }
+
+  /**
+   * Round a value to the next page size.
+   *
+   * @param l value
+   * @return rounded value
+   */
+  protected long roundToPageSize(long l) {
+    return pageSize + (l % pageSize > 0 ? pageSize : 0);
   }
 
   /**
@@ -404,12 +410,23 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       this.approx = approx;
     }
 
+    /**
+     * Get a single approximation value.
+     *
+     * @param dimension Dimension
+     * @return Value
+     */
     public int getApproximation(int dimension) {
       return approx.getApproximation(dimension);
     }
 
-    public DBID getId() {
-      return approx.getId();
+    /**
+     * Get the vector approximation.
+     *
+     * @return Vector approximation
+     */
+    public DBIDRef getApprox() {
+      return approx;
     }
 
     @Override
@@ -484,7 +501,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       // important: this structure contains the maxDist values for refinement!
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
-        DBID id = va.getId();
         PartialVACandidate pva = new PartialVACandidate(va);
 
         boolean pruned = false;
@@ -504,19 +520,19 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
             // candidate cannot be dropped
             // TODO: actually: no refinement needed - need API that allows
             // reporting maxdists only.
-            result.add(refine(id, query), id);
+            result.add(refine(va, query), va);
           }
           else { // refine candidate - true refinement
-            double dis = refine(id, query);
+            double dis = refine(va, query);
             stats.incrementRefinements();
             if(dis <= range) {
-              result.add(dis, id);
+              result.add(dis, va);
             }
           }
         }
       }
 
-      stats.incrementScannedBytes(relation.size() * VectorApproximation.byteOnDisk(BitsUtil.cardinality(subspace), partitions));
+      stats.incrementScannedBytes(roundToPageSize(relation.size() * (long) VectorApproximation.byteOnDisk(BitsUtil.cardinality(subspace), partitions)));
       stats.incrementQueryTime(System.nanoTime() - t);
       return result;
     }
@@ -620,7 +636,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
         }
       }
 
-      stats.incrementScannedBytes(relation.size() * VectorApproximation.byteOnDisk(addition, partitions));
+      stats.incrementScannedBytes(roundToPageSize(relation.size() * (long) VectorApproximation.byteOnDisk(addition, partitions)));
 
       // refinement step
       ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<>(candidates2);
@@ -708,12 +724,11 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       KNNHeap result = DBIDUtil.newHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.getKNNDistance();
-        DBID currentID = va.getId();
         if(result.size() < k || va.minDistP < stopdist) {
-          double dist = refine(currentID, query);
+          double dist = refine(va.getApprox(), query);
           stats.incrementRefinements();
           if(dist < stopdist) {
-            result.insert(dist, currentID);
+            result.insert(dist, va.getApprox());
           }
         }
       }
