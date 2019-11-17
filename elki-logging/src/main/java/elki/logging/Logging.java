@@ -168,7 +168,7 @@ public class Logging {
    * @param lev Logging level
    * @return status
    */
-  public boolean isLoggable(Level lev) {
+  public boolean isLoggable(java.util.logging.Level lev) {
     return logger.isLoggable(lev);
   }
 
