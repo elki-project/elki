@@ -27,11 +27,9 @@ import org.junit.Test;
 import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.clustering.trivial.ByLabelClustering;
 import elki.clustering.trivial.TrivialAllInOne;
-import elki.clustering.trivial.TrivialAllNoise;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;
-import elki.evaluation.clustering.ClusterContingencyTable;
 import elki.math.MeanVariance;
 
 /**
