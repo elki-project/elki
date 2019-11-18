@@ -63,11 +63,21 @@ public class GammaDistribution implements Distribution {
   /**
    * Maximum number of iterations for regularizedGammaP. To prevent degeneration
    * for extreme values.
-   * 
+   * <p>
    * FIXME: is this too high, too low? Can we improve behavior for extreme
    * cases?
    */
   static final int MAX_ITERATIONS = 1000;
+
+  /**
+   * Constant used in the logGamma function.
+   */
+  static final double LOGGAMMA_G = 607.0 / 128.0 + .5;
+
+  /**
+   * Precision threshold in {@link #regularizedGammaQ}
+   */
+  static final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
 
   /**
    * Alpha == k
@@ -223,7 +233,7 @@ public class GammaDistribution implements Distribution {
   /**
    * Compute logGamma.
    * <p>
-   * Based loosely on "Numerical Recpies" and the work of Paul Godfrey at
+   * Based loosely on "Numerical Recipes" and the work of Paul Godfrey at
    * http://my.fit.edu/~gabdo/gamma.txt
    * <p>
    * TODO: find out which approximation really is the best...
@@ -235,8 +245,7 @@ public class GammaDistribution implements Distribution {
     if(Double.isNaN(x) || (x <= 0.0)) {
       return Double.NaN;
     }
-    double g = 607.0 / 128.0;
-    double tmp = x + g + .5;
+    double tmp = x + LOGGAMMA_G;
     tmp = (x + 0.5) * FastMath.log(tmp) - tmp;
     double ser = LANCZOS[0];
     for(int i = LANCZOS.length - 1; i > 0; --i) {
@@ -286,12 +295,10 @@ public class GammaDistribution implements Distribution {
       return 1.0 - regularizedGammaQ(a, x);
     }
     // Loosely following "Numerical Recipes"
-    double term = 1.0 / a;
-    double sum = term;
+    double term = 1.0 / a, sum = term;
     for(int n = 1; n < MAX_ITERATIONS; n++) {
       // compute next element in the series
-      term = x / (a + n) * term;
-      sum = sum + term;
+      sum += term *= x / (a + n);
       if(sum == Double.POSITIVE_INFINITY) {
         return 1.0;
       }
@@ -328,12 +335,10 @@ public class GammaDistribution implements Distribution {
       return FastMath.log(1.0 - regularizedGammaQ(a, x));
     }
     // Loosely following "Numerical Recipes"
-    double del = 1.0 / a;
-    double sum = del;
+    double del = 1.0 / a, sum = del;
     for(int n = 1; n < Integer.MAX_VALUE; n++) {
       // compute next element in the series
-      del *= x / (a + n);
-      sum = sum + del;
+      sum += del *= x / (a + n);
       if(Math.abs(del / sum) < NUM_PRECISION || sum >= Double.POSITIVE_INFINITY) {
         break;
       }
@@ -371,10 +376,7 @@ public class GammaDistribution implements Distribution {
       return 1.0 - regularizedGammaP(a, x);
     }
     // Compute using continued fraction approach.
-    final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
-    double b = x + 1 - a;
-    double c = 1.0 / FPMIN;
-    double d = 1.0 / b;
+    double b = x + 1 - a, c = 1.0 / FPMIN, d = 1.0 / b;
     double fac = d;
     for(int i = 1; i < MAX_ITERATIONS; i++) {
       double an = i * (a - i);
@@ -426,17 +428,6 @@ public class GammaDistribution implements Distribution {
       url = "https://doi.org/10.1145/358315.358390", //
       bibkey = "DBLP:journals/cacm/AhrensD82")
   public static double nextRandom(double k, double theta, Random random) {
-    /* Constants */
-    final double q1 = 0.0416666664, q2 = 0.0208333723, q3 = 0.0079849875;
-    final double q4 = 0.0015746717, q5 = -0.0003349403, q6 = 0.0003340332;
-    final double q7 = 0.0006053049, q8 = -0.0004701849, q9 = 0.0001710320;
-    final double a1 = 0.333333333, a2 = -0.249999949, a3 = 0.199999867;
-    final double a4 = -0.166677482, a5 = 0.142873973, a6 = -0.124385581;
-    final double a7 = 0.110368310, a8 = -0.112750886, a9 = 0.104089866;
-    final double e1 = 1.000000000, e2 = 0.499999994, e3 = 0.166666848;
-    final double e4 = 0.041664508, e5 = 0.008345522, e6 = 0.001353826;
-    final double e7 = 0.000247453;
-
     if(k < 1.0) { // Base case, for small k
       final double b = 1.0 + 0.36788794412 * k; // Step 1
       while(true) {
@@ -454,139 +445,118 @@ public class GammaDistribution implements Distribution {
           }
         }
       }
+      // Unreachable.
+    }
+    // Step 1. Preparations
+    final double ss, s, d;
+    if(k != -1.0) {
+      ss = k - 0.5;
+      s = FastMath.sqrt(ss);
+      d = 5.656854249 - 12.0 * s;
     }
     else {
-      // Step 1. Preparations
-      final double ss, s, d;
-      if(k != -1.0) {
-        ss = k - 0.5;
-        s = FastMath.sqrt(ss);
-        d = 5.656854249 - 12.0 * s;
+      // For k == -1.0:
+      ss = s = d = 0.0;
+    }
+    // Random vector of maximum length 1
+    final double v1, /* v2, */v12;
+    { // Temporary values - candidate
+      double tv1, tv2, tv12;
+      do {
+        tv1 = 2.0 * random.nextDouble() - 1.0;
+        tv2 = 2.0 * random.nextDouble() - 1.0;
+        tv12 = tv1 * tv1 + tv2 * tv2;
+      }
+      while(tv12 > 1.0);
+      v1 = tv1;
+      /* v2 = tv2; */
+      v12 = tv12;
+    }
+
+    final double b, c, si, q0;
+    // Simpler accept cases & parameter computation
+    {
+      final double t = v1 * FastMath.sqrt(-2.0 * FastMath.log(v12) / v12);
+      final double x = s + 0.5 * t;
+      final double gds = x * x;
+      if(t >= 0.0) {
+        return (gds / theta); // Immediate acceptance
+      }
+
+      // Random uniform
+      final double un = random.nextDouble();
+      // Squeeze acceptance
+      if(d * un <= t * t * t) {
+        return (gds / theta);
+      }
+
+      if(k != -1.0) { // Step 4. Set-up for hat case
+        final double r = 1.0 / k;
+        q0 = ((((((((0.0001710320 * r - 0.0004701849) * r + 0.0006053049) * r + 0.0003340332) * r - 0.0003349403) //
+            * r + 0.0015746717) * r + 0.0079849875) * r + 0.0208333723) * r + 0.0416666664) * r;
+        if(k > 3.686) {
+          if(k > 13.022) {
+            b = 1.77;
+            si = 0.75;
+            c = 0.1515 / s;
+          }
+          else {
+            b = 1.654 + 0.0076 * ss;
+            si = 1.68 / s + 0.275;
+            c = 0.062 / s + 0.024;
+          }
+        }
+        else {
+          b = 0.463 + s - 0.178 * ss;
+          si = 1.235;
+          c = 0.195 / s - 0.079 + 0.016 * s;
+        }
       }
       else {
         // For k == -1.0:
-        ss = 0.0;
-        s = 0.0;
-        d = 0.0;
+        b = c = si = q0 = 0.0;
       }
-      // Random vector of maximum length 1
-      final double v1, /* v2, */v12;
-      { // Temporary values - candidate
-        double tv1, tv2, tv12;
-        do {
-          tv1 = 2.0 * random.nextDouble() - 1.0;
-          tv2 = 2.0 * random.nextDouble() - 1.0;
-          tv12 = tv1 * tv1 + tv2 * tv2;
-        }
-        while(tv12 > 1.0);
-        v1 = tv1;
-        /* v2 = tv2; */
-        v12 = tv12;
-      }
-
-      // double b = 0.0, c = 0.0;
-      // double si = 0.0, q0 = 0.0;
-      final double b, c, si, q0;
-
-      // Simpler accept cases & parameter computation
-      {
-        final double t = v1 * FastMath.sqrt(-2.0 * FastMath.log(v12) / v12);
-        final double x = s + 0.5 * t;
-        final double gds = x * x;
-        if(t >= 0.0) {
-          return (gds / theta); // Immediate acceptance
-        }
-
-        // Random uniform
-        final double un = random.nextDouble();
-        // Squeeze acceptance
-        if(d * un <= t * t * t) {
-          return (gds / theta);
-        }
-
-        if(k != -1.0) { // Step 4. Set-up for hat case
-          final double r = 1.0 / k;
-          q0 = ((((((((q9 * r + q8) * r + q7) * r + q6) * r + q5) * r + q4) * r + q3) * r + q2) * r + q1) * r;
-          if(k > 3.686) {
-            if(k > 13.022) {
-              b = 1.77;
-              si = 0.75;
-              c = 0.1515 / s;
-            }
-            else {
-              b = 1.654 + 0.0076 * ss;
-              si = 1.68 / s + 0.275;
-              c = 0.062 / s + 0.024;
-            }
-          }
-          else {
-            b = 0.463 + s - 0.178 * ss;
-            si = 1.235;
-            c = 0.195 / s - 0.079 + 0.016 * s;
-          }
-        }
-        else {
-          // For k == -1.0:
-          b = 0.0;
-          c = 0.0;
-          si = 0.0;
-          q0 = 0.0;
-        }
-        // Compute v and q
-        if(x > 0.0) {
-          final double v = t / (s + s);
-          final double q;
-          if(Math.abs(v) > 0.25) {
-            q = q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v);
-          }
-          else {
-            q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
-          }
-          // Quotient acceptance:
-          if(FastMath.log(1.0 - un) <= q) {
-            return (gds / theta);
-          }
-        }
-      }
-
-      // Double exponential deviate t
-      while(true) {
-        double e, u, sign_u, t;
-        // Retry until t is sufficiently large
-        do {
-          e = -FastMath.log(random.nextDouble());
-          u = random.nextDouble();
-          u = u + u - 1.0;
-          sign_u = (u > 0) ? 1.0 : -1.0;
-          t = b + (e * si) * sign_u;
-        }
-        while(t <= -0.71874483771719);
-
-        // New v(t) and q(t)
+      // Compute v and q
+      if(x > 0.0) {
         final double v = t / (s + s);
-        final double q;
-        if(Math.abs(v) > 0.25) {
-          q = q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v);
+        final double q = Math.abs(v) > 0.25 ? q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v) //
+            : q0 + 0.5 * t * t * ((((((((0.104089866 * v - 0.112750886) * v + 0.110368310) * v - 0.124385581) * v //
+                + 0.142873973) * v - 0.166677482) * v + 0.199999867) * v - 0.249999949) * v + 0.333333333) * v;
+        // Quotient acceptance:
+        if(FastMath.log(1.0 - un) <= q) {
+          return gds / theta;
         }
-        else {
-          q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
-        }
-        if(q <= 0.0) {
-          continue; // retry
-        }
-        // Compute w(t)
-        final double w;
-        if(q > 0.5) {
-          w = FastMath.exp(q) - 1.0;
-        }
-        else {
-          w = ((((((e7 * q + e6) * q + e5) * q + e4) * q + e3) * q + e2) * q + e1) * q;
-        }
-        // Hat acceptance
-        if(c * u * sign_u <= w * FastMath.exp(e - 0.5 * t * t)) {
-          final double x = s + 0.5 * t;
-          return (x * x / theta);
-        }
+      }
+    }
+
+    // Double exponential deviate t
+    while(true) {
+      double e, u, sign_u, t;
+      // Retry until t is sufficiently large
+      do {
+        e = -FastMath.log(random.nextDouble());
+        u = 2 * random.nextDouble() - 1.0;
+        sign_u = (u > 0) ? 1.0 : -1.0;
+        t = b + (e * si) * sign_u;
+      }
+      while(t <= -0.71874483771719);
+
+      // New v(t) and q(t)
+      final double v = t / (s + s);
+      final double q = Math.abs(v) > 0.25 ? q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v) //
+          : q0 + 0.5 * t * t * ((((((((0.104089866 * v - 0.112750886) * v + 0.110368310) * v - 0.124385581) * v //
+              + 0.142873973) * v - 0.166677482) * v + 0.199999867) * v - 0.249999949) * v + 0.333333333) * v;
+      if(q <= 0.0) {
+        continue; // retry
+      }
+      // Compute w(t)
+      final double w = q > 0.5 ? FastMath.exp(q) - 1.0 //
+          : ((((((0.000247453 * q + 0.001353826) * q + 0.008345522) * q + 0.041664508) * q + 0.166666848) * q //
+              + 0.499999994) * q + 1.0) * q;
+      // Hat acceptance
+      if(c * u * sign_u <= w * FastMath.exp(e - 0.5 * t * t)) {
+        final double x = s + 0.5 * t;
+        return x * x / theta;
       }
     }
   }
@@ -658,13 +628,12 @@ public class GammaDistribution implements Distribution {
     }
     else {
       // nu <= 0.32, AS 91 at 1
-      final double C7 = 4.67, C8 = 6.66, C9 = 6.73, C10 = 13.32;
       final double ag = FastMath.log1p(-p) + g + (k - 1) * MathUtil.LOG2;
       double ch = 0.4;
       while(true) {
-        final double p1 = 1 + ch * (C7 + ch);
-        final double p2 = ch * (C9 + ch * (C8 + ch));
-        final double t = -0.5 + (C7 + 2 * ch) / p1 - (C9 + ch * (C10 + 3 * ch)) / p2;
+        final double p1 = 1 + ch * (4.67 + ch);
+        final double p2 = ch * (6.73 + ch * (6.66 + ch));
+        final double t = -0.5 + (4.67 + 2 * ch) / p1 - (6.73 + ch * (13.32 + 3 * ch)) / p2;
         final double delta = (1 - FastMath.exp(ag + 0.5 * ch) * p2 / p1) / t;
         ch -= delta;
         if(Math.abs(delta) <= EPS1 * Math.abs(ch)) {
@@ -719,11 +688,8 @@ public class GammaDistribution implements Distribution {
       return 0.;
     }
 
-    int max_newton_iterations = 1;
     // For small values, ensure some refinement iterations
-    if(k < 1e-10) {
-      max_newton_iterations = 7;
-    }
+    int max_newton_iterations = k < 1e-10 ? 7 : 1;
 
     final double g = logGamma(k); // == logGamma(v/2)
 
@@ -754,8 +720,7 @@ public class GammaDistribution implements Distribution {
       final double ch0 = ch; // backup initial approximation
       for(int i = 1; i <= MAXIT; i++) {
         final double q = ch; // previous approximation
-        final double p1 = 0.5 * ch;
-        final double p2 = p - regularizedGammaP(k, p1);
+        final double p1 = 0.5 * ch, p2 = p - regularizedGammaP(k, p1);
         if(Double.isInfinite(p2) || ch <= 0) {
           ch = ch0;
           max_newton_iterations = 27;
@@ -763,8 +728,7 @@ public class GammaDistribution implements Distribution {
         }
         { // Taylor series of AS 91: iteration via "goto 4"
           final double t = p2 * FastMath.exp(k * MathUtil.LOG2 + g + p1 - c * FastMath.log(ch));
-          final double b = t / ch;
-          final double a = 0.5 * t - b * c;
+          final double b = t / ch, a = 0.5 * t - b * c;
           final double s1 = (210. + a * (140. + a * (105. + a * (84. + a * (70. + 60. * a))))) / 420.;
           final double s2 = (420. + a * (735. + a * (966. + a * (1141. + 1278 * a)))) / 2520.;
           final double s3 = (210. + a * (462. + a * (707. + 932. * a))) / 2520.;
