@@ -38,7 +38,7 @@ public class EuclideanDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     EuclideanDistance dist = new ELKIBuilder<>(EuclideanDistance.class).build();
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, MathUtil.SQRT2, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, MathUtil.SQRT2, 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

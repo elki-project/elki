@@ -42,10 +42,10 @@ public class HellingerDistanceTest extends AbstractDistanceTest {
   @Test
   public void testBasic() {
     // Also test the builder - we could have just used .STATIC
-    HellingerDistance df = new ELKIBuilder<>(HellingerDistance.class).build();
-    basicChecks(df);
-    assertVaryingLengthBasic(1e-15, df, MathUtil.SQRTHALF, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
-    assertNonnegativeSpatialConsistency(df);
+    HellingerDistance dist = new ELKIBuilder<>(HellingerDistance.class).build();
+    basicChecks(dist);
+    assertVaryingLengthBasic(dist, new double[] { MathUtil.SQRTHALF, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF }, 1e-15);
+    assertNonnegativeSpatialConsistency(dist);
   }
 
   @Test

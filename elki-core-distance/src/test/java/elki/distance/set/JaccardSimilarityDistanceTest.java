@@ -44,11 +44,11 @@ public class JaccardSimilarityDistanceTest extends AbstractSetDistanceTest {
   public void testJaccardSimilarityDistance() {
     JaccardSimilarityDistance dist = new ELKIBuilder<>(JaccardSimilarityDistance.class).build();
     basicChecks(dist);
-    assertSparseBasic(1e-10, dist, 1, 0, 1, 1, 1, 1);
+    assertSparseBasic(dist, new double[] { 1, 0, 1, 1, 1, 1 }, 0);
 
-    assertBitVectorDistances(dist, SCORES, 1e-10);
-    assertNumberVectorDistances(dist, SCORES, 1e-10);
-    assertFeatureVectorDistances(dist, SCORES, 1e-10);
-    assertIntegerVectorVarLen(dist, .8, 1e-10);
+    assertBitVectorDistances(dist, SCORES, 1e-15);
+    assertNumberVectorDistances(dist, SCORES, 1e-15);
+    assertFeatureVectorDistances(dist, SCORES, 1e-15);
+    assertIntegerVectorVarLen(dist, .8, 0);
   }
 }

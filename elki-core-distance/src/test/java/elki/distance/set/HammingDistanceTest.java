@@ -46,11 +46,11 @@ public class HammingDistanceTest extends AbstractSetDistanceTest {
     HammingDistance dist = new ELKIBuilder<>(HammingDistance.class).build();
 
     basicChecks(dist);
-    assertVaryingLengthBasic(1e-10, dist, 1, 0, 1, 1, 2, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, 2, 1 }, 0);
 
-    assertBitVectorDistances(dist, SCORES, 1e-10);
-    assertNumberVectorDistances(dist, SCORES, 1e-10);
-    assertFeatureVectorDistances(dist, SCORES, 1e-10);
-    assertIntegerVectorVarLen(dist, 8, 1e-10);
+    assertBitVectorDistances(dist, SCORES, 0);
+    assertNumberVectorDistances(dist, SCORES, 0);
+    assertFeatureVectorDistances(dist, SCORES, 0);
+    assertIntegerVectorVarLen(dist, 8, 0);
   }
 }

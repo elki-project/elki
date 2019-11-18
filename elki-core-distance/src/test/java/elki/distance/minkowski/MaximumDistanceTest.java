@@ -37,7 +37,7 @@ public class MaximumDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     MaximumDistance dist = new ELKIBuilder<>(MaximumDistance.class).build();
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, 1, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, 1, 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

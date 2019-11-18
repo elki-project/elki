@@ -47,7 +47,7 @@ public class CosineUnitlengthDistanceTest extends AbstractDistanceTest {
     CosineUnitlengthDistance dist = new ELKIBuilder<>(CosineUnitlengthDistance.class).build();
     basicChecks(dist);
     // Note: some of these are not well defined, as we have zero vectors.
-    assertVaryingLengthBasic(0, dist, 1, 1, 1, 1, 1, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 1, 1, 1, 1, 1 }, 0);
     assertNonnegativeSpatialConsistency(dist);
   }
 

@@ -41,10 +41,10 @@ public class FisherRaoDistanceTest extends AbstractDistanceTest {
   @Test
   public void testBasic() {
     // Also test the builder - we could have just used .STATIC
-    FisherRaoDistance df = new ELKIBuilder<>(FisherRaoDistance.class).build();
-    basicChecks(df);
-    assertVaryingLengthBasic(0, df, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI);
-    assertNonnegativeSpatialConsistency(df);
+    FisherRaoDistance dist = new ELKIBuilder<>(FisherRaoDistance.class).build();
+    basicChecks(dist);
+    assertVaryingLengthBasic(dist, new double[] { Math.PI, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI }, 0);
+    assertNonnegativeSpatialConsistency(dist);
   }
 
   @Test

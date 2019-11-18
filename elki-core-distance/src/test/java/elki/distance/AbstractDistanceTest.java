@@ -76,20 +76,26 @@ public abstract class AbstractDistanceTest {
   /**
    * Basic regression test for variable length vectors.
    *
-   * @param delta tolerance
    * @param dist Distance function
    * @param ds Correct vectors
+   * @param tolerance tolerance
    */
-  public static void assertVaryingLengthBasic(double tolerance, PrimitiveDistance<? super NumberVector> dist, double... ds) {
+  public static void assertVaryingLengthBasic(PrimitiveDistance<? super NumberVector> dist, double[] ds, double tolerance) {
     // Should accept variable lengths in the API:
     assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(DoubleVector.class, 1, 2)));
 
     assertEquals("Basic 0", ds[0], dist.distance(BASIC[0], BASIC[1]), tolerance);
+    assertEquals("Reverse 0", ds[0], dist.distance(BASIC[1], BASIC[0]), tolerance);
     assertEquals("Basic 1", ds[1], dist.distance(BASIC[0], BASIC[2]), tolerance);
+    assertEquals("Reverse 1", ds[1], dist.distance(BASIC[2], BASIC[0]), tolerance);
     assertEquals("Basic 2", ds[2], dist.distance(BASIC[0], BASIC[3]), tolerance);
+    assertEquals("Reverse 2", ds[2], dist.distance(BASIC[3], BASIC[0]), tolerance);
     assertEquals("Basic 3", ds[3], dist.distance(BASIC[1], BASIC[2]), tolerance);
+    assertEquals("Reverse 3", ds[3], dist.distance(BASIC[2], BASIC[1]), tolerance);
     assertEquals("Basic 4", ds[4], dist.distance(BASIC[1], BASIC[3]), tolerance);
+    assertEquals("Reverse 4", ds[4], dist.distance(BASIC[3], BASIC[1]), tolerance);
     assertEquals("Basic 5", ds[5], dist.distance(BASIC[2], BASIC[3]), tolerance);
+    assertEquals("Reverse 5", ds[5], dist.distance(BASIC[3], BASIC[2]), tolerance);
 
     double expect = dist.distance(BASIC[0], BASIC[3]);
     assertEquals("Distance not as expected", expect, dist.distance(BASIC[1], BASIC[2]), 1e-15);
@@ -128,11 +134,11 @@ public abstract class AbstractDistanceTest {
   /**
    * Basic regression test for sparse vectors.
    *
-   * @param delta tolerance
    * @param dist Distance function
    * @param ds Correct vectors
+   * @param tolerance tolerance
    */
-  public static void assertSparseBasic(double tolerance, PrimitiveDistance<? super SparseNumberVector> dist, double... ds) {
+  public static void assertSparseBasic(PrimitiveDistance<? super SparseNumberVector> dist, double[] ds, double tolerance) {
     // Should accept variable lengths in the API:
     assertTrue("Does not accept variable length.", dist.getInputTypeRestriction().isAssignableFromType(new VectorTypeInformation<>(SparseDoubleVector.class, 1, 2)));
 
@@ -250,7 +256,7 @@ public abstract class AbstractDistanceTest {
         d4 = new double[dim];
     DoubleVector v1 = DoubleVector.wrap(d1), v2 = DoubleVector.wrap(d2);
     HyperBoundingBox mbr = new HyperBoundingBox(d3, d4);
-    d1[0] = d2[1] = d4[1] = d4[2] = 1.; // Trivial sitations, with many zeros.
+    d1[0] = d2[1] = d4[1] = d4[2] = 1.; // Trivial situations, with many zeros.
     assertMBRDistances(v1, v2, mbr, dist);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {

@@ -37,7 +37,7 @@ public class ClarkDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     ClarkDistance dist = new ELKIBuilder<>(ClarkDistance.class).build();
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, MathUtil.SQRTHALF, MathUtil.SQRTHALF, 1, MathUtil.SQRTHALF }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

@@ -41,10 +41,10 @@ public class ChiDistanceTest extends AbstractDistanceTest {
   @Test
   public void testBasic() {
     // Also test the builder - we could have just used .STATIC
-    ChiDistance df = new ELKIBuilder<>(ChiDistance.class).build();
-    basicChecks(df);
-    assertVaryingLengthBasic(0, df, MathUtil.SQRT2, 0, MathUtil.SQRT2, MathUtil.SQRT2, 2, MathUtil.SQRT2);
-    assertNonnegativeSpatialConsistency(df);
+    ChiDistance dist = new ELKIBuilder<>(ChiDistance.class).build();
+    basicChecks(dist);
+    assertVaryingLengthBasic(dist, new double[] { MathUtil.SQRT2, 0, MathUtil.SQRT2, MathUtil.SQRT2, 2, MathUtil.SQRT2 }, 0);
+    assertNonnegativeSpatialConsistency(dist);
   }
 
   @Test

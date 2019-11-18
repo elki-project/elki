@@ -36,7 +36,7 @@ public class CanberraDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     CanberraDistance dist = new ELKIBuilder<>(CanberraDistance.class).build();
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, 2, 1}, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

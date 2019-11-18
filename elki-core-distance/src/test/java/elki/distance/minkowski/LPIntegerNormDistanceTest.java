@@ -43,7 +43,7 @@ public class LPIntegerNormDistanceTest extends AbstractDistanceTest {
         .build();
     assertSame("Subtyped", LPIntegerNormDistance.class, dist.getClass());
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

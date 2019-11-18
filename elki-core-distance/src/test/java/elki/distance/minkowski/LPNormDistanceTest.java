@@ -46,7 +46,7 @@ public class LPNormDistanceTest extends AbstractDistanceTest {
     assertSame("Subtyped", LPNormDistance.class, dist.getClass());
     assertFalse("Not metric", dist.isMetric());
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, 4, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, 4, 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
     dist = new ELKIBuilder<>(LPNormDistance.class) //
@@ -55,7 +55,7 @@ public class LPNormDistanceTest extends AbstractDistanceTest {
     assertSame("Not optimized", LPIntegerNormDistance.class, dist.getClass());
     assertTrue("Not metric", dist.isMetric());
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, FastMath.pow(2, 1. / 3), 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
   }

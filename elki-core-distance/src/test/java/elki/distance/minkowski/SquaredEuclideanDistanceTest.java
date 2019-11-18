@@ -20,6 +20,8 @@
  */
 package elki.distance.minkowski;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import elki.distance.AbstractDistanceTest;
@@ -37,8 +39,10 @@ public class SquaredEuclideanDistanceTest extends AbstractDistanceTest {
     // Also test the builder - we could have just used .STATIC
     SquaredEuclideanDistance dist = new ELKIBuilder<>(SquaredEuclideanDistance.class).build();
     basicChecks(dist);
-    assertVaryingLengthBasic(0, dist, 1, 0, 1, 1, 2, 1);
+    assertVaryingLengthBasic(dist, new double[] { 1, 0, 1, 1, 2, 1 }, 0);
     assertSpatialConsistency(dist);
     assertNonnegativeSpatialConsistency(dist);
+    // Test low-level API:
+    assertEquals("Basic 2", 1, dist.distance(BASIC[0].toArray(), BASIC[3].toArray()), 0);
   }
 }
