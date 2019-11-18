@@ -53,6 +53,8 @@ import elki.utilities.documentation.Title;
  * labels.
  * <p>
  * TODO: Noise handling (e.g., allow the user to specify a noise label pattern?)
+ * <p>
+ * TODO: allow specifying a separator character
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -104,9 +106,7 @@ public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Cluste
         noiseids.add(iditer);
         continue;
       }
-      String label = val.toString();
-
-      assign(labelmap, label, iditer);
+      assign(labelmap, val.toString(), iditer);
     }
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<>(labelmap.size());
@@ -116,27 +116,30 @@ public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Cluste
         noiseids.add((DBID) ids);
         continue;
       }
-      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
-      clusters.add(clus);
+      clusters.add(new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER));
     }
 
     for(Cluster<Model> cur : clusters) {
-      boolean isrootcluster = true;
+      Cluster<Model> bestparent = null;
       for(Cluster<Model> oth : clusters) {
-        if(oth != cur && oth.getName().startsWith(cur.getName())) {
-          clustering.addChildCluster(oth, cur);
-          if(LOG.isDebuggingFiner()) {
-            LOG.debugFiner(oth.getName() + " is a child of " + cur.getName());
+        if(oth != cur && cur.getName().startsWith(oth.getName())) {
+          if(bestparent == null || oth.getName().length() > bestparent.getName().length()) {
+            bestparent = oth;
           }
-          isrootcluster = false;
         }
       }
-      if(isrootcluster) {
+      if(bestparent != null) {
+        if(LOG.isDebuggingFiner()) {
+          LOG.debugFiner(cur.getName() + " is a child of " + bestparent.getName());
+        }
+        clustering.addChildCluster(bestparent, cur);
+      }
+      else {
         clustering.addToplevelCluster(cur);
       }
     }
     // Collected noise IDs.
-    if(noiseids.size() > 0) {
+    if(!noiseids.isEmpty()) {
       Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
       clustering.addToplevelCluster(c);
