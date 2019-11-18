@@ -66,7 +66,7 @@ public class PairCountingTest {
     assertEquals("F1-Measure not as expected", 0.487804878048781, pc.f1Measure(), 1e-15);
     assertEquals("Fb(5)-Measure not as expected", 0.499040307101727, pc.fMeasure(5), 1e-15);
     assertEquals("Adjusted Rand-Index not as expected", 0.26694045174538, pc.adjustedRandIndex(), 1e-15);
-    assertEquals("Mirkin-Index not as expected", 168, pc.mirkin());
+    assertEquals("Mirkin-Index not as expected", 84, pc.mirkin());
   }
 
   /**
