@@ -32,6 +32,7 @@ import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.evaluation.clustering.ClusterContingencyTable;
+import elki.math.MeanVariance;
 
 /**
  * Validate {@link ClusterContingencyTable} with respect to its ability to
@@ -57,20 +58,14 @@ public class ClusterContingencyTableTest {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
     Clustering<Model> rai = new TrivialAllInOne().autorun(db);
-    Clustering<Model> ran = new TrivialAllNoise().autorun(db);
     Clustering<?> rbl = new ByLabelClustering().autorun(db);
 
-    assertEquals(1.0, computeFMeasure(rai, rai, false), Double.MIN_VALUE);
-    assertEquals(1.0, computeFMeasure(ran, ran, false), Double.MIN_VALUE);
-    assertEquals(1.0, computeFMeasure(rbl, rbl, false), Double.MIN_VALUE);
+    MeanVariance v1 = new ClusterContingencyTable(true, false, rai, rbl).averageSymmetricGini();
+    assertEquals(2 / 3., v1.getMean(), Double.MIN_VALUE);
+    assertEquals(0.11111111111111112, v1.getNaiveVariance(), Double.MIN_VALUE);
 
-    assertEquals(0.009950248756218905, computeFMeasure(ran, rbl, true), Double.MIN_VALUE);
-    assertEquals(0.0033277870216306157, computeFMeasure(rai, ran, true), Double.MIN_VALUE);
-
-    assertEquals(0.5 /* 0.3834296724470135 */, computeFMeasure(rai, rbl, false), Double.MIN_VALUE);
-  }
-
-  private double computeFMeasure(Clustering<?> c1, Clustering<?> c2, boolean noise) {
-    return new ClusterContingencyTable(true, noise, c1, c2).getPaircount().f1Measure();
+    MeanVariance v2 = new ClusterContingencyTable(true, false, rai, rbl).adjustedSymmetricGini();
+    assertEquals(Double.NaN, v2.getMean(), Double.MIN_VALUE);
+    assertEquals(Double.NaN, v2.getNaiveVariance(), Double.MIN_VALUE);
   }
 }
