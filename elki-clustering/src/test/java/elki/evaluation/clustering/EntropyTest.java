@@ -59,6 +59,30 @@ public class EntropyTest {
     assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
   }
 
+  /**
+   * Testing of identical clusters in the large entropy algorithm
+   */
+  @Test
+  public void testIdenticalLarge() {
+    int[] a = { 0, 0, 1, 1, 2, 2 };
+    int[] la = new int[(10000 / 6 + 1) * 6];
+    int[] b = { 2, 2, 1, 1, 0, 0 };
+    int[] lb = new int[(10000 / 6 + 1) * 6];
+    for(int i = 0; i < la.length; i++) {
+      la[i] = a[i % 6];
+      lb[i] = b[i % 6];
+    }
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
+    assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
+    assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 1e-15);
+    assertEquals("minNMI not as expected", 1, e.minNMI(), 1e-15);
+    assertEquals("maxNMI not as expected", 1, e.maxNMI(), 1e-15);
+    assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 1e-15);
+    assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 1e-15);
+    assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
+  }
+
   @Test
   public void testSklearn() {
     // From sklearn unit test
@@ -69,6 +93,25 @@ public class EntropyTest {
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
     assertEquals("EMI not as expected", 0.15042, e.expectedMutualInformation(), 1e-5);
     assertEquals("AMI not as expected", 0.27821, e.adjustedArithmeticMI(), 1e-5);
+  }
+
+  /**
+   * Testing of sklearn example clusters in the large entropy algorithm
+   */
+  @Test
+  public void testSklearnLarge() {
+    // From sklearn unit test
+    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
+    int[] la = new int[(10000 / a.length + 1) * a.length];
+    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
+    int[] lb = new int[(10000 / b.length + 1) * b.length];
+    for(int i = 0; i < la.length; i++) {
+      la[i] = a[i % a.length];
+      lb[i] = b[i % b.length];
+    }
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
+    assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
   }
 
   /**
