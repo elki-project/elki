@@ -27,20 +27,20 @@ import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
 /**
- * Pair-counting measures.
+ * Pair-counting measures, with support for "noise" clusters and self-pairing
+ * support.
+ * <p>
+ * Implementation note: this implementation will either use n² or n(n-1) pairs
+ * for each cluster intersection; which means we use <i>ordered</i> pairs. In
+ * literature, you will often find (n choose 2) pairs, which differs by a factor
+ * of 2, but this factor will cancel out everywhere anyway. The raw pair counts
+ * are not exposed as an API, only the derived. The Mirkin index removes this
+ * factor of 2.
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
 public class PairCounting {
-  /**
-   * This is the maximum size this implementation can support.
-   *
-   * Note: this is approximately sqrt(2) * Integer.MAX_VALUE as long = 63 bits
-   * (+unused sign bit), int = 31 bits (+unused sign bit)
-   */
-  public static final long MAX_SIZE = (long) Math.floor(Math.sqrt(Long.MAX_VALUE));
-
   /**
    * Pairs in both clusterings.
    */
@@ -69,6 +69,9 @@ public class PairCounting {
     final int[][] contingency = table.contingency;
     final boolean breakNoise = table.breakNoiseClusters;
     final boolean selfPair = table.selfPairing;
+    if(!table.isStrictPartitioning()) {
+      LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings. The number of elements are: " + contingency[table.size1][table.size2 + 1] + " != " + contingency[table.size1 + 1][table.size2] + " elements.");
+    }
     // Aggregations
     long inBoth = 0, in1 = 0, in2 = 0;
     // Process first clustering:
@@ -109,14 +112,7 @@ public class PairCounting {
         }
       }
     }
-    // The official sum
-    int tsize = contingency[table.size1][table.size2];
-    if(contingency[table.size1][table.size2 + 1] != tsize || contingency[table.size1 + 1][table.size2] != tsize) {
-      LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings. The number of elements are: " + contingency[table.size1][table.size2 + 1] + " != " + contingency[table.size1 + 1][table.size2] + " elements.");
-    }
-    if(tsize < 0 || tsize >= MAX_SIZE) {
-      LoggingUtil.warning("Your data set size probably is too big for this implementation, which uses only long precision.");
-    }
+    final int tsize = contingency[table.size1][table.size2];
     long total = tsize * (long) (selfPair ? tsize : (tsize - 1));
     this.inBoth = inBoth;
     this.inFirst = in1 - inBoth;
@@ -257,6 +253,7 @@ public class PairCounting {
       url = "https://doi.org/10.1007/978-1-4613-0457-9", //
       bibkey = "doi:10.1007/978-1-4613-0457-9")
   public long mirkin() {
-    return 2 * (inFirst + inSecond);
+    // We *omit* the factor of 2 because we already counted each pair twice!
+    return inFirst + inSecond;
   }
 }

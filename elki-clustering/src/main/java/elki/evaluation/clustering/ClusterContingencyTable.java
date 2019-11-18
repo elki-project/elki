@@ -115,6 +115,10 @@ public class ClusterContingencyTable {
     // Initialize
     size1 = cs1.size();
     size2 = cs2.size();
+    // +2: 1 for cluster sizes, 1 for intersection sums
+    // these rows are expected to be equal for strict partitionings but may
+    // deviate if we have partial, hierarchical, or overlapping clusterings, in
+    // which case many measures will no longer work correctly!
     contingency = new int[size1 + 2][size2 + 2];
     noise1 = BitsUtil.zero(size1);
     noise2 = BitsUtil.zero(size2);
@@ -151,6 +155,17 @@ public class ClusterContingencyTable {
         contingency[size1][size2] += count;
       }
     }
+  }
+
+  /**
+   * Check whether the marginal cluster sizes both sum to the total size.
+   *
+   * @return {@code true} when the clustering is a non-overlapping complete
+   *         partitioning of the data set
+   */
+  public boolean isStrictPartitioning() {
+    int expected = contingency[size1][size2];
+    return contingency[size1][size2 + 1] == expected && contingency[size1 + 1][size2] == expected;
   }
 
   @Override
