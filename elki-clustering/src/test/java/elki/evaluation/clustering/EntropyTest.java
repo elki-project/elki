@@ -65,13 +65,9 @@ public class EntropyTest {
   @Test
   public void testIdenticalLarge() {
     int[] a = { 0, 0, 1, 1, 2, 2 };
-    int[] la = new int[(10000 / 6 + 1) * 6];
+    int[] la = repeat(a, 10_000);
     int[] b = { 2, 2, 1, 1, 0, 0 };
-    int[] lb = new int[(10000 / 6 + 1) * 6];
-    for(int i = 0; i < la.length; i++) {
-      la[i] = a[i % 6];
-      lb[i] = b[i % 6];
-    }
+    int[] lb = repeat(b, 10_000);
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
     assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
@@ -102,13 +98,9 @@ public class EntropyTest {
   public void testSklearnLarge() {
     // From sklearn unit test
     int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] la = new int[(10000 / a.length + 1) * a.length];
+    int[] la = repeat(a, 10_000);
     int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-    int[] lb = new int[(10000 / b.length + 1) * b.length];
-    for(int i = 0; i < la.length; i++) {
-      la[i] = a[i % a.length];
-      lb[i] = b[i % b.length];
-    }
+    int[] lb = repeat(b, 10_000);
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
@@ -137,5 +129,20 @@ public class EntropyTest {
       clusters.add(new Cluster<>(e.getValue(), e.getIntKey() < 0));
     }
     return new Clustering<>(clusters);
+  }
+
+  /**
+   * Repeats the data
+   * 
+   * @param data data to repeat
+   * @param times number of times to repeat the data
+   * @return array with repeated data
+   */
+  private int[] repeat(int[] data, int times) {
+    int[] res = new int[data.length * times];
+    for(int i = 0; i < times; i++) {
+      System.arraycopy(data, 0, res, i * data.length, data.length);
+    }
+    return res;
   }
 }

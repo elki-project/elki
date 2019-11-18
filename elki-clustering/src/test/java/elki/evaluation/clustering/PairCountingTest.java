@@ -34,6 +34,12 @@ import elki.database.Database;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 
+/**
+ * Test {@link PairCounting} with sklearn example and f1-measure with database
+ * 
+ * @author Robert Gehde
+ *
+ */
 public class PairCountingTest {
 
   // the following values depend on the data set used!
@@ -42,6 +48,9 @@ public class PairCountingTest {
   // size of the data set
   int shoulds = 600;
 
+  /**
+   * Test all calculated values with the SKLearn example
+   */
   @Test
   public void testPairCountingSKlearn() {
     int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
@@ -57,10 +66,12 @@ public class PairCountingTest {
     assertEquals("F1-Measure not as expected", 0.487804878048781, pc.f1Measure(), 1e-15);
     assertEquals("Fb(5)-Measure not as expected", 0.499040307101727, pc.fMeasure(5), 1e-15);
     assertEquals("Adjusted Rand-Index not as expected", 0.26694045174538, pc.adjustedRandIndex(), 1e-15);
-    assertEquals("Mirkin-Index not as expected", 168, pc.mirkin());// divide by
-                                                                   // 2
+    assertEquals("Mirkin-Index not as expected", 168, pc.mirkin());
   }
 
+  /**
+   * test f1-measure with the database example
+   */
   @Test
   public void compareDatabases() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
@@ -79,8 +90,15 @@ public class PairCountingTest {
     assertEquals(0.5 /* 0.3834296724470135 */, computeFMeasure(rai, rbl, false), Double.MIN_VALUE);
   }
 
+  /**
+   * calculate contingency table and get f1-measure
+   * 
+   * @param c1 first clustering
+   * @param c2 second clustering
+   * @param noise true, if clustering should have noise
+   * @return f1-measure between the clusterings
+   */
   private double computeFMeasure(Clustering<?> c1, Clustering<?> c2, boolean noise) {
     return new ClusterContingencyTable(true, noise, c1, c2).getPaircount().f1Measure();
   }
-
 }
