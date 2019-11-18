@@ -23,7 +23,6 @@ package elki.evaluation.clustering;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -34,6 +33,9 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Test entropy-based measures.
@@ -77,21 +79,20 @@ public class EntropyTest {
    * @return Clustering
    */
   public static Clustering<Model> makeClustering(DBIDArrayIter iter, int[] a) {
-    ArrayList<ModifiableDBIDs> l = new ArrayList<>();
+    Int2ObjectOpenHashMap<ModifiableDBIDs> l = new Int2ObjectOpenHashMap<>();
     for(int i = 0; i < a.length; i++) {
       int j = a[i];
-      while(j >= l.size()) {
-        l.add(null);
-      }
       ModifiableDBIDs cids = l.get(j);
       if(cids == null) {
-        l.set(j, cids = DBIDUtil.newArray());
+        l.put(j, cids = DBIDUtil.newArray());
       }
       cids.add(iter.seek(i));
     }
-    return new Clustering<>(l.stream() //
-        .filter(x -> x != null) //
-        .map(x -> new Cluster<>(x)) //
-        .collect(Collectors.toList()));
+    ArrayList<Cluster<Model>> clusters = new ArrayList<>(l.size());
+    // Negative cluster numbers are noise.
+    for(Int2ObjectMap.Entry<ModifiableDBIDs> e : l.int2ObjectEntrySet()) {
+      clusters.add(new Cluster<>(e.getValue(), e.getIntKey() < 0));
+    }
+    return new Clustering<>(clusters);
   }
 }
