@@ -153,25 +153,23 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
    * @param bestd Best distance
    * @param besti Best index
    */
-  private static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
+  protected static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
     final int size = bestd.length;
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
-    for(int x = 0, p = 0; x < size; x++) {
-      assert (p == MatrixParadigm.triangleSize(x));
+    besti[0] = Integer.MAX_VALUE; // invalid, but not deactivated
+    for(int x = 1, p = 0; x < size; x++) {
+      assert p == MatrixParadigm.triangleSize(x);
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
       for(int y = 0; y < x; y++, p++) {
         final double v = scratch[p];
-        if(v < bestd[y]) {
-          bestd[y] = v;
-          besti[y] = x;
-        }
         if(v < bestdx) {
           bestdx = v;
           bestix = y;
         }
       }
+      assert 0 <= bestix && bestix < x;
       bestd[x] = bestdx;
       besti[x] = bestix;
     }
@@ -179,7 +177,7 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
 
   /**
    * Perform the next merge step.
-   *
+   * <p>
    * Due to the cache, this is now O(n) each time, instead of O(n*n).
    *
    * @param size Data set size
@@ -193,7 +191,7 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
-    for(int cx = 0; cx < size; cx++) {
+    for(int cx = 1; cx < size; cx++) {
       // Skip if object has already joined a cluster:
       final int cy = besti[cx];
       if(cy < 0) {
@@ -206,8 +204,7 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
         y = cy;
       }
     }
-    assert (x >= 0 && y >= 0);
-    assert (y < x); // We could swap otherwise, but this shouldn't arise.
+    assert 0 <= y && y < x;
     merge(size, mat, bestd, besti, builder, mindist, x, y);
     return x;
   }
@@ -231,19 +228,15 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
     // Perform merge in data structure: x -> y
-    assert (y < x);
+    assert y < x;
     // Since y < x, prefer keeping y, dropping x.
     builder.add(ix, linkage.restore(mindist, distance.isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
-
-    // Deactivate x in cache:
-    besti[x] = -1;
-
-    // Note: this changes iy.
+    besti[x] = -1; // Deactivate removed cluster.
     updateMatrix(size, mat.matrix, iy, bestd, besti, builder, mindist, x, y, sizex, sizey);
-    if(besti[y] == x) {
+    if(y > 0) {
       findBest(size, mat.matrix, bestd, besti, y);
     }
   }
@@ -260,8 +253,8 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
-   * @param sizex Old size of first cluster
-   * @param sizey Old size of second cluster
+   * @param sizex Old size of first cluster, with {@code x > y}
+   * @param sizey Old size of second cluster, with {@code y > x}
    */
   protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, double[] bestd, int[] besti, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: miny < minx
@@ -316,9 +309,10 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
    * @param j Updated value d(y, j)
    * @param d New distance
    */
-  private void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
+  protected static void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
+    assert y < x;
     // New best
-    if(d <= bestd[j]) {
+    if(y < j && d <= bestd[j]) {
       bestd[j] = d;
       besti[j] = y;
       return;
@@ -329,12 +323,20 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
     }
   }
 
-  protected void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
-    final int jbase = MatrixParadigm.triangleSize(j);
+  /**
+   * Find the best in a row of the triangular matrix.
+   *
+   * @param size Active size
+   * @param scratch Scratch matrix
+   * @param bestd Best distances cache
+   * @param besti Best indexes cache
+   * @param j Row to update
+   */
+  protected static void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
     // The distance has increased, we may no longer be the best merge.
     double bestdj = Double.POSITIVE_INFINITY;
     int bestij = -1;
-    for(int i = 0, o = jbase; i < j; i++, o++) {
+    for(int i = 0, o = MatrixParadigm.triangleSize(j); i < j; i++, o++) {
       if(besti[i] < 0) {
         continue;
       }
@@ -344,17 +346,7 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
         bestij = i;
       }
     }
-    for(int i = j + 1, o = jbase + j + j; i < size; o += i, i++) {
-      // assert(o == MatrixParadigm.triangleSize(i) + j);
-      if(besti[i] < 0) {
-        continue;
-      }
-      final double dist = scratch[o];
-      if(dist <= bestdj) {
-        bestdj = dist;
-        bestij = i;
-      }
-    }
+    assert bestij < j;
     bestd[j] = bestdj;
     besti[j] = bestij;
   }

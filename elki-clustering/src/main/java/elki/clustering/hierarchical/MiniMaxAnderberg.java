@@ -20,8 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import java.util.Arrays;
-
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -88,11 +86,6 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     this.distance = distance;
   }
 
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
-  }
-
   /**
    * Run the algorithm
    *
@@ -118,7 +111,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     // Arrays used for caching:
     double[] bestd = new double[size];
     int[] besti = new int[size];
-    initializeNNCache(mat.matrix, bestd, besti);
+    AnderbergHierarchicalClustering.initializeNNCache(mat.matrix, bestd, besti);
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -130,37 +123,6 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     }
     LOG.ensureCompleted(prog);
     return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
-  }
-
-  /**
-   * Initialize the NN cache.
-   *
-   * @param scratch Scratch space
-   * @param bestd Best distance
-   * @param besti Best index
-   */
-  private static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
-    final int size = bestd.length;
-    Arrays.fill(bestd, Double.POSITIVE_INFINITY);
-    Arrays.fill(besti, -1);
-    for(int x = 0, p = 0; x < size; x++) {
-      assert (p == MatrixParadigm.triangleSize(x));
-      double bestdx = Double.POSITIVE_INFINITY;
-      int bestix = -1;
-      for(int y = 0; y < x; y++, p++) {
-        final double v = scratch[p];
-        if(v < bestd[y]) {
-          bestd[y] = v;
-          besti[y] = x;
-        }
-        if(v < bestdx) {
-          bestdx = v;
-          bestix = y;
-        }
-      }
-      bestd[x] = bestdx;
-      besti[x] = bestix;
-    }
   }
 
   /**
@@ -180,7 +142,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
-    for(int cx = 0; cx < size; cx++) {
+    for(int cx = 1; cx < size; cx++) {
       // Skip if object has already joined a cluster:
       final int cy = besti[cx];
       if(cy < 0) {
@@ -193,21 +155,14 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         y = cy;
       }
     }
-    // assert(lambda.doubleValue(ix.seek(x<y?y:x))==Double.POSITIVE_INFINITY);
-    assert (x >= 0 && y >= 0);
-    if(y > x) {
-      int tmp = x;
-      x = y;
-      y = tmp;
-    }
-    assert (y < x);
+    assert 0 <= y && y < x;
     merge(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
     return x;
   }
 
   /**
    * Execute the cluster merge
-   * 
+   *
    * @param size size of data set
    * @param mat Matrix paradigm
    * @param prots the prototypes of merges between clusters
@@ -220,16 +175,15 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param y second cluster to merge, with {@code y < x}
    */
   protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+    // Avoid allocating memory, by reusing existing iterators:
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
     int offset = MatrixParadigm.triangleSize(x) + y;
-
-    assert (y < x);
-
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + distances[offset]);
     }
-
+    // Perform merge in data structure: x -> y
+    assert y < x;
     ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
     // Keep y
     if(cy == null) {
@@ -247,19 +201,17 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
 
     // parent of x is set to y
     builder.add(ix, distances[offset], iy, prots.seek(offset));
-
-    // Deactivate x in cache:
-    besti[x] = -1;
+    besti[x] = -1; // Deactivate x in cache:
     updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
-    if(besti[y] == x) {
-      findBest(size, distances, bestd, besti, y);
+    if(y > 0) {
+      AnderbergHierarchicalClustering.findBest(size, distances, bestd, besti, y);
     }
   }
 
   /**
    * Update the entries of the matrices that contain a distance to y, the newly
    * merged cluster.
-   * 
+   *
    * @param size size of data set
    * @param mat matrix view
    * @param prots the prototypes of merges between clusters
@@ -287,7 +239,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
+      AnderbergHierarchicalClustering.updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
     }
 
     // Update entries at (a,y) with a > y
@@ -300,63 +252,13 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
+      AnderbergHierarchicalClustering.updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
     }
   }
 
-  /**
-   * Update the cache.
-   *
-   * @param size Working set size
-   * @param scratch Scratch matrix
-   * @param bestd Best distance
-   * @param besti Best index
-   * @param x First cluster
-   * @param y Second cluster, {@code y < x}
-   * @param j Updated value d(y, j)
-   * @param d New distance
-   */
-  private void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
-    // New best
-    if(d <= bestd[j]) {
-      bestd[j] = d;
-      besti[j] = y;
-      return;
-    }
-    // Needs slow update.
-    if(besti[j] == x || besti[j] == y) {
-      findBest(size, scratch, bestd, besti, j);
-    }
-  }
-
-  protected void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
-    final int jbase = MatrixParadigm.triangleSize(j);
-    // The distance has increased, we may no longer be the best merge.
-    double bestdj = Double.POSITIVE_INFINITY;
-    int bestij = -1;
-    for(int i = 0, o = jbase; i < j; i++, o++) {
-      if(besti[i] < 0) {
-        continue;
-      }
-      final double dist = scratch[o];
-      if(dist < bestdj) {
-        bestdj = dist;
-        bestij = i;
-      }
-    }
-    for(int i = j + 1, o = jbase + j + j; i < size; o += i, i++) {
-      // assert(o == MatrixParadigm.triangleSize(i) + j);
-      if(besti[i] < 0) {
-        continue;
-      }
-      final double dist = scratch[o];
-      if(dist < bestdj) {
-        bestdj = dist;
-        bestij = i;
-      }
-    }
-    bestd[j] = bestdj;
-    besti[j] = bestij;
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

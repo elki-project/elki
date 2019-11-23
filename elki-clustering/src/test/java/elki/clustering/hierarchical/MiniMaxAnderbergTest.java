@@ -36,8 +36,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
-  // TODO: add more data sets.
-
   /**
    * Run agglomerative hierarchical clustering with fixed parameters and compare
    * the result to a golden standard.
