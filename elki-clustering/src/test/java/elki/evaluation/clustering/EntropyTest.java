@@ -38,11 +38,17 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
- * Test entropy-based measures.
+ * Validate {@link Entropy} based Measures with an equal example
+ * and the SkLearn example
  * 
  * @author Erich Schubert
  */
 public class EntropyTest {
+
+  /**
+   * Validate {@link Entropy} based Measures with an equal example
+   * 
+   */
   @Test
   public void testIdentical() {
     int[] a = { 0, 0, 1, 1, 2, 2 };
@@ -60,7 +66,8 @@ public class EntropyTest {
   }
 
   /**
-   * Testing of identical clusters in the large entropy algorithm
+   * Validate the large path of the {@link Entropy} algorithm with an equal
+   * example
    */
   @Test
   public void testIdenticalLarge() {
@@ -79,6 +86,9 @@ public class EntropyTest {
     assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
   }
 
+  /**
+   * Validate {@link Entropy} based Measures with the SkLearn example
+   */
   @Test
   public void testSklearn() {
     // From sklearn unit test
@@ -92,7 +102,8 @@ public class EntropyTest {
   }
 
   /**
-   * Testing of sklearn example clusters in the large entropy algorithm
+   * Validate the large path of the {@link Entropy} algorithm with the SkLearn
+   * example
    */
   @Test
   public void testSklearnLarge() {
