@@ -45,7 +45,7 @@ public class BCubedTest extends AbstractClusterEvaluationTest {
 
     assertEquals("BCubed precision not as expected", 0.57843137254902, bc.precision(), 1e-15);
     assertEquals("BCubed Recall not as expected", 0.584313725490196, bc.recall(), 1e-15);
-
+    
     assertEquals("BCubed F1-Measure not as expected", 0.5813576695433655, bc.f1Measure(), 1e-15);
   }
 }
