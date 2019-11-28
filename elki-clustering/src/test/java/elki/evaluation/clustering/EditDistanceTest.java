@@ -33,18 +33,15 @@ import elki.database.ids.DBIDUtil;
  * @author Robert Gehde
  *
  */
-public class EditDistanceTest {
+public class EditDistanceTest extends AbstractClusterEvaluationTest {
 
   /**
    * Validate {@link EditDistance} with the SkLearn example
    */
   @Test
   public void testEditDistance() {
-    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-
-    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    EditDistance ed = new EditDistance(new ClusterContingencyTable(false, false, EntropyTest.makeClustering(ids.iter(), a), EntropyTest.makeClustering(ids.iter(), b)));
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
+    EditDistance ed = new EditDistance(new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)));
 
     assertEquals("EditDistance operations (first) not as expected", 8, ed.editOperationsFirst(), 1e-15);
     assertEquals("EditDistance operations (second) as expected", 8, ed.editOperationsSecond(), 1e-15);

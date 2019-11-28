@@ -40,7 +40,7 @@ import elki.database.ids.DBIDUtil;
  * @author Robert Gehde
  *
  */
-public class PairCountingTest {
+public class PairCountingTest extends AbstractClusterEvaluationTest {
 
   // the following values depend on the data set used!
   String dataset = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
@@ -53,10 +53,8 @@ public class PairCountingTest {
    */
   @Test
   public void testPairCountingSKlearn() {
-    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    PairCounting pc = new ClusterContingencyTable(false, false, EntropyTest.makeClustering(ids.iter(), a), EntropyTest.makeClustering(ids.iter(), b)).getPaircount();
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
+    PairCounting pc = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)).getPaircount();
 
     assertEquals("Precision not as expected", 0.476190476190476, pc.precision(), 1e-15);
     assertEquals("Recall not as expected", 0.5, pc.recall(), 1e-15);
