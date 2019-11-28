@@ -64,7 +64,7 @@ public class BCubed {
   protected BCubed(ClusterContingencyTable table) {
     super();
     double bCubedPrecision = 0.0, bCubedRecall = 0.0;
-    final int selfpair = table.selfPairing ? 1 : 0;
+    final int selfpair = table.selfPairing ? 0 : 1;
     for(int i1 = 0; i1 < table.size1; i1++) {
       final int[] sumrow = table.contingency[i1];
       for(int i2 = 0; i2 < table.size2; i2++) {
