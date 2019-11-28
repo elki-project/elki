@@ -22,20 +22,10 @@ package elki.evaluation.clustering;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 
-import elki.data.Cluster;
-import elki.data.Clustering;
-import elki.data.model.Model;
-import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDUtil;
-import elki.database.ids.ModifiableDBIDs;
-
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Validate {@link Entropy} based Measures with an equal example
@@ -43,7 +33,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * 
  * @author Erich Schubert
  */
-public class EntropyTest {
+public class EntropyTest extends AbstractClusterEvaluationTest {
 
   /**
    * Validate {@link Entropy} based Measures with an equal example
@@ -51,10 +41,8 @@ public class EntropyTest {
    */
   @Test
   public void testIdentical() {
-    int[] a = { 0, 0, 1, 1, 2, 2 };
-    int[] b = { 2, 2, 1, 1, 0, 0 };
-    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), a), makeClustering(ids.iter(), b)).getEntropy();
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SAMEA.length);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SAMEA), makeClustering(ids.iter(), SAMEB)).getEntropy();
     assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
     assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 1e-15);
     assertEquals("minNMI not as expected", 1, e.minNMI(), 1e-15);
@@ -71,10 +59,8 @@ public class EntropyTest {
    */
   @Test
   public void testIdenticalLarge() {
-    int[] a = { 0, 0, 1, 1, 2, 2 };
-    int[] la = repeat(a, 10_000);
-    int[] b = { 2, 2, 1, 1, 0, 0 };
-    int[] lb = repeat(b, 10_000);
+    int[] la = repeat(SAMEA, 10_000);
+    int[] lb = repeat(SAMEB, 10_000);
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
     assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
@@ -91,11 +77,8 @@ public class EntropyTest {
    */
   @Test
   public void testSklearn() {
-    // From sklearn unit test
-    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), a), makeClustering(ids.iter(), b)).getEntropy();
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
+    Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)).getEntropy();
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
     assertEquals("EMI not as expected", 0.15042, e.expectedMutualInformation(), 1e-5);
     assertEquals("AMI not as expected", 0.27821, e.adjustedArithmeticMI(), 1e-5);
@@ -108,52 +91,11 @@ public class EntropyTest {
   @Test
   public void testSklearnLarge() {
     // From sklearn unit test
-    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] la = repeat(a, 10_000);
-    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-    int[] lb = repeat(b, 10_000);
+    int[] la = repeat(SKLEARNA, 10_000);
+    int[] lb = repeat(SKLEARNB, 10_000);
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
   }
 
-  /**
-   * Helper, to generate a clustering from int[]
-   *
-   * @param iter DBID Iterator
-   * @param a cluster numbers
-   * @return Clustering
-   */
-  public static Clustering<Model> makeClustering(DBIDArrayIter iter, int[] a) {
-    Int2ObjectOpenHashMap<ModifiableDBIDs> l = new Int2ObjectOpenHashMap<>();
-    for(int i = 0; i < a.length; i++) {
-      int j = a[i];
-      ModifiableDBIDs cids = l.get(j);
-      if(cids == null) {
-        l.put(j, cids = DBIDUtil.newArray());
-      }
-      cids.add(iter.seek(i));
-    }
-    ArrayList<Cluster<Model>> clusters = new ArrayList<>(l.size());
-    // Negative cluster numbers are noise.
-    for(Int2ObjectMap.Entry<ModifiableDBIDs> e : l.int2ObjectEntrySet()) {
-      clusters.add(new Cluster<>(e.getValue(), e.getIntKey() < 0));
-    }
-    return new Clustering<>(clusters);
-  }
-
-  /**
-   * Repeats the data
-   * 
-   * @param data data to repeat
-   * @param times number of times to repeat the data
-   * @return array with repeated data
-   */
-  private int[] repeat(int[] data, int times) {
-    int[] res = new int[data.length * times];
-    for(int i = 0; i < times; i++) {
-      System.arraycopy(data, 0, res, i * data.length, data.length);
-    }
-    return res;
-  }
 }

@@ -33,14 +33,15 @@ import elki.database.ids.DBIDUtil;
  * @author Robert Gehde
  *
  */
-public class BCubedTest {
+public class BCubedTest extends AbstractClusterEvaluationTest {
 
+  /**
+   * Test {@link BCubed} with SkLearn example.
+   */
   @Test
   public void testBCubed() {
-    int[] a = { 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3 };
-    int[] b = { 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 3, 3, 3, 2, 2 };
-    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(a.length);
-    BCubed bc = new BCubed(new ClusterContingencyTable(true, false, EntropyTest.makeClustering(ids.iter(), a), EntropyTest.makeClustering(ids.iter(), b)));
+    DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
+    BCubed bc = new BCubed(new ClusterContingencyTable(true, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)));
 
     assertEquals("BCubed precision not as expected", 0.57843137254902, bc.precision(), 1e-15);
     assertEquals("BCubed Recall not as expected", 0.584313725490196, bc.recall(), 1e-15);
