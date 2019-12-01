@@ -241,6 +241,21 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
       return false;
     }
 
+    /**
+     * Check if a measurement already exists.
+     *
+     * @param name Measurement name
+     * @return {@code true} if measurement exists
+     */
+    public Measurement getMeasure(String name) {
+      for(Measurement m : measurements) {
+        if(m.name.equals(name)) {
+          return m;
+        }
+      }
+      return null;
+    }
+
     @Override
     public Iterator<Measurement> iterator() {
       return measurements.iterator();

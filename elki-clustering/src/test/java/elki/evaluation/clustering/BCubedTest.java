@@ -39,7 +39,7 @@ public class BCubedTest extends AbstractClusterEvaluationTest {
   @Test
   public void testBCubed() {
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
-    BCubed bc = new BCubed(new ClusterContingencyTable(true, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)));
+    BCubed bc = new ClusterContingencyTable(true, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)).getBCubed();
 
     assertEquals("BCubed precision not as expected", 0.57843137254902, bc.precision(), 1e-15);
     assertEquals("BCubed Recall not as expected", 0.584313725490196, bc.recall(), 1e-15);

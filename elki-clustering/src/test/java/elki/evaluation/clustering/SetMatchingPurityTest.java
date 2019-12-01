@@ -39,7 +39,7 @@ public class SetMatchingPurityTest extends AbstractClusterEvaluationTest {
   @Test
   public void test() {
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
-    SetMatchingPurity smp = new SetMatchingPurity(new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)));
+    SetMatchingPurity smp = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)).getSetMatching();
 
     assertEquals("Similarity not as expected", 0.705882352941176, smp.purity(), 1e-15);
     assertEquals("Inv. Similarity not as expected", .705882352941176, smp.inversePurity(), 1e-15);

@@ -39,7 +39,7 @@ public class EditDistanceTest extends AbstractClusterEvaluationTest {
   @Test
   public void testEditDistance() {
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SKLEARNA.length);
-    EditDistance ed = new EditDistance(new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)));
+    EditDistance ed = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SKLEARNA), makeClustering(ids.iter(), SKLEARNB)).getEdit();
 
     assertEquals("EditDistance operations (first) not as expected", 8, ed.editOperationsFirst());
     assertEquals("EditDistance operations (second) as expected", 8, ed.editOperationsSecond());
