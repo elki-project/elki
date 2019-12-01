@@ -27,15 +27,12 @@ import org.junit.Test;
 import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.clustering.trivial.ByLabelClustering;
 import elki.clustering.trivial.TrivialAllInOne;
-import elki.data.Clustering;
-import elki.data.model.Model;
 import elki.database.Database;
 import elki.math.MeanVariance;
 
 /**
  * Validate {@link ClusterContingencyTable} with respect to its ability to
- * compare
- * data clusterings.
+ * compare data clusterings.
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -47,23 +44,18 @@ public class ClusterContingencyTableTest {
   // size of the data set
   int shoulds = 600;
 
-  /**
-   * Validate {@link ClusterContingencyTable} with respect to its ability to
-   * compare data clusterings.
-   */
   @Test
-  public void testCompareDatabases() {
+  public void testGiniMeasure() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
+    ClusterContingencyTable table = new ClusterContingencyTable(true, false, //
+        new TrivialAllInOne().autorun(db), new ByLabelClustering().autorun(db));
 
-    Clustering<Model> rai = new TrivialAllInOne().autorun(db);
-    Clustering<?> rbl = new ByLabelClustering().autorun(db);
+    MeanVariance v1 = table.averageSymmetricGini();
+    assertEquals(2 / 3., v1.getMean(), 0);
+    assertEquals(0.11111111111111112, v1.getNaiveVariance(), 0);
 
-    MeanVariance v1 = new ClusterContingencyTable(true, false, rai, rbl).averageSymmetricGini();
-    assertEquals(2 / 3., v1.getMean(), Double.MIN_VALUE);
-    assertEquals(0.11111111111111112, v1.getNaiveVariance(), Double.MIN_VALUE);
-
-    MeanVariance v2 = new ClusterContingencyTable(true, false, rai, rbl).adjustedSymmetricGini();
-    assertEquals(Double.NaN, v2.getMean(), Double.MIN_VALUE);
-    assertEquals(Double.NaN, v2.getNaiveVariance(), Double.MIN_VALUE);
+    MeanVariance v2 = table.adjustedSymmetricGini();
+    assertEquals(Double.NaN, v2.getMean(), 0);
+    assertEquals(Double.NaN, v2.getNaiveVariance(), 0);
   }
 }

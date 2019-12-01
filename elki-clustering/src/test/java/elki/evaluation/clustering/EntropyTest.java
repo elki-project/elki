@@ -30,27 +30,25 @@ import elki.database.ids.DBIDUtil;
 /**
  * Validate {@link Entropy} based Measures with an equal example
  * and the SkLearn example
- * 
+ *
  * @author Erich Schubert
  */
 public class EntropyTest extends AbstractClusterEvaluationTest {
-
   /**
    * Validate {@link Entropy} based Measures with an equal example
-   * 
    */
   @Test
   public void testIdentical() {
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(SAMEA.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), SAMEA), makeClustering(ids.iter(), SAMEB)).getEntropy();
-    assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
-    assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 1e-15);
-    assertEquals("minNMI not as expected", 1, e.minNMI(), 1e-15);
-    assertEquals("maxNMI not as expected", 1, e.maxNMI(), 1e-15);
-    assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 1e-15);
-    assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 1e-15);
+    assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 0.);
+    assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 0.);
+    assertEquals("minNMI not as expected", 1, e.minNMI(), 0.);
+    assertEquals("maxNMI not as expected", 1, e.maxNMI(), 0.);
+    assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 0.);
+    assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 0.);
     assertEquals("EMI not as expected", 0.5441, e.expectedMutualInformation(), 1e-5);
-    assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
+    assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 0.);
   }
 
   /**
@@ -63,13 +61,13 @@ public class EntropyTest extends AbstractClusterEvaluationTest {
     int[] lb = repeat(SAMEB, 10_000);
     DBIDRange ids = DBIDUtil.generateStaticDBIDRange(la.length);
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
-    assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 1e-15);
-    assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 1e-15);
-    assertEquals("minNMI not as expected", 1, e.minNMI(), 1e-15);
-    assertEquals("maxNMI not as expected", 1, e.maxNMI(), 1e-15);
-    assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 1e-15);
-    assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 1e-15);
-    assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 1e-15);
+    assertEquals("MI not as expected", e.upperBoundMI(), e.mutualInformation(), 0.);
+    assertEquals("Joint NMI not as expected", 1, e.jointNMI(), 0.);
+    assertEquals("minNMI not as expected", 1, e.minNMI(), 0.);
+    assertEquals("maxNMI not as expected", 1, e.maxNMI(), 0.);
+    assertEquals("Arithmetic NMI not as expected", 1, e.arithmeticNMI(), 0.);
+    assertEquals("Geometric NMI not as expected", 1, e.geometricNMI(), 0.);
+    assertEquals("AMI not as expected", 1, e.adjustedMaxMI(), 0.);
   }
 
   /**
@@ -97,5 +95,4 @@ public class EntropyTest extends AbstractClusterEvaluationTest {
     Entropy e = new ClusterContingencyTable(false, false, makeClustering(ids.iter(), la), makeClustering(ids.iter(), lb)).getEntropy();
     assertEquals("MI not as expected", 0.41022, e.mutualInformation(), 1e-5);
   }
-
 }
