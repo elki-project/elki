@@ -479,14 +479,20 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       final Logging log = getLogger();
       IndefiniteProgress prog = log.isVerbose() ? new IndefiniteProgress("Iteration") : null;
       int iteration = 0;
-      while(++iteration <= maxiter) {
+      while(iteration < maxiter) {
+        Duration duration = log.newDuration(key + "." + iteration + ".time").begin();
+        long prevdiststat = diststat;
         log.incrementProcessed(prog);
-        int changed = iterate(iteration);
+        int changed = iterate(++iteration);
         if(changed == 0) {
           break;
         }
         if(log.isStatistics()) {
+          log.statistics(duration.end());
           log.statistics(new LongStatistic(key + "." + iteration + ".reassignments", Math.abs(changed)));
+          if(diststat > prevdiststat) {
+            log.statistics(new LongStatistic(key + "." + iteration + ".distance-computations", diststat - prevdiststat));
+          }
           final double s = sum(varsum);
           if(s > 0) {
             log.statistics(new DoubleStatistic(key + "." + iteration + ".variance-sum", s));
@@ -495,7 +501,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       }
       log.setCompleted(prog);
       log.statistics(new LongStatistic(key + ".iterations", iteration));
-      log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+      if(diststat > 0) {
+        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+      }
     }
 
     /**
