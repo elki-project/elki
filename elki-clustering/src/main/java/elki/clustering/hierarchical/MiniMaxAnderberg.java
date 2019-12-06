@@ -45,7 +45,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * <p>
  * This optimization is attributed to M. R. Anderberg.
  * <p>
- * This particular implementation is based on AnderbergHierarchicalClustering
+ * This particular implementation is based on Anderberg
  * <p>
  * Reference:
  * <p>
@@ -111,7 +111,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     // Arrays used for caching:
     double[] bestd = new double[size];
     int[] besti = new int[size];
-    AnderbergHierarchicalClustering.initializeNNCache(mat.matrix, bestd, besti);
+    Anderberg.initializeNNCache(mat.matrix, bestd, besti);
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -204,7 +204,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     besti[x] = -1; // Deactivate x in cache:
     updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
     if(y > 0) {
-      AnderbergHierarchicalClustering.findBest(size, distances, bestd, besti, y);
+      Anderberg.findBest(size, distances, bestd, besti, y);
     }
   }
 
@@ -239,7 +239,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      AnderbergHierarchicalClustering.updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
+      Anderberg.updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
     }
 
     // Update entries at (a,y) with a > y
@@ -252,7 +252,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      AnderbergHierarchicalClustering.updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
+      Anderberg.updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
     }
   }
 

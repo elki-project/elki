@@ -79,11 +79,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED)
-public class AnderbergHierarchicalClustering<O> implements HierarchicalClusteringAlgorithm {
+public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(AnderbergHierarchicalClustering.class);
+  private static final Logging LOG = Logging.getLogger(Anderberg.class);
 
   /**
    * Distance function used.
@@ -101,7 +101,7 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
    * @param distance Distance function to use
    * @param linkage Linkage method
    */
-  public AnderbergHierarchicalClustering(Distance<? super O> distance, Linkage linkage) {
+  public Anderberg(Distance<? super O> distance, Linkage linkage) {
     super();
     this.distance = distance;
     this.linkage = linkage;
@@ -388,8 +388,8 @@ public class AnderbergHierarchicalClustering<O> implements HierarchicalClusterin
     }
 
     @Override
-    public AnderbergHierarchicalClustering<O> make() {
-      return new AnderbergHierarchicalClustering<>(distance, linkage);
+    public Anderberg<O> make() {
+      return new Anderberg<>(distance, linkage);
     }
   }
 }

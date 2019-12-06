@@ -2,7 +2,7 @@
  * Linkages for hierarchical clustering.
  *
  * @opt include .*elki.clustering.hierarchical.AGNES
- * @opt include .*elki.clustering.hierarchical.AnderbergHierarchicalClustering
+ * @opt include .*elki.clustering.hierarchical.Anderberg
  */
 /*
  * This file is part of ELKI:

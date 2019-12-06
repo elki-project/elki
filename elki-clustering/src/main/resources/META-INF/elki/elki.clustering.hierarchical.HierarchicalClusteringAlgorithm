@@ -1,5 +1,5 @@
 elki.clustering.hierarchical.SLINK single-link single-linkage
-elki.clustering.hierarchical.AnderbergHierarchicalClustering
+elki.clustering.hierarchical.Anderberg
 elki.clustering.hierarchical.NNChain
 elki.clustering.hierarchical.AGNES HAC SAHN
 elki.clustering.hierarchical.CLINK Defays

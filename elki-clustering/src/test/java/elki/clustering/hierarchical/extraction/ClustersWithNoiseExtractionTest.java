@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.AnderbergHierarchicalClustering;
+import elki.clustering.hierarchical.Anderberg;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -42,7 +42,7 @@ public class ClustersWithNoiseExtractionTest extends AbstractClusterAlgorithmTes
     Clustering<?> clustering = new ELKIBuilder<>(ClustersWithNoiseExtraction.class) //
         .with(ClustersWithNoiseExtraction.Par.K_ID, 3) //
         .with(ClustersWithNoiseExtraction.Par.MINCLUSTERSIZE_ID, 5) //
-        .with(Algorithm.Utils.ALGORITHM_ID, AnderbergHierarchicalClustering.class) //
+        .with(Algorithm.Utils.ALGORITHM_ID, Anderberg.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.9242);
     assertClusterSizes(clustering, new int[] { 56, 123, 151 });
