@@ -23,9 +23,7 @@ package elki.clustering.kmeans.initialization;
 import java.util.Random;
 
 import elki.data.NumberVector;
-import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MeanVariance;
 import elki.utilities.Priority;
@@ -76,28 +74,20 @@ public class RandomNormalGenerated extends AbstractKMeansInitialization {
 
   @Override
   public double[][] chooseInitialMeans(Relation<? extends NumberVector> relation, int k, NumberVectorDistance<?> distance) {
-    final int dim = RelationUtil.dimensionality(relation);
-    MeanVariance[] mvs = MeanVariance.newArray(dim);
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      NumberVector v = relation.get(it);
-      for(int i = 0; i < dim; i++) {
-        mvs[i].put(v.doubleValue(i));
-      }
-    }
+    MeanVariance[] mvs = MeanVariance.of(relation);
+    final int dim = mvs.length;
     double[] min = new double[dim], scale = new double[dim];
     for(int d = 0; d < dim; d++) {
-      final double sigma = mvs[d].getSampleStddev();
       min[d] = mvs[d].getMean();
-      scale[d] = sigma;
+      scale[d] = mvs[d].getSampleStddev();
     }
-    double[][] means = new double[k][];
+    double[][] means = new double[k][dim];
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
-      double[] r = new double[dim];
+      double[] r = means[i];
       for(int d = 0; d < dim; d++) {
-        r[d] = min[d] + scale[d] * random.nextGaussian();
+        r[d] = scale[d] * random.nextGaussian() + min[d];
       }
-      means[i] = r;
     }
     return means;
   }

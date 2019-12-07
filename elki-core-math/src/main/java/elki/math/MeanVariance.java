@@ -20,6 +20,10 @@
  */
 package elki.math;
 
+import elki.data.NumberVector;
+import elki.database.ids.DBIDIter;
+import elki.database.relation.Relation;
+import elki.database.relation.RelationUtil;
 import elki.utilities.documentation.Reference;
 
 import net.jafama.FastMath;
@@ -300,5 +304,23 @@ public class MeanVariance extends Mean {
     super.reset();
     m2 = 0;
     return this;
+  }
+
+  /**
+   * Compute the variances of a relation.
+   *
+   * @param relation Data relation
+   * @return Variances
+   */
+  public static MeanVariance[] of(Relation<? extends NumberVector> relation) {
+    final int dim = RelationUtil.dimensionality(relation);
+    MeanVariance[] mv = newArray(dim);
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      NumberVector vec = relation.get(it);
+      for(int d = 0; d < dim; d++) {
+        mv[d].put(vec.doubleValue(d));
+      }
+    }
+    return mv;
   }
 }

@@ -22,21 +22,15 @@ package elki.clustering.kmeans.initialization;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDs;
-import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.logging.Logging;
+import elki.logging.statistics.LongStatistic;
 import elki.math.MeanVariance;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
@@ -58,20 +52,23 @@ import elki.utilities.random.RandomFactory;
  *
  * @author Erich Schubert
  * @since 0.7.5
- *
- * @param <O> Vector type
  */
 @Reference(authors = "R. Ostrovsky, Y. Rabani, L. J. Schulman, C. Swamy", //
     title = "The effectiveness of Lloyd-type methods for the k-means problem", //
     booktitle = "Symposium on Foundations of Computer Science (FOCS)", //
     url = "https://doi.org/10.1109/FOCS.2006.75", //
-    bibkey = "DBLP:conf/focs/OstrovskyRSS062")
+    bibkey = "DBLP:conf/focs/OstrovskyRSS06")
 @Reference(authors = "R. Ostrovsky, Y. Rabani, L. J. Schulman, C. Swamy", //
-    title = "The effectiveness of lloyd-type methods for the k-means problem", //
+    title = "The effectiveness of Lloyd-type methods for the k-means problem", //
     booktitle = "Journal of the ACM 59(6)", //
     url = "https://doi.org/10.1145/2395116.2395117", //
     bibkey = "DBLP:journals/jacm/OstrovskyRSS12")
-public class Ostrovsky<O> extends AbstractKMeansInitialization {
+public class Ostrovsky extends AbstractKMeansInitialization {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(Ostrovsky.class);
+
   /**
    * Constructor.
    *
@@ -90,84 +87,91 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
       // Really. This uses variance and König-Huygens below, and WILL fail
       throw new IllegalArgumentException("This initialization works ONLY with squared Euclidean distances for correctness.");
     }
-    DBIDs ids = relation.getDBIDs();
-    @SuppressWarnings("unchecked")
-    DistanceQuery<NumberVector> distQ = new QueryBuilder<>((Relation<NumberVector>) relation, (NumberVectorDistance<NumberVector>) distance).distanceQuery();
-    Random random = rnd.getSingleThreadedRandom();
-
-    // Center and total variance
-    final int dim = RelationUtil.dimensionality(relation);
-    MeanVariance[] mv = MeanVariance.newArray(dim);
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      NumberVector vec = relation.get(it);
-      for(int d = 0; d < dim; d++) {
-        mv[d].put(vec.doubleValue(d));
-      }
-    }
-    double[] center = new double[dim];
-    double total = 0;
-    for(int d = 0; d < dim; d++) {
-      center[d] = mv[d].getMean();
-      total += mv[d].getSumOfSquares();
-    }
-    final double bias = total / ids.size();
-
-    NumberVector cnv = DoubleVector.wrap(center);
-
-    // Pick first vector:
-    NumberVector firstvec = null, secondvec = null;
-    double firstdist = 0.;
-    double r = random.nextDouble() * total * 2;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      firstdist = distQ.distance(cnv, firstvec = relation.get(it));
-      if((r -= bias + firstdist) <= 0) {
-        break;
-      }
-    }
-
-    // Pick second vector:
-    double r2 = random.nextDouble() * (total + relation.size() * firstdist);
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      double seconddist = distQ.distance(firstvec, secondvec = relation.get(it));
-      if((r2 -= seconddist) <= 0) {
-        break;
-      }
-    }
-
-    List<NumberVector> means = new ArrayList<>(k);
-    means.add(firstvec);
-    means.add(secondvec);
-
-    // Initialize weights
-    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
-    double weightsum = initialWeights(weights, relation, ids, firstvec, secondvec, distQ);
-    KMeansPlusPlus.chooseRemaining(relation, ids, distQ, k, means, weights, weightsum, random);
-    weights.destroy();
-    return unboxVectors(means);
+    return new NumberVectorInstance(relation, distance, rnd).run(relation, k);
   }
 
   /**
-   * Initialize the weight list.
+   * Instance for number vectors.
    *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param relation Data relation
-   * @param first First ID
-   * @param second Second ID
-   * @param distQ Distance query
-   * @return Weight sum
-   * @param <T> Object type
+   * @author Erich Schubert
    */
-  protected static <T> double initialWeights(WritableDoubleDataStore weights, Relation<? extends T> relation, DBIDs ids, T first, T second, DistanceQuery<? super T> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      // distance will usually already be squared
-      T v = relation.get(it);
-      double weight = Math.min(distQ.distance(first, v), distQ.distance(second, v));
-      weights.putDouble(it, weight);
-      weightsum += weight;
+  protected class NumberVectorInstance extends KMeansPlusPlus.NumberVectorInstance {
+    /**
+     * Constructor.
+     *
+     * @param relation Data relation
+     * @param distance Distance function
+     * @param rnd Random generator
+     */
+    public NumberVectorInstance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> distance, RandomFactory rnd) {
+      super(relation, distance, rnd);
     }
-    return weightsum;
+
+    public double[][] run(Relation<? extends NumberVector> relation, int k) {
+      // Center and total variance
+      MeanVariance[] mv = MeanVariance.of(relation);
+      double[] center = new double[mv.length];
+      double total = 0;
+      for(int d = 0; d < mv.length; d++) {
+        center[d] = mv[d].getMean();
+        total += mv[d].getSumOfSquares();
+      }
+      final double bias = total / ids.size();
+      NumberVector cnv = DoubleVector.wrap(center);
+
+      // Pick first vector:
+      NumberVector firstvec = null, secondvec = null;
+      double firstdist = 0., r = random.nextDouble() * total * 2;
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        ++diststat;
+        // distance is squared Euclidean as per above
+        firstdist = distance.distance(cnv, firstvec = relation.get(it));
+        if((r -= bias + firstdist) <= 0) {
+          break;
+        }
+      }
+
+      // Pick second vector:
+      double r2 = random.nextDouble() * (total + relation.size() * firstdist);
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        ++diststat;
+        // distance is squared Euclidean as per above
+        double seconddist = distance.distance(firstvec, secondvec = relation.get(it));
+        if((r2 -= seconddist) <= 0) {
+          break;
+        }
+      }
+
+      List<NumberVector> means = new ArrayList<>(k);
+      means.add(firstvec);
+      means.add(secondvec);
+
+      chooseRemaining(k, means, initialWeights(relation, firstvec, secondvec));
+      weights.destroy();
+      LOG.statistics(new LongStatistic(KMeansPlusPlus.class.getName() + ".distance-computations", diststat));
+      return unboxVectors(means);
+    }
+
+    /**
+     * Initialize the weight list.
+     *
+     * @param relation Data relation
+     * @param first First ID
+     * @param second Second ID
+     * @return Weight sum
+     */
+    protected double initialWeights(Relation<? extends NumberVector> relation, NumberVector first, NumberVector second) {
+      double weightsum = 0.;
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        NumberVector v = relation.get(it);
+        diststat += 2;
+        // distance is squared Euclidean as per above
+        double weight = Math.min(distance.distance(first, v), distance.distance(second, v));
+        weights.putDouble(it, weight);
+        weightsum += weight;
+      }
+      return weightsum;
+    }
   }
 
   /**
@@ -175,10 +179,10 @@ public class Ostrovsky<O> extends AbstractKMeansInitialization {
    *
    * @author Erich Schubert
    */
-  public static class Par<V> extends AbstractKMeansInitialization.Par {
+  public static class Par extends AbstractKMeansInitialization.Par {
     @Override
-    public Ostrovsky<V> make() {
-      return new Ostrovsky<>(rnd);
+    public Ostrovsky make() {
+      return new Ostrovsky(rnd);
     }
   }
 }

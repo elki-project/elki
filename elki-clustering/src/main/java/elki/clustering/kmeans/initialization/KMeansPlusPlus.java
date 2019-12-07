@@ -30,11 +30,11 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
-import elki.logging.LoggingUtil;
+import elki.logging.Logging;
+import elki.logging.statistics.LongStatistic;
 import elki.utilities.documentation.Reference;
 import elki.utilities.random.RandomFactory;
 
@@ -59,6 +59,11 @@ import elki.utilities.random.RandomFactory;
     bibkey = "DBLP:conf/soda/ArthurV07")
 public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements KMedoidsInitialization<O> {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(KMeansPlusPlus.class);
+
+  /**
    * Constructor.
    *
    * @param rnd Random generator.
@@ -72,222 +77,278 @@ public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements K
     if(relation.size() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + relation.size() + " < k objects.");
     }
-    DBIDs ids = relation.getDBIDs();
-    @SuppressWarnings("unchecked")
-    DistanceQuery<NumberVector> distQ = new QueryBuilder<>((Relation<NumberVector>) relation, (NumberVectorDistance<NumberVector>) distance).distanceQuery();
-
-    // Chose first mean
-    Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(ids, random);
-    NumberVector firstvec = relation.get(first);
-    List<NumberVector> means = new ArrayList<>(k);
-    means.add(firstvec);
-
-    // Initialize weights
-    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
-    double weightsum = initialWeights(weights, ids, firstvec, distQ);
-    chooseRemaining(relation, ids, distQ, k, means, weights, weightsum, random);
-    weights.destroy();
-    return unboxVectors(means);
+    return new NumberVectorInstance(relation, distance, rnd).run(k);
   }
 
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
-    Random random = rnd.getSingleThreadedRandom();
-    DBIDRef first = DBIDUtil.randomSample(ids, random);
-    ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
-    means.add(first);
-
-    // Initialize weights
-    WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
-    double weightsum = initialWeights(weights, ids, first, distQ);
-    chooseRemaining(ids, distQ, k, means, weights, weightsum, random);
-    weights.destroy();
-    return means;
-  }
-
-  /**
-   * Initialize the weight list.
-   *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param first Added ID
-   * @param distQ Distance query
-   * @return Weight sum
-   */
-  static double initialWeights(WritableDoubleDataStore weights, DBIDs ids, NumberVector first, DistanceQuery<? super NumberVector> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      // Distance will usually already be squared
-      double weight = distQ.distance(first, it);
-      weights.putDouble(it, weight);
-      weightsum += weight;
+    if(ids.size() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + ids.size() + " < k objects.");
     }
-    return weightsum;
+    return new MedoidsInstance(ids, distQ, rnd).run(k);
   }
 
   /**
-   * Initialize the weight list.
+   * Abstract instance implementing the weight handling.
    *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param latest Added ID
-   * @param distQ Distance query
-   * @return Weight sum
+   * @author Erich Schubert
+   *
+   * @param <T> Object type handled
    */
-  static double initialWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      // Distance will usually already be squared
-      double weight = distQ.distance(latest, it);
-      weights.putDouble(it, weight);
-      weightsum += weight;
+  protected abstract static class Instance<T> {
+    /**
+     * Object IDs
+     */
+    protected DBIDs ids;
+
+    /**
+     * Weights
+     */
+    protected WritableDoubleDataStore weights;
+
+    /**
+     * Count the number of distance computations.
+     */
+    protected long diststat;
+
+    /**
+     * Random generator
+     */
+    protected Random random;
+
+    /**
+     * Constructor.
+     *
+     * @param ids IDs to process
+     * @param rnd Random generator
+     */
+    public Instance(DBIDs ids, RandomFactory rnd) {
+      this.ids = ids;
+      this.random = rnd.getSingleThreadedRandom();
+      this.weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
     }
-    return weightsum;
-  }
 
-  /**
-   * Choose remaining means, weighted by distance.
-   *
-   * @param relation Data relation
-   * @param ids IDs
-   * @param distQ Distance function
-   * @param k Number of means to choose
-   * @param means Means storage
-   * @param weights Weights (initialized!)
-   * @param weightsum Sum of weights
-   * @param random Random generator
-   */
-  static void chooseRemaining(Relation<? extends NumberVector> relation, DBIDs ids, DistanceQuery<NumberVector> distQ, int k, List<NumberVector> means, WritableDoubleDataStore weights, double weightsum, Random random) {
-    while(true) {
-      if(weightsum > Double.MAX_VALUE) {
-        throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
+    /**
+     * Compute the distance of two objects.
+     *
+     * @param a First object
+     * @param b Second object
+     * @return Distance
+     */
+    abstract protected double distance(T a, DBIDRef b);
+
+    /**
+     * Initialize the weight list.
+     *
+     * @param first Added ID
+     * @return Weight sum
+     */
+    protected double initialWeights(T first) {
+      double weightsum = 0.;
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        // Distance will usually already be squared
+        double weight = distance(first, it);
+        weights.putDouble(it, weight);
+        weightsum += weight;
       }
-      if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean - to few data points?");
+      return weightsum;
+    }
+
+    /**
+     * Update the weight list.
+     *
+     * @param latest Added ID
+     * @return Weight sum
+     */
+    protected double updateWeights(T latest) {
+      double weightsum = 0.;
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        double weight = weights.doubleValue(it);
+        if(weight <= 0.) {
+          continue; // Duplicate, or already chosen.
+        }
+        // Distances are assumed to be squared already
+        double newweight = distance(latest, it);
+        if(newweight < weight) {
+          weights.putDouble(it, newweight);
+          weight = newweight;
+        }
+        weightsum += weight;
       }
+      return weightsum;
+    }
+
+    protected double nextDouble(double weightsum) {
       double r = random.nextDouble() * weightsum;
       while(r <= 0 && weightsum > Double.MIN_NORMAL) {
         r = random.nextDouble() * weightsum; // Try harder to not choose 0.
       }
-      DBIDIter it = ids.iter();
-      while(it.valid()) {
-        if((r -= weights.doubleValue(it)) < 0) {
+      return r;
+    }
+  }
+
+  /**
+   * Instance for k-means, number vector based.
+   *
+   * @author Erich Schubert
+   */
+  protected static class NumberVectorInstance extends Instance<NumberVector> {
+    /**
+     * Distance function
+     */
+    protected NumberVectorDistance<?> distance;
+
+    /**
+     * Data relation.
+     */
+    protected Relation<? extends NumberVector> relation;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Data relation to process
+     * @param distance Distance function
+     * @param rnd Random generator
+     */
+    public NumberVectorInstance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> distance, RandomFactory rnd) {
+      super(relation.getDBIDs(), rnd);
+      this.distance = distance;
+      this.relation = relation;
+    }
+
+    /**
+     * Run k-means++ initialization for number vectors.
+     *
+     * @param k K
+     * @return Vectors
+     */
+    public double[][] run(int k) {
+      List<NumberVector> means = new ArrayList<>(k);
+      // Choose first mean
+      NumberVector firstvec = relation.get(DBIDUtil.randomSample(ids, random));
+      means.add(firstvec);
+      chooseRemaining(k, means, initialWeights(firstvec));
+      weights.destroy();
+      LOG.statistics(new LongStatistic(KMeansPlusPlus.class.getName() + ".distance-computations", diststat));
+      return unboxVectors(means);
+    }
+
+    @Override
+    protected double distance(NumberVector a, DBIDRef b) {
+      ++diststat;
+      return distance.distance(a, relation.get(b));
+    }
+
+    /**
+     * Choose remaining means, weighted by distance.
+     *
+     * @param k Number of means to choose
+     * @param means Means storage
+     * @param weightsum Sum of weights
+     */
+    protected void chooseRemaining(int k, List<NumberVector> means, double weightsum) {
+      while(true) {
+        if(weightsum > Double.MAX_VALUE) {
+          throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
+        }
+        if(weightsum < Double.MIN_NORMAL) {
+          LOG.warning("Could not choose a reasonable mean - to few unique data points?");
+        }
+        double r = nextDouble(weightsum);
+        DBIDIter it = ids.iter();
+        while(it.valid()) {
+          if((r -= weights.doubleValue(it)) <= 0) {
+            break;
+          }
+          it.advance();
+        }
+        if(!it.valid()) { // Rare case, but happens due to floating math
+          weightsum -= r; // Decrease
+          continue; // Retry
+        }
+        // Add new mean:
+        final NumberVector newmean = relation.get(it);
+        means.add(newmean);
+        if(means.size() >= k) {
           break;
         }
-        it.advance();
+        // Update weights:
+        weights.putDouble(it, 0.);
+        weightsum = updateWeights(newmean);
       }
-      if(!it.valid()) { // Rare case, but happens due to floating math
-        weightsum -= r; // Decrease
-        continue; // Retry
-      }
-      // Add new mean:
-      final NumberVector newmean = relation.get(it);
-      means.add(newmean);
-      if(means.size() >= k) {
-        break;
-      }
-      // Update weights:
-      weights.putDouble(it, 0.);
-      weightsum = updateWeights(weights, ids, newmean, distQ);
     }
   }
 
   /**
-   * Choose remaining means, weighted by distance.
+   * Instance for k-medoids.
    *
-   * @param ids IDs
-   * @param distQ Distance function
-   * @param k Number of means to choose
-   * @param means Means storage
-   * @param weights Weights (initialized!)
-   * @param weightsum Sum of weights
-   * @param random Random generator
+   * @author Erich Schubert
    */
-  static void chooseRemaining(DBIDs ids, DistanceQuery<?> distQ, int k, ArrayModifiableDBIDs means, WritableDoubleDataStore weights, double weightsum, Random random) {
-    while(true) {
-      if(weightsum > Double.MAX_VALUE) {
-        throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
-      }
-      if(weightsum < Double.MIN_NORMAL) {
-        LoggingUtil.warning("Could not choose a reasonable mean - to few data points?");
-      }
-      double r = random.nextDouble() * weightsum;
-      while(r <= 0 && weightsum > Double.MIN_NORMAL) {
-        r = random.nextDouble() * weightsum; // Try harder to not choose 0.
-      }
-      DBIDIter it = ids.iter();
-      while(it.valid()) {
-        if((r -= weights.doubleValue(it)) <= 0) {
+  protected static class MedoidsInstance extends Instance<DBIDRef> {
+    /**
+     * Distance query
+     */
+    DistanceQuery<?> distQ;
+
+    public MedoidsInstance(DBIDs ids, DistanceQuery<?> distQ, RandomFactory rnd) {
+      super(ids, rnd);
+      this.distQ = distQ;
+    }
+
+    public DBIDs run(int k) {
+      ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
+      // Choose the first object
+      DBIDRef first = DBIDUtil.randomSample(ids, random);
+      means.add(first);
+      chooseRemaining(k, means, initialWeights(first));
+      weights.destroy();
+      LOG.statistics(new LongStatistic(KMeansPlusPlus.class.getName() + ".distance-computations", diststat));
+      return means;
+    }
+
+    @Override
+    protected double distance(DBIDRef a, DBIDRef b) {
+      ++diststat;
+      return distQ.distance(a, b);
+    }
+
+    /**
+     * Choose remaining means, weighted by distance.
+     *
+     * @param k Number of means to choose
+     * @param means Means storage
+     * @param weightsum Sum of weights
+     */
+    protected void chooseRemaining(int k, ArrayModifiableDBIDs means, double weightsum) {
+      while(true) {
+        if(weightsum > Double.MAX_VALUE) {
+          throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
+        }
+        if(weightsum < Double.MIN_NORMAL) {
+          LOG.warning("Could not choose a reasonable mean - to few unique data points?");
+        }
+        double r = nextDouble(weightsum);
+        DBIDIter it = ids.iter();
+        while(it.valid()) {
+          if((r -= weights.doubleValue(it)) <= 0) {
+            break;
+          }
+          it.advance();
+        }
+        if(!it.valid()) { // Rare case, but happens due to floating math
+          weightsum -= r; // Decrease
+          continue; // Retry
+        }
+        // Add new mean:
+        means.add(it);
+        if(means.size() >= k) {
           break;
         }
-        it.advance();
+        // Update weights:
+        weights.putDouble(it, 0.);
+        weightsum = updateWeights(it);
       }
-      if(!it.valid()) { // Rare case, but happens due to floating math
-        weightsum -= r; // Decrease
-        continue; // Retry
-      }
-      // Add new mean:
-      means.add(it);
-      if(means.size() >= k) {
-        break;
-      }
-      // Update weights:
-      weights.putDouble(it, 0.);
-      weightsum = updateWeights(weights, ids, it, distQ);
     }
-  }
-
-  /**
-   * Update the weight list.
-   *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param latest Added ID
-   * @param distQ Distance query
-   * @return Weight sum
-   */
-  private static double updateWeights(WritableDoubleDataStore weights, DBIDs ids, DBIDRef latest, DistanceQuery<?> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      double weight = weights.doubleValue(it);
-      if(weight <= 0.) {
-        continue; // Duplicate, or already chosen.
-      }
-      double newweight = distQ.distance(latest, it);
-      if(newweight < weight) {
-        weights.putDouble(it, newweight);
-        weight = newweight;
-      }
-      weightsum += weight;
-    }
-    return weightsum;
-  }
-
-  /**
-   * Update the weight list.
-   *
-   * @param weights Weight list
-   * @param ids IDs
-   * @param latest Added ID
-   * @param distQ Distance query
-   * @return Weight sum
-   */
-  private static double updateWeights(WritableDoubleDataStore weights, DBIDs ids, NumberVector latest, DistanceQuery<? super NumberVector> distQ) {
-    double weightsum = 0.;
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      double weight = weights.doubleValue(it);
-      if(weight <= 0.) {
-        continue; // Duplicate, or already chosen.
-      }
-      double newweight = distQ.distance(latest, it);
-      if(newweight < weight) {
-        weights.putDouble(it, newweight);
-        weight = newweight;
-      }
-      weightsum += weight;
-    }
-    return weightsum;
   }
 
   /**

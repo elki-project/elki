@@ -26,11 +26,10 @@ import java.util.List;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MeanVariance;
+
 import net.jafama.FastMath;
 
 /**
@@ -60,17 +59,10 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
   public List<DiagonalGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
     assert (initialMeans.length == k);
-    final int dim = RelationUtil.dimensionality(relation);
-    MeanVariance[] mvs = MeanVariance.newArray(dim);
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      NumberVector v = relation.get(it);
-      for(int d = 0; d < dim; d++) {
-        mvs[d].put(v.doubleValue(d));
-      }
-    }
-    double[] variances = new double[dim];
+    MeanVariance[] mvs = MeanVariance.of(relation);
+    double[] variances = new double[mvs.length];
     final double f = FastMath.pow(k, -2. / variances.length);
-    for(int d = 0; d < dim; d++) {
+    for(int d = 0; d < mvs.length; d++) {
       variances[d] = mvs[d].getSampleVariance() * f;
     }
 
