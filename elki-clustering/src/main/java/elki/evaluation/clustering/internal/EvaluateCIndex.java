@@ -112,6 +112,7 @@ public class EvaluateCIndex<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
+   * 
    * @param rel Data relation
    * @param c Clustering
    * @return C-Index
@@ -217,7 +218,10 @@ public class EvaluateCIndex<O> implements Evaluator {
           }
         }
         for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
-          if(DBIDUtil.compare(it1, it2) <= 0) { // Only once.
+          // Careful: we don't want duplicate distances, but we already do the
+          // same trick on the clusters; so on different clusters we need to
+          // look at all pairs, within a cluster only half.
+          if(i == j && DBIDUtil.compare(it1, it2) <= 0) {
             continue;
           }
           double dist = dq.distance(it1, it2);
