@@ -31,6 +31,8 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.LPNormDistance;
+import elki.distance.subspace.SubspaceLPNormDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -42,11 +44,14 @@ import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import net.jafama.FastMath;
 
 /**
  * Compute the Davies-Bouldin index of a data set.
@@ -85,6 +90,11 @@ public class EvaluateDaviesBouldin implements Evaluator {
   private NumberVectorDistance<?> distance;
 
   /**
+   * Exponent p for computing the power mean.
+   */
+  private double p;
+
+  /**
    * Key for logging statistics.
    */
   private String key = EvaluateDaviesBouldin.class.getName();
@@ -94,11 +104,13 @@ public class EvaluateDaviesBouldin implements Evaluator {
    *
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
+   * @param p Power mean exponent p
    */
-  public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
+  public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, double p) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
+    this.p = p;
   }
 
   /**
@@ -190,9 +202,11 @@ public class EvaluateDaviesBouldin implements Evaluator {
       }
       double wD = 0.;
       for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-        wD += distance.distance(centroid, rel.get(it));
+        double dist = distance.distance(centroid, rel.get(it));
+        wD += p != 1 ? FastMath.pow(dist, p) : dist;
       }
-      withinGroupDists[i] = wD / cluster.size();
+      wD /= cluster.size(); // Average
+      withinGroupDists[i] = p != 1 ? FastMath.pow(wD, 1. / p) : wD;
     }
     return withinGroupDists;
   }
@@ -228,6 +242,11 @@ public class EvaluateDaviesBouldin implements Evaluator {
     public static final OptionID NOISE_ID = new OptionID("davies-bouldin.noisehandling", "Control how noise should be treated.");
 
     /**
+     * Power exponent p.
+     */
+    public static final OptionID POWER_ID = new OptionID("davies-bouldin.p", "Power exponent for computing the mean, defaults to the power of the Lp norm, if used.");
+
+    /**
      * Distance function to use.
      */
     private NumberVectorDistance<?> distance;
@@ -237,17 +256,27 @@ public class EvaluateDaviesBouldin implements Evaluator {
      */
     private NoiseHandling noiseOption;
 
+    /**
+     * Exponent p for computing the power mean.
+     */
+    private double p;
+
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<?>>(DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new EnumParameter<NoiseHandling>(NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
+      double defaultp = distance instanceof LPNormDistance ? ((LPNormDistance) distance).getP() : //
+          distance instanceof SubspaceLPNormDistance ? ((SubspaceLPNormDistance) distance).getP() : //
+              1; // Default is arithmetic mean
+      new DoubleParameter(POWER_ID, defaultp) //
+          .grab(config, x -> p = x);
     }
 
     @Override
     public EvaluateDaviesBouldin make() {
-      return new EvaluateDaviesBouldin(distance, noiseOption);
+      return new EvaluateDaviesBouldin(distance, noiseOption, p);
     }
   }
 }
