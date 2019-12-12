@@ -1,0 +1,21 @@
+# Datensatz, der in der KDD-Vorlesung/Übung mehrfach vorkommt.
+2.7	2.1	Outlier
+1.7	5.25	Outlier
+2.3	7.1	Cluster_1
+0.8	7.9	Cluster_1
+1.7	8.7	Cluster_1
+2.3	7.9	Cluster_1
+2.7	9.3	Cluster_1
+7.3	9.4	Outlier
+5.8	1.7	Cluster_2
+7.3	0.75	Cluster_2
+6.8	2.8	Cluster_2
+6.7	1.9	Cluster_2
+7.9	2.9	Cluster_2
+9.2	1.75	Cluster_2
+8.3	1.75	Cluster_2
+7.9	0.7	Cluster_2
+10.2	9.8	Cluster_3
+10.3	10.8	Cluster_3
+11.2	10.1	Cluster_3
+10.8	11.3	Cluster_3
