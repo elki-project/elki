@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -186,7 +187,7 @@ public class MiniGUI extends AbstractApplication {
       store.load();
       savedSettingsModel.update();
     }
-    catch(FileNotFoundException e) {
+    catch(FileNotFoundException | NoSuchFileException e) {
       // Ignore - probably didn't save any settings yet.
     }
     catch(IOException e) {

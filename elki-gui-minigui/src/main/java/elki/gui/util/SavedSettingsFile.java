@@ -86,25 +86,25 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * @throws IOException thrown on IO errors
    */
   public void load() throws FileNotFoundException, IOException {
-    BufferedReader is = Files.newBufferedReader(file);
-    String line;
-    ArrayList<String> buf = null;
-    while((line = is.readLine()) != null) {
-      // skip comments
-      if(line.startsWith(COMMENT_PREFIX)) {
-        continue;
-      }
-      if(line.length() == 0) {
-        buf = null;
-      }
-      else if(buf == null) {
-        store.add(new Pair<>(line, buf = new ArrayList<>()));
-      }
-      else {
-        buf.add(line);
+    try (BufferedReader is = Files.newBufferedReader(file)) {
+      String line;
+      ArrayList<String> buf = null;
+      while((line = is.readLine()) != null) {
+        // skip comments
+        if(line.startsWith(COMMENT_PREFIX)) {
+          continue;
+        }
+        if(line.length() == 0) {
+          buf = null;
+        }
+        else if(buf == null) {
+          store.add(new Pair<>(line, buf = new ArrayList<>()));
+        }
+        else {
+          buf.add(line);
+        }
       }
     }
-    is.close();
   }
 
   @Override

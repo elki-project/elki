@@ -25,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -172,7 +173,7 @@ public class MultiStepGUI extends AbstractApplication {
     try {
       settings.load();
     }
-    catch(FileNotFoundException e) {
+    catch(FileNotFoundException | NoSuchFileException e) {
       LOG.warning("Error loading saved settings.", e);
     }
     catch(IOException e) {
