@@ -120,7 +120,8 @@ public class Ostrovsky extends AbstractKMeansInitialization {
       NumberVector cnv = DoubleVector.wrap(center);
 
       // Pick first vector:
-      NumberVector firstvec = null, secondvec = null;
+      List<NumberVector> means = new ArrayList<>(k);
+      NumberVector firstvec = null;
       double firstdist = 0., r = random.nextDouble() * total * 2;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         ++diststat;
@@ -130,47 +131,14 @@ public class Ostrovsky extends AbstractKMeansInitialization {
           break;
         }
       }
-
-      // Pick second vector:
-      double r2 = random.nextDouble() * (total + relation.size() * firstdist);
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        ++diststat;
-        // distance is squared Euclidean as per above
-        double seconddist = distance.distance(firstvec, secondvec = relation.get(it));
-        if((r2 -= seconddist) <= 0) {
-          break;
-        }
-      }
-
-      List<NumberVector> means = new ArrayList<>(k);
       means.add(firstvec);
-      means.add(secondvec);
-
-      chooseRemaining(k, means, initialWeights(relation, firstvec, secondvec));
+      // The rule for picking the second vector is effectively the same
+      // as for picking all the remaining vectors, so we can use the inherited
+      // code from our k-means++ implementation.
+      chooseRemaining(k, means, initialWeights(firstvec));
       weights.destroy();
       LOG.statistics(new LongStatistic(KMeansPlusPlus.class.getName() + ".distance-computations", diststat));
       return unboxVectors(means);
-    }
-
-    /**
-     * Initialize the weight list.
-     *
-     * @param relation Data relation
-     * @param first First ID
-     * @param second Second ID
-     * @return Weight sum
-     */
-    protected double initialWeights(Relation<? extends NumberVector> relation, NumberVector first, NumberVector second) {
-      double weightsum = 0.;
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        NumberVector v = relation.get(it);
-        diststat += 2;
-        // distance is squared Euclidean as per above
-        double weight = Math.min(distance.distance(first, v), distance.distance(second, v));
-        weights.putDouble(it, weight);
-        weightsum += weight;
-      }
-      return weightsum;
     }
   }
 
