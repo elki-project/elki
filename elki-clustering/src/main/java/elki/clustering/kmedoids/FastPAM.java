@@ -239,13 +239,13 @@ public class FastPAM<V> extends FastPAM1<V> {
         if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
           continue; // This is a medoid.
         }
+        Arrays.fill(cost, 0);
         // The cost we get back by making the non-medoid h medoid.
-        Arrays.fill(cost, -nearest.doubleValue(h));
-        computeReassignmentCost(h, cost);
+        double acc = -nearest.doubleValue(h) + computeReassignmentCost(h, cost);
 
         // Find the best possible swap for each medoid:
         for(int i = 0; i < cost.length; i++) {
-          final double costi = cost[i];
+          final double costi = cost[i] + acc;
           if(costi < best[i]) {
             best[i] = costi;
             bestids.set(i, h);
@@ -275,6 +275,9 @@ public class FastPAM<V> extends FastPAM1<V> {
 
     /**
      * Compute the reassignment cost of one swap.
+     * <p>
+     * This differs from the version in regular PAM by the bit mask operation
+     * only.
      *
      * @param h Current object to swap with the medoid
      * @param mnum Medoid number to be replaced
@@ -293,7 +296,6 @@ public class FastPAM<V> extends FastPAM1<V> {
         final double dist_h = distQ.distance(h, j);
         // Check if current medoid of j is removed:
         if((assignment.intValue(j) & 0x7FFF) == mnum) {
-          // distance(j, o) to second nearest / possible reassignment
           // Case 1b: j switches to new medoid, or to the second nearest:
           cost += Math.min(dist_h, second.doubleValue(j)) - distcur;
         }

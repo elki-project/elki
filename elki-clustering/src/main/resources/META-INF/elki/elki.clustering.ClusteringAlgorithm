@@ -34,8 +34,10 @@ elki.clustering.kmeans.SortMeans
 elki.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.clustering.kmeans.YinYangKMeans
 elki.clustering.kmeans.XMeans
+elki.clustering.kmedoids.FasterPAM
 elki.clustering.kmedoids.FastPAM
 elki.clustering.kmedoids.FastPAM1
+elki.clustering.kmedoids.EagerPAM
 elki.clustering.kmedoids.PAM
 elki.clustering.kmedoids.ReynoldsPAM
 elki.clustering.kmedoids.AlternatingKMedoids

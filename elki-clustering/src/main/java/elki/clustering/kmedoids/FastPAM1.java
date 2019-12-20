@@ -143,12 +143,12 @@ public class FastPAM1<V> extends PAM<V> {
             continue; // This is a medoid.
           }
           // The cost we get back by making the non-medoid h medoid.
-          Arrays.fill(cost, -nearest.doubleValue(h));
-          computeReassignmentCost(h, cost);
+          Arrays.fill(cost, 0.);
+          final double acc = -nearest.doubleValue(h) + computeReassignmentCost(h, cost);
 
           // Find the best possible swap for h:
           for(int i = 0; i < k; i++) {
-            final double costi = cost[i];
+            final double costi = cost[i] + acc;
             if(costi < best) {
               best = costi;
               bestid.set(h);
@@ -221,9 +221,11 @@ public class FastPAM1<V> extends PAM<V> {
      * Compute the reassignment cost, for all medoids in one pass.
      *
      * @param h Current object to swap with any medoid.
-     * @param cost Cost aggregation array, must have size k
+     * @param loss Loss change aggregation array, must have size k
+     * @return Loss change accumulator that applies to all
      */
-    protected void computeReassignmentCost(DBIDRef h, double[] cost) {
+    protected double computeReassignmentCost(DBIDRef h, double[] loss) {
+      double acc = 0.;
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
         if(DBIDUtil.equal(h, j)) {
@@ -231,24 +233,18 @@ public class FastPAM1<V> extends PAM<V> {
         }
         // distance(j, i) for pi == pj
         final double distcur = nearest.doubleValue(j);
-        // distance(j, o) to second nearest / possible reassignment
-        final double distsec = second.doubleValue(j);
         // distance(j, h) to new medoid
         final double dist_h = distQ.distance(h, j);
-        // Case 1b: j switches to new medoid, or to the second nearest:
-        final int pj = assignment.intValue(j) & 0x7FFF;
-        cost[pj] += Math.min(dist_h, distsec) - distcur;
+        // Case (i): new medoid is closest:
         if(dist_h < distcur) {
-          final double delta = dist_h - distcur;
-          // Case 1c: j is closer to h than its current medoid
-          for(int pi = 0; pi < pj; pi++) {
-            cost[pi] += delta;
-          }
-          for(int pi = pj + 1; pi < cost.length; pi++) {
-            cost[pi] += delta;
-          }
-        } // else Case 1a): j is closer to i than h and m, so no change.
+          acc += dist_h - distcur;
+        }
+        else {
+          // distance(j, o) to second nearest / possible reassignment
+          loss[assignment.intValue(j) & 0x7FFF] += Math.min(dist_h, second.doubleValue(j)) - distcur;
+        }
       }
+      return acc;
     }
 
     /**
