@@ -135,19 +135,16 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     cache.defaultReturnValue(Float.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
-    parser.parse(in, new DistanceCacheWriter() {
-      @Override
-      public void put(int id1, int id2, double distance) {
-        if(id1 < id2) {
-          min = id1 < min ? id1 : min;
-          max = id2 > max ? id2 : max;
-        }
-        else {
-          min = id2 < min ? id2 : min;
-          max = id1 > max ? id1 : max;
-        }
-        cache.put(makeKey(id1, id2), (float) distance);
+    parser.parse(in, (id1, id2, distance) -> {
+      if(id1 < id2) {
+        min = id1 < min ? id1 : min;
+        max = id2 > max ? id2 : max;
       }
+      else {
+        min = id2 < min ? id2 : min;
+        max = id1 > max ? id1 : max;
+      }
+      cache.put(makeKey(id1, id2), (float) distance);
     });
     if(min != 0) {
       LOG.verbose("Distance matrix is supposed to be 0-indexed. Choosing offset " + min + " to compensate.");
@@ -180,10 +177,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
     FileBasedSparseFloatDistance other = (FileBasedSparseFloatDistance) obj;

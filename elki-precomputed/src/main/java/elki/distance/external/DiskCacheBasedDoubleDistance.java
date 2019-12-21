@@ -80,10 +80,6 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
 
   @Override
   public double distance(int i1, int i2) {
-    // the smaller id is the first key
-    if(i1 > i2) {
-      return distance(i2, i1);
-    }
     try {
       return cache.getRecordBuffer(i1, i2).getDouble();
     }

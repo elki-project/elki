@@ -130,10 +130,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
    * @return Linear offset
    */
   private int computeOffset(int x, int y) {
-    if(y > x) {
-      return computeOffset(y, x);
-    }
-    return ((x * (x + 1)) >> 1) + y;
+    return y > x ? ((y * (y + 1)) >>> 1) + x : ((x * (x + 1)) >>> 1) + y;
   }
 
   /**
@@ -150,7 +147,7 @@ public class OnDiskUpperTriangleMatrix implements AutoCloseable {
     }
     return array.getRecordBuffer(computeOffset(x, y));
   }
-  
+
   /**
    * Close the matrix file.
    *

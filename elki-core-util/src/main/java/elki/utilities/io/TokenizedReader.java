@@ -53,7 +53,7 @@ public class TokenizedReader extends BufferedLineReader {
   public TokenizedReader(Pattern colSep, String quoteChars, Pattern comment) {
     super();
     this.tokenizer = new Tokenizer(colSep, quoteChars);
-    this.comment = comment.matcher("");
+    this.comment = comment == null ? null : comment.matcher("");
   }
 
   /**
@@ -62,7 +62,7 @@ public class TokenizedReader extends BufferedLineReader {
    * @return The next line, or {@code null}.
    */
   public boolean nextLineExceptComments() throws IOException {
-    while(nextLine()) {
+    while(super.nextLine()) {
       if(comment == null || !comment.reset(buf).matches()) {
         tokenizer.initialize(buf, 0, buf.length());
         return true;
@@ -70,10 +70,19 @@ public class TokenizedReader extends BufferedLineReader {
     }
     return false;
   }
+  
+  @Override
+  public boolean nextLine() throws IOException {
+    if (super.nextLine()) {
+      tokenizer.initialize(buf, 0, buf.length());
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Cleanup the internal state of the tokenized reader.
-   * 
+   * <p>
    * This also closes the input stream, but the TokenizerReader can still be
    * applied to a new stream using any of the {@link #reset} methods.
    */

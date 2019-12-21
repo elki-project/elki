@@ -23,13 +23,12 @@ package elki.distance.external;
 import java.io.InputStream;
 
 /**
- * A DistanceParser shall provide a DistanceParsingResult by parsing an
- * InputStream.
- * 
+ * Parse distances from an input stream into a distance cache for storing.
+ *
  * @author Arthur Zimek
  * @since 0.1
- * 
- * @navassoc - create - DistanceCacheWriter
+ *
+ * @navassoc - call - DistanceParser.DistanceCacheWriter
  */
 public interface DistanceParser {
   /**
@@ -40,4 +39,23 @@ public interface DistanceParser {
    * @param cache Cache writer
    */
   void parse(InputStream in, DistanceCacheWriter cache);
+
+  /**
+   * Interface to plug in the cache storage into the parser.
+   * 
+   * @author Erich Schubert
+   * @since 0.7.0
+   */
+  @FunctionalInterface
+  interface DistanceCacheWriter {
+    /**
+     * Puts the specified distance value for the given ids to the distance
+     * cache.
+     *
+     * @param id1 the first id offset
+     * @param id2 the second id offset
+     * @param distance the distance value
+     */
+    void put(int id1, int id2, double distance);
+  }
 }
