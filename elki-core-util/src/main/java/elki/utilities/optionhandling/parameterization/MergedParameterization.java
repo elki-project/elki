@@ -32,7 +32,7 @@ import elki.utilities.optionhandling.parameters.Parameter;
  * This configuration can be "rewound" to allow the same values to be consumed
  * multiple times, by different classes. This is used in best-effort
  * parameterization when some instances might not apply given the actual data,
- * e.g. in visualization classes.
+ * e.g., in visualization classes.
  * 
  * @author Erich Schubert
  * @since 0.3

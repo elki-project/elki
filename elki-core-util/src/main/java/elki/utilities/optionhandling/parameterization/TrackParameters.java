@@ -28,7 +28,7 @@ import elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Utility wrapper to track parameters for a configuration session.
- *
+ * <p>
  * All actual Parameterization operations are forwarded to the inner class.
  *
  * @author Erich Schubert
@@ -143,7 +143,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * {@inheritDoc}
-   *
+   * <p>
    * Track parameters using a shared options list with parent tracker.
    */
   @Override

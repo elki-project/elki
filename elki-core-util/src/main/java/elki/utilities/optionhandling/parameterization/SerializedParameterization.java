@@ -32,8 +32,9 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.Parameter;
 
 /**
- * Manage a parameterization serialized as String array, e.g. from command line.
- *
+ * Manage a parameterization serialized as String array, e.g., from command
+ * line.
+ * <p>
  * When building parameter lists, use {@link ListParameterization} where
  * possible.
  *
@@ -43,7 +44,7 @@ import elki.utilities.optionhandling.parameters.Parameter;
 public class SerializedParameterization extends AbstractParameterization {
   /**
    * Prefix of option markers on the command line.
-   *
+   * <p>
    * The option markers are supposed to be given on the command line with
    * leading <code>-</code>.
    */
