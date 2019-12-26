@@ -20,15 +20,29 @@
  */
 package elki.utilities.io;
 
+import elki.logging.Logging;
 import elki.utilities.datastructures.BitsUtil;
 
 /**
  * Helper functionality for parsing.
+ * <p>
+ * This class is fairly optimized. Because exceptions frequently occur in
+ * parsing (e.g., when trying to parse a text as float), this implementation
+ * avoids allocating exceptions and stack traces in these cases, and uses static
+ * instances instead. By setting the logging level for the ParseUtil class to
+ * FINE, the backtraces can still be obtained for development. But usually you
+ * will want to catch this exception and instead throw your own with additional
+ * context information of the value that failed to parse.
  * 
  * @author Erich Schubert
  * @since 0.7.5
  */
 public final class ParseUtil {
+  /**
+   * Logging helper.
+   */
+  private static final Logging LOG = Logging.getLogger(ParseUtil.class);
+
   /**
    * Private constructor. Static methods only.
    */
@@ -37,76 +51,65 @@ public final class ParseUtil {
   }
 
   /**
-   * Preallocated exceptions.
+   * Preallocated exception.
+   *
+   * @author Erich Schubert
    */
-  public static final NumberFormatException EMPTY_STRING = new NumberFormatException("Parser called on an empty string.") {
+  private static class PreallocatedException extends NumberFormatException {
+    /**
+     * Serialization version ID.
+     */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     *
+     * @param msg Message
+     */
+    public PreallocatedException(String msg) {
+      super(msg);
+    }
 
     @Override
     public synchronized Throwable fillInStackTrace() {
       return this;
     }
-  };
+
+    @Override
+    public String toString() {
+      return getClass().getSuperclass().getName() + ": " + getMessage() + " (increase the logging level of " + ParseUtil.class.getName() + " to get a backtrace)";
+    }
+  }
 
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException EXPONENT_OVERFLOW = new NumberFormatException("Precision overflow for double exponent.") {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  };
+  public static final NumberFormatException EMPTY_STRING = new PreallocatedException("Parser called on an empty string");
 
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException INVALID_EXPONENT = new NumberFormatException("Invalid exponent") {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  };
+  public static final NumberFormatException EXPONENT_OVERFLOW = new PreallocatedException("Precision overflow for double exponent");
 
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException TRAILING_CHARACTERS = new NumberFormatException("String sequence was not completely consumed.") {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  };
+  public static final NumberFormatException INVALID_EXPONENT = new PreallocatedException("Invalid exponent");
 
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException PRECISION_OVERFLOW = new NumberFormatException("Precision overflow when parsing a number.") {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  };
+  public static final NumberFormatException TRAILING_CHARACTERS = new PreallocatedException("String sequence was not completely consumed");
 
   /**
    * Preallocated exceptions.
    */
-  public static final NumberFormatException NOT_A_NUMBER = new NumberFormatException("Number must start with a digit or dot.") {
-    private static final long serialVersionUID = 1L;
+  public static final NumberFormatException PRECISION_OVERFLOW = new PreallocatedException("Precision overflow when parsing a number");
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
-    }
-  };
+  /**
+   * Preallocated exceptions.
+   */
+  public static final NumberFormatException NOT_A_NUMBER = new PreallocatedException("Number must start with a digit or dot");
 
   /**
    * Infinity pattern, with any capitalization
@@ -133,7 +136,7 @@ public final class ParseUtil {
    */
   public static double parseDouble(final byte[] str, final int start, final int end) {
     if(start >= end) {
-      throw EMPTY_STRING;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(EMPTY_STRING.getMessage()) : EMPTY_STRING;
     }
     // Current position and character.
     int pos = start;
@@ -156,7 +159,7 @@ public final class ParseUtil {
     final int realstart = pos;
     // Begin parsing real numbers!
     if(((cur < '0') || (cur > '9')) && (cur != '.')) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
     // Parse digits into a long, remember offset of decimal point.
@@ -170,7 +173,7 @@ public final class ParseUtil {
           decimal = tmp; // Otherwise, silently ignore the extra digits.
         }
         else if(++decimalPoint == 0) { // Because we ignored the digit
-          throw PRECISION_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
       }
       else if((cur == '.') && (decimalPoint < 0)) {
@@ -186,7 +189,7 @@ public final class ParseUtil {
     }
     // Not a single digit, only "-." etc.
     if(pos == realstart + (decimalPoint >= 0 ? 1 : 0)) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -201,7 +204,7 @@ public final class ParseUtil {
         cur = str[pos];
       }
       if((cur < '0') || (cur > '9')) { // At least one digit required.
-        throw INVALID_EXPONENT;
+        throw LOG.isDebuggingFine() ? new NumberFormatException(INVALID_EXPONENT.getMessage()) : INVALID_EXPONENT;
       }
       while(true) {
         final int digit = cur - '0';
@@ -210,7 +213,7 @@ public final class ParseUtil {
         }
         exp = (exp << 3) + (exp << 1) + digit;
         if(exp > Double.MAX_EXPONENT) {
-          throw EXPONENT_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(EXPONENT_OVERFLOW.getMessage()) : EXPONENT_OVERFLOW;
         }
         if(++pos >= end) {
           break;
@@ -222,7 +225,7 @@ public final class ParseUtil {
     // Adjust exponent by the offset of the dot in our long.
     exp = decimalPoint > 0 ? (exp - decimalPoint) : exp;
     if(pos != end) {
-      throw TRAILING_CHARACTERS;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(TRAILING_CHARACTERS.getMessage()) : TRAILING_CHARACTERS;
     }
 
     return BitsUtil.lpow10(isNegative ? -decimal : decimal, exp);
@@ -258,7 +261,7 @@ public final class ParseUtil {
    */
   public static double parseDouble(final CharSequence str, final int start, final int end) {
     if(start >= end) {
-      throw EMPTY_STRING;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(EMPTY_STRING.getMessage()) : EMPTY_STRING;
     }
     // Current position and character.
     int pos = start;
@@ -281,7 +284,7 @@ public final class ParseUtil {
     final int realstart = pos;
     // Begin parsing real numbers!
     if(((cur < '0') || (cur > '9')) && (cur != '.')) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
     // Parse digits into a long, remember offset of decimal point.
@@ -295,7 +298,7 @@ public final class ParseUtil {
           decimal = tmp; // Otherwise, silently ignore the extra digits.
         }
         else if(++decimalPoint == 0) { // Because we ignored the digit
-          throw PRECISION_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
       }
       else if((cur == '.') && (decimalPoint < 0)) {
@@ -311,7 +314,7 @@ public final class ParseUtil {
     }
     // Not a single digit, only "-." etc.
     if(pos == realstart + (decimalPoint >= 0 ? 1 : 0)) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
     // We need the offset from the back for adjusting the exponent:
     // Note that we need the current value of i!
@@ -326,7 +329,7 @@ public final class ParseUtil {
         cur = str.charAt(pos);
       }
       if((cur < '0') || (cur > '9')) { // At least one digit required.
-        throw INVALID_EXPONENT;
+        throw LOG.isDebuggingFine() ? new NumberFormatException(INVALID_EXPONENT.getMessage()) : INVALID_EXPONENT;
       }
       while(true) {
         final int digit = cur - '0';
@@ -335,7 +338,7 @@ public final class ParseUtil {
         }
         exp = (exp << 3) + (exp << 1) + digit;
         if(exp > Double.MAX_EXPONENT) {
-          throw EXPONENT_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(EXPONENT_OVERFLOW.getMessage()) : EXPONENT_OVERFLOW;
         }
         if(++pos >= end) {
           break;
@@ -347,7 +350,7 @@ public final class ParseUtil {
     // Adjust exponent by the offset of the dot in our long.
     exp = decimalPoint > 0 ? (exp - decimalPoint) : exp;
     if(pos != end) {
-      throw TRAILING_CHARACTERS;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(TRAILING_CHARACTERS.getMessage()) : TRAILING_CHARACTERS;
     }
 
     return BitsUtil.lpow10(isNegative ? -decimal : decimal, exp);
@@ -373,7 +376,7 @@ public final class ParseUtil {
    */
   public static long parseLongBase10(final CharSequence str, final int start, final int end) {
     if(start >= end) {
-      throw EMPTY_STRING;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(EMPTY_STRING.getMessage()) : EMPTY_STRING;
     }
     // Current position and character.
     int pos = start;
@@ -388,7 +391,7 @@ public final class ParseUtil {
 
     // Begin parsing real numbers!
     if((cur < '0') || (cur > '9')) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
     // Parse digits into a long, remember offset of decimal point.
@@ -402,7 +405,7 @@ public final class ParseUtil {
           if(isNegative && tmp == 0x8000000000000000L && pos + 1 == end) {
             return Long.MIN_VALUE;
           }
-          throw PRECISION_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
@@ -415,7 +418,7 @@ public final class ParseUtil {
       cur = str.charAt(pos);
     }
     if(pos != end) {
-      throw TRAILING_CHARACTERS;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(TRAILING_CHARACTERS.getMessage()) : TRAILING_CHARACTERS;
     }
 
     return isNegative ? -decimal : decimal;
@@ -441,7 +444,7 @@ public final class ParseUtil {
    */
   public static int parseIntBase10(final CharSequence str, final int start, final int end) {
     if(start >= end) {
-      throw EMPTY_STRING;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(EMPTY_STRING.getMessage()) : EMPTY_STRING;
     }
     // Current position and character.
     int pos = start;
@@ -456,7 +459,7 @@ public final class ParseUtil {
 
     // Begin parsing real numbers!
     if((cur < '0') || (cur > '9')) {
-      throw NOT_A_NUMBER;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
     // Parse digits into a int, remember offset of decimal point.
@@ -470,7 +473,7 @@ public final class ParseUtil {
           if(isNegative && tmp == 0x80000000 && pos + 1 == end) {
             return Integer.MIN_VALUE;
           }
-          throw PRECISION_OVERFLOW;
+          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
         decimal = tmp;
       }
@@ -483,7 +486,7 @@ public final class ParseUtil {
       cur = str.charAt(pos);
     }
     if(pos != end) {
-      throw TRAILING_CHARACTERS;
+      throw LOG.isDebuggingFine() ? new NumberFormatException(TRAILING_CHARACTERS.getMessage()) : TRAILING_CHARACTERS;
     }
 
     return isNegative ? -decimal : decimal;

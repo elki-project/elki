@@ -275,6 +275,25 @@ public class Tokenizer implements Iter {
   }
 
   /**
+   * Get length of token.
+   *
+   * @return Token length
+   */
+  public int getLength() {
+    return end - start;
+  }
+
+  /**
+   * Get a single character.
+   *
+   * @param off Offset
+   * @return Character
+   */
+  public char getChar(int off) {
+    return input.charAt(start + off);
+  }
+
+  /**
    * Perform cleanup.
    */
   public void cleanup() {
