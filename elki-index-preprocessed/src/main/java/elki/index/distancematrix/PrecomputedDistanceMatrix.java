@@ -34,6 +34,7 @@ import elki.distance.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
@@ -117,6 +118,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     matrix = new double[msize];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
+    Duration timer = LOG.newDuration(getClass().getName() + ".precomputation-time").begin();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing distance matrix", msize, LOG) : null;
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
@@ -130,6 +132,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
       }
     }
     LOG.ensureCompleted(prog);
+    LOG.statistics(timer.end());
   }
 
   /**
