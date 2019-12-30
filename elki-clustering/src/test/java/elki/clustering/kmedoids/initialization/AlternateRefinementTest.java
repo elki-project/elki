@@ -54,6 +54,7 @@ public class AlternateRefinementTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, AlternateRefinement.class) //
+        .with(KMeans.SEED_ID, 0) //
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //

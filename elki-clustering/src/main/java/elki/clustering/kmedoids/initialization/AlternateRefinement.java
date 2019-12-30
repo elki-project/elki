@@ -20,17 +20,19 @@
  */
 package elki.clustering.kmedoids.initialization;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import elki.clustering.kmeans.initialization.KMeansPlusPlus;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.IntegerDataStore;
+import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -97,39 +99,31 @@ public class AlternateRefinement<O> implements KMedoidsInitialization<O> {
 
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
-    // For storing the initial clusters:
-    ArrayList<ModifiableDBIDs> clusters = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newArray((ids.size() / k) + 10));
-    }
     // Get initial medoids, assign points.
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(inner.chooseInitialMedoids(k, ids, distQ));
+    DBIDArrayMIter miter = medoids.iter();
     k = medoids.size();
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0);
+
     double[] cost = new double[k];
-    double tc = assignToNearestCluster(medoids, ids, distQ, clusters, cost);
+    double tc = assignToNearestCluster(miter, ids, distQ, assignment, cost);
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(getClass().getName() + ".initial-cost", tc));
     }
     // Refine medoids
-    DBIDArrayMIter miter = medoids.iter();
-    // Swap phase
     int iteration = 0;
     while(iteration < maxiter || maxiter <= 0) {
       ++iteration;
       boolean changed = false;
       // Try to swap the medoid with a better cluster member:
       for(int i = 0; i < k; i++) {
-        double bestm = findMedoid(clusters.get(i), distQ, miter.seek(i), cost[i]);
-        if(bestm < cost[i]) {
-          changed = true;
-          cost[i] = bestm;
-        }
+        changed |= findMedoid(ids, distQ, assignment, i, miter.seek(i), cost);
       }
       if(!changed || iteration == maxiter) {
         break;
       }
       double nc = VMath.sum(cost);
-      tc = assignToNearestCluster(medoids, ids, distQ, clusters, cost);
+      tc = assignToNearestCluster(miter, ids, distQ, assignment, cost);
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".iteration." + iteration + ".estimated-cost", nc));
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".iteration." + iteration + ".reassigned-cost", tc));
@@ -172,35 +166,66 @@ public class AlternateRefinement<O> implements KMedoidsInitialization<O> {
   }
 
   /**
+   * Find the best medoid of a given fixed set.
+   * 
+   * @param ids Object ids
+   * @param distQ Distance query
+   * @param assignment Cluster assignment
+   * @param j Cluster number
+   * @param miter Medoid iterator, pointing to the current medoid (modified)
+   * @param cost Prior cost, of the current assignment / cost[j] is output
+   * @return {@code true} if the medoid changed.
+   */
+  public static boolean findMedoid(DBIDs ids, DistanceQuery<?> distQ, IntegerDataStore assignment, int j, DBIDArrayMIter miter, double[] cost) {
+    boolean changed = false;
+    double bestm = cost[j];
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(miter, iter) || assignment.intValue(iter) != j) {
+        continue;
+      }
+      double sum = 0;
+      for(DBIDIter iter2 = ids.iter(); iter2.valid() && sum < bestm; iter2.advance()) {
+        if(DBIDUtil.equal(iter, iter2) || assignment.intValue(iter2) != j) {
+          continue;
+        }
+        sum += distQ.distance(iter, iter2);
+      }
+      if(sum < bestm) {
+        miter.setDBID(iter);
+        bestm = sum;
+        changed = true;
+      }
+    }
+    cost[j] = bestm;
+    return changed;
+  }
+
+  /**
    * Compute the initial cluster assignment.
    *
    * @param medoids Initial medoids
    * @param ids All objects
    * @param distQ Distance query
-   * @param clusters Output: clusters
+   * @param assignment Output: clusters
    * @param cost Output: cost per cluster
    * @return Cost (and "clusters" is changed)
    */
-  protected static double assignToNearestCluster(ArrayDBIDs medoids, DBIDs ids, DistanceQuery<?> distQ, ArrayList<ModifiableDBIDs> clusters, double[] cost) {
+  public static double assignToNearestCluster(DBIDArrayIter miter, DBIDs ids, DistanceQuery<?> distQ, WritableIntegerDataStore assignment, double[] cost) {
     Arrays.fill(cost, 0);
-    for(ModifiableDBIDs c : clusters) {
-      c.clear();
-    }
-    DBIDArrayIter miter = medoids.iter();
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY;
-      int minindx = -1;
+      int curindx = assignment.intValue(iditer), minindx = curindx;
+      double mindist = distQ.distance(iditer, miter.seek(curindx));
       for(miter.seek(0); miter.valid(); miter.advance()) {
+        if(miter.getOffset() == curindx) {
+          continue;
+        }
         final double dist = distQ.distance(iditer, miter);
         if(dist < mindist) {
           minindx = miter.getOffset();
           mindist = dist;
         }
       }
-      if(minindx < 0) {
-        throw new AbortException("Too many infinite distances. Cannot assign objects.");
-      }
-      clusters.get(minindx).add(iditer);
+      assignment.put(iditer, minindx);
       cost[minindx] += mindist;
     }
     return VMath.sum(cost);
