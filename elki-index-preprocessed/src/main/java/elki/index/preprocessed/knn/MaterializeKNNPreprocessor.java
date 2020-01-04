@@ -335,21 +335,6 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
   }
 
   @Override
-  public String getLongName() {
-    return "kNN Preprocessor";
-  }
-
-  @Override
-  public String getShortName() {
-    return "knn preprocessor";
-  }
-
-  @Override
-  public void logStatistics() {
-    // TODO: can we log some sensible statistics?
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

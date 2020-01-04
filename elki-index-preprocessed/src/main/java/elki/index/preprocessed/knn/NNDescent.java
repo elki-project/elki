@@ -55,6 +55,8 @@ import elki.utilities.random.RandomFactory;
  * Efficient k-nearest neighbor graph construction for generic similarity
  * measures<br>
  * Proc. 20th Int. Conf. on World Wide Web (WWW'11)
+ * <p>
+ * TODO: collect and log some query statistics.
  *
  * @author Evelyn Kirner
  * @since 0.7.5
@@ -458,21 +460,6 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  @Override
-  public void logStatistics() {
-    // TODO
-  }
-
-  @Override
-  public String getLongName() {
-    return "NNDescent kNN";
-  }
-
-  @Override
-  public String getShortName() {
-    return "nn-descent-knn";
   }
 
   @Override

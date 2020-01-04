@@ -160,21 +160,6 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     return LOG;
   }
 
-  @Override
-  public String getLongName() {
-    return "Spatial Index Approximative kNN";
-  }
-
-  @Override
-  public String getShortName() {
-    return "spatial-approximate-knn";
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
-  }
-
   /**
    * The actual preprocessor instance.
    *

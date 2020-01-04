@@ -185,16 +185,6 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> 
   }
 
   @Override
-  public String getLongName() {
-    return "k-d-tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "k-d-tree";
-  }
-
-  @Override
   public void logStatistics() {
     if(objaccess != null) {
       LOG.statistics(objaccess);

@@ -22,12 +22,11 @@ package elki.index;
 
 /**
  * Interface defining the minimum requirements for all index classes.
- * 
+ * <p>
  * See also: {@link IndexFactory}, {@link DynamicIndex}
  * 
  * @author Elke Achtert
  * @since 0.1
- * 
  */
 public interface Index {
   /**
@@ -38,28 +37,12 @@ public interface Index {
 
   /**
    * Send statistics to the logger, if enabled.
-   * 
+   * <p>
    * Note: you must have set the logging level appropriately before initializing
    * the index! Otherwise, the index might not have collected the desired
    * statistics.
    */
-  void logStatistics();
-  
-  /**
-   * Get a long (human-readbale) name of the index.
-   *
-   * @return Name
-   */
-  // @Override // Used to be in Result
-  String getLongName();
-
-  /**
-   * Get a short (suitable for filenames) name of the index.
-   * 
-   * FIXME: remove.
-   *
-   * @return Name
-   */
-  // @Override // Used to be in Result
-  String getShortName();
+  default void logStatistics() {
+    // Nothing to do.
+  };
 }

@@ -43,6 +43,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.index.*;
 import elki.math.geodesy.EarthModel;
 import elki.math.geodesy.SphericalVincentyEarthModel;
+import elki.result.Metadata;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -86,16 +87,7 @@ public class LngLatAsECEFIndex<O extends NumberVector> extends ProjectedIndex<O,
    */
   public LngLatAsECEFIndex(Relation<? extends O> relation, Projection<O, O> proj, Relation<O> view, Index inner, boolean norefine) {
     super(relation, proj, view, inner, norefine, 1.0);
-  }
-
-  @Override
-  public String getLongName() {
-    return "ECEF " + inner.getLongName();
-  }
-
-  @Override
-  public String getShortName() {
-    return "ecef-" + inner.getShortName();
+    Metadata.of(this).setLongName("ECEF " + Metadata.of(inner).getLongName());
   }
 
   @SuppressWarnings("unchecked")

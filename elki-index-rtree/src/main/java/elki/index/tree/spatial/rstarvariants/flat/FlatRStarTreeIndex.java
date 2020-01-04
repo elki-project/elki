@@ -174,16 +174,6 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
   }
 
   @Override
-  public String getLongName() {
-    return "Flat R*-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "flatrstartree";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

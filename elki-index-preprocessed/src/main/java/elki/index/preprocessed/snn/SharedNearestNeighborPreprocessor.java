@@ -137,21 +137,6 @@ public class SharedNearestNeighborPreprocessor<O> implements SharedNearestNeighb
     return storage.get(objid);
   }
 
-  @Override
-  public String getLongName() {
-    return "SNN id index";
-  }
-
-  @Override
-  public String getShortName() {
-    return "SNN-index";
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
-  }
-
   /**
    * Get the number of neighbors
    * 

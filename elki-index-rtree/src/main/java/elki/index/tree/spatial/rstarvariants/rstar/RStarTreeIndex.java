@@ -177,16 +177,6 @@ public class RStarTreeIndex<O extends NumberVector> extends RStarTree implements
   }
 
   @Override
-  public String getLongName() {
-    return "R*-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "rstartree";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

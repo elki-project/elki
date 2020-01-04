@@ -541,16 +541,6 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   }
 
   @Override
-  public String getLongName() {
-    return "RdKNNTree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "rdknntree";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

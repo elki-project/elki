@@ -114,21 +114,6 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
     return LOG;
   }
 
-  @Override
-  public String getLongName() {
-    return "cached-knn";
-  }
-
-  @Override
-  public String getShortName() {
-    return "cached-knn";
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
-  }
-
   /**
    * The parameterizable factory.
    *

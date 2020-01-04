@@ -194,16 +194,6 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
   }
 
   @Override
-  public String getLongName() {
-    return "iDistance index";
-  }
-
-  @Override
-  public String getShortName() {
-    return "idistance-index";
-  }
-
-  @Override
   public Logging getLogger() {
     return LOG;
   }

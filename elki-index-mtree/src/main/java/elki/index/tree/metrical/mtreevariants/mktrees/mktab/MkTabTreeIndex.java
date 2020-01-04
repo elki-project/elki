@@ -135,14 +135,4 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
         new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }
-
-  @Override
-  public String getLongName() {
-    return "MkTab-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "mktabtree";
-  }
 }

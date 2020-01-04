@@ -228,16 +228,6 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
   }
 
   @Override
-  public String getLongName() {
-    return "VA-file index";
-  }
-
-  @Override
-  public String getShortName() {
-    return "va-file";
-  }
-
-  @Override
   public KNNSearcher<V> kNNByObject(DistanceQuery<V> distanceQuery, int maxk, int flags) {
     Distance<? super V> df = distanceQuery.getDistance();
     return df instanceof LPNormDistance ? new VAFileKNNQuery(distanceQuery, ((LPNormDistance) df).getP()) : null;

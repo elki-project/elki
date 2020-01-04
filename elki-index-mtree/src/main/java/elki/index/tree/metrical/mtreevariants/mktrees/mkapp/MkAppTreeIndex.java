@@ -122,14 +122,4 @@ public class MkAppTreeIndex<O> extends MkAppTree<O> implements RangeIndex<O>, KN
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
         new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }
-
-  @Override
-  public String getLongName() {
-    return "MkApp-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "mkapptree";
-  }
 }

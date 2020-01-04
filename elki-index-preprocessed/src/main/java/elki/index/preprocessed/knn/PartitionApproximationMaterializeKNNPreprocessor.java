@@ -140,21 +140,6 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
     return LOG;
   }
 
-  @Override
-  public String getLongName() {
-    return "Random partition kNN approximation";
-  }
-
-  @Override
-  public String getShortName() {
-    return "random-partition-knn";
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
-  }
-
   /**
    * The parameterizable factory.
    *

@@ -215,14 +215,4 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
         new MTreeRangeByDBID<>(this, distanceQuery) : null;
   }
-
-  @Override
-  public String getLongName() {
-    return "M-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "mtree";
-  }
 }

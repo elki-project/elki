@@ -218,16 +218,6 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    */
   protected abstract Logging getLogger();
 
-  @Override
-  public String getLongName() {
-    return "Cover Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "cover-tree";
-  }
-
   /**
    * Index factory.
    * 

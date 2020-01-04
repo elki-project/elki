@@ -164,16 +164,6 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
   }
 
   @Override
-  public String getLongName() {
-    return "Precomputed Distance Matrix";
-  }
-
-  @Override
-  public String getShortName() {
-    return "distance-matrix";
-  }
-
-  @Override
   public DistanceQuery<O> getDistanceQuery(Distance<? super O> distanceFunction) {
     return this.distance.equals(distanceFunction) ? new PrecomputedDistanceQuery() : null;
   }

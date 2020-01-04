@@ -161,16 +161,6 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
   }
 
   @Override
-  public String getShortName() {
-    return "pva-file";
-  }
-
-  @Override
-  public String getLongName() {
-    return "partial va-file";
-  }
-
-  @Override
   public Logging getLogger() {
     return LOG;
   }

@@ -214,16 +214,6 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   }
 
   @Override
-  public String getLongName() {
-    return "k-d-tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "k-d-tree";
-  }
-
-  @Override
   public void logStatistics() {
     if(objaccess != null) {
       LOG.statistics(objaccess);

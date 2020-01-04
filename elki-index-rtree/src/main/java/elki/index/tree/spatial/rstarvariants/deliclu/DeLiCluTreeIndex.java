@@ -214,16 +214,6 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
   }
 
   @Override
-  public String getLongName() {
-    return "DeLiClu-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "deliclutree";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

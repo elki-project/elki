@@ -294,16 +294,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
   }
 
   @Override
-  public String getLongName() {
-    return "kNN and RkNN Preprocessor";
-  }
-
-  @Override
-  public String getShortName() {
-    return "knn and rknn preprocessor";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

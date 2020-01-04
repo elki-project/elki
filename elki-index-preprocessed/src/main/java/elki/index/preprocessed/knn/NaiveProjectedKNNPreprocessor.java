@@ -245,16 +245,6 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
   }
 
   @Override
-  public String getLongName() {
-    return "Space Filling Curve KNN preprocessor";
-  }
-
-  @Override
-  public String getShortName() {
-    return "spacefilling-knn";
-  }
-
-  @Override
   public void logStatistics() {
     LOG.statistics(new DoubleStatistic(this.getClass().getCanonicalName() + ".distance-computations-per-k", mean.getMean()));
   }

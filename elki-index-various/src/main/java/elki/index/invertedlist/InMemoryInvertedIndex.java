@@ -266,16 +266,6 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
         df instanceof ArcCosineDistance ? new ArcCosineRangeQuery() : null;
   }
 
-  @Override
-  public String getLongName() {
-    return "Inverted lists index";
-  }
-
-  @Override
-  public String getShortName() {
-    return "inverted-lists";
-  }
-
   /**
    * kNN query object, for cosine distance.
    * 

@@ -38,6 +38,7 @@ import elki.distance.Distance;
 import elki.index.*;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
+import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -130,6 +131,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     this.norefine = norefine;
     this.kmulti = kmulti;
     this.refinements = LOG.isStatistics() ? LOG.newCounter(this.getClass().getName() + ".refinements") : null;
+    Metadata.of(this).setLongName("Projected " + Metadata.of(inner).getLongName());
   }
 
   /**
@@ -144,16 +146,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   @Override
   public void initialize() {
     inner.initialize();
-  }
-
-  @Override
-  public String getLongName() {
-    return "projected " + inner.getLongName();
-  }
-
-  @Override
-  public String getShortName() {
-    return "proj-" + inner.getShortName();
   }
 
   @Override

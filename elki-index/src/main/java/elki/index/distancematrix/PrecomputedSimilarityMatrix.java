@@ -165,16 +165,6 @@ public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements 
   }
 
   @Override
-  public String getLongName() {
-    return "Precomputed Similarity Matrix";
-  }
-
-  @Override
-  public String getShortName() {
-    return "similarity-matrix";
-  }
-
-  @Override
   public SimilarityQuery<O> getSimilarityQuery(Similarity<? super O> similarityFunction) {
     return this.similarityFunction.equals(similarityFunction) ? new PrecomputedSimilarityQuery() : null;
   }

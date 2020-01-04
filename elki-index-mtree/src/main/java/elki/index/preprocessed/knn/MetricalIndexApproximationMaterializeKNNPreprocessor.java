@@ -168,23 +168,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
   }
 
   @Override
-  public String getLongName() {
-    return "Metrical index knn approximation";
-  }
-
-  @Override
-  public String getShortName() {
-    return "metrical-knn-approximation";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
   }
 
   /**

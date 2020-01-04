@@ -139,16 +139,6 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
     }
 
     @Override
-    public String getLongName() {
-      return "LSH index";
-    }
-
-    @Override
-    public String getShortName() {
-      return "lsh-index";
-    }
-
-    @Override
     public void initialize() {
       final int numhash = hashfunctions.size();
       hashtables = new ArrayList<>(numhash);

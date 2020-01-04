@@ -120,21 +120,6 @@ public class RandomSampleKNNPreprocessor<O> extends AbstractMaterializeKNNPrepro
     return LOG;
   }
 
-  @Override
-  public String getLongName() {
-    return "random sample kNN";
-  }
-
-  @Override
-  public String getShortName() {
-    return "random-sample-knn";
-  }
-
-  @Override
-  public void logStatistics() {
-    // No statistics to log.
-  }
-
   /**
    * The parameterizable factory.
    *

@@ -152,14 +152,4 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
     return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
         new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }
-
-  @Override
-  public String getLongName() {
-    return "MkMax-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "mkmaxtree";
-  }
 }
