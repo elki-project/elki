@@ -97,7 +97,7 @@ public abstract class AbstractCoverTree<O> implements Index {
    * @param relation Data relation
    * @param distance Distance function
    * @param expansion Expansion rate
-   * @param truncate Truncate branches with less than this number of instances.
+   * @param truncate Truncate branches with less than this number of instances
    */
   public AbstractCoverTree(Relation<O> relation, Distance<? super O> distance, double expansion, int truncate) {
     super();
@@ -121,7 +121,7 @@ public abstract class AbstractCoverTree<O> implements Index {
   }
 
   /**
-   * Convert a distance to an upper scaling bound-
+   * Convert a distance to an upper scaling bound.
    * 
    * @param d Distance
    * @return Scaling bound
@@ -197,10 +197,10 @@ public abstract class AbstractCoverTree<O> implements Index {
    * @param collect Output list
    */
   protected void collectByCover(DBIDRef cur, ModifiableDoubleDBIDList candidates, double fmax, ModifiableDoubleDBIDList collect) {
-    assert (collect.size() == 0) : "Not empty";
+    assert collect.isEmpty() : "Not empty";
     DoubleDBIDListIter it = candidates.iter().advance(); // Except first = cur!
     while(it.valid()) {
-      assert (!DBIDUtil.equal(cur, it));
+      assert !DBIDUtil.equal(cur, it);
       final double dist = distance(cur, it);
       if(dist <= fmax) { // Collect
         collect.add(dist, it);
@@ -254,8 +254,7 @@ public abstract class AbstractCoverTree<O> implements Index {
      *
      * @param distance Distance function
      * @param expansion Expansion rate
-     * @param truncate Truncate branches with less than this number of
-     *        instances.
+     * @param truncate Truncate branches with less than this number of instances
      */
     public Factory(Distance<? super O> distance, double expansion, int truncate) {
       super();

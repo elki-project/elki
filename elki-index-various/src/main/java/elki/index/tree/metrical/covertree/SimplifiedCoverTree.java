@@ -78,7 +78,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    * @param relation data relation
    * @param distance distance function
    * @param expansion Expansion rate
-   * @param truncate Truncate branches with less than this number of instances.
+   * @param truncate Truncate branches with less than this number of instances
    */
   public SimplifiedCoverTree(Relation<O> relation, Distance<? super O> distance, double expansion, int truncate) {
     super(relation, distance, expansion, truncate);
@@ -108,8 +108,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Constructor.
      *
-     * @param r Object.
-     * @param maxDist Maximum distance to any descendant.
+     * @param r Reference object
+     * @param maxDist Maximum distance to any descendant
      */
     public Node(DBIDRef r, double maxDist) {
       this.singletons = DBIDUtil.newArray();
@@ -121,12 +121,12 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Constructor for leaf node.
      *
-     * @param r Object.
-     * @param maxDist Maximum distance to any descendant.
-     * @param singletons Singletons.
+     * @param r Reference object
+     * @param maxDist Maximum distance to any descendant
+     * @param singletons Singletons
      */
     public Node(DBIDRef r, double maxDist, DoubleDBIDList singletons) {
-      assert (!singletons.contains(r));
+      assert !singletons.contains(r);
       this.singletons = DBIDUtil.newArray(singletons.size() + 1);
       this.singletons.add(r);
       this.singletons.addDBIDs(singletons);
@@ -155,10 +155,10 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    * @param ids IDs to load
    */
   public void bulkLoad(DBIDs ids) {
-    if(ids.size() == 0) {
+    if(ids.isEmpty()) {
       return;
     }
-    assert (root == null) : "Tree already initialized.";
+    assert root == null : "Tree already initialized.";
     DBIDIter it = ids.iter();
     DBID first = DBIDUtil.deref(it);
     // Compute distances to all neighbors:
@@ -181,7 +181,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    * @return Root node of subtree
    */
   protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
-    assert (!elems.contains(cur));
+    assert !elems.contains(cur);
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
     final int nextScale = scale - 1;
@@ -194,14 +194,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList();
     excludeNotCovered(elems, scaleToDist(scale), candidates);
     // If no elements were not in the cover, build a compact tree:
-    if(candidates.size() == 0) {
+    if(candidates.isEmpty()) {
       LOG.warning("Scale not chosen appropriately? " + max + " " + scaleToDist(scale));
       return bulkConstruct(cur, nextScale, elems);
     }
     // We will have at least one other child, so build the parent:
     Node node = new Node(cur, max);
     // Routing element now is a singleton:
-    final boolean curSingleton = elems.size() == 0;
+    final boolean curSingleton = elems.isEmpty();
     if(!curSingleton) {
       // Add node for the routing object:
       node.children.add(bulkConstruct(cur, nextScale, elems));
@@ -209,11 +209,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     final double fmax = scaleToDist(nextScale);
     // Build additional cover nodes:
     for(DoubleDBIDListIter it = candidates.iter(); it.valid();) {
-      assert (it.getOffset() == 0);
+      assert it.getOffset() == 0;
       DBID t = DBIDUtil.deref(it);
       collectByCover(it, candidates, fmax, elems.clear());
-      assert (DBIDUtil.equal(t, it)) : "First element in candidates must not change!";
-      if(elems.size() == 0) { // Singleton
+      assert DBIDUtil.equal(t, it) : "First element in candidates must not change!";
+      if(elems.isEmpty()) { // Singleton
         node.singletons.add(it);
       }
       else {
@@ -222,7 +222,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       }
       candidates.removeSwap(0);
     }
-    assert (candidates.size() == 0);
+    assert candidates.isEmpty();
     // Routing object is not yet handled:
     if(curSingleton && !node.children.isEmpty()) {
       node.singletons.add(cur); // Add as regular singleton.
@@ -756,8 +756,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      *
      * @param distance Distance function
      * @param expansion Expansion rate
-     * @param truncate Truncate branches with less than this number of
-     *        instances.
+     * @param truncate Truncate branches with less than this number of instances
      */
     public Factory(Distance<? super O> distance, double expansion, int truncate) {
       super(distance, expansion, truncate);
