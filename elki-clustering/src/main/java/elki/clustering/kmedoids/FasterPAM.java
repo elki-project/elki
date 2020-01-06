@@ -20,8 +20,6 @@
  */
 package elki.clustering.kmedoids;
 
-import java.util.Arrays;
-
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
@@ -123,11 +121,13 @@ public class FasterPAM<O> extends FastPAM<O> {
       // Swap phase
       DBIDArrayIter m = medoids.iter();
       DBIDVar lastswap = DBIDUtil.newVar();
-      double[] cost = new double[k];
+      double[] cost = new double[k], pcost = new double[k];
       int iteration = 0, prevswaps = 0, swaps = 0;
       while(iteration < maxiter || maxiter <= 0) {
         ++iteration;
         LOG.incrementProcessed(prog);
+        // Compute costs of reassigning to the second closest medoid.
+        updatePriorCost(pcost);
         // Iterate over all non-medoids:
         for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
           // Check if we completed an entire round without swapping:
@@ -138,9 +138,10 @@ public class FasterPAM<O> extends FastPAM<O> {
           if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
             continue; // This is a medoid.
           }
-          Arrays.fill(cost, 0);
+          // Initialize with medoid removal cost:
+          System.arraycopy(pcost, 0, cost, 0, pcost.length);
           // The cost we get back by making the non-medoid h medoid.
-          double acc = -nearest.doubleValue(h) + computeReassignmentCost(h, cost);
+          double acc = computeReassignmentCost(h, cost);
 
           // Find the best possible swap for each medoid:
           int min = argmin(cost);
@@ -151,7 +152,9 @@ public class FasterPAM<O> extends FastPAM<O> {
           ++swaps;
           lastswap.set(h);
           updateAssignment(medoids, m, h, min);
+          updatePriorCost(pcost);
           tc += bestcost;
+          assert tc >= 0;
           if(LOG.isStatistics()) {
             LOG.statistics(new DoubleStatistic(KEY + ".swap-" + swaps + ".cost", tc));
           }

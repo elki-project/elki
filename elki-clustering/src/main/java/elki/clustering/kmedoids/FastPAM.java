@@ -22,8 +22,8 @@ package elki.clustering.kmedoids;
 
 import java.util.Arrays;
 
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
-import elki.clustering.kmedoids.initialization.LAB;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -170,12 +170,13 @@ public class FastPAM<V> extends FastPAM1<V> {
       DBIDArrayIter m = medoids.iter();
       ArrayModifiableDBIDs bestids = DBIDUtil.newArray(k);
       DBIDVar bestid = DBIDUtil.newVar();
-      double[] best = new double[k], cost = new double[k];
+      double[] best = new double[k];
+      double[] cost = new double[k], pcost = new double[k];
       int iteration = 0;
       while(iteration < maxiter || maxiter <= 0) {
         ++iteration;
         LOG.incrementProcessed(prog);
-        findBestSwaps(m, bestids, best, cost);
+        findBestSwaps(m, bestids, best, cost, pcost);
         // Convergence check
         int min = argmin(best);
         if(!(best[min] < -1e-12 * tc)) {
@@ -231,7 +232,8 @@ public class FastPAM<V> extends FastPAM1<V> {
      * @param best Storage for best cost
      * @param cost Scratch space for cost
      */
-    protected void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost) {
+    protected void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost, double[] pcost) {
+      updatePriorCost(pcost);
       Arrays.fill(best, Double.POSITIVE_INFINITY);
       // Iterate over all non-medoids:
       for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
@@ -239,10 +241,8 @@ public class FastPAM<V> extends FastPAM1<V> {
         if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
           continue; // This is a medoid.
         }
-        Arrays.fill(cost, 0);
-        // The cost we get back by making the non-medoid h medoid.
-        double acc = -nearest.doubleValue(h) + computeReassignmentCost(h, cost);
-
+        System.arraycopy(pcost, 0, cost, 0, pcost.length);
+        double acc = computeReassignmentCost(h, cost);
         // Find the best possible swap for each medoid:
         for(int i = 0; i < cost.length; i++) {
           final double costi = cost[i] + acc;
@@ -332,7 +332,7 @@ public class FastPAM<V> extends FastPAM1<V> {
     @SuppressWarnings("rawtypes")
     @Override
     protected Class<? extends KMedoidsInitialization> defaultInitializer() {
-      return LAB.class;
+      return RandomlyChosen.class;
     }
 
     @Override

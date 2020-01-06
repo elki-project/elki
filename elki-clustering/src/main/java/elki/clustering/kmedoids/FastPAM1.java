@@ -23,6 +23,7 @@ package elki.clustering.kmedoids;
 import java.util.Arrays;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -129,11 +130,13 @@ public class FastPAM1<V> extends PAM<V> {
       // Swap phase
       DBIDVar bestid = DBIDUtil.newVar();
       DBIDArrayIter m = medoids.iter();
-      double[] cost = new double[k];
+      double[] cost = new double[k], pcost = new double[k];
       int iteration = 0;
       while(iteration < maxiter || maxiter <= 0) {
         ++iteration;
         LOG.incrementProcessed(prog);
+        // Compute costs of reassigning to the second closest medoid.
+        updatePriorCost(pcost);
         double best = Double.POSITIVE_INFINITY;
         int bestcluster = -1;
         // Iterate over all non-medoids:
@@ -142,9 +145,10 @@ public class FastPAM1<V> extends PAM<V> {
           if(DBIDUtil.equal(m.seek(assignment.intValue(h) & 0x7FFF), h)) {
             continue; // This is a medoid.
           }
+          // Initialize with medoid removal cost:
+          System.arraycopy(pcost, 0, cost, 0, pcost.length);
           // The cost we get back by making the non-medoid h medoid.
-          Arrays.fill(cost, 0.);
-          final double acc = -nearest.doubleValue(h) + computeReassignmentCost(h, cost);
+          final double acc = computeReassignmentCost(h, cost);
 
           // Find the best possible swap for h:
           for(int i = 0; i < k; i++) {
@@ -180,6 +184,20 @@ public class FastPAM1<V> extends PAM<V> {
     }
 
     /**
+     * Prior assignment costs.
+     *
+     * @param pcost Prior cost.
+     */
+    protected void updatePriorCost(double[] pcost) {
+      WritableIntegerDataStore a = assignment;
+      WritableDoubleDataStore s = second, n = nearest;
+      Arrays.fill(pcost, 0);
+      for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
+        pcost[a.intValue(j) & 0x7FFF] += s.doubleValue(j) - n.doubleValue(j);
+      }
+    }
+
+    /**
      * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids
      * of those objects, that are nearest to the k<sup>th</sup> mean.
      *
@@ -190,8 +208,8 @@ public class FastPAM1<V> extends PAM<V> {
       DBIDArrayIter miter = means.iter();
       double cost = 0.;
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        double mindist = Double.POSITIVE_INFINITY,
-            mindist2 = Double.POSITIVE_INFINITY;
+        double mindist = Double.POSITIVE_INFINITY;
+        double mindist2 = Double.POSITIVE_INFINITY;
         int minindx = -1, minindx2 = -1;
         for(miter.seek(0); miter.valid(); miter.advance()) {
           final double dist = distQ.distance(iditer, miter);
@@ -220,28 +238,28 @@ public class FastPAM1<V> extends PAM<V> {
     /**
      * Compute the reassignment cost, for all medoids in one pass.
      *
-     * @param h Current object to swap with any medoid.
+     * @param xj Current object to swap with any medoid.
      * @param loss Loss change aggregation array, must have size k
      * @return Loss change accumulator that applies to all
      */
-    protected double computeReassignmentCost(DBIDRef h, double[] loss) {
+    protected double computeReassignmentCost(DBIDRef xj, double[] loss) {
+      final WritableDoubleDataStore nearest = this.nearest;
+      final WritableDoubleDataStore second = this.second;
+      final WritableIntegerDataStore assignment = this.assignment;
       double acc = 0.;
-      // Compute costs of reassigning other objects j:
-      for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-        if(DBIDUtil.equal(h, j)) {
-          continue;
-        }
-        // distance(j, i) for pi == pj
-        final double distcur = nearest.doubleValue(j);
-        // distance(j, h) to new medoid
-        final double dist_h = distQ.distance(h, j);
+      // Compute costs of reassigning other objects o:
+      for(DBIDIter xo = ids.iter(); xo.valid(); xo.advance()) {
+        final double dn = nearest.doubleValue(xo), ds = second.doubleValue(xo);
+        final double dxo = distQ.distance(xj, xo);
         // Case (i): new medoid is closest:
-        if(dist_h < distcur) {
-          acc += dist_h - distcur;
+        if(dxo < dn) {
+          acc += dxo - dn;
+          // loss already includes ds - dn, remove
+          loss[assignment.intValue(xo) & 0x7FFF] += dn - ds;
         }
-        else {
-          // distance(j, o) to second nearest / possible reassignment
-          loss[assignment.intValue(j) & 0x7FFF] += Math.min(dist_h, second.doubleValue(j)) - distcur;
+        else if(dxo < ds) {
+          // loss already includes ds - dn, adjust to d(xo) - dn
+          loss[assignment.intValue(xo) & 0x7FFF] += dxo - ds;
         }
       }
       return acc;
