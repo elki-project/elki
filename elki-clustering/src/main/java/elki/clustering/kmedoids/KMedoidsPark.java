@@ -27,6 +27,7 @@ import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
+import elki.clustering.kmedoids.initialization.AlternateRefinement;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.clustering.kmedoids.initialization.ParkJun;
 import elki.data.Cluster;
@@ -34,6 +35,9 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -176,59 +180,34 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, relation.getDBIDs(), distQ));
+    final DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, ids, distQ));
     DBIDArrayMIter miter = medoids.iter();
-    double[] mdists = new double[k];
-    // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      HashSetModifiableDBIDs set = DBIDUtil.newHashSet(relation.size() / k);
-      set.add(miter.seek(i)); // Add medoids.
-      clusters.add(set);
-    }
+    double[] cost = new double[k];
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0);
 
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
-    double tc = assignToNearestCluster(miter, mdists, clusters, distQ);
+    double tc = AlternateRefinement.assignToNearestCluster(miter, ids, distQ, assignment, cost);
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
     }
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids EM iteration", LOG) : null;
-    // Swap phase
+    // Refinement phase
     int iteration = 0;
     while(iteration < maxiter || maxiter <= 0) {
       ++iteration;
       boolean changed = false;
       // Try to swap the medoid with a better cluster member:
-      int i = 0;
-      for(miter.seek(0); miter.valid(); miter.advance(), i++) {
-        double bestm = mdists[i];
-        ModifiableDBIDs ci = clusters.get(i);
-        for(DBIDIter iter = ci.iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(miter, iter)) {
-            continue;
-          }
-          double sum = 0;
-          for(DBIDIter iter2 = ci.iter(); iter2.valid() && sum < bestm; iter2.advance()) {
-            if(DBIDUtil.equal(iter, iter2)) {
-              continue;
-            }
-            sum += distQ.distance(iter, iter2);
-          }
-          if(sum < bestm) {
-            medoids.set(i, iter);
-            changed = true;
-            bestm = sum;
-          }
-        }
-        mdists[i] = bestm;
+      for(miter.seek(0); miter.valid(); miter.advance()) {
+        changed |= AlternateRefinement.findMedoid(ids, distQ, assignment, miter.getOffset(), miter, cost);
       }
       if(!changed) {
         break; // Converged
       }
       // Reassign
-      double nc = assignToNearestCluster(miter, mdists, clusters, distQ);
+      double nc = AlternateRefinement.assignToNearestCluster(miter, ids, distQ, assignment, cost);
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
       }
@@ -245,6 +224,13 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
       LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
     }
 
+    List<ModifiableDBIDs> clusters = new ArrayList<>();
+    for(int i = 0; i < k; i++) {
+      clusters.add(DBIDUtil.newArray(relation.size() / k / 2));
+    }
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      clusters.get(assignment.intValue(iter)).add(iter);
+    }
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<>();
     Metadata.of(result).setLongName("k-Medoids Clustering");
@@ -252,74 +238,6 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
       result.addToplevelCluster(new Cluster<>(clusters.get(it.getOffset()), new MedoidModel(DBIDUtil.deref(it))));
     }
     return result;
-  }
-
-  /**
-   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
-   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   *
-   * @param miter Iterator over the medoids
-   * @param dsum Distance sums
-   * @param clusters cluster assignment
-   * @param distQ distance query
-   * @return cost
-   */
-  protected double assignToNearestCluster(DBIDArrayIter miter, double[] dsum, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V> distQ) {
-    double cost = 0;
-    double[] dists = new double[k];
-    for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      // Find current cluster assignment. Ugly, but is it worth int[n]?
-      final int current = currentCluster(clusters, iditer);
-      int minindex = -1;
-      double mindist = Double.POSITIVE_INFINITY;
-      if(current >= 0) {
-        // Always prefer current assignment on ties, for convergence.
-        minindex = current;
-        mindist = dists[current] = distQ.distance(iditer, miter.seek(current));
-      }
-      for(miter.seek(0); miter.valid(); miter.advance()) {
-        if(miter.getOffset() == current) {
-          continue;
-        }
-        double d = dists[miter.getOffset()] = distQ.distance(iditer, miter);
-        if(d < mindist) {
-          minindex = miter.getOffset();
-          mindist = d;
-        }
-      }
-      cost += mindist;
-      if(minindex == current) {
-        continue;
-      }
-      if(!clusters.get(minindex).add(iditer)) {
-        throw new IllegalStateException("Reassigning to the same cluster. " + current + " -> " + minindex);
-      }
-      dsum[minindex] += mindist;
-      // Remove from previous cluster
-      if(current >= 0) {
-        if(!clusters.get(current).remove(iditer)) {
-          throw new IllegalStateException("Removing from the wrong cluster.");
-        }
-        dsum[current] -= dists[current];
-      }
-    }
-    return cost;
-  }
-
-  /**
-   * Find the current cluster assignment.
-   *
-   * @param clusters Clusters
-   * @param id Current object
-   * @return Current cluster assignment.
-   */
-  protected int currentCluster(List<? extends ModifiableDBIDs> clusters, DBIDRef id) {
-    for(int i = 0; i < k; i++) {
-      if(clusters.get(i).contains(id)) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   /**
