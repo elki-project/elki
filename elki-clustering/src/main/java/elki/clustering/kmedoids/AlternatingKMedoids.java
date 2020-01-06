@@ -25,11 +25,10 @@ import java.util.List;
 
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.clustering.kmedoids.initialization.AlternateRefinement;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
-import elki.clustering.kmedoids.initialization.ParkJun;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
@@ -59,7 +58,8 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * A k-medoids clustering algorithm, implemented as EM-style batch algorithm.
+ * A k-medoids clustering algorithm, implemented as EM-style batch algorithm;
+ * known in literature as the "alternate" method.
  * <p>
  * In contrast to PAM, which will in each iteration update one medoid with one
  * (arbitrary) non-medoid, this implementation follows the EM pattern. In the
@@ -116,16 +116,16 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Expert Systems with Applications 36(2)", //
     url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
     bibkey = "DBLP:journals/eswa/ParkJ09")
-public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMedoidsPark.class);
+  private static final Logging LOG = Logging.getLogger(AlternatingKMedoids.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMedoidsPark.class.getName();
+  private static final String KEY = AlternatingKMedoids.class.getName();
 
   /**
    * Distance function used.
@@ -133,12 +133,12 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
   protected Distance<? super V> distance;
 
   /**
-   * Holds the value of {@link AbstractKMeans#K_ID}.
+   * Number of clusters to find.
    */
   protected int k;
 
   /**
-   * Holds the value of {@link AbstractKMeans#MAXITER_ID}.
+   * Maximum number of iterations.
    */
   protected int maxiter;
 
@@ -155,7 +155,7 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPark(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public AlternatingKMedoids(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super();
     this.distance = distance;
     this.k = k;
@@ -273,7 +273,7 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, ParkJun.class) //
+      new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, RandomlyChosen.class) //
           .grab(config, x -> initializer = x);
       new IntParameter(KMeans.MAXITER_ID, 0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
@@ -281,8 +281,8 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
     }
 
     @Override
-    public KMedoidsPark<V> make() {
-      return new KMedoidsPark<>(distance, k, maxiter, initializer);
+    public AlternatingKMedoids<V> make() {
+      return new AlternatingKMedoids<>(distance, k, maxiter, initializer);
     }
   }
 }

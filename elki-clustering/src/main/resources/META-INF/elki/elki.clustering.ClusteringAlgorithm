@@ -34,8 +34,8 @@ elki.clustering.kmeans.XMeans
 elki.clustering.kmedoids.FastPAM
 elki.clustering.kmedoids.FastPAM1
 elki.clustering.kmedoids.PAM
-elki.clustering.kmedoids.PAMReynolds
-elki.clustering.kmedoids.KMedoidsPark
+elki.clustering.kmedoids.ReynoldsPAM
+elki.clustering.kmedoids.AlternatingKMedoids
 elki.clustering.kmedoids.CLARA
 elki.clustering.kmedoids.FastCLARA
 elki.clustering.kmedoids.CLARANS

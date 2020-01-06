@@ -38,11 +38,11 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class KMedoidsParkTest extends AbstractClusterAlgorithmTest {
+public class AlternatingKMedoidsTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsPark() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<KMedoidsPark<DoubleVector>>(KMedoidsPark.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<AlternatingKMedoids<DoubleVector>>(AlternatingKMedoids.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.INIT_ID, ParkJun.class) //
         .build().autorun(db);

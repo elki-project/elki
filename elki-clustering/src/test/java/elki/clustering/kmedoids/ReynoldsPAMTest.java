@@ -36,7 +36,7 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class PAMReynoldsTest extends AbstractClusterAlgorithmTest {
+public class ReynoldsPAMTest extends AbstractClusterAlgorithmTest {
   /**
    * Run KMedians PAM with fixed parameters and compare the result to a golden
    * standard.
@@ -44,7 +44,7 @@ public class PAMReynoldsTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMedoidsPAM() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<MedoidModel> result = new ELKIBuilder<PAMReynolds<DoubleVector>>(PAMReynolds.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<ReynoldsPAM<DoubleVector>>(ReynoldsPAM.class) //
         .with(KMeans.K_ID, 5) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.998005);

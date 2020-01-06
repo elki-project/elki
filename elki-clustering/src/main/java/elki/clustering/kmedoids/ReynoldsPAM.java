@@ -59,16 +59,16 @@ import elki.utilities.documentation.Reference;
     booktitle = "J. Math. Model. Algorithms 5(4)", //
     url = "https://doi.org/10.1007/s10852-005-9022-1", //
     bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
-public class PAMReynolds<V> extends PAM<V> {
+public class ReynoldsPAM<V> extends PAM<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(PAMReynolds.class);
+  private static final Logging LOG = Logging.getLogger(ReynoldsPAM.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = PAMReynolds.class.getName();
+  private static final String KEY = ReynoldsPAM.class.getName();
 
   /**
    * Constructor.
@@ -78,7 +78,7 @@ public class PAMReynolds<V> extends PAM<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public PAMReynolds(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public ReynoldsPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distance, k, maxiter, initializer);
   }
 
@@ -178,10 +178,12 @@ public class PAMReynolds<V> extends PAM<V> {
     /**
      * Compute the cost of removing a medoid just once. This can then be reused
      * for every point, thus decreasing the runtime cost at low memory overhead.
-     *
+     * <p>
      * The output array contains for each medoid the cost of removing all its
      * points, and reassigning them to the second nearest medoid instead.
      *
+     * @param i Medoid to virtually remove
+     * @param tnearest Output storage
      * @return Cost
      */
     protected double computeRemovalCost(int i, WritableDoubleDataStore tnearest) {
@@ -236,8 +238,8 @@ public class PAMReynolds<V> extends PAM<V> {
    */
   public static class Par<V> extends PAM.Par<V> {
     @Override
-    public PAMReynolds<V> make() {
-      return new PAMReynolds<>(distance, k, maxiter, initializer);
+    public ReynoldsPAM<V> make() {
+      return new ReynoldsPAM<>(distance, k, maxiter, initializer);
     }
   }
 }
