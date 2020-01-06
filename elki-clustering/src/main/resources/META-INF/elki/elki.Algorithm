@@ -52,6 +52,7 @@ elki.clustering.kmedoids.PAM
 elki.clustering.kmedoids.ReynoldsPAM
 elki.clustering.kmedoids.AlternatingKMedoids
 elki.clustering.kmedoids.CLARA
+elki.clustering.kmedoids.FasterCLARA
 elki.clustering.kmedoids.FastCLARA
 elki.clustering.kmedoids.CLARANS
 elki.clustering.kmedoids.FastCLARANS
