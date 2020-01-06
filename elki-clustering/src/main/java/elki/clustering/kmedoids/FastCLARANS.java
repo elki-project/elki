@@ -216,6 +216,7 @@ public class FastCLARANS<V> extends CLARANS<V> {
      */
     protected double computeCostDifferential(DBIDRef h) {
       Arrays.fill(cost, 0);
+      double acc = 0.; // Cost accumulator for all
       final int k = cost.length;
       // Compute costs of reassigning other objects j:
       for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
@@ -226,25 +227,19 @@ public class FastCLARANS<V> extends CLARANS<V> {
         final double distcur = nearest.doubleValue(j);
         // distance(j, h) to new medoid
         final double dist_h = distQ.distance(h, j);
-        // current assignment of j
-        final int jcur = assignment.intValue(j);
-        // Check if current medoid of j is removed:
-        cost[jcur] += Math.min(dist_h, second.doubleValue(j)) - distcur;
-        final double change = dist_h - distcur;
-        if(change < 0) {
-          for(int mnum = 0; mnum < jcur; mnum++) {
-            cost[mnum] += change;
-          }
-          for(int mnum = jcur + 1; mnum < k; mnum++) {
-            cost[mnum] += change;
-          }
+        if(dist_h < distcur) {
+          acc += dist_h - distcur;
+        }
+        else {
+          cost[assignment.intValue(j)] += Math.min(dist_h, second.doubleValue(j)) - distcur;
         }
       }
-      double min = cost[0];
+      // Add shared costs when processing the cost anyway
+      double min = cost[0] += acc;
       lastbest = 0;
       for(int i = 1; i < k; i++) {
         if(cost[i] < min) {
-          min = cost[i];
+          min = cost[i] += acc;
           lastbest = i;
         }
       }

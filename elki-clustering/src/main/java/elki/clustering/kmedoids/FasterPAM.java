@@ -33,11 +33,11 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 
 /**
- * Variation of FastPAM that greedily immediately performs any swap that yield
- * an improvement during an iteration. Compared to {@link EagerPAM} it
- * considers all current medoids together, and chooses the best of these;
- * so apart from computing candidate swaps O(k) times faster, it will also
- * be able to sometimes choose better swaps.
+ * Variation of FastPAM that eagerly performs any swap that yields an
+ * improvement during an iteration. Compared to {@link EagerPAM} it considers
+ * all current medoids together, and chooses the best of these; hence apart from
+ * computing candidate swaps O(k) times faster, it will also be able to
+ * sometimes choose better swaps.
  *
  * @author Erich Schubert
  *
@@ -172,6 +172,7 @@ public class FasterPAM<O> extends FastPAM<O> {
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
         LOG.statistics(new LongStatistic(KEY + ".swaps", swaps));
+        LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
       }
       // Cleanup
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {

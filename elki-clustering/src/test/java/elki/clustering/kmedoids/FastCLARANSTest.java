@@ -38,21 +38,22 @@ import elki.utilities.ELKIBuilder;
  */
 public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testCLARANS() {
+  public void testFastCLARANS() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 5) //
-        .with(CLARANS.Par.RANDOM_ID, 0) //
+        .with(CLARANS.Par.RANDOM_ID, 2) //
         .with(CLARANS.Par.NEIGHBORS_ID, 3) //
         .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().autorun(db);
-    // FastCLARANS finds better solution than CLARANS in this unit test!
-    assertFMeasure(db, result, .998);
-    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    // FastCLARANS finds better solution than CLARANS in this unit test.
+    // We actually had to vary the random seed to not get 1.0
+    assertFMeasure(db, result, .99602);
+    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 
   @Test
-  public void testCLARANSNoise() {
+  public void testFastCLARANSNoise() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 3) //
