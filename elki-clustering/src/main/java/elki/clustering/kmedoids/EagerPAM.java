@@ -30,10 +30,26 @@ import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.Priority;
+import elki.utilities.documentation.Reference;
 
 /**
- * Variation of PAM that greedily performs all swaps that yield an
- * improvement during an iteration.
+ * Variation of PAM that eagerly performs all swaps that yield an improvement
+ * during an iteration. This has been used as early as in Whitaker's "fast
+ * interchange" heuristic, and constitutes a variant of the "local
+ * hill-climbing" approach considered by Estivill-Castro.
+ * <p>
+ * Reference:
+ * <p>
+ * R. A. Whitaker<br>
+ * A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And
+ * Median Location Problems<br>
+ * INFOR: Information Systems and Operational Research 21(2)
+ * <p>
+ * V. Estivill-Castro and A. T. Murray<br>
+ * Discovering Associations in Spatial Data - An Efficient Medoid Based
+ * Approach<br>
+ * Proc. 2nd Pacific-Asia Conf. on Research and Development in Knowledge
+ * Discovery and Data Mining, PAKDD-98
  *
  * @author Erich Schubert
  *
@@ -43,11 +59,26 @@ import elki.utilities.Priority;
  * @param <O> object datatype
  */
 @Priority(Priority.SUPPLEMENTARY)
+@Reference(authors = "R. A. Whitaker", //
+    title = "A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And Median Location Problems", //
+    booktitle = "INFOR: Information Systems and Operational Research 21(2)", //
+    url = "https://doi.org/10.1080/03155986.1983.11731889", //
+    bibkey = "doi:10.1080/03155986.1983.11731889")
+@Reference(authors = "V. Estivill-Castro and A. T. Murray", //
+    title = "Discovering Associations in Spatial Data - An Efficient Medoid Based Approach", //
+    booktitle = "Proc. 2nd Pacific-Asia Conf. on Research and Development in Knowledge Discovery and Data Mining, PAKDD-98", //
+    url = "https://doi.org/10.1007/3-540-64383-4_10", //
+    bibkey = "DBLP:conf/pakdd/Estivill-CastroM98")
 public class EagerPAM<O> extends PAM<O> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(EagerPAM.class);
+
+  /**
+   * Key for loggers.
+   */
+  private static final String KEY = EagerPAM.class.getName();
 
   /**
    * Constructor.
@@ -107,9 +138,8 @@ public class EagerPAM<O> extends PAM<O> {
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
       double tc = assignToNearestCluster(medoids), nc = tc;
-      String key = getClass().getName();
       if(LOG.isStatistics()) {
-        LOG.statistics(new DoubleStatistic(key + ".iteration-" + 0 + ".cost", tc));
+        LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
       }
 
       final boolean metric = distQ.getDistance().isMetric();
@@ -147,14 +177,14 @@ public class EagerPAM<O> extends PAM<O> {
               // Reassign
               nc = assignToNearestCluster(medoids);
               if(LOG.isStatistics()) {
-                LOG.statistics(new DoubleStatistic(key + ".swap-" + swaps + ".cost", nc));
+                LOG.statistics(new DoubleStatistic(KEY + ".swap-" + swaps + ".cost", nc));
               }
               break;
             }
           }
         }
         if(LOG.isStatistics()) {
-          LOG.statistics(new LongStatistic(key + ".iteration-" + iteration + ".swaps", swaps - prevswaps));
+          LOG.statistics(new LongStatistic(KEY + ".iteration-" + iteration + ".swaps", swaps - prevswaps));
         }
         if(prevswaps == swaps) {
           break;
@@ -168,7 +198,9 @@ public class EagerPAM<O> extends PAM<O> {
       }
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
-        LOG.statistics(new LongStatistic(key + ".iterations", iteration));
+        LOG.statistics(new LongStatistic(KEY + ".swaps", swaps));
+        LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+        LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
       }
       return tc;
     }

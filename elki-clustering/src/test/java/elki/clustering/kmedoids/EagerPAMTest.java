@@ -31,7 +31,7 @@ import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Test EagerPAM clustering.
+ * Test eager PAM k-Medoids clustering.
  *
  * @author Erich Schubert
  */
