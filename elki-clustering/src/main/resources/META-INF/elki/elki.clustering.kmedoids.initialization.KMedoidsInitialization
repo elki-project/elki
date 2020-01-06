@@ -1,5 +1,7 @@
+elki.clustering.kmedoids.initialization.GreedyG
 elki.clustering.kmedoids.initialization.BUILD
 elki.clustering.kmedoids.initialization.LAB
+elki.clustering.kmedoids.initialization.AlternateRefinement
 elki.clustering.kmedoids.initialization.ParkJun
 elki.clustering.kmeans.initialization.FarthestPoints
 elki.clustering.kmeans.initialization.FarthestSumPoints

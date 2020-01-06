@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.SingleAssignmentKMeans;
 import elki.clustering.kmedoids.CLARA;
 import elki.clustering.kmedoids.PAM;
 import elki.data.Clustering;
@@ -33,46 +32,34 @@ import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Performs a single assignment with different k-means initializations.
+ * Unit test the AlternateRefinement initialization.
  *
  * @author Erich Schubert
- * @since 0.7.5
  */
-public class BUILDTest extends AbstractClusterAlgorithmTest {
+public class AlternateRefinementTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testKMeansBUILD() {
-    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.INIT_ID, BUILD.class) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.99800500);
-    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
-  }
-
-  @Test
-  public void testPAMBUILD() {
+  public void testPAMAlternate() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<PAM<DoubleVector>>(PAM.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.INIT_ID, BUILD.class) //
+        .with(KMeans.INIT_ID, AlternateRefinement.class) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.99800500);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 
   @Test
-  public void testCLARABUILD() {
+  public void testCLARAAlternate() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.INIT_ID, BUILD.class) //
+        .with(KMeans.INIT_ID, AlternateRefinement.class) //
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 0) //
+        .with(CLARA.Par.RANDOM_ID, 2) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99602);
-    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    assertFMeasure(db, result, 0.994025);
+    assertClusterSizes(result, new int[] { 198, 199, 200, 201, 202 });
   }
 }
