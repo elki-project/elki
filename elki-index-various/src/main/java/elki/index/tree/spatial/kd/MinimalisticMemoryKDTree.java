@@ -37,7 +37,6 @@ import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.distance.minkowski.SparseLPNormDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.index.AbstractIndex;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
@@ -83,36 +82,41 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Communications of the ACM 18(9)", //
     url = "https://doi.org/10.1145/361002.361007", //
     bibkey = "DBLP:journals/cacm/Bentley75")
-public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements DistancePriorityIndex<O> {
+public class MinimalisticMemoryKDTree<O extends NumberVector> implements DistancePriorityIndex<O> {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(MinimalisticMemoryKDTree.class);
 
   /**
+   * The representation we are bound to.
+   */
+  protected final Relation<O> relation;
+
+  /**
    * The actual "tree" as a sorted array.
    */
-  ArrayModifiableDBIDs sorted = null;
+  protected ArrayModifiableDBIDs sorted = null;
 
   /**
    * The number of dimensions.
    */
-  int dims = -1;
+  protected int dims = -1;
 
   /**
    * Maximum size of leaf nodes.
    */
-  int leafsize;
+  protected int leafsize;
 
   /**
    * Counter for comparisons.
    */
-  final Counter objaccess;
+  protected final Counter objaccess;
 
   /**
    * Counter for distance computations.
    */
-  final Counter distcalc;
+  protected final Counter distcalc;
 
   /**
    * Constructor.
@@ -121,7 +125,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    * @param leafsize Maximum size of leaf nodes
    */
   public MinimalisticMemoryKDTree(Relation<O> relation, int leafsize) {
-    super(relation);
+    this.relation = relation;
     this.leafsize = leafsize;
     assert (leafsize >= 1);
     if(LOG.isStatistics()) {

@@ -40,7 +40,12 @@ import elki.logging.statistics.Counter;
  * 
  * @param <O> Object type
  */
-public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
+public abstract class AbstractRefiningIndex<O> implements Index {
+  /**
+   * The representation we are bound to.
+   */
+  protected final Relation<O> relation;
+
   /**
    * Refinement counter.
    */
@@ -52,9 +57,8 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
    * @param relation Relation indexed
    */
   public AbstractRefiningIndex(Relation<O> relation) {
-    super(relation);
-    Logging log = getLogger();
-    refinements = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".refinements") : null;
+    this.relation = relation;
+    this.refinements = getLogger().isStatistics() ? getLogger().newCounter(this.getClass().getName() + ".refinements") : null;
   }
 
   /**

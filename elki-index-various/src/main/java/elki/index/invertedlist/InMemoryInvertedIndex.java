@@ -37,7 +37,6 @@ import elki.database.relation.Relation;
 import elki.distance.ArcCosineDistance;
 import elki.distance.CosineDistance;
 import elki.distance.Distance;
-import elki.index.AbstractIndex;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
 import elki.index.RangeIndex;
@@ -62,21 +61,26 @@ import net.jafama.FastMath;
  *
  * @param <V> Vector type
  */
-public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex<V> implements KNNIndex<V>, RangeIndex<V> {
+public class InMemoryInvertedIndex<V extends NumberVector> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(InMemoryInvertedIndex.class);
 
   /**
+   * The representation we are bound to.
+   */
+  protected final Relation<V> relation;
+
+  /**
    * Inverted index.
    */
-  ArrayList<ModifiableDoubleDBIDList> index;
+  protected ArrayList<ModifiableDoubleDBIDList> index;
 
   /**
    * Length storage.
    */
-  WritableDoubleDataStore length;
+  protected WritableDoubleDataStore length;
 
   /**
    * Constructor.
@@ -84,7 +88,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
    * @param relation Data.
    */
   public InMemoryInvertedIndex(Relation<V> relation) {
-    super(relation);
+    this.relation = relation;
   }
 
   @Override

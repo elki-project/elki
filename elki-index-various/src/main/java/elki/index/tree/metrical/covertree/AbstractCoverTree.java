@@ -25,13 +25,13 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.index.AbstractIndex;
+import elki.index.Index;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;
 import elki.logging.statistics.LongStatistic;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -48,18 +48,23 @@ import net.jafama.FastMath;
  *
  * @param <O> Object type
  */
-public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
+public abstract class AbstractCoverTree<O> implements Index {
+  /**
+   * The representation we are bound to.
+   */
+  protected final Relation<O> relation;
+
   /**
    * Constant expansion rate. 2 would be the intuitive value, but the original
    * version used 1.3, so we copy this. This means that in every level, the
    * cover radius shrinks by 1.3.
    */
-  final double expansion;
+  protected final double expansion;
 
   /**
    * Logarithm base.
    */
-  final double invLogExpansion;
+  protected final double invLogExpansion;
 
   /**
    * Remaining points are likely identical. For 1.3 this yields: -2700
@@ -95,7 +100,8 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @param truncate Truncate branches with less than this number of instances.
    */
   public AbstractCoverTree(Relation<O> relation, Distance<? super O> distance, double expansion, int truncate) {
-    super(relation);
+    super();
+    this.relation = relation;
     this.distance = distance;
     this.distanceQuery = distance.instantiate(relation);
     this.truncate = truncate;
