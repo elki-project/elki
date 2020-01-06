@@ -174,7 +174,7 @@ public class CLARA<V> extends PAM<V> {
     }
     LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", best));
+      LOG.statistics(new DoubleStatistic(getClass().getName() + ".final-cost", best));
     }
     if(bestmedoids == null) {
       throw new IllegalStateException("numsamples must be larger than 0.");

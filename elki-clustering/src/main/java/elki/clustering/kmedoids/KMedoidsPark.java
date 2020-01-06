@@ -46,6 +46,7 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.logging.statistics.StringStatistic;
 import elki.result.Metadata;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -77,39 +78,40 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Reference:
  * <p>
- * H.-S. Park, C.-H. Jun<br>
- * A simple and fast algorithm for K-medoids clustering<br>
- * Expert Systems with Applications 36(2)
+ * F. E. Maranzana<br>
+ * On the location of supply points to minimize transport costs<br>
+ * Journal of the Operational Research Society 15.3
  * <p>
  * A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith<br>
  * Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering
  * Algorithms<br>
  * J. Math. Model. Algorithms 5(4)
  * <p>
- * F. E. Maranzana<br>
- * On the location of supply points to minimize transport costs<br>
- * Journal of the Operational Research Society 15.3
+ * H.-S. Park, C.-H. Jun<br>
+ * A simple and fast algorithm for K-medoids clustering<br>
+ * Expert Systems with Applications 36(2)
  *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @param <V> vector datatype
  */
-@Reference(authors = "H.-S. Park, C.-H. Jun", //
-    title = "A simple and fast algorithm for K-medoids clustering", //
-    booktitle = "Expert Systems with Applications 36(2)", //
-    url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
-    bibkey = "DBLP:journals/eswa/ParkJ09")
-@Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
-    title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
-    booktitle = "J. Math. Model. Algorithms 5(4)", //
-    url = "https://doi.org/10.1007/s10852-005-9022-1", //
-    bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "F. E. Maranzana", //
     title = "On the location of supply points to minimize transport costs", //
     booktitle = "Journal of the Operational Research Society 15.3", //
     url = "https://doi.org/10.1057/jors.1964.47", //
     bibkey = "doi:10.1057/jors.1964.47")
+@Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
+    title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
+    booktitle = "J. Math. Model. Algorithms 5(4)", //
+    url = "https://doi.org/10.1007/s10852-005-9022-1", //
+    bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
+@Reference(authors = "H.-S. Park, C.-H. Jun", //
+    title = "A simple and fast algorithm for K-medoids clustering", //
+    booktitle = "Expert Systems with Applications 36(2)", //
+    url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
+    bibkey = "DBLP:journals/eswa/ParkJ09")
 public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
@@ -194,7 +196,6 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Medoids EM iteration", LOG) : null;
     // Swap phase
-    DBIDVar best = DBIDUtil.newVar();
     int iteration = 0;
     while(iteration < maxiter || maxiter <= 0) {
       ++iteration;
@@ -202,30 +203,26 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
       // Try to swap the medoid with a better cluster member:
       int i = 0;
       for(miter.seek(0); miter.valid(); miter.advance(), i++) {
-        best.unset();
         double bestm = mdists[i];
-        for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
+        ModifiableDBIDs ci = clusters.get(i);
+        for(DBIDIter iter = ci.iter(); iter.valid(); iter.advance()) {
           if(DBIDUtil.equal(miter, iter)) {
             continue;
           }
           double sum = 0;
-          for(DBIDIter iter2 = clusters.get(i).iter(); iter2.valid(); iter2.advance()) {
+          for(DBIDIter iter2 = ci.iter(); iter2.valid() && sum < bestm; iter2.advance()) {
             if(DBIDUtil.equal(iter, iter2)) {
               continue;
             }
             sum += distQ.distance(iter, iter2);
           }
           if(sum < bestm) {
-            best.set(iter);
+            medoids.set(i, iter);
+            changed = true;
             bestm = sum;
           }
         }
-        if(best.isSet() && !DBIDUtil.equal(miter, best)) {
-          changed = true;
-          assert (clusters.get(i).contains(best));
-          medoids.set(i, best);
-          mdists[i] = bestm;
-        }
+        mdists[i] = bestm;
       }
       if(!changed) {
         break; // Converged
@@ -235,11 +232,17 @@ public class KMedoidsPark<V> implements ClusteringAlgorithm<Clustering<MedoidMod
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + iteration + ".cost", nc));
       }
+      if(nc > tc) {
+        LOG.warning(getClass().getName() + " failed to converge - numerical instability?");
+        break;
+      }
+      tc = nc;
       LOG.incrementProcessed(prog);
     }
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+      LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
     }
 
     // Wrap result

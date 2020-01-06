@@ -170,6 +170,7 @@ public class PAMReynolds<V> extends PAM<V> {
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+        LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
       }
       return tc;
     }

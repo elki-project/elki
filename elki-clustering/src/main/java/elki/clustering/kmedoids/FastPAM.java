@@ -214,6 +214,7 @@ public class FastPAM<V> extends FastPAM1<V> {
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
         LOG.statistics(new LongStatistic(KEY + ".fast-swaps", fastswaps));
+        LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
       }
       // Cleanup
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {

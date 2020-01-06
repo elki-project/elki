@@ -61,14 +61,20 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * The original Partitioning Around Medoids (PAM) algorithm or k-medoids
- * clustering, as proposed by Kaufman and Rousseeuw in "Clustering by means of
- * Medoids".
+ * clustering, as proposed by Kaufman and Rousseeuw; a largely equivalent method
+ * was also proposed by Whitaker in the operations research domain, and is well
+ * known by the name "fast interchange" there.
  * <p>
  * Reference:
  * <p>
  * L. Kaufman, P. J. Rousseeuw<br>
  * Clustering by means of Medoids<br>
  * Statistical Data Analysis Based on the L1-Norm and Related Methods
+ * <p>
+ * R. A. Whitaker<br>
+ * A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And
+ * Median Location Problems<br>
+ * INFOR: Information Systems and Operational Research 21(2)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -89,6 +95,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch2", //
     bibkey = "doi:10.1002/9780470316801.ch2")
+@Reference(authors = "R. A. Whitaker", //
+    title = "A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And Median Location Problems", //
+    booktitle = "INFOR: Information Systems and Operational Research 21(2)", //
+    url = "https://doi.org/10.1080/03155986.1983.11731889", //
+    bibkey = "doi:10.1080/03155986.1983.11731889")
 public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
@@ -202,7 +213,7 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
 
   /**
    * Instance for a single dataset.
-   *
+   * <p>
    * Note: we experimented with not caching the distance to nearest and second
    * nearest, but only the assignments. The matrix lookup was more expensive, so
    * this is probably worth the 2*n doubles in storage.
@@ -262,7 +273,7 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?
       double tc = assignToNearestCluster(medoids);
-      String key = getClass().getName();
+      String key = getClass().getName().replace("$Instance", "");
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(key + ".iteration-" + 0 + ".cost", tc));
       }
@@ -323,6 +334,7 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(key + ".iterations", iteration));
+        LOG.statistics(new DoubleStatistic(key + ".final-cost", tc));
       }
       return tc;
     }
@@ -347,10 +359,8 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
         final double dist_h = distQ.distance(h, j);
         // Check if current medoid of j is removed:
         if(assignment.intValue(j) == mnum) {
-          // distance(j, o) to second nearest / possible reassignment
-          final double distsec = second.doubleValue(j);
           // Case 1b: j switches to new medoid, or to the second nearest:
-          cost += Math.min(dist_h, distsec) - distcur;
+          cost += Math.min(dist_h, second.doubleValue(j)) - distcur;
         }
         else if(dist_h < distcur) {
           // Case 1c: j is closer to h than its current medoid
@@ -361,8 +371,7 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
     }
 
     /**
-     * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids
-     * of those objects, that are nearest to the k<sup>th</sup> mean.
+     * Assign each object to the nearest cluster, return the cost.
      *
      * @param means Object centroids
      * @return Assignment cost
@@ -395,7 +404,6 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
       }
       return cost;
     }
-
   }
 
   /**

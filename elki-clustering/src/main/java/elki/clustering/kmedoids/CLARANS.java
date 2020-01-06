@@ -234,7 +234,7 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
     }
     LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic(getClass().getName() + ".cost", bestscore));
+      LOG.statistics(new DoubleStatistic(getClass().getName() + ".final-cost", bestscore));
     }
 
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, best.assignment, k);

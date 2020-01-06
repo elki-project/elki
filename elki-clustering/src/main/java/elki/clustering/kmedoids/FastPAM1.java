@@ -170,6 +170,7 @@ public class FastPAM1<V> extends PAM<V> {
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
+        LOG.statistics(new DoubleStatistic(KEY + ".final-cost", tc));
       }
       // Cleanup
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {

@@ -39,13 +39,21 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * PAM initialization for k-means (and of course, for PAM).
+ * PAM initialization for k-means (and of course, for PAM). While this version
+ * is based on the work of Kaufman and Rousseeuw, a similar approach was also
+ * proposed by Whitaker in the operations research domain, and is well
+ * known by the name "fast greedy" there.
  * <p>
  * Reference:
  * <p>
  * L. Kaufman, P. J. Rousseeuw<br>
  * Clustering by means of Medoids<br>
  * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
+ * <p>
+ * R. A. Whitaker<br>
+ * A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And
+ * Median Location Problems<br>
+ * INFOR: Information Systems and Operational Research 21(2)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -61,6 +69,11 @@ import elki.utilities.optionhandling.Parameterizer;
     booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
     url = "https://doi.org/10.1002/9780470316801.ch2", //
     bibkey = "doi:10.1002/9780470316801.ch2")
+@Reference(authors = "R. A. Whitaker", //
+    title = "A Fast Algorithm For The Greedy Interchange For Large-Scale Clustering And Median Location Problems", //
+    booktitle = "INFOR: Information Systems and Operational Research 21(2)", //
+    url = "https://doi.org/10.1080/03155986.1983.11731889", //
+    bibkey = "doi:10.1080/03155986.1983.11731889")
 public class BUILD<O> implements KMeansInitialization, KMedoidsInitialization<O> {
   /**
    * Class logger.

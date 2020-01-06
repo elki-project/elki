@@ -50,6 +50,7 @@ elki.clustering.kmedoids.CLARA
 elki.clustering.kmedoids.FastCLARA
 elki.clustering.kmedoids.CLARANS
 elki.clustering.kmedoids.FastCLARANS
+elki.clustering.kmedoids.SingleAssignmentKMedoids
 elki.clustering.Leader
 elki.clustering.NaiveMeanShiftClustering
 elki.clustering.optics.OPTICSXi
