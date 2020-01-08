@@ -46,8 +46,8 @@ import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -214,8 +214,8 @@ public class EvaluateDBCV<O> implements Evaluator {
       double dspcMin = Double.POSITIVE_INFINITY;
       for(DBIDArrayIter it = cids[c].iter(); it.valid(); it.advance()) {
         // We again ignore external nodes, if the cluster has any internal
-        // nodes.
-        if(currentDegree[it.getOffset()] < 2 && internalEdges[c]) {
+        // nodes (edge count is not reliable because of stars, use node count)
+        if(currentDegree[it.getOffset()] < 2 && cluster.size() > 2) {
           continue;
         }
         double currentCoreDist = clusterCoreDists[it.getOffset()];
@@ -227,7 +227,8 @@ public class EvaluateDBCV<O> implements Evaluator {
           int[] oDegree = clusterDegrees[oc];
           double[] oclusterCoreDists = coreDists[oc];
           for(DBIDArrayIter it2 = cids[oc].iter(); it2.valid(); it2.advance()) {
-            if(oDegree[it2.getOffset()] < 2 && internalEdges[oc]) {
+            // See above.
+            if(oDegree[it2.getOffset()] < 2 && cluster.size() > 2) {
               continue;
             }
             double mutualReachDist = MathUtil.max(currentCoreDist, oclusterCoreDists[it2.getOffset()], dq.distance(it, it2));
