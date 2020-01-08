@@ -32,7 +32,6 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.evaluation.Evaluator;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
@@ -174,7 +173,7 @@ public class EvaluatePBMIndex implements Evaluator {
         case TREAT_NOISE_AS_SINGLETONS:
           // Singletons: a = 0 by definition.
           for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-            b += SquaredEuclideanDistance.STATIC.distance(overallCentroid, rel.get(it));
+            b += distance.distance(overallCentroid, rel.get(it));
           }
           continue; // with NEXT cluster.
         case MERGE_NOISE:
