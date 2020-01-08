@@ -46,8 +46,8 @@ import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -215,7 +215,12 @@ public class EvaluateDBCV<O> implements Evaluator {
       for(DBIDArrayIter it = cids[c].iter(); it.valid(); it.advance()) {
         // We again ignore external nodes, if the cluster has any internal
         // nodes.
-        if(currentDegree[it.getOffset()] < 2 && internalEdges[c]) {
+        if(currentDegree[it.getOffset()] < 2 && cluster.size() > 2) {
+          // was && internalEdges[c], now cluster.size() > 2. Reason: If the
+          // cluster has more than 2 nodes, then there is at least 1 internal
+          // node.
+          // was wrong because a star as MSP has no internal edges, but a
+          // defined internal node
           continue;
         }
         double currentCoreDist = clusterCoreDists[it.getOffset()];
@@ -227,7 +232,8 @@ public class EvaluateDBCV<O> implements Evaluator {
           int[] oDegree = clusterDegrees[oc];
           double[] oclusterCoreDists = coreDists[oc];
           for(DBIDArrayIter it2 = cids[oc].iter(); it2.valid(); it2.advance()) {
-            if(oDegree[it2.getOffset()] < 2 && internalEdges[oc]) {
+            if(oDegree[it2.getOffset()] < 2 && cluster.size() > 2) {
+              // changed as in l228, reason given there
               continue;
             }
             double mutualReachDist = MathUtil.max(currentCoreDist, oclusterCoreDists[it2.getOffset()], dq.distance(it, it2));
