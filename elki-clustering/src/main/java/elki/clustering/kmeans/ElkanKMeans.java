@@ -106,6 +106,45 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
       cdist = new double[k][k];
     }
 
+    /**
+     * Perform initial cluster assignment.
+     *
+     * @return Number of changes (i.e. relation size)
+     */
+    protected int initialAssignToNearestCluster() {
+      assert k == means.length;
+      initialSeperation(cdist);
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        NumberVector fv = relation.get(it);
+        double[] l = lower.get(it);
+        // Check all (other) means:
+        double best = distance(fv, means[0]);
+        l[0] = best = isSquared ? FastMath.sqrt(best) : best;
+        int minIndex = 0;
+        for(int j = 1; j < k; j++) {
+          if(best > cdist[minIndex][j]) {
+            double dist = distance(fv, means[j]);
+            l[j] = dist = isSquared ? FastMath.sqrt(dist) : dist;
+            if(dist < best) {
+              minIndex = j;
+              best = dist;
+            }
+          }
+        }
+        for(int j = 1; j < k; j++) {
+          if(l[j] == 0. && j != minIndex) {
+            l[j] = 2 * cdist[minIndex][j] - best;
+          }
+        }
+        // Assign to nearest cluster.
+        clusters.get(minIndex).add(it);
+        assignment.putInt(it, minIndex);
+        upper.putDouble(it, best);
+        plusEquals(sums[minIndex], fv);
+      }
+      return relation.size();
+    }
+
     @Override
     protected int assignToNearestCluster() {
       assert (k == means.length);

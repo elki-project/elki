@@ -162,20 +162,29 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
      * @return Number of changes (i.e. relation size)
      */
     protected int initialAssignToNearestCluster() {
-      assert (k == means.length);
+      assert k == means.length;
+      double[][] cdist = new double[k][k];
+      initialSeperation(cdist);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         double[] l = lower.get(it);
         // Check all (other) means:
-        double best = Double.POSITIVE_INFINITY;
-        int minIndex = -1;
-        for(int j = 0; j < k; j++) {
-          double dist = distance(fv, means[j]);
-          dist = isSquared ? FastMath.sqrt(dist) : dist;
-          l[j] = dist;
-          if(dist < best) {
-            minIndex = j;
-            best = dist;
+        double best = distance(fv, means[0]);
+        l[0] = best = isSquared ? FastMath.sqrt(best) : best;
+        int minIndex = 0;
+        for(int j = 1; j < k; j++) {
+          if(best > cdist[minIndex][j]) {
+            double dist = distance(fv, means[j]);
+            l[j] = dist = isSquared ? FastMath.sqrt(dist) : dist;
+            if(dist < best) {
+              minIndex = j;
+              best = dist;
+            }
+          }
+        }
+        for(int j = 1; j < k; j++) {
+          if(l[j] == 0. && j != minIndex) {
+            l[j] = 2 * sep[j] - best;
           }
         }
         // Assign to nearest cluster.

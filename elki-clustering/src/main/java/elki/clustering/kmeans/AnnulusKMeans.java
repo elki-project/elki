@@ -129,23 +129,34 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
 
     @Override
     protected int initialAssignToNearestCluster() {
-      assert (k == means.length);
+      assert k == means.length;
+      double[][] sep2 = new double[k][k];
+      computeSquaredSeparation(sep2);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers
-        double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
-        int minIndex = -1, secIndex = -1;
-        for(int i = 0; i < k; i++) {
-          double dist = distance(fv, means[i]);
-          if(dist < min1) {
-            secIndex = minIndex;
-            minIndex = i;
-            min2 = min1;
-            min1 = dist;
-          }
-          else if(dist < min2) {
-            secIndex = i;
-            min2 = dist;
+        double min1 = distance(fv, means[0]), min2 = distance(fv, means[1]);
+        int minIndex = 0, secIndex = 1;
+        if(min2 < min1) {
+          double tmp = min1;
+          min1 = min2;
+          min2 = tmp;
+          minIndex = 1;
+          secIndex = 0;
+        }
+        for(int i = 2; i < k; i++) {
+          if(min2 > sep2[minIndex][i]) {
+            double dist = distance(fv, means[i]);
+            if(dist < min1) {
+              secIndex = minIndex;
+              minIndex = i;
+              min2 = min1;
+              min1 = dist;
+            }
+            else if(dist < min2) {
+              secIndex = i;
+              min2 = dist;
+            }
           }
         }
         // Assign to nearest cluster.
@@ -164,12 +175,12 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
      */
     protected void orderMeans() {
       final int k = cdist.length;
-      assert (sep.length == k);
+      assert sep.length == k;
       Arrays.fill(sep, Double.POSITIVE_INFINITY);
       for(int i = 0; i < k; i++) {
-        cdist[i] = VMath.euclideanLength(means[i]);
-        cnum[i] = i;
         double[] mi = means[i];
+        cdist[i] = VMath.euclideanLength(mi);
+        cnum[i] = i;
         for(int j = 0; j < i; j++) {
           double d = distance(mi, means[j]);
           d = 0.5 * (isSquared ? FastMath.sqrt(d) : d);

@@ -155,21 +155,31 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
      * @return Number of changes (i.e. relation size)
      */
     protected int initialAssignToNearestCluster() {
-      assert (k == means.length);
+      assert k == means.length;
+      double[][] cdist = new double[k][k];
+      computeSquaredSeparation(cdist);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers
-        double min1 = Double.POSITIVE_INFINITY, min2 = Double.POSITIVE_INFINITY;
-        int minIndex = -1;
-        for(int i = 0; i < k; i++) {
-          double dist = distance(fv, means[i]);
-          if(dist < min1) {
-            minIndex = i;
-            min2 = min1;
-            min1 = dist;
-          }
-          else if(dist < min2) {
-            min2 = dist;
+        double min1 = distance(fv, means[0]), min2 = distance(fv, means[1]);
+        int minIndex = 0;
+        if(min2 < min1) {
+          double tmp = min1;
+          min1 = min2;
+          min2 = tmp;
+          minIndex = 1;
+        }
+        for(int i = 2; i < k; i++) {
+          if(min2 > cdist[minIndex][i]) {
+            double dist = distance(fv, means[i]);
+            if(dist < min1) {
+              minIndex = i;
+              min2 = min1;
+              min1 = dist;
+            }
+            else if(dist < min2) {
+              min2 = dist;
+            }
           }
         }
         // Assign to nearest cluster.
@@ -249,7 +259,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
      */
     protected void recomputeSeperation(double[][] means, double[] sep) {
       final int k = means.length;
-      assert (sep.length == k);
+      assert sep.length == k;
       Arrays.fill(sep, Double.POSITIVE_INFINITY);
       for(int i = 1; i < k; i++) {
         double[] m1 = means[i];

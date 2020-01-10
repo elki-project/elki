@@ -501,9 +501,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       }
       log.setCompleted(prog);
       log.statistics(new LongStatistic(key + ".iterations", iteration));
-      if(diststat > 0) {
-        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
-      }
     }
 
     /**
@@ -553,10 +550,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       }
       boolean issquared = isSquared();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        double mindist = Double.POSITIVE_INFINITY;
         NumberVector fv = relation.get(iditer);
+        double mindist = distance(fv, means[0]);
         int minIndex = 0;
-        for(int i = 0; i < k; i++) {
+        for(int i = 1; i < k; i++) {
           double dist = distance(fv, means[i]);
           if(dist < mindist) {
             minIndex = i;
@@ -593,6 +590,37 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
           cdist[i][j] = cdist[j][i] = d;
           sep[i] = (d < sep[i]) ? d : sep[i];
           sep[j] = (d < sep[j]) ? d : sep[j];
+        }
+      }
+    }
+
+    /**
+     * Initial separation of means. Used by Elkan, SimplifiedElkan.
+     *
+     * @param cost Pairwise separation output (as sqrt/2)
+     */
+    protected void initialSeperation(double[][] cdist) {
+      final int k = means.length;
+      final boolean issquared = df.isSquared();
+      for(int i = 1; i < k; i++) {
+        double[] mi = means[i];
+        for(int j = 0; j < i; j++) {
+          double d = distance(mi, means[j]);
+          cdist[i][j] = cdist[j][i] = .5 * (issquared ? FastMath.sqrt(d) : d);
+        }
+      }
+    }
+
+    /**
+     * Initial separation of means. Used by Hamerly, Exponion, and Annulus.
+     * 
+     * @param cost Pairwise separation output (as squared/4)
+     */
+    protected void computeSquaredSeparation(double[][] cost) {
+      for(int i = 0; i < k; i++) {
+        double[] mi = means[i];
+        for(int j = 0; j < i; j++) {
+          cost[i][j] = cost[j][i] = distance(mi, means[j]) * 0.25;
         }
       }
     }
@@ -647,6 +675,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      * @return Clustering result
      */
     protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
+      Logging log = getLogger();
       Clustering<KMeansModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Means Clustering");
       if(relation.size() <= 0) {
@@ -662,6 +691,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
         }
       }
       else {
+        long beforestat = diststat;
         double totalvariance = 0.;
         for(int i = 0; i < clusters.size(); i++) {
           DBIDs ids = clusters.get(i);
@@ -676,11 +706,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
           totalvariance += varsum;
           result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, varsum)));
         }
-        Logging log = getLogger();
         if(log.isStatistics()) {
           log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
-          log.statistics(new LongStatistic(key + ".distance-computations", diststat));
+          log.statistics(new LongStatistic(key + ".variance.distance-computations", diststat - beforestat));
         }
+      }
+      if(log.isStatistics()) {
+        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
       }
       return result;
     }
