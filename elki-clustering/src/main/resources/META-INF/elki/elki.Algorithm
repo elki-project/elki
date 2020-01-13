@@ -22,6 +22,7 @@ elki.clustering.hierarchical.HDBSCANLinearMemory
 elki.clustering.hierarchical.MiniMaxAnderberg
 elki.clustering.hierarchical.MiniMaxNNChain
 elki.clustering.hierarchical.MiniMax
+elki.clustering.hierarchical.birch.BIRCHLloydKMeans
 elki.clustering.hierarchical.birch.BIRCHLeafClustering
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans

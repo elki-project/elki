@@ -102,7 +102,7 @@ public class ClusteringFeature {
   public double centroid(int i) {
     return n > 0 ? ls[i] / n : 0.;
   }
-
+  
   /**
    * Sum over all dimensions of sums of squares.
    *

@@ -12,6 +12,7 @@ elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
 elki.clustering.hierarchical.extraction.CutDendrogramByHeight
 elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
+elki.clustering.hierarchical.birch.BIRCHLloydKMeans
 elki.clustering.hierarchical.birch.BIRCHLeafClustering
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans
