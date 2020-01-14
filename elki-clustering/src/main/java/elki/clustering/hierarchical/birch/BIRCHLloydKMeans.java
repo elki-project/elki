@@ -41,7 +41,6 @@ import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
-import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -196,8 +195,9 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
     for(int i = 1; i <= maxiter || maxiter <= 0; i++) {
       means = i == 1 ? means : means(assignment, means, cfs, weights);
       if(i > 1 && LOG.isStatistics()) {
-        // This function is only correct after updating the means:
-        double varsum = VMath.sum(calculateVariances(assignment, means, cfs, weights));
+        // This function is only correct after reassigning the points and then
+        // updating the means, so in the second iteration onward.
+        double varsum = sum(calculateVariances(assignment, means, cfs, weights));
         LOG.statistics(new DoubleStatistic(getClass().getName() + "." + (i - 1) + ".varsum", varsum));
       }
       int changed = assignToNearestCluster(assignment, means, cfmeans, cfs, weights);
@@ -315,7 +315,7 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    * @param assignment Cluster assignment of CFs
    * @param means Cluster means
    * @param cfs CF leaves
-   * @param weight Cluster weights
+   * @param weights Cluster weights
    * @return Per-cluster variances
    */
   private double[] calculateVariances(int[] assignment, double[][] means, ClusteringFeature[] cfs, int[] weights) {

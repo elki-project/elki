@@ -73,8 +73,8 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
     assert (dim == cf2.getDimensionality());
-    final int n1 = cf1.n, n2 = cf2.n, n3 = 1 + n2;
-    final double div1 = 1. / cf1.n, div2 = 1. / n2, div3 = 1. / n3;
+    final int n1 = cf1.n, n2 = cf2.n, n3 = n1 + n2;
+    final double div1 = 1. / n1, div2 = 1. / n2, div3 = 1. / n3;
     double dot1 = 0., dot2 = 0., dot3 = 0.;
     for(int d = 0; d < dim; d++) {
       double x1 = cf1.ls[d], x2 = cf2.ls[d];

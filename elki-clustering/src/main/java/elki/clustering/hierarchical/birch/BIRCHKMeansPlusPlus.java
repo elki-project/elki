@@ -86,7 +86,7 @@ public class BIRCHKMeansPlusPlus {
       }
       // Add new mean:
       means[m] = x[i].clone();
-      if(m < k) {
+      if(m < k - 1) {
         // Update weights:
         weights[i] = 0.;
         weightsum = updateWeights(means[m], x);
