@@ -41,8 +41,8 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.ABSORPTION_ID, DiameterCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93866);
-    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.93789);
+    assertClusterSizes(clustering, new int[] { 59, 176, 196, 207 });
   }
 
   @Test
@@ -52,8 +52,8 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.ABSORPTION_ID, RadiusCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.92082);
-    assertClusterSizes(clustering, new int[] { 82, 154, 200, 202 });
+    assertFMeasure(db, clustering, 0.8619);
+    assertClusterSizes(clustering, new int[] { 105, 112, 200, 221 });
   }
 
   @Test
@@ -63,8 +63,8 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.ABSORPTION_ID, EuclideanDistanceCriterion.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93023);
-    assertClusterSizes(clustering, new int[] { 75, 161, 200, 202 });
+    assertFMeasure(db, clustering, 0.93866);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   @Test
@@ -123,7 +123,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93814);
-    assertClusterSizes(clustering, new int[] { 200, 218, 220});
+    assertFMeasure(db, clustering, 0.89558);
+    assertClusterSizes(clustering, new int[] { 65, 156, 198, 219 });
   }
 }
