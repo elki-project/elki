@@ -29,12 +29,12 @@ import elki.utilities.exceptions.AbortException;
 
 /**
  * Shared code for algorithms that work on a strict matrix paradigm.
- *
+ * <p>
  * Note that this requires \(O(n^2)\) memory (and often \(O(n^3)\) runtime).
- *
+ * <p>
  * This class bridges the gap from the relational (indexed by identifiers) and
  * the matrix view (indexed by integers 0...n-1).
- *
+ * <p>
  * While this will usually store (merge-) distances when clustering, it can
  * store arbitrary doubles.
  *
@@ -87,7 +87,7 @@ public class MatrixParadigm {
 
   /**
    * Get a value from the (upper triangular) distance matrix.
-   *
+   * <p>
    * Note: in many cases, linear iteration over the matrix will be fastet than
    * repeated calls to this method!
    *
@@ -96,9 +96,7 @@ public class MatrixParadigm {
    * @return Distance
    */
   public double get(int x, int y) {
-    return (x == y) ? 0 : (x < y) //
-        ? matrix[MatrixParadigm.triangleSize(y) + x] //
-        : matrix[MatrixParadigm.triangleSize(x) + y];
+    return x == y ? 0 : x < y ? matrix[triangleSize(y) + x] : matrix[triangleSize(x) + y];
   }
 
   /**

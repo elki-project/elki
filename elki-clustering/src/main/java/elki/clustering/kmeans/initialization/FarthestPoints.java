@@ -37,7 +37,7 @@ import elki.utilities.random.RandomFactory;
 /**
  * K-Means initialization by repeatedly choosing the farthest point (by the
  * <em>minimum</em> distance to earlier points).
- *
+ * <p>
  * Note: this is less random than other initializations, so running multiple
  * times will be more likely to return the same local minima.
  *
