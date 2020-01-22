@@ -38,10 +38,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class FarthestSumPointsTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run KMeans with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testFarthestSumPointsInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
@@ -54,10 +50,6 @@ public class FarthestSumPointsTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 32, 169, 199, 201, 399 });
   }
 
-  /**
-   * Run CLARA with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testFarthestSumPointsInitialMedoids() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
@@ -70,7 +62,7 @@ public class FarthestSumPointsTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.960085);
-    assertClusterSizes(result, new int[] { 180, 199, 200, 201, 220 });
+    assertFMeasure(db, result, 0.99602);
+    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 }

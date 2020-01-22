@@ -71,9 +71,9 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
-    // Chose first mean
     double[][] means = new double[k][];
 
+    // Chose first mean
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     NumberVector prevmean = relation.get(first);
     means[0] = prevmean.toArray();
@@ -110,22 +110,17 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
 
   @Override
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
-    @SuppressWarnings("unchecked")
-    final Relation<O> relation = (Relation<O>) distQ.getRelation();
-
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
-
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    DBIDRef first = DBIDUtil.randomSample(ids, rnd);
-    DBIDVar prevmean = DBIDUtil.newVar(first);
-    means.add(first);
+    DBIDVar prevmean = DBIDUtil.newVar(DBIDUtil.randomSample(ids, rnd));
+    DBIDVar best = DBIDUtil.newVar(prevmean);
+    means.add(prevmean);
 
-    DBIDVar best = DBIDUtil.newVar(first);
-    for(int i = (dropfirst ? 0 : 1); i < k; i++) {
+    for(int i = dropfirst ? 0 : 1; i < k; i++) {
       // Find farthest object:
       double maxdist = Double.NEGATIVE_INFINITY;
-      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         final double prev = store.doubleValue(it);
         if(prev != prev) {
           continue; // NaN: already chosen!
@@ -149,6 +144,7 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
       means.add(best);
     }
 
+    store.destroy();
     return means;
   }
 
