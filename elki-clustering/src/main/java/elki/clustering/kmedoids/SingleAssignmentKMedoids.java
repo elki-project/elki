@@ -23,18 +23,17 @@ package elki.clustering.kmedoids;
 import elki.Algorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.*;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.utilities.Priority;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
@@ -69,17 +68,9 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
     super(distance, k, 0, initializer);
   }
 
-  /**
-   * Run the main algorithm. Internal use, for easier subclassing, this
-   * primarily is a wrapper around "new Instance" for subclasses.
-   *
-   * @param distQ Distance query
-   * @param ids IDs to process
-   * @param medoids Current medoids
-   * @param assignment Cluster assignment output
-   */
+  @Override
   protected void run(DistanceQuery<O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
-    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    new Instance(distQ, ids, assignment).run(medoids);
   }
 
   /**
@@ -99,16 +90,6 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
     DistanceQuery<?> distQ;
 
     /**
-     * Distance to the nearest medoid of each point.
-     */
-    WritableDoubleDataStore nearest;
-
-    /**
-     * Distance to the second nearest medoid.
-     */
-    WritableDoubleDataStore second;
-
-    /**
      * Cluster mapping.
      */
     WritableIntegerDataStore assignment;
@@ -124,20 +105,15 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
       this.distQ = distQ;
       this.ids = ids;
       this.assignment = assignment;
-      this.nearest = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-      this.second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     }
 
     /**
      * Run the PAM optimization phase.
      *
      * @param medoids Medoids list
-     * @param maxiter
      * @return final cost
      */
-    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
-      // Initial assignment to nearest medoids
-      // TODO: reuse distance information, from the build phase, when possible?
+    protected double run(ArrayModifiableDBIDs medoids) {
       double tc = assignToNearestCluster(medoids);
       String key = getClass().getName().replace("$Instance", "");
       if(LOG.isStatistics()) {
@@ -153,23 +129,20 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
      * @param means Object centroids
      * @return Assignment cost
      */
-    protected double assignToNearestCluster(ArrayDBIDs means) {
+    protected double assignToNearestCluster(ArrayModifiableDBIDs means) {
       DBIDArrayIter miter = means.iter();
       double cost = 0.;
-      for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        double mindist = Double.POSITIVE_INFINITY;
-        int minindx = -1;
-        for(miter.seek(0); miter.valid(); miter.advance()) {
-          final double dist = distQ.distance(iditer, miter);
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        double mindist = distQ.distance(miter.seek(0), it);
+        int minindx = 0;
+        for(miter.advance(); miter.valid(); miter.advance()) {
+          final double dist = distQ.distance(miter, it);
           if(dist < mindist) {
             minindx = miter.getOffset();
             mindist = dist;
           }
         }
-        if(minindx < 0) {
-          throw new AbortException("Too many infinite distances. Cannot assign objects.");
-        }
-        assignment.put(iditer, minindx);
+        assignment.put(it, minindx);
         cost += mindist;
       }
       return cost;
