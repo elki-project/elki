@@ -108,6 +108,9 @@ public class EvaluateDaviesBouldin implements Evaluator {
    */
   public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, double p) {
     super();
+    if(noiseOpt == NoiseHandling.TREAT_NOISE_AS_SINGLETONS) {
+      LOG.warning("NoiseHandling.TREAT_NOISE_AS_SINGLETONS is currently not supported correctly by EvaluateDaviesBouldin.");
+    }
     this.distance = distance;
     this.noiseOption = noiseOpt;
     this.p = p;
