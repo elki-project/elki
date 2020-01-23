@@ -162,19 +162,23 @@ public class EvaluatePBMIndex implements Evaluator {
 
     // a: Distance to own centroid
     // b: Distance to overall centroid
+    // nCL: Number of actual Clusters (needed for Singleton option)
     double a = 0, b = 0;
+    int nCl = clusters.size();
     Iterator<? extends Cluster<?>> ci = clusters.iterator();
     for(int i = 0; ci.hasNext(); i++) {
       Cluster<?> cluster = ci.next();
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseHandling){
         case IGNORE_NOISE:
+          nCl -= 1; // adjust for ignored cluster
           continue; // Ignored
         case TREAT_NOISE_AS_SINGLETONS:
           // Singletons: a = 0 by definition.
           for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
             b += distance.distance(overallCentroid, rel.get(it));
           }
+          nCl += cluster.size() - 1; // expand number of clusters
           continue; // with NEXT cluster.
         case MERGE_NOISE:
           break; // Treat like a cluster below:
@@ -188,7 +192,7 @@ public class EvaluatePBMIndex implements Evaluator {
       }
     }
 
-    final double pbm = FastMath.pow((1. / centroids.length) * (b / a) * max, 2.);
+    final double pbm = FastMath.pow((1. / nCl) * (b / a) * max, 2.);
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));
