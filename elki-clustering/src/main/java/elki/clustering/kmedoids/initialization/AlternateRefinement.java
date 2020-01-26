@@ -138,35 +138,6 @@ public class AlternateRefinement<O> implements KMedoidsInitialization<O> {
 
   /**
    * Find the best medoid of a given fixed set.
-   *
-   * @param ci Cluster
-   * @param distQ Distance query
-   * @param miter Medoid iterator, pointing to the current medoid (modified)
-   * @param bestm Prior cost, of the current assignment
-   * @return New cost
-   */
-  protected static double findMedoid(ModifiableDBIDs ci, DistanceQuery<?> distQ, DBIDArrayMIter miter, double bestm) {
-    for(DBIDIter iter = ci.iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(miter, iter)) {
-        continue;
-      }
-      double sum = 0;
-      for(DBIDIter iter2 = ci.iter(); iter2.valid() && sum < bestm; iter2.advance()) {
-        if(DBIDUtil.equal(iter, iter2)) {
-          continue;
-        }
-        sum += distQ.distance(iter, iter2);
-      }
-      if(sum < bestm) {
-        miter.setDBID(iter);
-        bestm = sum;
-      }
-    }
-    return bestm;
-  }
-
-  /**
-   * Find the best medoid of a given fixed set.
    * 
    * @param ids Object ids
    * @param distQ Distance query
@@ -203,7 +174,7 @@ public class AlternateRefinement<O> implements KMedoidsInitialization<O> {
   /**
    * Compute the initial cluster assignment.
    *
-   * @param medoids Initial medoids
+   * @param miter Medoids iterator
    * @param ids All objects
    * @param distQ Distance query
    * @param assignment Output: clusters

@@ -130,7 +130,7 @@ public class KuhnMunkres {
     this.cmark = csel.clone();
     Arrays.fill(rmark, -1);
     // Iterative refinement:
-    for(long maxit = rowlen * collen; maxit >= 0 && selected < rowlen; maxit--) {
+    for(long maxit = rowlen * (long) collen; maxit >= 0 && selected < rowlen; maxit--) {
       while(true) {
         double h = findUncoveredMinimum(); // O(n²)
         debugLogMatrix(Level.FINEST, maxit, "Select min");
@@ -328,7 +328,7 @@ public class KuhnMunkres {
     if(LOG.isLoggable(l)) {
       String padding = "      ";
       StringBuilder buf = new StringBuilder(cost.length * csel.length * 10 + 10) //
-          .append('#').append(1L + cost.length * csel.length - maxit) //
+          .append('#').append(1L + cost.length * (long) csel.length - maxit) //
           .append(' ').append(msg).append("\n");
       for(int i = 0; i < cost.length; i++) {
         for(int j = 0; j < csel.length; j++) {
@@ -358,8 +358,10 @@ public class KuhnMunkres {
         }
         buf.append(rmark != null && rmark[i] >= 0 ? "--\n" : "\n");
       }
-      for(int j = 0; j < (cmark != null ? cmark.length : 0); j++) {
-        buf.append(cmark[j] < 0 ? "         " : "    |    ");
+      if(cmark != null) {
+        for(int j = 0; j < cmark.length; j++) {
+          buf.append(cmark[j] < 0 ? "         " : "    |    ");
+        }
       }
       LOG.log(l, buf.toString());
     }

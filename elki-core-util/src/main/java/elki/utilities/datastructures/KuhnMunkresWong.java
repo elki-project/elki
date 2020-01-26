@@ -96,7 +96,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
     Arrays.fill(rmark, -1);
     initUncoveredMinimum(); // O(n²)
     // Iterative refinement:
-    for(long maxit = rowlen * collen; maxit >= 0 && selected < rowlen; maxit--) {
+    for(long maxit = rowlen * (long) collen; maxit >= 0 && selected < rowlen; maxit--) {
       while(true) {
         double h = findUncoveredMinimum(); // improved version O(n)
         debugLogMatrix(Level.FINEST, maxit, "Select min");

@@ -597,7 +597,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     /**
      * Initial separation of means. Used by Elkan, SimplifiedElkan.
      *
-     * @param cost Pairwise separation output (as sqrt/2)
+     * @param cdist Pairwise separation output (as sqrt/2)
      */
     protected void initialSeperation(double[][] cdist) {
       final int k = means.length;
