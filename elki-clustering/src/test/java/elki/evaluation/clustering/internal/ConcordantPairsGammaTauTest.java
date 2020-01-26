@@ -49,16 +49,16 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateConcordantPairs} with ByLabelClustering and KMeans
+ * Test for {@link ConcordantPairsGammaTau} with ByLabelClustering and KMeans
  * Clustering
  * 
  * @author Robert Gehde
  */
-public class EvaluateConcordantPairsTest {
+public class ConcordantPairsGammaTauTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Regression test for {@link EvaluateConcordantPairs} with ByLabelClustering
+   * Regression test for {@link ConcordantPairsGammaTau} with ByLabelClustering
    */
   @Test
   public void testEvaluateConcordantPairs() {
@@ -68,7 +68,7 @@ public class EvaluateConcordantPairsTest {
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateConcordantPairs<Object> ecp = new ELKIBuilder<>(EvaluateConcordantPairs.class).with(EvaluateConcordantPairs.Par.DISTANCE_ID, dist).with(EvaluateConcordantPairs.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    ConcordantPairsGammaTau<Object> ecp = new ELKIBuilder<>(ConcordantPairsGammaTau.class).with(ConcordantPairsGammaTau.Par.DISTANCE_ID, dist).with(ConcordantPairsGammaTau.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
 
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
@@ -100,7 +100,7 @@ public class EvaluateConcordantPairsTest {
   }
 
   /**
-   * Regression test for {@link EvaluateConcordantPairs} with KMeans clustering
+   * Regression test for {@link ConcordantPairsGammaTau} with KMeans clustering
    */
   @Test
   public void testEvaluateConcordantPairsKMeans() {
@@ -110,7 +110,7 @@ public class EvaluateConcordantPairsTest {
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateConcordantPairs<Object> ecp = new ELKIBuilder<>(EvaluateConcordantPairs.class).with(EvaluateConcordantPairs.Par.DISTANCE_ID, dist).with(EvaluateConcordantPairs.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    ConcordantPairsGammaTau<Object> ecp = new ELKIBuilder<>(ConcordantPairsGammaTau.class).with(ConcordantPairsGammaTau.Par.DISTANCE_ID, dist).with(ConcordantPairsGammaTau.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
 
     // create clustering
     LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));

@@ -1,14 +1,14 @@
 elki.evaluation.clustering.EvaluateClustering
 elki.evaluation.clustering.LogClusterSizes
-elki.evaluation.clustering.internal.EvaluateSilhouette
-elki.evaluation.clustering.internal.EvaluateSimplifiedSilhouette
-elki.evaluation.clustering.internal.EvaluateVarianceRatioCriteria calinski-harabasz
-elki.evaluation.clustering.internal.EvaluateDaviesBouldin
-elki.evaluation.clustering.internal.EvaluateConcordantPairs
-elki.evaluation.clustering.internal.EvaluatePBMIndex
-elki.evaluation.clustering.internal.EvaluateCIndex
-elki.evaluation.clustering.internal.EvaluateDBCV
-elki.evaluation.clustering.internal.EvaluateSquaredErrors
+elki.evaluation.clustering.internal.Silhouette
+elki.evaluation.clustering.internal.SimplifiedSilhouette
+elki.evaluation.clustering.internal.VarianceRatioCriterion calinski-harabasz
+elki.evaluation.clustering.internal.DaviesBouldinIndex
+elki.evaluation.clustering.internal.ConcordantPairsGammaTau
+elki.evaluation.clustering.internal.PBMIndex
+elki.evaluation.clustering.internal.CIndex
+elki.evaluation.clustering.internal.DBCV
+elki.evaluation.clustering.internal.SquaredErrors
 elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 elki.evaluation.clustering.extractor.SimplifiedHierarchyExtractionEvaluator
 elki.evaluation.clustering.extractor.HDBSCANHierarchyExtractionEvaluator

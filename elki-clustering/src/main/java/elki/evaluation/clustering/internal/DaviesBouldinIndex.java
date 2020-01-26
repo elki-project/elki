@@ -73,11 +73,11 @@ import net.jafama.FastMath;
     booktitle = "IEEE Transactions Pattern Analysis and Machine Intelligence 1(2)", //
     url = "https://doi.org/10.1109/TPAMI.1979.4766909", //
     bibkey = "DBLP:journals/pami/DaviesB79")
-public class EvaluateDaviesBouldin implements Evaluator {
+public class DaviesBouldinIndex implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateDaviesBouldin.class);
+  private static final Logging LOG = Logging.getLogger(DaviesBouldinIndex.class);
 
   /**
    * Option for noise handling.
@@ -97,7 +97,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateDaviesBouldin.class.getName();
+  private String key = DaviesBouldinIndex.class.getName();
 
   /**
    * Constructor.
@@ -106,10 +106,10 @@ public class EvaluateDaviesBouldin implements Evaluator {
    * @param noiseOpt Flag to control noise handling
    * @param p Power mean exponent p
    */
-  public EvaluateDaviesBouldin(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, double p) {
+  public DaviesBouldinIndex(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, double p) {
     super();
     if(noiseOpt == NoiseHandling.TREAT_NOISE_AS_SINGLETONS) {
-      LOG.warning("NoiseHandling.TREAT_NOISE_AS_SINGLETONS is currently not supported correctly by EvaluateDaviesBouldin.");
+      LOG.warning("NoiseHandling.TREAT_NOISE_AS_SINGLETONS is currently not supported correctly by DaviesBouldinIndex.");
     }
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -126,7 +126,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
   public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
-    int noisecount = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
+    int noisecount = SimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
     double[] withinGroupDistance = withinGroupDistances(rel, clusters, centroids);
 
     Mean daviesBouldin = new Mean();
@@ -188,8 +188,9 @@ public class EvaluateDaviesBouldin implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Davies Bouldin Index", daviesBouldinMean, 0., Double.POSITIVE_INFINITY, 0., true);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return daviesBouldinMean;
   }
 
@@ -278,8 +279,8 @@ public class EvaluateDaviesBouldin implements Evaluator {
     }
 
     @Override
-    public EvaluateDaviesBouldin make() {
-      return new EvaluateDaviesBouldin(distance, noiseOption, p);
+    public DaviesBouldinIndex make() {
+      return new DaviesBouldinIndex(distance, noiseOption, p);
     }
   }
 }

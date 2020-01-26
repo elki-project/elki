@@ -75,7 +75,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM)", //
     url = "https://doi.org/10.1137/1.9781611973440.96", //
     bibkey = "DBLP:conf/sdm/MoulaviJCZS14")
-public class EvaluateDBCV<O> implements Evaluator {
+public class DBCV<O> implements Evaluator {
   /**
    * Distance function to use.
    */
@@ -86,7 +86,7 @@ public class EvaluateDBCV<O> implements Evaluator {
    *
    * @param distance Distance function
    */
-  public EvaluateDBCV(Distance<? super O> distance) {
+  public DBCV(Distance<? super O> distance) {
     super();
     this.distance = distance;
   }
@@ -246,8 +246,9 @@ public class EvaluateDBCV<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(cl, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Density Based Clustering Validation", dbcv, 0., Double.POSITIVE_INFINITY, 0., true);
-    Metadata.hierarchyOf(cl).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(cl).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return dbcv;
   }
 
@@ -291,8 +292,8 @@ public class EvaluateDBCV<O> implements Evaluator {
     }
 
     @Override
-    public EvaluateDBCV<O> make() {
-      return new EvaluateDBCV<>(distance);
+    public DBCV<O> make() {
+      return new DBCV<>(distance);
     }
   }
 }

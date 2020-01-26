@@ -37,7 +37,7 @@ import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.filter.typeconversions.ClassLabelFilter;
-import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.EvaluateClustering.ScoreResult;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
@@ -49,34 +49,37 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateVarianceRatioCriteria} with ByLabelClustering and
- * KMeans clustering
- * 
+ * Class for testing {@link SquaredErrors} Measures with
+ * ByLabelClustering and KMeans clustering
+ *
  * @author Robert Gehde
  */
-public class EvaluateVarianceRatioCriteriaTest {
+public class SquaredErrorsTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluateVarianceRatioCriteria} with ByLabelClustering and
+   * Test for {@link SquaredErrors} Measures with ByLabelClustering and
    * TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateVarianceRatioCriteriaSingleton() {
+  public void testEvaluateSquaredErrorsSingleton() {
     // load classes and data
+    EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateVarianceRatioCriteria<? extends NumberVector> varacri = new ELKIBuilder<>(EvaluateVarianceRatioCriteria.class). //
-        with(EvaluateVarianceRatioCriteria.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    SquaredErrors serr = new ELKIBuilder<>(SquaredErrors.class). //
+        with(SquaredErrors.Par.DISTANCE_ID, dist). //
+        with(SquaredErrors.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    varacri.evaluateClustering(rel, rbl);
+    serr.evaluateClustering(rel, rbl);
+
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -87,33 +90,45 @@ public class EvaluateVarianceRatioCriteriaTest {
 
     MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
-    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
-    assertNotNull("No Variance Ratio Criteria Value", m);
+    assertTrue(squarederror.hasMeasure("Mean distance"));
+    Measurement m = squarederror.getMeasure("Mean distance");
+    assertNotNull("No SquaredError Mean distance Value", m);
+    assertEquals("Mean distance not as expected", 0.790049591497545, m.getVal(), 1e-15);
 
-    assertEquals("VarianceRatioCriteria not as expected", 77.025, m.getVal(), 1e-13);
+    assertTrue(squarederror.hasMeasure("Sum of Squares"));
+    Measurement s = squarederror.getMeasure("Sum of Squares");
+    assertNotNull("No SquaredError Sum of Squares Value", s);
+    assertEquals("Sum of Squares not as expected", 16.8, s.getVal(), 1e-15);
+
+    assertTrue(squarederror.hasMeasure("RMSD"));
+    Measurement r = squarederror.getMeasure("RMSD");
+    assertNotNull("No SquaredError RMSD Value", r);
+    assertEquals("RMSD not as expected", 0.916515138991168, r.getVal(), 1e-15);
   }
 
   /**
-   * Test for {@link EvaluateVarianceRatioCriteria} with ByLabelClustering and
+   * Test for {@link SquaredErrors} Measures with ByLabelClustering and
    * MERGE_NOISE option
    */
   @Test
-  public void testEvaluateVarianceRatioCriteria() {
+  public void testEvaluateSquaredErrors() {
     // load classes and data
+    EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateVarianceRatioCriteria<? extends NumberVector> varacri = new ELKIBuilder<>(EvaluateVarianceRatioCriteria.class). //
-        with(EvaluateVarianceRatioCriteria.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    SquaredErrors serr = new ELKIBuilder<>(SquaredErrors.class). //
+        with(SquaredErrors.Par.DISTANCE_ID, dist). //
+        with(SquaredErrors.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    varacri.evaluateClustering(rel, rbl);
+    serr.evaluateClustering(rel, rbl);
+
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -124,35 +139,44 @@ public class EvaluateVarianceRatioCriteriaTest {
 
     MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
-    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
-    assertNotNull("No Variance Ratio Criteria Value", m);
+    assertTrue(squarederror.hasMeasure("Mean distance"));
+    Measurement m = squarederror.getMeasure("Mean distance");
+    assertNotNull("No SquaredError Mean distance Value", m);
+    assertEquals("Mean distance not as expected", 1.30231191554356, m.getVal(), 1e-13);
 
-    assertEquals("VarianceRatioCriteria not as expected", 40.7195512820513, m.getVal(), 1e-13);
+    assertTrue(squarederror.hasMeasure("Sum of Squares"));
+    Measurement s = squarederror.getMeasure("Sum of Squares");
+    assertNotNull("No SquaredError Sum of Squares Value", s);
+    assertEquals("Sum of Squares not as expected", 55.4666666666667, s.getVal(), 1e-13);
+
+    assertTrue(squarederror.hasMeasure("RMSD"));
+    Measurement r = squarederror.getMeasure("RMSD");
+    assertNotNull("No SquaredError RMSD Value", r);
+    assertEquals("RMSD not as expected", 1.66533279957291, r.getVal(), 1e-13);
   }
 
   /**
-   * Regression test for {@link EvaluateVarianceRatioCriteria} with KMeans
+   * Regression test for {@link SquaredErrors} Measures with KMeans
    * clustering and TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateVarianceRatioCriteriaKMeans() {
+  public void testEvaluateSquaredErrorsKMeans() {
     // load classes and data
+    EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateVarianceRatioCriteria<? extends NumberVector> varacri = new ELKIBuilder<>(EvaluateVarianceRatioCriteria.class). //
-        with(EvaluateVarianceRatioCriteria.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
-
+    SquaredErrors serr = new ELKIBuilder<>(SquaredErrors.class). //
+        with(SquaredErrors.Par.DISTANCE_ID, dist). //
+        with(SquaredErrors.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
-    LloydKMeans<NumberVector> clustering = //
-        new LloydKMeans<NumberVector>(SquaredEuclideanDistance.STATIC, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
+    LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
-    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
-
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    varacri.evaluateClustering(rel, rbl);
+    serr.evaluateClustering(rel, rbl);
+
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -163,10 +187,19 @@ public class EvaluateVarianceRatioCriteriaTest {
 
     MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
-    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
-    assertNotNull("No Variance Ratio Criteria Value", m);
+    assertTrue(squarederror.hasMeasure("Mean distance"));
+    Measurement m = squarederror.getMeasure("Mean distance");
+    assertNotNull("No SquaredError Mean distance Value", m);
+    assertEquals("Mean distance not as expected", 1.3680866220495633, m.getVal(), 1e-13);
 
-    assertEquals("VarianceRatioCriteria not as expected", 65.60937499999999, m.getVal(), 1e-13);
+    assertTrue(squarederror.hasMeasure("Sum of Squares"));
+    Measurement s = squarederror.getMeasure("Sum of Squares");
+    assertNotNull("No SquaredError Sum of Squares Value", s);
+    assertEquals("Sum of Squares not as expected", 54.93333333333334, s.getVal(), 1e-13);
+
+    assertTrue(squarederror.hasMeasure("RMSD"));
+    Measurement r = squarederror.getMeasure("RMSD");
+    assertNotNull("No SquaredError RMSD Value", r);
+    assertEquals("RMSD not as expected", 1.6573070526208071, r.getVal(), 1e-13);
   }
 }

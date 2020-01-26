@@ -51,7 +51,7 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Compute the Variance Ratio Criteria of a data set, also known as
+ * Compute the Variance Ratio Criterion of a data set, also known as
  * Calinski-Harabasz index.
  * <p>
  * Reference:
@@ -73,11 +73,11 @@ import elki.utilities.optionhandling.parameters.Flag;
     url = "https://doi.org/10.1080/03610927408827101", //
     bibkey = "doi:10.1080/03610927408827101")
 @Alias({ "calinski-harabasz" })
-public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
+public class VarianceRatioCriterion<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateVarianceRatioCriteria.class);
+  private static final Logging LOG = Logging.getLogger(VarianceRatioCriterion.class);
 
   /**
    * Option for noise handling.
@@ -92,7 +92,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateVarianceRatioCriteria.class.getName();
+  private String key = VarianceRatioCriterion.class.getName();
 
   /**
    * Constructor.
@@ -100,7 +100,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * @param noiseOption Flag to control noise handling
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateVarianceRatioCriteria(NoiseHandling noiseOption, boolean penalize) {
+  public VarianceRatioCriterion(NoiseHandling noiseOption, boolean penalize) {
     super();
     this.noiseOption = noiseOption;
     this.penalize = penalize;
@@ -121,7 +121,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     int ignorednoise = 0;
     if(clusters.size() > 1) {
       NumberVector[] centroids = new NumberVector[clusters.size()];
-      ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
+      ignorednoise = SimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
 
       // Build global centroid and cluster count:
       final int dim = RelationUtil.dimensionality(rel);
@@ -172,8 +172,9 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., false);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return vrc;
   }
 
@@ -264,8 +265,8 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     }
 
     @Override
-    public EvaluateVarianceRatioCriteria<? extends NumberVector> make() {
-      return new EvaluateVarianceRatioCriteria<>(noiseOption, penalize);
+    public VarianceRatioCriterion<? extends NumberVector> make() {
+      return new VarianceRatioCriterion<>(noiseOption, penalize);
     }
   }
 }

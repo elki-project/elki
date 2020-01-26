@@ -22,6 +22,7 @@ package elki.evaluation.clustering.internal;
 
 import static org.junit.Assert.*;
 
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -49,37 +50,37 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateDaviesBouldin} with ByLabelClustering and KMeans
- * clustering
+ * Test for {@link SimplifiedSilhouette} with ByLabelClustering and
+ * KMeans clustering
  * 
  * @author Robert Gehde
  */
-public class EvaluateDaviesBouldinTest {
+public class SimplifiedSilhouetteTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluateDaviesBouldin} with ByLabelClustering
+   * Test for {@link SimplifiedSilhouette} with ByLabelClustering and
+   * TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateDavisBouldin() {
+  public void testEvaluateSimplifiedSilhouetteSingleton() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateDaviesBouldin dabo = new ELKIBuilder<>(EvaluateDaviesBouldin.class). //
-        with(EvaluateDaviesBouldin.Par.DISTANCE_ID, dist). //
-        with(EvaluateDaviesBouldin.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    SimplifiedSilhouette silh = new ELKIBuilder<>(SimplifiedSilhouette.class). //
+        with(Silhouette.Par.DISTANCE_ID, dist). //
+        with(Silhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<? extends NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
 
     // evaluate clustering
-    dabo.evaluateClustering(rel, rbl);
-
+    silh.evaluateClustering(rel, rbl);
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -88,36 +89,39 @@ public class EvaluateDaviesBouldinTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup dabomg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(dabomg.hasMeasure("Davies Bouldin Index"));
-    Measurement m = dabomg.getMeasure("Davies Bouldin Index");
-    assertNotNull("No Davies Bouldin Index", m);
-    assertEquals("Davies Bouldin Index (mean) not as expected", 1.02661179674861, m.getVal(), 1e-13);
+    Iterator<Measurement> simsilit = silhouette.iterator();
+    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
+    Measurement m = simsilit.next();
+    assertFalse("Too many measurements", simsilit.hasNext());
+
+    assertEquals("Silhouette not as expected", 0.639274812814525, m.getVal(), 1e-15);
   }
 
   /**
-   * Test for {@link EvaluateDaviesBouldin} with KMeans clustering
+   * Test for {@link SimplifiedSilhouette} with ByLabelClustering and
+   * MERGER_NOISE option
    */
   @Test
-  public void testEvaluateDavisBouldinKMeans() {
+  public void testEvaluateSimplifiedSilhouette() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateDaviesBouldin dabo = new ELKIBuilder<>(EvaluateDaviesBouldin.class). //
-        with(EvaluateDaviesBouldin.Par.DISTANCE_ID, dist). //
-        with(EvaluateDaviesBouldin.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    SimplifiedSilhouette silh = new ELKIBuilder<>(SimplifiedSilhouette.class). //
+        with(Silhouette.Par.DISTANCE_ID, dist). //
+        with(Silhouette.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
-    LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
-    Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
+        with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
+    Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
 
     // evaluate clustering
-    dabo.evaluateClustering(rel, rbl);
-
+    silh.evaluateClustering(rel, rbl);
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -126,11 +130,49 @@ public class EvaluateDaviesBouldinTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup dabomg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(dabomg.hasMeasure("Davies Bouldin Index"));
-    Measurement m = dabomg.getMeasure("Davies Bouldin Index");
-    assertNotNull("No Davies Bouldin Index", m);
-    assertEquals("Davies Bouldin Index (mean) not as expected", .4184031237431774, m.getVal(), 1e-13);
+    Iterator<Measurement> simsilit = silhouette.iterator();
+    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
+    Measurement m = simsilit.next();
+    assertFalse("Too many measurements", simsilit.hasNext());
+
+    assertEquals("Silhouette not as expected", 0.698584394068721, m.getVal(), 1e-15);
+  }
+
+  /**
+   * Regression test for {@link SimplifiedSilhouette} with KMeans
+   * clustering and TREAT_NOISE_AS_SINGLETONS option
+   */
+  @Test
+  public void testEvaluateSimplifiedSilhouetteTestKMeans() {
+    // load classes and data
+    EuclideanDistance dist = EuclideanDistance.STATIC;
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20);
+    SimplifiedSilhouette silh = new ELKIBuilder<>(SimplifiedSilhouette.class). //
+        with(Silhouette.Par.DISTANCE_ID, dist). //
+        with(Silhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    // create clustering
+    LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
+    Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+    // evaluate clustering
+    silh.evaluateClustering(rel, rbl);
+    // get measurement data
+    It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
+    assertTrue("No evaluation result", it.valid());
+    assertTrue("Not a score result", it.get() instanceof EvaluationResult);
+    EvaluationResult er = it.get();
+    it.advance();
+    assertFalse("More than one evaluation result?", it.valid());
+
+    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    // check measurements
+    Iterator<Measurement> simsilit = silhouette.iterator();
+    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
+    Measurement m = simsilit.next();
+    assertFalse("Too many measurements", simsilit.hasNext());
+
+    assertEquals("Silhouette not as expected", 0.8024712757957062, m.getVal(), 1e-15);
   }
 }

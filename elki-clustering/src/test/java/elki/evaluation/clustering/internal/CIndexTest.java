@@ -22,7 +22,6 @@ package elki.evaluation.clustering.internal;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -51,36 +50,37 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateSilhouette} with ByLabelClustering and KMeans
- * clustering
+ * Test for {@link CIndex} with ByLabelClustering and KMeans clustering
  * 
  * @author Robert Gehde
  */
-public class EvaluateSilhouetteTest {
+public class CIndexTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluateSilhouette} with ByLabelClustering and
+   * Test for {@link CIndex} with ByLabelClustering and
    * TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateSilhouetteTestSingleton() {
+  public void testEvaluateCIndexSingleton() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateSilhouette<NumberVector> silh = new ELKIBuilder<>(EvaluateSilhouette.class). //
-        with(EvaluateSilhouette.Par.DISTANCE_ID, dist). //
-        with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    CIndex<NumberVector> cind = new ELKIBuilder<>(CIndex.class). //
+        with(CIndex.Par.DISTANCE_ID, dist). //
+        with(CIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -90,38 +90,38 @@ public class EvaluateSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> silit = silhouette.iterator();
-    assertTrue("No silhouette measurement", silit.hasNext());
-    Measurement m = silit.next();
-    assertFalse("Too many measurements", silit.hasNext());
-
-    assertEquals("Silhouette not as expected", 0.520636492550455, m.getVal(), 1e-15);
+    assertTrue(cindmg.hasMeasure("C-Index"));
+    Measurement m = cindmg.getMeasure("C-Index");
+    assertNotNull("No C-Index Value", m);
+    assertEquals("C-Index not as expected", 0.002711774027916, m.getVal(), 1e-15);
   }
 
   /**
-   * Test for {@link EvaluateSilhouette} with ByLabelClustering and MERGE_NOISE
-   * option
+   * Test for {@link CIndex} with ByLabelClustering and
+   * MERGE_NOISE option
    */
   @Test
-  public void testEvaluateSilhouetteTest() {
+  public void testEvaluateCIndex() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateSilhouette<NumberVector> silh = new ELKIBuilder<>(EvaluateSilhouette.class). //
-        with(EvaluateSilhouette.Par.DISTANCE_ID, dist). //
-        with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    CIndex<NumberVector> cind = new ELKIBuilder<>(CIndex.class). //
+        with(CIndex.Par.DISTANCE_ID, dist). //
+        with(CIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -131,31 +131,37 @@ public class EvaluateSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> silit = silhouette.iterator();
-    assertTrue("No silhouette measurement", silit.hasNext());
-    Measurement m = silit.next();
-    assertFalse("Too many measurements", silit.hasNext());
-
-    assertEquals("Silhouette not as expected", 0.589897756171037, m.getVal(), 1e-13);
+    assertTrue(cindmg.hasMeasure("C-Index"));
+    Measurement m = cindmg.getMeasure("C-Index");
+    assertNotNull("No C-Index Value", m);
+    assertEquals("C-Index not as expected", 0.024871721992941, m.getVal(), 1e-15);
   }
 
   /**
-   * Regression test for {@link EvaluateSilhouette} with KMeans clustering and
-   * TREAT_NOISE_AS_SINGLETONS option
+   * Regression test for {@link CIndex} with KMeans clustering
+   * and TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateSilhouetteTestKMeans() {
+  public void testEvaluateCIndexKMeans() {
+    // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20);
-    EvaluateSilhouette<NumberVector> silh = new ELKIBuilder<>(EvaluateSilhouette.class).with(EvaluateSilhouette.Par.DISTANCE_ID, dist).with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    ListParameterization param = new ListParameterization();
+    param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
+        new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
+    CIndex<NumberVector> cind = new ELKIBuilder<>(CIndex.class). //
+        with(CIndex.Par.DISTANCE_ID, dist). //
+        with(CIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
 
+    // create clustering
     LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -165,13 +171,11 @@ public class EvaluateSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> silit = silhouette.iterator();
-    assertTrue("No silhouette measurement", silit.hasNext());
-    Measurement m = silit.next();
-    assertFalse("Too many measurements", silit.hasNext());
-
-    assertEquals("Silhouette not as expected", 0.6970597031375269, m.getVal(), 1e-15);
+    assertTrue(cindmg.hasMeasure("C-Index"));
+    Measurement m = cindmg.getMeasure("C-Index");
+    assertNotNull("No C-Index Value", m);
+    assertEquals("C-Index not as expected", 0.00891005391901485, m.getVal(), 1e-15);
   }
 }

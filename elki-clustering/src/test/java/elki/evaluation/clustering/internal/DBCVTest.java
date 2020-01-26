@@ -46,7 +46,7 @@ import elki.utilities.datastructures.iterator.It;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test for {@link EvaluateDBCV} with ByLabelClustering
+ * Test for {@link DBCV} with ByLabelClustering
  * <p>
  * Note:<br>
  * This measurement is unpredictable, as it depends on the order of the data
@@ -54,11 +54,11 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * 
  * @author Robert Gehde
  */
-public class EvaluateDBCVTest {
+public class DBCVTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini-jitter.csv";
 
   /**
-   * Test for {@link EvaluateDBCV} with ByLabelClustering
+   * Test for {@link DBCV} with ByLabelClustering
    */
   @Test
   public void testEvaluateDBCV() {
@@ -71,8 +71,8 @@ public class EvaluateDBCVTest {
     // 0).build());
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(1));
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateDBCV<NumberVector> dbcv = new ELKIBuilder<>(EvaluateDBCV.class). //
-        with(EvaluateDBCV.Par.DISTANCE_ID, dist).build();
+    DBCV<NumberVector> dbcv = new ELKIBuilder<>(DBCV.class). //
+        with(DBCV.Par.DISTANCE_ID, dist).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();

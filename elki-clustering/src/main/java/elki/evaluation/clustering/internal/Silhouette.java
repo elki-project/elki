@@ -75,11 +75,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Journal of Computational and Applied Mathematics, Volume 20", //
     url = "https://doi.org/10.1016/0377-0427(87)90125-7", //
     bibkey = "doi:10.1016/0377-04278790125-7")
-public class EvaluateSilhouette<O> implements Evaluator {
+public class Silhouette<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(Silhouette.class);
 
   /**
    * Distance function to use.
@@ -99,7 +99,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateSilhouette.class.getName();
+  private String key = Silhouette.class.getName();
 
   /**
    * Constructor.
@@ -108,7 +108,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param noiseOption Handling of "noise" clusters.
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSilhouette(Distance<? super O> distance, NoiseHandling noiseOption, boolean penalize) {
+  public Silhouette(Distance<? super O> distance, NoiseHandling noiseOption, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOption;
@@ -122,7 +122,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
    * @param mergenoise Flag to treat noise as clusters, instead of breaking them
    *        into singletons.
    */
-  public EvaluateSilhouette(Distance<? super O> distance, boolean mergenoise) {
+  public Silhouette(Distance<? super O> distance, boolean mergenoise) {
     this(distance, mergenoise ? NoiseHandling.MERGE_NOISE : NoiseHandling.TREAT_NOISE_AS_SINGLETONS, true);
   }
 
@@ -218,8 +218,9 @@ public class EvaluateSilhouette<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return meansil;
   }
 
@@ -285,8 +286,8 @@ public class EvaluateSilhouette<O> implements Evaluator {
     }
 
     @Override
-    public EvaluateSilhouette<O> make() {
-      return new EvaluateSilhouette<>(distance, noiseOption, penalize);
+    public Silhouette<O> make() {
+      return new Silhouette<>(distance, noiseOption, penalize);
     }
   }
 }

@@ -72,11 +72,11 @@ import net.jafama.FastMath;
     booktitle = "Pattern recognition, 37(3)", //
     url = "https://doi.org/10.1016/j.patcog.2003.06.005", //
     bibkey = "DBLP:journals/pr/PakhiraBM04")
-public class EvaluatePBMIndex implements Evaluator {
+public class PBMIndex implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluatePBMIndex.class);
+  private static final Logging LOG = Logging.getLogger(PBMIndex.class);
 
   /**
    * Option for noise handling.
@@ -91,7 +91,7 @@ public class EvaluatePBMIndex implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluatePBMIndex.class.getName();
+  private String key = PBMIndex.class.getName();
 
   /**
    * Constructor.
@@ -99,7 +99,7 @@ public class EvaluatePBMIndex implements Evaluator {
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
    */
-  public EvaluatePBMIndex(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
+  public PBMIndex(NumberVectorDistance<?> distance, NoiseHandling noiseOpt) {
     super();
     this.distance = distance;
     this.noiseHandling = noiseOpt;
@@ -115,12 +115,12 @@ public class EvaluatePBMIndex implements Evaluator {
   public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
-    int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseHandling);
+    int ignorednoise = SimplifiedSilhouette.centroids(rel, clusters, centroids, noiseHandling);
 
     // Build global centroid and cluster count:
     final int dim = RelationUtil.dimensionality(rel);
     Centroid overallCentroid = new Centroid(dim);
-    EvaluateVarianceRatioCriteria.globalCentroid(overallCentroid, rel, clusters, centroids, noiseHandling);
+    VarianceRatioCriterion.globalCentroid(overallCentroid, rel, clusters, centroids, noiseHandling);
 
     // Maximum distance between centroids:
     double max = 0;
@@ -205,8 +205,9 @@ public class EvaluatePBMIndex implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return pbm;
   }
 
@@ -260,8 +261,8 @@ public class EvaluatePBMIndex implements Evaluator {
     }
 
     @Override
-    public EvaluatePBMIndex make() {
-      return new EvaluatePBMIndex(distance, noiseHandling);
+    public PBMIndex make() {
+      return new PBMIndex(distance, noiseHandling);
     }
   }
 

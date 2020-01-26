@@ -34,7 +34,6 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.query.distance.PrimitiveDistanceQuery;
 import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.filter.typeconversions.ClassLabelFilter;
@@ -50,37 +49,35 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateCIndex} with ByLabelClustering and KMeans clustering
+ * Test for {@link PBMIndex} with ByLabelClustering
  * 
  * @author Robert Gehde
  */
-public class EvaluateCIndexTest {
+public class PBMIndexTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluateCIndex} with ByLabelClustering and
-   * TREAT_NOISE_AS_SINGLETONS option
+   * Test for {@link PBMIndex} with ByLabelClustering and KMeans
+   * clustering and TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateCIndexSingleton() {
+  public void testEvaluatePBMIndexMergeSingleton() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateCIndex<NumberVector> cind = new ELKIBuilder<>(EvaluateCIndex.class). //
-        with(EvaluateCIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluateCIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
-
+    PBMIndex pbmi = new ELKIBuilder<>(PBMIndex.class). //
+        with(PBMIndex.Par.DISTANCE_ID, dist). //
+        with(PBMIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-
-    // evaluate clustering
-    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    // evaluate Clustering
+    pbmi.evaluateClustering(rel, rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -90,38 +87,37 @@ public class EvaluateCIndexTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(cindmg.hasMeasure("C-Index"));
-    Measurement m = cindmg.getMeasure("C-Index");
-    assertNotNull("No C-Index Value", m);
-    assertEquals("C-Index not as expected", 0.002711774027916, m.getVal(), 1e-15);
+    assertTrue(pbmimg.hasMeasure("PBM-Index"));
+    Measurement m = pbmimg.getMeasure("PBM-Index");
+    assertNotNull("No PBM-Index Value", m);
+    assertEquals("PBM-Index not as expected", 130.144723838978, m.getVal(), 1e-10);
   }
 
   /**
-   * Test for {@link EvaluateCIndex} with ByLabelClustering and
+   * Test for {@link PBMIndex} with ByLabelClustering and KMeans
+   * clustering and
    * MERGE_NOISE option
    */
   @Test
-  public void testEvaluateCIndex() {
+  public void testEvaluatePBMIndexMerge() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateCIndex<NumberVector> cind = new ELKIBuilder<>(EvaluateCIndex.class). //
-        with(EvaluateCIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluateCIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
-
+    PBMIndex pbmi = new ELKIBuilder<>(PBMIndex.class). //
+        with(PBMIndex.Par.DISTANCE_ID, dist). //
+        with(PBMIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-
-    // evaluate clustering
-    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    // evaluate Clustering
+    pbmi.evaluateClustering(rel, rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -131,37 +127,35 @@ public class EvaluateCIndexTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(cindmg.hasMeasure("C-Index"));
-    Measurement m = cindmg.getMeasure("C-Index");
-    assertNotNull("No C-Index Value", m);
-    assertEquals("C-Index not as expected", 0.024871721992941, m.getVal(), 1e-15);
+    assertTrue(pbmimg.hasMeasure("PBM-Index"));
+    Measurement m = pbmimg.getMeasure("PBM-Index");
+    assertNotNull("No PBM-Index Value", m);
+    assertEquals("PBM-Index not as expected", 68.1409216939055, m.getVal(), 1e-13);
   }
 
   /**
-   * Regression test for {@link EvaluateCIndex} with KMeans clustering
-   * and TREAT_NOISE_AS_SINGLETONS option
+   * Regression test for {@link PBMIndex} with ByLabelClustering and
+   * MERGE_NOISE option
    */
   @Test
-  public void testEvaluateCIndexKMeans() {
+  public void testEvaluatePBMIndexMergeKMeans() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateCIndex<NumberVector> cind = new ELKIBuilder<>(EvaluateCIndex.class). //
-        with(EvaluateCIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluateCIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
-
+    PBMIndex pbmi = new ELKIBuilder<>(PBMIndex.class). //
+        with(PBMIndex.Par.DISTANCE_ID, dist). //
+        with(PBMIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-
-    // evaluate clustering
-    cind.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    // evaluate Clustering
+    pbmi.evaluateClustering(rel, rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -171,11 +165,11 @@ public class EvaluateCIndexTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup cindmg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(cindmg.hasMeasure("C-Index"));
-    Measurement m = cindmg.getMeasure("C-Index");
-    assertNotNull("No C-Index Value", m);
-    assertEquals("C-Index not as expected", 0.00891005391901485, m.getVal(), 1e-15);
+    assertTrue(pbmimg.hasMeasure("PBM-Index"));
+    Measurement m = pbmimg.getMeasure("PBM-Index");
+    assertNotNull("No PBM-Index Value", m);
+    assertEquals("PBM-Index not as expected", 101.43532084834351, m.getVal(), 1e-13);
   }
 }

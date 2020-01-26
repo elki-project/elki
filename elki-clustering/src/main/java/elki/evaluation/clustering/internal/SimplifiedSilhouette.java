@@ -62,11 +62,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
-public class EvaluateSimplifiedSilhouette implements Evaluator {
+public class SimplifiedSilhouette implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSimplifiedSilhouette.class);
+  private static final Logging LOG = Logging.getLogger(SimplifiedSilhouette.class);
 
   /**
    * Option for noise handling.
@@ -86,7 +86,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateSimplifiedSilhouette.class.getName();
+  private String key = SimplifiedSilhouette.class.getName();
 
   /**
    * Constructor.
@@ -95,7 +95,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
    * @param noiseOpt Flag to control noise handling
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateSimplifiedSilhouette(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, boolean penalize) {
+  public SimplifiedSilhouette(NumberVectorDistance<?> distance, NoiseHandling noiseOpt, boolean penalize) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -199,8 +199,9 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Simp. Silhouette +-" + FormatUtil.NF2.format(stdssil), meanssil, -1., 1., 0., false);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return meanssil;
   }
 
@@ -271,18 +272,18 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<NumberVectorDistance<?>>(EvaluateSilhouette.Par.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<NumberVectorDistance<?>>(Silhouette.Par.DISTANCE_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
-      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+      new EnumParameter<NoiseHandling>(Silhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
       if(noiseOption == NoiseHandling.IGNORE_NOISE) {
-        new Flag(EvaluateSilhouette.Par.NO_PENALIZE_ID).grab(config, x -> penalize = !x);
+        new Flag(Silhouette.Par.NO_PENALIZE_ID).grab(config, x -> penalize = !x);
       }
     }
 
     @Override
-    public EvaluateSimplifiedSilhouette make() {
-      return new EvaluateSimplifiedSilhouette(distance, noiseOption, penalize);
+    public SimplifiedSilhouette make() {
+      return new SimplifiedSilhouette(distance, noiseOption, penalize);
     }
   }
 }

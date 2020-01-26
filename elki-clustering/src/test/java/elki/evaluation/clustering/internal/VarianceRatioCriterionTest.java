@@ -22,7 +22,6 @@ package elki.evaluation.clustering.internal;
 
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -38,7 +37,7 @@ import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.filter.typeconversions.ClassLabelFilter;
-import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.evaluation.clustering.EvaluateClustering.ScoreResult;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
@@ -50,37 +49,34 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluateSimplifiedSilhouette} with ByLabelClustering and
+ * Test for {@link VarianceRatioCriterion} with ByLabelClustering and
  * KMeans clustering
  * 
  * @author Robert Gehde
  */
-public class EvaluateSimplifiedSilhouetteTest {
+public class VarianceRatioCriterionTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluateSimplifiedSilhouette} with ByLabelClustering and
+   * Test for {@link VarianceRatioCriterion} with ByLabelClustering and
    * TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateSimplifiedSilhouetteSingleton() {
+  public void testEvaluateVarianceRatioCriteriaSingleton() {
     // load classes and data
-    EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateSimplifiedSilhouette silh = new ELKIBuilder<>(EvaluateSimplifiedSilhouette.class). //
-        with(EvaluateSilhouette.Par.DISTANCE_ID, dist). //
-        with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+        with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
     // evaluate clustering
-    silh.evaluateClustering(rel, rbl);
+    varacri.evaluateClustering(rel, rbl);
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -89,39 +85,35 @@ public class EvaluateSimplifiedSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> simsilit = silhouette.iterator();
-    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
-    Measurement m = simsilit.next();
-    assertFalse("Too many measurements", simsilit.hasNext());
+    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
+    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
+    assertNotNull("No Variance Ratio Criteria Value", m);
 
-    assertEquals("Silhouette not as expected", 0.639274812814525, m.getVal(), 1e-15);
+    assertEquals("VarianceRatioCriterion not as expected", 77.025, m.getVal(), 1e-13);
   }
 
   /**
-   * Test for {@link EvaluateSimplifiedSilhouette} with ByLabelClustering and
-   * MERGER_NOISE option
+   * Test for {@link VarianceRatioCriterion} with ByLabelClustering and
+   * MERGE_NOISE option
    */
   @Test
-  public void testEvaluateSimplifiedSilhouette() {
+  public void testEvaluateVarianceRatioCriteria() {
     // load classes and data
-    EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluateSimplifiedSilhouette silh = new ELKIBuilder<>(EvaluateSimplifiedSilhouette.class). //
-        with(EvaluateSilhouette.Par.DISTANCE_ID, dist). //
-        with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+        with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
     // evaluate clustering
-    silh.evaluateClustering(rel, rbl);
+    varacri.evaluateClustering(rel, rbl);
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -130,34 +122,37 @@ public class EvaluateSimplifiedSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> simsilit = silhouette.iterator();
-    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
-    Measurement m = simsilit.next();
-    assertFalse("Too many measurements", simsilit.hasNext());
+    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
+    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
+    assertNotNull("No Variance Ratio Criteria Value", m);
 
-    assertEquals("Silhouette not as expected", 0.698584394068721, m.getVal(), 1e-15);
+    assertEquals("VarianceRatioCriterion not as expected", 40.7195512820513, m.getVal(), 1e-13);
   }
 
   /**
-   * Regression test for {@link EvaluateSimplifiedSilhouette} with KMeans
+   * Regression test for {@link VarianceRatioCriterion} with KMeans
    * clustering and TREAT_NOISE_AS_SINGLETONS option
    */
   @Test
-  public void testEvaluateSimplifiedSilhouetteTestKMeans() {
+  public void testEvaluateVarianceRatioCriteriaKMeans() {
     // load classes and data
-    EuclideanDistance dist = EuclideanDistance.STATIC;
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20);
-    EvaluateSimplifiedSilhouette silh = new ELKIBuilder<>(EvaluateSimplifiedSilhouette.class). //
-        with(EvaluateSilhouette.Par.DISTANCE_ID, dist). //
-        with(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    ListParameterization param = new ListParameterization();
+    param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
+        new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
+    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+        with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+
     // create clustering
-    LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
+    LloydKMeans<NumberVector> clustering = //
+        new LloydKMeans<NumberVector>(SquaredEuclideanDistance.STATIC, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
-    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D);
+
     // evaluate clustering
-    silh.evaluateClustering(rel, rbl);
+    varacri.evaluateClustering(rel, rbl);
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
     assertTrue("No evaluation result", it.valid());
@@ -166,13 +161,12 @@ public class EvaluateSimplifiedSilhouetteTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup squarederror = er.findOrCreateGroup("Distance-based");
     // check measurements
-    Iterator<Measurement> simsilit = silhouette.iterator();
-    assertTrue("No simplified silhouette measurement", simsilit.hasNext());
-    Measurement m = simsilit.next();
-    assertFalse("Too many measurements", simsilit.hasNext());
+    assertTrue(squarederror.hasMeasure("Variance Ratio Criteria"));
+    Measurement m = squarederror.getMeasure("Variance Ratio Criteria");
+    assertNotNull("No Variance Ratio Criteria Value", m);
 
-    assertEquals("Silhouette not as expected", 0.8024712757957062, m.getVal(), 1e-15);
+    assertEquals("VarianceRatioCriterion not as expected", 65.60937499999999, m.getVal(), 1e-13);
   }
 }

@@ -80,11 +80,11 @@ import net.jafama.FastMath;
     booktitle = "Journal of the American Statistical Association, 70(349)", //
     url = "https://doi.org/10.1080/01621459.1975.10480256", //
     bibkey = "doi:10.1080/01621459.1975.10480256")
-public class EvaluateConcordantPairs<O> implements Evaluator {
+public class ConcordantPairsGammaTau<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateConcordantPairs.class);
+  private static final Logging LOG = Logging.getLogger(ConcordantPairsGammaTau.class);
 
   /**
    * Option for noise handling.
@@ -99,7 +99,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateConcordantPairs.class.getName();
+  private String key = ConcordantPairsGammaTau.class.getName();
 
   /**
    * Constructor.
@@ -107,7 +107,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    * @param distance Distance function
    * @param noiseHandling Control noise handling
    */
-  public EvaluateConcordantPairs(PrimitiveDistance<? super NumberVector> distance, NoiseHandling noiseHandling) {
+  public ConcordantPairsGammaTau(PrimitiveDistance<? super NumberVector> distance, NoiseHandling noiseHandling) {
     super();
     this.distance = distance;
     this.noiseHandling = noiseHandling;
@@ -208,8 +208,9 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     MeasurementGroup g = ev.findOrCreateGroup("Concordance");
     g.addMeasure("Gamma", gamma, -1., 1., 0., false);
     g.addMeasure("Tau", tau, -1., +1., 0., false);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return gamma;
   }
 
@@ -336,8 +337,8 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     }
 
     @Override
-    public EvaluateConcordantPairs<O> make() {
-      return new EvaluateConcordantPairs<>(distance, noiseHandling);
+    public ConcordantPairsGammaTau<O> make() {
+      return new ConcordantPairsGammaTau<>(distance, noiseHandling);
     }
   }
 }

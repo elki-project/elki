@@ -49,35 +49,36 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Test for {@link EvaluatePBMIndex} with ByLabelClustering
+ * Test for {@link DaviesBouldinIndex} with ByLabelClustering and KMeans
+ * clustering
  * 
  * @author Robert Gehde
  */
-public class EvaluatePBMIndexTest {
+public class DaviesBouldinIndexTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
-   * Test for {@link EvaluatePBMIndex} with ByLabelClustering and KMeans
-   * clustering and TREAT_NOISE_AS_SINGLETONS option
+   * Test for {@link DaviesBouldinIndex} with ByLabelClustering
    */
   @Test
-  public void testEvaluatePBMIndexMergeSingleton() {
+  public void testEvaluateDavisBouldin() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluatePBMIndex pbmi = new ELKIBuilder<>(EvaluatePBMIndex.class). //
-        with(EvaluatePBMIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluatePBMIndex.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
+    DaviesBouldinIndex dabo = new ELKIBuilder<>(DaviesBouldinIndex.class). //
+        with(DaviesBouldinIndex.Par.DISTANCE_ID, dist). //
+        with(DaviesBouldinIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
         with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-    // evaluate Clustering
-    pbmi.evaluateClustering(rel, rbl);
+    Relation<? extends NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+
+    // evaluate clustering
+    dabo.evaluateClustering(rel, rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -87,75 +88,35 @@ public class EvaluatePBMIndexTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup dabomg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(pbmimg.hasMeasure("PBM-Index"));
-    Measurement m = pbmimg.getMeasure("PBM-Index");
-    assertNotNull("No PBM-Index Value", m);
-    assertEquals("PBM-Index not as expected", 130.144723838978, m.getVal(), 1e-10);
+    assertTrue(dabomg.hasMeasure("Davies Bouldin Index"));
+    Measurement m = dabomg.getMeasure("Davies Bouldin Index");
+    assertNotNull("No Davies Bouldin Index", m);
+    assertEquals("Davies Bouldin Index (mean) not as expected", 1.02661179674861, m.getVal(), 1e-13);
   }
 
   /**
-   * Test for {@link EvaluatePBMIndex} with ByLabelClustering and KMeans
-   * clustering and
-   * MERGE_NOISE option
+   * Test for {@link DaviesBouldinIndex} with KMeans clustering
    */
   @Test
-  public void testEvaluatePBMIndexMerge() {
+  public void testEvaluateDavisBouldinKMeans() {
     // load classes and data
     EuclideanDistance dist = EuclideanDistance.STATIC;
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluatePBMIndex pbmi = new ELKIBuilder<>(EvaluatePBMIndex.class). //
-        with(EvaluatePBMIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluatePBMIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
-    // create clustering
-    ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
-        with(ByLabelClustering.Par.NOISE_ID, Pattern.compile("Outlier")).build();
-    Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
-    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-    // evaluate Clustering
-    pbmi.evaluateClustering(rel, rbl);
-
-    // get measurement data
-    It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
-    assertTrue("No evaluation result", it.valid());
-    assertTrue("Not a score result", it.get() instanceof EvaluationResult);
-    EvaluationResult er = it.get();
-    it.advance();
-    assertFalse("More than one evaluation result?", it.valid());
-
-    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
-    // check measurements
-    assertTrue(pbmimg.hasMeasure("PBM-Index"));
-    Measurement m = pbmimg.getMeasure("PBM-Index");
-    assertNotNull("No PBM-Index Value", m);
-    assertEquals("PBM-Index not as expected", 68.1409216939055, m.getVal(), 1e-13);
-  }
-
-  /**
-   * Regression test for {@link EvaluatePBMIndex} with ByLabelClustering and
-   * MERGE_NOISE option
-   */
-  @Test
-  public void testEvaluatePBMIndexMergeKMeans() {
-    // load classes and data
-    EuclideanDistance dist = EuclideanDistance.STATIC;
-    ListParameterization param = new ListParameterization();
-    param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
-        new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    EvaluatePBMIndex pbmi = new ELKIBuilder<>(EvaluatePBMIndex.class). //
-        with(EvaluatePBMIndex.Par.DISTANCE_ID, dist). //
-        with(EvaluatePBMIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
+    DaviesBouldinIndex dabo = new ELKIBuilder<>(DaviesBouldinIndex.class). //
+        with(DaviesBouldinIndex.Par.DISTANCE_ID, dist). //
+        with(DaviesBouldinIndex.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
-    // evaluate Clustering
-    pbmi.evaluateClustering(rel, rbl);
+
+    // evaluate clustering
+    dabo.evaluateClustering(rel, rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -165,11 +126,11 @@ public class EvaluatePBMIndexTest {
     it.advance();
     assertFalse("More than one evaluation result?", it.valid());
 
-    MeasurementGroup pbmimg = er.findOrCreateGroup("Distance-based");
+    MeasurementGroup dabomg = er.findOrCreateGroup("Distance-based");
     // check measurements
-    assertTrue(pbmimg.hasMeasure("PBM-Index"));
-    Measurement m = pbmimg.getMeasure("PBM-Index");
-    assertNotNull("No PBM-Index Value", m);
-    assertEquals("PBM-Index not as expected", 101.43532084834351, m.getVal(), 1e-13);
+    assertTrue(dabomg.hasMeasure("Davies Bouldin Index"));
+    Measurement m = dabomg.getMeasure("Davies Bouldin Index");
+    assertNotNull("No Davies Bouldin Index", m);
+    assertEquals("Davies Bouldin Index (mean) not as expected", .4184031237431774, m.getVal(), 1e-13);
   }
 }

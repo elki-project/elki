@@ -77,11 +77,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Psychological Bulletin, Vol. 83(6)", //
     url = "https://doi.org/10.1037/0033-2909.83.6.1072", //
     bibkey = "doi:10.1037/0033-2909.83.6.1072")
-public class EvaluateCIndex<O> implements Evaluator {
+public class CIndex<O> implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateCIndex.class);
+  private static final Logging LOG = Logging.getLogger(CIndex.class);
 
   /**
    * Option for noise handling.
@@ -96,7 +96,7 @@ public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateCIndex.class.getName();
+  private String key = CIndex.class.getName();
 
   /**
    * Constructor.
@@ -104,7 +104,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * @param distance Distance function
    * @param noiseOpt Flag to control noise handling
    */
-  public EvaluateCIndex(Distance<? super O> distance, NoiseHandling noiseOpt) {
+  public CIndex(Distance<? super O> distance, NoiseHandling noiseOpt) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOpt;
@@ -196,8 +196,9 @@ public class EvaluateCIndex<O> implements Evaluator {
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return cIndex;
   }
 
@@ -300,8 +301,8 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
 
     @Override
-    public EvaluateCIndex<O> make() {
-      return new EvaluateCIndex<>(distance, noiseOption);
+    public CIndex<O> make() {
+      return new CIndex<>(distance, noiseOption);
     }
   }
 

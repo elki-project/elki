@@ -69,11 +69,11 @@ import net.jafama.FastMath;
  * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling
  */
-public class EvaluateSquaredErrors implements Evaluator {
+public class SquaredErrors implements Evaluator {
   /**
    * Logger for debug output.
    */
-  private static final Logging LOG = Logging.getLogger(EvaluateSquaredErrors.class);
+  private static final Logging LOG = Logging.getLogger(SquaredErrors.class);
 
   /**
    * Handling of Noise clusters
@@ -88,7 +88,7 @@ public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Key for logging statistics.
    */
-  private String key = EvaluateSquaredErrors.class.getName();
+  private String key = SquaredErrors.class.getName();
 
   /**
    * Constructor.
@@ -96,7 +96,7 @@ public class EvaluateSquaredErrors implements Evaluator {
    * @param distance Distance function to use.
    * @param noiseOption Control noise handling.
    */
-  public EvaluateSquaredErrors(NumberVectorDistance<?> distance, NoiseHandling noiseOption) {
+  public SquaredErrors(NumberVectorDistance<?> distance, NoiseHandling noiseOption) {
     super();
     this.distance = distance;
     this.noiseOption = noiseOption;
@@ -146,8 +146,9 @@ public class EvaluateSquaredErrors implements Evaluator {
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
-    Metadata.hierarchyOf(c).addChild(ev);
-    // FIXME: notify of changes, if reused!
+    if(!Metadata.hierarchyOf(c).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
     return ssq;
   }
 
@@ -199,8 +200,8 @@ public class EvaluateSquaredErrors implements Evaluator {
     }
 
     @Override
-    public EvaluateSquaredErrors make() {
-      return new EvaluateSquaredErrors(distance, noiseOption);
+    public SquaredErrors make() {
+      return new SquaredErrors(distance, noiseOption);
     }
   }
 }

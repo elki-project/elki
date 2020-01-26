@@ -39,7 +39,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.evaluation.clustering.internal.EvaluateSilhouette;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
@@ -247,7 +247,7 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
           .grab(config, x -> distance = x);
       new ObjectParameter<ClusteringAlgorithm<?>>(CLUSTERING_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> clusterer = x);
-      new EnumParameter<NoiseHandling>(EvaluateSilhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
+      new EnumParameter<NoiseHandling>(Silhouette.Par.NOISE_ID, NoiseHandling.class, NoiseHandling.TREAT_NOISE_AS_SINGLETONS) //
           .grab(config, x -> noiseOption = x);
     }
 
