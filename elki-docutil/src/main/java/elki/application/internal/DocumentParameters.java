@@ -820,7 +820,7 @@ public class DocumentParameters {
   /**
    * Sort parameters by their option id.
    */
-  private static Comparator<OptionID> SORT_BY_OPTIONID = new Comparator<OptionID>() {
+  private static final Comparator<OptionID> SORT_BY_OPTIONID = new Comparator<OptionID>() {
     @Override
     public int compare(OptionID o1, OptionID o2) {
       return o1.getName().compareToIgnoreCase(o2.getName());
@@ -830,7 +830,7 @@ public class DocumentParameters {
   /**
    * Sort parameters by OptionID, then class priority.
    */
-  private static Comparator<Pair<Parameter<?>, Class<?>>> SORT_BY_OPTIONID_PRIORITY = new Comparator<Pair<Parameter<?>, Class<?>>>() {
+  private static final Comparator<Pair<Parameter<?>, Class<?>>> SORT_BY_OPTIONID_PRIORITY = new Comparator<Pair<Parameter<?>, Class<?>>>() {
     @Override
     public int compare(Pair<Parameter<?>, Class<?>> o1, Pair<Parameter<?>, Class<?>> o2) {
       int c = SORT_BY_OPTIONID.compare(o1.first.getOptionID(), o2.first.getOptionID());

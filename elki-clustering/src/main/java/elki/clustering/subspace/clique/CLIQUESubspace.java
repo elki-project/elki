@@ -242,7 +242,7 @@ public class CLIQUESubspace extends Subspace {
    * Note: this comparator provides an ordering that is inconsistent with
    * equals.
    */
-  public static Comparator<CLIQUESubspace> BY_COVERAGE = new Comparator<CLIQUESubspace>() {
+  public static final Comparator<CLIQUESubspace> BY_COVERAGE = new Comparator<CLIQUESubspace>() {
     @Override
     public int compare(CLIQUESubspace s1, CLIQUESubspace s2) {
       return Integer.compare(s2.getCoverage(), s1.getCoverage());

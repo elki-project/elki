@@ -38,7 +38,7 @@ public class LogNormalLogMOMEstimator implements LogMeanVarianceEstimator<LogNor
   /**
    * Static estimator, using mean and variance.
    */
-  public static LogNormalLogMOMEstimator STATIC = new LogNormalLogMOMEstimator();
+  public static final LogNormalLogMOMEstimator STATIC = new LogNormalLogMOMEstimator();
 
   /**
    * Private constructor, use static instance!

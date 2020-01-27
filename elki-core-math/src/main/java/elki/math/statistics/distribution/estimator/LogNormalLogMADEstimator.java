@@ -54,7 +54,7 @@ public class LogNormalLogMADEstimator implements LogMADDistributionEstimator<Log
   /**
    * Static estimator, more robust to outliers by using the median.
    */
-  public static LogNormalLogMADEstimator STATIC = new LogNormalLogMADEstimator();
+  public static final LogNormalLogMADEstimator STATIC = new LogNormalLogMADEstimator();
 
   /**
    * Constructor. Private: use static instance!

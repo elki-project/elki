@@ -445,7 +445,7 @@ public class DocumentReferences {
     }
   };
 
-  private static Comparator<Map.Entry<Reference, TreeSet<Object>>> SORT_BY_FIRST_CLASS = new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
+  private static final Comparator<Map.Entry<Reference, TreeSet<Object>>> SORT_BY_FIRST_CLASS = new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
     @Override
     public int compare(Map.Entry<Reference, TreeSet<Object>> p1, Map.Entry<Reference, TreeSet<Object>> p2) {
       final Object o1 = p1.getValue().first(), o2 = p2.getValue().first();

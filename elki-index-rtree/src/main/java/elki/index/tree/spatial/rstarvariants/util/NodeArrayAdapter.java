@@ -34,7 +34,7 @@ public class NodeArrayAdapter implements ArrayAdapter<SpatialEntry, AbstractNode
   /**
    * Static adapter.
    */
-  public static NodeArrayAdapter STATIC = new NodeArrayAdapter();
+  public static final NodeArrayAdapter STATIC = new NodeArrayAdapter();
 
   /**
    * Constructor.

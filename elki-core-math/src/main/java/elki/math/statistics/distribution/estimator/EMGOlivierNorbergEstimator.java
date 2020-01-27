@@ -49,7 +49,7 @@ public class EMGOlivierNorbergEstimator implements MOMDistributionEstimator<Expo
   /**
    * Static estimator class.
    */
-  public static EMGOlivierNorbergEstimator STATIC = new EMGOlivierNorbergEstimator();
+  public static final EMGOlivierNorbergEstimator STATIC = new EMGOlivierNorbergEstimator();
 
   /**
    * Private constructor, use static instance!

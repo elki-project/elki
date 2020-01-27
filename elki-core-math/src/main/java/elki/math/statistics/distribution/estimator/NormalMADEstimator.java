@@ -53,7 +53,7 @@ public class NormalMADEstimator implements MADDistributionEstimator<NormalDistri
   /**
    * Static estimator, more robust to outliers by using the median.
    */
-  public static NormalMADEstimator STATIC = new NormalMADEstimator();
+  public static final NormalMADEstimator STATIC = new NormalMADEstimator();
 
   /**
    * Constructor. Private: use static instance!

@@ -40,7 +40,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
   /**
    * Static instance
    */
-  public static KolmogorovSmirnovTest STATIC = new KolmogorovSmirnovTest();
+  public static final KolmogorovSmirnovTest STATIC = new KolmogorovSmirnovTest();
 
   /**
    * Constructor.

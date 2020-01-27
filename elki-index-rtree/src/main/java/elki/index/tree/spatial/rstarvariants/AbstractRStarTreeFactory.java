@@ -87,12 +87,12 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     /**
      * Fast-insertion parameter. Optional.
      */
-    public static OptionID INSERTION_STRATEGY_ID = new OptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
+    public static final OptionID INSERTION_STRATEGY_ID = new OptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
 
     /**
      * Split strategy parameter. Optional.
      */
-    public static OptionID SPLIT_STRATEGY_ID = new OptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
+    public static final OptionID SPLIT_STRATEGY_ID = new OptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
 
     /**
      * Parameter for bulk strategy
@@ -107,7 +107,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
     /**
      * Overflow treatment.
      */
-    public static OptionID OVERFLOW_STRATEGY_ID = new OptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
+    public static final OptionID OVERFLOW_STRATEGY_ID = new OptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
 
     /**
      * Tree settings

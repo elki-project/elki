@@ -73,7 +73,7 @@ public final class OptionID {
    *        exist already
    * @return the OptionID for the given name
    */
-  public static OptionID getOrCreateOptionID(final String name, final String description) {
+  public static final OptionID getOrCreateOptionID(final String name, final String description) {
     return new OptionID(name, description);
   }
 

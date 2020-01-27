@@ -40,7 +40,7 @@ public class NormalMOMEstimator implements MeanVarianceDistributionEstimator<Nor
   /**
    * Static estimator, using mean and variance.
    */
-  public static NormalMOMEstimator STATIC = new NormalMOMEstimator();
+  public static final NormalMOMEstimator STATIC = new NormalMOMEstimator();
 
   /**
    * Private constructor, use static instance!

@@ -35,7 +35,7 @@ public class DisableQueryOptimizer implements QueryOptimizer {
   /**
    * Public static instance.
    */
-  public static DisableQueryOptimizer STATIC = new DisableQueryOptimizer();
+  public static final DisableQueryOptimizer STATIC = new DisableQueryOptimizer();
 
   /**
    * Constructor, use {@link #STATIC} instead.

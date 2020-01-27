@@ -236,7 +236,7 @@ public class QuickSelect {
   /**
    * Adapter for double arrays.
    */
-  public static Adapter<double[]> DOUBLE_ADAPTER = new Adapter<double[]>() {
+  public static final Adapter<double[]> DOUBLE_ADAPTER = new Adapter<double[]>() {
     @Override
     public void swap(double[] data, int i, int j) {
       double tmp = data[i];
@@ -253,7 +253,7 @@ public class QuickSelect {
   /**
    * Adapter for integer arrays.
    */
-  public static Adapter<int[]> INTEGER_ADAPTER = new Adapter<int[]>() {
+  public static final Adapter<int[]> INTEGER_ADAPTER = new Adapter<int[]>() {
     @Override
     public void swap(int[] data, int i, int j) {
       int tmp = data[i];
@@ -270,7 +270,7 @@ public class QuickSelect {
   /**
    * Adapter for float arrays.
    */
-  public static Adapter<float[]> FLOAT_ADAPTER = new Adapter<float[]>() {
+  public static final Adapter<float[]> FLOAT_ADAPTER = new Adapter<float[]>() {
     @Override
     public void swap(float[] data, int i, int j) {
       float tmp = data[i];
@@ -287,7 +287,7 @@ public class QuickSelect {
   /**
    * Adapter for short arrays.
    */
-  public static Adapter<short[]> SHORT_ADAPTER = new Adapter<short[]>() {
+  public static final Adapter<short[]> SHORT_ADAPTER = new Adapter<short[]>() {
     @Override
     public void swap(short[] data, int i, int j) {
       short tmp = data[i];
@@ -304,7 +304,7 @@ public class QuickSelect {
   /**
    * Adapter for long arrays.
    */
-  public static Adapter<long[]> LONG_ADAPTER = new Adapter<long[]>() {
+  public static final Adapter<long[]> LONG_ADAPTER = new Adapter<long[]>() {
     @Override
     public void swap(long[] data, int i, int j) {
       long tmp = data[i];
@@ -321,7 +321,7 @@ public class QuickSelect {
   /**
    * Adapter for byte arrays.
    */
-  public static Adapter<byte[]> BYTE_ADAPTER = new Adapter<byte[]>() {
+  public static final Adapter<byte[]> BYTE_ADAPTER = new Adapter<byte[]>() {
     @Override
     public void swap(byte[] data, int i, int j) {
       byte tmp = data[i];
@@ -338,7 +338,7 @@ public class QuickSelect {
   /**
    * Adapter for char arrays.
    */
-  public static Adapter<char[]> CHAR_ADAPTER = new Adapter<char[]>() {
+  public static final Adapter<char[]> CHAR_ADAPTER = new Adapter<char[]>() {
     @Override
     public void swap(char[] data, int i, int j) {
       char tmp = data[i];

@@ -254,7 +254,7 @@ public class ELKIServiceScanner {
   /**
    * Sort classes by their class name. Package first, then class.
    */
-  public static Comparator<Class<?>> SORT_BY_NAME = new Comparator<Class<?>>() {
+  public static final Comparator<Class<?>> SORT_BY_NAME = new Comparator<Class<?>>() {
     @Override
     public int compare(Class<?> o1, Class<?> o2) {
       return comparePackageClass(o1, o2);

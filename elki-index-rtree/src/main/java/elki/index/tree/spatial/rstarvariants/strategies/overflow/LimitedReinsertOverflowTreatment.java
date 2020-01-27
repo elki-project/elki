@@ -121,7 +121,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
     /**
      * Fast-insertion parameter. Optional.
      */
-    public static OptionID REINSERT_STRATEGY_ID = new OptionID("rtree.reinsertion-strategy", "The strategy to select candidates for reinsertion.");
+    public static final OptionID REINSERT_STRATEGY_ID = new OptionID("rtree.reinsertion-strategy", "The strategy to select candidates for reinsertion.");
 
     /**
      * The actual reinsertion strategy

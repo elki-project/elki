@@ -281,7 +281,7 @@ public class Cluster<M extends Model> implements TextWriteable {
    * clusters. Do NOT use in e.g. a TreeSet since it is
    * <em>inconsistent with equals</em>.
    */
-  public static Comparator<Cluster<?>> BY_NAME_SORTER = new Comparator<Cluster<?>>() {
+  public static final Comparator<Cluster<?>> BY_NAME_SORTER = new Comparator<Cluster<?>>() {
     @Override
     public int compare(Cluster<?> o1, Cluster<?> o2) {
       if(o1 == o2) {

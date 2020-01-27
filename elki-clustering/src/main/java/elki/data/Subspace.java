@@ -208,7 +208,7 @@ public class Subspace {
    * returned if {@code d1} is less than or greater than {@code d2}. Otherwise
    * the two subspaces have equal dimensions and zero will be returned.
    */
-  public static Comparator<Subspace> DIMENSION_COMPARATOR = new Comparator<Subspace>() {
+  public static final Comparator<Subspace> DIMENSION_COMPARATOR = new Comparator<Subspace>() {
     @Override
     public int compare(Subspace s1, Subspace s2) {
       if(s1 == s2 || s1.getDimensions() == s2.getDimensions()) {
