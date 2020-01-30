@@ -131,16 +131,6 @@ public class XTreeIndex<O extends NumberVector> extends XTree implements RangeIn
   }
 
   @Override
-  public String getLongName() {
-    return "X-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "xtree";
-  }
-
-  @Override
   protected Logging getLogger() {
     return LOG;
   }

@@ -22,12 +22,14 @@ package elki.clustering.correlation;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import elki.clustering.AbstractProjectedClustering;
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.ClusterModel;
 import elki.data.model.Model;
@@ -36,12 +38,10 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.math.linearalgebra.Centroid;
-import elki.math.linearalgebra.pca.PCAResult;
 import elki.math.linearalgebra.pca.PCARunner;
 import elki.result.Metadata;
 import elki.utilities.documentation.Description;
@@ -72,8 +72,6 @@ import net.jafama.FastMath;
  *
  * @has - - - PCARunner
  * @composed - - - ProjectedEnergy
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ORCLUS: Arbitrarily ORiented projected CLUSter generation")
 @Description("Algorithm to find correlation clusters in high dimensional spaces.")
@@ -82,7 +80,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '00)", //
     url = "https://doi.org/10.1145/342009.335383", //
     bibkey = "DBLP:conf/sigmod/AggarwalY00")
-public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<Clustering<Model>, V> {
+public class ORCLUS extends AbstractProjectedClustering<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -130,7 +128,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    *
    * @param relation Relation
    */
-  public Clustering<Model> run(Relation<V> relation) {
+  public Clustering<Model> run(Relation<? extends NumberVector> relation) {
     // current dimensionality associated with each seed
     int dim_c = RelationUtil.dimensionality(relation);
 
@@ -188,7 +186,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param k the size of the random sample
    * @return the initial seed list
    */
-  private List<ORCLUSCluster> initialSeeds(Relation<V> database, int k) {
+  private List<ORCLUSCluster> initialSeeds(Relation<? extends NumberVector> database, int k) {
     DBIDs randomSample = DBIDUtil.randomSample(database.getDBIDs(), k, rnd);
     List<ORCLUSCluster> seeds = new ArrayList<>(k);
     for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
@@ -205,17 +203,17 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param clusters the array of clusters to which the objects should be
    *        assigned to
    */
-  private void assign(Relation<V> database, List<ORCLUSCluster> clusters) {
-    NumberVectorDistance<? super V> distFunc = SquaredEuclideanDistance.STATIC;
+  private void assign(Relation<? extends NumberVector> database, List<ORCLUSCluster> clusters) {
+    SquaredEuclideanDistance distFunc = SquaredEuclideanDistance.STATIC;
     // clear the current clusters
     for(ORCLUSCluster cluster : clusters) {
       cluster.objectIDs.clear();
     }
 
     // projected centroids of the clusters
-    List<NumberVector> projectedCentroids = new ArrayList<>(clusters.size());
+    List<double[]> projectedCentroids = new ArrayList<>(clusters.size());
     for(ORCLUSCluster c : clusters) {
-      projectedCentroids.add(DoubleVector.wrap(project(c, c.centroid)));
+      projectedCentroids.add(times(c.basis, c.centroid));
     }
 
     // for each data point o do
@@ -224,11 +222,10 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
 
       // determine projected distance between o and clusters
       ORCLUSCluster minCluster = clusters.get(0);
-      double minDist = distFunc.distance(DoubleVector.wrap(project(minCluster, o)), projectedCentroids.get(0));
+      double minDist = distFunc.distance(times(minCluster.basis, o), projectedCentroids.get(0));
       for(int i = 1; i < clusters.size(); i++) {
         ORCLUSCluster c = clusters.get(i);
-        NumberVector o_proj = DoubleVector.wrap(project(c, o));
-        double dist = distFunc.distance(o_proj, projectedCentroids.get(i));
+        double dist = distFunc.distance(times(c.basis, o), projectedCentroids.get(i));
         if(dist < minDist) {
           minDist = dist;
           minCluster = c;
@@ -255,9 +252,8 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param dim the dimensionality of the subspace
    * @return matrix defining the basis of the subspace for the specified cluster
    */
-  private double[][] findBasis(Relation<V> database, ORCLUSCluster cluster, int dim) {
-    PCAResult pcares = pca.processIds(cluster.objectIDs, database);
-    final double[][] evs = pcares.getEigenvectors();
+  private double[][] findBasis(Relation<? extends NumberVector> database, ORCLUSCluster cluster, int dim) {
+    double[][] evs = pca.processIds(cluster.objectIDs, database).getEigenvectors();
     return Arrays.copyOfRange(evs, evs.length - dim, evs.length);
   }
 
@@ -269,15 +265,13 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param k_new the new number of seeds
    * @param d_new the new dimensionality of the subspaces for each seed
    */
-  private void merge(Relation<V> relation, List<ORCLUSCluster> clusters, int k_new, int d_new, IndefiniteProgress cprogress) {
+  private void merge(Relation<? extends NumberVector> relation, List<ORCLUSCluster> clusters, int k_new, int d_new, IndefiniteProgress cprogress) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<>((clusters.size() * (clusters.size() - 1)) >>> 1);
     for(int i = 0; i < clusters.size(); i++) {
+      ORCLUSCluster c_i = clusters.get(i);
       for(int j = i + 1; j < clusters.size(); j++) {
         // projected energy of c_ij in subspace e_ij
-        ORCLUSCluster c_i = clusters.get(i);
-        ORCLUSCluster c_j = clusters.get(j);
-
-        projectedEnergies.add(projectedEnergy(relation, c_i, c_j, i, j, d_new));
+        projectedEnergies.add(projectedEnergy(relation, c_i, clusters.get(j), i, j, d_new));
       }
     }
 
@@ -287,38 +281,26 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
+      ORCLUSCluster c_ij = minPE.cluster;
+      final int i = minPE.i, j = minPE.j;
 
       // renumber the clusters by replacing cluster c_i with cluster c_ij
       // and discarding cluster c_j
-      for(int c = 0; c < clusters.size(); c++) {
-        if(c == minPE.i) {
-          clusters.remove(c);
-          clusters.add(c, minPE.cluster);
-        }
-        if(c == minPE.j) {
-          clusters.remove(c);
-        }
-      }
+      clusters.set(i, c_ij);
+      clusters.remove(j);
 
       // remove obsolete projected energies and renumber the others ...
-      int i = minPE.i, j = minPE.j;
-      for(Iterator<ProjectedEnergy> it = projectedEnergies.iterator(); it.hasNext();) {
-        ProjectedEnergy pe = it.next();
-        if(pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
-          it.remove();
+      projectedEnergies.removeIf(pe -> pe.i == i || pe.i == j || pe.j == i || pe.j == j);
+      for(ProjectedEnergy pe : projectedEnergies) {
+        if(pe.i > j) {
+          pe.i--;
         }
-        else {
-          if(pe.i > j) {
-            pe.i -= 1;
-          }
-          if(pe.j > j) {
-            pe.j -= 1;
-          }
+        if(pe.j > j) {
+          pe.j--;
         }
       }
 
-      // ... and recompute them
-      ORCLUSCluster c_ij = minPE.cluster;
+      // ... and recompute the PEs with the new cluster
       for(int c = 0; c < clusters.size(); c++) {
         if(c < i) {
           projectedEnergies.add(projectedEnergy(relation, clusters.get(c), c_ij, c, i, d_new));
@@ -344,16 +326,15 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param dim the dimensionality of the clusters
    * @return the projected energy of the specified cluster
    */
-  private ProjectedEnergy projectedEnergy(Relation<V> relation, ORCLUSCluster c_i, ORCLUSCluster c_j, int i, int j, int dim) {
-    NumberVectorDistance<? super V> distFunc = SquaredEuclideanDistance.STATIC;
+  private ProjectedEnergy projectedEnergy(Relation<? extends NumberVector> relation, ORCLUSCluster c_i, ORCLUSCluster c_j, int i, int j, int dim) {
+    SquaredEuclideanDistance distFunc = SquaredEuclideanDistance.STATIC;
     // union of cluster c_i and c_j
     ORCLUSCluster c_ij = union(relation, c_i, c_j, dim);
 
     double sum = 0.;
-    NumberVector c_proj = DoubleVector.wrap(project(c_ij, c_ij.centroid));
+    double[] c_proj = times(c_ij.basis, c_ij.centroid);
     for(DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
-      NumberVector o_proj = DoubleVector.wrap(project(c_ij, relation.get(iter).toArray()));
-      sum += distFunc.distance(o_proj, c_proj);
+      sum += distFunc.distance(c_proj, times(c_ij.basis, relation.get(iter).toArray()));
     }
     sum /= c_ij.objectIDs.size();
 
@@ -369,38 +350,25 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param dim the dimensionality of the union cluster
    * @return the union of the two specified clusters
    */
-  private ORCLUSCluster union(Relation<V> relation, ORCLUSCluster c1, ORCLUSCluster c2, int dim) {
+  private ORCLUSCluster union(Relation<? extends NumberVector> relation, ORCLUSCluster c1, ORCLUSCluster c2, int dim) {
     ORCLUSCluster c = new ORCLUSCluster();
-    c.objectIDs = DBIDUtil.newHashSet(c1.objectIDs);
-    c.objectIDs.addDBIDs(c2.objectIDs);
-    c.objectIDs = DBIDUtil.newArray(c.objectIDs);
+    c.objectIDs = DBIDUtil.union(c1.objectIDs, c2.objectIDs);
 
-    if(c.objectIDs.size() > 0) {
+    if(!c.objectIDs.isEmpty()) {
       c.centroid = Centroid.make(relation, c.objectIDs).getArrayRef();
       c.basis = findBasis(relation, c, dim);
     }
     else {
-      c.centroid = timesEquals(plusEquals(c1.centroid, c2.centroid), .5);
+      c.centroid = timesEquals(plus(c1.centroid, c2.centroid), .5);
       c.basis = identity(dim, c.centroid.length);
     }
     return c;
   }
 
   /**
-   * Returns the projection of real vector o in the subspace of cluster c.
-   * 
-   * @param c the cluster
-   * @param o the double vector
-   * @return the projection of double vector o in the subspace of cluster c
-   */
-  private double[] project(ORCLUSCluster c, double[] o) {
-    return times(c.basis, o);
-  }
-
-  /**
    * Encapsulates the attributes of a cluster.
    */
-  private final class ORCLUSCluster {
+  private static final class ORCLUSCluster {
     // TODO: reuse/derive from existing cluster classes?
     /**
      * The ids of the objects belonging to this cluster.
@@ -443,13 +411,30 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
   /**
    * Encapsulates the projected energy for a cluster.
    */
-  private final class ProjectedEnergy implements Comparable<ProjectedEnergy> {
+  private static final class ProjectedEnergy implements Comparable<ProjectedEnergy> {
+    /**
+     * Origin cluster indexes
+     */
     int i, j;
 
+    /**
+     * Resulting merged cluster
+     */
     ORCLUSCluster cluster;
 
+    /**
+     * Projected energy
+     */
     double projectedEnergy;
 
+    /**
+     * Constructor.
+     *
+     * @param i First cluster id
+     * @param j Second cluster id
+     * @param cluster Resulting merged cluster
+     * @param projectedEnergy Projected energy
+     */
     ProjectedEnergy(int i, int j, ORCLUSCluster cluster, double projectedEnergy) {
       this.i = i;
       this.j = j;
@@ -475,7 +460,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractProjectedClustering.Par {
+  public static class Par extends AbstractProjectedClustering.Par {
     /**
      * Parameter to specify the factor for reducing the number of current
      * clusters in each iteration, must be an integer greater than 0 and less
@@ -525,8 +510,8 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     }
 
     @Override
-    public ORCLUS<V> make() {
-      return new ORCLUS<>(k, k_i, l, alpha, rnd, pca);
+    public ORCLUS make() {
+      return new ORCLUS(k, k_i, l, alpha, rnd, pca);
     }
   }
 }

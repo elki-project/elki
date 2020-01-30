@@ -144,17 +144,7 @@ public class LuceneDocumentRelation implements Relation<Document> {
 
     @Override
     public void logStatistics() {
-      // Log some stats from lucene?
-    }
-
-    @Override
-    public String getLongName() {
-      return "Lucene index";
-    }
-
-    @Override
-    public String getShortName() {
-      return "lucene-index";
+      // TODO: Log some stats from lucene?
     }
   }
 }

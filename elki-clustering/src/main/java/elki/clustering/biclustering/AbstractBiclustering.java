@@ -27,12 +27,7 @@ import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.BiclusterModel;
-import elki.database.Database;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDUtil;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.utilities.datastructures.BitsUtil;
@@ -49,21 +44,14 @@ import elki.utilities.datastructures.BitsUtil;
  *
  * @author Arthur Zimek
  * @since 0.1
- * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
- *        consist of rows where each row relates to an object of type V and the
- *        columns relate to the attribute values of these objects
+ *
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector, M extends BiclusterModel> implements ClusteringAlgorithm<Clustering<M>> {
-  /**
-   * Keeps the currently set database.
-   */
-  private Database database;
-
+public abstract class AbstractBiclustering<M extends BiclusterModel> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Relation we use.
    */
-  protected Relation<V> relation;
+  protected Relation<? extends NumberVector> relation;
 
   /**
    * Iterator to use for more efficient random access.
@@ -99,7 +87,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
    * @param relation Relation to process
    * @return Clustering result
    */
-  public final Clustering<M> run(Relation<V> relation) {
+  public final Clustering<M> run(Relation<? extends NumberVector> relation) {
     this.relation = relation;
     colDim = RelationUtil.dimensionality(relation);
     rowIDs = DBIDUtil.ensureArray(this.relation.getDBIDs());
@@ -271,23 +259,5 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
    */
   protected int getColDim() {
     return colDim;
-  }
-
-  /**
-   * Getter for database.
-   *
-   * @return database
-   */
-  public Database getDatabase() {
-    return database;
-  }
-
-  /**
-   * Getter for the relation.
-   *
-   * @return relation
-   */
-  public Relation<V> getRelation() {
-    return relation;
   }
 }

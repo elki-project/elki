@@ -22,7 +22,7 @@ package elki.utilities.datastructures.histogram;
 
 /**
  * Histogram class storing double values.
- * 
+ * <p>
  * The histogram will start with "bin" bins, but it can grow dynamicall to the
  * left and right.
  * 
@@ -89,7 +89,7 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
     int bin = getBinNr(coord);
     if(bin < 0) {
       if(size - bin > data.length) {
-        // Reallocate. TODO: use an arraylist-like grow strategy!
+        // Reallocate.
         Object[] tmpdata = new Object[growSize(data.length, size - bin)];
         System.arraycopy(data, 0, tmpdata, -bin, size);
         data = tmpdata;
@@ -161,6 +161,30 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
     @SuppressWarnings("unchecked")
     public T getValue() {
       return (T) data[bin];
+    }
+
+    @Override
+    public Iter advance() {
+      super.advance();
+      return this;
+    }
+
+    @Override
+    public Iter advance(int count) {
+      super.advance(count);
+      return this;
+    }
+
+    @Override
+    public Iter retract() {
+      super.retract();
+      return this;
+    }
+
+    @Override
+    public Iter seek(int off) {
+      super.seek(off);
+      return this;
     }
   }
 

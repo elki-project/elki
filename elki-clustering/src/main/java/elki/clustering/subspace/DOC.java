@@ -29,7 +29,6 @@ import elki.data.Subspace;
 import elki.data.model.SubspaceModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -67,8 +66,6 @@ import net.jafama.FastMath;
  * @since 0.6.0
  * 
  * @has - - - SubspaceModel
- * 
- * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("DOC: Density-based Optimal projective Clustering")
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", //
@@ -76,7 +73,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
     url = "https://doi.org/10.1145/564691.564739", //
     bibkey = "DBLP:conf/sigmod/ProcopiucJAM02")
-public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class DOC implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -123,17 +120,15 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
   }
 
   /**
-   * Performs the DOC or FastDOC (as configured) algorithm on the given
-   * Database.
+   * Performs the DOC or FastDOC (as configured) algorithm.
    * <p>
    * This will run exhaustively, i.e. run DOC until no clusters are found
    * anymore / the database size has shrunk below the threshold for minimum
    * cluster size.
    * 
-   * @param database Database
    * @param relation Data relation
    */
-  public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<? extends NumberVector> relation) {
     // Dimensionality of our set.
     final int d = RelationUtil.dimensionality(relation);
 
@@ -161,7 +156,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     // To not only find a single cluster, we continue running until our set
     // of points is empty.
     while(S.size() > minClusterSize) {
-      Cluster<SubspaceModel> C = runDOC(database, relation, S, d, n, m, (int) r, minClusterSize);
+      Cluster<SubspaceModel> C = runDOC(relation, S, d, n, m, (int) r, minClusterSize);
 
       if(C == null) {
         // Stop trying if we couldn't find a cluster.
@@ -190,7 +185,6 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
   /**
    * Performs a single run of DOC, finding a single cluster.
    * 
-   * @param database Database context
    * @param relation used to get actual values for DBIDs.
    * @param S The set of points we're working on.
    * @param d Dimensionality of the data set we're currently working on.
@@ -200,7 +194,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param minClusterSize Minimum size a cluster must have to be accepted.
    * @return a cluster, if one is found, else <code>null</code>.
    */
-  protected Cluster<SubspaceModel> runDOC(Database database, Relation<V> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
+  protected Cluster<SubspaceModel> runDOC(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs S, final int d, int n, int m, int r, int minClusterSize) {
     // Best cluster for the current run.
     DBIDs C = null;
     // Relevant attributes for the best cluster.
@@ -279,13 +273,14 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param relation Data relation
    * @return Neighbors
    */
-  protected DBIDs findNeighbors(DBIDRef q, long[] nD, ArrayModifiableDBIDs S, Relation<V> relation) {
+  protected DBIDs findNeighbors(DBIDRef q, long[] nD, ArrayModifiableDBIDs S, Relation<? extends NumberVector> relation) {
     // Weights for distance (= rectangle query)
-    DistanceQuery<V> dq = new QueryBuilder<>(relation, new SubspaceMaximumDistance(nD)).distanceQuery();
+    DistanceQuery<?> dq = new QueryBuilder<>(relation, new SubspaceMaximumDistance(nD)).distanceQuery();
 
     // TODO: add filtering capabilities into query API!
     // Until then, using the range query API will be unnecessarily slow.
-    // RangeSearcher<V> rq = relation.getRangeQuery(df, DatabaseQuery.HINT_SINGLE);
+    // RangeSearcher<V> rq = relation.getRangeQuery(df,
+    // DatabaseQuery.HINT_SINGLE);
     ArrayModifiableDBIDs nC = DBIDUtil.newArray();
     for(DBIDIter it = S.iter(); it.valid(); it.advance()) {
       if(dq.distance(q, it) <= w) {
@@ -305,7 +300,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param points the points to test.
    * @return <code>true</code> if the dimension is relevant.
    */
-  protected boolean dimensionIsRelevant(int dimension, Relation<V> relation, DBIDs points) {
+  protected boolean dimensionIsRelevant(int dimension, Relation<? extends NumberVector> relation, DBIDs points) {
     double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
     for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
       double xV = relation.get(iter).doubleValue(dimension);
@@ -327,7 +322,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param D the relevant dimensions.
    * @return an object representing the subspace cluster.
    */
-  protected Cluster<SubspaceModel> makeCluster(Relation<V> relation, DBIDs C, long[] D) {
+  protected Cluster<SubspaceModel> makeCluster(Relation<? extends NumberVector> relation, DBIDs C, long[] D) {
     DBIDs ids = DBIDUtil.newHashSet(C); // copy, also to lose distance values!
     Cluster<SubspaceModel> cluster = new Cluster<>(ids);
     cluster.setModel(new SubspaceModel(new Subspace(D), Centroid.make(relation, ids).getArrayRef()));
@@ -353,7 +348,7 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * 
    * @author Florian Nuecke
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Relative density threshold parameter Alpha.
      */
@@ -411,8 +406,8 @@ public class DOC<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     }
 
     @Override
-    public DOC<V> make() {
-      return new DOC<>(alpha, beta, w, random);
+    public DOC make() {
+      return new DOC(alpha, beta, w, random);
     }
   }
 }

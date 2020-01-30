@@ -290,7 +290,6 @@ public class CLIQUE implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(buf != null) {
       LOG.debugFiner(buf.append("   total number of 1-dim units: ").append(units.size()).toString());
     }
-
     return units;
   }
 
@@ -306,10 +305,11 @@ public class CLIQUE implements SubspaceClusteringAlgorithm<SubspaceModel> {
     assert (minima.length == featureVector.getDimensionality());
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       double v = featureVector.doubleValue(d);
-      if(v == v) { // Avoid NaN.
-        maxima[d] = MathUtil.max(v, maxima[d]);
-        minima[d] = MathUtil.min(v, minima[d]);
+      if(Double.isNaN(v)) {
+        continue;
       }
+      maxima[d] = MathUtil.max(v, maxima[d]);
+      minima[d] = MathUtil.min(v, minima[d]);
     }
   }
 

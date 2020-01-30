@@ -83,10 +83,8 @@ import net.jafama.FastMath;
  * @since 0.1
  *
  * @assoc - - - DiSHPreferenceVectorIndex
- * @has - - - SubspaceModel
+ * @has - - - SubspaceMode
  * @has - - - DiSHClusterOrder
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
@@ -95,7 +93,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 12th Int. Conf. on Database Systems for Advanced Applications (DASFAA)", //
     url = "https://doi.org/10.1007/978-3-540-71703-4_15", //
     bibkey = "DBLP:conf/dasfaa/AchtertBKKMZ07")
-public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class DiSH implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -155,7 +153,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param relation Relation to process
    * @return Clustering
    */
-  public Clustering<SubspaceModel> run(Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<? extends NumberVector> relation) {
     if(minpts >= relation.size()) {
       throw new AbortException("Parameter minpts is chosen unreasonably large. This won't yield meaningful results.");
     }
@@ -173,7 +171,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
    */
-  private Clustering<SubspaceModel> computeClusters(Relation<V> database, DiSHClusterOrder clusterOrder) {
+  private Clustering<SubspaceModel> computeClusters(Relation<? extends NumberVector> database, DiSHClusterOrder clusterOrder) {
     final int dimensionality = RelationUtil.dimensionality(database);
 
     // extract clusters
@@ -250,13 +248,13 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
    */
-  private Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> extractClusters(Relation<V> relation, DiSHClusterOrder clusterOrder) {
+  private Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> extractClusters(Relation<? extends NumberVector> relation, DiSHClusterOrder clusterOrder) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extract Clusters", relation.size(), LOG) : null;
     Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = new Object2ObjectOpenCustomHashMap<>(BitsUtil.FASTUTIL_HASH_STRATEGY);
     // Note clusterOrder currently contains DBID objects anyway.
     WritableDataStore<Pair<long[], ArrayModifiableDBIDs>> entryToClusterMap = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Pair.class);
     for(DBIDIter iter = clusterOrder.iter(); iter.valid(); iter.advance()) {
-      V object = relation.get(iter);
+      NumberVector object = relation.get(iter);
       long[] preferenceVector = clusterOrder.getCommonPreferenceVector(iter);
 
       // get the list of (parallel) clusters for the preference vector
@@ -342,7 +340,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param clustersMap the mapping of bits sets to clusters
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel>> sortClusters(Relation<V> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private List<Cluster<SubspaceModel>> sortClusters(Relation<? extends NumberVector> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     final int db_dim = RelationUtil.dimensionality(relation);
     // int num = 1;
     List<Cluster<SubspaceModel>> clusters = new ArrayList<>();
@@ -359,25 +357,18 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
     }
 
     // sort the clusters w.r.t. lambda
-    Comparator<Cluster<SubspaceModel>> comparator = new Comparator<Cluster<SubspaceModel>>() {
-      @Override
-      public int compare(Cluster<SubspaceModel> c1, Cluster<SubspaceModel> c2) {
-        return c2.getModel().getSubspace().dimensionality() - c1.getModel().getSubspace().dimensionality();
-      }
-    };
-    Collections.sort(clusters, comparator);
+    Collections.sort(clusters, (c1, c2) -> c2.getModel().getSubspace().dimensionality() - c1.getModel().getSubspace().dimensionality());
     return clusters;
   }
 
   /**
    * Removes the clusters with size &lt; minpts from the cluster map and adds
-   * them
-   * to their parents.
+   * them to their parents.
    *
    * @param relation the relation storing the objects
    * @param clustersMap the map containing the clusters
    */
-  private void checkClusters(Relation<V> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private void checkClusters(Relation<? extends NumberVector> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     final int dimensionality = RelationUtil.dimensionality(relation);
     // check if there are clusters < minpts
     // and add them to not assigned
@@ -432,7 +423,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param clustersMap the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private Pair<long[], ArrayModifiableDBIDs> findParent(Relation<V> relation, Pair<long[], ArrayModifiableDBIDs> child, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private Pair<long[], ArrayModifiableDBIDs> findParent(Relation<? extends NumberVector> relation, Pair<long[], ArrayModifiableDBIDs> child, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     Centroid child_centroid = ProjectedCentroid.make(child.first, relation, child.second);
 
     Pair<long[], ArrayModifiableDBIDs> result = null;
@@ -472,7 +463,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Relation<V> database, Clustering<SubspaceModel> clustering, List<Cluster<SubspaceModel>> clusters, int dimensionality) {
+  private void buildHierarchy(Relation<? extends NumberVector> database, Clustering<SubspaceModel> clustering, List<Cluster<SubspaceModel>> clusters, int dimensionality) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     final int db_dim = RelationUtil.dimensionality(database);
     Hierarchy<Cluster<SubspaceModel>> hier = clustering.getClusterHierarchy();
@@ -557,7 +548,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Relation<V> relation, Cluster<SubspaceModel> parent, It<Cluster<SubspaceModel>> iter, int db_dim) {
+  private boolean isParent(Relation<? extends NumberVector> relation, Cluster<SubspaceModel> parent, It<Cluster<SubspaceModel>> iter, int db_dim) {
     Subspace s_p = parent.getModel().getSubspace();
     NumberVector parent_centroid = ProjectedCentroid.make(s_p.getDimensions(), relation, parent.getIDs());
     int subspaceDim_parent = db_dim - s_p.dimensionality();
@@ -624,11 +615,11 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    *
    * @author Erich Schubert
    */
-  private class Instance extends GeneralizedOPTICS.Instance<V, DiSHClusterOrder> {
+  private class Instance extends GeneralizedOPTICS.Instance<DiSHClusterOrder> {
     /**
      * Data relation.
      */
-    private Relation<V> relation;
+    private Relation<? extends NumberVector> relation;
 
     /**
      * Cluster order.
@@ -680,7 +671,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
      *
      * @param relation Relation
      */
-    public Instance(Relation<V> relation) {
+    public Instance(Relation<? extends NumberVector> relation) {
       super(relation.getDBIDs());
       DBIDs ids = relation.getDBIDs();
       this.clusterOrder = DBIDUtil.newArray(ids.size());
@@ -727,7 +718,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
                 .append(" (").append(allNeighbors[d].size()).append(") = ").append(allNeighbors[d]);
           }
         }
-        preferenceVectors.put(it, determinePreferenceVector(relation, allNeighbors, msg));
+        preferenceVectors.put(it, determinePreferenceVector(allNeighbors, msg));
 
         if(msg != null) {
           LOG.debugFine(msg.toString());
@@ -742,26 +733,24 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
     /**
      * Determines the preference vector according to the specified neighbor ids.
      *
-     * @param relation the database storing the objects
      * @param neighborIDs the list of ids of the neighbors in each dimension
      * @param msg a string buffer for debug messages
      * @return the preference vector
      */
-    private long[] determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+    private long[] determinePreferenceVector(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
       return strategy == Strategy.APRIORI ? //
-          determinePreferenceVectorByApriori(relation, neighborIDs, msg) : //
+          determinePreferenceVectorByApriori(neighborIDs, msg) : //
           determinePreferenceVectorByMaxIntersection(neighborIDs, msg);
     }
 
     /**
      * Determines the preference vector with the apriori strategy.
      *
-     * @param relation the database storing the objects
      * @param neighborIDs the list of ids of the neighbors in each dimension
      * @param msg a string buffer for debug messages
      * @return the preference vector
      */
-    private long[] determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
+    private long[] determinePreferenceVectorByApriori(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
       int dimensionality = neighborIDs.length;
 
       ArrayList<BitVector> bvs = new ArrayList<>(relation.size());
@@ -917,7 +906,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
       clusterOrder.add(id);
 
       long[] pv1 = preferenceVectors.get(id);
-      V dv1 = relation.get(id);
+      NumberVector dv1 = relation.get(id);
       final int dim = dv1.getDimensionality();
 
       long[] ones = BitsUtil.ones(dim);
@@ -926,7 +915,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
       DBIDArrayIter iter = tmpIds.iter();
       for(; iter.valid(); iter.advance()) {
         long[] pv2 = preferenceVectors.get(iter);
-        V dv2 = relation.get(iter);
+        NumberVector dv2 = relation.get(iter);
         // We need a copy of this for the distance.
         long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
 
@@ -986,8 +975,8 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
 
     @Override
     public int compare(DBIDRef o1, DBIDRef o2) {
-      int c1 = correlationValue.intValue(o1),
-          c2 = correlationValue.intValue(o2);
+      int c1 = correlationValue.intValue(o1);
+      int c2 = correlationValue.intValue(o2);
       return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
           super.compare(o1, o2);
     }
@@ -1055,7 +1044,7 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * The default value for epsilon.
      */
@@ -1136,8 +1125,8 @@ public class DiSH<V extends NumberVector> implements SubspaceClusteringAlgorithm
     }
 
     @Override
-    public DiSH<V> make() {
-      return new DiSH<>(epsilon, minpts, strategy);
+    public DiSH make() {
+      return new DiSH(epsilon, minpts, strategy);
     }
   }
 }

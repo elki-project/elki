@@ -25,7 +25,6 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.datasource.AbstractDatabaseConnection;
@@ -44,10 +43,6 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * @since 0.7.0
  */
 public class PreDeConTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run PreDeCon with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testPreDeConResults() {
     // Additional input parameters
@@ -56,7 +51,7 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
     inp.addParameter(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 1);
     Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 2500, inp);
 
-    Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+    Clustering<Model> result = new ELKIBuilder<>(PreDeCon.class) //
         .with(DBSCAN.Par.EPSILON_ID, 60) //
         .with(DBSCAN.Par.MINPTS_ID, 40) //
         .with(PreDeCon.Settings.Par.DELTA_ID, 400) //
@@ -69,14 +64,10 @@ public class PreDeConTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 43, 93, 108, 611, 638, 1007 });
   }
 
-  /**
-   * Run PreDeCon with fixed parameters and compare the result to a golden
-   * standard.O
-   */
   @Test
   public void testPreDeConSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<Model> result = new ELKIBuilder<PreDeCon<DoubleVector>>(PreDeCon.class) //
+    Clustering<Model> result = new ELKIBuilder<>(PreDeCon.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.3) //
         .with(DBSCAN.Par.MINPTS_ID, 10) //
         .with(PreDeCon.Settings.Par.DELTA_ID, 0.012) //

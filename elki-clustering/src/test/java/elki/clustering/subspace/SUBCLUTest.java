@@ -25,6 +25,7 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
+import elki.data.NumberVector;
 import elki.data.model.SubspaceModel;
 import elki.database.Database;
 import elki.datasource.AbstractDatabaseConnection;
@@ -47,7 +48,7 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSUBCLUResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<NumberVector>>(SUBCLU.class) //
         .with(SUBCLU.Par.EPSILON_ID, 0.001) //
         .with(SUBCLU.Par.MINPTS_ID, 100) //
         .build().autorun(db);
@@ -58,7 +59,7 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSUBCLUSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<NumberVector>>(SUBCLU.class) //
         .with(SUBCLU.Par.EPSILON_ID, 0.04) //
         .with(SUBCLU.Par.MINPTS_ID, 70) //
         .build().autorun(db);
@@ -79,6 +80,6 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
         .with(SUBCLU.Par.MINDIM_ID, 2) //
         .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    assertClusterSizes(result, new int[] { 72, 135, 145, 157, 161});
+    assertClusterSizes(result, new int[] { 72, 135, 145, 157, 161 });
   }
 }

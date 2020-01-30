@@ -25,7 +25,6 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.DimensionModel;
 import elki.database.Database;
 import elki.math.linearalgebra.pca.PCARunner;
@@ -46,15 +45,11 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class COPACTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run COPAC with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCOPACResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
     // these parameters are not picked too well - room for improvement.
-    Clustering<DimensionModel> result = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
+    Clustering<DimensionModel> result = new ELKIBuilder<>(COPAC.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.02) //
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(COPAC.Par.K_ID, 15) //
@@ -63,14 +58,10 @@ public class COPACTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 54, 196, 200 });
   }
 
-  /**
-   * Run COPAC with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCOPACOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-    Clustering<DimensionModel> result = new ELKIBuilder<COPAC<DoubleVector>>(COPAC.class) //
+    Clustering<DimensionModel> result = new ELKIBuilder<>(COPAC.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.5) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .with(COPAC.Par.K_ID, 45) //

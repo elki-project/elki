@@ -24,16 +24,15 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
  * Test P3C on a simple test data set.
- * 
+ * <p>
  * Note: both data sets are really beneficial for P3C, and with reasonably
  * chosen parameters, it works perfectly.
- * 
+ * <p>
  * FIXME: Previously, these test would score perfect. Now we have one outlier!
  * But from visual inspection, this might be a true positive.
  * 
@@ -41,27 +40,21 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class P3CTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run P3C with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testP3CSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-    Clustering<?> result = new ELKIBuilder<P3C<DoubleVector>>(P3C.class).build().autorun(db);
+    Clustering<?> result = new ELKIBuilder<>(P3C.class).build().autorun(db);
     assertFMeasure(db, result, .99800101);
     assertClusterSizes(result, new int[] { 1, 200, 399 });
   }
 
-  /**
-   * Run P3C with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testP3COverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<?> result = new ELKIBuilder<P3C<DoubleVector>>(P3C.class) //
-        .with(P3C.Par.ALPHA_THRESHOLD_ID, 0.01)//
+    Clustering<?> result = new ELKIBuilder<>(P3C.class) //
+        .with(P3C.Par.ALPHA_THRESHOLD_ID, 0.005)//
         .build().autorun(db);
-    assertFMeasure(db, result, .99596185);
-    assertClusterSizes(result, new int[] { 4, 148, 300, 398 });
+    assertFMeasure(db, result, .99798);
+    assertClusterSizes(result, new int[] { 2, 149, 300, 399 });
   }
 }

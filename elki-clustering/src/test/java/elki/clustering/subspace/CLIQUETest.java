@@ -40,14 +40,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class CLIQUETest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run CLIQUE with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCLIQUEResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<>(CLIQUE.class) //
         .with(CLIQUE.Par.TAU_ID, "0.1") //
         .with(CLIQUE.Par.XSI_ID, 20) //
         .build().autorun(db);
@@ -56,14 +52,10 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 200, 200, 216, 400 });
   }
 
-  /**
-   * Run CLIQUE with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCLIQUESubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<>(CLIQUE.class) //
         .with(CLIQUE.Par.TAU_ID, 0.2) //
         .with(CLIQUE.Par.XSI_ID, 6) //
         .build().autorun(db);
@@ -72,14 +64,10 @@ public class CLIQUETest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
   }
 
-  /**
-   * Run CLIQUE with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testCLIQUESubspaceOverlappingPrune() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<SubspaceModel> result = new ELKIBuilder<CLIQUE>(CLIQUE.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<>(CLIQUE.class) //
         .with(CLIQUE.Par.TAU_ID, 0.2) //
         .with(CLIQUE.Par.XSI_ID, 6) //
         .with(CLIQUE.Par.PRUNE_ID) //

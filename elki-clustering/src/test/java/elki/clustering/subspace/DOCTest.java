@@ -24,26 +24,22 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
  * Test DOC on a simple test data set.
- *
+ * <p>
  * On the first set, its an all-or-nothing depending on the parameters.
  *
  * @author Erich Schubert
  * @since 0.7.5
  */
 public class DOCTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run DOC with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testDOCSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-    Clustering<?> result = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+    Clustering<?> result = new ELKIBuilder<>(DOC.class) //
         .with(DOC.Par.RANDOM_ID, 0) //
         .with(DOC.Par.ALPHA_ID, 0.4) //
         .with(DOC.Par.BETA_ID, 0.85) //
@@ -52,13 +48,10 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 200, 400 });
   }
 
-  /**
-   * Run DOC with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testDOCOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<?> result = new ELKIBuilder<DOC<DoubleVector>>(DOC.class) //
+    Clustering<?> result = new ELKIBuilder<>(DOC.class) //
         .with(DOC.Par.RANDOM_ID, 2) //
         .with(DOC.Par.ALPHA_ID, 0.4) //
         .with(DOC.Par.BETA_ID, 0.99) //

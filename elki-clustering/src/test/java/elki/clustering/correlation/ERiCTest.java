@@ -25,7 +25,6 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.CorrelationModel;
 import elki.database.Database;
 import elki.math.linearalgebra.pca.PCARunner;
@@ -51,7 +50,7 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testERiCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
+    Clustering<CorrelationModel> result = new ELKIBuilder<>(ERiC.class) //
         .with(DBSCAN.Par.MINPTS_ID, 30) //
         // ERiC Distance function in DBSCAN:
         .with(ERiC.Par.DELTA_ID, 0.20) //
@@ -63,15 +62,15 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
         .with(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class) //
         .with(RelativeEigenPairFilter.Par.EIGENPAIR_FILTER_RALPHA, 1.60) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.728074); // Hierarchical pairs scored: 0.9204825
+    assertFMeasure(db, result, 0.728074); // Hierarchical pairs scored:
+                                          // 0.9204825
     assertClusterSizes(result, new int[] { 109, 188, 303 });
   }
 
   @Test
   public void testERiCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
-        // ERiC
+    Clustering<CorrelationModel> result = new ELKIBuilder<>(ERiC.class) //
         .with(DBSCAN.Par.MINPTS_ID, 15) //
         // ERiC Distance function in DBSCAN:
         .with(ERiC.Par.DELTA_ID, 1.0) //
@@ -90,8 +89,7 @@ public class ERiCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testERiCSubspaceOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
-    Clustering<CorrelationModel> result = new ELKIBuilder<ERiC<DoubleVector>>(ERiC.class) //
-        // ERiC
+    Clustering<CorrelationModel> result = new ELKIBuilder<>(ERiC.class) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         // ERiC Distance function in DBSCAN:
         .with(ERiC.Par.DELTA_ID, 1.0) //

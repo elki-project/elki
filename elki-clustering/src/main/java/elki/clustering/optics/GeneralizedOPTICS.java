@@ -45,24 +45,16 @@ import elki.logging.progress.FiniteProgress;
  * @since 0.7.0
  *
  * @navassoc - produces - ClusterOrder
- *
- * @param <O> the type of objects handled by the algorithm
- * @param <R> the type of results in the cluster order
  */
-public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> implements OPTICSTypeAlgorithm {
-  /**
-   * Constructor.
-   */
-  public GeneralizedOPTICS() {
-    super();
-  }
-
+public abstract interface GeneralizedOPTICS extends OPTICSTypeAlgorithm {
   /**
    * Instance for processing a single data set.
    *
    * @author Erich Schubert
+   * 
+   * @param <R> the type of results in the cluster order
    */
-  public abstract static class Instance<O, R> implements Comparator<DBIDRef> {
+  public abstract static class Instance<R> implements Comparator<DBIDRef> {
     /**
      * Holds a set of processed ids.
      */
@@ -149,7 +141,7 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> implements OP
      *
      * @param id Current object ID
      */
-    abstract protected void initialDBID(DBIDRef id);
+    protected abstract void initialDBID(DBIDRef id);
 
     /**
      * Add the current DBID to the cluster order, and expand its neighbors if
@@ -157,20 +149,20 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> implements OP
      *
      * @param id Current object ID
      */
-    abstract protected void expandDBID(DBIDRef id);
+    protected abstract void expandDBID(DBIDRef id);
 
     /**
      * Build the final result.
      *
      * @return Result
      */
-    abstract protected R buildResult();
+    protected abstract R buildResult();
 
     /**
      * Get the class logger.
      *
      * @return Class logger
      */
-    abstract protected Logging getLogger();
+    protected abstract Logging getLogger();
   }
 }

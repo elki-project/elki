@@ -91,7 +91,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
    * @param query Range query
    * @return Precomputed models
    */
-  public DataStore<M> preprocess(Class<? super M> modelcls, Relation<O> relation, RangeSearcher<DBIDRef> query) {
+  public DataStore<M> preprocess(Class<? super M> modelcls, Relation<? extends O> relation, RangeSearcher<DBIDRef> query) {
     WritableDataStore<M> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, modelcls);
 
     Duration time = getLogger().newDuration(this.getClass().getName() + ".preprocessing-time").begin();
@@ -114,7 +114,7 @@ public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements Ne
    * @param relation Data relation
    * @return Model for this object.
    */
-  abstract protected M computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<O> relation);
+  protected abstract M computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<? extends O> relation);
 
   /**
    * Get the class logger.

@@ -25,7 +25,6 @@ import java.util.Random;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.data.NumberVector;
 import elki.data.model.BiclusterWithInversionsModel;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -64,15 +63,13 @@ import elki.utilities.random.RandomFactory;
  * @since 0.6.0
  *
  * @composed - - - BiclusterCandidate
- *
- * @param <V> Vector type.
  */
 @Reference(authors = "Y. Cheng, G. M. Church", //
     title = "Biclustering of expression data", //
     booktitle = "Proc. 8th Int. Conf. on Intelligent Systems for Molecular Biology (ISMB)", //
     url = "http://www.aaai.org/Library/ISMB/2000/ismb00-010.php", //
     bibkey = "DBLP:conf/ismb/ChengC00")
-public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
+public class ChengAndChurch extends AbstractBiclustering<BiclusterWithInversionsModel> {
   /**
    * The logger for this class.
    */
@@ -803,10 +800,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
    * @author Erich Schubert
    *
    * @hidden
-   *
-   * @param <V> Vector type
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the distribution of replacement values when masking
      * a cluster.
@@ -879,8 +874,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     }
 
     @Override
-    public ChengAndChurch<V> make() {
-      return new ChengAndChurch<>(delta, alpha, n, dist, rnd);
+    public ChengAndChurch make() {
+      return new ChengAndChurch(delta, alpha, n, dist, rnd);
     }
   }
 }

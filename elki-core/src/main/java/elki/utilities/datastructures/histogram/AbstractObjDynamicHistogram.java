@@ -119,8 +119,7 @@ public abstract class AbstractObjDynamicHistogram<T> extends ObjHistogram<T> {
     }
     materialize();
     testResample(coord);
-    T ret = super.get(coord);
-    return ret;
+    return super.get(coord);
   }
 
   /**

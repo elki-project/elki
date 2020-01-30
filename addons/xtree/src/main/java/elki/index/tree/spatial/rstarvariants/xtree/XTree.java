@@ -88,16 +88,6 @@ public class XTree extends AbstractXTree<XTreeNode> {
   }
 
   @Override
-  public String getLongName() {
-    return "X-Tree";
-  }
-
-  @Override
-  public String getShortName() {
-    return "x-tree";
-  }
-
-  @Override
   protected Class<XTreeNode> getNodeClass() {
     return XTreeNode.class;
   }

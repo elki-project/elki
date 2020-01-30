@@ -81,8 +81,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @has - - - SubspaceModel
  * @has - - - ClusterCandidate
  * @has - - - Signature
- * 
- * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("P3C: A Robust Projected Clustering Algorithm.")
 @Reference(authors = "Gabriela Moise, Jörg Sander, Martin Ester", //
@@ -91,7 +89,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     url = "https://doi.org/10.1109/ICDM.2006.123", //
     bibkey = "DBLP:conf/icdm/MoiseSE06")
 @Priority(Priority.RECOMMENDED - 10) // More specialized
-public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<SubspaceModel> {
+public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
    */
@@ -148,8 +146,10 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
 
   /**
    * Performs the P3C algorithm on the given Database.
+   * 
+   * @param relation Input data
    */
-  public Clustering<SubspaceModel> run(Relation<V> relation) {
+  public Clustering<SubspaceModel> run(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     // Overall progress.
@@ -396,6 +396,12 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     return clusterCores;
   }
 
+  /**
+   * Prune redundant cluster cores
+   * 
+   * @param clusterCores Cluster cores
+   * @return Pruned cluster cores
+   */
   private ArrayList<Signature> pruneRedundantClusterCores(ArrayList<Signature> clusterCores) {
     // Prune cluster cores based on Definition 3, Condition 2.
     ArrayList<Signature> retain = new ArrayList<>(clusterCores.size());
@@ -414,17 +420,16 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
       }
       retain.add(clusterCore);
     }
-    clusterCores = retain;
-    return clusterCores;
+    return retain;
   }
 
   /**
    * Partition the data set into {@code bins} bins in each dimension
    * <i>independently</i>.
-   * 
+   * <p>
    * This can be used to construct a grid approximation of the data using O(d n)
    * memory.
-   * 
+   * <p>
    * When a dimension is found to be constant, it will not be partitioned, but
    * instead the corresponding array will be set to {@code null}.
    * 
@@ -432,7 +437,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param bins Number of bins
    * @return Partitions of each dimension.
    */
-  private SetDBIDs[][] partitionData(final Relation<V> relation, final int bins) {
+  private SetDBIDs[][] partitionData(Relation<? extends NumberVector> relation, int bins) {
     final int dim = RelationUtil.dimensionality(relation);
     SetDBIDs[][] partitions = new SetDBIDs[dim][bins];
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
@@ -542,7 +547,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param models Cluster models.
    * @param dim Dimensionality
    */
-  private void computeFuzzyMembership(Relation<V> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs unassigned, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, int dim) {
+  private void computeFuzzyMembership(Relation<? extends NumberVector> relation, ArrayList<Signature> clusterCores, ModifiableDBIDs unassigned, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, int dim) {
     final int n = relation.size();
     final double pweight = 1. / n; // Weight of each point
     final int k = clusterCores.size();
@@ -584,7 +589,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param models Cluster models.
    * @param unassigned the list of points not yet assigned.
    */
-  private void assignUnassigned(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, ModifiableDBIDs unassigned) {
+  private void assignUnassigned(Relation<? extends NumberVector> relation, WritableDataStore<double[]> probClusterIGivenX, List<MultivariateGaussianModel> models, ModifiableDBIDs unassigned) {
     if(unassigned.size() == 0) {
       return;
     }
@@ -600,7 +605,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     for(DBIDIter iter = unassigned.iter(); iter.valid(); iter.advance()) {
       // Find the best matching known cluster core using the Mahalanobis
       // distance.
-      V v = relation.get(iter);
+      NumberVector v = relation.get(iter);
       int bestCluster = -1;
       MultivariateGaussianModel bestModel = null;
       double minDistance = Double.POSITIVE_INFINITY;
@@ -674,7 +679,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * @param clusterCandidates the list of clusters to check.
    * @param noise the set to which to add points deemed outliers.
    */
-  private void findOutliers(Relation<V> relation, List<MultivariateGaussianModel> models, ArrayList<ClusterCandidate> clusterCandidates, ModifiableDBIDs noise) {
+  private void findOutliers(Relation<? extends NumberVector> relation, List<MultivariateGaussianModel> models, ArrayList<ClusterCandidate> clusterCandidates, ModifiableDBIDs noise) {
     Iterator<MultivariateGaussianModel> it = models.iterator();
     for(int c = 0; it.hasNext(); c++) {
       MultivariateGaussianModel model = it.next();
@@ -734,7 +739,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     // Create merged signature.
     int[] spec = first.spec.clone();
     spec[d2] = second.spec[d2];
-    spec[d2 + 1] = second.spec[d2];
+    spec[d2 + 1] = second.spec[d2 + 1];
 
     final Signature newsig = new Signature(spec, intersection);
     if(LOG.isDebugging()) {
@@ -859,7 +864,7 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
    * 
    * @author Florian Nuecke
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the chi squared test threshold.
      */
@@ -937,8 +942,8 @@ public class P3C<V extends NumberVector> implements SubspaceClusteringAlgorithm<
     }
 
     @Override
-    public P3C<V> make() {
-      return new P3C<>(alpha, poissonThreshold, maxEmIterations, emDelta, minClusterSize);
+    public P3C make() {
+      return new P3C(alpha, poissonThreshold, maxEmIterations, emDelta, minClusterSize);
     }
   }
 }

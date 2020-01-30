@@ -71,8 +71,6 @@ import net.jafama.FastMath;
  *
  * @composed - - - HiSCPreferenceVectorIndex
  * @navhas - produces - CorrelationClusterOrder
- *
- * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
@@ -81,7 +79,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06)", //
     url = "https://doi.org/10.1007/11871637_42", //
     bibkey = "DBLP:conf/pkdd/AchtertBKKMZ06")
-public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
+public class HiSC implements GeneralizedOPTICS {
   /**
    * The logger for this class.
    */
@@ -121,7 +119,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * @param relation Data relation
    * @return OPTICS cluster order
    */
-  public ClusterOrder run(Relation<V> relation) {
+  public ClusterOrder run(Relation<? extends NumberVector> relation) {
     return new Instance(relation).run();
   }
 
@@ -130,7 +128,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    */
-  private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
+  private class Instance extends GeneralizedOPTICS.Instance<CorrelationClusterOrder> {
     /**
      * The data store.
      */
@@ -144,7 +142,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Data relation.
      */
-    private Relation<V> relation;
+    private Relation<? extends NumberVector> relation;
 
     /**
      * Correlation dimensionality.
@@ -161,7 +159,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      *
      * @param relation Relation
      */
-    public Instance(Relation<V> relation) {
+    public Instance(Relation<? extends NumberVector> relation) {
       super(relation.getDBIDs());
       this.clusterOrder = DBIDUtil.newArray(relation.size());
       this.relation = relation;
@@ -235,7 +233,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       clusterOrder.add(id);
 
       final long[] pv1 = preferenceVectors.get(id);
-      final V v1 = relation.get(id);
+      final NumberVector v1 = relation.get(id);
       final int dim = v1.getDimensionality();
 
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -245,7 +243,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
           continue;
         }
         long[] pv2 = preferenceVectors.get(iter);
-        V v2 = relation.get(iter);
+        NumberVector v2 = relation.get(iter);
         final long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
 
         // number of zero values in commonPreferenceVector
@@ -315,7 +313,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * @return the weighted distance between the two specified vectors according
    *         to the given preference vector
    */
-  public double weightedDistance(V v1, V v2, long[] weightVector) {
+  public double weightedDistance(NumberVector v1, NumberVector v2, long[] weightVector) {
     double sqrDist = 0.;
     for(int i = BitsUtil.nextSetBit(weightVector, 0); i >= 0; i = BitsUtil.nextSetBit(weightVector, i + 1)) {
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
@@ -334,7 +332,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the maximum distance between two vectors with equal
      * preference vectors before considering them as parallel, must be a double
@@ -384,8 +382,8 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     }
 
     @Override
-    public HiSC<V> make() {
-      return new HiSC<>(alpha, k);
+    public HiSC make() {
+      return new HiSC(alpha, k);
     }
   }
 }

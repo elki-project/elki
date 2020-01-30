@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.SubspaceModel;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -41,13 +40,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class DiSHTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run DiSH with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testDiSHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-hierarchy.csv", 450);
-    Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<>(DiSH.class) //
         .with(DiSH.Par.EPSILON_ID, 0.005) //
         .with(DiSH.Par.MU_ID, 50) //
         .build().autorun(db);
@@ -55,13 +51,10 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 50, 199, 201 });
   }
 
-  /**
-   * Run DiSH with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testDiSHSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
-    Clustering<SubspaceModel> result = new ELKIBuilder<DiSH<DoubleVector>>(DiSH.class) //
+    Clustering<SubspaceModel> result = new ELKIBuilder<>(DiSH.class) //
         .with(DiSH.Par.EPSILON_ID, 0.1) //
         .with(DiSH.Par.MU_ID, 40) //
         .with(DiSH.Par.STRATEGY_ID, DiSH.Strategy.APRIORI) //

@@ -207,10 +207,7 @@ public class CLIQUESubspace extends Subspace {
         }
       }
     }
-    if(s.denseUnits.isEmpty()) {
-      return null;
-    }
-    return s;
+    return s.denseUnits.isEmpty() ? null : s;
   }
 
   /**
@@ -219,12 +216,13 @@ public class CLIQUESubspace extends Subspace {
    */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder() //
+    StringBuilder result = new StringBuilder(1000) //
         .append(super.toString()) //
         .append("\nCoverage: ").append(coverage) //
         .append("\nUnits: \n");
     for(CLIQUEUnit denseUnit : denseUnits) {
-      result.append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
+      result.append("   ").append(denseUnit.toString()) //
+          .append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }
     return result.toString();
   }
@@ -242,10 +240,5 @@ public class CLIQUESubspace extends Subspace {
    * Note: this comparator provides an ordering that is inconsistent with
    * equals.
    */
-  public static final Comparator<CLIQUESubspace> BY_COVERAGE = new Comparator<CLIQUESubspace>() {
-    @Override
-    public int compare(CLIQUESubspace s1, CLIQUESubspace s2) {
-      return Integer.compare(s2.getCoverage(), s1.getCoverage());
-    }
-  };
+  public static final Comparator<CLIQUESubspace> BY_COVERAGE = (s1, s2) -> Integer.compare(s2.getCoverage(), s1.getCoverage());
 }

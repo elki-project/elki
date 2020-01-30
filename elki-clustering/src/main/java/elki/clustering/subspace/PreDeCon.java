@@ -24,7 +24,6 @@ import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.PreDeConCorePredicate;
 import elki.clustering.dbscan.predicates.PreDeConNeighborPredicate;
-import elki.data.NumberVector;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -52,8 +51,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @has - - - PreDeCon.Settings
  * @composed - - - PreDeConNeighborPredicate
  * @composed - - - PreDeConCorePredicate
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PreDeCon: Subspace Preference weighted Density Connected Clustering")
 @Description("PreDeCon computes clusters of subspace preference weighted connected points. "//
@@ -63,14 +60,14 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
     url = "https://doi.org/10.1109/ICDM.2004.10087", //
     bibkey = "DBLP:conf/icdm/BohmKKK04")
-public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
+public class PreDeCon extends GeneralizedDBSCAN {
   /**
    * Constructor.
    * 
    * @param settings PreDeCon settings.
    */
   public PreDeCon(PreDeCon.Settings settings) {
-    super(new PreDeConNeighborPredicate<>(settings), new PreDeConCorePredicate(settings), false);
+    super(new PreDeConNeighborPredicate(settings), new PreDeConCorePredicate(settings), false);
   }
 
   /**
@@ -214,7 +211,7 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * PreDeConSettings.
      */
@@ -226,8 +223,8 @@ public class PreDeCon<V extends NumberVector> extends GeneralizedDBSCAN {
     }
 
     @Override
-    public PreDeCon<V> make() {
-      return new PreDeCon<>(settings);
+    public PreDeCon make() {
+      return new PreDeCon(settings);
     }
   }
 }

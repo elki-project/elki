@@ -29,7 +29,7 @@ import elki.database.ids.DBIDs;
 
 /**
  * Get the neighbors of an object
- * 
+ * <p>
  * Note the Factory/Instance split of this interface.
  * 
  * @author Erich Schubert
@@ -60,7 +60,7 @@ public interface NeighborPredicate<T> {
    * 
    * @return Type information
    */
-  SimpleTypeInformation<? extends T> getOutputType();
+  SimpleTypeInformation<T> getOutputType();
 
   /**
    * Instance for a particular data set.

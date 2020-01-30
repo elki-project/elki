@@ -59,20 +59,17 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek<br>
  * Computing Clusters of Correlation Connected Objects<br>
  * Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)
- * 
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
  * @since 0.7.0
- * 
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "Christian Böhm, Karin Kailing, Peer Kröger, Arthur Zimek", //
     title = "Computing Clusters of Correlation Connected Objects", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
     url = "https://doi.org/10.1145/1007568.1007620", //
     bibkey = "DBLP:conf/sigmod/BohmKKZ04")
-public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConModel, PreDeConModel> {
+public class FourCNeighborPredicate extends AbstractRangeQueryNeighborPredicate<NumberVector, PreDeConModel, PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -113,7 +110,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
 
   @Override
   public Instance instantiate(Database database) {
-    Relation<V> relation = database.getRelation(getInputTypeRestriction());
+    Relation<NumberVector> relation = database.getRelation(getInputTypeRestriction());
     RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, distance).rangeByDBID(epsilon);
     mvSize.reset();
     mvSize2.reset();
@@ -145,7 +142,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   }
 
   @Override
-  protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<V> relation) {
+  protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<? extends NumberVector> relation) {
     mvSize.put(neighbors.size());
     PCAResult epairs = pca.processIds(neighbors, relation);
     int cordim = filter.filter(epairs.getEigenvalues());
@@ -227,7 +224,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
    * 
    * @author Erich Schubert
    */
-  public static class Par<O extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * 4C settings.
      */
@@ -239,8 +236,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     }
 
     @Override
-    public FourCNeighborPredicate<O> make() {
-      return new FourCNeighborPredicate<>(settings);
+    public FourCNeighborPredicate make() {
+      return new FourCNeighborPredicate(settings);
     }
   }
 }

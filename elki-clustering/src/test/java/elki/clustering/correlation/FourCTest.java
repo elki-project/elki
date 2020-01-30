@@ -25,7 +25,6 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
@@ -42,13 +41,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class FourCTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run 4C with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testFourCResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-    Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+    Clustering<Model> result = new ELKIBuilder<>(FourC.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.30) //
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //
@@ -58,13 +54,10 @@ public class FourCTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 218, 382 });
   }
 
-  /**
-   * Run 4C with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testFourCOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-    Clustering<Model> result = new ELKIBuilder<FourC<DoubleVector>>(FourC.class) //
+    Clustering<Model> result = new ELKIBuilder<>(FourC.class) //
         .with(DBSCAN.Par.EPSILON_ID, 3) //
         .with(DBSCAN.Par.MINPTS_ID, 50) //
         .with(LimitEigenPairFilter.Par.EIGENPAIR_FILTER_DELTA, 0.5) //

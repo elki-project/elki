@@ -39,7 +39,7 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testHiCOResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600);
-    Clustering<OPTICSModel> result = new ELKIBuilder<OPTICSXi>(OPTICSXi.class) //
+    Clustering<OPTICSModel> result = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSXi.Par.XI_ID, 0.1) //
         .with(OPTICSXi.Par.XIALG_ID, HiCO.class) //
         .with(HiCO.Par.MU_ID, 20) //
@@ -54,7 +54,7 @@ public class HiCOTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testHiCOOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);
-    Clustering<OPTICSModel> result = new ELKIBuilder<OPTICSXi>(OPTICSXi.class) //
+    Clustering<OPTICSModel> result = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSXi.Par.XI_ID, 0.2) //
         .with(OPTICSXi.Par.XIALG_ID, HiCO.class) //
         .with(HiCO.Par.MU_ID, 20) //

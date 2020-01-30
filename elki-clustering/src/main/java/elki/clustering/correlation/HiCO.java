@@ -77,8 +77,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @composed - - - HiCO.Instance
  * @composed - - - KNNQueryFilteredPCAIndex
  * @navhas - produces - CorrelationClusterOrder
- *
- * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
@@ -87,7 +85,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06)", //
     url = "https://doi.org/10.1109/SSDBM.2006.35", //
     bibkey = "DBLP:conf/ssdbm/AchtertBKZ06")
-public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
+public class HiCO implements GeneralizedOPTICS {
   /**
    * The logger for this class.
    */
@@ -157,7 +155,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * @param relation Data relation
    * @return OPTICS cluster order
    */
-  public ClusterOrder run(Relation<V> relation) {
+  public ClusterOrder run(Relation<? extends NumberVector> relation) {
     if(mu >= relation.size()) {
       throw new AbortException("Parameter mu is chosen unreasonably large. This won't yield meaningful results.");
     }
@@ -171,11 +169,11 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @assoc - - - KNNQueryFilteredLocalPCAIndex
    */
-  private class Instance extends GeneralizedOPTICS.Instance<V, CorrelationClusterOrder> {
+  private class Instance extends GeneralizedOPTICS.Instance<CorrelationClusterOrder> {
     /**
      * Data relation.
      */
-    private Relation<V> relation;
+    private Relation<? extends NumberVector> relation;
 
     /**
      * The storage for precomputed local PCAs
@@ -210,12 +208,9 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Sort object by the temporary fields.
      */
-    Comparator<DBIDRef> tmpcomp = new Comparator<DBIDRef>() {
-      @Override
-      public int compare(DBIDRef o1, DBIDRef o2) {
-        int c = Integer.compare(tmpCorrelation.intValue(o2), tmpCorrelation.intValue(o1));
-        return c != 0 ? c : Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
-      }
+    Comparator<DBIDRef> tmpcomp = (o1, o2) -> {
+      int c = Integer.compare(tmpCorrelation.intValue(o2), tmpCorrelation.intValue(o1));
+      return c != 0 ? c : Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
     };
 
     /**
@@ -223,7 +218,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      *
      * @param relation Relation
      */
-    public Instance(Relation<V> relation) {
+    public Instance(Relation<? extends NumberVector> relation) {
       super(relation.getDBIDs());
       DBIDs ids = relation.getDBIDs();
       this.clusterOrder = DBIDUtil.newArray(ids.size());
@@ -275,7 +270,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       clusterOrder.add(id);
 
       PCAFilteredResult pca1 = localPCAs.get(id);
-      V dv1 = relation.get(id);
+      NumberVector dv1 = relation.get(id);
       final int dim = dv1.getDimensionality();
 
       DBIDArrayIter iter = tmpIds.iter();
@@ -285,7 +280,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
           continue;
         }
         PCAFilteredResult pca2 = localPCAs.get(iter);
-        V dv2 = relation.get(iter);
+        NumberVector dv2 = relation.get(iter);
 
         tmpCorrelation.putInt(iter, correlationDistance(pca1, pca2, dim));
         tmpDistance.putDouble(iter, EuclideanDistance.STATIC.distance(dv1, dv2));
@@ -424,7 +419,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the smoothing factor, must be an integer greater
      * than 0. The {link {@link #MU_ID}-nearest neighbor is used to compute the
@@ -500,8 +495,8 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     }
 
     @Override
-    public HiCO<V> make() {
-      return new HiCO<>(k > 0 ? k : mu, pca, alpha, mu, delta);
+    public HiCO make() {
+      return new HiCO(k > 0 ? k : mu, pca, alpha, mu, delta);
     }
   }
 }

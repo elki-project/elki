@@ -22,7 +22,6 @@ package elki.clustering;
 
 import elki.clustering.subspace.PROCLUS;
 import elki.data.Clustering;
-import elki.data.NumberVector;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 
@@ -34,30 +33,29 @@ import elki.utilities.optionhandling.Parameterizer;
  * @since 0.1
  *
  * @param <R> the result we return
- * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedClustering<R extends Clustering<?>> implements ClusteringAlgorithm<R> {
   /**
-   * Holds the value of {@link Par#K_ID}.
+   * The number of clusters to find
    */
   protected int k;
 
   /**
-   * Holds the value of {@link Par#K_I_ID}.
+   * Multiplier for the number of initial seeds
    */
   protected int k_i;
 
   /**
-   * Holds the value of {@link Par#L_ID}.
+   * Dimensionality of clusters to find
    */
   protected int l;
 
   /**
    * Internal constructor.
    *
-   * @param k K parameter
-   * @param k_i K_i parameter
-   * @param l L parameter
+   * @param k The number of clusters to find
+   * @param k_i Multiplier for the number of initial seeds
+   * @param l Dimensionality of clusters to find
    */
   public AbstractProjectedClustering(int k, int k_i, int l) {
     super();
@@ -90,10 +88,19 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      */
     public static final OptionID L_ID = new OptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
 
+    /**
+     * The number of clusters to find
+     */
     protected int k;
 
+    /**
+     * Multiplier for the number of initial seeds
+     */
     protected int k_i;
 
+    /**
+     * Dimensionality of clusters to find
+     */
     protected int l;
   }
 }

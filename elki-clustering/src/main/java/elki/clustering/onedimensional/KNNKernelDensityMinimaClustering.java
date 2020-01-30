@@ -57,7 +57,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class KNNKernelDensityMinimaClustering<V extends NumberVector> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
+public class KNNKernelDensityMinimaClustering implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**
    * Class logger.
    */
@@ -125,7 +125,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> implements
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<ClusterModel> run(Relation<V> relation) {
+  public Clustering<ClusterModel> run(Relation<? extends NumberVector> relation) {
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     final int size = ids.size();
 
@@ -278,7 +278,7 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> implements
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Dimension to use for clustering.
      */
@@ -347,8 +347,8 @@ public class KNNKernelDensityMinimaClustering<V extends NumberVector> implements
     }
 
     @Override
-    public KNNKernelDensityMinimaClustering<V> make() {
-      return new KNNKernelDensityMinimaClustering<>(dim, kernel, mode, k, minwindow);
+    public KNNKernelDensityMinimaClustering make() {
+      return new KNNKernelDensityMinimaClustering(dim, kernel, mode, k, minwindow);
     }
   }
 }

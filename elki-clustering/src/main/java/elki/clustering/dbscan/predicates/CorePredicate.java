@@ -27,7 +27,7 @@ import elki.database.ids.DBIDRef;
 /**
  * Predicate for GeneralizedDBSCAN to evaluate whether a point is a core point
  * or not.
- * 
+ * <p>
  * Note the Factory/Instance split of this interface.
  * 
  * @author Erich Schubert
@@ -44,7 +44,7 @@ public interface CorePredicate<T> {
    * @param database Database to instantiate for
    * @return Instance
    */
-  Instance<? super T> instantiate(Database database);
+  Instance<T> instantiate(Database database);
 
   /**
    * Test whether the neighborhood type T is accepted by this predicate.
@@ -53,7 +53,7 @@ public interface CorePredicate<T> {
    * @return true when the type is accepted
    */
   boolean acceptsType(SimpleTypeInformation<? extends T> type);
-  
+
   /**
    * Instance for a particular data set.
    * 

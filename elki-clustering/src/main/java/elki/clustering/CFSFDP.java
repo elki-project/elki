@@ -230,7 +230,7 @@ public class CFSFDP<O> implements ClusteringAlgorithm<Clustering<SimplePrototype
 
     @Override
     public CFSFDP<O> make() {
-      return new CFSFDP<O>(distance, dc, k);
+      return new CFSFDP<>(distance, dc, k);
     }
   }
 }

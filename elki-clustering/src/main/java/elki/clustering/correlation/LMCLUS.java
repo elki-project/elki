@@ -46,7 +46,6 @@ import elki.math.MeanVariance;
 import elki.result.Metadata;
 import elki.utilities.datastructures.histogram.DoubleDynamicHistogram;
 import elki.utilities.datastructures.histogram.DoubleHistogram;
-import elki.utilities.datastructures.histogram.DoubleHistogram.Iter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.TooManyRetriesException;
 import elki.utilities.io.FormatUtil;
@@ -167,7 +166,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Relation<NumberVector> relation) {
+  public Clustering<Model> run(Relation<? extends NumberVector> relation) {
     Clustering<Model> ret = new Clustering<>();
     Metadata.of(ret).setLongName("LMCLUS Clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
@@ -256,14 +255,14 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
    * This method samples a number of linear manifolds an tries to determine
    * which the one with the best cluster is.
    *
-   * <PRE>
+   * <pre>
    * A number of sample points according to the dimension of the linear manifold are taken.
    * The basis (B) and the origin(o) of the manifold are calculated.
    * A distance histogram using  the distance function ||x-o|| -||B^t*(x-o)|| is generated.
    * The best threshold is searched using the elevate threshold function.
    * The overall goodness of the threshold is determined.
    * The process is redone until a specific number of samples is taken.
-   * </PRE>
+   * </pre>
    *
    * @param relation The vector relation
    * @param currentids Current DBIDs
@@ -272,7 +271,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private Separation findSeparation(Relation<NumberVector> relation, DBIDs currentids, int dimension, Random r) {
+  private Separation findSeparation(Relation<? extends NumberVector> relation, DBIDs currentids, int dimension, Random r) {
     Separation separation = new Separation();
     // determine the number of samples needed, to secure that with a specific
     // probability
@@ -385,12 +384,9 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
    */
   private double[] findAndEvaluateThreshold(DoubleDynamicHistogram histogram) {
     int n = histogram.getNumBins();
-    double[] p1 = new double[n];
-    double[] p2 = new double[n];
-    double[] mu1 = new double[n];
-    double[] mu2 = new double[n];
-    double[] sigma1 = new double[n];
-    double[] sigma2 = new double[n];
+    double[] p1 = new double[n], p2 = new double[n];
+    double[] mu1 = new double[n], mu2 = new double[n];
+    double[] sigma1 = new double[n], sigma2 = new double[n];
     double[] jt = new double[n];
     // Forward pass
     {
@@ -406,8 +402,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
     // Backwards pass
     {
       MeanVariance mv = new MeanVariance();
-      DoubleHistogram.Iter backwards = histogram.iter();
-      backwards.seek(histogram.getNumBins() - 1); // Seek to last
+      DoubleHistogram.Iter backwards = histogram.iter().seek(histogram.getNumBins() - 1);
 
       for(int j = n - 1; backwards.valid(); j--, backwards.retract()) {
         p2[j] = backwards.getValue() + ((j + 1 < n) ? p2[j + 1] : 0);
@@ -457,9 +452,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
       }
       devPrev = devCur;
     }
-    Iter iter = histogram.iter();
-    iter.seek(bestpos);
-    return new double[] { iter.getRight(), bestgoodness };
+    return new double[] { histogram.iter().seek(bestpos).getRight(), bestgoodness };
   }
 
   /**

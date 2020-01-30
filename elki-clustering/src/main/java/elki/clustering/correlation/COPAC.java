@@ -69,8 +69,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @has - - - DimensionModel
  * @composed - - - COPACNeighborPredicate
- * 
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " //
@@ -80,7 +78,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
     url = "https://doi.org/10.1137/1.9781611972771.37", //
     bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
-public class COPAC<V extends NumberVector> implements ClusteringAlgorithm<Clustering<DimensionModel>> {
+public class COPAC implements ClusteringAlgorithm<Clustering<DimensionModel>> {
   /**
    * Settings class.
    */
@@ -108,8 +106,8 @@ public class COPAC<V extends NumberVector> implements ClusteringAlgorithm<Cluste
    * @param relation Vector field relation
    * @return COPAC clustering
    */
-  public Clustering<DimensionModel> run(Database database, Relation<V> relation) {
-    COPACNeighborPredicate.Instance npred = new COPACNeighborPredicate<V>(settings).instantiate(relation);
+  public Clustering<DimensionModel> run(Database database, Relation<? extends NumberVector> relation) {
+    COPACNeighborPredicate.Instance npred = new COPACNeighborPredicate(settings).instantiate(relation);
     CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
     Clustering<Model> dclusters = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
     // Re-wrap the detected clusters for COPAC:
@@ -164,7 +162,7 @@ public class COPAC<V extends NumberVector> implements ClusteringAlgorithm<Cluste
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Size for the kNN neighborhood used in the PCA step of COPAC.
      */
@@ -194,8 +192,8 @@ public class COPAC<V extends NumberVector> implements ClusteringAlgorithm<Cluste
     }
 
     @Override
-    public COPAC<V> make() {
-      return new COPAC<>(settings);
+    public COPAC make() {
+      return new COPAC(settings);
     }
   }
 }

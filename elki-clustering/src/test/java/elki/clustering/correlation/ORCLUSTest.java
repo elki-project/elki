@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -40,14 +39,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class ORCLUSTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run ORCLUS with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testORCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
-    Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<>(ORCLUS.class) //
         .with(ORCLUS.Par.K_ID, 3) //
         .with(ORCLUS.Par.L_ID, 1) //
         .with(ORCLUS.Par.SEED_ID, 1) //
@@ -56,14 +51,10 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 28, 33, 389 });
   }
 
-  /**
-   * Run ORCLUS with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testORCLUSSkewedDisjoint() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-skewed-disjoint-3-5d.ascii", 601);
-    Clustering<Model> result = new ELKIBuilder<ORCLUS<DoubleVector>>(ORCLUS.class) //
+    Clustering<Model> result = new ELKIBuilder<>(ORCLUS.class) //
         .with(ORCLUS.Par.K_ID, 3) //
         .with(ORCLUS.Par.L_ID, 4) //
         .with(ORCLUS.Par.SEED_ID, 0) //

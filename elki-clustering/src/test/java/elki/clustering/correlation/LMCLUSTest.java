@@ -35,9 +35,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class LMCLUSTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run LMCLUS with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testLMCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
@@ -50,9 +47,6 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 30, 570 });
   }
 
-  /**
-   * Run LMCLUS with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testLMCLUSOverlap() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-overlap-3-5d.ascii", 650);

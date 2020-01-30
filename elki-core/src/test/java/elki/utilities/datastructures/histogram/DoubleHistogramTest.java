@@ -40,7 +40,7 @@ public class DoubleHistogramTest {
     double[] initial = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     double[] filled = { 0.0, 1.23, 4.56, 7.89, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     double[] changed = { 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0.0, 0.0, 0.0, 0.0 };
-    double[] resized = { -1.23, 0.0, 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0.0, 0.0, 0.0, 0.0, 0.0, -4.56 };
+    double[] resized = { -1.23, 0.0, 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0.0, 0.0, 0.0, 0.0, 0.0, -4.56, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
     DoubleHistogram hist = new DoubleHistogram(10, 0.0, 1.0);
     assertArrayEquals("Empty histogram doesn't match", initial, hist.data, 1E-15);
     hist.increment(0.15, 1.23);
@@ -59,7 +59,7 @@ public class DoubleHistogramTest {
 
     // compare results via Iterator.
     int off = 0;
-    for (DoubleHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
+    for(DoubleHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       assertEquals("Array iterator bin position", -0.15 + 0.1 * off, iter.getCenter(), 0.00001);
       assertEquals("Array iterator bin contents", resized[off], iter.getValue(), 0.00001);
       off++;

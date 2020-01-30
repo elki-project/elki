@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
@@ -40,14 +39,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class PROCLUSTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run PROCLUS with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testPROCLUSResults() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
-    Clustering<?> result = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+    Clustering<?> result = new ELKIBuilder<>(PROCLUS.class) //
         .with(PROCLUS.Par.L_ID, 1) //
         .with(PROCLUS.Par.K_ID, 4) //
         // NOTE: PROCLUS quality heavily depends on random...
@@ -57,14 +52,10 @@ public class PROCLUSTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 22, 36, 200, 342 });
   }
 
-  /**
-   * Run PROCLUS with fixed parameters and compare the result to a golden
-   * standard.
-   */
   @Test
   public void testPROCLUSSubspaceOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
-    Clustering<?> result = new ELKIBuilder<PROCLUS<DoubleVector>>(PROCLUS.class) //
+    Clustering<?> result = new ELKIBuilder<>(PROCLUS.class) //
         .with(PROCLUS.Par.L_ID, 2) //
         .with(PROCLUS.Par.K_ID, 3) //
         // NOTE: PROCLUS quality heavily depends on random...

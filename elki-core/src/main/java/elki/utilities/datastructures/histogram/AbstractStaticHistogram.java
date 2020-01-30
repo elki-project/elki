@@ -22,7 +22,7 @@ package elki.utilities.datastructures.histogram;
 
 /**
  * Abstract base class for histograms.
- * 
+ * <p>
  * Note that this is abstracted from the actual data storage, so it can be
  * adapted for multiple use cases.
  * 
@@ -77,15 +77,11 @@ public abstract class AbstractStaticHistogram implements Histogram {
    * @return bin number
    */
   protected int getBinNr(double coord) {
-    if (Double.isInfinite(coord) || Double.isNaN(coord)) {
+    if(Double.isInfinite(coord) || Double.isNaN(coord)) {
       throw new UnsupportedOperationException("Encountered non-finite value in Histogram: " + coord);
     }
-    if (coord == max) {
-      // System.err.println("Triggered special case: "+ (Math.floor((coord -
-      // base) / binsize) + offset) + " vs. " + (size - 1));
-      return size - 1;
-    }
-    return (int) Math.floor((coord - base) / binsize) + offset;
+    return coord == max ? size - 1 : //
+        ((int) Math.floor((coord - base) / binsize) + offset);
   }
 
   /**
@@ -99,15 +95,12 @@ public abstract class AbstractStaticHistogram implements Histogram {
     // Double until 64, then increase by 50% each time.
     int newCapacity = ((current < 64) ? ((current + 1) << 1) : ((current >> 1) * 3));
     // overflow?
-    if (newCapacity < 0) {
+    if(newCapacity < 0) {
       throw new OutOfMemoryError();
     }
-    if (requiredSize > newCapacity) {
-      newCapacity = requiredSize;
-    }
-    return requiredSize;
+    return requiredSize > newCapacity ? requiredSize : newCapacity;
   }
-  
+
   /**
    * Get the number of bins actually in use.
    * 

@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * Histogram class storing double values.
- * 
+ * <p>
  * The histogram will start with "bin" bins, but it can grow dynamically to the
  * left and right.
  * 
@@ -57,13 +57,14 @@ public class DoubleHistogram extends AbstractStaticHistogram {
    */
   public void increment(double coord, double val) {
     int bin = getBinNr(coord);
-    if (bin < 0) {
-      if (size - bin > data.length) {
-        // Reallocate. TODO: use an arraylist-like grow strategy!
+    if(bin < 0) {
+      if(size - bin > data.length) {
+        // Reallocate.
         double[] tmpdata = new double[growSize(data.length, size - bin)];
         System.arraycopy(data, 0, tmpdata, -bin, size);
         data = tmpdata;
-      } else {
+      }
+      else {
         // Shift in place and clear head
         System.arraycopy(data, 0, data, -bin, size);
         Arrays.fill(data, 0, -bin, (double) 0);
@@ -74,7 +75,8 @@ public class DoubleHistogram extends AbstractStaticHistogram {
       offset -= bin;
       size -= bin;
       // TODO: modCounter++; and have iterators fast-fail
-    } else if (bin >= data.length) {
+    }
+    else if(bin >= data.length) {
       double[] tmpdata = new double[growSize(data.length, bin + 1)];
       System.arraycopy(data, 0, tmpdata, 0, size);
       tmpdata[bin] = val;
@@ -83,8 +85,9 @@ public class DoubleHistogram extends AbstractStaticHistogram {
       // TODO: modCounter++; and have iterators fast-fail
       // Unset max value when resizing
       max = Double.MAX_VALUE;
-    } else {
-      if (bin >= size) {
+    }
+    else {
+      if(bin >= size) {
         // TODO: reset bins to 0 first?
         size = bin + 1;
       }
@@ -121,6 +124,30 @@ public class DoubleHistogram extends AbstractStaticHistogram {
      */
     public double getValue() {
       return data[bin];
+    }
+
+    @Override
+    public Iter advance() {
+      super.advance();
+      return this;
+    }
+
+    @Override
+    public Iter advance(int count) {
+      super.advance(count);
+      return this;
+    }
+
+    @Override
+    public Iter retract() {
+      super.retract();
+      return this;
+    }
+
+    @Override
+    public Iter seek(int off) {
+      super.seek(off);
+      return this;
     }
   }
 }

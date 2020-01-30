@@ -24,7 +24,6 @@ import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.FourCCorePredicate;
 import elki.clustering.dbscan.predicates.FourCNeighborPredicate;
-import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
@@ -56,8 +55,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @composed - - - Settings
  * @composed - - - FourCNeighborPredicate
  * @composed - - - FourCCorePredicate
- *
- * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " //
@@ -67,14 +64,14 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
     url = "https://doi.org/10.1145/1007568.1007620", //
     bibkey = "DBLP:conf/sigmod/BohmKKZ04")
-public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
+public class FourC extends GeneralizedDBSCAN {
   /**
    * Constructor.
    *
    * @param settings FourC settings.
    */
   public FourC(FourC.Settings settings) {
-    super(new FourCNeighborPredicate<V>(settings), new FourCCorePredicate(settings), false);
+    super(new FourCNeighborPredicate(settings), new FourCCorePredicate(settings), false);
   }
 
   @Override
@@ -194,7 +191,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
    *
    * @author Erich Schubert
    */
-  public static class Par<O extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Settings storage.
      */
@@ -206,8 +203,8 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
     }
 
     @Override
-    public FourC<O> make() {
-      return new FourC<>(settings);
+    public FourC make() {
+      return new FourC(settings);
     }
   }
 }

@@ -51,15 +51,13 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.7.0
  *
  * @navassoc - - - PreDeConModel
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "Christian Böhm, Karin Kailing, Hans-Peter Kriegel, Peer Kröger", //
     title = "Density Connected Clustering with Local Subspace Preferences", //
     booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
     url = "https://doi.org/10.1109/ICDM.2004.10087", //
     bibkey = "DBLP:conf/icdm/BohmKKK04")
-public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel, PreDeConNeighborPredicate.PreDeConModel> {
+public class PreDeConNeighborPredicate extends AbstractRangeQueryNeighborPredicate<NumberVector, PreDeConNeighborPredicate.PreDeConModel, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -88,7 +86,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
 
   @Override
   public Instance instantiate(Database database) {
-    Relation<V> relation = database.getRelation(distance.getInputTypeRestriction());
+    Relation<? extends NumberVector> relation = database.getRelation(distance.getInputTypeRestriction());
     RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, distance).rangeByDBID(epsilon);
     mvSize.reset();
     mvVar.reset();
@@ -113,7 +111,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
   }
 
   @Override
-  protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<V> relation) {
+  protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<? extends NumberVector> relation) {
     final int referenceSetSize = neighbors.size();
     mvSize.put(referenceSetSize);
 
@@ -123,13 +121,13 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
       return new PreDeConModel(Integer.MAX_VALUE, DBIDUtil.EMPTYDBIDS);
     }
 
-    V obj = relation.get(id);
+    NumberVector obj = relation.get(id);
     final int dim = obj.getDimensionality();
 
     // Per-dimension variances:
     double[] s = new double[dim];
     for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-      V o = relation.get(neighbor);
+      NumberVector o = relation.get(neighbor);
       for(int d = 0; d < dim; d++) {
         final double diff = obj.doubleValue(d) - o.doubleValue(d);
         s[d] += diff * diff;
@@ -157,7 +155,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
     // Check which neighbors survive
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(referenceSetSize);
     for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-      V o = relation.get(neighbor);
+      NumberVector o = relation.get(neighbor);
       // Weighted Euclidean distance:
       double dev = 0.;
       for(int d = 0; d < dim; d++) {
@@ -252,7 +250,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * PreDeCon settings.
      */
@@ -264,8 +262,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
     }
 
     @Override
-    public PreDeConNeighborPredicate<V> make() {
-      return new PreDeConNeighborPredicate<>(settings);
+    public PreDeConNeighborPredicate make() {
+      return new PreDeConNeighborPredicate(settings);
     }
   }
 }

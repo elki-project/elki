@@ -38,7 +38,7 @@ public class HiSCTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testHiSC() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-4-5d.ascii", 1100);
-    Clustering<?> result = new ELKIBuilder<OPTICSXi>(OPTICSXi.class) //
+    Clustering<?> result = new ELKIBuilder<>(OPTICSXi.class) //
         .with(OPTICSXi.Par.XIALG_ID, HiSC.class) //
         .with(OPTICSXi.Par.XI_ID, 0.5) //
         .with(HiSC.Par.ALPHA_ID, 0.05) //

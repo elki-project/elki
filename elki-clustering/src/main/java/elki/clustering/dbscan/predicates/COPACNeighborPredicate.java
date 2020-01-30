@@ -65,15 +65,13 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.7.0
  *
  * @navassoc - - - COPACNeighborPredicate.COPACModel
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "Elke Achtert, Christian Böhm, Hans-Peter Kriegel, Peer Kröger, Arthur Zimek", //
     title = "Robust, Complete, and Efficient Correlation Clustering", //
     booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
     url = "https://doi.org/10.1137/1.9781611972771.37", //
     bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
-public class COPACNeighborPredicate<V extends NumberVector> implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
+public class COPACNeighborPredicate implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
   /**
    * The logger for this class.
    */
@@ -102,7 +100,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
 
   @Override
   public NeighborPredicate.Instance<COPACModel> instantiate(Database database) {
-    return instantiate(database.<V> getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return instantiate(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -111,7 +109,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * @param relation Vector relation
    * @return Instance
    */
-  public COPACNeighborPredicate.Instance instantiate(Relation<V> relation) {
+  public COPACNeighborPredicate.Instance instantiate(Relation<? extends NumberVector> relation) {
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(settings.k);
     WritableDataStore<COPACModel> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, COPACModel.class);
 
@@ -135,7 +133,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * @param relation Data relation
    * @return COPAC object model
    */
-  protected COPACModel computeLocalModel(DBIDRef id, DoubleDBIDList knnneighbors, Relation<V> relation) {
+  protected COPACModel computeLocalModel(DBIDRef id, DoubleDBIDList knnneighbors, Relation<? extends NumberVector> relation) {
     PCAResult epairs = settings.pca.processIds(knnneighbors, relation);
     int pdim = settings.filter.filter(epairs.getEigenvalues());
     double[] vecP = relation.get(id).toArray();
@@ -272,7 +270,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * COPAC settings.
      */
@@ -284,8 +282,8 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     }
 
     @Override
-    public COPACNeighborPredicate<V> make() {
-      return new COPACNeighborPredicate<>(settings);
+    public COPACNeighborPredicate make() {
+      return new COPACNeighborPredicate(settings);
     }
   }
 }

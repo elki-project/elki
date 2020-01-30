@@ -87,8 +87,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @composed - - - PCAFilteredRunner
  * @composed - - - ERiCNeighborPredicate
  * @has - - - CorrelationModel
- *
- * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " //
@@ -98,7 +96,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
     url = "https://doi.org/10.1109/SSDBM.2007.21", //
     bibkey = "DBLP:conf/ssdbm/AchtertBKKZ07")
-public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
+public class ERiC implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * The logger for this class.
    */
@@ -130,7 +128,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<CorrelationModel> run(Database database, Relation<V> relation) {
+  public Clustering<CorrelationModel> run(Database database, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
@@ -138,7 +136,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
     // Run Generalized DBSCAN
     LOG.beginStep(stepprog, 1, "Preprocessing local correlation dimensionalities and partitioning data");
     // FIXME: how to ensure we are running on the same relation?
-    ERiCNeighborPredicate<V>.Instance npred = new ERiCNeighborPredicate<V>(settings).instantiate(relation);
+    ERiCNeighborPredicate.Instance npred = new ERiCNeighborPredicate(settings).instantiate(relation);
     CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
     Clustering<Model> copacResult = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
 
@@ -212,7 +210,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @param npred ERiC predicate
    * @return a list of clusters for each dimensionality
    */
-  private List<List<Cluster<CorrelationModel>>> extractCorrelationClusters(Clustering<Model> dbscanResult, Relation<V> relation, int dimensionality, ERiCNeighborPredicate<V>.Instance npred) {
+  private List<List<Cluster<CorrelationModel>>> extractCorrelationClusters(Clustering<Model> dbscanResult, Relation<? extends NumberVector> relation, int dimensionality, ERiCNeighborPredicate.Instance npred) {
     // result
     List<List<Cluster<CorrelationModel>>> clusterMap = new ArrayList<>();
     for(int i = 0; i <= dimensionality; i++) {
@@ -275,7 +273,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
     return clusterMap;
   }
 
-  private void buildHierarchy(Clustering<CorrelationModel> clustering, List<List<Cluster<CorrelationModel>>> clusterMap, ERiCNeighborPredicate<V>.Instance npred) {
+  private void buildHierarchy(Clustering<CorrelationModel> clustering, List<List<Cluster<CorrelationModel>>> clusterMap, ERiCNeighborPredicate.Instance npred) {
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
     Hierarchy<Cluster<CorrelationModel>> hier = clustering.getClusterHierarchy();
 
@@ -327,7 +325,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel> parent, It<Cluster<CorrelationModel>> iter) {
+  private boolean isParent(ERiCNeighborPredicate.Instance npred, Cluster<CorrelationModel> parent, It<Cluster<CorrelationModel>> iter) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     for(; iter.valid(); iter.advance()) {
@@ -403,7 +401,7 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Size for the kNN neighborhood used in the PCA step of ERiC.
      */
@@ -453,8 +451,8 @@ public class ERiC<V extends NumberVector> implements ClusteringAlgorithm<Cluster
     }
 
     @Override
-    public ERiC<V> make() {
-      return new ERiC<>(settings);
+    public ERiC make() {
+      return new ERiC(settings);
     }
   }
 }

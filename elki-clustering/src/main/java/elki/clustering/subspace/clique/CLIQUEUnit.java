@@ -229,20 +229,14 @@ public class CLIQUEUnit {
     }
     // n-1 dimensions must be the same:
     int e = dims.length - 1;
-    if(!checkDimensions(other, e)) {
-      return null;
-    }
-    if(dims[e] >= other.dims[e]) {
+    if(!checkDimensions(other, e) || dims[e] >= other.dims[e]) {
       return null;
     }
 
-    HashSetModifiableDBIDs resultIDs = DBIDUtil.newHashSet(this.ids);
-    resultIDs.retainAll(other.ids);
+    ModifiableDBIDs resultIDs = DBIDUtil.intersection(this.ids, other.ids);
 
-    if(resultIDs.size() / all < tau) {
-      return null;
-    }
-    return new CLIQUEUnit(this, other.dims[e], other.bounds[e << 1], other.bounds[(e << 1) + 1], resultIDs);
+    return resultIDs.size() / all < tau ? null : //
+        new CLIQUEUnit(this, other.dims[e], other.bounds[e << 1], other.bounds[(e << 1) + 1], resultIDs);
   }
 
   /**

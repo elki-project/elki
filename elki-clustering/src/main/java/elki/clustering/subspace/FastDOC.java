@@ -25,7 +25,6 @@ import java.util.Random;
 import elki.data.Cluster;
 import elki.data.NumberVector;
 import elki.data.model.SubspaceModel;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
@@ -52,8 +51,6 @@ import elki.utilities.random.RandomFactory;
  * @since 0.7.5
  * 
  * @has - - - SubspaceModel
- * 
- * @param <V> the type of NumberVector handled by this Algorithm.
  */
 @Title("FastDOC: Density-based Optimal projective Clustering")
 @Reference(authors = "C. M. Procopiuc, M. Jones, P. K. Agarwal, T. M. Murali", //
@@ -61,7 +58,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", //
     url = "https://doi.org/10.1145/564691.564739", //
     bibkey = "DBLP:conf/sigmod/ProcopiucJAM02")
-public class FastDOC<V extends NumberVector> extends DOC<V> {
+public class FastDOC extends DOC {
   /**
    * The logger for this class.
    */
@@ -99,7 +96,7 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
    * @return a cluster, if one is found, else <code>null</code>.
    */
   @Override
-  protected Cluster<SubspaceModel> runDOC(Database database, Relation<V> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r, int minClusterSize) {
+  protected Cluster<SubspaceModel> runDOC(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs S, int d, int n, int m, int r, int minClusterSize) {
     // Relevant attributes of highest cardinality.
     long[] D = null;
     // The seed point for the best dimensions.
@@ -162,7 +159,7 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
    * 
    * @author Florian Nuecke
    */
-  public static class Par<V extends NumberVector> extends DOC.Par<V> {
+  public static class Par extends DOC.Par {
     /**
      * Stopping threshold for FastDOC.
      */
@@ -182,8 +179,8 @@ public class FastDOC<V extends NumberVector> extends DOC<V> {
     }
 
     @Override
-    public FastDOC<V> make() {
-      return new FastDOC<>(alpha, beta, w, d_zero, random);
+    public FastDOC make() {
+      return new FastDOC(alpha, beta, w, d_zero, random);
     }
   }
 }
