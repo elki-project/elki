@@ -85,7 +85,6 @@ public class FastDOC extends DOC {
   /**
    * Performs a single run of FastDOC, finding a single cluster.
    * 
-   * @param database Database context
    * @param relation used to get actual values for DBIDs.
    * @param S The set of points we're working on.
    * @param d Dimensionality of the data set we're currently working on.

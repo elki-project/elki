@@ -512,20 +512,18 @@ public class DiSH implements SubspaceClusteringAlgorithm<SubspaceModel> {
               if(msg != null) {
                 msg.append("\n d = ").append(d);
               }
-              if(d <= 2 * epsilon) {
-                // no parent exists or c_j is not a parent of the already
-                // existing parents
-                if(hier.numParents(c_i) == 0 || !isParent(database, c_j, hier.iterParents(c_i), db_dim)) {
-                  clustering.addChildCluster(c_j, c_i);
-                  if(msg != null) {
-                    msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)) //
-                        .append("] is parent of [") //
-                        .append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']');
-                  }
-                }
+              if(d > 2 * epsilon) {
+                throw new IllegalStateException("Should never happen: d = " + d + " > 2*" + epsilon);
               }
-              else {
-                throw new RuntimeException("Should never happen: d = " + d);
+              // no parent exists or c_j is not a parent of the already
+              // existing parents
+              if(hier.numParents(c_i) == 0 || !isParent(database, c_j, hier.iterParents(c_i), db_dim)) {
+                clustering.addChildCluster(c_j, c_i);
+                if(msg != null) {
+                  msg.append("\n [").append(BitsUtil.toStringLow(s_j.getDimensions(), db_dim)) //
+                      .append("] is parent of [") //
+                      .append(BitsUtil.toStringLow(s_i.getDimensions(), db_dim)).append(']');
+                }
               }
             }
           }

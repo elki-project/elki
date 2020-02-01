@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -40,13 +39,10 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class CASHTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run CASH with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testCASHResults() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
-    Clustering<Model> result = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
+    Clustering<Model> result = new ELKIBuilder<>(CASH.class) //
         .with(CASH.Par.JITTER_ID, 0.7) //
         .with(CASH.Par.MINPTS_ID, 50) //
         .with(CASH.Par.MAXLEVEL_ID, 25) //
@@ -56,13 +52,10 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 18, 80, 252, 468 });
   }
 
-  /**
-   * Run CASH with fixed parameters and compare the result to a golden standard.
-   */
   @Test
   public void testCASHEmbedded() {
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600);
-    Clustering<Model> result = new ELKIBuilder<CASH<DoubleVector>>(CASH.class) //
+    Clustering<Model> result = new ELKIBuilder<>(CASH.class) //
         .with(CASH.Par.JITTER_ID, 0.7) //
         .with(CASH.Par.MINPTS_ID, 160) //
         .with(CASH.Par.MAXLEVEL_ID, 40) //

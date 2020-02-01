@@ -91,8 +91,6 @@ import net.jafama.FastMath;
  * @has - - - CASHInterval
  * @has - - - ParameterizationFunction
  * @has - - - LinearEquationModel
- *
- * @param <V> Vector type
  */
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
@@ -102,7 +100,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08)", //
     url = "https://doi.org/10.1137/1.9781611972788.69", //
     bibkey = "DBLP:conf/sdm/AchtertBDKZ08")
-public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -172,7 +170,7 @@ public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @param rel Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Relation<V> rel) {
+  public Clustering<Model> run(Relation<? extends NumberVector> rel) {
     fulldatabase = preprocess(rel);
     processedIDs = DBIDUtil.newHashSet(fulldatabase.size());
     noiseDim = dimensionality(fulldatabase);
@@ -203,7 +201,7 @@ public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Cluster
    * @param vrel Vector relation
    * @return Preprocessed relation
    */
-  private Relation<ParameterizationFunction> preprocess(Relation<V> vrel) {
+  private Relation<ParameterizationFunction> preprocess(Relation<? extends NumberVector> vrel) {
     DBIDs ids = vrel.getDBIDs();
     SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
     WritableDataStore<ParameterizationFunction> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ParameterizationFunction.class);
@@ -760,8 +758,8 @@ public class CASH<V extends NumberVector> implements ClusteringAlgorithm<Cluster
     }
 
     @Override
-    public CASH<NumberVector> make() {
-      return new CASH<>(minPts, maxLevel, minDim, jitter, adjust);
+    public CASH make() {
+      return new CASH(minPts, maxLevel, minDim, jitter, adjust);
     }
   }
 }

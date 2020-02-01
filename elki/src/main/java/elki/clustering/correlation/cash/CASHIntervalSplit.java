@@ -25,11 +25,9 @@ import java.util.Map;
 
 import elki.data.HyperBoundingBox;
 import elki.data.spatial.SpatialUtil;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.utilities.io.FormatUtil;
@@ -44,6 +42,11 @@ import elki.utilities.io.FormatUtil;
  */
 public class CASHIntervalSplit {
   /**
+   * The logger of the class.
+   */
+  private static final Logging LOG = Logging.getLogger(CASHIntervalSplit.class);
+
+  /**
    * The database storing the parameterization functions.
    */
   private Relation<ParameterizationFunction> database;
@@ -52,23 +55,18 @@ public class CASHIntervalSplit {
    * Caches minimum function values for given intervals, used for better split
    * performance.
    */
-  private Map<HyperBoundingBox, Map<DBID, Double>> f_minima;
+  private Map<HyperBoundingBox, WritableDoubleDataStore> f_minima;
 
   /**
    * Caches maximum function values for given intervals, used for better split
    * performance.
    */
-  private Map<HyperBoundingBox, Map<DBID, Double>> f_maxima;
+  private Map<HyperBoundingBox, WritableDoubleDataStore> f_maxima;
 
   /**
    * Minimum points.
    */
   private int minPts;
-
-  /**
-   * The logger of the class.
-   */
-  private static final Logging LOG = Logging.getLogger(CASHIntervalSplit.class);
 
   /**
    * Initializes the logger and sets the debug status to the given value.
@@ -105,64 +103,51 @@ public class CASHIntervalSplit {
 
     ModifiableDBIDs childIDs = DBIDUtil.newHashSet(superSetIDs.size());
 
-    Map<DBID, Double> minima = f_minima.get(interval);
-    Map<DBID, Double> maxima = f_maxima.get(interval);
+    WritableDoubleDataStore minima = f_minima.get(interval);
+    WritableDoubleDataStore maxima = f_maxima.get(interval);
     if(minima == null || maxima == null) {
-      minima = new HashMap<>();
-      f_minima.put(interval, minima);
-      maxima = new HashMap<>();
-      f_maxima.put(interval, maxima);
+      f_minima.put(interval, minima = DataStoreFactory.FACTORY.makeDoubleStorage(superSetIDs, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.NaN));
+      f_maxima.put(interval, maxima = DataStoreFactory.FACTORY.makeDoubleStorage(superSetIDs, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.NaN));
     }
 
     for(DBIDIter iter = superSetIDs.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      Double f_min = minima.get(id);
-      Double f_max = maxima.get(id);
+      double f_min = minima.doubleValue(iter);
+      double f_max = maxima.doubleValue(iter);
 
-      if(f_min == null) {
-        ParameterizationFunction f = database.get(id);
+      if(Double.isNaN(f_min)) {
+        ParameterizationFunction f = database.get(iter);
         HyperBoundingBox minMax = f.determineAlphaMinMax(interval);
-        f_min = f.function(SpatialUtil.getMin(minMax));
-        f_max = f.function(SpatialUtil.getMax(minMax));
-        minima.put(id, f_min);
-        maxima.put(id, f_max);
+        minima.put(iter, f_min = f.function(SpatialUtil.getMin(minMax)));
+        maxima.put(iter, f_max = f.function(SpatialUtil.getMax(minMax)));
       }
 
       if(msg != null) {
-        msg.append("\n\nf_min ").append(f_min);
-        msg.append("\nf_max ").append(f_max);
-        msg.append("\nd_min ").append(d_min);
-        msg.append("\nd_max ").append(d_max);
+        msg.append("\n\nf_min ").append(f_min) //
+            .append("\nf_max ").append(f_max) //
+            .append("\nd_min ").append(d_min) //
+            .append("\nd_max ").append(d_max);
       }
 
       if(f_min - f_max > ParameterizationFunction.DELTA) {
-        throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " + "\nf_min[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_min + "\nf_max[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_max + "\nf " + database.get(id));
+        throw new IllegalArgumentException("Houston, we have a problem: f_min > f_max! " + "\nf_min[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_min + "\nf_max[" + FormatUtil.format(SpatialUtil.centroid(interval)) + "] = " + f_max + "\nf " + database.get(iter));
       }
 
       if(f_min <= d_max && f_max >= d_min) {
-        childIDs.add(id);
+        childIDs.add(iter);
         if(msg != null) {
-          msg.append("\nid ").append(id).append(" appended");
+          msg.append("\nid ").append(iter).append(" appended");
         }
       }
-
       else {
         if(msg != null) {
-          msg.append("\nid ").append(id).append(" NOT appended");
+          msg.append("\nid ").append(iter).append(" NOT appended");
         }
       }
     }
 
     if(msg != null) {
-      msg.append("\nchildIds ").append(childIDs.size());
-      LOG.debugFine(msg.toString());
+      LOG.debugFine(msg.append("\nchildIds ").append(childIDs.size()).toString());
     }
-
-    if(childIDs.size() < minPts) {
-      return null;
-    }
-    else {
-      return childIDs;
-    }
+    return childIDs.size() < minPts ? null : childIDs;
   }
 }

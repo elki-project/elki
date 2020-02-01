@@ -41,18 +41,18 @@ public class ParameterizationFunction {
    * Available types for the global extremum.
    */
   public enum ExtremumType {
-  /**
-   * Minimum.
-   */
-  MINIMUM,
-  /**
-   * Maximum.
-   */
-  MAXIMUM,
-  /**
-   * Constant.
-   */
-  CONSTANT
+    /**
+     * Minimum.
+     */
+    MINIMUM,
+    /**
+     * Maximum.
+     */
+    MAXIMUM,
+    /**
+     * Constant.
+     */
+    CONSTANT
   }
 
   /**
@@ -398,11 +398,10 @@ public class ParameterizationFunction {
    * @return a string representation of the object.
    */
   public String toString(int offset) {
-    StringBuilder result = new StringBuilder();
+    StringBuilder result = new StringBuilder(1000);
     for(int d = 0; d < vec.getDimensionality(); d++) {
       if(d != 0) {
-        result.append(" + \n");
-        FormatUtil.whitespace(result, offset);
+        FormatUtil.whitespace(result.append(" + \n"), offset);
       }
       result.append(vec.doubleValue(d));
       for(int j = 0; j < d; j++) {
@@ -444,7 +443,6 @@ public class ParameterizationFunction {
         throw new IllegalStateException("Houston, we have a problem!\n" + this + "\n" + vec + "\n" + FormatUtil.format(alphaExtremum));
       }
     }
-
     determineGlobalExtremumType();
   }
 
@@ -463,8 +461,7 @@ public class ParameterizationFunction {
     }
 
     // look if f1 and f2 are less, greater or equal to f
-    double f1 = function(alpha_1);
-    double f2 = function(alpha_2);
+    double f1 = function(alpha_1), f2 = function(alpha_2);
 
     if(f1 < f && f2 < f) {
       extremumType = ExtremumType.MAXIMUM;
@@ -501,14 +498,8 @@ public class ParameterizationFunction {
     }
     tan /= vec.doubleValue(n);
 
-    // if (debug) {
-    // debugFiner("tan alpha_" + (n + 1) + " = " + tan);
-    // }
     double alpha_n = Math.atan(tan);
-    if(alpha_n < 0) {
-      alpha_n = Math.PI + alpha_n;
-    }
-    return alpha_n;
+    return alpha_n < 0 ? Math.PI + alpha_n : alpha_n;
   }
 
   /**
