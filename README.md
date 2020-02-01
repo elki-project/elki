@@ -1,6 +1,7 @@
 # ELKI
 ##### Environment for Developing KDD-Applications Supported by Index-Structures
-[![DBLP:journals/pvldb/SchubertKEZSZ15](https://img.shields.io/badge/DBLP--BibTeX-journals%2Fpvldb%2FSchubertKEZSZ15-brightgreen.svg)](http://dblp.uni-trier.de/rec/bibtex/journals/pvldb/SchubertKEZSZ15)
+[![arXiv:1902-03616](https://img.shields.io/badge/arXiv-1902.03616-brightgreen)](https://arxiv.org/abs/1902.03616)
+[![DBLP:journals/corr/abs-1902-03616](https://img.shields.io/badge/DBLP--BibTeX-journals%2Fcorr%2Fabs--1902--03616-brightgreen)](https://dblp.org/rec/html/journals/corr/abs-1902-03616)
 [![License AGPL-3.0](https://img.shields.io/badge/License-AGPL--3-brightgreen.svg)](https://elki-project.github.io/license)
 [![Build Status](https://travis-ci.org/elki-project/elki.svg?branch=master)](https://travis-ci.org/elki-project/elki)
 
