@@ -584,7 +584,7 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     double pweight = 1. / relation.size();
 
     // Rescale weights, to take unassigned points into account:
-    for(EMClusterModel<?> m : models) {
+    for(EMClusterModel<?, ?> m : models) {
       m.setWeight(m.getWeight() * (relation.size() - unassigned.size()) * pweight);
     }
 

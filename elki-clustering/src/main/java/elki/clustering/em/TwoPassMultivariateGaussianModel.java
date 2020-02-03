@@ -43,7 +43,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class TwoPassMultivariateGaussianModel implements EMClusterModel<EMModel> {
+public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**
    * Class logger.
    */

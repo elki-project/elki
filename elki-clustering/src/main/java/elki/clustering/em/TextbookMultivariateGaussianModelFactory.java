@@ -27,11 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.database.relation.Relation;
-import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -42,28 +47,33 @@ import net.jafama.FastMath;
  * "Textbook" refers to the E[XY]-E[X]E[Y] equation for covariance, that is
  * numerically not reliable with floating point math, but popular in textbooks.
  * <p>
- * Again, do not use this. Always prefer {@link MultivariateGaussianModelFactory}.
+ * Again, do not use this. Always prefer
+ * {@link MultivariateGaussianModelFactory}.
  *
  * @author Erich Schubert
  * @since 0.7.5
  *
  * @has - - - TextbookMultivariateGaussianModel
- *
- * @param <V> vector type
  */
-public class TextbookMultivariateGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {
+public class TextbookMultivariateGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
+  /**
+   * Class to choose the initial means
+   */
+  protected KMeansInitialization initializer;
+
   /**
    * Constructor.
    *
    * @param initializer Class for choosing the initial seeds.
    */
   public TextbookMultivariateGaussianModelFactory(KMeansInitialization initializer) {
-    super(initializer);
+    super();
+    this.initializer = initializer;
   }
 
   @Override
-  public List<TextbookMultivariateGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
-    double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
+  public List<TextbookMultivariateGaussianModel> buildInitialModels(Relation<? extends NumberVector> relation, int k) {
+    double[][] initialMeans = initializer.chooseInitialMeans(relation, k, SquaredEuclideanDistance.STATIC);
     assert initialMeans.length == k;
     // Compute the global covariance matrix for better starting conditions:
     double[][] covmat = CovarianceMatrix.make(relation).destroyToPopulationMatrix();
@@ -82,13 +92,22 @@ public class TextbookMultivariateGaussianModelFactory<V extends NumberVector> ex
    * @author Erich Schubert
    *
    * @hidden
-   *
-   * @param <V> Vector type
    */
-  public static class Par<V extends NumberVector> extends AbstractEMModelFactory.Par<V> {
+  public static class Par implements Parameterizer {
+    /**
+     * Initialization method
+     */
+    protected KMeansInitialization initializer;
+
     @Override
-    public TextbookMultivariateGaussianModelFactory<V> make() {
-      return new TextbookMultivariateGaussianModelFactory<>(initializer);
+    public void configure(Parameterization config) {
+      new ObjectParameter<KMeansInitialization>(INIT_ID, KMeansInitialization.class, RandomlyChosen.class) //
+          .grab(config, x -> initializer = x);
+    }
+
+    @Override
+    public TextbookMultivariateGaussianModelFactory make() {
+      return new TextbookMultivariateGaussianModelFactory(initializer);
     }
   }
 }

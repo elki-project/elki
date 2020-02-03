@@ -35,7 +35,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class SphericalGaussianModel implements EMClusterModel<EMModel> {
+public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**
    * Mean vector.
    */

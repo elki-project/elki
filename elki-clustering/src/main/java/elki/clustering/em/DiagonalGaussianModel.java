@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
+public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**
    * Constant to avoid singular matrixes.
    */

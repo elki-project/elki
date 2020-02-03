@@ -20,16 +20,18 @@
  */
 package elki.clustering.em;
 
-import elki.data.NumberVector;
-import elki.data.model.MeanModel;
+import elki.data.model.Model;
 
 /**
  * Models usable in EM clustering.
  * 
  * @author Erich Schubert
  * @since 0.7.0
+ * 
+ * @param <O> Input object type
+ * @param <M> Cluster model type
  */
-public interface EMClusterModel<M extends MeanModel> {
+public interface EMClusterModel<O, M extends Model> {
   /**
    * Begin the E step.
    */
@@ -46,13 +48,13 @@ public interface EMClusterModel<M extends MeanModel> {
 
   /**
    * First run in the E step.
-   *
+   * <p>
    * By default, this is not used (c.f. {@link #needsTwoPass()}.
    *
    * @param vec Vector to process
    * @param weight Weight of point ("responsibility" of the cluster)
    */
-  default void firstPassE(NumberVector vec, double weight) {
+  default void firstPassE(O vec, double weight) {
     // empty.
   };
 
@@ -71,7 +73,7 @@ public interface EMClusterModel<M extends MeanModel> {
    * @param vec Vector to process
    * @param weight Weight of point ("responsibility" of the cluster)
    */
-  void updateE(NumberVector vec, double weight);
+  void updateE(O vec, double weight);
 
   /**
    * Finalize the E step.
@@ -87,7 +89,7 @@ public interface EMClusterModel<M extends MeanModel> {
    * @param vec Vector
    * @return log likelihood.
    */
-  double estimateLogDensity(NumberVector vec);
+  double estimateLogDensity(O vec);
 
   /**
    * Finalize a cluster model.

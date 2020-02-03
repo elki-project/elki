@@ -22,10 +22,9 @@ package elki.clustering.em;
 
 import java.util.List;
 
-import elki.data.NumberVector;
-import elki.data.model.MeanModel;
+import elki.data.model.Model;
 import elki.database.relation.Relation;
-import elki.distance.NumberVectorDistance;
+import elki.utilities.optionhandling.OptionID;
 
 /**
  * Factory for initializing the EM models.
@@ -35,17 +34,21 @@ import elki.distance.NumberVectorDistance;
  *
  * @navassoc - creates - EMClusterModel
  *
- * @param <V> Vector type
- * @param <M> Model type
+ * @param <O> Input object type
+ * @param <M> Cluster model type
  */
-public interface EMClusterModelFactory<V extends NumberVector, M extends MeanModel> {
+public interface EMClusterModelFactory<O, M extends Model> {
   /**
    * Build the initial models
    *
    * @param relation Relation
    * @param k Number of clusters
-   * @param df Distance function
    * @return Initial models
    */
-  List<? extends EMClusterModel<M>> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df);
+  List<? extends EMClusterModel<O, M>> buildInitialModels(Relation<? extends O> relation, int k);
+
+  /**
+   * Parameter to specify the cluster center initialization.
+   */
+  static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
 }
