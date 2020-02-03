@@ -42,6 +42,7 @@ import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
 import elki.logging.progress.MutableProgress;
 import elki.logging.progress.StepProgress;
+import elki.logging.statistics.DoubleStatistic;
 import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.math.linearalgebra.CovarianceMatrix;
@@ -196,7 +197,6 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(stepProgress != null) {
       stepProgress.beginStep(3, "Merging marked bins to 1-signatures.", LOG);
     }
-
     ArrayList<Signature> signatures = constructOneSignatures(partitions, markers);
 
     if(stepProgress != null) {
@@ -208,12 +208,10 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(stepProgress != null) {
       stepProgress.beginStep(5, "Pruning redundant cluster cores.", LOG);
     }
-
     clusterCores = pruneRedundantClusterCores(clusterCores);
     if(LOG.isVerbose()) {
       LOG.verbose("Number of cluster cores found: " + clusterCores.size());
     }
-
     if(clusterCores.isEmpty()) {
       LOG.setCompleted(stepProgress);
       Clustering<SubspaceModel> c = new Clustering<>();
@@ -225,7 +223,6 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(stepProgress != null) {
       stepProgress.beginStep(5, "Refining cluster cores to clusters via EM.", LOG);
     }
-
     // Track objects not assigned to any cluster:
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
@@ -244,8 +241,8 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
       // reassign probabilities
       emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
-      if(LOG.isVerbose()) {
-        LOG.verbose("iteration " + it + " - expectation value: " + emNew);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(getClass().getName() + ".iteration-" + it + ".logexpectation", emNew));
       }
       if((emNew - emOld) <= emDelta) {
         break;
@@ -253,11 +250,9 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     }
 
     // Perform EM clustering.
-
     if(stepProgress != null) {
       stepProgress.beginStep(6, "Generating hard clustering.", LOG);
     }
-
     // Create a hard clustering, making sure each data point only is part of one
     // cluster, based on the best match from the membership matrix.
     ArrayList<ClusterCandidate> clusterCandidates = hardClustering(probClusterIGivenX, clusterCores, relation.getDBIDs());
@@ -265,7 +260,6 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(stepProgress != null) {
       stepProgress.beginStep(7, "Looking for outliers and moving them to the noise set.", LOG);
     }
-
     // Outlier detection. Remove points from clusters that have a Mahalanobis
     // distance larger than the critical value of the ChiSquare distribution.
     findOutliers(relation, models, clusterCandidates, noise);
@@ -273,7 +267,6 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(stepProgress != null) {
       stepProgress.beginStep(8, "Removing empty clusters.", LOG);
     }
-
     // Remove near-empty clusters.
     for(Iterator<ClusterCandidate> it = clusterCandidates.iterator(); it.hasNext();) {
       ClusterCandidate cand = it.next();
@@ -285,17 +278,14 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
         it.remove();
       }
     }
-
     if(LOG.isVerbose()) {
       LOG.verbose("Number of clusters remaining: " + clusterCandidates.size());
     }
 
     // TODO Check all attributes previously deemed uniform (section 3.5).
-
     if(stepProgress != null) {
       stepProgress.beginStep(9, "Generating final result.", LOG);
     }
-
     // Generate final output.
     Clustering<SubspaceModel> result = new Clustering<>();
     Metadata.of(result).setLongName("P3C Clustering");
@@ -308,9 +298,7 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     if(noise.size() > 0) {
       result.addToplevelCluster(new Cluster<SubspaceModel>(noise, true));
     }
-
     LOG.ensureCompleted(stepProgress);
-
     return result;
   }
 
@@ -381,8 +369,7 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
           // 1-signatures to try merging with this p-signature as well.
           clusterCores.add(merge);
           // Flag both "parents" for removal.
-          parent.prune = true;
-          onesig.prune = true;
+          parent.prune = onesig.prune = true;
         }
       }
       if(mergeProgress != null) {
@@ -526,11 +513,11 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
         maxpos = i;
       }
     }
-    if(mv.getCount() < 1. || !(mv.getNaiveVariance() > 0.)) {
+    if(mv.getCount() < 1. || !(mv.getPopulationVariance() > 0.)) {
       return -1;
     }
     // ChiSquare statistic is the naive variance of the sizes!
-    final double chiSquare = mv.getNaiveVariance() / mv.getMean();
+    final double chiSquare = mv.getPopulationVariance() / mv.getMean();
     final int binCount = parts.length - card;
     final double test = ChiSquaredDistribution.cdf(chiSquare, Math.max(1, binCount - card - 1));
     return ((1. - alpha) < test) ? maxpos : -1;

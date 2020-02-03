@@ -65,7 +65,7 @@ public class GlobalPrincipalComponentAnalysisTransformTest extends AbstractDataS
         assertEquals("Unexpected covariance", col == row ? 1. : 0., ncm[row][col], 1e-15);
       }
       assertEquals("Mean not as expected", 0., mvs[col].getMean(), 1e-15);
-      assertEquals("Variance not as expected", 1., mvs[col].getNaiveVariance(), 1e-15);
+      assertEquals("Variance not as expected", 1., mvs[col].getPopulationVariance(), 1e-15);
     }
   }
 

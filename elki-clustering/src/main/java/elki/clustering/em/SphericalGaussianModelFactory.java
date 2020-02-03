@@ -58,11 +58,11 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
   @Override
   public List<SphericalGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
-    assert (initialMeans.length == k);
+    assert initialMeans.length == k;
     MeanVariance[] mvs = MeanVariance.of(relation);
     double varsum = 0.;
     for(int d = 0; d < mvs.length; d++) {
-      varsum += mvs[d].getSampleVariance();
+      varsum += mvs[d].getPopulationVariance();
     }
     varsum *= FastMath.pow(k, -2. / mvs.length); // Initial variance estimate
 

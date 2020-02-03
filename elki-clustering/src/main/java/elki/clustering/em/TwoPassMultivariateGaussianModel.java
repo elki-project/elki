@@ -36,7 +36,7 @@ import net.jafama.FastMath;
 /**
  * Model for a single Gaussian cluster, using two-passes for slightly better
  * numerics.
- *
+ * <p>
  * This is the more classic approach, but the savings in numerical precision are
  * usually negligible, since we already use a very stable and fast approach.
  * 
@@ -271,8 +271,6 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<EMModel>
 
   /**
    * Compute the Mahalanobis distance from the centroid for a given vector.
-   *
-   * Note: used by P3C.
    * 
    * @param vec Vector
    * @return Mahalanobis distance

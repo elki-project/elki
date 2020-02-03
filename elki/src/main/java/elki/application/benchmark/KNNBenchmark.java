@@ -131,9 +131,9 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Result hashcode: " + hash);
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
         if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
         }
       }
     }
@@ -176,9 +176,9 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       LOG.ensureCompleted(prog);
       if(LOG.isStatistics()) {
         LOG.statistics("Result hashcode: " + hash);
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
         if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
         }
       }
     }

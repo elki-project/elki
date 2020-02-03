@@ -237,7 +237,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   /**
    * Compute the Mahalanobis distance from the centroid for a given vector.
-   *
+   * <p>
    * Note: used by P3C.
    * 
    * @param vec Vector

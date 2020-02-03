@@ -242,11 +242,11 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
       LOG.ensureCompleted(prog);
     }
     if(LOG.isStatistics()) {
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
-      LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getNaiveStddev());
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+      LOG.statistics("Recall of true results: " + mvrec.getMean() + " +- " + mvrec.getPopulationStddev());
       if(mvdist.getCount() > 0) {
-        LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getNaiveStddev());
-        LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getNaiveStddev());
+        LOG.statistics("Mean absolute k-error: " + mvdaerr.getMean() + " +- " + mvdaerr.getPopulationStddev());
+        LOG.statistics("Mean relative k-error: " + mvdrerr.getMean() + " +- " + mvdrerr.getPopulationStddev());
       }
       if(misses > 0) {
         LOG.statistics(String.format("Number of queries that returned less than k=%d objects: %d (%.2f%%)", k, misses, misses * 100. / mv.getCount()));

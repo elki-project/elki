@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 import elki.data.model.MeanModel;
 
 /**
- * Models useable in EM clustering.
+ * Models usable in EM clustering.
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -58,7 +58,7 @@ public interface EMClusterModel<M extends MeanModel> {
 
   /**
    * Finalize the first pass of the E step.
-   *
+   * <p>
    * By default, this is not used (c.f. {@link #needsTwoPass()}.
    */
   default void finalizeFirstPassE() {

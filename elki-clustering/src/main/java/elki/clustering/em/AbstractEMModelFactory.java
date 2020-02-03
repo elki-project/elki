@@ -67,8 +67,7 @@ public abstract class AbstractEMModelFactory<V extends NumberVector, M extends M
     /**
      * Parameter to specify the cluster center initialization.
      */
-    public static final OptionID INIT_ID = new OptionID("em.centers", //
-    "Method to choose the initial cluster centers.");
+    public static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
 
     /**
      * Initialization method

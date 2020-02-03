@@ -63,7 +63,7 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
     double[] variances = new double[mvs.length];
     final double f = FastMath.pow(k, -2. / variances.length);
     for(int d = 0; d < mvs.length; d++) {
-      variances[d] = mvs[d].getSampleVariance() * f;
+      variances[d] = mvs[d].getPopulationVariance() * f;
     }
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);

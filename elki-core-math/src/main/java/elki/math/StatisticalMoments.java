@@ -260,7 +260,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * @return Skewness
    */
   public double getNaiveSkewness() {
-    return (m3 / n) / FastMath.pow(getNaiveVariance(), 1.5);
+    return (m3 / n) / FastMath.pow(getPopulationVariance(), 1.5);
   }
 
   /**

@@ -37,7 +37,7 @@ import net.jafama.FastMath;
 /**
  * Factory for EM with multivariate Gaussian models (with covariance; also known
  * as Gaussian Mixture Modeling, GMM).
- *
+ * <p>
  * These models have individual covariance matrixes, so this corresponds to the
  * {@code 'VVV'} model in Mclust (R).
  *
@@ -61,9 +61,9 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
   @Override
   public List<MultivariateGaussianModel> buildInitialModels(Relation<V> relation, int k, NumberVectorDistance<? super V> df) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, df);
-    assert (initialMeans.length == k);
+    assert initialMeans.length == k;
     // Compute the global covariance matrix for better starting conditions:
-    double[][] covmat = CovarianceMatrix.make(relation).destroyToSampleMatrix();
+    double[][] covmat = CovarianceMatrix.make(relation).destroyToPopulationMatrix();
     timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
 
     List<MultivariateGaussianModel> models = new ArrayList<>(k);

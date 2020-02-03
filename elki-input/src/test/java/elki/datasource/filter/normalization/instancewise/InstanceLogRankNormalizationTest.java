@@ -68,7 +68,7 @@ public class InstanceLogRankNormalizationTest extends AbstractDataSourceTest {
       assertEquals("Min value is not 0", 0., mms.getMin(), 0);
       assertEquals("Max value is not 1", 1., mms.getMax(), 0);
       assertEquals("Mean value is not as expected", expected.getMean(), mms.getMean(), 1e-14);
-      assertEquals("Variance is not as expected", expected.getNaiveVariance(), mms.getNaiveVariance(), 1e-14);
+      assertEquals("Variance is not as expected", expected.getPopulationVariance(), mms.getPopulationVariance(), 1e-14);
       mms.reset();
     }
   }

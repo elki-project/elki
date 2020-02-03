@@ -52,10 +52,10 @@ public class ClusterContingencyTableTest {
 
     MeanVariance v1 = table.averageSymmetricGini();
     assertEquals(2 / 3., v1.getMean(), 0);
-    assertEquals(0.11111111111111112, v1.getNaiveVariance(), 0);
+    assertEquals(0.11111111111111112, v1.getPopulationVariance(), 0);
 
     MeanVariance v2 = table.adjustedSymmetricGini();
     assertEquals(Double.NaN, v2.getMean(), 0);
-    assertEquals(Double.NaN, v2.getNaiveVariance(), 0);
+    assertEquals(Double.NaN, v2.getPopulationVariance(), 0);
   }
 }

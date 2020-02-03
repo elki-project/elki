@@ -140,7 +140,6 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   public void finalizeEStep(double weight, double prior) {
     final int dim = variances.length;
     this.weight = weight;
-    // FIXME: support prior.
     double logDet = 0;
     if(prior > 0 && priordiag != null) {
       // MAP

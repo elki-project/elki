@@ -152,7 +152,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     DoubleMinMax minmax = new DoubleMinMax();
     {
       final double mean = mv.getMean();
-      final double variance = mv.getNaiveStddev();
+      final double variance = mv.getPopulationStddev();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double score = Math.abs((scores.doubleValue(iditer) - mean) / variance);
         minmax.put(score);

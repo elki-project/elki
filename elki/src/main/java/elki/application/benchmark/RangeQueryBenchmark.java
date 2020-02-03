@@ -149,7 +149,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     }
     if(LOG.isStatistics()) {
       LOG.statistics("Result hashcode: " + hash);
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
     }
   }
 

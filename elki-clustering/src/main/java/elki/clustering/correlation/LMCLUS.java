@@ -396,7 +396,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
         p1[i] = forward.getValue() + ((i > 0) ? p1[i - 1] : 0);
         mv.put(i, forward.getValue());
         mu1[i] = mv.getMean();
-        sigma1[i] = mv.getNaiveStddev();
+        sigma1[i] = mv.getPopulationStddev();
       }
     }
     // Backwards pass
@@ -408,7 +408,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
         p2[j] = backwards.getValue() + ((j + 1 < n) ? p2[j + 1] : 0);
         mv.put(j, backwards.getValue());
         mu2[j] = mv.getMean();
-        sigma2[j] = mv.getNaiveStddev();
+        sigma2[j] = mv.getPopulationStddev();
       }
     }
 

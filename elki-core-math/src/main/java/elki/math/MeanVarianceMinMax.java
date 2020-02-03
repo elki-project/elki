@@ -194,7 +194,7 @@ public class MeanVarianceMinMax extends MeanVariance {
 
   @Override
   public String toString() {
-    return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getNaiveVariance() + ",min=" + getMin() + ",max=" + getMax() + ",weight=" + n + ")";
+    return "MeanVarianceMinMax(mean=" + getMean() + ",var=" + getPopulationVariance() + ",min=" + getMin() + ",max=" + getMax() + ",weight=" + n + ")";
   }
 
   @Override

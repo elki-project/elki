@@ -116,14 +116,14 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     // calculate neighborhood average of normalized attribute values.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // Compute global z score
-      final double globalZ = (relation.get(iditer).doubleValue(0) - globalmv.getMean()) / globalmv.getNaiveStddev();
+      final double globalZ = (relation.get(iditer).doubleValue(0) - globalmv.getMean()) / globalmv.getPopulationStddev();
       // Compute local average z score
       Mean localm = new Mean();
       for(DBIDIter iter = npred.getNeighborDBIDs(iditer).iter(); iter.valid(); iter.advance()) {
         if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        localm.put((relation.get(iter).doubleValue(0) - globalmv.getMean()) / globalmv.getNaiveStddev());
+        localm.put((relation.get(iter).doubleValue(0) - globalmv.getMean()) / globalmv.getPopulationStddev());
       }
       // if neighors.size == 0
       final double localZ;

@@ -169,7 +169,7 @@ public class ABOD<V extends NumberVector> implements OutlierAlgorithm {
     }
     // Sample variance probably would be better here, but the ABOD publication
     // uses the naive variance.
-    return s.getNaiveVariance();
+    return s.getPopulationVariance();
   }
 
   @Override

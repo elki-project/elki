@@ -258,7 +258,7 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
     for(int i = 0; i < k; i++) {
       result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
     }
-    if(isSoft()) {
+    if(soft) {
       Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("EM Cluster Probabilities", SOFT_TYPE, relation.getDBIDs(), probClusterIGivenX));
     }
     else {
@@ -374,14 +374,10 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
   }
 
   /**
-   * @return the soft
-   */
-  public boolean isSoft() {
-    return soft;
-  }
-
-  /**
-   * @param soft the soft to set
+   * Set whether the clustering is supposed to preserve cluster assignment
+   * probabilities. Used by {@link elki.outlier.clustering.EMOutlier}.
+   *
+   * @param soft return assignment probabilities
    */
   public void setSoft(boolean soft) {
     this.soft = soft;
@@ -404,20 +400,17 @@ public class EM<V extends NumberVector, M extends MeanModel> implements Clusteri
      * E(M) - E(M') &lt; em.delta, must be a double equal to or greater than 0.
      */
     public static final OptionID DELTA_ID = new OptionID("em.delta", //
-        "The termination criterion for maximization of E(M): " + //
-            "E(M) - E(M') < em.delta");
+        "The termination criterion for maximization of E(M): E(M) - E(M') < em.delta");
 
     /**
      * Parameter to specify the EM cluster models to use.
      */
-    public static final OptionID INIT_ID = new OptionID("em.model", //
-        "Model factory.");
+    public static final OptionID INIT_ID = new OptionID("em.model", "Model factory.");
 
     /**
      * Parameter to specify the MAP prior
      */
-    public static final OptionID PRIOR_ID = new OptionID("em.map.prior", //
-        "Regularization factor for MAP estimation.");
+    public static final OptionID PRIOR_ID = new OptionID("em.map.prior", "Regularization factor for MAP estimation.");
 
     /**
      * Number of clusters.

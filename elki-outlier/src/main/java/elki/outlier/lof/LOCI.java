@@ -190,7 +190,7 @@ public class LOCI<O> implements OutlierAlgorithm {
           }
           // We only use the average and standard deviation
           final double nhat_r_alpha = mv_n_r_alpha.getMean();
-          final double sigma_nhat_r_alpha = mv_n_r_alpha.getNaiveStddev();
+          final double sigma_nhat_r_alpha = mv_n_r_alpha.getPopulationStddev();
 
           // Redundant divisions by nhat_r_alpha removed.
           final double mdef = nhat_r_alpha - n_alphar;

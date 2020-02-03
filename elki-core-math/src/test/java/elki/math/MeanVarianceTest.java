@@ -104,7 +104,7 @@ public class MeanVarianceTest {
     // Values will not be exactly zero, because 1000.0001 is not exactly
     // representable as float.
     // (But that is not what is causing the problem above).
-    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 2e-14);
+    assertEquals("Variance is not zero", 0, mv.getPopulationVariance(), 2e-14);
     assertEquals("Mean is bad", 1000.0001, mv.getMean(), 1e-12);
   }
 
@@ -121,7 +121,7 @@ public class MeanVarianceTest {
     mv.put(new double[] { 0, 0, 0 });
     assertEquals("Count wrong.", 7, mv.getCount(), 0.);
     assertEquals("Mean wrong.", 0, mv.getMean(), 0.);
-    assertEquals("Variance wrong.", 0, mv.getNaiveVariance(), 0.);
+    assertEquals("Variance wrong.", 0, mv.getPopulationVariance(), 0.);
     assertEquals("No toString", -1, mv.toString().indexOf('@'));
   }
 
@@ -135,9 +135,9 @@ public class MeanVarianceTest {
     assertEquals("First mean", 2, m1.getMean(), 0.);
     assertEquals("First std", 1, m1.getSampleStddev(), 0.);
     assertEquals("Second mean", 5.5, m2.getMean(), 0.);
-    assertEquals("Second std", Math.sqrt(1.25), m2.getNaiveStddev(), 0.);
+    assertEquals("Second std", Math.sqrt(1.25), m2.getPopulationStddev(), 0.);
     assertEquals("Third mean", 4, m3.getMean(), 0.);
-    assertEquals("Third std", 4., m3.getNaiveVariance(), 0.);
+    assertEquals("Third std", 4., m3.getPopulationVariance(), 0.);
     m2.put(new double[] { 1, 2, 3 }, new double[] { 4, 2, 1 });
     assertEquals("Fourth mean", 3.0, m2.getMean(), 0);
     assertEquals("Fourth weight", 11, m2.getCount(), 0);

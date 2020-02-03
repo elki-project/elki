@@ -92,7 +92,7 @@ public class MeanVarianceMinMaxTest {
       var /= WINDOWSIZE;
       var += errs * errs;
       assertEquals("Variance does not agree at i=" + i, mc.getSampleVariance(), mv.getSampleVariance(), 1e-14);
-      assertEquals("Variance does not agree at i=" + i, var, mv.getNaiveVariance(), 1e-14);
+      assertEquals("Variance does not agree at i=" + i, var, mv.getPopulationVariance(), 1e-14);
       // We can only test mc here:
       assertEquals("Min does not agree at i=" + i, min, mc.getMin(), 0);
       assertEquals("Max does not agree at i=" + i, max, mc.getMax(), 0);
@@ -115,7 +115,7 @@ public class MeanVarianceMinMaxTest {
     // Values will not be exactly zero, because 1000.0001 is no)t exactly
     // representable as float.
     // (But that is not what is causing the problem above).
-    assertEquals("Variance is not zero", 0, mv.getNaiveVariance(), 2e-14);
+    assertEquals("Variance is not zero", 0, mv.getPopulationVariance(), 2e-14);
     assertEquals("Mean is bad", 1000.0001, mv.getMean(), 1e-12);
   }
 
@@ -132,7 +132,7 @@ public class MeanVarianceMinMaxTest {
     mv.put(new double[] { 0, 0, 0 });
     assertEquals("Count wrong.", 7, mv.getCount(), 0.);
     assertEquals("Mean wrong.", 0, mv.getMean(), 0.);
-    assertEquals("Variance wrong.", 0, mv.getNaiveVariance(), 0.);
+    assertEquals("Variance wrong.", 0, mv.getPopulationVariance(), 0.);
     assertEquals("No toString", -1, mv.toString().indexOf('@'));
   }
 
@@ -150,11 +150,11 @@ public class MeanVarianceMinMaxTest {
     assertEquals("First max", 3, m1.getMax(), 0.);
     assertEquals("First max", 2, m1.getDiff(), 0.);
     assertEquals("Second mean", 5.5, m2.getMean(), 0.);
-    assertEquals("Second std", Math.sqrt(1.25), m2.getNaiveStddev(), 0.);
+    assertEquals("Second std", Math.sqrt(1.25), m2.getPopulationStddev(), 0.);
     assertEquals("Second min", 4, m2.getMin(), 0.);
     assertEquals("Second max", 7, m2.getMax(), 0.);
     assertEquals("Third mean", 4, m3.getMean(), 0.);
-    assertEquals("Third std", 4., m3.getNaiveVariance(), 0.);
+    assertEquals("Third std", 4., m3.getPopulationVariance(), 0.);
     assertEquals("Third min", 1, m3.getMin(), 0.);
     assertEquals("Third max", 7, m3.getMax(), 0.);
     m2.put(new double[] { 1, 2, 3 }, new double[] { 4, 2, 1 });

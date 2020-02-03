@@ -108,7 +108,7 @@ public class StatisticalMomentsTest {
     // numpy.array(data).mean() = 0.98342960290360215
     assertEquals("Mean does not match.", 0.98342960290360215, m.getMean(), 1e-15);
     // numpy.array(data).std() = 0.44953213330440578
-    assertEquals("Naive stddev does not match.", 0.44953213330440578, m.getNaiveStddev(), 1e-15);
+    assertEquals("Naive stddev does not match.", 0.44953213330440578, m.getPopulationStddev(), 1e-15);
     // numpy.array(data).std(ddof=1) = 0.45179679314507293
     assertEquals("Sample stddev does not match.", 0.45179679314507293, m.getSampleStddev(), 1e-15);
     // numpy.array(data).min() = 0.31363044500658022
@@ -132,11 +132,11 @@ public class StatisticalMomentsTest {
     assertEquals("First kurt", 1.5, m1.getNaiveKurtosis(), 0.);
     assertEquals("First kurt", -1.5, m1.getNaiveExcessKurtosis(), 0.);
     assertEquals("Second mean", 5.5, m2.getMean(), 0.);
-    assertEquals("Second std", Math.sqrt(1.25), m2.getNaiveStddev(), 0.);
+    assertEquals("Second std", Math.sqrt(1.25), m2.getPopulationStddev(), 0.);
     assertEquals("Second skew", 0, m2.getNaiveSkewness(), 0.);
     assertEquals("Second kurt", 1.64, m2.getNaiveKurtosis(), 0.);
     assertEquals("Third mean", 4, m3.getMean(), 0.);
-    assertEquals("Third std", 4., m3.getNaiveVariance(), 0.);
+    assertEquals("Third std", 4., m3.getPopulationVariance(), 0.);
     assertEquals("Third skew", 0, m3.getNaiveSkewness(), 0.);
     assertEquals("Third kurt", 1.75, m3.getNaiveKurtosis(), 0.);
     // m2.put(new double[] { 1, 2, 3 }, new double[] { 4, 2, 1 });

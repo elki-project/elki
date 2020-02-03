@@ -37,7 +37,7 @@ import net.jafama.FastMath;
  * {@link #getMean()} and {@link #getSampleVariance()}.
  * <p>
  * Make sure you have understood variance correctly when using
- * {@link #getNaiveVariance()} - since this class is fed with samples and
+ * {@link #getPopulationVariance()} - since this class is fed with samples and
  * estimates the mean from the samples, {@link #getSampleVariance()} is often
  * the more appropriate version.
  * <p>
@@ -229,18 +229,18 @@ public class MeanVariance extends Mean {
   }
 
   /**
-   * Return the naive variance (not taking sampling into account)
-   * 
-   * Note: usually, you should be using {@link #getSampleVariance} instead!
+   * Return the population variance (scaled by 1/N).
+   * <p>
+   * Note: often you should be using {@link #getSampleVariance} instead!
    * 
    * @return variance
    */
-  public double getNaiveVariance() {
+  public double getPopulationVariance() {
     return m2 / n;
   }
 
   /**
-   * Return sample variance.
+   * Return sample variance (scaled by 1/(N-1)).
    * 
    * @return sample variance
    */
@@ -261,18 +261,18 @@ public class MeanVariance extends Mean {
   }
 
   /**
-   * Return standard deviation using the non-sample variance
-   * 
-   * Note: usually, you should be using {@link #getSampleStddev} instead!
+   * Return standard deviation using the population variance (scaled by 1/N).
+   * <p>
+   * Note: often, you should be using {@link #getSampleStddev} instead!
    * 
    * @return stddev
    */
-  public double getNaiveStddev() {
-    return FastMath.sqrt(getNaiveVariance());
+  public double getPopulationStddev() {
+    return FastMath.sqrt(getPopulationVariance());
   }
 
   /**
-   * Return standard deviation
+   * Return sample standard deviation (scaled by 1/(N-1)).
    * 
    * @return stddev
    */
@@ -281,7 +281,7 @@ public class MeanVariance extends Mean {
   }
 
   /**
-   * Create and initialize a new array of MeanVariance
+   * Create and initialize a new array of MeanVariance.
    * 
    * @param dimensionality Dimensionality
    * @return New and initialized Array
@@ -296,7 +296,7 @@ public class MeanVariance extends Mean {
 
   @Override
   public String toString() {
-    return "MeanVariance(mean=" + getMean() + ",var=" + getNaiveVariance() + ",weight=" + n + ")";
+    return "MeanVariance(mean=" + getMean() + ",var=" + getPopulationVariance() + ",weight=" + n + ")";
   }
 
   @Override

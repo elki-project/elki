@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.parameters.DoubleListParameter;
  * Class to perform and undo a normalization on real vectors with respect to
  * given mean and standard deviation in each dimension.
  * <p>
- * We use the biased variance ({@link MeanVariance#getNaiveStddev()}), because
+ * We use the biased variance ({@link MeanVariance#getPopulationStddev()}), because
  * this produces that with exactly standard deviation 1. While often the
  * unbiased estimate ({@link MeanVariance#getSampleStddev()}) is more
  * appropriate, it will not ensure this interesting property. For large data,
@@ -126,7 +126,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     }
     for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getNaiveStddev();
+      stddev[d] = mvs[d].getPopulationStddev();
       stddev[d] = stddev[d] > Double.MIN_NORMAL ? stddev[d] : 1.;
       if(buf != null) {
         buf.append(" m: ").append(mean[d]).append(" v: ").append(stddev[d]);
