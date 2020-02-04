@@ -65,14 +65,15 @@ public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, D
 
   @Override
   default KNNList getKNN(O obj, int k) {
-    KNNHeap heap = DBIDUtil.newHeap(k);
+    final KNNHeap heap = DBIDUtil.newHeap(k);
     double threshold = Double.POSITIVE_INFINITY;
     for(PrioritySearcher<O> iter = search(obj); iter.valid(); iter.advance()) {
-      if(!(iter.getLowerBound() > threshold)) {
-        double dist = iter.computeExactDistance();
-        if(dist <= threshold) {
-          iter.decreaseCutoff(threshold = heap.insert(dist, iter));
-        }
+      if(iter.getLowerBound() > threshold) {
+        continue;
+      }
+      double dist = iter.computeExactDistance();
+      if(dist <= threshold) {
+        iter.decreaseCutoff(threshold = heap.insert(dist, iter));
       }
     }
     return heap.toKNNList();
@@ -81,11 +82,12 @@ public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, D
   @Override
   default ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
     for(PrioritySearcher<O> iter = search(obj, range); iter.valid(); iter.advance()) {
-      if(!(iter.getLowerBound() > range)) {
-        final double dist = iter.computeExactDistance();
-        if(dist <= range) {
-          result.add(dist, iter);
-        }
+      if(iter.getLowerBound() > range) {
+        continue;
+      }
+      final double dist = iter.computeExactDistance();
+      if(dist <= range) {
+        result.add(dist, iter);
       }
     }
     return result;

@@ -101,20 +101,16 @@ public class IntegerArrayQuickSort {
     // Choose pivots by looking at five candidates.
     final int seventh = (len >> 3) + (len >> 6) + 1;
     final int m3 = (start + end) >> 1; // middle
-    final int m2 = m3 - seventh;
-    final int m1 = m2 - seventh;
-    final int m4 = m3 + seventh;
-    final int m5 = m4 + seventh;
+    final int m2 = m3 - seventh, m4 = m3 + seventh;
 
     // Explicit (and optimal) sorting network for 5 elements
     // See Knuth for details.
-    sort5(data, m1, m2, m3, m4, m5, comp);
+    sort5(data, m2 - seventh, m2, m3, m4, m4 + seventh, comp);
 
     // Choose the 2 and 4th as pivots, as we want to get three parts
     // Copy to variables v1 and v3, replace them with the start and end
     // Note: do not modify v1 or v3 until we put them back!
-    final int lpivot = data[m2];
-    final int rpivot = data[m4];
+    final int lpivot = data[m2], rpivot = data[m4];
     data[m2] = data[start];
     data[m4] = data[last];
 
@@ -134,11 +130,10 @@ public class IntegerArrayQuickSort {
       if(c == 0) {
         continue;
       }
-      else if(c < 0) {
+      if(c < 0) {
         // Traditional quicksort
         data[k] = data[left];
-        data[left] = tmp;
-        left++;
+        data[left++] = tmp;
       }
       else if(tied || comp.compare(tmp, rpivot) > 0) {
         // Now look at the right. First skip correct entries there, too
@@ -153,33 +148,31 @@ public class IntegerArrayQuickSort {
         }
         // Now move tmp from k to the right.
         data[k] = data[right];
-        data[right] = tmp;
-        right--;
+        data[right--] = tmp;
         // Test the element we just inserted: left or center?
         if(comp.compare(data[k], lpivot) < 0) {
           final int tmp2 = data[k];
           data[k] = data[left];
-          data[left] = tmp2;
-          left++;
+          data[left++] = tmp2;
         } // else: center. cannot be on right.
       }
     }
     // Put the pivot elements back in.
     // Remember: we must not modify v1 and v3 above.
-    data[start] = data[left - 1];
-    data[left - 1] = lpivot;
-    data[last] = data[right + 1];
-    data[right + 1] = rpivot;
+    data[start] = data[--left];
+    data[left] = lpivot;
+    data[last] = data[++right];
+    data[right] = rpivot;
     // v1 and v3 are now safe to modify again. Perform recursion:
-    quickSort(data, start, left - 1, comp);
+    quickSort(data, start, left, comp);
     // Handle the middle part - if necessary:
     if(!tied) {
       // TODO: the original publication had a special tie handling here.
       // It shouldn't affect correctness, but probably improves situations
       // with a lot of tied elements.
-      quickSort(data, left, right + 1, comp);
+      quickSort(data, left, right, comp);
     }
-    quickSort(data, right + 2, end, comp);
+    quickSort(data, ++right, end, comp);
   }
 
   /**

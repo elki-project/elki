@@ -24,10 +24,7 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
@@ -145,7 +142,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
 
     @Override
     public DoubleDBIDList getNeighbors(DBIDRef reference) {
-      return rq.getRange(reference, epsilon);
+      return rq.getRange(reference, epsilon, DBIDUtil.newDistanceDBIDList());
     }
 
     @Override

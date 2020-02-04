@@ -81,14 +81,11 @@ public final class DoubleIntegerArrayQuickSort {
 
     // Choose pivots by looking at five candidates.
     final int seventh = (len >> 3) + (len >> 6) + 1;
-    final int m3 = (start + end) >> 1; // middle
-    final int m2 = m3 - seventh;
-    final int m1 = m2 - seventh;
-    final int m4 = m3 + seventh;
-    final int m5 = m4 + seventh;
+    final int m3 = (start + end) >>> 1; // middle
+    final int m2 = m3 - seventh, m4 = m3 + seventh;
 
     // Mixture of insertion and merge sort:
-    sort5(keys, vals, m1, m2, m3, m4, m5);
+    sort5(keys, vals, m2 - seventh, m2, m3, m4, m4 + seventh);
 
     // Move pivot to the front.
     double pivotkey = keys[m3];
@@ -112,9 +109,7 @@ public final class DoubleIntegerArrayQuickSort {
       if(right <= left) {
         break;
       }
-      swap(keys, vals, left, right);
-      left++;
-      right--;
+      swap(keys, vals, left++, right--);
     }
     // right now points to the last element smaller than the pivot.
     // Move pivot back into the appropriate place
@@ -140,7 +135,7 @@ public final class DoubleIntegerArrayQuickSort {
 
   /**
    * An explicit sort, for the five pivot candidates.
-   * 
+   * <p>
    * Note that this <em>must</em> only be used with
    * {@code m1 < m2 < m3 < m4 < m5}.
    * 
@@ -245,14 +240,11 @@ public final class DoubleIntegerArrayQuickSort {
 
     // Choose pivots by looking at five candidates.
     final int seventh = (len >> 3) + (len >> 6) + 1;
-    final int m3 = (start + end) >> 1; // middle
-    final int m2 = m3 - seventh;
-    final int m1 = m2 - seventh;
-    final int m4 = m3 + seventh;
-    final int m5 = m4 + seventh;
+    final int m3 = (start + end) >>> 1; // middle
+    final int m2 = m3 - seventh, m4 = m3 + seventh;
 
     // Mixture of insertion and merge sort:
-    sortReverse5(keys, vals, m1, m2, m3, m4, m5);
+    sortReverse5(keys, vals, m2 - seventh, m2, m3, m4, m4 + seventh);
 
     // Move pivot to the front.
     double pivotkey = keys[m3];
@@ -276,9 +268,7 @@ public final class DoubleIntegerArrayQuickSort {
       if(right <= left) {
         break;
       }
-      swap(keys, vals, left, right);
-      left++;
-      right--;
+      swap(keys, vals, left++, right--);
     }
     // right now points to the last element smaller than the pivot.
     // Move pivot back into the appropriate place
@@ -304,7 +294,7 @@ public final class DoubleIntegerArrayQuickSort {
 
   /**
    * An explicit sort, for the five pivot candidates.
-   * 
+   * <p>
    * Note that this <em>must</em> only be used with
    * {@code m1 < m2 < m3 < m4 < m5}.
    * 

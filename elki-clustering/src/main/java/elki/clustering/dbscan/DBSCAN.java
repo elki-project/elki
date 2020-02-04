@@ -204,6 +204,11 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
     protected RangeSearcher<DBIDRef> rangeQuery;
 
     /**
+     * Neighbor query output.
+     */
+    protected final ModifiableDoubleDBIDList neighbors = DBIDUtil.newDistanceDBIDList();
+
+    /**
      * Run the DBSCAN algorithm
      *
      * @param relation Data relation
@@ -245,7 +250,7 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
      * @param seeds Array to store the current seeds
      */
     protected void expandCluster(DBIDRef startObjectID, ArrayModifiableDBIDs seeds) {
-      DoubleDBIDList neighbors = rangeQuery.getRange(startObjectID, epsilon);
+      rangeQuery.getRange(startObjectID, epsilon, neighbors.clear());
       processedIDs.add(startObjectID);
       LOG.incrementProcessed(objprog);
       ncounter += neighbors.size();
@@ -262,9 +267,7 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
 
       DBIDVar o = DBIDUtil.newVar();
       while(!seeds.isEmpty()) {
-        // Note: we could reuse the neighbors list here,
-        // but at least on JDK8 this was much slower!
-        neighbors = rangeQuery.getRange(seeds.pop(o), epsilon);
+        rangeQuery.getRange(seeds.pop(o), epsilon, neighbors.clear());
         ncounter += neighbors.size(); // statistics for assistance
         if(neighbors.size() >= minpts) { // neighbor is core
           processNeighbors(neighbors, currentCluster, seeds);

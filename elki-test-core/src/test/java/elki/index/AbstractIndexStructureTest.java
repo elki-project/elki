@@ -145,7 +145,7 @@ public abstract class AbstractIndexStructureTest {
    * @param refc Reference vectors
    */
   private static void assertNeighbors(Relation<DoubleVector> rel, DistanceQuery<? super DoubleVector> dist, DoubleDBIDList results, double[] refd, double[][] refc) {
-    assertEquals("Result size does not match expectation!", results.size(), refd.length);
+    assertEquals("Result size does not match expectation!", refd.length, results.size());
     for(DoubleDBIDListIter res = results.iter(); res.valid(); res.advance()) {
       int o = res.getOffset();
       assertEquals("Expected distance at offset " + o + " doesn't match.", refd[o], res.doubleValue(), 1e-12);

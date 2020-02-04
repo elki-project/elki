@@ -305,13 +305,13 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeKNNObjectSearcher() : null;
+        new CoverTreePriorityObjectSearcher() : null;
   }
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeKNNDBIDSearcher() : null;
+        new CoverTreePriorityDBIDSearcher() : null;
   }
 
   @Override
@@ -376,7 +376,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
           for(Node c : cur.children) {
             // This only seems to reduce the number of distance computations
             // marginally, unfortunately.
-            if(d - c.maxDist - c.parentDist <= range) {
+            if(Math.abs(d - c.parentDist) - c.maxDist <= range) {
               open.add(c);
             }
           }
@@ -391,7 +391,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         final DoubleDBIDListIter it = cur.singletons.iter().advance();
         // For remaining singletons, compute the distances:
         while(it.valid()) {
-          if(d - it.doubleValue() <= range) {
+          if(Math.abs(d - it.doubleValue()) <= range) {
             final double d2 = queryDistance(it);
             if(d2 <= range) {
               result.add(d2, it);
@@ -494,7 +494,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
           for(Node c : cur.children) {
             // This only seems to reduce the number of distance computations
             // marginally, unfortunately.
-            if(d - c.maxDist - c.parentDist <= d_k) {
+            if(Math.abs(d - c.parentDist) - c.maxDist <= d_k) {
               // Reuse distance if the previous routing object is the same:
               double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), it) //
                   ? d : queryDistance(tmp)) //
@@ -514,7 +514,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         it.advance(); // Skip routing object.
         // For remaining singletons, compute the distances:
         while(it.valid()) {
-          if(d - it.doubleValue() <= d_k) {
+          if(Math.abs(d - it.doubleValue()) <= d_k) {
             final double d2 = queryDistance(it);
             if(d2 <= d_k) {
               d_k = knnList.insert(d2, it);
@@ -679,7 +679,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
       do {
         while(candidates.valid()) {
           // Pruning with lower bound:
-          if(routingDist - candidates.doubleValue() <= threshold) {
+          if(Math.abs(routingDist - candidates.doubleValue()) <= threshold) {
             return (T) this;
           }
           candidates.advance(); // Skip
@@ -711,7 +711,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
       // Add child nodes to priority queue:
       for(Node c : cur.children) {
         // This pruning rule very rarely works, unfortunately
-        if(routingDist - c.maxDist - c.parentDist <= threshold) {
+        if(Math.abs(routingDist - c.parentDist) - c.maxDist <= threshold) {
           // Reuse distance if the previous routing object is the same:
           double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
               ? routingDist : queryDistance(tmp)) //
