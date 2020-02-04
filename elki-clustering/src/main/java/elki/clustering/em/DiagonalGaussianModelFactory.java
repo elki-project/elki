@@ -71,12 +71,13 @@ public class DiagonalGaussianModelFactory implements EMClusterModelFactory<Numbe
     double[] variances = new double[mvs.length];
     final double f = FastMath.pow(k, -2. / variances.length);
     for(int d = 0; d < mvs.length; d++) {
-      variances[d] = mvs[d].getPopulationVariance() * f;
+      final double v = mvs[d].getPopulationVariance();
+      variances[d] = v > 0 ? v * f : 1e-10;
     }
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new DiagonalGaussianModel(1. / k, nv, variances.clone()));
+      models.add(new DiagonalGaussianModel(1. / k, nv, variances));
     }
     return models;
   }

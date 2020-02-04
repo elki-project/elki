@@ -20,7 +20,6 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.copy;
 import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
@@ -81,7 +80,7 @@ public class TextbookMultivariateGaussianModelFactory implements EMClusterModelF
 
     List<TextbookMultivariateGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new TextbookMultivariateGaussianModel(1. / k, nv, copy(covmat)));
+      models.add(new TextbookMultivariateGaussianModel(1. / k, nv, covmat));
     }
     return models;
   }

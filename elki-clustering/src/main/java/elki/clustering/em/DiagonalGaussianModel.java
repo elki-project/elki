@@ -97,12 +97,11 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[dim];
     if(variances == null) {
-      this.variances = new double[dim];
-      Arrays.fill(variances, 1.);
+      Arrays.fill(this.variances = new double[dim], 1.);
     }
     else {
-      this.variances = variances;
-      this.priordiag = copy(variances);
+      this.variances = copy(variances);
+      this.priordiag = variances;
     }
     this.wsum = 0.;
   }
@@ -146,7 +145,8 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
       double nu = dim + 2; // Popular default.
       double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
-        logDet += FastMath.log(variances[i] = (variances[i] + prior * priordiag[i]) * f2);
+        double v = (variances[i] + prior * priordiag[i]);
+        logDet += FastMath.log(variances[i] = v > 0 ? v * f2 : SINGULARITY_CHEAT);
       }
     }
     else if(wsum > 0.) { // MLE
@@ -168,8 +168,8 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
   public double mahalanobisDistance(NumberVector vec) {
     double agg = 0.;
     for(int i = 0; i < variances.length; i++) {
-      double diff = vec.doubleValue(i) - mean[i];
-      agg += diff / variances[i] * diff;
+      double diff = vec.doubleValue(i) - mean[i], v = variances[i];
+      agg += diff / v * diff;
     }
     return agg;
   }

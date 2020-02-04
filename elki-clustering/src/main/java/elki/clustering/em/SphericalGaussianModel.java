@@ -89,8 +89,8 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
-    this.variance = var;
-    this.priorvar = var;
+    this.variance = var > 0 ? var : 1e-10;
+    this.priorvar = this.variance;
     this.wsum = 0.;
   }
 

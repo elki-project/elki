@@ -116,8 +116,8 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.tmp = new double[mean.length];
-    this.covariance = covariance != null ? covariance : identity(mean.length, mean.length);
-    this.priormatrix = covariance != null ? copy(covariance) : null;
+    this.covariance = covariance != null ? copy(covariance) : identity(mean.length, mean.length);
+    this.priormatrix = covariance != null ? covariance : null;
     this.wsum = 0.;
     updateCholesky();
   }
