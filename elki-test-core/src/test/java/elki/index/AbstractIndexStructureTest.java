@@ -365,13 +365,18 @@ public abstract class AbstractIndexStructureTest {
         DoubleVector dv = DoubleVector.wrap(querypoint);
         { // verify the knn result:
           ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
+          double minall = 0;
           for(prioq.search(dv); prioq.valid(); prioq.advance()) {
             double approx = prioq.getApproximateDistance(); // May be NaN
             double atol = prioq.getApproximateAccuracy(); // May be NaN
             double lb = prioq.getLowerBound(); // May be NaN
             double ub = prioq.getUpperBound(); // May be NaN
+            double alllb = prioq.allLowerBound(); // May be NaN
             double exact = prioq.computeExactDistance();
             ids.add(exact, prioq);
+            assertFalse("All lower bound decreased", alllb < minall);
+            minall = alllb;
+            assertFalse("All lower bound incorrect", exact < alllb);
             assertFalse("Lower bound incorrect", exact < lb);
             assertFalse("Upper bound incorrect", exact > ub);
             assertFalse("Lower tolerance incorrect", exact < approx - atol);

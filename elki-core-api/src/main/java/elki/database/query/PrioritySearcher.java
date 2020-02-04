@@ -153,4 +153,15 @@ public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, D
   default double getUpperBound() {
     return Double.NaN;
   }
+
+  /**
+   * Lower bound for all subsequent instances (that have been completely
+   * explored). The searcher guarantees that no further results will be returned
+   * with a distance less than this.
+   *
+   * @return lower bound
+   */
+  default double allLowerBound() {
+    return 0;
+  }
 }

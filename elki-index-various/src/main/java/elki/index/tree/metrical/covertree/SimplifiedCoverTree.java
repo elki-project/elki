@@ -181,7 +181,6 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    * @return Root node of subtree
    */
   protected Node bulkConstruct(DBIDRef cur, int maxScale, ModifiableDoubleDBIDList elems) {
-    assert !elems.contains(cur);
     final double max = maxDistance(elems);
     final int scale = Math.min(distToScale(max) - 1, maxScale);
     final int nextScale = scale - 1;
@@ -315,7 +314,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
 
     /**
      * Perform the actual search.
@@ -410,7 +409,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    */
   public abstract class CoverTreeKNNSearcher {
     /**
-     * Priority queue of candidates
+     * Priority queue of candidates.
      */
     private DoubleObjectMinHeap<Node> pq = new DoubleObjectMinHeap<>();
 
@@ -422,7 +421,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Do the main search
      *
-     * @param k Number of neighbors to collect.
+     * @param k Number of neighbors to collect
      * @return results
      */
     protected KNNList doSearch(int k) {
@@ -479,7 +478,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
   }
 
   /**
@@ -538,7 +537,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    */
   public abstract class CoverTreePrioritySearcher<T extends PrioritySearcher<Q>, Q> implements PrioritySearcher<Q> {
     /**
-     * Stopping distance threshold
+     * Stopping distance threshold.
      */
     double threshold = Double.POSITIVE_INFINITY;
 
@@ -565,7 +564,12 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * Maximum distance of current node.
      */
-    double maxDist;
+    private double maxDist;
+
+    /**
+     * Current lower bound.
+     */
+    private double lb;
 
     /**
      * Constructor.
@@ -580,7 +584,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
 
     /**
      * Start the search.
@@ -600,6 +604,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       assert threshold <= this.threshold;
       this.threshold = threshold;
       return (T) this;
+    }
+
+    @Override
+    public double allLowerBound() {
+      return lb;
     }
 
     @Override
@@ -641,6 +650,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
         return false;
       }
       final Node cur = pq.peekValue();
+      lb = prio > lb ? prio : lb;
       routingDist = prio + cur.maxDist; // Restore distance to center.
       maxDist = cur.maxDist; // Store accuracy for bounds
       candidates = cur.singletons.iter(); // Routing object initially
@@ -674,7 +684,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     @Override
     public double getLowerBound() {
-      return candidates.getOffset() == 0 ? routingDist : routingDist - maxDist;
+        // FIXME: MathUtil.max(lb, ...
+      return candidates.getOffset() == 0 ? routingDist : routingDist > maxDist ? routingDist - maxDist : 0.;
     }
 
     @Override
@@ -764,7 +775,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     @Override
     public SimplifiedCoverTree<O> instantiate(Relation<O> relation) {
-      return new SimplifiedCoverTree<O>(relation, distance, expansion, truncate);
+      return new SimplifiedCoverTree<>(relation, distance, expansion, truncate);
     }
 
     /**

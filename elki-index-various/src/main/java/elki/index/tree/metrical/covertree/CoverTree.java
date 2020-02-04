@@ -35,6 +35,7 @@ import elki.index.DistancePriorityIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.MathUtil;
 import elki.utilities.Priority;
 import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 import elki.utilities.documentation.Reference;
@@ -135,11 +136,6 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      * Child nodes.
      */
     List<Node> children;
-
-    /**
-     * Expansion scale.
-     */
-    // int scale = SCALE_LEAF;
 
     /**
      * Constructor.
@@ -357,7 +353,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
 
     /**
      * Perform the actual search.
@@ -536,7 +532,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
   }
 
   /**
@@ -620,6 +616,11 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
     private double routingDist;
 
     /**
+     * Current lower bound.
+     */
+    private double lb;
+
+    /**
      * Constructor.
      */
     public CoverTreePrioritySearcher() {
@@ -632,7 +633,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      * @param it Candidate
      * @return Distance
      */
-    abstract protected double queryDistance(DBIDRef it);
+    protected abstract double queryDistance(DBIDRef it);
 
     /**
      * Start the search.
@@ -652,6 +653,11 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
       assert threshold <= this.threshold;
       this.threshold = threshold;
       return (T) this;
+    }
+
+    @Override
+    public double allLowerBound() {
+      return lb;
     }
 
     @Override
@@ -697,6 +703,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         return false;
       }
       final Node cur = pq.peekValue();
+      lb = prio > lb ? prio : lb;
       routingDist = prio + cur.maxDist; // Restore distance to center.
       candidates = cur.singletons.iter(); // Routing object initially
       pq.poll(); // Remove
@@ -722,22 +729,23 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     @Override
     public double getApproximateDistance() {
-      return routingDist;
+      return MathUtil.max(candidates.doubleValue(), routingDist);
     }
 
     @Override
     public double getApproximateAccuracy() {
-      return candidates.getOffset() == 0 ? 0. : candidates.doubleValue();
+      return candidates.getOffset() == 0 ? 0. : MathUtil.min(candidates.doubleValue(), routingDist);
     }
 
     @Override
     public double getLowerBound() {
-      return candidates.getOffset() == 0 ? routingDist : routingDist - candidates.doubleValue();
+      // FIXME: MathUtil.max(lb, ...
+      return candidates.getOffset() == 0 ? routingDist : Math.abs(candidates.doubleValue() - routingDist);
     }
 
     @Override
     public double getUpperBound() {
-      return candidates.getOffset() == 0 ? routingDist : routingDist + candidates.doubleValue();
+      return candidates.getOffset() == 0 ? routingDist : candidates.doubleValue() + routingDist;
     }
 
     @Override
@@ -822,7 +830,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     @Override
     public CoverTree<O> instantiate(Relation<O> relation) {
-      return new CoverTree<O>(relation, distance, expansion, truncate);
+      return new CoverTree<>(relation, distance, expansion, truncate);
     }
 
     /**
