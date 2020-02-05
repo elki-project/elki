@@ -20,9 +20,14 @@
  */
 package elki.index.tree.spatial.rstarvariants.rstar;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
+import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.data.NumberVector;
+import elki.database.Database;
+import elki.database.StaticArrayDatabase;
 import elki.database.query.knn.WrappedKNNDBIDByLookup;
 import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.index.AbstractIndexStructureTest;
@@ -30,18 +35,12 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.query.EuclideanRStarTreeDistancePrioritySearcher;
 import elki.index.tree.spatial.rstarvariants.query.RStarTreeKNNSearcher;
 import elki.index.tree.spatial.rstarvariants.query.RStarTreeRangeSearcher;
-import elki.index.tree.spatial.rstarvariants.strategies.bulk.*;
 import elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
-import elki.index.tree.spatial.rstarvariants.strategies.split.AngTanLinearSplit;
-import elki.index.tree.spatial.rstarvariants.strategies.split.GreeneSplit;
-import elki.index.tree.spatial.rstarvariants.strategies.split.RTreeLinearSplit;
-import elki.index.tree.spatial.rstarvariants.strategies.split.RTreeQuadraticSplit;
-import elki.math.spacefillingcurves.BinarySplitSpatialSorter;
-import elki.math.spacefillingcurves.HilbertSpatialSorter;
-import elki.math.spacefillingcurves.PeanoSpatialSorter;
-import elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import elki.persistent.AbstractPageFileFactory;
+import elki.result.Metadata;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.datastructures.iterator.It;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the R*-tree index.
@@ -83,222 +82,18 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
   }
 
   /**
-   * Test {@link RStarTree} using {@link RTreeLinearSplit}
+   * Trigger some additional integrity checks on the tree.
    */
   @Test
-  public void testRTreeLinearSplit() {
+  public void runConsistencyChecks() {
     RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeLinearSplit.class) //
+        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 200) //
         .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} using {@link RTreeQuadraticSplit}
-   */
-  @Test
-  public void testRTreeQuadraticSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, RTreeQuadraticSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} using {@link GreeneSplit}
-   */
-  @Test
-  public void testRTreeGreeneSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, GreeneSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} using {@link RTreeLinearSplit}
-   */
-  @Test
-  public void testRTreeAngTanLinearSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, AngTanLinearSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link FileOrderBulkSplit}
-   */
-  @Test
-  public void testFileOrderBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, FileOrderBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link MaxExtensionBulkSplit}
-   */
-  @Test
-  public void testMaxExtensionBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link OneDimSortBulkSplit}
-   */
-  @Test
-  public void testOneDimSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, OneDimSortBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link SpatialSortBulkSplit} with
-   * {@link ZCurveSpatialSorter}
-   */
-  @Test
-  public void testZCurveSpatialSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Par.SORTER_ID, ZCurveSpatialSorter.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link SpatialSortBulkSplit} with
-   * {@link HilbertSpatialSorter}
-   */
-  @Test
-  public void testHilbertSpatialSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Par.SORTER_ID, HilbertSpatialSorter.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link SpatialSortBulkSplit} with
-   * {@link PeanoSpatialSorter}
-   */
-  @Test
-  public void testPeanoSpatialSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Par.SORTER_ID, PeanoSpatialSorter.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link SpatialSortBulkSplit} with
-   * {@link BinarySplitSpatialSorter}
-   */
-  @Test
-  public void testBinarySplitSpatialSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
-        .with(SpatialSortBulkSplit.Par.SORTER_ID, BinarySplitSpatialSorter.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using {@link SortTileRecursiveBulkSplit}
-   */
-  @Test
-  public void testSortTileRecursiveBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using
-   * {@link MaxExtensionSortTileRecursiveBulkSplit}
-   */
-  @Test
-  public void testMaxExtensionSortTileRecursiveBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, MaxExtensionSortTileRecursiveBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
-  }
-
-  /**
-   * Test {@link RStarTree} bulk loaded using
-   * {@link AdaptiveSortTileRecursiveBulkSplit}
-   */
-  @Test
-  public void testAdaptiveSortTileRecursiveBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
-        .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
-        .with(RStarTreeFactory.Par.BULK_SPLIT_ID, AdaptiveSortTileRecursiveBulkSplit.class) //
-        .build();
-    assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, EuclideanRStarTreeDistancePrioritySearcher.class);
-    assertExactCosine(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
+    ListParameterization inputparams = new ListParameterization() //
+        .addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase("elki/testdata/unittests/hierarchical-3d2d1d.csv", 600, inputparams);
+    It<RStarTreeIndex<?>> it = Metadata.hierarchyOf(db).iterDescendants().filter(RStarTreeIndex.class);
+    assertTrue("No R*-tree found?", it.valid());
+    it.get().getRoot().integrityCheck(it.get());
   }
 }

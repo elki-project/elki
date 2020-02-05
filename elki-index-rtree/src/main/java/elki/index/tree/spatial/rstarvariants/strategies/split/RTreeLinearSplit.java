@@ -55,8 +55,7 @@ public class RTreeLinearSplit implements SplitStrategy {
   public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
-    long[] assignment = BitsUtil.zero(num);
-    long[] assigned = BitsUtil.zero(num);
+    long[] assignment = BitsUtil.zero(num), assigned = BitsUtil.zero(num);
     // MBRs and Areas of current assignments
     ModifiableHyperBoundingBox mbr1, mbr2;
     double area1 = 0, area2 = 0;
@@ -70,17 +69,16 @@ public class RTreeLinearSplit implements SplitStrategy {
       for(int d = 0; d < dim; d++) {
         // We need to find two candidates each, in case of el==eh!
         double minlow = Double.POSITIVE_INFINITY;
-        double maxlow = Double.NEGATIVE_INFINITY,
-            maxlow2 = Double.NEGATIVE_INFINITY;
-        double minhig = Double.POSITIVE_INFINITY,
-            minhig2 = Double.POSITIVE_INFINITY;
+        double maxlow = Double.NEGATIVE_INFINITY;
+        double maxlow2 = Double.NEGATIVE_INFINITY;
+        double minhig = Double.POSITIVE_INFINITY;
+        double minhig2 = Double.POSITIVE_INFINITY;
         double maxhig = Double.NEGATIVE_INFINITY;
         int el = -1, el2 = -1;
         int eh = -1, eh2 = -1;
         for(int i = 0; i < num; i++) {
           E ei = getter.get(entries, i);
-          final double low = ei.getMin(d);
-          final double hig = ei.getMax(d);
+          final double low = ei.getMin(d), hig = ei.getMax(d);
           minlow = Math.min(minlow, low);
           maxhig = Math.max(maxhig, hig);
           if(low >= maxlow) {
@@ -137,8 +135,7 @@ public class RTreeLinearSplit implements SplitStrategy {
       // Assign second to second set
       BitsUtil.setI(assignment, w2);
       // Initial mbrs and areas
-      final E w1i = getter.get(entries, w1);
-      final E w2i = getter.get(entries, w2);
+      E w1i = getter.get(entries, w1), w2i = getter.get(entries, w2);
       area1 = SpatialUtil.volume(w1i);
       area2 = SpatialUtil.volume(w2i);
       mbr1 = new ModifiableHyperBoundingBox(w1i);
@@ -174,14 +171,8 @@ public class RTreeLinearSplit implements SplitStrategy {
         preferSecond = (d2 < d1);
         // QS3: tie handling
         if(d1 == d2) {
-          // Prefer smaller area
-          if(area1 != area2) {
-            preferSecond = (area2 < area1);
-          }
-          else {
-            // Prefer smaller group size
-            preferSecond = (in2 < in1);
-          }
+          // Prefer smaller area, then smaller group size
+          preferSecond = (area1 != area2) ? (area2 < area1) : (in2 < in1);
         }
         // Mark as used.
         BitsUtil.setI(assigned, next);

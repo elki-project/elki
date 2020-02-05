@@ -55,8 +55,7 @@ public class RTreeQuadraticSplit implements SplitStrategy {
   public <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
     final int num = getter.size(entries);
     // Object assignment, and processed objects
-    long[] assignment = BitsUtil.zero(num);
-    long[] assigned = BitsUtil.zero(num);
+    long[] assignment = BitsUtil.zero(num), assigned = BitsUtil.zero(num);
     // MBRs and Areas of current assignments
     ModifiableHyperBoundingBox mbr1, mbr2;
     double area1 = 0, area2 = 0;
@@ -137,14 +136,8 @@ public class RTreeQuadraticSplit implements SplitStrategy {
         }
         // QS3: tie handling
         if(greatestPreference == 0) {
-          // Prefer smaller area
-          if(area1 != area2) {
-            preferSecond = (area2 < area1);
-          }
-          else {
-            // Prefer smaller group size
-            preferSecond = (in2 < in1);
-          }
+          // Prefer smaller area, then smaller group size
+          preferSecond = (area1 != area2) ? (area2 < area1) : (in2 < in1);
         }
         // Mark as used.
         BitsUtil.setI(assigned, best);

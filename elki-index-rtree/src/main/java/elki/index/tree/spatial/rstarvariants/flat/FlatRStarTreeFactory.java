@@ -25,7 +25,6 @@ import elki.database.relation.Relation;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.index.tree.spatial.rstarvariants.RTreeSettings;
-import elki.persistent.PageFile;
 import elki.persistent.PageFileFactory;
 
 /**
@@ -52,9 +51,7 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
 
   @Override
   public FlatRStarTreeIndex<O> instantiate(Relation<O> relation) {
-    PageFile<FlatRStarTreeNode> pagefile = makePageFile(getNodeClass());
-    FlatRStarTreeIndex<O> index = new FlatRStarTreeIndex<>(relation, pagefile, settings);
-    return index;
+    return new FlatRStarTreeIndex<>(relation, makePageFile(getNodeClass()), settings);
   }
 
   protected Class<FlatRStarTreeNode> getNodeClass() {

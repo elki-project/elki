@@ -91,8 +91,7 @@ public class GreeneSplit implements SplitStrategy {
       if(worst > 0) {
         // Data to keep
         // Initial mbrs and areas
-        E m1 = getter.get(entries, w1);
-        E m2 = getter.get(entries, w2);
+        E m1 = getter.get(entries, w1), m2 = getter.get(entries, w2);
 
         double bestsep = Double.NEGATIVE_INFINITY;
         double bestsep2 = Double.NEGATIVE_INFINITY;
@@ -130,7 +129,7 @@ public class GreeneSplit implements SplitStrategy {
       BitsUtil.setI(assignment, data[i].second);
     }
     // Tie handling
-    if(num % 2 == 0) {
+    if((num & 1) == 0) {
       // We need to compute the bounding boxes
       ModifiableHyperBoundingBox mbr1 = new ModifiableHyperBoundingBox(getter.get(entries, data[0].second));
       for(int i = 1; i < half; i++) {

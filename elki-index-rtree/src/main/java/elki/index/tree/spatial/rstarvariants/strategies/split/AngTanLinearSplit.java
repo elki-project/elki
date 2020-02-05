@@ -29,7 +29,6 @@ import elki.logging.Logging;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
@@ -68,75 +67,68 @@ public class AngTanLinearSplit implements SplitStrategy {
     final int num = getter.size(entries);
     // We need the overall MBR for computing edge preferences
     ModifiableHyperBoundingBox total = new ModifiableHyperBoundingBox(getter.get(entries, 0));
-    {
-      for(int i = 1; i < num; i++) {
-        total.extend(getter.get(entries, i));
-      }
+    for(int i = 1; i < num; i++) {
+      total.extend(getter.get(entries, i));
     }
     final int dim = total.getDimensionality();
     // Prepare the axis lists (we use bitsets)
     long[][] closer = new long[dim][num];
-    {
-      for(int i = 0; i < num; i++) {
-        E e = getter.get(entries, i);
-        for(int d = 0; d < dim; d++) {
-          double low = e.getMin(d) - total.getMin(d);
-          double hig = total.getMax(d) - e.getMax(d);
-          if(low >= hig) {
-            BitsUtil.setI(closer[d], i);
-          }
+    for(int i = 0; i < num; i++) {
+      E e = getter.get(entries, i);
+      for(int d = 0; d < dim; d++) {
+        double low = e.getMin(d) - total.getMin(d);
+        double hig = total.getMax(d) - e.getMax(d);
+        if(low >= hig) {
+          BitsUtil.setI(closer[d], i);
         }
       }
     }
     // Find the most even split
-    {
-      int axis = -1;
-      int bestcard = Integer.MAX_VALUE;
-      long[] bestset = null;
-      double bestover = Double.NaN;
-      for(int d = 0; d < dim; d++) {
-        long[] cand = closer[d];
-        int card = BitsUtil.cardinality(cand);
-        card = Math.max(card, num - card);
-        if(card == num) {
-          continue;
+    int axis = -1, bestcard = Integer.MAX_VALUE;
+    long[] bestset = null;
+    double bestover = Double.NaN;
+    for(int d = 0; d < dim; d++) {
+      long[] cand = closer[d];
+      int card = BitsUtil.cardinality(cand);
+      card = Math.max(card, num - card);
+      if(card == num) {
+        continue;
+      }
+      if(card < bestcard) {
+        axis = d;
+        bestcard = card;
+        bestset = cand;
+        bestover = Double.NaN;
+      }
+      else if(card == bestcard) {
+        // Tie handling
+        if(Double.isNaN(bestover)) {
+          bestover = computeOverlap(entries, getter, bestset);
         }
-        if(card < bestcard) {
+        double overlap = computeOverlap(entries, getter, cand);
+        if(overlap < bestover) {
           axis = d;
           bestcard = card;
           bestset = cand;
-          bestover = Double.NaN;
+          bestover = overlap;
         }
-        else if(card == bestcard) {
-          // Tie handling
-          if(Double.isNaN(bestover)) {
-            bestover = computeOverlap(entries, getter, bestset);
-          }
-          double overlap = computeOverlap(entries, getter, cand);
-          if(overlap < bestover) {
+        else if(overlap == bestover) {
+          double bestlen = total.getMax(axis) - total.getMin(axis);
+          double candlen = total.getMax(d) - total.getMin(d);
+          if(candlen < bestlen) {
             axis = d;
             bestcard = card;
             bestset = cand;
             bestover = overlap;
           }
-          else if(overlap == bestover) {
-            double bestlen = total.getMax(axis) - total.getMin(axis);
-            double candlen = total.getMax(d) - total.getMin(d);
-            if(candlen < bestlen) {
-              axis = d;
-              bestcard = card;
-              bestset = cand;
-              bestover = overlap;
-            }
-          }
         }
       }
-      if(bestset == null) {
-        LOG.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
-        return BitsUtil.random(num >> 1, num, new Random());
-      }
-      return bestset;
     }
+    if(bestset == null) {
+      LOG.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
+      return BitsUtil.random(num >> 1, num, new Random());
+    }
+    return bestset;
   }
 
   /**
@@ -168,9 +160,7 @@ public class AngTanLinearSplit implements SplitStrategy {
         }
       }
     }
-    if(mbr1 == null || mbr2 == null) {
-      throw new AbortException("Invalid state in split: one of the sets is empty.");
-    }
+    assert mbr1 != null && mbr2 != null : "Invalid state in split: one of the sets is empty.";
     return SpatialUtil.overlap(mbr1, mbr2);
   }
 
