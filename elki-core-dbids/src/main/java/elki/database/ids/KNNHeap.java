@@ -32,7 +32,7 @@ package elki.database.ids;
  * @opt nodefillcolor LemonChiffon
  * @assoc - "serializes to" - KNNList
  */
-public interface KNNHeap extends DBIDRef {
+public interface KNNHeap extends DoubleDBIDHeap {
   /**
    * Serialize to a {@link KNNList}. This empties the heap!
    *
@@ -49,6 +49,23 @@ public interface KNNHeap extends DBIDRef {
   KNNList toKNNListSqrt();
 
   /**
+   * Add a distance-id pair to the heap
+   *
+   * @param distance Distance value
+   * @param id ID number
+   * @return Distance to the element at the top of the heap
+   */
+  double insert(double distance, DBIDRef id);
+
+  /**
+   * <b>Disallowed</b>, because {@code max} is fixed.
+   *
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  double insert(double distance, DBIDRef id, int max);
+
+  /**
    * Get the K parameter ("maxsize" internally).
    *
    * @return K
@@ -61,59 +78,4 @@ public interface KNNHeap extends DBIDRef {
    * @return Maximum distance
    */
   double getKNNDistance();
-
-  /**
-   * Get the topmost distance (for fewer than k entries, return the largest of
-   * the current set of candidates).
-   *
-   * @return distance
-   */
-  double maxDistance();
-
-  /**
-   * Add a distance-id pair to the heap unless the distance is too large.
-   * <p>
-   * Compared to the super.add() method, this often saves the pair construction.
-   *
-   * @param distance Distance value
-   * @param id ID number
-   * @return current k-distance
-   */
-  double insert(double distance, DBIDRef id);
-
-  /**
-   * Current size of heap.
-   *
-   * @return Heap size
-   */
-  int size();
-
-  /**
-   * Test if the heap is empty.
-   *
-   * @return true when empty.
-   */
-  default boolean isEmpty() {
-    return size() == 0;
-  }
-
-  /**
-   * Clear the heap.
-   */
-  void clear();
-
-  /**
-   * Unordered iterator over the heap.
-   *
-   * @return Iterator
-   */
-  DoubleDBIDIter unorderedIterator();
-
-  /**
-   * Check if an object is already in the heap.
-   * 
-   * @param other Other object
-   * @return {@code true} if contained
-   */
-  boolean contains(DBIDRef other);
 }

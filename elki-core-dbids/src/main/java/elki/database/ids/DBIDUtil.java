@@ -480,12 +480,30 @@ public final class DBIDUtil {
   }
 
   /**
-   * Create an appropriate heap for the distance type.
-   *
-   * This will use a double heap if appropriate.
+   * Create a min heap for Double+DBID pairs.
    *
    * @param k K value
-   * @return New heap of size k, appropriate for this distance type.
+   * @return New heap of size k
+   */
+  public static DoubleDBIDHeap newMinHeap(int k) {
+    return DBIDFactory.FACTORY.newMinHeap(k);
+  }
+
+  /**
+   * Create a max heap for Double+DBID pairs.
+   *
+   * @param k K value
+   * @return New heap of size k
+   */
+  public static DoubleDBIDHeap newMaxHeap(int k) {
+    return DBIDFactory.FACTORY.newMaxHeap(k);
+  }
+
+  /**
+   * Create a heap for the k nearest neighbors (with ties).
+   *
+   * @param k K value
+   * @return New heap of size k.
    */
   public static KNNHeap newHeap(int k) {
     return DBIDFactory.FACTORY.newHeap(k);
@@ -523,7 +541,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random shuffling of the given DBID array.
-   *
+   * <p>
    * Only the first {@code limit} elements will be fully randomized, but the
    * remaining objects will also be changed.
    *

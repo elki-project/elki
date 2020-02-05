@@ -179,6 +179,22 @@ public interface DBIDFactory {
   HashSetModifiableDBIDs newHashSet(DBIDs existing);
 
   /**
+   * Create a min heap.
+   *
+   * @param k Design sign
+   * @return New heap of size k.
+   */
+  DoubleDBIDHeap newMinHeap(int k);
+
+  /**
+   * Create a max heap (see also {@link newHeap} for a kNN heap).
+   *
+   * @param k Design sign
+   * @return New heap of size k.
+   */
+  DoubleDBIDHeap newMaxHeap(int k);
+
+  /**
    * Create an heap for kNN search.
    *
    * @param k K value

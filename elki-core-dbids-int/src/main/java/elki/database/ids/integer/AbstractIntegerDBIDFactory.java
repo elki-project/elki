@@ -20,20 +20,9 @@
  */
 package elki.database.ids.integer;
 
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDFactory;
-import elki.database.ids.DBIDPair;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.DoubleDBIDPair;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.ids.StaticDBIDs;
+import elki.database.ids.*;
+import elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
+import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import elki.utilities.io.ByteBufferSerializer;
 import elki.utilities.io.FixedSizeByteBufferSerializer;
 
@@ -127,6 +116,16 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public DoubleDBIDPair newPair(double val, DBIDRef id) {
     return new DoubleIntegerDBIDPair(val, id.internalGetIndex());
+  }
+
+  @Override
+  public DoubleDBIDHeap newMinHeap(int k) {
+    return new DoubleIntegerDBIDHeap(new DoubleIntegerMinHeap(k));
+  }
+
+  @Override
+  public DoubleDBIDHeap newMaxHeap(int k) {
+    return new DoubleIntegerDBIDHeap(new DoubleIntegerMaxHeap(k));
   }
 
   @Override
