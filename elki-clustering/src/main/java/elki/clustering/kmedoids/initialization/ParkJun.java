@@ -115,21 +115,20 @@ public class ParkJun<O> implements KMeansInitialization, KMedoidsInitialization<
     LOG.ensureCompleted(prog);
 
     // We use a heap to only store the best values.
-    KNNHeap knn = DBIDUtil.newHeap(k);
+    DoubleDBIDHeap knn = DBIDUtil.newMaxHeap(k);
     prog = LOG.isVerbose() ? new FiniteProgress("Computing element scores", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double sum = 0;
       for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         sum += distQ.distance(iter, iter2) / distsum.doubleValue(iter2);
       }
-      knn.insert(sum, iter);
+      knn.insert(sum, iter, k);
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
     distsum.destroy();
 
-    ArrayModifiableDBIDs medids = DBIDUtil.newArray(knn.toKNNList().subList(k));
-    return medids;
+    return knn.unorderedIterator().addTo(DBIDUtil.newArray(k));
   }
 
   /**

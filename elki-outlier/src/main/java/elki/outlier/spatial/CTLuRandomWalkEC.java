@@ -158,28 +158,20 @@ public class CTLuRandomWalkEC<O> implements OutlierAlgorithm {
           if(i == j) {
             continue;
           }
-          final double e;
           final double distance = distFunc.distance(id, n);
           heap.insert(distance, n);
           if(distance == 0) {
             LOG.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));
-            e = 0;
+            continue;
           }
-          else {
-            double diff = Math.abs(val - relation.get(n).doubleValue(0));
-            double exp = FastMath.exp(FastMath.pow(diff, alpha));
-            // Implementation note: not inverting exp worked a lot better.
-            // Therefore we diverge from the article here.
-            e = exp / distance;
-          }
-          E[j][i] = e;
+          double diff = Math.abs(val - relation.get(n).doubleValue(0));
+          double exp = FastMath.exp(FastMath.pow(diff, alpha));
+          // Implementation note: not inverting exp worked a lot better.
+          // Therefore we diverge from the article here.
+          E[j][i] = exp / distance;
         }
         // Convert kNN Heap into DBID array (unordered)
-        ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
-        for(DBIDIter it = heap.unorderedIterator(); it.valid(); it.advance()) {
-          nids.add(it);
-        }
-        neighbors.put(id, nids);
+        neighbors.put(id, heap.unorderedIterator().addTo(DBIDUtil.newArray(heap.size())));
       }
     }
     // normalize the adjacent Matrix
@@ -191,11 +183,9 @@ public class CTLuRandomWalkEC<O> implements OutlierAlgorithm {
       for(int j = 0; j < E.length; j++) {
         sum += E[j][i];
       }
-      if(sum == 0) {
-        sum = 1.0;
-      }
+      sum = sum != 0 ? sum : 1.0;
       for(int j = 0; j < E.length; j++) {
-        E[j][i] = -c * E[j][i] / sum;
+        E[j][i] *= -c / sum;
       }
     }
     // Add identity matrix. The diagonal should still be 0s, so this is trivial.
@@ -211,8 +201,7 @@ public class CTLuRandomWalkEC<O> implements OutlierAlgorithm {
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
         // Note: matrix times ith unit vector = ith column
-        double[] sim = getCol(E, i);
-        similarityVectors.put(id, sim);
+        similarityVectors.put(id, getCol(E, i));
       }
     }
     E = null;
@@ -226,11 +215,10 @@ public class CTLuRandomWalkEC<O> implements OutlierAlgorithm {
         if(DBIDUtil.equal(id, iter)) {
           continue;
         }
-        double sim = angle(similarityVectors.get(id), similarityVectors.get(iter));
-        gmean *= sim;
+        gmean *= angle(similarityVectors.get(id), similarityVectors.get(iter));
         cnt++;
       }
-      final double score = FastMath.pow(gmean, 1.0 / cnt);
+      final double score = cnt > 0 ? FastMath.pow(gmean, 1.0 / cnt) : 1;
       minmax.put(score);
       scores.putDouble(id, score);
     }

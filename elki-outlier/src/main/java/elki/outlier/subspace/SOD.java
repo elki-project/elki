@@ -209,12 +209,8 @@ public class SOD<V extends NumberVector> implements OutlierAlgorithm {
       }
       nearestNeighbors.insert(-simQ.similarity(queryObject, iter), iter);
     }
-    // Collect DBIDs
-    ArrayModifiableDBIDs dbids = DBIDUtil.newArray(nearestNeighbors.size());
-    for(DBIDIter iter = nearestNeighbors.unorderedIterator(); iter.valid(); iter.advance()) {
-      dbids.add(iter);
-    }
-    return dbids;
+    // Reduce result to DBIDs
+    return nearestNeighbors.unorderedIterator().addTo(DBIDUtil.newArray(nearestNeighbors.size()));
   }
 
   /**

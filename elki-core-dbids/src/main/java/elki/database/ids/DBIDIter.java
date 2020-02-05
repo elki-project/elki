@@ -58,4 +58,20 @@ import elki.utilities.datastructures.iterator.Iter;
 public interface DBIDIter extends DBIDRef, Iter {
   @Override
   DBIDIter advance();
+
+  /**
+   * Add all remaining elements of an iterator to an existing collection.
+   * 
+   * @param <T> Collection type
+   * @param collection Existing collection
+   * @param iter Iterator to process
+   * @return
+   */
+  default <T extends ModifiableDBIDs> T addTo(T collection) {
+    while(valid()) {
+      collection.add(this);
+      advance();
+    }
+    return collection;
+  }
 }
