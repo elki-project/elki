@@ -30,6 +30,7 @@ import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.*;
+import elki.database.query.ExactPrioritySearcher;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -356,58 +357,81 @@ public abstract class AbstractIndexStructureTest {
     DistanceQuery<DoubleVector> dist = qb.distanceQuery();
     DBIDRef second = relation.iterDBIDs().advance();
 
-    if(expectQuery != null) {
-      PrioritySearcher<DoubleVector> prioq = qb.priorityByObject();
-      PrioritySearcher<DBIDRef> prioq2 = qb.priorityByDBID();
-      assertClass(expectQuery, prioq, prioq2);
-      if(!dbidonly) {
-        // get the 10 next neighbors
-        DoubleVector dv = DoubleVector.wrap(querypoint);
-        { // verify the knn result:
-          ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
-          double minall = 0;
-          for(prioq.search(dv); prioq.valid(); prioq.advance()) {
-            double approx = prioq.getApproximateDistance(); // May be NaN
-            double atol = prioq.getApproximateAccuracy(); // May be NaN
-            double lb = prioq.getLowerBound(); // May be NaN
-            double ub = prioq.getUpperBound(); // May be NaN
-            double alllb = prioq.allLowerBound(); // May be NaN
-            double exact = prioq.computeExactDistance();
-            ids.add(exact, prioq);
-            assertFalse("All lower bound decreased", alllb < minall);
-            minall = alllb;
-            assertFalse("All lower bound incorrect", exact < alllb);
-            assertFalse("Lower bound incorrect", exact < lb);
-            assertFalse("Upper bound incorrect", exact > ub);
-            assertFalse("Lower tolerance incorrect", exact < approx - atol);
-            assertFalse("Upper tolerance incorrect", exact > approx + atol);
-          }
-          ids.sort();
-          assertNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
-        }
-        assertNeighbors(relation, dist, prioq.getKNN(dv, k), shouldd, shouldc);
-        assertNeighbors(relation, dist, prioq.getRange(dv, eps), shouldd, shouldc);
-      }
+    PrioritySearcher<DoubleVector> prioq = qb.priorityByObject();
+    PrioritySearcher<DBIDRef> prioq2 = qb.priorityByDBID();
+    assertClass(expectQuery, prioq, prioq2);
+    if(!dbidonly) {
       // get the 10 next neighbors
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       { // verify the knn result:
         ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
-        for(prioq2.search(second); prioq2.valid(); prioq2.advance()) {
-          double approx = prioq2.getApproximateDistance(); // May be NaN
-          double atol = prioq2.getApproximateAccuracy(); // May be NaN
-          double lb = prioq2.getLowerBound(); // May be NaN
-          double ub = prioq2.getUpperBound(); // May be NaN
-          double exact = prioq2.computeExactDistance();
-          ids.add(exact, prioq2);
+        double minall = 0;
+        for(prioq.search(dv); prioq.valid(); prioq.advance()) {
+          double approx = prioq.getApproximateDistance(); // May be NaN
+          double atol = prioq.getApproximateAccuracy(); // May be NaN
+          double lb = prioq.getLowerBound(); // May be NaN
+          double ub = prioq.getUpperBound(); // May be NaN
+          double alllb = prioq.allLowerBound(); // May be NaN
+          double exact = prioq.computeExactDistance();
+          ids.add(exact, prioq);
+          assertFalse("All lower bound decreased", alllb < minall);
+          minall = alllb;
+          assertFalse("All lower bound incorrect", lb < alllb);
+          assertFalse("All lower bound incorrect", exact < alllb);
           assertFalse("Lower bound incorrect", exact < lb);
           assertFalse("Upper bound incorrect", exact > ub);
           assertFalse("Lower tolerance incorrect", exact < approx - atol);
           assertFalse("Upper tolerance incorrect", exact > approx + atol);
         }
         ids.sort();
-        assertNeighbors(ids.slice(0, k), shouldd2, shouldc2);
+        assertNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
       }
-      assertNeighbors(prioq2.getKNN(second, k), shouldd2, shouldc2);
-      assertNeighbors(prioq2.getRange(second, eps2), shouldd2, shouldc2);
+      assertNeighbors(relation, dist, prioq.getKNN(dv, k), shouldd, shouldc);
+      assertNeighbors(relation, dist, prioq.getRange(dv, eps), shouldd, shouldc);
+      // Perform a complete, ordered search
+      {
+        PrioritySearcher<DoubleVector> ex = new ExactPrioritySearcher.ByObject<>(dist, prioq);
+        int c = 0;
+        double prevdist = 0;
+        for(ex.search(dv); ex.valid(); ex.advance()) {
+          assertTrue("Not correctly ordered at " + c, prevdist <= ex.computeExactDistance());
+          prevdist = ex.computeExactDistance();
+          ++c;
+        }
+        assertEquals("Incomplete results.", relation.size(), c);
+      }
+    }
+    // get the 10 next neighbors
+    { // verify the knn result:
+      ModifiableDoubleDBIDList ids = DBIDUtil.newDistanceDBIDList();
+      for(prioq2.search(second); prioq2.valid(); prioq2.advance()) {
+        double approx = prioq2.getApproximateDistance(); // May be NaN
+        double atol = prioq2.getApproximateAccuracy(); // May be NaN
+        double lb = prioq2.getLowerBound(); // May be NaN
+        double ub = prioq2.getUpperBound(); // May be NaN
+        double exact = prioq2.computeExactDistance();
+        ids.add(exact, prioq2);
+        assertFalse("Lower bound incorrect", exact < lb);
+        assertFalse("Upper bound incorrect", exact > ub);
+        assertFalse("Lower tolerance incorrect", exact < approx - atol);
+        assertFalse("Upper tolerance incorrect", exact > approx + atol);
+      }
+      ids.sort();
+      assertNeighbors(ids.slice(0, k), shouldd2, shouldc2);
+    }
+    assertNeighbors(prioq2.getKNN(second, k), shouldd2, shouldc2);
+    assertNeighbors(prioq2.getRange(second, eps2), shouldd2, shouldc2);
+    // Perform a complete, ordered search
+    {
+      PrioritySearcher<DBIDRef> ex = new ExactPrioritySearcher.ByDBID(dist, prioq2);
+      int c = 0;
+      double prevdist = 0;
+      for(ex.search(second); ex.valid(); ex.advance()) {
+        assertTrue("Not correctly ordered at " + c, prevdist <= ex.computeExactDistance());
+        prevdist = ex.computeExactDistance();
+        ++c;
+      }
+      assertEquals("Incomplete results.", relation.size(), c);
     }
   }
 }

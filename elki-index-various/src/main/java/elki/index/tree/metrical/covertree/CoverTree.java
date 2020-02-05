@@ -586,10 +586,9 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
    *
    * @author Erich Schubert
    * 
-   * @param <T> this type
    * @param <Q> query type
    */
-  public abstract class CoverTreePrioritySearcher<T extends PrioritySearcher<Q>, Q> implements PrioritySearcher<Q> {
+  public abstract class CoverTreePrioritySearcher<Q> implements PrioritySearcher<Q> {
     /**
      * Stopping distance threshold.
      */
@@ -640,19 +639,19 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      *
      * @return this.
      */
-    protected T doSearch() {
+    protected PrioritySearcher<Q> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
       pq.clear();
       pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
+      lb = 0.;
       return advance(); // Find first
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T decreaseCutoff(double threshold) {
+    public PrioritySearcher<Q> decreaseCutoff(double threshold) {
       assert threshold <= this.threshold;
       this.threshold = threshold;
-      return (T) this;
+      return this;
     }
 
     @Override
@@ -665,9 +664,8 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
       return candidates.valid();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T advance() {
+    public PrioritySearcher<Q> advance() {
       // Advance the main iterator, if defined:
       if(candidates.valid()) {
         candidates.advance();
@@ -680,13 +678,13 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         while(candidates.valid()) {
           // Pruning with lower bound:
           if(Math.abs(routingDist - candidates.doubleValue()) <= threshold) {
-            return (T) this;
+            return this;
           }
           candidates.advance(); // Skip
         }
       }
       while(advanceQueue()); // Try next node
-      return (T) this;
+      return this;
     }
 
     /**
@@ -739,8 +737,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     @Override
     public double getLowerBound() {
-      // FIXME: MathUtil.max(lb, ...
-      return candidates.getOffset() == 0 ? routingDist : Math.abs(candidates.doubleValue() - routingDist);
+      return candidates.getOffset() == 0 ? routingDist : MathUtil.max(lb, Math.abs(candidates.doubleValue() - routingDist));
     }
 
     @Override
@@ -764,14 +761,14 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
    *
    * @author Erich Schubert
    */
-  public class CoverTreePriorityObjectSearcher extends CoverTreePrioritySearcher<CoverTreePriorityObjectSearcher, O> {
+  public class CoverTreePriorityObjectSearcher extends CoverTreePrioritySearcher<O> {
     /**
      * Query object
      */
     private O query;
 
     @Override
-    public CoverTreePriorityObjectSearcher search(O query) {
+    public PrioritySearcher<O> search(O query) {
       this.query = query;
       doSearch();
       return this;
@@ -788,14 +785,14 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
    *
    * @author Erich Schubert
    */
-  public class CoverTreePriorityDBIDSearcher extends CoverTreePrioritySearcher<CoverTreePriorityDBIDSearcher, DBIDRef> {
+  public class CoverTreePriorityDBIDSearcher extends CoverTreePrioritySearcher<DBIDRef> {
     /**
      * Query object
      */
     private DBIDRef query;
 
     @Override
-    public CoverTreePriorityDBIDSearcher search(DBIDRef query) {
+    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
       this.query = query;
       doSearch();
       return this;

@@ -20,11 +20,9 @@
  */
 package elki.database.query;
 
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.KNNList;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.database.query.LinearScanQuery;
 import elki.database.relation.Relation;
 
 /**
@@ -74,7 +72,7 @@ public class WrappedPrioritySearchDBIDByLookup<O> implements PrioritySearcher<DB
   }
 
   @Override
-  public DBIDIter advance() {
+  public PrioritySearcher<DBIDRef> advance() {
     inner.advance();
     return this;
   }

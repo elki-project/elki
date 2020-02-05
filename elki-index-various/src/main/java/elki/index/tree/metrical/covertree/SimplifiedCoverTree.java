@@ -35,6 +35,7 @@ import elki.index.DistancePriorityIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.MathUtil;
 import elki.utilities.datastructures.heap.DoubleObjectMinHeap;
 
 /**
@@ -532,10 +533,9 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    * 
-   * @param <T> this type
    * @param <Q> query type
    */
-  public abstract class CoverTreePrioritySearcher<T extends PrioritySearcher<Q>, Q> implements PrioritySearcher<Q> {
+  public abstract class CoverTreePrioritySearcher<Q> implements PrioritySearcher<Q> {
     /**
      * Stopping distance threshold.
      */
@@ -591,19 +591,19 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      *
      * @return this.
      */
-    protected T doSearch() {
+    protected PrioritySearcher<Q> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
       pq.clear();
       pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
+      lb = 0;
       return advance(); // Find first
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T decreaseCutoff(double threshold) {
+    public PrioritySearcher<Q> decreaseCutoff(double threshold) {
       assert threshold <= this.threshold;
       this.threshold = threshold;
-      return (T) this;
+      return this;
     }
 
     @Override
@@ -616,9 +616,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       return candidates.valid();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public T advance() {
+    public PrioritySearcher<Q> advance() {
       // Advance the main iterator, if defined:
       if(candidates.valid()) {
         candidates.advance();
@@ -629,11 +628,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       // upper and lower bounds easily.
       do {
         if(candidates.valid()) {
-          return (T) this;
+          return this;
         }
       }
       while(advanceQueue()); // Try next node
-      return (T) this;
+      return this;
     }
 
     /**
@@ -684,8 +683,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     @Override
     public double getLowerBound() {
-        // FIXME: MathUtil.max(lb, ...
-      return candidates.getOffset() == 0 ? routingDist : routingDist > maxDist ? routingDist - maxDist : 0.;
+      return candidates.getOffset() == 0 ? routingDist : MathUtil.max(lb, routingDist > maxDist ? routingDist - maxDist : 0.);
     }
 
     @Override
@@ -709,14 +707,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreePriorityObjectSearcher extends CoverTreePrioritySearcher<CoverTreePriorityObjectSearcher, O> {
+  public class CoverTreePriorityObjectSearcher extends CoverTreePrioritySearcher<O> {
     /**
      * Query object
      */
     private O query;
 
     @Override
-    public CoverTreePriorityObjectSearcher search(O query) {
+    public PrioritySearcher<O> search(O query) {
       this.query = query;
       doSearch();
       return this;
@@ -733,14 +731,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
    *
    * @author Erich Schubert
    */
-  public class CoverTreePriorityDBIDSearcher extends CoverTreePrioritySearcher<CoverTreePriorityDBIDSearcher, DBIDRef> {
+  public class CoverTreePriorityDBIDSearcher extends CoverTreePrioritySearcher<DBIDRef> {
     /**
      * Query object
      */
     private DBIDRef query;
 
     @Override
-    public CoverTreePriorityDBIDSearcher search(DBIDRef query) {
+    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
       this.query = query;
       doSearch();
       return this;

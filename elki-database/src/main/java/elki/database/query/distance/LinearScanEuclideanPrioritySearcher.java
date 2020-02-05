@@ -116,7 +116,7 @@ public abstract class LinearScanEuclideanPrioritySearcher<Q, O extends NumberVec
   }
 
   @Override
-  public DBIDIter advance() {
+  public PrioritySearcher<Q> advance() {
     iter.advance();
     curdist = curdistsq = Double.NaN;
     return this;

@@ -379,7 +379,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     @Override
-    public DBIDIter advance() {
+    public PrioritySearcher<DBIDRef> advance() {
       if(++off >= sorted) {
         partialSort(Math.min(sorted == 1 ? 10 : sorted + (sorted >>> 1), dists.length));
       }
