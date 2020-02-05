@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * Binary heap for ${key.type != "K" ? key.type : "Object"} keys and ${val.type != "V" ? val.type : "Object"} values.
- *
+ * <p>
  * This class is generated from a template.
  *
  * @author Erich Schubert
@@ -243,7 +243,7 @@ public class ${classname}${key.gend}${val.gend} implements ${key.boxed.equals("C
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   *
+   * <p>
    * Use this class as follows:
    *
    * <pre>

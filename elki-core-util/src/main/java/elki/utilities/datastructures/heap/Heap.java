@@ -27,7 +27,7 @@ import java.util.Comparator;
  * Basic in-memory heap structure. Closely related to a
  * {@link java.util.PriorityQueue}, but here we can override methods to obtain
  * e.g. a {@link TopBoundedHeap}
- * 
+ * <p>
  * Additionally, this heap is built lazily: if you first add many elements, then
  * poll the heap, it will be bulk-loaded in O(n) instead of iteratively built in
  * O(n log n). This is implemented via a simple validTo counter.
@@ -302,7 +302,7 @@ public class Heap<E> {
 
   /**
    * Test whether the heap is still valid.
-   * 
+   * <p>
    * Debug method.
    * 
    * @return {@code null} when the heap is correct

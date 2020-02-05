@@ -118,7 +118,6 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
    * Unordered heap iterator class.
    * 
    * @author Erich Schubert
-   * 
    */
   public class UnorderedIter extends Heap<E>.UnorderedIter {
     /**

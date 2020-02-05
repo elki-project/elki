@@ -22,7 +22,7 @@ package elki.utilities.datastructures.arraylike;
 
 /**
  * Use a {@code ${type}[]} in the ArrayAdapter API.
- *
+ * <p>
  * This class is generated from a code template.
  *
  * @author Erich Schubert

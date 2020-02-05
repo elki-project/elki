@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 /**
  * Array of ${type} values (primitive, avoiding the boxing overhead of ArrayList<${boxedtype}>).
- *
+ * <p>
  * This class is generated from a code template.
  *
  * @author Erich Schubert
@@ -33,7 +33,7 @@ import java.util.Arrays;
 public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classname}> {
   /**
    * Maximum array size permitted by Java.
-   *
+   * <p>
    * This is JVM dependent, but 2^31 - 5 is the usual OpenJDK8 value.
    */
   private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5;
@@ -83,7 +83,7 @@ public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classnam
 
   /**
    * Constructor from an existing array.
-   *
+   * <p>
    * The new array will be allocated as small as possible, so modifications will
    * cause a resize!
    *

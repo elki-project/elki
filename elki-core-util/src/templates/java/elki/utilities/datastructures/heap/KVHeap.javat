@@ -24,7 +24,7 @@ import elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Basic in-memory heap interface, for ${key.type != "K" ? key.type : "Object"} keys and ${val.type != "V" ? val.type : "Object"} values.
- *
+ * <p>
  * This class is generated from a template.
  *
  * @author Erich Schubert

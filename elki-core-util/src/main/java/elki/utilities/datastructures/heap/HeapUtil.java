@@ -22,7 +22,7 @@ package elki.utilities.datastructures.heap;
 
 /**
  * Next power of 2, for heaps.
- *
+ * <p>
  * Usually, you should prefer the version in the
  * {@link elki.math.MathUtil} class. This copy exists to avoid
  * depending onto math from these data structures.
@@ -40,7 +40,7 @@ public final class HeapUtil {
 
   /**
    * Find the next power of 2.
-   *
+   * <p>
    * Classic bit operation, for signed 32-bit. Valid for positive integers only
    * (0 otherwise).
    *

@@ -24,6 +24,8 @@ import elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Basic in-memory heap for ${type != "K" ? type : "Object"} values.
+ * <p>
+ * This class is generated from a template.
  *
  * @author Erich Schubert
  * @since 0.5.5

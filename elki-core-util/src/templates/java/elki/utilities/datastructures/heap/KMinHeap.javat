@@ -24,6 +24,8 @@ import java.util.Arrays;
 
 /**
  * Binary heap for primitive types.
+ * <p>
+ * This class is generated from a template.
  *
  * @author Erich Schubert
  * @since 0.5.5
@@ -193,7 +195,7 @@ ${extra ? "\n  " + extra.fields +"\n" : ""}
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   *
+   * <p>
    * Use this class as follows:
    *
    * <pre>
