@@ -27,65 +27,15 @@ package elki.database.ids;
  * {@link elki.database.ids.DBIDRef}.
  *
  * @author Erich Schubert
- * @since 0.5.5
- *
- * @opt nodefillcolor LemonChiffon
  */
-public interface DoubleDBIDListIter extends DoubleDBIDIter, DBIDArrayIter {
+public interface DoubleDBIDIter extends DBIDIter {
   /**
-   * Static empty iterator.
+   * Get the double value
+   *
+   * @return double value
    */
-  DoubleDBIDListIter EMPTY = new DoubleDBIDListIter() {
-    @Override
-    public int internalGetIndex() {
-      return -1;
-    }
-
-    @Override
-    public boolean valid() {
-      return false;
-    }
-
-    @Override
-    public int getOffset() {
-      return -1;
-    }
-
-    @Override
-    public double doubleValue() {
-      return Double.NaN;
-    }
-
-    @Override
-    public DoubleDBIDListIter advance() {
-      return this;
-    }
-
-    @Override
-    public DoubleDBIDListIter advance(int count) {
-      return this;
-    }
-
-    @Override
-    public DoubleDBIDListIter retract() {
-      return this;
-    }
-
-    @Override
-    public DoubleDBIDListIter seek(int off) {
-      return this;
-    }
-  };
+  double doubleValue();
 
   @Override
-  DoubleDBIDListIter advance();
-
-  @Override
-  DoubleDBIDListIter advance(int count);
-
-  @Override
-  DoubleDBIDListIter retract();
-
-  @Override
-  DoubleDBIDListIter seek(int off);
+  DoubleDBIDIter advance();
 }

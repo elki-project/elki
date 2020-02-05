@@ -199,7 +199,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
         HashSetModifiableDBIDs newNeighbors = flag.get(iditer);
         HashSetModifiableDBIDs oldNeighbors = DBIDUtil.newHashSet();
         KNNHeap heap = store.get(iditer);
-        for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+        for(DoubleDBIDIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
           if(!newNeighbors.contains(heapiter)) {
             oldNeighbors.add(heapiter);
           }
@@ -255,7 +255,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       // Add query point and convert heap to list:
       KNNHeap heap = store.get(iditer);
       tempHeap.insert(0, iditer);
-      for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+      for(DoubleDBIDIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
         tempHeap.insert(heapiter.doubleValue(), heapiter);
       }
       storage.put(iditer, tempHeap.toKNNList());
@@ -424,7 +424,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       KNNHeap realNeighbors = store.get(iditer);
       HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
       HashSetModifiableDBIDs realNewNeighbors = sampleNewNeighbors.get(iditer).clear(); // Reuse
-      for(DoubleDBIDListIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+      for(DoubleDBIDIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
         if(newNeighbors.contains(heapiter)) {
           realNewNeighbors.add(heapiter);
           t++;
@@ -449,7 +449,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNHeap heap = store.get(iditer);
       HashSetDBIDs newNeighbors = sampleNewHash.get(iditer);
-      for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+      for(DoubleDBIDIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
         (newNeighbors.contains(heapiter) ? newReverseNeighbors : oldReverseNeighbors).get(heapiter).add(iditer);
       }
     }

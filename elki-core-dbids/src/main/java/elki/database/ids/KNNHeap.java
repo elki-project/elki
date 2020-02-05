@@ -107,7 +107,7 @@ public interface KNNHeap extends DBIDRef {
    *
    * @return Iterator
    */
-  DoubleDBIDListIter unorderedIterator();
+  DoubleDBIDIter unorderedIterator();
 
   /**
    * Check if an object is already in the heap.

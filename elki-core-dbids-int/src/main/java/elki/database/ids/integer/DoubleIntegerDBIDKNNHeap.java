@@ -23,7 +23,7 @@ package elki.database.ids.integer;
 import java.util.Arrays;
 
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.DoubleDBIDIter;
 import elki.database.ids.KNNHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
@@ -215,7 +215,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   @Override
   public int internalGetIndex() {
-    return (numties > 0) ? ties[numties - 1] : heap.isEmpty() ? Integer.MIN_VALUE : heap.peekValue();
+    return numties > 0 ? ties[numties - 1] : heap.isEmpty() ? Integer.MIN_VALUE : heap.peekValue();
   }
 
   @Override
@@ -230,7 +230,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   }
 
   @Override
-  public DoubleDBIDListIter unorderedIterator() {
+  public DoubleDBIDIter unorderedIterator() {
     return new UnorderedIter();
   }
 
@@ -239,7 +239,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    *
    * @author Erich Schubert
    */
-  private class UnorderedIter implements DoubleDBIDListIter {
+  private class UnorderedIter implements DoubleDBIDIter {
     /**
      * Iterator of the real heap.
      */
@@ -261,17 +261,12 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     }
 
     @Override
-    public int getOffset() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public double doubleValue() {
       return it.valid() ? it.getKey() : kdist;
     }
 
     @Override
-    public DoubleDBIDListIter advance() {
+    public DoubleDBIDIter advance() {
       if(it.valid()) {
         it.advance();
       }
@@ -279,24 +274,6 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
         ++t;
       }
       return this;
-    }
-
-    @Override
-    public DoubleDBIDListIter advance(int count) {
-      while(count-- > 0) {
-        advance();
-      }
-      return this;
-    }
-
-    @Override
-    public DoubleDBIDListIter retract() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public DoubleDBIDListIter seek(int off) {
-      throw new UnsupportedOperationException();
     }
   }
 }
