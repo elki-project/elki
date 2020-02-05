@@ -24,9 +24,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * Basic in-memory heap structure. Closely related to a
- * {@link java.util.PriorityQueue}, but here we can override methods to obtain
- * e.g. a {@link TopBoundedHeap}
+ * Basic in-memory heap structure. Similar to a {@link java.util.PriorityQueue},
+ * but with some additional operations.
  * <p>
  * Additionally, this heap is built lazily: if you first add many elements, then
  * poll the heap, it will be bulk-loaded in O(n) instead of iteratively built in
@@ -119,18 +118,25 @@ public class Heap<E> {
   }
 
   /**
-   * Combined operation that removes the top element, and inserts a new element
-   * instead.
+   * Add an element to the heap.
    * 
-   * @param e New element to insert
-   * @return Previous top element of the heap
+   * @param e Element to add
+   * @param maxsize Maximum size
    */
-  @SuppressWarnings("unchecked")
-  public E replaceTopElement(E e) {
-    Object oldroot = queue[0];
-    heapifyDown(0, e);
+  public void add(E e, int maxsize) {
+    if(size == maxsize) {
+      if(comparator.compare(e, queue[0]) > 0) {
+        // Replace top element, and repair:
+        heapifyDown(0, e);
+        heapModified();
+      }
+      return;
+    }
+    if(++size > queue.length) {
+      queue = Arrays.copyOf(queue, HeapUtil.nextSize(queue.length));
+    }
+    heapifyUp(size - 1, e);
     heapModified();
-    return (E) oldroot;
   }
 
   /**

@@ -20,20 +20,17 @@
  */
 package elki.index.tree.spatial.rstarvariants.strategies.insert;
 
-import java.util.Collections;
-
 import elki.data.HyperBoundingBox;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.utilities.datastructures.arraylike.ArrayAdapter;
-import elki.utilities.datastructures.heap.TopBoundedHeap;
+import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.pairs.DoubleIntPair;
 
 /**
  * The choose subtree method proposed by the R*-Tree with slightly better
@@ -78,14 +75,14 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     }
 
     // Heap of candidates
-    TopBoundedHeap<DoubleIntPair> candidates = new TopBoundedHeap<>(numCandidates, Collections.reverseOrder());
+    DoubleIntegerMinHeap candidates = new DoubleIntegerMinHeap(numCandidates);
     for(int i = 0; i < size; i++) {
       // Existing object and extended rectangle:
       SpatialComparable entry = getter.get(options, i);
       HyperBoundingBox mbr = SpatialUtil.union(entry, obj);
       // Area increase
       final double inc_area = SpatialUtil.volume(mbr) - SpatialUtil.volume(entry);
-      candidates.add(new DoubleIntPair(inc_area, i));
+      candidates.add(inc_area, i, numCandidates);
     }
 
     // R*-Tree: overlap increase for leaves.
@@ -95,17 +92,18 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     double least_area = Double.POSITIVE_INFINITY;
     // least overlap increase, on reduced candidate set:
     while(!candidates.isEmpty()) {
-      DoubleIntPair pair = candidates.poll();
-      final double inc_area = pair.first;
+      final double inc_area = candidates.peekKey();
+      final int cand = candidates.peekValue();
+      candidates.poll();
 
       // Existing object and extended rectangle:
-      SpatialComparable entry = getter.get(options, pair.second);
+      SpatialComparable entry = getter.get(options, cand);
       HyperBoundingBox mbr = SpatialUtil.union(entry, obj);
       // Compute relative overlap increase.
       double overlap_wout = 0.0;
       double overlap_with = 0.0;
       for(int k = 0; k < size; k++) {
-        if(pair.second != k) {
+        if(cand != k) {
           SpatialComparable other = getter.get(options, k);
           overlap_wout += SpatialUtil.relativeOverlap(entry, other);
           overlap_with += SpatialUtil.relativeOverlap(mbr, other);
@@ -118,7 +116,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
         least_overlap = inc_overlap;
         least_areainc = inc_area;
         least_area = area;
-        best = pair.second;
+        best = cand;
       }
       else if(inc_overlap == least_overlap) {
         final double area = SpatialUtil.volume(entry);
@@ -126,7 +124,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
           least_overlap = inc_overlap;
           least_areainc = inc_area;
           least_area = area;
-          best = pair.second;
+          best = cand;
         }
       }
     }

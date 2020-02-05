@@ -47,7 +47,6 @@ import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.datastructures.heap.Heap;
-import elki.utilities.datastructures.heap.TopBoundedHeap;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -252,14 +251,14 @@ public class HiCS<V extends NumberVector> implements OutlierAlgorithm {
     }
 
     TreeSet<HiCSSubspace> subspaceList = new TreeSet<>(HiCSSubspace.SORT_BY_SUBSPACE);
-    TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
+    Heap<HiCSSubspace> dDimensionalList = new Heap<>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", (dbdim * (dbdim - 1)) >> 1, LOG) : null;
     // compute two-element sets of subspaces
     for(int i = 0; i < dbdim; i++) {
       for(int j = i + 1; j < dbdim; j++) {
         HiCSSubspace ts = new HiCSSubspace(dbdim).set(i).set(j);
         calculateContrast(relation, ts, subspaceIndex, random);
-        dDimensionalList.add(ts);
+        dDimensionalList.add(ts, cutoff);
         LOG.incrementProcessed(prog);
       }
     }
@@ -291,7 +290,7 @@ public class HiCS<V extends NumberVector> implements OutlierAlgorithm {
           }
 
           calculateContrast(relation, joinedSet, subspaceIndex, random);
-          dDimensionalList.add(joinedSet);
+          dDimensionalList.add(joinedSet, cutoff);
           LOG.incrementProcessed(qprog);
         }
       }

@@ -149,13 +149,6 @@ public class UpdatableHeap<O> extends Heap<O> {
     return (O) ret;
   }
 
-  @Override
-  public O replaceTopElement(O e) {
-    O node = super.replaceTopElement(e);
-    index.removeInt(node);
-    return node;
-  }
-
   /**
    * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
    *
