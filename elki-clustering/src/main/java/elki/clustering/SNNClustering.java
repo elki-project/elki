@@ -157,12 +157,10 @@ public class SNNClustering<O> implements ClusteringAlgorithm<Clustering<Model>> 
       }
     }
     else {
-      for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-        noise.add(id);
-        if(objprog != null && clusprog != null) {
-          objprog.setProcessed(noise.size(), LOG);
-          clusprog.setProcessed(resultList.size(), LOG);
-        }
+      noise.addDBIDs(relation.getDBIDs());
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(noise.size(), LOG);
+        clusprog.setProcessed(resultList.size(), LOG);
       }
     }
     // Finish progress logging

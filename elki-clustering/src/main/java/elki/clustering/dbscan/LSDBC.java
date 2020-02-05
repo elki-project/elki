@@ -208,19 +208,14 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
     // do the actual inversion
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       // Negative values are non-core points:
-      int cid = clusterids.intValue(id);
-      int cluster = Math.abs(cid);
-      clusterlists.get(cluster).add(id);
+      clusterlists.get(Math.abs(clusterids.intValue(id))).add(id);
     }
     clusterids.destroy();
 
     Clustering<Model> result = new Clustering<>();
     Metadata.of(result).setLongName("LSDBC Clustering");
     for(int cid = NOISE; cid < clusterlists.size(); cid++) {
-      boolean isNoise = (cid == NOISE);
-      Cluster<Model> c;
-      c = new Cluster<Model>(clusterlists.get(cid), isNoise, ClusterModel.CLUSTER);
-      result.addToplevelCluster(c);
+      result.addToplevelCluster(new Cluster<Model>(clusterlists.get(cid), (cid == NOISE), ClusterModel.CLUSTER));
     }
     return result;
   }

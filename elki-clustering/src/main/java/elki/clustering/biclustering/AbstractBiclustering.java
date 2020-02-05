@@ -128,8 +128,7 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
     DBIDArrayIter iter = this.rowIDs.iter();
     for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
-      iter.seek(i);
-      rowIDs.add(iter);
+      rowIDs.add(iter.seek(i));
     }
     return rowIDs;
   }

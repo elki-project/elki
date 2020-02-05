@@ -139,9 +139,8 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-        distances[pos] = dq.distance(ix, iy);
+        distances[pos++] = dq.distance(ix, iy);
         prots.add(iy);
-        pos++;
       }
     }
     assert (prots.size() == pos);
