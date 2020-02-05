@@ -61,40 +61,14 @@ public class TopBoundedHeap<E> extends Heap<E> {
 
   @Override
   public void add(E e) {
-    if (super.size() < maxsize) {
+    if(super.size() < maxsize) {
       // Just offer.
       super.add(e);
       return;
     }
-    // Peek at the top element, return if we are worse.
-    final int comp = comparator.compare(e, queue[0]);
-    if (comp < 0) {
-      return;
-    }
-    if (comp == 0) {
-      handleOverflow(e);
-    } else {
+    if(comparator.compare(e, queue[0]) > 0) {
       // Otherwise, replace and repair:
-      handleOverflow(super.replaceTopElement(e));
+      super.replaceTopElement(e);
     }
-  }
-
-  /**
-   * Handle an overflow in the structure. This function can be overridden to get
-   * overflow treatment.
-   * 
-   * @param e Overflowing element.
-   */
-  protected void handleOverflow(E e) {
-    // discard extra element
-  }
-
-  /**
-   * Get the maximum size.
-   * 
-   * @return the maximum size
-   */
-  public int getMaxSize() {
-    return maxsize;
   }
 }

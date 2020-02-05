@@ -20,6 +20,7 @@
  */
 package elki.utilities.datastructures.heap;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -112,7 +113,7 @@ public class UpdatableHeap<O> extends Heap<O> {
     if(pos == NO_VALUE) {
       // resize when needed
       if(size + 1 > queue.length) {
-        resize(size + 1);
+        queue = Arrays.copyOf(queue, HeapUtil.nextSize(queue.length));
       }
       index.put(e, size);
       size++;
@@ -130,46 +131,22 @@ public class UpdatableHeap<O> extends Heap<O> {
     heapModified();
   }
 
-  @Override
-  protected O removeAt(int pos) {
-    if(pos < 0 || pos >= size) {
-      return null;
-    }
-    @SuppressWarnings("unchecked")
-    final O ret = (O) queue[pos];
-    // Replacement object:
-    final Object reinsert = queue[size - 1];
-    queue[size - 1] = null;
-    // Keep heap in sync?
-    size--;
-    if(comparator.compare(ret, reinsert) > 0) {
-      heapifyUp(pos, reinsert);
-    }
-    else {
-      heapifyDown(pos, reinsert);
-    }
-    heapModified();
-    // Keep index up to date
-    index.removeInt(ret);
-    return ret;
-  }
-
-  /**
-   * Remove the given object from the queue.
-   *
-   * @param e Object to remove
-   * @return Existing entry
-   */
-  public O removeObject(O e) {
-    int pos = index.getInt(e);
-    return (pos >= 0) ? removeAt(pos) : null;
-  }
-
+  @SuppressWarnings("unchecked")
   @Override
   public O poll() {
-    O node = super.poll();
-    index.removeInt(node);
-    return node;
+    if(size == 0) {
+      return null;
+    }
+    final Object ret = queue[0];
+    if(--size > 0) {
+      final Object reinsert = queue[size];
+      queue[size] = null;
+      heapifyDown(0, reinsert);
+      // Keep index up to date
+      index.removeInt(ret);
+    }
+    heapModified();
+    return (O) ret;
   }
 
   @Override

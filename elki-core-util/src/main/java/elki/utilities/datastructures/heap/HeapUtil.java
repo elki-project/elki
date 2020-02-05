@@ -32,6 +32,11 @@ package elki.utilities.datastructures.heap;
  */
 public final class HeapUtil {
   /**
+   * Maximum Java array size according to some sources.
+   */
+  private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5;
+
+  /**
    * Private constructor. Static methods only.
    */
   private HeapUtil() {
@@ -55,5 +60,23 @@ public final class HeapUtil {
     x |= x >>> 8;
     x |= x >>> 16;
     return ++x;
+  }
+
+  /**
+   * Next size if a heap exceeds the current capacity.
+   *
+   * @param current Current capacity
+   * @return next heap size
+   */
+  public static int nextSize(int current) {
+    // Double until 64, then increase by 50% each time.
+    int newCapacity = current < 64 ? ++current << 1 : current + (current >> 1);
+    if(newCapacity < 0 || newCapacity > MAX_ARRAY_SIZE) {
+      if(current == MAX_ARRAY_SIZE) {
+        throw new OutOfMemoryError("Heap size overflowed");
+      }
+      return MAX_ARRAY_SIZE;
+    }
+    return newCapacity;
   }
 }
