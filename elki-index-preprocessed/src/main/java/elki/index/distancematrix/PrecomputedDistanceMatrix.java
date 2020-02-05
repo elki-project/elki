@@ -408,6 +408,31 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     }
 
     @Override
+    public double getApproximateDistance() {
+      return dists[off];
+    }
+
+    @Override
+    public double getApproximateAccuracy() {
+      return 0;
+    }
+
+    @Override
+    public double getLowerBound() {
+      return dists[off];
+    }
+
+    @Override
+    public double getUpperBound() {
+      return dists[off];
+    }
+
+    @Override
+    public double allLowerBound() {
+      return off < idx.length ? 0 : Double.POSITIVE_INFINITY;
+    }
+
+    @Override
     public int compare(PrecomputedDistanceMatrix<O>.PrecomputedDistancePrioritySearcher data, int i, int j) {
       return Double.compare(dists[i], dists[j]);
     }

@@ -205,7 +205,11 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
 
   @Override
   public double getLowerBound() {
-    assert valid();
+    return mindist;
+  }
+
+  @Override
+  public double allLowerBound() {
     return mindist;
   }
 

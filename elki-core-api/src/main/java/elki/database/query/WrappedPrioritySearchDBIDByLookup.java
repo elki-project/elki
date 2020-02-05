@@ -118,6 +118,11 @@ public class WrappedPrioritySearchDBIDByLookup<O> implements PrioritySearcher<DB
     return inner.computeExactDistance();
   }
 
+  @Override
+  public double allLowerBound() {
+    return inner.allLowerBound();
+  }
+
   /**
    * Linear scan searcher.
    * 

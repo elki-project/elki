@@ -624,6 +624,11 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
     }
 
     @Override
+    public double allLowerBound() {
+      return cur.mindist;
+    }
+
+    @Override
     public double computeExactDistance() {
       countDistanceComputation();
       countObjectAccess();

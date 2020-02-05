@@ -179,7 +179,11 @@ public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialCompara
 
   @Override
   public double getLowerBound() {
-    assert valid();
+    return mindist < 0 ? (mindist = FastMath.sqrt(mindist)) : mindist;
+  }
+
+  @Override
+  public double allLowerBound() {
     return mindist < 0 ? (mindist = FastMath.sqrt(mindist)) : mindist;
   }
 

@@ -651,6 +651,11 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
     }
 
     @Override
+    public double allLowerBound() {
+      return cur.mindist;
+    }
+
+    @Override
     public double computeExactDistance() {
       countDistanceComputation();
       countObjectAccess();

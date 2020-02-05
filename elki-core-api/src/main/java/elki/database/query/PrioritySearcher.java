@@ -163,9 +163,7 @@ public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, D
    *
    * @return lower bound; {@code 0} if no guarantees (e.g., linear scan)
    */
-  default double allLowerBound() {
-    return valid() ? 0 : Double.POSITIVE_INFINITY;
-  }
+  double allLowerBound();
 
   @Override
   PrioritySearcher<O> advance();

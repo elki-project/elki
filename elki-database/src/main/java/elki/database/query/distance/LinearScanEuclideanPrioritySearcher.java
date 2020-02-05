@@ -169,6 +169,11 @@ public abstract class LinearScanEuclideanPrioritySearcher<Q, O extends NumberVec
         thresholdsq == thresholdsq && getSquaredDistance() > thresholdsq ? thresholdUp : Double.NaN;
   }
 
+  @Override
+  public double allLowerBound() {
+    return iter.valid() ? 0 : Double.POSITIVE_INFINITY;
+  }
+
   /**
    * Search by Object.
    *

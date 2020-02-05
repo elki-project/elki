@@ -130,6 +130,11 @@ public abstract class LinearScanPrioritySearcher<Q, O> implements PrioritySearch
     return curdist; // May be NaN, if not computed yet.
   }
 
+  @Override
+  public double allLowerBound() {
+    return iter.valid() ? 0 : Double.POSITIVE_INFINITY;
+  }
+
   /**
    * Search by Object.
    *
