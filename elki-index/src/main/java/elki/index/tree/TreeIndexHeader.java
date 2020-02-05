@@ -20,12 +20,12 @@
  */
 package elki.index.tree;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Stack;
 
 import elki.persistent.DefaultPageHeader;
+import elki.utilities.datastructures.arraylike.IntegerArray;
 
 /**
  * Encapsulates the header information of a tree-like index structure. This
@@ -216,23 +216,16 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * @param file File to work with
    * @throws IOException thrown on IO errors
    */
-  public void writeEmptyPages(Stack<Integer> emptyPages, FileChannel file) throws IOException {
+  public void writeEmptyPages(IntegerArray emptyPages, FileChannel file) throws IOException {
     if(emptyPages.isEmpty()) {
       this.emptyPagesSize = 0;
       return; // nothing to write
     }
-    // FIXME: serialize this as a list of ints, not using Java serialization...
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream oos = new ObjectOutputStream(baos);
-    oos.writeObject(emptyPages);
-    oos.flush();
-    byte[] bytes = baos.toByteArray();
-    oos.close();
-    baos.close();
-    this.emptyPagesSize = bytes.length;
-    if(this.emptyPagesSize > 0) {
-      file.write(ByteBuffer.wrap(bytes), file.size());
-    }
+    emptyPages.sort();
+    this.emptyPagesSize = emptyPages.size * Integer.BYTES;
+    ByteBuffer buf = ByteBuffer.allocateDirect(this.emptyPagesSize);
+    buf.asIntBuffer().put(emptyPages.data, 0, emptyPages.size);
+    file.write(buf, file.size());
   }
 
   /**
@@ -244,19 +237,17 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * @throws ClassNotFoundException if the stack of empty pages could not be
    *         correctly read from file
    */
-  @SuppressWarnings("unchecked")
-  public Stack<Integer> readEmptyPages(FileChannel file) throws IOException, ClassNotFoundException {
-    if(emptyPagesSize == 0) {
-      return new Stack<>();
+  public IntegerArray readEmptyPages(FileChannel file) throws IOException, ClassNotFoundException {
+    IntegerArray emptyPages = new IntegerArray();
+    if(emptyPagesSize > 0) {
+      int n = emptyPagesSize / Integer.BYTES;
+      if(n > emptyPages.data.length) {
+        emptyPages.data = new int[n];
+      }
+      ByteBuffer buf = ByteBuffer.allocateDirect(emptyPagesSize);
+      file.read(buf, file.size() - emptyPagesSize);
+      buf.asIntBuffer().get(emptyPages.data, 0, n);
     }
-    byte[] bytes = new byte[emptyPagesSize];
-    file.read(ByteBuffer.wrap(bytes), file.size() - emptyPagesSize);
-    // FIXME: serialize this as a list of ints, not using Java serialization...
-    ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-    ObjectInputStream ois = new ObjectInputStream(bais);
-    Stack<Integer> emptyPages = (Stack<Integer>) ois.readObject();
-    ois.close();
-    bais.close();
     return emptyPages;
   }
 

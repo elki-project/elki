@@ -247,7 +247,7 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
           ByteBuffer buffer = file.getRecordBuffer(i);
           int type = buffer.getInt();
           if(type == EMPTY_PAGE) {
-            emptyPages.push(i);
+            emptyPages.add(i);
           }
           else if(type == FILLED_PAGE) {
             nextPageID = i + 1;

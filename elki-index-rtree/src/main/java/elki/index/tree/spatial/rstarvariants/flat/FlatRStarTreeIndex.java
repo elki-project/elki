@@ -51,6 +51,11 @@ import elki.persistent.PageFile;
  */
 public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree implements DistancePriorityIndex<O>, DynamicIndex {
   /**
+   * The appropriate logger for this index.
+   */
+  private static final Logging LOG = Logging.getLogger(FlatRStarTreeIndex.class);
+
+  /**
    * The relation we index
    */
   private Relation<O> relation;
@@ -66,11 +71,6 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
     super(pagefile, settings);
     this.relation = relation;
   }
-
-  /**
-   * The appropriate logger for this index.
-   */
-  private static final Logging LOG = Logging.getLogger(FlatRStarTreeIndex.class);
 
   /**
    * Wrap a vector as spatial point leaf entry.
@@ -106,7 +106,7 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
    */
   @Override
   public final void insertAll(DBIDs ids) {
-    if(ids.isEmpty() || (ids.size() == 1)) {
+    if(ids.isEmpty()) {
       return;
     }
 
@@ -127,12 +127,6 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
     doExtraIntegrityChecks();
   }
 
-  /**
-   * Deletes the specified object from this index.
-   * 
-   * @return true if this index did contain the object with the specified id,
-   *         false otherwise
-   */
   @Override
   public final boolean delete(DBIDRef id) {
     // find the leaf node containing o

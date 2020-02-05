@@ -311,8 +311,8 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   @Override
   public void setNextPageID(int next_page_id) {
     this.nextPageID = next_page_id;
-    while(!emptyPages.isEmpty() && emptyPages.peek() >= this.nextPageID) {
-      emptyPages.pop();
+    while(!emptyPages.isEmpty() && emptyPages.get(emptyPages.size - 1) >= this.nextPageID) {
+      --emptyPages.size;
     }
   }
 
@@ -350,7 +350,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
             ObjectInputStream ois = new ObjectInputStream(bais);
             int type = ois.readInt();
             if(type == EMPTY_PAGE) {
-              emptyPages.push(i);
+              emptyPages.add(i);
             }
             else if(type == FILLED_PAGE) {
               nextPageID = i + 1;

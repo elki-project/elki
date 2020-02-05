@@ -70,8 +70,10 @@ public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, 
 
   /**
    * Increases the length of the entries array to entries.length + 1.
+   * 
+   * @param newsize New size
    */
-  public final void increaseEntries() {
-    entries = Arrays.copyOf(entries, entries.length + 1);
+  public final void increaseEntries(int newsize) {
+    entries = Arrays.copyOf(entries, newsize);
   }
 }

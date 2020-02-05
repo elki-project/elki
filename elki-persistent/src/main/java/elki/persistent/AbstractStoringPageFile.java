@@ -20,9 +20,8 @@
  */
 package elki.persistent;
 
-import java.util.Stack;
-
 import elki.logging.statistics.LongStatistic;
+import elki.utilities.datastructures.arraylike.IntegerArray;
 
 /**
  * Abstract class implementing general methods of a PageFile. A PageFile stores
@@ -37,7 +36,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
   /**
    * A stack holding the empty page ids.
    */
-  protected Stack<Integer> emptyPages;
+  protected IntegerArray emptyPages;
 
   /**
    * The last page ID.
@@ -53,7 +52,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
    * Creates a new PageFile.
    */
   protected AbstractStoringPageFile(int pageSize) {
-    this.emptyPages = new Stack<>();
+    this.emptyPages = new IntegerArray();
     this.nextPageID = 0;
     this.pageSize = pageSize;
   }
@@ -73,6 +72,14 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
       }
       page.setPageID(pageID);
     }
+    else {
+      if(pageID >= nextPageID) {
+        for(int i = nextPageID; i < pageID; i++) {
+          emptyPages.add(i);
+        }
+        nextPageID = pageID + 1;
+      }
+    }
     return pageID;
   }
 
@@ -84,7 +91,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
   @Override
   public void deletePage(int pageID) {
     // put id to empty nodes
-    emptyPages.push(pageID);
+    emptyPages.add(pageID);
   }
 
   /**
@@ -93,12 +100,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
    * @return the next empty page id
    */
   private int getNextEmptyPageID() {
-    if(!emptyPages.empty()) {
-      return emptyPages.pop();
-    }
-    else {
-      return -1;
-    }
+    return emptyPages.isEmpty() ? -1 : emptyPages.get(--emptyPages.size);
   }
 
   /**
@@ -147,7 +149,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
   @Override
   public void logStatistics() {
     super.logStatistics();
-    if (getLogger().isStatistics()) {
+    if(getLogger().isStatistics()) {
       getLogger().statistics(new LongStatistic(this.getClass().getName() + ".numpages", nextPageID - emptyPages.size()));
     }
   }

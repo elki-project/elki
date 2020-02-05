@@ -195,7 +195,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
       result.add(createNewDirectoryEntry(dirNode));
       if(getLogger().isDebuggingFiner()) {
-        getLogger().debugFiner("Directory page no: "+dirNode.getPageID());
+        getLogger().debugFiner("Directory page no: " + dirNode.getPageID());
       }
     }
 
@@ -214,7 +214,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
   private N createRoot(N root, List<E> objects) {
     // insert data
     for(E entry : objects) {
-      if (entry instanceof LeafEntry) {
+      if(entry instanceof LeafEntry) {
         root.addLeafEntry(entry);
       }
       else {
@@ -228,11 +228,8 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     // write to file
     writeNode(root);
     if(getLogger().isDebuggingFiner()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append("pageNo ").append(root.getPageID());
-      getLogger().debugFiner(msg.toString());
+      getLogger().debugFiner("pageNo " + root.getPageID());
     }
-
     return root;
   }
 }
