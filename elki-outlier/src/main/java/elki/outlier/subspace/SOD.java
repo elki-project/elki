@@ -20,7 +20,6 @@
  */
 package elki.outlier.subspace;
 
-import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
@@ -34,7 +33,6 @@ import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.distance.subspace.SubspaceEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
@@ -62,6 +60,8 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import net.jafama.FastMath;
 
 /**
  * Subspace Outlier Degree: Outlier Detection in Axis-Parallel Subspaces of High
@@ -243,12 +243,14 @@ public class SOD<V extends NumberVector> implements OutlierAlgorithm {
    * @return sod score
    */
   private double subspaceOutlierDegree(V queryObject, double[] center, long[] weightVector) {
-    final int card = BitsUtil.cardinality(weightVector);
-    if(card == 0) {
-      return 0;
+    double sqrDist = 0;
+    int card = 0;
+    for(int d = BitsUtil.nextSetBit(weightVector, 0); d >= 0; d = BitsUtil.nextSetBit(weightVector, d + 1)) {
+      final double delta = queryObject.doubleValue(d) - center[d];
+      sqrDist += delta * delta;
+      card++;
     }
-    final SubspaceEuclideanDistance df = new SubspaceEuclideanDistance(weightVector);
-    return df.distance(queryObject, DoubleVector.wrap(center)) / card;
+    return sqrDist > 0 ? FastMath.sqrt(sqrDist) / card : 0.;
   }
 
   /**
