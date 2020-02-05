@@ -20,10 +20,8 @@
  */
 package elki.database.query;
 
-import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDHeap;
-import elki.database.query.distance.DistanceQuery;
 
 /**
  * Priority searcher that refines all objects to their exact distances,
@@ -40,7 +38,7 @@ import elki.database.query.distance.DistanceQuery;
  *
  * @param <O> Object type
  */
-public abstract class ExactPrioritySearcher<O> implements PrioritySearcher<O> {
+public class ExactPrioritySearcher<O> implements PrioritySearcher<O> {
   /**
    * Nested priority searcher
    */
@@ -61,7 +59,7 @@ public abstract class ExactPrioritySearcher<O> implements PrioritySearcher<O> {
    *
    * @param inner Inner query
    */
-  protected ExactPrioritySearcher(PrioritySearcher<O> inner) {
+  public ExactPrioritySearcher(PrioritySearcher<O> inner) {
     this.inner = inner;
   }
 
@@ -136,91 +134,5 @@ public abstract class ExactPrioritySearcher<O> implements PrioritySearcher<O> {
       inner.advance();
     }
     return this;
-  }
-
-  /**
-   * Compute distance to query object.
-   *
-   * @param it Candidate
-   * @return Distance
-   */
-  protected abstract double queryDistance(DBIDRef it);
-
-  /**
-   * Priority query class.
-   *
-   * @author Erich Schubert
-   */
-  public static class ByObject<O> extends ExactPrioritySearcher<O> {
-    /**
-     * Distance to use.
-     */
-    private final DistanceQuery<O> distance;
-
-    /**
-     * Query object
-     */
-    private O query;
-
-    /**
-     * Constructor.
-     *
-     * @param distance Distance query
-     * @param inner Inner searcher
-     */
-    public ByObject(DistanceQuery<O> distance, PrioritySearcher<O> inner) {
-      super(inner);
-      this.distance = distance;
-    }
-
-    @Override
-    public PrioritySearcher<O> search(O query) {
-      this.query = query;
-      return super.search(query);
-    }
-
-    @Override
-    protected double queryDistance(DBIDRef it) {
-      return distance.distance(query, it);
-    }
-  }
-
-  /**
-   * Priority query class.
-   *
-   * @author Erich Schubert
-   */
-  public static class ByDBID extends ExactPrioritySearcher<DBIDRef> {
-    /**
-     * Distance to use.
-     */
-    private final DistanceQuery<?> distance;
-
-    /**
-     * Query object
-     */
-    private DBIDRef query;
-
-    /**
-     * Constructor.
-     *
-     * @param distance Distance query
-     * @param inner Inner searcher
-     */
-    public ByDBID(DistanceQuery<?> distance, PrioritySearcher<DBIDRef> inner) {
-      super(inner);
-      this.distance = distance;
-    }
-
-    @Override
-    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
-      this.query = query;
-      return super.search(query);
-    }
-
-    @Override
-    protected double queryDistance(DBIDRef it) {
-      return distance.distance(query, it);
-    }
   }
 }

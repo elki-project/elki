@@ -390,7 +390,7 @@ public abstract class AbstractIndexStructureTest {
       assertNeighbors(relation, dist, prioq.getRange(dv, eps), shouldd, shouldc);
       // Perform a complete, ordered search
       {
-        PrioritySearcher<DoubleVector> ex = new ExactPrioritySearcher.ByObject<>(dist, prioq);
+        PrioritySearcher<DoubleVector> ex = new ExactPrioritySearcher<>(prioq);
         int c = 0;
         double prevdist = 0;
         for(ex.search(dv); ex.valid(); ex.advance()) {
@@ -423,7 +423,7 @@ public abstract class AbstractIndexStructureTest {
     assertNeighbors(prioq2.getRange(second, eps2), shouldd2, shouldc2);
     // Perform a complete, ordered search
     {
-      PrioritySearcher<DBIDRef> ex = new ExactPrioritySearcher.ByDBID(dist, prioq2);
+      PrioritySearcher<DBIDRef> ex = new ExactPrioritySearcher<>(prioq2);
       int c = 0;
       double prevdist = 0;
       for(ex.search(second); ex.valid(); ex.advance()) {

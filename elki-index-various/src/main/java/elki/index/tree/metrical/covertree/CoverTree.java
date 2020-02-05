@@ -747,7 +747,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     @Override
     public double computeExactDistance() {
-      return candidates.getOffset() == 0 ? routingDist : queryDistance(candidates);
+      return candidates.getOffset() == 0 || candidates.doubleValue() == 0 ? routingDist : queryDistance(candidates);
     }
 
     @Override
