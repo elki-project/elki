@@ -176,8 +176,7 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("CLARANS sampling restarts", numlocal, LOG) : null;
     for(int i = 0; i < numlocal; i++) {
       // 2. choose random initial medoids
-      curr.medoids.clear();
-      curr.medoids.addDBIDs(DBIDUtil.randomSample(ids, k, rnd));
+      curr.medoids.clear().addDBIDs(DBIDUtil.randomSample(ids, k, rnd));
       // Cost of initial solution:
       double total = curr.assignToNearestCluster();
 
@@ -323,8 +322,7 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
      */
     protected double computeCostDifferential(DBIDRef h, int mnum, Assignment scratch) {
       // Update medoids of scratch copy.
-      scratch.medoids.clear();
-      scratch.medoids.addDBIDs(medoids);
+      scratch.medoids.clear().addDBIDs(medoids);
       scratch.medoids.set(mnum, h);
       double cost = 0;
       // Compute costs of reassigning other objects j:

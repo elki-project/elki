@@ -112,8 +112,7 @@ public class FastCLARANS<V> extends CLARANS<V> {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("CLARANS sampling restarts", numlocal, LOG) : null;
     for(int i = 0; i < numlocal; i++) {
       // 2. choose random initial medoids
-      curr.medoids.clear();
-      curr.medoids.addDBIDs(DBIDUtil.randomSample(ids, k, rnd));
+      curr.medoids.clear().addDBIDs(DBIDUtil.randomSample(ids, k, rnd));
       // Cost of initial solution:
       double total = curr.assignToNearestCluster();
 

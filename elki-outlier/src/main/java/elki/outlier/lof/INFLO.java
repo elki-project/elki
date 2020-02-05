@@ -249,8 +249,7 @@ public class INFLO<O> implements OutlierAlgorithm {
         LOG.incrementProcessed(prog);
         continue;
       }
-      set.clear();
-      set.addDBIDs(knn);
+      set.clear().addDBIDs(knn);
       set.addDBIDs(rNNminuskNNs.get(iter));
       // Compute mean density of NN \cup RNN
       double sum = 0.;

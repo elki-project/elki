@@ -880,8 +880,7 @@ public class DiSH implements SubspaceClusteringAlgorithm<SubspaceModel> {
         }
       }
       if(maxDim >= 0) {
-        set.clear();
-        set.addDBIDs(maxIntersection);
+        set.clear().addDBIDs(maxIntersection);
       }
       return maxDim;
     }

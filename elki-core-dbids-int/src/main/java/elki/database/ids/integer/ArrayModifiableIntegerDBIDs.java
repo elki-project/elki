@@ -210,8 +210,9 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
-  public void clear() {
+  public ArrayModifiableIntegerDBIDs clear() {
     size = 0;
+    return this;
   }
 
   @Override

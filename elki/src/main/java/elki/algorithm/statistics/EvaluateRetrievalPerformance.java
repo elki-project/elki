@@ -150,7 +150,7 @@ public class EvaluateRetrievalPerformance<O> implements Algorithm {
     FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Processing query objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       Object label = lrelation.get(iter);
-      findMatches(posn, lrelation, label);
+      findMatches(posn.clear(), lrelation, label);
       if(posn.size() > 0) {
         computeDistances(nlist, iter, distQuery, relation);
         if(nlist.size() != relation.size() - (includeSelf ? 0 : 1)) {
@@ -230,7 +230,6 @@ public class EvaluateRetrievalPerformance<O> implements Algorithm {
    * @param label Query object label
    */
   private void findMatches(ModifiableDBIDs posn, Relation<?> lrelation, Object label) {
-    posn.clear();
     for(DBIDIter ri = lrelation.iterDBIDs(); ri.valid(); ri.advance()) {
       if(match(label, lrelation.get(ri))) {
         posn.add(ri);

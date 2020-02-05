@@ -137,8 +137,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
           newMedians[i] = medians[i];
           continue;
         }
-        list.clear();
-        list.addDBIDs(clu);
+        list.clear().addDBIDs(clu);
         double[] mean = new double[dim];
         for(int d = 0; d < dim; d++) {
           sorter.setDimension(d);

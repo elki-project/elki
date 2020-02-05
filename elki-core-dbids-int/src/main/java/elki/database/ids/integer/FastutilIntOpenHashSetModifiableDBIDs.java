@@ -195,8 +195,9 @@ class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, I
   }
 
   @Override
-  public void clear() {
+  public FastutilIntOpenHashSetModifiableDBIDs clear() {
     store.clear();
+    return this;
   }
 
   @Override

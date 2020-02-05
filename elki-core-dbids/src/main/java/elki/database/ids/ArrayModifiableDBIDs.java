@@ -52,6 +52,9 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    */
   void sort(int start, int end, Comparator<? super DBIDRef> comparator);
 
+  @Override
+  ArrayModifiableDBIDs clear();
+
   /**
    * Remove the i'th entry (starting at 0)
    *
@@ -69,7 +72,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
 
   /**
    * Insert at position i (starting at 0, moving the remainder by one position).
-   *
+   * <p>
    * Note: this operation has linear time complexity on average: O(n/2)
    *
    * @param i Index

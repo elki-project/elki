@@ -287,8 +287,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private void boundSize(HashSetModifiableDBIDs set, int items) {
     if(set.size() > items) {
       DBIDs sample = DBIDUtil.randomSample(set, items, rnd);
-      set.clear();
-      set.addDBIDs(sample);
+      set.clear().addDBIDs(sample);
     }
   }
 
@@ -424,8 +423,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       KNNHeap realNeighbors = store.get(iditer);
       HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
-      HashSetModifiableDBIDs realNewNeighbors = sampleNewNeighbors.get(iditer);
-      realNewNeighbors.clear(); // Reuse
+      HashSetModifiableDBIDs realNewNeighbors = sampleNewNeighbors.get(iditer).clear(); // Reuse
       for(DoubleDBIDListIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
         if(newNeighbors.contains(heapiter)) {
           realNewNeighbors.add(heapiter);

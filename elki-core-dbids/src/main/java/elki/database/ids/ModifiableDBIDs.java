@@ -22,7 +22,7 @@ package elki.database.ids;
 
 /**
  * Interface for a generic modifiable DBID collection.
- *
+ * <p>
  * Note: we had this use the Java Collections API for a long time, however this
  * prevented certain optimizations. So it now only mimics the Collections API
  * <em>deliberately</em>.
@@ -68,11 +68,11 @@ public interface ModifiableDBIDs extends DBIDs {
   /**
    * Clear this collection.
    */
-  void clear();
+  ModifiableDBIDs clear();
 
   /**
    * Get a <em>modifiable</em> DBID iterator (a more efficient API).
-   *
+   * <p>
    * usage example:
    *
    * <pre>
