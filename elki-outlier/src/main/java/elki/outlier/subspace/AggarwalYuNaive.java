@@ -60,8 +60,6 @@ import elki.utilities.pairs.IntIntPair;
  * @author Ahmed Hettab
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @param <V> Vector type
  */
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
@@ -70,7 +68,7 @@ import elki.utilities.pairs.IntIntPair;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //
     bibkey = "DBLP:conf/sigmod/AggarwalY01")
-public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuOutlier<V> {
+public class AggarwalYuNaive extends AbstractAggarwalYuOutlier {
   /**
    * The logger for this class.
    */
@@ -92,7 +90,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
    * @param relation Relation
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<V> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
@@ -176,10 +174,10 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractAggarwalYuOutlier.Par {
+  public static class Par extends AbstractAggarwalYuOutlier.Par {
     @Override
-    public AggarwalYuNaive<V> make() {
-      return new AggarwalYuNaive<>(k, phi);
+    public AggarwalYuNaive make() {
+      return new AggarwalYuNaive(k, phi);
     }
   }
 }

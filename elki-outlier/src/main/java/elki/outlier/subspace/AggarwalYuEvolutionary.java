@@ -69,8 +69,6 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
  *
  * @navhas - runs - EvolutionarySearch
  * @navhas - obtains - Individuum
- *
- * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
@@ -79,7 +77,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //
     bibkey = "DBLP:conf/sigmod/AggarwalY01")
-public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAggarwalYuOutlier<V> {
+public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
   /**
    * The logger for this class.
    */
@@ -125,11 +123,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    * @param relation Relation
    * @return Result
    */
-  public OutlierResult run(Relation<V> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     final int dbsize = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    Heap<Individuum>.UnorderedIter individuums = (new EvolutionarySearch(relation, ranges, m, rnd.getSingleThreadedRandom())).run();
+    Heap<Individuum>.UnorderedIter individuums = (new EvolutionarySearch(relation, ranges, rnd.getSingleThreadedRandom())).run();
 
     WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     for(; individuums.valid(); individuums.advance()) {
@@ -180,11 +178,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     final ArrayList<ArrayList<DBIDs>> ranges;
 
     /**
-     * m to use.
-     */
-    final int m;
-
-    /**
      * random generator.
      */
     final private Random random;
@@ -194,13 +187,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      *
      * @param relation Database to use
      * @param ranges DBID ranges to process
-     * @param m Population size
      * @param random Random generator
      */
-    public EvolutionarySearch(Relation<V> relation, ArrayList<ArrayList<DBIDs>> ranges, int m, Random random) {
+    public EvolutionarySearch(Relation<? extends NumberVector> relation, ArrayList<ArrayList<DBIDs>> ranges, Random random) {
       super();
       this.ranges = ranges;
-      this.m = m;
       this.dbsize = relation.size();
       this.dim = RelationUtil.dimensionality(relation);
       this.random = random;
@@ -645,7 +636,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends AbstractAggarwalYuOutlier.Par {
+  public static class Par extends AbstractAggarwalYuOutlier.Par {
     /**
      * Parameter to specify the number of solutions must be an integer greater
      * than 1.
@@ -677,8 +668,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     }
 
     @Override
-    public AggarwalYuEvolutionary<V> make() {
-      return new AggarwalYuEvolutionary<>(k, phi, m, rnd);
+    public AggarwalYuEvolutionary make() {
+      return new AggarwalYuEvolutionary(k, phi, m, rnd);
     }
   }
 }

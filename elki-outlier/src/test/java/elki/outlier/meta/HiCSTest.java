@@ -22,12 +22,11 @@ package elki.outlier.meta;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
-import elki.outlier.lof.LOF;
-import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.math.statistics.tests.KolmogorovSmirnovTest;
 import elki.math.statistics.tests.WelchTTest;
+import elki.outlier.AbstractOutlierAlgorithmTest;
+import elki.outlier.lof.LOF;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -41,7 +40,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHiCSKS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-    OutlierResult result = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
+    OutlierResult result = new ELKIBuilder<>(HiCS.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(HiCS.Par.LIMIT_ID, 10) //
         .with(HiCS.Par.SEED_ID, 0) //
@@ -54,7 +53,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHiCSWelch() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-    OutlierResult result = new ELKIBuilder<HiCS<DoubleVector>>(HiCS.class) //
+    OutlierResult result = new ELKIBuilder<>(HiCS.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(HiCS.Par.LIMIT_ID, 10) //
         .with(HiCS.Par.SEED_ID, 0) //

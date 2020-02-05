@@ -67,8 +67,6 @@ import net.jafama.FastMath;
  *
  * @author Lisa Reichert
  * @since 0.3
- *
- * @param <V> Vector Type
  */
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
 @Description("Fits a mixture model consisting of a Gaussian and a uniform distribution to the data.")
@@ -78,7 +76,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML-2000)", //
     url = "https://doi.org/10.7916/D8C53SKF", //
     bibkey = "DBLP:conf/icml/Eskin00")
-public class GaussianUniformMixture<V extends NumberVector> implements OutlierAlgorithm {
+public class GaussianUniformMixture implements OutlierAlgorithm {
   /**
    * Maximum number of iterations to do.
    */
@@ -123,7 +121,7 @@ public class GaussianUniformMixture<V extends NumberVector> implements OutlierAl
    * @param relation Data relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<V> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Build entire covariance matrix:
@@ -142,7 +140,7 @@ public class GaussianUniformMixture<V extends NumberVector> implements OutlierAl
       for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
         // Change mask to make the current Fobject anomalous
         boolean wasadded = anomalous.add(iter) || !anomalous.remove(iter);
-        final V vec = relation.get(iter);
+        NumberVector vec = relation.get(iter);
         builder.put(vec, wasadded ? -1 : +1); // Remove
         // Compute new likelihoods
         double currentLogLike = (objids.size() - anomalous.size()) * logml + loglikelihoodNormal(objids, anomalous, builder, relation) //
@@ -193,7 +191,7 @@ public class GaussianUniformMixture<V extends NumberVector> implements OutlierAl
    * @param relation Database
    * @return loglikelihood for normal objects
    */
-  private double loglikelihoodNormal(DBIDs objids, SetDBIDs anomalous, CovarianceMatrix builder, Relation<V> relation) {
+  private double loglikelihoodNormal(DBIDs objids, SetDBIDs anomalous, CovarianceMatrix builder, Relation<? extends NumberVector> relation) {
     double[] mean = builder.getMeanVector();
     final LUDecomposition lu = new LUDecomposition(builder.makeSampleMatrix());
     double[][] covInv = lu.inverse();
@@ -213,7 +211,7 @@ public class GaussianUniformMixture<V extends NumberVector> implements OutlierAl
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the fraction of expected outliers.
      */
@@ -224,21 +222,27 @@ public class GaussianUniformMixture<V extends NumberVector> implements OutlierAl
      */
     public static final OptionID C_ID = new OptionID("mmo.c", "cutoff");
 
+    /**
+     * Expected outlier fraction
+     */
     protected double l = 1E-7;
 
-    protected double c = 0;
+    /**
+     * Cutoff parameter
+     */
+    protected double c = 1E-7;
 
     @Override
     public void configure(Parameterization config) {
-      new DoubleParameter(C_ID, 1E-7) //
+      new DoubleParameter(L_ID, 1E-7) //
           .grab(config, x -> l = x);
       new DoubleParameter(C_ID, 1E-7) //
           .grab(config, x -> c = x);
     }
 
     @Override
-    public GaussianUniformMixture<V> make() {
-      return new GaussianUniformMixture<>(l, c);
+    public GaussianUniformMixture make() {
+      return new GaussianUniformMixture(l, c);
     }
   }
 }

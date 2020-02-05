@@ -22,9 +22,8 @@ package elki.outlier.subspace;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
-import elki.data.DoubleVector;
 import elki.database.Database;
+import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -38,7 +37,7 @@ public class AggarwalYuNaiveTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testAggarwalYuNaive() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-    OutlierResult result = new ELKIBuilder<AggarwalYuNaive<DoubleVector>>(AggarwalYuNaive.class) //
+    OutlierResult result = new ELKIBuilder<>(AggarwalYuNaive.class) //
         .with(AggarwalYuNaive.Par.K_ID, 2) //
         .with(AggarwalYuNaive.Par.PHI_ID, 8) //
         .build().autorun(db);

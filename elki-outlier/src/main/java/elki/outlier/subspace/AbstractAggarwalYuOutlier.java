@@ -53,15 +53,13 @@ import net.jafama.FastMath;
  * @author Ahmed Hettab
  * @author Erich Schubert
  * @since 0.4.0
- *
- * @param <V> Vector type
  */
 @Reference(authors = "C. C. Aggarwal, P. S. Yu", //
     title = "Outlier detection for high dimensional data", //
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001)", //
     url = "https://doi.org/10.1145/375663.375668", //
     bibkey = "DBLP:conf/sigmod/AggarwalY01")
-public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> implements OutlierAlgorithm {
+public abstract class AbstractAggarwalYuOutlier implements OutlierAlgorithm {
   /**
    * Symbolic value for subspaces not in use.
    */
@@ -102,7 +100,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> implemen
    * @param relation Relation to process
    * @return range map
    */
-  protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<V> relation) {
+  protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<>();

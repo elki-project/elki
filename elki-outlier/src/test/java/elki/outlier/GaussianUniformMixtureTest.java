@@ -22,7 +22,6 @@ package elki.outlier;
 
 import org.junit.Test;
 
-import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
@@ -37,7 +36,7 @@ public class GaussianUniformMixtureTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testGaussianUniformMixture() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
-    OutlierResult result = new ELKIBuilder<GaussianUniformMixture<DoubleVector>>(GaussianUniformMixture.class).build().autorun(db);
+    OutlierResult result = new ELKIBuilder<>(GaussianUniformMixture.class).build().autorun(db);
     assertAUC(db, "Noise", result, 0.9932512);
     assertSingleScore(result, 1025, -20.131949);
   }

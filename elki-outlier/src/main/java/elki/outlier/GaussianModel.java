@@ -56,12 +56,10 @@ import net.jafama.FastMath;
  * 
  * @author Lisa Reichert
  * @since 0.3
- * 
- * @param <V> Vector type
  */
 @Title("Gaussian Model Outlier Detection")
 @Description("Fit a multivariate gaussian model onto the data, and use the PDF to compute an outlier score.")
-public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
+public class GaussianModel implements OutlierAlgorithm {
   /**
    * Invert the result
    */
@@ -88,7 +86,7 @@ public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
    * @param relation Data relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<V> relation) {
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     DoubleMinMax mm = new DoubleMinMax();
     // resulting scores
     WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
@@ -111,7 +109,6 @@ public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
       // Gaussian PDF
       final double mDist = transposeTimesTimes(x, covarianceTransposed, x);
       final double prob = fakt * FastMath.exp(-mDist * .5);
-
       mm.put(prob);
       oscores.putDouble(iditer, prob);
     }
@@ -136,12 +133,15 @@ public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
    * 
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * OptionID for inversion flag.
      */
     public static final OptionID INVERT_ID = new OptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
 
+    /**
+     * Invert the output range.
+     */
     protected boolean invert = false;
 
     @Override
@@ -150,8 +150,8 @@ public class GaussianModel<V extends NumberVector> implements OutlierAlgorithm {
     }
 
     @Override
-    public GaussianModel<V> make() {
-      return new GaussianModel<>(invert);
+    public GaussianModel make() {
+      return new GaussianModel(invert);
     }
   }
 }
