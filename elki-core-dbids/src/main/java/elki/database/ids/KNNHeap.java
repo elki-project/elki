@@ -31,9 +31,8 @@ package elki.database.ids;
  *
  * @opt nodefillcolor LemonChiffon
  * @assoc - "serializes to" - KNNList
- * @composed - - - DoubleDBIDPair
  */
-public interface KNNHeap {
+public interface KNNHeap extends DBIDRef {
   /**
    * Serialize to a {@link KNNList}. This empties the heap!
    *
@@ -64,6 +63,14 @@ public interface KNNHeap {
   double getKNNDistance();
 
   /**
+   * Get the topmost distance (for fewer than k entries, return the largest of
+   * the current set of candidates).
+   *
+   * @return distance
+   */
+  double maxDistance();
+
+  /**
    * Add a distance-id pair to the heap unless the distance is too large.
    * <p>
    * Compared to the super.add() method, this often saves the pair construction.
@@ -73,15 +80,6 @@ public interface KNNHeap {
    * @return current k-distance
    */
   double insert(double distance, DBIDRef id);
-
-  /**
-   * Add a distance-id pair to the heap unless the distance is too large.
-   * <p>
-   * Use for existing pairs.
-   *
-   * @param e Existing distance pair
-   */
-  void insert(DoubleDBIDPair e);
 
   /**
    * Current size of heap.

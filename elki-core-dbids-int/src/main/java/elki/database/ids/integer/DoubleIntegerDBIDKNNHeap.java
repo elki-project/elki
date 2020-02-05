@@ -24,10 +24,10 @@ import java.util.Arrays;
 
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.DoubleDBIDPair;
 import elki.database.ids.KNNHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
+
 import net.jafama.FastMath;
 
 /**
@@ -73,8 +73,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
    * Constructor.
    *
-   * @param k
-   *        Size of knn.
+   * @param k Size of knn.
    */
   protected DoubleIntegerDBIDKNNHeap(int k) {
     super();
@@ -111,35 +110,11 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     return kdist;
   }
 
-  @Override
-  public void insert(final DoubleDBIDPair e) {
-    final double distance = e.doubleValue();
-    final int iid = e.internalGetIndex();
-    if(heap.size() < k) {
-      heap.add(distance, iid);
-      if(heap.size() >= k) {
-        kdist = heap.peekKey();
-      }
-      return;
-    }
-    // Tied with top:
-    if(distance >= kdist) {
-      if(distance == kdist) {
-        addToTies(iid);
-      }
-      return;
-    }
-    // Old top element: (kdist, previd)
-    updateHeap(distance, iid);
-  }
-
   /**
    * Do a full update for the heap.
    *
-   * @param distance
-   *        Distance
-   * @param iid
-   *        Object id
+   * @param distance Distance
+   * @param iid Object id
    */
   private void updateHeap(final double distance, final int iid) {
     final double prevdist = kdist;
@@ -158,8 +133,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
    * Ensure the ties array has capacity for at least one more element.
    *
-   * @param id
-   *        Id to add
+   * @param id Id to add
    */
   private void addToTies(int id) {
     if(ties.length == numties) {
@@ -234,22 +208,14 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     return ret;
   }
 
-  /**
-   * Peek the topmost distance.
-   *
-   * @return distance
-   */
-  protected double peekDistance() {
-    return (numties > 0) ? kdist : heap.peekKey();
+  @Override
+  public double maxDistance() {
+    return heap.isEmpty() ? Double.NaN : heap.peekKey();
   }
 
-  /**
-   * Peek the topmost internal ID.
-   *
-   * @return internal id
-   */
-  protected int peekInternalDBID() {
-    return (numties > 0) ? ties[numties - 1] : heap.peekValue();
+  @Override
+  public int internalGetIndex() {
+    return (numties > 0) ? ties[numties - 1] : heap.isEmpty() ? Integer.MIN_VALUE : heap.peekValue();
   }
 
   @Override
