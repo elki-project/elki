@@ -105,7 +105,7 @@ public class UncertainBoundingBoxVisualization implements VisFactory {
     /**
      * The representation we visualize
      */
-    final protected Relation<? extends UncertainObject> rel;
+    protected final Relation<? extends UncertainObject> rel;
 
     /**
      * Constructor.

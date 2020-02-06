@@ -125,7 +125,6 @@ public class OutlierSmROCCurve implements Evaluator {
         else {
           negcnt += 1;
         }
-        continue;
       }
       else {
         // Add point for *previous* result (since we are no longer tied with it)

@@ -46,7 +46,7 @@ public abstract class AbstractDatabaseDistance<O> implements Distance<O> {
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O> implements DatabaseDistanceQuery<O> {
+  public abstract static class Instance<O> implements DatabaseDistanceQuery<O> {
     /**
      * Relation to query.
      */

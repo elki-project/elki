@@ -89,6 +89,6 @@ public class WrappedRangeDBIDByLookup<O> implements RangeSearcher<DBIDRef> {
    */
   public static <O> RangeSearcher<DBIDRef> wrap(Relation<? extends O> relation, RangeSearcher<O> inner) {
     return inner == null ? null : inner instanceof LinearScanQuery //
-        ? new Linear<O>(relation, inner) : new WrappedRangeDBIDByLookup<O>(relation, inner);
+        ? new Linear<>(relation, inner) : new WrappedRangeDBIDByLookup<>(relation, inner);
   }
 }

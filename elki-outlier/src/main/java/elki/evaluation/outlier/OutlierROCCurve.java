@@ -149,8 +149,7 @@ public class OutlierROCCurve implements Evaluator {
     }
 
     if(nonefound) {
-      return;
-      // logger.warning("No results found to process with ROC curve analyzer.
+      // LOG.warning("No results found to process with ROC curve analyzer.
       // Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
   }

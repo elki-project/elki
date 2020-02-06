@@ -117,12 +117,12 @@ public class UncertainSamplesVisualization implements VisFactory {
     /**
      * The representation we visualize
      */
-    final protected Relation<? extends UncertainObject> rel;
+    protected final Relation<? extends UncertainObject> rel;
 
     /**
      * Random factory.
      */
-    final protected RandomFactory random = RandomFactory.DEFAULT;
+    protected final RandomFactory random = RandomFactory.DEFAULT;
 
     /**
      * Constructor.

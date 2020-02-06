@@ -225,26 +225,24 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    *         cannot be found.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-
     // TODO: do we need to write/read the capacity?
     final int capacity = in.readInt();
     if(isLeaf()) {
-      entries = (E[]) new SpatialPointLeafEntry[capacity];
+      entries = new SpatialPointLeafEntry[capacity];
       for(int i = 0; i < numEntries; i++) {
         SpatialPointLeafEntry s = new SpatialPointLeafEntry();
         s.readExternal(in);
-        entries[i] = (E) s;
+        entries[i] = s;
       }
     }
     else {
-      entries = (E[]) new SpatialDirectoryEntry[capacity];
+      entries = new SpatialDirectoryEntry[capacity];
       for(int i = 0; i < numEntries; i++) {
         SpatialDirectoryEntry s = new SpatialDirectoryEntry();
         s.readExternal(in);
-        entries[i] = (E) s;
+        entries[i] = s;
       }
     }
   }

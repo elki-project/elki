@@ -142,7 +142,7 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
     double logDet = 0;
     if(prior > 0 && priordiag != null) {
       // MAP
-      double nu = dim + 2; // Popular default.
+      double nu = dim + 2.; // Popular default.
       double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
         double v = (variances[i] + prior * priordiag[i]);

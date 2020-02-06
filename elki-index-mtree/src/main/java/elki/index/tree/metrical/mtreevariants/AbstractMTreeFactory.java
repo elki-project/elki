@@ -108,7 +108,7 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
           .grab(config, x -> settings.insertStrategy = x);
     }
 
-    abstract protected S makeSettings();
+    protected abstract S makeSettings();
 
     @Override
     public abstract AbstractMTreeFactory<O, N, E, ?> make();

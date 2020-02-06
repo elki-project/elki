@@ -142,7 +142,6 @@ public class CanopyPreClustering<O> implements ClusteringAlgorithm<Clustering<Pr
           iter.remove();
         }
       }
-      // TODO: remember the central object using a CanopyModel?
       // Construct cluster:
       clusters.add(new Cluster<>(cids, new SimplePrototypeModel<>(relation.get(first))));
 

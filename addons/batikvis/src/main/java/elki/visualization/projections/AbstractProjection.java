@@ -33,7 +33,7 @@ public abstract class AbstractProjection implements Projection {
   /**
    * Scales in data set
    */
-  final protected LinearScale[] scales;
+  protected final LinearScale[] scales;
 
   /**
    * Projector used

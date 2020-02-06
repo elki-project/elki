@@ -268,7 +268,7 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
     /**
      * Nested similarity function.
      */
-    final protected Similarity<? super O> similarityFunction;
+    protected final Similarity<? super O> similarityFunction;
 
     /**
      * Constructor.

@@ -89,6 +89,6 @@ public class WrappedKNNDBIDByLookup<O> implements KNNSearcher<DBIDRef> {
    */
   public static <O> KNNSearcher<DBIDRef> wrap(Relation<? extends O> relation, KNNSearcher<O> inner) {
     return inner == null ? null : inner instanceof LinearScanQuery //
-        ? new Linear<O>(relation, inner) : new WrappedKNNDBIDByLookup<O>(relation, inner);
+        ? new Linear<>(relation, inner) : new WrappedKNNDBIDByLookup<>(relation, inner);
   }
 }

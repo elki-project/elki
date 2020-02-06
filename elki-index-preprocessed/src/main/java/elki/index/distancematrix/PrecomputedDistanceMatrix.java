@@ -469,7 +469,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     /**
      * Nested distance function.
      */
-    final protected Distance<? super O> distance;
+    protected final Distance<? super O> distance;
 
     /**
      * Constructor.

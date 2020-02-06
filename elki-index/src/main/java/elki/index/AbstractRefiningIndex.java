@@ -66,7 +66,7 @@ public abstract class AbstractRefiningIndex<O> implements Index {
    * 
    * @return Logger
    */
-  abstract public Logging getLogger();
+  public abstract Logging getLogger();
 
   /**
    * Increment the refinement counter, if in use.

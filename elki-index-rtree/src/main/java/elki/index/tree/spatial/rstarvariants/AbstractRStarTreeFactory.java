@@ -119,7 +119,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
      * 
      * @return Settings instance.
      */
-    abstract protected S createSettings();
+    protected abstract S createSettings();
 
     @Override
     public void configure(Parameterization config) {

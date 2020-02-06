@@ -340,7 +340,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
     /**
      * LIFO stack of open nodes.
      */
-    private ArrayList<Node> open = new ArrayList<Node>();
+    private ArrayList<Node> open = new ArrayList<>();
 
     /**
      * Temporary storage.

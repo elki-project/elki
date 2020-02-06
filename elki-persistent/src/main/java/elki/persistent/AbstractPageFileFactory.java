@@ -84,6 +84,6 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     }
 
     @Override
-    abstract public PageFileFactory<P> make();
+    public abstract PageFileFactory<P> make();
   }
 }

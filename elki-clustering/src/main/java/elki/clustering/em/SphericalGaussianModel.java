@@ -128,7 +128,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
     this.weight = weight;
     double logDet = 0.;
     if(prior > 0) { // MAP
-      double nu = dim + 2; // Popular default.F
+      double nu = dim + 2.; // Popular default.
       variance /= dim;
       logDet = FastMath.log(variance = (variance + prior * priorvar) / (wsum + prior * (nu + dim + 2)));
     }

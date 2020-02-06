@@ -38,12 +38,12 @@ public class PrimitiveSimilarityQuery<O> implements SimilarityQuery<O> {
   /**
    * The data to use for this query
    */
-  final protected Relation<? extends O> relation;
+  protected final Relation<? extends O> relation;
 
   /**
    * The distance function we use.
    */
-  final protected PrimitiveSimilarity<? super O> similarityFunction;
+  protected final PrimitiveSimilarity<? super O> similarityFunction;
 
   /**
    * Constructor.

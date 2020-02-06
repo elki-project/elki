@@ -56,7 +56,7 @@ import elki.utilities.documentation.Title;
     booktitle = "Proc. Int. Conf. Very Large Data Bases (VLDB'97)", //
     url = "http://www.vldb.org/conf/1997/P426.PDF", //
     bibkey = "DBLP:conf/vldb/CiacciaPZ97")
-abstract public class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
+public abstract class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry, MTreeSettings<O, MTreeNode<O>, MTreeEntry>> {
   /**
    * The logger for this class.
    */

@@ -139,7 +139,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
     }, // Minimum Variance, Wishart (1969), Anderson (1971)
     ;
 
-    abstract public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy);
+    public abstract double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy);
   }
 
   /**

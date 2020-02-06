@@ -23,9 +23,7 @@ package elki.index.tree.spatial.rstarvariants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 import elki.data.HyperBoundingBox;
 import elki.data.ModifiableHyperBoundingBox;
@@ -210,11 +208,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     writeNode(leaf);
 
     // condense the tree
-    Stack<N> stack = new Stack<>();
+    ArrayDeque<N> stack = new ArrayDeque<>();
     condenseTree(deletionPath.getParentPath(), stack);
 
     // reinsert underflow nodes
-    while(!stack.empty()) {
+    while(!stack.isEmpty()) {
       N node = stack.pop();
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
@@ -593,7 +591,6 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   public void reInsert(N node, IndexTreePath<E> path, int[] offs) {
     final int depth = path.getPathCount();
-
     long[] remove = BitsUtil.zero(node.getCapacity());
     List<E> reInsertEntries = new ArrayList<>(offs.length);
     for(int i = 0; i < offs.length; i++) {
@@ -717,7 +714,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param stack the stack holding the nodes to be reinserted after the tree
    *        has been condensed
    */
-  private void condenseTree(IndexTreePath<E> subtree, Stack<N> stack) {
+  private void condenseTree(IndexTreePath<E> subtree, ArrayDeque<N> stack) {
     N node = getNode(subtree.getEntry());
     // node is not root
     if(!isRoot(node)) {

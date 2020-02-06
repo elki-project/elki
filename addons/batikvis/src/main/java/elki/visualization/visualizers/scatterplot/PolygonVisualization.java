@@ -108,7 +108,7 @@ public class PolygonVisualization implements VisFactory {
     /**
      * The representation we visualize
      */
-    final protected Relation<PolygonsObject> rep;
+    protected final Relation<PolygonsObject> rep;
 
     /**
      * Constructor.

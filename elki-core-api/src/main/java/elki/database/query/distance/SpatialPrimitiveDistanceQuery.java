@@ -27,6 +27,7 @@ import elki.distance.SpatialPrimitiveDistance;
 
 /**
  * Distance query for spatial distance functions
+ *
  * @author Erich Schubert
  * @since 0.4.0
  *
@@ -38,7 +39,7 @@ public class SpatialPrimitiveDistanceQuery<V extends SpatialComparable> extends 
   /**
    * The distance function we use.
    */
-  final protected SpatialPrimitiveDistance<? super V> distanceFunction;
+  protected final SpatialPrimitiveDistance<? super V> distanceFunction;
   
   /**
    * @param relation Representation to use

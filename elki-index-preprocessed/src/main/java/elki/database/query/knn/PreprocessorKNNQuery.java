@@ -43,7 +43,7 @@ public class PreprocessorKNNQuery<O> implements KNNSearcher<DBIDRef> {
   /**
    * The data to use for this query
    */
-  final protected Relation<? extends O> relation;
+  protected final Relation<? extends O> relation;
 
   /**
    * The last preprocessor result

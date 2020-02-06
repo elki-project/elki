@@ -89,6 +89,6 @@ public class WrappedRKNNDBIDByLookup<O> implements RKNNSearcher<DBIDRef> {
    */
   public static <O> RKNNSearcher<DBIDRef> wrap(Relation<? extends O> relation, RKNNSearcher<O> inner) {
     return inner == null ? null : inner instanceof LinearScanQuery //
-        ? new Linear<O>(relation, inner) : new WrappedRKNNDBIDByLookup<O>(relation, inner);
+        ? new Linear<>(relation, inner) : new WrappedRKNNDBIDByLookup<>(relation, inner);
   }
 }

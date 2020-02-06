@@ -220,7 +220,7 @@ public class COP<V extends NumberVector> implements OutlierAlgorithm {
           double dev = projected[d];
           // Scale with variance and accumulate
           sqdevs += dev * dev / evs[d];
-          scores[d] = 1 - ChiSquaredDistribution.cdf(sqdevs, d + 1);
+          scores[d] = 1 - ChiSquaredDistribution.cdf(sqdevs, d + 1.);
         }
       }
       else {

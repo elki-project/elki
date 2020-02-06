@@ -108,14 +108,14 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    * @param pointerresult Hierarchical result in pointer representation.
    * @return Clustering
    */
-  abstract public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult);
+  public abstract Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult);
 
   /**
    * Instance for a single data set.
    * 
    * @author Erich Schubert
    */
-  abstract public class Instance {
+  public abstract class Instance {
     /**
      * Unordered IDs
      */
@@ -379,7 +379,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      * @param it Iterator on this list (reused)
      * @return Splitting point
      */
-    abstract protected int findSplit(DBIDArrayIter it);
+    protected abstract int findSplit(DBIDArrayIter it);
 
     /**
      * Make the cluster for the given object
@@ -421,14 +421,14 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     return algorithm.getInputTypeRestriction();
   }
 
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
    * Parameterization class.
    *
    * @author Erich Schubert
    */
-  abstract public static class Par implements Parameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter to configure the output mode (nested or truncated clusters).
      */

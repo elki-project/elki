@@ -49,7 +49,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
   /**
    * The filters to invoke
    */
-  final protected List<? extends DatabaseConnection> sources;
+  protected final List<? extends DatabaseConnection> sources;
 
   /**
    * Constructor.

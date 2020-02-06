@@ -152,6 +152,6 @@ public class WrappedPrioritySearchDBIDByLookup<O> implements PrioritySearcher<DB
    */
   public static <O> PrioritySearcher<DBIDRef> wrap(Relation<? extends O> relation, PrioritySearcher<O> inner) {
     return inner == null ? null : inner instanceof LinearScanQuery //
-        ? new Linear<O>(relation, inner) : new WrappedPrioritySearchDBIDByLookup<O>(relation, inner);
+        ? new Linear<>(relation, inner) : new WrappedPrioritySearchDBIDByLookup<>(relation, inner);
   }
 }

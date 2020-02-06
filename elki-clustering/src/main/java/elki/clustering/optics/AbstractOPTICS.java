@@ -118,7 +118,7 @@ public abstract class AbstractOPTICS<O> implements OPTICSTypeAlgorithm {
    * 
    * @param <O> Object type
    */
-  public static abstract class Par<O> implements Parameterizer {
+  public abstract static class Par<O> implements Parameterizer {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered, must be suitable to the distance function specified.

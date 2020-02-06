@@ -40,7 +40,7 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
   /**
    * The current projection
    */
-  final protected Projection1D proj;
+  protected final Projection1D proj;
 
   /**
    * Constructor.

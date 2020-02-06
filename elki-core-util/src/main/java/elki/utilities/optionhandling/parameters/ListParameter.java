@@ -79,5 +79,5 @@ public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> exte
    *
    * @return Size
    */
-  abstract public int size();
+  public abstract int size();
 }

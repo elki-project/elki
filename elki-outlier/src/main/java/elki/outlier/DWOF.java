@@ -216,10 +216,10 @@ public class DWOF<O> implements OutlierAlgorithm {
           if(DBIDUtil.equal(neighbor1, neighbor2) || DBIDUtil.equal(neighbor2, iter)) {
             continue;
           }
-          double distance = distFunc.distance(neighbor1, neighbor2);
-          mean.put(distance);
-          if(distance > 0. && distance < absoluteMinDist) {
-            absoluteMinDist = distance;
+          double dist = distFunc.distance(neighbor1, neighbor2);
+          mean.put(dist);
+          if(dist > 0. && dist < absoluteMinDist) {
+            absoluteMinDist = dist;
           }
         }
       }

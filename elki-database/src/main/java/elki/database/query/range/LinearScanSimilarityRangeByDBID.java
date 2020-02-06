@@ -40,7 +40,7 @@ public class LinearScanSimilarityRangeByDBID<O> implements RangeSearcher<DBIDRef
   /**
    * Hold the similarity function to be used.
    */
-  final protected SimilarityQuery<O> simQuery;
+  protected final SimilarityQuery<O> simQuery;
 
   /**
    * Constructor.

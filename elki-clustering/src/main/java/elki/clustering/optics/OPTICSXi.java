@@ -175,7 +175,7 @@ public class OPTICSXi implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
     ClusterHierarchyBuilder builder = new ClusterHierarchyBuilder(clusterOrder);
 
     double mib = 0.0;
-    List<SteepArea> salist = keepsteep ? new ArrayList<SteepArea>() : null;
+    List<SteepArea> salist = keepsteep ? new ArrayList<>() : null;
     List<SteepDownArea> sdaset = new ArrayList<>();
 
     for(SteepScanPosition scan = new SteepScanPosition(clusterOrderResult); scan.hasNext();) {

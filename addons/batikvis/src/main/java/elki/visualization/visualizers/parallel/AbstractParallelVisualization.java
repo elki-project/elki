@@ -48,12 +48,12 @@ public abstract class AbstractParallelVisualization<NV> extends AbstractVisualiz
   /**
    * The current projection
    */
-  final protected ProjectionParallel proj;
+  protected final ProjectionParallel proj;
 
   /**
    * The representation we visualize
    */
-  final protected Relation<NV> relation;
+  protected final Relation<NV> relation;
 
   /**
    * margin

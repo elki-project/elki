@@ -120,7 +120,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   /**
    * Our context
    */
-  final protected VisualizerContext context;
+  protected final VisualizerContext context;
 
   /**
    * The actual visualization instance, for a single projection

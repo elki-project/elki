@@ -47,7 +47,7 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
   /**
    * Class logger.
    */
-  private static Logging LOG = Logging.getLogger(TwoPassMultivariateGaussianModel.class);
+  private static final Logging LOG = Logging.getLogger(TwoPassMultivariateGaussianModel.class);
 
   /**
    * Constant to avoid singular matrixes.
@@ -199,7 +199,7 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
     assert (f > 0) : wsum;
     if(prior > 0 && priormatrix != null) {
       // MAP
-      double nu = dim + 2; // Popular default.
+      double nu = dim + 2.; // Popular default.
       double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
         double[] row_i = covariance[i], pri_i = priormatrix[i];
@@ -230,9 +230,8 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
    * Update the cholesky decomposition.
    */
   private void updateCholesky() {
-    // TODO: further improve handling of degenerated cases?
-    CholeskyDecomposition chol = new CholeskyDecomposition(covariance);
-    if(!chol.isSPD()) {
+    CholeskyDecomposition nextchol = new CholeskyDecomposition(covariance);
+    if(!nextchol.isSPD()) {
       // Add a small value to the diagonal, to reduce some rounding problems.
       double s = 0.;
       for(int i = 0; i < covariance.length; i++) {
@@ -242,14 +241,14 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
       for(int i = 0; i < covariance.length; i++) {
         covariance[i][i] += s;
       }
-      chol = new CholeskyDecomposition(covariance);
+      nextchol = new CholeskyDecomposition(covariance);
     }
-    if(!chol.isSPD()) {
+    if(!nextchol.isSPD()) {
       LOG.warning("A cluster has degenerated, likely due to lack of variance in a subset of the data or too extreme magnitude differences.\n" + //
           "The algorithm will likely stop without converging, and fail to produce a good fit.");
-      chol = this.chol != null ? this.chol : chol; // Prefer previous
+      nextchol = this.chol != null ? this.chol : nextchol; // Prefer previous
     }
-    this.chol = chol;
+    this.chol = nextchol;
     logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 
@@ -276,7 +275,6 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    // TODO: this allocates one array.
     return squareSum(chol.solveLInplace(minusEquals(vec.toArray(), mean)));
   }
 

@@ -152,9 +152,7 @@ public class ComputeOutlierHistogram implements Evaluator {
       };
     }
     else {
-      hist = new ObjHistogram<double[]>(bins, min, max, () -> {
-        return new double[2];
-      });
+      hist = new ObjHistogram<>(bins, min, max, () -> new double[2]);
     }
 
     // first fill histogram only with values of outliers

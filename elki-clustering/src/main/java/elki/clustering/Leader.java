@@ -174,7 +174,7 @@ public class Leader<O> implements ClusteringAlgorithm<Clustering<PrototypeModel<
 
     @Override
     public Leader<O> make() {
-      return new Leader<O>(distance, threshold);
+      return new Leader<>(distance, threshold);
     }
   }
 }

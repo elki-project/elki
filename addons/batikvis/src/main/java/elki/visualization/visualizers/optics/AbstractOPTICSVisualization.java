@@ -44,7 +44,7 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
   /**
    * The plot
    */
-  final protected OPTICSProjection optics;
+  protected final OPTICSProjection optics;
 
   /**
    * Width of plot (in display units)

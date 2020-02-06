@@ -80,7 +80,7 @@ public abstract class AbstractIndexBasedDistance<O, F extends IndexFactory<O>> e
    * @param <I> Index type
    * @param <F> Distance function type
    */
-  abstract public static class Instance<O, I extends Index, F extends Distance<? super O>> implements IndexBasedDistance.Instance<O, I> {
+  public abstract static class Instance<O, I extends Index, F extends Distance<? super O>> implements IndexBasedDistance.Instance<O, I> {
     /**
      * Relation to query.
      */

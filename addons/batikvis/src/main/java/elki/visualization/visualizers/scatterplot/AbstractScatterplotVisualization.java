@@ -52,17 +52,17 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
   /**
    * The current projection
    */
-  final protected Projection2D proj;
+  protected final Projection2D proj;
 
   /**
    * The representation we visualize
    */
-  final protected Relation<? extends NumberVector> rel;
+  protected final Relation<? extends NumberVector> rel;
 
   /**
    * The DBID sample
    */
-  final protected SamplingResult sample;
+  protected final SamplingResult sample;
 
   /**
    * Constructor.

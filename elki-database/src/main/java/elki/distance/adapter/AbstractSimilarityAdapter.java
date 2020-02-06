@@ -75,7 +75,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
   }
 
   @Override
-  abstract public <T extends O> DistanceQuery<T> instantiate(Relation<T> database);
+  public abstract <T extends O> DistanceQuery<T> instantiate(Relation<T> database);
 
   @Override
   public boolean equals(Object obj) {

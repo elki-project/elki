@@ -202,7 +202,6 @@ public class OutlierRankingEvaluation implements Evaluator {
     }
 
     if(nonefound) {
-      return;
       // LOG.warning("No results found to process with ROC curve analyzer. Got
       // "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }

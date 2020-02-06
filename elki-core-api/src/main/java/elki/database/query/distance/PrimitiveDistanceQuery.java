@@ -39,12 +39,12 @@ public class PrimitiveDistanceQuery<O> implements DistanceQuery<O> {
   /**
    * The data to use for this query
    */
-  final protected Relation<? extends O> relation;
+  protected final Relation<? extends O> relation;
 
   /**
    * The distance function we use.
    */
-  final protected PrimitiveDistance<? super O> distanceFunction;
+  protected final PrimitiveDistance<? super O> distanceFunction;
 
   /**
    * Constructor.

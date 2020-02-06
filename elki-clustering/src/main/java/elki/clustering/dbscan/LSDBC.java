@@ -89,7 +89,7 @@ public class LSDBC<O extends NumberVector> implements ClusteringAlgorithm<Cluste
   /**
    * Class logger.
    */
-  private static Logging LOG = Logging.getLogger(LSDBC.class);
+  private static final Logging LOG = Logging.getLogger(LSDBC.class);
 
   /**
    * Number of neighbors (+ query point)

@@ -36,7 +36,7 @@ public class PreprocessorRKNNQuery<O> implements RKNNSearcher<DBIDRef> {
   /**
    * The data to use for this query
    */
-  final protected Relation<? extends O> relation;
+  protected final Relation<? extends O> relation;
 
   /**
    * The last preprocessor result

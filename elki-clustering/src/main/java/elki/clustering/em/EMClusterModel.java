@@ -56,7 +56,7 @@ public interface EMClusterModel<O, M extends Model> {
    */
   default void firstPassE(O vec, double weight) {
     // empty.
-  };
+  }
 
   /**
    * Finalize the first pass of the E step.

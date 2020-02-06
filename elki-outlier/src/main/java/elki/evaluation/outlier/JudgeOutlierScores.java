@@ -92,12 +92,10 @@ public class JudgeOutlierScores implements Evaluator {
    * @param outlierIds Outlier IDs
    * @param or Outlier Result to evaluate
    * @return Outlier score result
-   * @throws IllegalStateException
    */
-  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, OutlierResult or) throws IllegalStateException {
+  protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, OutlierResult or) {
     if(scaling instanceof OutlierScaling) {
-      OutlierScaling oscaling = (OutlierScaling) scaling;
-      oscaling.prepare(or);
+      ((OutlierScaling) scaling).prepare(or);
     }
 
     final ScalingFunction innerScaling;
@@ -110,12 +108,7 @@ public class JudgeOutlierScores implements Evaluator {
       LOG.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
     }
     else {
-      if(min == 0.0 && max == 1.0) {
-        innerScaling = new IdentityScaling();
-      }
-      else {
-        innerScaling = new LinearScaling(1.0 / (max - min), -min);
-      }
+      innerScaling = (min == 0.0 && max == 1.0) ? new IdentityScaling() : new LinearScaling(1.0 / (max - min), -min);
     }
 
     double posscore = 0.0;
@@ -145,7 +138,7 @@ public class JudgeOutlierScores implements Evaluator {
   public void processNewResult(Object result) {
     Database db = ResultUtil.findDatabase(result);
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if (ors == null || ors.isEmpty()) {
+    if(ors == null || ors.isEmpty()) {
       return;
     }
 
@@ -153,7 +146,7 @@ public class JudgeOutlierScores implements Evaluator {
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 
-    for (OutlierResult or : ors) {
+    for(OutlierResult or : ors) {
       Metadata.hierarchyOf(or).addChild(computeScore(ids, outlierIds, or));
     }
   }

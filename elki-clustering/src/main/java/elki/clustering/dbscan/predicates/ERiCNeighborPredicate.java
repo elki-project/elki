@@ -191,11 +191,7 @@ public class ERiCNeighborPredicate implements NeighborPredicate<DBIDs> {
      * @return {@code true} when the two vectors are close enough.
      */
     public boolean strongNeighbors(NumberVector v1, NumberVector v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
-      if(pca1.getCorrelationDimension() != pca2.getCorrelationDimension()) {
-        return false;
-      }
-
-      if(!approximatelyLinearDependent(pca1, pca2) || !approximatelyLinearDependent(pca2, pca1)) {
+      if(pca1.getCorrelationDimension() != pca2.getCorrelationDimension() || !approximatelyLinearDependent(pca1, pca2) || !approximatelyLinearDependent(pca2, pca1)) {
         return false;
       }
 
@@ -233,14 +229,14 @@ public class ERiCNeighborPredicate implements NeighborPredicate<DBIDs> {
      * up the same space. Note, that the first PCA must have at least as many
      * strong eigenvectors than the second PCA.
      * 
-     * @param pca1 first PCA
-     * @param pca2 second PCA
+     * @param p1 first PCA
+     * @param p2 second PCA
      * @return true, if the strong eigenvectors of the two specified PCAs span
      *         up the same space
      */
-    protected boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
-      double[][] m1_czech = pca1.dissimilarityMatrix();
-      double[][] v2_strong = pca2.getStrongEigenvectors();
+    protected boolean approximatelyLinearDependent(PCAFilteredResult p1, PCAFilteredResult p2) {
+      double[][] m1_czech = p1.dissimilarityMatrix();
+      double[][] v2_strong = p2.getStrongEigenvectors();
       for(int i = 0; i < v2_strong.length; i++) {
         double[] v2_i = v2_strong[i];
         // check, if distance of v2_i to the space of pca_1 > delta

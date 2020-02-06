@@ -105,6 +105,6 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
     }
 
     @Override
-    abstract public MTreeSplit<E, N> make();
+    public abstract MTreeSplit<E, N> make();
   }
 }

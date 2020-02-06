@@ -40,12 +40,12 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
   /**
    * The distance function we use.
    */
-  final protected DBIDRangeDistance distanceFunction;
+  protected final DBIDRangeDistance distanceFunction;
 
   /**
    * The DBID range we are accessing.
    */
-  final protected DBIDRange range;
+  protected final DBIDRange range;
 
   /**
    * Constructor.

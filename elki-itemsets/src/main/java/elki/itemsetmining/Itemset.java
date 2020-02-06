@@ -88,7 +88,7 @@ public abstract class Itemset implements Comparable<Itemset> {
    *
    * @return Itemset length
    */
-  abstract public int length();
+  public abstract int length();
 
   /**
    * Get the items.

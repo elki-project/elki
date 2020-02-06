@@ -45,17 +45,17 @@ public class DragableArea implements EventListener {
   /**
    * Our element node.
    */
-  final protected Element element;
+  protected final Element element;
 
   /**
    * The coordinate system node.
    */
-  final protected Element coordref;
+  protected final Element coordref;
 
   /**
    * The plot we are attached to.
    */
-  final protected SVGPlot svgp;
+  protected final SVGPlot svgp;
 
   /**
    * The point where the drag started.

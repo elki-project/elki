@@ -106,7 +106,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
    * 
    * @return Logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
    * Normalize a single instance.

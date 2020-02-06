@@ -39,7 +39,7 @@ public class LinearScanSimilarityRangeByObject<O> implements RangeSearcher<O>, L
   /**
    * Hold the similarity function to be used.
    */
-  final protected SimilarityQuery<O> simQuery;
+  protected final SimilarityQuery<O> simQuery;
 
   /**
    * Constructor.

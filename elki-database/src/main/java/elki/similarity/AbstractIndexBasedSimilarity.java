@@ -58,7 +58,7 @@ public abstract class AbstractIndexBasedSimilarity<O, F extends IndexFactory<O>>
   }
 
   @Override
-  abstract public <T extends O> Instance<T, ?> instantiate(Relation<T> database);
+  public abstract <T extends O> Instance<T, ?> instantiate(Relation<T> database);
 
   @Override
   public boolean isSymmetric() {
@@ -80,7 +80,7 @@ public abstract class AbstractIndexBasedSimilarity<O, F extends IndexFactory<O>>
    * @param <O> Object type
    * @param <I> Index type
    */
-  abstract public static class Instance<O, I extends Index> implements IndexBasedSimilarity.Instance<O, I> {
+  public abstract static class Instance<O, I extends Index> implements IndexBasedSimilarity.Instance<O, I> {
     /**
      * Relation to query.
      */

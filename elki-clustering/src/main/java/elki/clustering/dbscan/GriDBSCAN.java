@@ -160,12 +160,12 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
       return result;
     }
 
-    double gridwidth = this.gridwidth; // local copy.
-    if(gridwidth < 2. * epsilon) {
+    double adjgridwidth = this.gridwidth; // local copy.
+    if(adjgridwidth < 2. * epsilon) {
       LOG.warning("Invalid grid width (less than 2*epsilon, recommended 10*epsilon). Increasing grid width automatically.");
-      gridwidth = 2. * epsilon;
+      adjgridwidth = 2. * epsilon;
     }
-    return new Instance<V>(distance, epsilon, minpts, gridwidth).run(relation);
+    return new Instance<V>(distance, epsilon, minpts, adjgridwidth).run(relation);
   }
 
   /**
@@ -373,7 +373,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
      * @return Total number of grid cells
      */
     private long computeGridBaseOffsets(int size) {
-      StringBuffer buf = LOG.isDebuggingFinest() ? new StringBuffer() : null;
+      StringBuilder buf = LOG.isDebuggingFinest() ? new StringBuilder() : null;
       double[] min = domain[0], max = domain[1];
       long total = 1;
       for(int d = 0; d < dim; d++) {
@@ -383,8 +383,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
         }
         int c = cells[d] = Math.max(1, (int) FastMath.ceil(wi / gridwidth));
         offset[d] = mi - (c * gridwidth - wi) * .5;
-        assert (offset[d] <= mi) : "Grid inconsistent.";
-        assert (offset[d] + c * gridwidth >= ma) : "Grid inconsistent.";
+        assert (offset[d] <= mi) || (offset[d] + c * gridwidth >= ma) : "Grid inconsistent.";
         total *= c;
         if(total < 0) {
           LOG.warning("Excessive amount of grid cells (long overflow)! Use larger grid cells.");
@@ -424,7 +423,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
      * @param offset Offset
      */
     protected void buildGrid(Relation<V> relation, int numcells, double[] offset) {
-      grid = new Long2ObjectOpenHashMap<ModifiableDBIDs>(numcells >>> 2);
+      grid = new Long2ObjectOpenHashMap<>(numcells >>> 2);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         V obj = relation.get(it);
         insertIntoGrid(it, obj, 0, 0);
@@ -449,11 +448,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
       for(int i = mi; i <= ma; i++) {
         int c = v * cn + i;
         if(nd == cells.length) {
-          ModifiableDBIDs ids = grid.get(c);
-          if(ids == null) {
-            grid.put(c, ids = DBIDUtil.newArray());
-          }
-          ids.add(id);
+          grid.computeIfAbsent(c, x -> DBIDUtil.newArray()).add(id);
         }
         else {
           insertIntoGrid(id, obj, nd, c);

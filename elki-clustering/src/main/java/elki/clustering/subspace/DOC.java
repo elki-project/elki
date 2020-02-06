@@ -136,7 +136,7 @@ public class DOC implements SubspaceClusteringAlgorithm<SubspaceModel> {
     ArrayModifiableDBIDs S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
-    double r = Math.abs(FastMath.log(d + d) / FastMath.log(beta * .5));
+    double r = Math.abs(FastMath.log(2. * d) / FastMath.log(beta * .5));
     // Outer loop count.
     int n = (int) (2. / alpha);
     // Inner loop count.

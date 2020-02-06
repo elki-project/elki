@@ -52,7 +52,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * The filters to invoke
    */
-  final protected List<? extends DatabaseConnection> sources;
+  protected final List<? extends DatabaseConnection> sources;
 
   /**
    * Constructor.

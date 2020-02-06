@@ -29,9 +29,9 @@ import elki.result.outlier.OutlierResult;
 /**
  * This adapter can be used for an arbitrary collection of Integers, and uses
  * that id1.compareTo(id2) != 0 for id1 != id2 to satisfy the comparability.
- * 
+ * <p>
  * Note that of course, no id should occur more than once.
- * 
+ * <p>
  * The ROC values would be incorrect then anyway!
  * 
  * @author Erich Schubert
@@ -86,17 +86,5 @@ public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
   @Override
   public DBIDRef getRef() {
     return iter;
-  }
-
-  @Deprecated
-  @Override
-  public int hashCode() {
-    return super.hashCode();
-  }
-
-  @Deprecated
-  @Override
-  public boolean equals(Object obj) {
-    return super.equals(obj);
   }
 }

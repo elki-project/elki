@@ -135,7 +135,7 @@ public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements K
      * @param b Second object
      * @return Distance
      */
-    abstract protected double distance(T a, DBIDRef b);
+    protected abstract double distance(T a, DBIDRef b);
 
     /**
      * Initialize the weight list.

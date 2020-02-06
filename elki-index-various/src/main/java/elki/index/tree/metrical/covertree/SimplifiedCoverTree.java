@@ -302,7 +302,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     /**
      * LIFO stack of open nodes.
      */
-    private ArrayList<Node> open = new ArrayList<Node>();
+    private ArrayList<Node> open = new ArrayList<>();
 
     /**
      * Temporary storage.

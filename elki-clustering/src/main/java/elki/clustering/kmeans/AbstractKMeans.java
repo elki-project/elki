@@ -847,6 +847,6 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     }
 
     @Override
-    abstract public AbstractKMeans<V, ?> make();
+    public abstract AbstractKMeans<V, ?> make();
   }
 }

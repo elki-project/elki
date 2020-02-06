@@ -57,7 +57,7 @@ public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
    * 
    * @return Logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
    * Writes a page into this file. The method tests if the page has already an

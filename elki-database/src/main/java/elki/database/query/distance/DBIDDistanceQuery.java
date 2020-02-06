@@ -38,12 +38,12 @@ public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
   /**
    * Relation to query.
    */
-  final protected Relation<DBID> relation;
+  protected final Relation<DBID> relation;
 
   /**
    * The distance function we use.
    */
-  final protected DBIDDistance distanceFunction;
+  protected final DBIDDistance distanceFunction;
 
   /**
    * Constructor.
