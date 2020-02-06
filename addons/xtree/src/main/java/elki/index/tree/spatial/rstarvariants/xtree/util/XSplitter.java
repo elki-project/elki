@@ -20,12 +20,7 @@
  */
 package elki.index.tree.spatial.rstarvariants.xtree.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import elki.data.HyperBoundingBox;
 import elki.data.ModifiableHyperBoundingBox;
@@ -40,9 +35,9 @@ import elki.index.tree.spatial.rstarvariants.xtree.XTreeDirectoryEntry;
 import elki.index.tree.spatial.rstarvariants.xtree.XTreeSettings;
 import elki.logging.Logging;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
-import elki.utilities.datastructures.heap.Heap;
-import elki.utilities.datastructures.heap.TopBoundedHeap;
-import elki.utilities.pairs.DoubleIntPair;
+import elki.utilities.datastructures.heap.DoubleIntegerHeap;
+import elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
+import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 
 import it.unimi.dsi.fastutil.ints.IntComparator;
 import it.unimi.dsi.fastutil.ints.IntIterator;
@@ -146,19 +141,20 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     double[] pqUBFirst = new double[dim];
     Arrays.fill(pqUBFirst, Double.NEGATIVE_INFINITY);
     // maintain the second entries' upper bounds
-    List<Heap<DoubleIntPair>> pqUBSecond = new ArrayList<>(dim);
+    List<DoubleIntegerHeap> pqUBSecond = new ArrayList<>(dim);
     for(int i = 0; i < dim; i++) {
-      // Descending heap
-      pqUBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries, Collections.reverseOrder()));
+      // Descending heap.
+      // FIXME: double-check that these shouldn't be swapped.
+      pqUBSecond.add(new DoubleIntegerMaxHeap(maxEntries));
     }
     // the first entries' minimum lower bounds
     double[] pqLBFirst = new double[dim];
     Arrays.fill(pqLBFirst, Double.POSITIVE_INFINITY);
     // maintain the second entries' minimum lower bounds
-    List<Heap<DoubleIntPair>> pqLBSecond = new ArrayList<>(dim);
+    List<DoubleIntegerHeap> pqLBSecond = new ArrayList<>(dim);
     for(int i = 0; i < dim; i++) {
       // Ascending heap
-      pqLBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries));
+      pqLBSecond.add(new DoubleIntegerMinHeap(maxEntries));
     }
     // initialize bounds for first entry collection
     for(int index = 0; index < minEntries; index++) {
@@ -167,8 +163,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     HyperBoundingBox mbr1 = new HyperBoundingBox(pqLBFirst, pqUBFirst);
 
     // fill bounding queues for the second entry collection
-    double[] minSecond = new double[dim];
-    double[] maxSecond = new double[dim];
+    double[] minSecond = new double[dim], maxSecond = new double[dim];
     Arrays.fill(maxSecond, Double.NEGATIVE_INFINITY);
     Arrays.fill(minSecond, Double.POSITIVE_INFINITY);
 
@@ -179,20 +174,19 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     }
     for(int i = 0; i < dim; i++) {
       // with index entrySorting.length => never to be removed
-      pqLBSecond.get(i).add(new DoubleIntPair(minSecond[i], entrySorting.length));
-      pqUBSecond.get(i).add(new DoubleIntPair(maxSecond[i], entrySorting.length));
+      pqLBSecond.get(i).add(minSecond[i], entrySorting.length, maxEntries);
+      pqUBSecond.get(i).add(maxSecond[i], entrySorting.length, maxEntries);
     }
     // add the entries to be removed later on
     for(int index = minEntries; index < maxEntries; index++) {
-      add2MBR(entrySorting, pqUBSecond, pqLBSecond, index);
+      add2MBR(entrySorting, pqUBSecond, pqLBSecond, index, maxEntries);
     }
     for(int i = 0; i < minSecond.length; i++) {
-      minSecond[i] = pqLBSecond.get(i).peek().first;
-      maxSecond[i] = pqUBSecond.get(i).peek().first;
+      minSecond[i] = pqLBSecond.get(i).peekKey();
+      maxSecond[i] = pqUBSecond.get(i).peekKey();
     }
     ModifiableHyperBoundingBox mbr2 = new ModifiableHyperBoundingBox(minSecond, maxSecond);
     double surfaceSum = SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
-
     // generate the other distributions and file the surface sums
     for(int limit = minEntries; limit < maxEntries; limit++) {
       // extend first MBR by entry at position entrySorting[limit]:
@@ -201,7 +195,6 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
       removeFromMBR(pqUBSecond, pqLBSecond, limit, mbr2);
       surfaceSum += SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
     }
-
     return surfaceSum;
   }
 
@@ -224,32 +217,30 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    *        <code>mbr</code>.
    * @param mbr The MBR to be adapted to a smaller entry list.
    */
-  private void removeFromMBR(List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index, ModifiableHyperBoundingBox mbr) {
-    boolean change = false;
-    DoubleIntPair pqPair;
+  private void removeFromMBR(List<DoubleIntegerHeap> pqUB, List<DoubleIntegerHeap> pqLB, int index, ModifiableHyperBoundingBox mbr) {
     for(int d = 0; d < mbr.getDimensionality(); d++) {
       // remove all relevant upper bound entries belonging to the first set
-      pqPair = pqUB.get(d).peek();
-      while(pqPair.second <= index) {
+      boolean change = false;
+      int pqVal = pqUB.get(d).peekValue();
+      while(pqVal <= index) {
         change = true;
         pqUB.get(d).poll();
-        pqPair = pqUB.get(d).peek();
+        pqVal = pqUB.get(d).peekValue();
       }
       if(change) { // there probably was a change, as an entry has been removed
-        mbr.setMax(d, pqPair.first);
+        mbr.setMax(d, pqUB.get(d).peekKey());
       }
       change = false;
       // remove all relevant lower bound entries belonging to the first set
-      pqPair = pqLB.get(d).peek();
-      while(pqPair.second <= index) {
+      pqVal = pqLB.get(d).peekValue();
+      while(pqVal <= index) {
         change = true;
         pqLB.get(d).poll();
-        pqPair = pqLB.get(d).peek();
+        pqVal = pqLB.get(d).peekValue();
       }
       if(change) { // there probably was a change, as an entry has been removed
-        mbr.setMin(d, pqPair.first);
+        mbr.setMin(d, pqUB.get(d).peekKey());
       }
-      change = false;
     }
   }
 
@@ -298,14 +289,13 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    *        <code>entrySorting</code> for the entries belonging to
    *        <code>mbr</code>.
    * @param index the index in the sorting referencing the entry to be added
+   * @param maxEntries Maximum heap size
    */
-  private void add2MBR(int[] entrySorting, List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index) {
+  private void add2MBR(int[] entrySorting, List<DoubleIntegerHeap> pqUB, List<DoubleIntegerHeap> pqLB, int index, int maxEntries) {
     SpatialComparable currMBR = node.getEntry(entrySorting[index]);
     for(int d = 0; d < currMBR.getDimensionality(); d++) {
-      double max = currMBR.getMax(d);
-      pqUB.get(d).add(new DoubleIntPair(max, index));
-      double min = currMBR.getMin(d);
-      pqLB.get(d).add(new DoubleIntPair(min, index));
+      pqUB.get(d).add(currMBR.getMax(d), index, maxEntries);
+      pqLB.get(d).add(currMBR.getMin(d), index, maxEntries);
     }
   }
 

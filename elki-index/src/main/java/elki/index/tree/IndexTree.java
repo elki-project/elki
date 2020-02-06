@@ -342,4 +342,14 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
   public int getLeafMinimum() {
     return leafMinimum;
   }
+
+  /**
+   * Directly access the backing page file, still used by the old xtree code.
+   *
+   * @return the page file
+   */
+  @Deprecated
+  protected PageFile<N> getFile() {
+    return file;
+  }
 }
