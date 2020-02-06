@@ -72,7 +72,7 @@ public class SphericalGaussianModelFactory implements EMClusterModelFactory<Numb
     for(int d = 0; d < mvs.length; d++) {
       varsum += mvs[d].getPopulationVariance();
     }
-    varsum *= FastMath.pow(k, -2. / mvs.length); // Initial variance estimate
+    varsum *= FastMath.pow(k, -2. / mvs.length) / mvs.length; // Initial variance estimate
 
     List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {

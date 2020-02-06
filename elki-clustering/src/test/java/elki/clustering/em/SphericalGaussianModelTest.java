@@ -56,8 +56,8 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
         .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.9357286);
-    assertClusterSizes(result, new int[] { 103, 104, 208, 295 });
+    assertFMeasure(db, result, 0.97137);
+    assertClusterSizes(result, new int[] { 99, 100, 202, 309 });
   }
   @Test
   public void testConstantMLE() {
