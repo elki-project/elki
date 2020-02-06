@@ -37,7 +37,7 @@ public final class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVec
    * Static instance.
    */
   public static final FeatureVectorAdapter<?> STATIC = new FeatureVectorAdapter<>();
-  
+
   /**
    * Constructor.
    * <p>
@@ -53,7 +53,7 @@ public final class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVec
   }
 
   @Override
-  public F get(FeatureVector<F> array, int off) throws IndexOutOfBoundsException {
+  public F get(FeatureVector<F> array, int off) {
     return array.getValue(off);
   }
 }

@@ -219,9 +219,6 @@ public class KuhnMunkres {
         }
       }
     }
-    if(selected == rsel.length) {
-      return;
-    }
   }
 
   /**

@@ -80,7 +80,7 @@ import net.jafama.FastMath;
     booktitle = "Journal of the American Statistical Association, 70(349)", //
     url = "https://doi.org/10.1080/01621459.1975.10480256", //
     bibkey = "doi:10.1080/01621459.1975.10480256")
-public class ConcordantPairsGammaTau<O> implements Evaluator {
+public class ConcordantPairsGammaTau implements Evaluator {
   /**
    * Logger for debug output.
    */
@@ -115,6 +115,7 @@ public class ConcordantPairsGammaTau<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
+   * 
    * @param rel Data relation
    * @param c Clustering
    *
@@ -307,7 +308,7 @@ public class ConcordantPairsGammaTau<O> implements Evaluator {
    *
    * @author Stephan Baier
    */
-  public static class Par<O> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for choosing the distance function.
      */
@@ -337,8 +338,8 @@ public class ConcordantPairsGammaTau<O> implements Evaluator {
     }
 
     @Override
-    public ConcordantPairsGammaTau<O> make() {
-      return new ConcordantPairsGammaTau<>(distance, noiseHandling);
+    public ConcordantPairsGammaTau make() {
+      return new ConcordantPairsGammaTau(distance, noiseHandling);
     }
   }
 }

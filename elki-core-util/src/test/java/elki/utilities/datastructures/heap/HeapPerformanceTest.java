@@ -41,13 +41,13 @@ import org.junit.Test;
  * @since 0.7.0
  */
 public class HeapPerformanceTest {
-  final private int queueSize = 200000;
+  private final int queueSize = 200000;
 
-  final private int preiterations = 20;
+  private final int preiterations = 20;
 
-  final private int iterations = 200;
+  private final int iterations = 200;
 
-  final private long seed = 123456L;
+  private final long seed = 123456L;
 
   @Ignore
   @Test

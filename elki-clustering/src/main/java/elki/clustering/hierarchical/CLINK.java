@@ -96,23 +96,21 @@ public class CLINK<O> extends SLINK<O> {
    */
   @Override
   protected void process(DBIDRef id, ArrayDBIDs ids, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
-    clinkstep3(id, it, n, pi, lambda, m);
+    clinkstep3(it, n, pi, lambda, m);
     clinkstep4567(id, ids, it, n, pi, lambda, m);
-    clinkstep8(id, it, n, pi, lambda, m);
+    clinkstep8(id, it, n, pi, lambda);
   }
 
   /**
    * Third step: Determine the values for P and L
    *
-   * @param id the id of the object to be inserted into the pointer
-   *        representation
    * @param i Iterator
    * @param n Stopping position
    * @param pi Pi data store
    * @param lambda Lambda data store
    * @param m Distance data store
    */
-  private void clinkstep3(DBIDRef id, DBIDArrayIter i, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
+  private void clinkstep3(DBIDArrayIter i, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
     DBIDVar p_i = DBIDUtil.newVar();
     // for i = 1..n
     for(i.seek(0); i.getOffset() < n; i.advance()) {
@@ -198,9 +196,8 @@ public class CLINK<O> extends SLINK<O> {
    * @param n Last object to process
    * @param pi Parent data store
    * @param lambda Height data store
-   * @param m Distance data store
    */
-  private void clinkstep8(DBIDRef id, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
+  private void clinkstep8(DBIDRef id, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda) {
     DBIDVar p_i = DBIDUtil.newVar(), pp_i = DBIDUtil.newVar();
     for(it.seek(0); it.getOffset() < n; it.advance()) {
       p_i.from(pi, it); // p_i = pi[i]

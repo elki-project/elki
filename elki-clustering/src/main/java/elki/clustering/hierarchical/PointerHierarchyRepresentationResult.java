@@ -235,7 +235,7 @@ public class PointerHierarchyRepresentationResult {
    * @return Sorted object ids.
    */
   public ArrayDBIDs topologicalSort() {
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(this.ids);
+    final ArrayModifiableDBIDs ids = DBIDUtil.newArray(this.ids);
     if(mergeOrder != null) {
       ids.sort(new DataStoreUtil.AscendingByIntegerDataStore(mergeOrder));
       WritableDoubleDataStore maxheight = computeMaxHeight();

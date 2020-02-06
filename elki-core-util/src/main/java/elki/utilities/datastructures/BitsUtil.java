@@ -398,10 +398,7 @@ public final class BitsUtil {
    */
   public static long[] setI(long[] v, long[] o) {
     assert (o.length <= v.length) : "Bit set sizes do not agree.";
-    final int max = Math.min(v.length, o.length);
-    for(int i = 0; i < max; i++) {
-      v[i] = o[i];
-    }
+    System.arraycopy(o, 0, v, 0, Math.min(v.length, o.length));
     return v;
   }
 

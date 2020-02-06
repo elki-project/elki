@@ -102,8 +102,8 @@ public class ParameterException extends Exception {
         .append(p instanceof Flag ? "Flag '" : "Parameter '") //
         .append(p.getOptionID().getName()) //
         .append("' ").append(mid) //
-        .append(p instanceof Flag ? " Flag '" : " Parameter '") //
-        .append(p.getOptionID().getName()) //
+        .append(p2 instanceof Flag ? " Flag '" : " Parameter '") //
+        .append(p2.getOptionID().getName()) //
         .append(message.length() > 0 ? "' " : "'.").append(message).toString();
   }
 }

@@ -20,6 +20,7 @@
  */
 package elki.utilities.optionhandling.parameterization;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,11 +69,9 @@ public class SerializedParameterization extends AbstractParameterization {
    *
    * @param args Parameters
    */
-  public SerializedParameterization(String[] args) {
-    this();
-    for(String arg : args) {
-      parameters.add(arg);
-    }
+  @SafeVarargs
+  public SerializedParameterization(String... args) {
+    this(Arrays.asList(args));
   }
 
   /**

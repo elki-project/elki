@@ -37,10 +37,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run AffinityPropagation with fixed parameters and
-   * compare the result to a golden standard.
-   */
   @Test
   public void testAffinityPropagationClusteringAlgorithmResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
@@ -50,10 +46,6 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 5, 5, 7, 55, 105, 153 });
   }
 
-  /**
-   * Run AffinityPropagation with fixed parameters and
-   * compare the result to a golden standard.
-   */
   @Test
   public void testAffinityPropagationClusteringAlgorithmOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -63,10 +55,6 @@ public class AffinityPropagationTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(result, new int[] { 24, 27, 29, 34, 36, 36, 37, 38, 41, 43, 43, 44, 46, 47, 56, 57 });
   }
 
-  /**
-   * Run AffinityPropagation with fixed parameters and
-   * compare the result to a golden standard.
-   */
   @Test
   public void testAffinityPropagationSimilarity() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);

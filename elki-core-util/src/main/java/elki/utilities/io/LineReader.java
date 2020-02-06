@@ -27,16 +27,16 @@ import java.io.Reader;
 
 /**
  * Fast class to read a file, line per line.
- *
+ * <p>
  * Lines must be split using Unix newlines <code>\n</code>, linefeeds
  * <code>\r</code> are ignored.
- *
+ * <p>
  * This is a rather minimal implementation, which supposedly pays off in
  * performance. In particular, this class allows recycling the buffer, which
  * will yield less object allocations and thus less garbage collection.
- *
+ * <p>
  * Usage example:
- *
+ * 
  * <pre>
  * StringBuilder buf = new StringBuilder();
  * LineReader reader = new LineReader(inputStream);
@@ -53,7 +53,7 @@ public class LineReader implements AutoCloseable {
   /**
    * Default buffer size to use
    */
-  final static int BUFFER_SIZE = 4096;
+  private static final int BUFFER_SIZE = 4096;
 
   /**
    * Input stream to read from

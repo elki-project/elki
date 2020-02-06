@@ -58,7 +58,7 @@ public class CheckELKIServices {
   private static final Logging LOG = Logging.getLogger(CheckELKIServices.class);
 
   /**
-   * Pattern to STRIP comments, while keeping commented class names.
+   * Pattern to strip comments, while keeping commented class names.
    */
   private static final Pattern STRIP = Pattern.compile("^[\\s#]*(?:deprecated:\\s*)?(.*?)[\\s]*$");
 
@@ -200,14 +200,15 @@ public class CheckELKIServices {
         Files.createDirectories(folder);
         Path out = folder.resolve(prop);
         if(!out.startsWith(folder)) {
-          throw new RuntimeException("Insecure path: " + out.toString());
+          throw new IllegalStateException("Insecure path: " + out.toString());
         }
-        BufferedWriter pr = Files.newBufferedWriter(out, StandardOpenOption.APPEND);
-        pr.append('\n'); // In case there was no linefeed at the end.
-        for(String remaining : sorted) {
-          pr.append(remaining).append('\n');
+        try (
+            BufferedWriter pr = Files.newBufferedWriter(out, StandardOpenOption.APPEND)) {
+          pr.append('\n'); // In case there was no linefeed at the end.
+          for(String remaining : sorted) {
+            pr.append(remaining).append('\n');
+          }
         }
-        pr.close();
         LOG.warning("Updated service file: " + out.toString());
       }
       catch(IOException e) {
@@ -243,7 +244,7 @@ public class CheckELKIServices {
       }
       return;
     }
-    HashSet<String> aliases = new HashSet<String>();
+    HashSet<String> aliases = new HashSet<>();
     for(int i = 1; i < parts.length; i++) {
       aliases.add(parts[i]);
     }

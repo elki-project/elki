@@ -68,7 +68,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   private static final byte TAG_VECTOR_FIELD = 2;
 
   @Override
-  public TypeInformation fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+  public TypeInformation fromByteBuffer(ByteBuffer buffer) throws IOException {
     byte type = buffer.get();
     switch(type){
     case TAG_SIMPLE:
@@ -83,7 +83,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   }
 
   @Override
-  public void toByteBuffer(ByteBuffer buffer, TypeInformation object) throws IOException, UnsupportedOperationException {
+  public void toByteBuffer(ByteBuffer buffer, TypeInformation object) throws IOException {
     final Class<?> clz = object.getClass();
     // We have three supported type informations.
     // We need to check with equals, because we canNOT allow subclasses!
@@ -106,7 +106,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   }
 
   @Override
-  public int getByteSize(TypeInformation object) throws IOException, UnsupportedOperationException {
+  public int getByteSize(TypeInformation object) throws IOException {
     final Class<?> clz = object.getClass();
     // We have three supported type informations.
     // We need to check with equals, because we canNOT allow subclasses!
@@ -147,7 +147,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   static class SimpleTypeSerializer implements ByteBufferSerializer<SimpleTypeInformation<?>> {
     @SuppressWarnings("unchecked")
     @Override
-    public SimpleTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+    public SimpleTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException {
       try {
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         Class<Object> clz = (Class<Object>) Class.forName(typename);
@@ -166,7 +166,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, SimpleTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public void toByteBuffer(ByteBuffer buffer, SimpleTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {
@@ -191,7 +191,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public int getByteSize(SimpleTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public int getByteSize(SimpleTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {
@@ -230,7 +230,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   static class VectorTypeSerializer implements ByteBufferSerializer<VectorTypeInformation<?>> {
     @SuppressWarnings("unchecked")
     @Override
-    public VectorTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+    public VectorTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException {
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
@@ -241,7 +241,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
-        return new VectorTypeInformation<NumberVector>(factory, serializer, mindim, maxdim);
+        return new VectorTypeInformation<>(factory, serializer, mindim, maxdim);
       }
       catch(ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
@@ -252,7 +252,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, VectorTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public void toByteBuffer(ByteBuffer buffer, VectorTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {
@@ -279,7 +279,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public int getByteSize(VectorTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public int getByteSize(VectorTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {
@@ -321,7 +321,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
   static class VectorFieldTypeSerializer implements ByteBufferSerializer<VectorFieldTypeInformation<?>> {
     @SuppressWarnings("unchecked")
     @Override
-    public VectorFieldTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+    public VectorFieldTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException {
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
@@ -356,7 +356,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, VectorFieldTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public void toByteBuffer(ByteBuffer buffer, VectorFieldTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {
@@ -395,7 +395,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     }
 
     @Override
-    public int getByteSize(VectorFieldTypeInformation<?> object) throws IOException, UnsupportedOperationException {
+    public int getByteSize(VectorFieldTypeInformation<?> object) throws IOException {
       // First of all, the type needs to have an actual serializer in the type
       final ByteBufferSerializer<?> serializer = object.getSerializer();
       if(serializer == null) {

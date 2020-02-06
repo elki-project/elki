@@ -152,7 +152,7 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     if(this == obj) {
       return true;
     }
-    if(obj == null || !(obj instanceof HyperBoundingBox)) {
+    if(!(obj instanceof HyperBoundingBox)) {
       return false;
     }
     HyperBoundingBox box = (HyperBoundingBox) obj;

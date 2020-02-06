@@ -350,7 +350,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
       }
 
       DendrogramModel model;
-      if(members != null && !members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
+      if(!members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
         model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyRepresentationResult) pointerresult).findPrototype(members));
       }
       else {

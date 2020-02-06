@@ -24,7 +24,7 @@ import elki.data.NumberVector;
 
 /**
  * Adapter to use a feature vector as an array of features.
- * 
+ * <p>
  * Use the static instance {@link #STATIC}!
  * 
  * @author Erich Schubert
@@ -52,37 +52,37 @@ public class NumberVectorAdapter implements NumberArrayAdapter<Number, NumberVec
 
   @Override
   @Deprecated
-  public Number get(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public Number get(NumberVector array, int off) {
     return array.getValue(off + 1);
   }
 
   @Override
-  public double getDouble(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public double getDouble(NumberVector array, int off) {
     return array.doubleValue(off);
   }
 
   @Override
-  public float getFloat(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(NumberVector array, int off) {
     return array.floatValue(off);
   }
 
   @Override
-  public int getInteger(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public int getInteger(NumberVector array, int off) {
     return array.intValue(off);
   }
 
   @Override
-  public short getShort(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public short getShort(NumberVector array, int off) {
     return array.shortValue(off);
   }
 
   @Override
-  public long getLong(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public long getLong(NumberVector array, int off) {
     return array.longValue(off);
   }
 
   @Override
-  public byte getByte(NumberVector array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(NumberVector array, int off) {
     return array.byteValue(off);
   }
 }

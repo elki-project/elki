@@ -119,12 +119,10 @@ public final class OptionUtil {
    * @param buf Buffer to append to.
    * @param pcls Parameterizable class to describe
    * @param width Width
-   * @param indent Text indent
    * @return Formatted description
    */
-  public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width, String indent) throws ClassInstantiationException {
+  public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width) throws ClassInstantiationException {
     println(buf, width, "Description for class " + pcls.getName());
-
     Title title = pcls.getAnnotation(Title.class);
     if(title != null && title.value() != null && !title.value().isEmpty()) {
       println(buf, width, title.value());
@@ -149,8 +147,7 @@ public final class OptionUtil {
 
     SerializedParameterization config = new SerializedParameterization();
     TrackParameters track = new TrackParameters(config);
-    @SuppressWarnings("unused")
-    Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
+    ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
     Collection<TrackedParameter> options = track.getAllParameters();
     if(!options.isEmpty()) {
       OptionUtil.formatForConsole(buf, width, options);

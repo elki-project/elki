@@ -45,6 +45,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -259,16 +260,11 @@ public class AffinityPropagation<O> implements ClusteringAlgorithm<Clustering<Me
     for(int i = 0; i1.valid(); i1.advance(), i++) {
       int c = assignment[i];
       // Add to cluster members:
-      ModifiableDBIDs cids = map.get(c);
-      if(cids == null) {
-        cids = DBIDUtil.newArray();
-        map.put(c, cids);
-      }
-      cids.add(i1);
+      map.computeIfAbsent(c, x -> DBIDUtil.newArray()).add(i1);
     }
     // If we stopped early, the cluster lead might be in a different cluster.
-    for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
-      Int2ObjectOpenHashMap.Entry<ModifiableDBIDs> entry = iter.next();
+    for(ObjectIterator<Int2ObjectMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+      Int2ObjectMap.Entry<ModifiableDBIDs> entry = iter.next();
       final int key = entry.getIntKey();
       int targetkey = key;
       ModifiableDBIDs tids = null;
@@ -299,8 +295,8 @@ public class AffinityPropagation<O> implements ClusteringAlgorithm<Clustering<Me
     DBIDArrayIter i1 = ids.iter();
     Metadata.of(clustering).setLongName("Affinity Propagation Clustering");
     ModifiableDBIDs noise = DBIDUtil.newArray();
-    for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
-      Int2ObjectOpenHashMap.Entry<ModifiableDBIDs> entry = iter.next();
+    for(ObjectIterator<Int2ObjectMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+      Int2ObjectMap.Entry<ModifiableDBIDs> entry = iter.next();
       i1.seek(entry.getIntKey());
       if(entry.getValue().size() > 1) {
         MedoidModel mod = new MedoidModel(DBIDUtil.deref(i1));

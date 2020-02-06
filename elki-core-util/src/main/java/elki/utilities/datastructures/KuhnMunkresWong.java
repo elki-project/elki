@@ -76,6 +76,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
    * @param cost Cost matrix
    * @return Selected columns, per row
    */
+  @Override
   public int[] run(double[][] cost) {
     final int rowlen = cost.length, collen = cost[0].length;
     if(collen < rowlen) {
@@ -189,9 +190,6 @@ public class KuhnMunkresWong extends KuhnMunkres {
         }
       }
     }
-    if(selected == rsel.length) {
-      return;
-    }
   }
 
   /**
@@ -235,8 +233,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
         }
       }
     }
-    assert minr >= 0;
-    assert rsel[minr] != minc;
+    assert minr >= 0 && rsel[minr] != minc;
     return h;
   }
 

@@ -66,7 +66,6 @@ public class IntIntPair implements Comparable<IntIntPair> {
     if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
-
     IntIntPair other = (IntIntPair) obj;
     return (this.first == other.first) && (this.second == other.second);
   }
@@ -78,7 +77,7 @@ public class IntIntPair implements Comparable<IntIntPair> {
   public final int hashCode() {
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (first * 0x9e3779b1 + second);
+    return first * 0x9e3779b1 + second;
   }
 
   /**
@@ -90,10 +89,7 @@ public class IntIntPair implements Comparable<IntIntPair> {
   @Override
   public int compareTo(IntIntPair other) {
     int fdiff = this.first - other.first;
-    if(fdiff != 0) {
-      return fdiff;
-    }
-    return this.second - other.second;
+    return fdiff != 0 ? fdiff : this.second - other.second;
   }
 
   /**
@@ -105,10 +101,7 @@ public class IntIntPair implements Comparable<IntIntPair> {
    */
   public int compareSwappedTo(IntIntPair other) {
     int fdiff = this.second - other.second;
-    if(fdiff != 0) {
-      return fdiff;
-    }
-    return this.first - other.first;
+    return fdiff != 0 ? fdiff : this.first - other.first;
   }
 
   /**
@@ -137,30 +130,15 @@ public class IntIntPair implements Comparable<IntIntPair> {
   /**
    * Comparator to compare by second component only
    */
-  public static final Comparator<IntIntPair> BYFIRST_COMPARATOR = new Comparator<IntIntPair>() {
-    @Override
-    public int compare(IntIntPair o1, IntIntPair o2) {
-      return o1.first - o2.first;
-    }
-  };
+  public static final Comparator<IntIntPair> BYFIRST_COMPARATOR = (o1, o2) -> o1.first - o2.first;
 
   /**
    * Comparator to compare by second component only
    */
-  public static final Comparator<IntIntPair> BYSECOND_COMPARATOR = new Comparator<IntIntPair>() {
-    @Override
-    public int compare(IntIntPair o1, IntIntPair o2) {
-      return o1.second - o2.second;
-    }
-  };
+  public static final Comparator<IntIntPair> BYSECOND_COMPARATOR = (o1, o2) -> o1.second - o2.second;
 
   /**
    * Comparator to compare by swapped components
    */
-  public static final Comparator<IntIntPair> SWAPPED_COMPARATOR = new Comparator<IntIntPair>() {
-    @Override
-    public int compare(IntIntPair o1, IntIntPair o2) {
-      return o1.compareSwappedTo(o2);
-    }
-  };
+  public static final Comparator<IntIntPair> SWAPPED_COMPARATOR = (o1, o2) -> o1.compareSwappedTo(o2);
 }

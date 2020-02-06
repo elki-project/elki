@@ -114,11 +114,9 @@ public class Polygon implements SpatialComparable {
     Iterator<double[]> iter = points.iterator();
     while(iter.hasNext()) {
       double[] data = iter.next();
-      for(int i = 0; i < data.length; i++) {
-        if(i > 0) {
-          buf.append(',');
-        }
-        buf.append(data[i]);
+      buf.append(data[0]);
+      for(int i = 1; i < data.length; i++) {
+        buf.append(',').append(data[i]);
       }
       if(iter.hasNext()) {
         buf.append(' ');
@@ -217,8 +215,7 @@ public class Polygon implements SpatialComparable {
    * @return True when the polygons intersect
    */
   public boolean intersects2DIncomplete(Polygon other) {
-    assert (this.getDimensionality() == 2);
-    assert (other.getDimensionality() == 2);
+    assert this.getDimensionality() == 2 && other.getDimensionality() == 2;
     for(double[] v : this.points) {
       if(other.containsPoint2D(v)) {
         return true;
@@ -234,9 +231,9 @@ public class Polygon implements SpatialComparable {
 
   /**
    * Point in polygon test, based on
-   * 
+   * <p>
    * http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-   * 
+   * <p>
    * by W. Randolph Franklin
    * 
    * @param v Point to test
@@ -244,21 +241,16 @@ public class Polygon implements SpatialComparable {
    */
   public boolean containsPoint2D(double[] v) {
     assert (v.length == 2);
-    final double testx = v[0];
-    final double testy = v[1];
+    final double testx = v[0], testy = v[1];
     boolean c = false;
 
     Iterator<double[]> it = points.iterator();
     double[] pre = points.get(points.size() - 1);
     while(it.hasNext()) {
       final double[] cur = it.next();
-      final double curx = cur[0], cury = cur[1];
-      final double prex = pre[0], prey = pre[1];
-      if(((cury > testy) != (prey > testy))) {
-        if((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
-          c = !c;
-        }
-      }
+      final double curx = cur[0], cury = cur[1], prex = pre[0], prey = pre[1];
+      c ^= ((cury > testy) != (prey > testy)) && //
+          (testx < (prex - curx) * (testy - cury) / (prey - cury) + curx);
       pre = cur;
     }
     return c;
@@ -267,7 +259,7 @@ public class Polygon implements SpatialComparable {
   /**
    * Compute the polygon area (geometric, not geographic) using the Shoelace
    * formula.
-   *
+   * <p>
    * This is appropriate for simple polygons in the cartesian plane only.
    *
    * @return Area

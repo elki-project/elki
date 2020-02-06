@@ -87,7 +87,7 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
    * @param <E> the type of MTreeEntry used in the M-Tree
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    */
-  public static abstract class Par<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> implements Parameterizer {
+  public abstract static class Par<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> implements Parameterizer {
     /**
      * Distribution strategy parameter.
      */

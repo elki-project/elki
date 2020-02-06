@@ -71,7 +71,7 @@ public interface Algorithm {
    * 
    * @author Erich Schubert
    */
-  class Utils {
+  public final class Utils {
     /**
      * Parameter to specify the algorithm to run.
      */
@@ -82,6 +82,13 @@ public interface Algorithm {
      */
     public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
+    /**
+     * Static utility class. Do not instantiate.
+     */
+    private Utils() {
+      // Do not use
+    }
+    
     /**
      * Try to auto-run the algorithm on a database by calling a method called
      * {@link run}, with an optional {@link Database} and with data relations as

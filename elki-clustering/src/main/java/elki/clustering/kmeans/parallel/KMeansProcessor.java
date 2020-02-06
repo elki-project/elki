@@ -142,7 +142,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
           continue;
         }
         int sizea = sizes[i];
-        double sum = sizea + sizeb;
+        double sum = sizea + (double) sizeb;
         double[] cent = centroids[i];
         if(sizea > 0) {
           timesEquals(cent, sizea / sum);

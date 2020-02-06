@@ -123,13 +123,7 @@ public class KDTreeFilteringKMeans<V extends NumberVector> extends KDTreePruning
       super(relation, df, means);
     }
 
-    /**
-     * The filtering algorithm.
-     * 
-     * @param u Current node
-     * @param alive Range of alive means
-     * @return Updated range.
-     */
+    @Override
     protected int pruning(KDNode u, int alive) {
       final double[] mid = u.mid, halfwidth = u.halfwidth;
       int nearest = getNearestCenter(mid, alive);

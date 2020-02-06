@@ -73,16 +73,17 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
-    for(int i = 0, j = 0; i < size; i++, i1.advance()) {
+    int j = 0;
+    for(int i = 0; i < size; i++, i1.advance()) {
       double[] mati = mat[i];
       i2.seek(i + 1);
       for(int k = i + 1; k < size; k++, i2.advance()) {
         mati[k] = -dq.distance(i1, i2);
         mat[k][i] = mati[k]; // symmetry.
-        flat[j] = mati[k];
-        j++;
+        flat[j++] = mati[k];
       }
     }
+    assert j == (size * (size - 1)) >>> 1;
     double median = QuickSelect.quantile(flat, quantile);
     // On the diagonal, we place the median
     for(int i = 0; i < size; i++) {

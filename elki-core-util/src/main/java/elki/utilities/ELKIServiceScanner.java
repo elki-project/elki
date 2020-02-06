@@ -25,12 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import elki.logging.Logging;
 
@@ -126,7 +121,7 @@ public class ELKIServiceScanner {
    *
    * @return Master cache
    */
-  private synchronized static List<Class<?>> initialize() {
+  private static synchronized List<Class<?>> initialize() {
     if(MASTER_CACHE != null) {
       return MASTER_CACHE;
     }
@@ -151,13 +146,12 @@ public class ELKIServiceScanner {
               res.add(cls);
             }
             catch(Exception | Error e) {
-              continue;
+              // ignore
             }
           }
         }
         catch(URISyntaxException e) {
           LOG.warning("Incorrect classpath entry: " + u);
-          continue;
         }
       }
       MASTER_CACHE = Collections.unmodifiableList(res);
@@ -247,19 +241,17 @@ public class ELKIServiceScanner {
       if(files.isEmpty()) {
         findNext();
       }
-      return !files.isEmpty() ? files.remove(files.size() - 1) : null;
+      if(files.isEmpty()) {
+        throw new NoSuchElementException();
+      }
+      return files.remove(files.size() - 1);
     }
   }
 
   /**
    * Sort classes by their class name. Package first, then class.
    */
-  public static final Comparator<Class<?>> SORT_BY_NAME = new Comparator<Class<?>>() {
-    @Override
-    public int compare(Class<?> o1, Class<?> o2) {
-      return comparePackageClass(o1, o2);
-    }
-  };
+  public static final Comparator<Class<?>> SORT_BY_NAME = (o1, o2) -> comparePackageClass(o1, o2);
 
   /**
    * Compare two classes, by package name first.
@@ -293,12 +285,9 @@ public class ELKIServiceScanner {
   /**
    * Comparator to sort classes by priority, then alphabetic.
    */
-  public static final Comparator<Class<?>> SORT_BY_PRIORITY = new Comparator<Class<?>>() {
-    @Override
-    public int compare(Class<?> o1, Class<?> o2) {
-      int c = Integer.compare(classPriority(o2), classPriority(o1));
-      c = c != 0 ? c : comparePackageClass(o1, o2);
-      return c != 0 ? c : o1.getCanonicalName().compareTo(o2.getCanonicalName());
-    }
+  public static final Comparator<Class<?>> SORT_BY_PRIORITY = (o1, o2) -> {
+    int c = Integer.compare(classPriority(o2), classPriority(o1));
+    c = c != 0 ? c : comparePackageClass(o1, o2);
+    return c != 0 ? c : o1.getCanonicalName().compareTo(o2.getCanonicalName());
   };
 }

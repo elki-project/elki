@@ -180,7 +180,7 @@ public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
     /**
      * random generator.
      */
-    final private Random random;
+    private final Random random;
 
     /**
      * Constructor.

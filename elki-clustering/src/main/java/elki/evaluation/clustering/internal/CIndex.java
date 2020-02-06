@@ -254,7 +254,7 @@ public class CIndex<O> implements Evaluator {
   @Override
   public void processNewResult(Object result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
-    if(crs.size() < 1) {
+    if(crs.isEmpty()) {
       return;
     }
     Database db = ResultUtil.findDatabase(result);

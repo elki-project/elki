@@ -38,7 +38,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   /**
    * Reference storage.
    */
-  final private HashMap<O, Rec<O>> graph;
+  private final HashMap<O, Rec<O>> graph;
 
   /**
    * All elements, in insertion order (and will not fail badly if concurrent

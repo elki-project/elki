@@ -81,7 +81,6 @@ public class CheckParameterizables {
             }
             catch(ClassNotFoundException e) {
               LOG.warning("Service file name is not a class name: " + prop);
-              continue;
             }
           }
         }
@@ -105,7 +104,6 @@ public class CheckParameterizables {
               }
               catch(ClassNotFoundException e) {
                 LOG.warning("Service file name is not a class name: " + prop);
-                continue;
               }
             }
           }
@@ -169,7 +167,7 @@ public class CheckParameterizables {
    *
    * @author Erich Schubert
    */
-  enum State {
+  private enum State {
     NO_CONSTRUCTOR, //
     INSTANTIABLE, //
     DEFAULT_INSTANTIABLE, //

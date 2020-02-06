@@ -48,7 +48,7 @@ public class PreprocessorKNNQuery<O> implements KNNSearcher<DBIDRef> {
   /**
    * The last preprocessor result
    */
-  final private AbstractMaterializeKNNPreprocessor<O> preprocessor;
+  private final AbstractMaterializeKNNPreprocessor<O> preprocessor;
 
   /**
    * Warn only once.

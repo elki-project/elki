@@ -76,12 +76,7 @@ public class NNChain<O> extends AGNES<O> {
     super(distance, linkage);
   }
 
-  /**
-   * Run the algorithm
-   *
-   * @param relation Data relation
-   * @return Clustering result
-   */
+  @Override
   public PointerHierarchyRepresentationResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");

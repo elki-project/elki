@@ -29,10 +29,10 @@ import elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * @since 0.1
  *
- * @param <THIS> type self-reference
+ * @param <P> type self-reference
  * @param <T> the type of a possible value (i.e., the type of the option)
  */
-public abstract class NumberParameter<THIS extends NumberParameter<THIS, T>, T extends Number> extends AbstractParameter<THIS, T> {
+public abstract class NumberParameter<P extends NumberParameter<P, T>, T extends Number> extends AbstractParameter<P, T> {
   /**
    * Constructs a number parameter with the given optionID and default Value.
    * 

@@ -74,7 +74,7 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
       double maxdist = Double.NEGATIVE_INFINITY;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         final double prev = store.doubleValue(it);
-        if(prev != prev) {
+        if(Double.isNaN(prev)) {
           continue; // NaN: already chosen!
         }
         double dsum = prev + distance.distance(prevmean, relation.get(it));
@@ -112,7 +112,7 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
       double maxdist = Double.NEGATIVE_INFINITY;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         final double prev = store.doubleValue(it);
-        if(prev != prev) {
+        if(Double.isNaN(prev)) {
           continue; // NaN: already chosen!
         }
         double dsum = prev + distQ.distance(prevmean, it);
@@ -144,11 +144,6 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
    * @author Erich Schubert
    */
   public static class Par<V> extends FarthestPoints.Par<V> {
-    /**
-     * Flag for discarding the first object chosen.
-     */
-    protected boolean keepfirst = false;
-
     @Override
     public FarthestSumPoints<V> make() {
       return new FarthestSumPoints<>(rnd, !keepfirst);

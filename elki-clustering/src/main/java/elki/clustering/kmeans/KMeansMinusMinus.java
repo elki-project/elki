@@ -150,7 +150,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       for(int i = 0; i < k; i++) {
         clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       }
-      ((AbstractKMeans.Instance) this).clusters = null; // Invalidate
+      super.clusters = null; // Invalidate
     }
 
     @Override

@@ -22,7 +22,7 @@ package elki.utilities.datastructures.iterator;
 
 /**
  * Modifiable iterator, that also supports removal.
- * 
+ * <p>
  * Usage example:
  * 
  * <pre>
@@ -43,7 +43,7 @@ package elki.utilities.datastructures.iterator;
 public interface MIter extends Iter {
   /**
    * Remove the object the iterator currently points to.
-   * 
+   * <p>
    * Note that, usually, the iterator will now point to a different object, very
    * often to the previous one (but this is not guaranteed!)
    */

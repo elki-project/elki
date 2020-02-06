@@ -122,7 +122,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
+    return builder.complete();
   }
 
   /**
@@ -204,7 +204,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     besti[x] = -1; // Deactivate x in cache:
     updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
     if(y > 0) {
-      Anderberg.findBest(size, distances, bestd, besti, y);
+      Anderberg.findBest(distances, bestd, besti, y);
     }
   }
 
@@ -239,7 +239,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      Anderberg.updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
+      Anderberg.updateCache(distances, bestd, besti, x, y, b, distances[yoffset + b]);
     }
 
     // Update entries at (a,y) with a > y
@@ -252,7 +252,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      Anderberg.updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
+      Anderberg.updateCache(distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
     }
   }
 

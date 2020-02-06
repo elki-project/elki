@@ -63,21 +63,21 @@ public class BCubed {
    */
   protected BCubed(ClusterContingencyTable table) {
     super();
-    double bCubedPrecision = 0.0, bCubedRecall = 0.0;
+    double aggPrec = 0.0, aggRec = 0.0;
     final int selfpair = table.selfPairing ? 0 : 1;
     for(int i1 = 0; i1 < table.size1; i1++) {
       final int[] sumrow = table.contingency[i1];
       for(int i2 = 0; i2 < table.size2; i2++) {
         final int c = sumrow[i2];
         if(c > selfpair) {
-          bCubedPrecision += c * (c - selfpair) / (double) (table.contingency[table.size1][i2] - selfpair);
-          bCubedRecall += c * (c - selfpair) / (double) (sumrow[table.size2] - selfpair);
+          aggPrec += c * (c - selfpair) / (double) (table.contingency[table.size1][i2] - selfpair);
+          aggRec += c * (c - selfpair) / (double) (sumrow[table.size2] - selfpair);
         }
       }
     }
     final int total = table.contingency[table.size1][table.size2];
-    this.bCubedPrecision = bCubedPrecision / total;
-    this.bCubedRecall = bCubedRecall / total;
+    this.bCubedPrecision = aggPrec / total;
+    this.bCubedRecall = aggRec / total;
   }
 
   /**

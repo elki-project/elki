@@ -48,23 +48,23 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 /**
  * Parser for simple clustering results in vector form, as written by
  * {@link ClusteringVectorDumper}.
- *
+ * <p>
  * This allows reading the output of <em>multiple</em> clustering runs, and
  * analyze the results using ELKI algorithm.
- *
+ * <p>
  * The input format is very simple, each line containing a sequence of cluster
  * assignments in integer form, and an optional label:
- *
+ * 
  * <pre>
  * 0 0 1 1 0 First
  * 0 0 0 1 2 Second
  * </pre>
- *
+ * 
  * represents two clusterings for 5 objects. The first clustering has two
  * clusters, the second contains three clusters.
- *
+ * <p>
  * TODO: this parser currently is quite hacky, and could use a cleanup.
- *
+ * <p>
  * TODO: support noise, via negative cluster numbers?
  *
  * @author Erich Schubert

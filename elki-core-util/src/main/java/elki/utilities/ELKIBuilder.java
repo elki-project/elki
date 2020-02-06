@@ -27,14 +27,14 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Builder utility class.
- *
+ * <p>
  * This class delegates to {@link ListParameterization} and
  * {@link ClassGenericsUtil}, but may be easier to use in many cases.
- * 
+ * <p>
  * You will often need to specify the type T, because of <i>nested</i>
  * generics. This is because of the way generics are implemented in Java, and
  * we cannot easily resolve this; you have to give the type explicitly.
- *
+ * <p>
  * Example:
  * {@code
  * RStarTreeFactory<DoubleVector> indexfactory =
@@ -73,11 +73,11 @@ public final class ELKIBuilder<T> {
 
   /**
    * Constructor.
-   *
+   * <p>
    * You will often need to specify the type T, because of <i>nested</i>
    * generics. This is because of the way generics are implemented in Java, and
    * we cannot easily resolve this; you have to give the type explicitly.
-   *
+   * <p>
    * Example:
    * {@code
    * RStarTreeFactory<DoubleVector> indexfactory =
@@ -145,10 +145,10 @@ public final class ELKIBuilder<T> {
 
   /**
    * Instantiate, consuming the parameter list.
-   *
+   * <p>
    * This will throw an {@link AbortException} if the parameters are incomplete,
    * or {@code build()} is called twice.
-   * 
+   * <p>
    * We lose some type safety here, for convenience. The type {@code <C>} is
    * meant to be {@code <T>} with generics added only, which is necessary
    * because generics are implemented by erasure in Java.

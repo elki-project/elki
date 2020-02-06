@@ -108,12 +108,12 @@ public class LuceneDistanceRangeSearcher implements RangeSearcher<DBIDRef> {
     /**
      * Result collector.
      */
-    final private ModifiableDoubleDBIDList result;
+    private final ModifiableDoubleDBIDList result;
 
     /**
      * Threshold range.
      */
-    final private double range;
+    private final double range;
 
     /**
      * Constructor.

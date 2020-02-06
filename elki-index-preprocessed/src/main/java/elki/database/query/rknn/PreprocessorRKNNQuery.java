@@ -41,7 +41,7 @@ public class PreprocessorRKNNQuery<O> implements RKNNSearcher<DBIDRef> {
   /**
    * The last preprocessor result
    */
-  final private MaterializeKNNAndRKNNPreprocessor<O> preprocessor;
+  private final MaterializeKNNAndRKNNPreprocessor<O> preprocessor;
 
   /**
    * Warn only once.

@@ -55,7 +55,7 @@ public final class DatabaseUtil {
    * @param database
    * @return string representation
    */
-  public static Relation<String> guessLabelRepresentation(Database database) throws NoSupportedDataTypeException {
+  public static Relation<String> guessLabelRepresentation(Database database) {
     try {
       Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
       if(classrep != null) {
@@ -92,7 +92,7 @@ public final class DatabaseUtil {
    * @param database
    * @return string representation
    */
-  public static Relation<String> guessObjectLabelRepresentation(Database database) throws NoSupportedDataTypeException {
+  public static Relation<String> guessObjectLabelRepresentation(Database database) {
     try {
       Relation<? extends LabelList> labelsrep = database.getRelation(TypeUtil.LABELLIST);
       if(labelsrep != null) {

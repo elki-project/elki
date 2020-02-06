@@ -175,12 +175,13 @@ public final class FormatUtil {
       return NF6;
     case 8:
       return NF8;
+    default:
+      final NumberFormat nf = NumberFormat.getInstance(Locale.US);
+      nf.setMaximumFractionDigits(digits);
+      nf.setMinimumFractionDigits(digits);
+      nf.setGroupingUsed(false);
+      return nf;
     }
-    final NumberFormat nf = NumberFormat.getInstance(Locale.US);
-    nf.setMaximumFractionDigits(digits);
-    nf.setMinimumFractionDigits(digits);
-    nf.setGroupingUsed(false);
-    return nf;
   }
 
   /**
@@ -568,7 +569,7 @@ public final class FormatUtil {
    */
   public static String format(boolean[] b, final String sep) {
     return (b == null) ? "null" : (b.length == 0) ? "" : //
-        formatTo(new StringBuilder(), b, ", ").toString();
+        formatTo(new StringBuilder(), b, sep).toString();
   }
 
   /**

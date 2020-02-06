@@ -208,32 +208,25 @@ public class Subspace {
    * returned if {@code d1} is less than or greater than {@code d2}. Otherwise
    * the two subspaces have equal dimensions and zero will be returned.
    */
-  public static final Comparator<Subspace> DIMENSION_COMPARATOR = new Comparator<Subspace>() {
-    @Override
-    public int compare(Subspace s1, Subspace s2) {
-      if(s1 == s2 || s1.getDimensions() == s2.getDimensions()) {
-        return 0;
-      }
-
-      if(s1.getDimensions() == null) {
-        return -1;
-      }
-
-      if(s2.getDimensions() == null) {
-        return 1;
-      }
-
-      int compare = s1.dimensionality() - s2.dimensionality();
-      if(compare != 0) {
-        return compare;
-      }
-
-      for(int d1 = BitsUtil.nextSetBit(s1.getDimensions(), 0), d2 = BitsUtil.nextSetBit(s2.getDimensions(), 0); d1 >= 0 && d2 >= 0; d1 = BitsUtil.nextSetBit(s1.getDimensions(), d1 + 1), d2 = BitsUtil.nextSetBit(s2.getDimensions(), d2 + 1)) {
-        if(d1 != d2) {
-          return d1 - d2;
-        }
-      }
+  public static final Comparator<Subspace> DIMENSION_COMPARATOR = (s1, s2) -> {
+    if(s1 == s2 || s1.getDimensions() == s2.getDimensions()) {
       return 0;
     }
+    if(s1.getDimensions() == null) {
+      return -1;
+    }
+    if(s2.getDimensions() == null) {
+      return 1;
+    }
+    int compare = s1.dimensionality() - s2.dimensionality();
+    if(compare != 0) {
+      return compare;
+    }
+    for(int d1 = BitsUtil.nextSetBit(s1.getDimensions(), 0), d2 = BitsUtil.nextSetBit(s2.getDimensions(), 0); d1 >= 0 && d2 >= 0; d1 = BitsUtil.nextSetBit(s1.getDimensions(), d1 + 1), d2 = BitsUtil.nextSetBit(s2.getDimensions(), d2 + 1)) {
+      if(d1 != d2) {
+        return d1 - d2;
+      }
+    }
+    return 0;
   };
 }

@@ -39,7 +39,7 @@ public class NoSupportedDataTypeException extends IllegalStateException {
   /**
    * Available types
    */
-  private Collection<TypeInformation> types = null;
+  private final transient Collection<TypeInformation> types;
 
   /**
    * Constructor.
@@ -60,6 +60,7 @@ public class NoSupportedDataTypeException extends IllegalStateException {
    */
   public NoSupportedDataTypeException(String string) {
     super(string);
+    this.types = null;
   }
 
   @Override

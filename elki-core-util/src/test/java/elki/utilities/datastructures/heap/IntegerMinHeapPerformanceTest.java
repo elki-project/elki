@@ -41,11 +41,11 @@ import org.junit.Test;
  * @since 0.7.0
  */
 public class IntegerMinHeapPerformanceTest {
-  final private int queueSize = 100000;
+  private final int queueSize = 100000;
 
-  final private int iterations = 20;
+  private final int iterations = 20;
 
-  final private long seed = 123456L;
+  private final long seed = 123456L;
 
   @Ignore
   @Test

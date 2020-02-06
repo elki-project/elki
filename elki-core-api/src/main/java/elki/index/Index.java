@@ -44,5 +44,5 @@ public interface Index {
    */
   default void logStatistics() {
     // Nothing to do.
-  };
+  }
 }

@@ -24,7 +24,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Generic interface for a parameterizable factory.
- * 
+ * <p>
  * To instantiate a class, use {@link Parameterization#tryInstantiate(Class)}!
  * 
  * @author Erich Schubert
@@ -33,7 +33,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 public interface Parameterizer {
   /**
    * Configure the class.
-   * 
+   * <p>
    * Note: the status is collected by the parameterization object, so that
    * multiple errors may arise and be reported in one run.
    * 
@@ -45,7 +45,7 @@ public interface Parameterizer {
 
   /**
    * Make an instance after successful configuration.
-   * 
+   * <p>
    * Note: your class should return the exact type, only this very broad
    * interface should use {@code Object} as return type.
    *

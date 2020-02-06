@@ -122,7 +122,7 @@ public class Ostrovsky extends AbstractKMeansInitialization {
       // Pick first vector:
       List<NumberVector> means = new ArrayList<>(k);
       NumberVector firstvec = null;
-      double firstdist = 0., r = random.nextDouble() * total * 2;
+      double firstdist, r = random.nextDouble() * total * 2;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         ++diststat;
         // distance is squared Euclidean as per above

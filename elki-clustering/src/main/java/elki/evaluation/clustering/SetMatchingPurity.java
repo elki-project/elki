@@ -69,7 +69,7 @@ public class SetMatchingPurity {
     super();
     final int[][] contingency = table.contingency;
     final int r = table.size1, c = table.size2;
-    double smPurity = 0.0, smFFirst = 0.0;
+    double aggPurity = 0.0, aggFirst = 0.0;
     // iterate first clustering
     for(int i = 0; i < r; i++) {
       double precisionMax = 0.0, fMax = 0.0;
@@ -77,10 +77,10 @@ public class SetMatchingPurity {
         precisionMax = Math.max(precisionMax, contingency[i][j]);
         fMax = Math.max(fMax, (2.0 * contingency[i][j]) / (contingency[i][c] + contingency[r][j]));
       }
-      smPurity += precisionMax;
-      smFFirst += contingency[i][c] * fMax;
+      aggPurity += precisionMax;
+      aggFirst += contingency[i][c] * fMax;
     }
-    double smInversePurity = 0.0, smFSecond = 0.0;
+    double aggInvP = 0.0, aggSecond = 0.0;
     // iterate second clustering
     for(int i = 0; i < c; i++) {
       double recallMax = 0.0, fMax = 0.0;
@@ -88,15 +88,15 @@ public class SetMatchingPurity {
         recallMax = Math.max(recallMax, contingency[j][i]);
         fMax = Math.max(fMax, (2.0 * contingency[j][i]) / (contingency[j][c] + contingency[r][i]));
       }
-      smInversePurity += recallMax;
-      smFSecond += contingency[r][i] * fMax;
+      aggInvP += recallMax;
+      aggSecond += contingency[r][i] * fMax;
     }
     final int numobj = contingency[r][c];
     // Store and scale
-    this.smPurity = smPurity / numobj;
-    this.smFFirst = smFFirst / numobj;
-    this.smInversePurity = smInversePurity / numobj;
-    this.smFSecond = smFSecond / numobj;
+    this.smPurity = aggPurity / numobj;
+    this.smFFirst = aggFirst / numobj;
+    this.smInversePurity = aggInvP / numobj;
+    this.smFSecond = aggSecond / numobj;
   }
 
   /**

@@ -56,8 +56,7 @@ public class ClusterIntersectionSimilarity implements PrimitiveDistance<Cluster<
 
   @Override
   public double distance(Cluster<?> o1, Cluster<?> o2) {
-    int i = DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
-    return Math.max(o1.size(), o2.size()) - i;
+    return (double) Math.max(o1.size(), o2.size()) - DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
   }
 
   @Override

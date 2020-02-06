@@ -136,7 +136,7 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
         }
         for(Relation<?> r : database.getRelations()) {
           if(r.size() == assignment.size()) {
-            attachToRelation(database, r, assignment, name);
+            attachToRelation(r, assignment, name);
             assignment.clear();
             name.clear();
             continue line;
@@ -154,12 +154,11 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
   /**
    * Build a clustering from the file result.
    *
-   * @param database Database
    * @param r Result to attach to
    * @param assignment Cluster assignment
    * @param name Name
    */
-  private void attachToRelation(Database database, Relation<?> r, IntArrayList assignment, ArrayList<String> name) {
+  private void attachToRelation(Relation<?> r, IntArrayList assignment, ArrayList<String> name) {
     DBIDs ids = r.getDBIDs();
     if(!(ids instanceof ArrayDBIDs)) {
       throw new AbortException("External clusterings can only be used with static DBIDs.");

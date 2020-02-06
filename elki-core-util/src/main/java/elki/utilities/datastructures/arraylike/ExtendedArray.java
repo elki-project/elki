@@ -71,7 +71,7 @@ public class ExtendedArray<T> implements ArrayAdapter<T, ExtendedArray<T>> {
   }
 
   @Override
-  public T get(ExtendedArray<T> array, int off) throws IndexOutOfBoundsException {
+  public T get(ExtendedArray<T> array, int off) {
     assert (this == array);
     if(off == size - 1) {
       return extra;

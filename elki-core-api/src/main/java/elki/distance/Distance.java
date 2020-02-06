@@ -57,7 +57,7 @@ public interface Distance<O> {
 
   /**
    * Squared distances, that would become metric after square root.
-   * 
+   * <p>
    * E.g. squared Euclidean.
    * 
    * @return {@code true} when squared.

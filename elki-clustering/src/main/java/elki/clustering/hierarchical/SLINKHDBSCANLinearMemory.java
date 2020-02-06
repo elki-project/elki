@@ -68,7 +68,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */
@@ -117,7 +117,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       // Steps 1,3,4 are exactly as in SLINK
-      step1(id, pi, lambda);
+      pi.put(id, id);
       // Step 2 is modified to use a different distance
       step2(id, processedIDs, distQ, coredists, m);
       step3(id, pi, lambda, processedIDs, m);
@@ -130,22 +130,6 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
     LOG.ensureCompleted(progress);
 
     return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
-  }
-
-  /**
-   * First step: Initialize P(id) = id, L(id) = infinity.
-   *
-   * @param id the id of the object to be inserted into the pointer
-   *        representation
-   * @param pi Pi data store
-   * @param lambda Lambda data store
-   */
-  private void step1(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDataStore lambda) {
-    // P(n+1) = n+1:
-    pi.put(id, id);
-    // L(n+1) = infinity
-    // Initialized already.
-    // lambda.putDouble(id, Double.POSITIVE_INFINITY);
   }
 
   /**

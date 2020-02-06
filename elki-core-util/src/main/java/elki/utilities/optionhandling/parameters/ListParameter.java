@@ -31,10 +31,10 @@ import elki.utilities.optionhandling.OptionID;
  * @author Erich Schubert
  * @since 0.1
  *
- * @param <THIS> Type self-reference
+ * @param <P> Type self-reference
  * @param <T> List type
  */
-public abstract class ListParameter<THIS extends ListParameter<THIS, T>, T> extends AbstractParameter<THIS, T> {
+public abstract class ListParameter<P extends ListParameter<P, T>, T> extends AbstractParameter<P, T> {
   /**
    * A pattern defining a &quot;,&quot;.
    */

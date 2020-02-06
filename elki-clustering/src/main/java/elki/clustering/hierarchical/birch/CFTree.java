@@ -532,7 +532,7 @@ public class CFTree {
     @Override
     public Iter advance() {
       current = null;
-      while(queue.size() > 0) {
+      while(!queue.isEmpty()) {
         // Pop last element
         ClusteringFeature f = queue.remove(queue.size() - 1);
         if(!(f instanceof TreeNode)) { // lead

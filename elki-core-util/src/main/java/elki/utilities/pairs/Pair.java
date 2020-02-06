@@ -22,10 +22,10 @@ package elki.utilities.pairs;
 
 /**
  * Simple class wrapping two objects.
- *
+ * <p>
  * <b>Do not use this for primitive types such as {@code Integer} and
  * {@code Double} - avoid the memory waste and garbage collection overhead!</b>
- *
+ * <p>
  * Does not implement any "special" interfaces such as Comparable. If you need
  * more complicated pairs, please use <em>domain specific</em> code, with more
  * meaningful field names and comparators.
@@ -33,19 +33,19 @@ package elki.utilities.pairs;
  * @author Erich Schubert
  * @since 0.2
  *
- * @param <FIRST> first type
- * @param <SECOND> second type
+ * @param <F> first type
+ * @param <S> second type
  */
-public class Pair<FIRST, SECOND> {
+public class Pair<F, S> {
   /**
    * First value in pair
    */
-  public FIRST first;
+  public F first;
 
   /**
    * Second value in pair
    */
-  public SECOND second;
+  public S second;
 
   /**
    * Initialize pair
@@ -53,7 +53,7 @@ public class Pair<FIRST, SECOND> {
    * @param first first parameter
    * @param second second parameter
    */
-  public Pair(FIRST first, SECOND second) {
+  public Pair(F first, S second) {
     this.first = first;
     this.second = second;
   }
@@ -71,7 +71,7 @@ public class Pair<FIRST, SECOND> {
    *
    * @return first element in pair
    */
-  public final FIRST getFirst() {
+  public final F getFirst() {
     return first;
   }
 
@@ -80,7 +80,7 @@ public class Pair<FIRST, SECOND> {
    *
    * @param first new value for first element
    */
-  public final void setFirst(FIRST first) {
+  public final void setFirst(F first) {
     this.first = first;
   }
 
@@ -89,7 +89,7 @@ public class Pair<FIRST, SECOND> {
    *
    * @return second element in pair
    */
-  public final SECOND getSecond() {
+  public final S getSecond() {
     return second;
   }
 
@@ -98,13 +98,13 @@ public class Pair<FIRST, SECOND> {
    *
    * @param second new value for second element
    */
-  public final void setSecond(SECOND second) {
+  public final void setSecond(S second) {
     this.second = second;
   }
 
   /**
    * Simple equals statement.
-   *
+   * <p>
    * This Pair equals another Object if they are identical or if the other
    * Object is also a Pair and the {@link #first} and {@link #second} element of
    * this Pair equal the {@link #first} and {@link #second} element,

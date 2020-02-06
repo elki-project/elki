@@ -284,7 +284,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
       else {
         if(c2 == null) {
           c1.add(succ);
-          clusters.put(succ, c2 = c1);
+          clusters.put(succ, c1);
         }
         else {
           c2.addDBIDs(c1);

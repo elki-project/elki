@@ -38,7 +38,7 @@ public abstract class AbstractProjection implements Projection {
   /**
    * Projector used
    */
-  final private Projector p;
+  private final Projector p;
 
   /**
    * Constructor.

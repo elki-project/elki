@@ -230,7 +230,7 @@ public class QuickSelect {
      */
     default void isSorted(T data, int begin, int end) {
       // nothing to do by default
-    };
+    }
   }
 
   /**

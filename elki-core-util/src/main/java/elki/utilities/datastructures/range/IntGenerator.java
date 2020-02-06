@@ -25,15 +25,15 @@ import java.util.stream.IntStream;
 
 /**
  * Generators of integer ranges.
- *
+ * <p>
  * This is similar in spirit to the Java {@link IntStream}, but it allows the
  * stream to be processed multiple times, and allows accessing the minimum and
  * maximum. This is necessary to, e.g., precompute nearest neighbors for the
  * maximum k employed and similar.
- *
+ * <p>
  * Duplicates values are not automatically removed, and the values are not
  * necessarily ordered.
- *
+ * <p>
  * TODO: fully support the Java 8 {@link IntStream} API, in particular
  * spliterators for parallel processing.
  *

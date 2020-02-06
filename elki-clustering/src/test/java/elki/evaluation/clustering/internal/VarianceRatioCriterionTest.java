@@ -68,7 +68,7 @@ public class VarianceRatioCriterionTest {
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+    VarianceRatioCriterion varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
         with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
@@ -105,7 +105,7 @@ public class VarianceRatioCriterionTest {
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+    VarianceRatioCriterion varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
         with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
     // create clustering
     ByLabelClustering clustering = new ELKIBuilder<>(ByLabelClustering.class). //
@@ -142,7 +142,7 @@ public class VarianceRatioCriterionTest {
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
-    VarianceRatioCriterion<? extends NumberVector> varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
+    VarianceRatioCriterion varacri = new ELKIBuilder<>(VarianceRatioCriterion.class). //
         with(VarianceRatioCriterion.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
 
     // create clustering

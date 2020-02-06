@@ -255,7 +255,7 @@ public class DBCV<O> implements Evaluator {
   @Override
   public void processNewResult(Object newResult) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(newResult);
-    if(crs.size() < 1) {
+    if(crs.isEmpty()) {
       return;
     }
     Database db = ResultUtil.findDatabase(newResult);

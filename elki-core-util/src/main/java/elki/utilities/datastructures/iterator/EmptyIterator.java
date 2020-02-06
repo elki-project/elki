@@ -84,5 +84,4 @@ public class EmptyIterator<O> implements It<O> {
   public void forEach(Consumer<? super O> action) {
     // Empty!
   }
-
 }

@@ -45,10 +45,10 @@ import elki.utilities.optionhandling.constraints.ParameterConstraint;
  * @composed - - - OptionID
  * @assoc - - - ParameterConstraint
  * 
- * @param <THIS> type self-reference
+ * @param <P> type self-reference
  * @param <T> the type of a possible value (i.e., the type of the option)
  */
-public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>, T> implements Parameter<T> {
+public abstract class AbstractParameter<P extends AbstractParameter<P, T>, T> implements Parameter<T> {
   /**
    * The option name.
    */
@@ -110,10 +110,10 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @SuppressWarnings("unchecked")
   @Override
-  public THIS setDefaultValue(T defaultValue) {
+  public P setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
     this.optionalParameter = true;
-    return (THIS) this;
+    return (P) this;
   }
 
   @Override
@@ -139,9 +139,9 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @SuppressWarnings("unchecked")
   @Override
-  public THIS setOptional(boolean opt) {
+  public P setOptional(boolean opt) {
     this.optionalParameter = opt;
-    return (THIS) this;
+    return (P) this;
   }
 
   @Override
@@ -224,9 +224,6 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
     return obj != null && validate(parseValue(obj));
   }
 
-  @Override
-  public abstract String getSyntax();
-
   /**
    * Parse a given value into the destination type.
    * 
@@ -237,18 +234,15 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
   protected abstract T parseValue(Object obj) throws ParameterException;
 
   @Override
-  public abstract String getValueAsString();
-
-  @Override
   public String getDefaultValueAsString() {
     return getDefaultValue().toString();
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public THIS addConstraint(ParameterConstraint<? super T> constraint) {
+  public P addConstraint(ParameterConstraint<? super T> constraint) {
     (constraints != null ? constraints : (constraints = new ArrayList<>(2))).add(constraint);
-    return (THIS) this;
+    return (P) this;
   }
 
   @Override

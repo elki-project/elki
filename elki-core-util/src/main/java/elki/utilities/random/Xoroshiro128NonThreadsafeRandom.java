@@ -111,7 +111,7 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
 
   @Override
   public double nextDouble() {
-    return ((long) nextLong() >>> 11) * 0x1.0p-53;
+    return (nextLong() >>> 11) * 0x1.0p-53;
   }
 
   static final String BADBOUND = "bound must be positive";

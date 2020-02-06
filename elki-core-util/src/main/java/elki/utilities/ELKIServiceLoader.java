@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import elki.utilities.exceptions.AbortException;
@@ -41,7 +42,7 @@ import elki.utilities.exceptions.AbortException;
 public class ELKIServiceLoader {
   /**
    * Resource name prefix for the ELKI functionality discovery.
-   *
+   * <p>
    * Note: resources are always separated with /, even on Windows.
    */
   public static final String RESOURCE_PREFIX = "META-INF/elki/";
@@ -83,7 +84,7 @@ public class ELKIServiceLoader {
         URLConnection conn = nextElement.openConnection();
         conn.setUseCaches(false);
         try (InputStream ist = conn.getInputStream();
-            InputStreamReader is = new InputStreamReader(ist, "UTF-8")) {
+            InputStreamReader is = new InputStreamReader(ist, StandardCharsets.UTF_8)) {
           int start = 0, cur = 0, valid = is.read(buf, 0, buf.length);
           char c;
           while(cur < valid) {
@@ -143,7 +144,8 @@ public class ELKIServiceLoader {
     // Class name:
     String cname = new String(line, begin, cend - begin);
     ELKIServiceRegistry.register(parent, cname);
-    for(int abegin = cend + 1, aend = -1; abegin < end; abegin = aend + 1) {
+    int abegin = cend + 1, aend = -1;
+    while(abegin < end) {
       // Skip whitespace:
       while(abegin < end && line[abegin] == ' ') {
         abegin++;
@@ -154,6 +156,7 @@ public class ELKIServiceLoader {
         aend++;
       }
       ELKIServiceRegistry.registerAlias(parent, new String(line, abegin, aend - abegin), cname);
+      abegin = aend + 1;
     }
   }
 }

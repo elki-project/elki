@@ -24,7 +24,7 @@ import elki.utilities.optionhandling.ParameterException;
 
 /**
  * Interface for specifying parameter constraints.
- *
+ * <p>
  * Each class specifying a constraint addressing only one parameter should
  * implement this interface.
  * The constraint value for testing the parameter should be defined as private

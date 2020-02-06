@@ -106,11 +106,7 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
       cdist = new double[k][k];
     }
 
-    /**
-     * Perform initial cluster assignment.
-     *
-     * @return Number of changes (i.e. relation size)
-     */
+    @Override
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
       initialSeperation(cdist);

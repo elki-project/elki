@@ -52,7 +52,6 @@ public class LinearIntGenerator implements IntGenerator {
    * @param stop Stop value (inclusive, if reachable by step size)
    */
   public LinearIntGenerator(int start, int step, int stop) {
-    assert (start <= stop);
     if(step == 0 && start != stop) {
       throw new IllegalStateException("Step size cannot be zero.");
     }
@@ -93,7 +92,6 @@ public class LinearIntGenerator implements IntGenerator {
   public StringBuilder serializeTo(StringBuilder buf) {
     return buf.append(start).append(",+=").append(step).append(',').append(stop);
   }
-
 
   @Override
   public String toString() {

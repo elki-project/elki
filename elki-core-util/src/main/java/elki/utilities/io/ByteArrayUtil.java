@@ -21,25 +21,20 @@
 package elki.utilities.io;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import elki.logging.LoggingUtil;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Class with various utilities for manipulating byte arrays.
- *
+ * <p>
  * If you find a reusable copy of this in the Java API, please tell me. Using a
  * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
  * doesn't seem appropriate.
- *
+ * <p>
  * C.f. {@link java.io.DataOutputStream} and
  * {@link java.io.ByteArrayOutputStream}
  *
@@ -486,7 +481,7 @@ public final class ByteArrayUtil {
     /**
      * Character set to use.
      */
-    Charset charset = Charset.forName("UTF-8");
+    Charset charset = StandardCharsets.UTF_8;
 
     /**
      * Encoder.
@@ -605,9 +600,9 @@ public final class ByteArrayUtil {
 
   /**
    * Write an signed integer using a variable-length encoding.
-   *
+   * <p>
    * The sign bit is moved to bit 0.
-   *
+   * <p>
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
    *
@@ -621,9 +616,9 @@ public final class ByteArrayUtil {
 
   /**
    * Write a signed long using a variable-length encoding.
-   *
+   * <p>
    * The sign bit is moved to bit 0.
-   *
+   * <p>
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
    *
@@ -637,7 +632,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write an unsigned integer using a variable-length encoding.
-   *
+   * <p>
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
    *
@@ -656,10 +651,10 @@ public final class ByteArrayUtil {
 
   /**
    * Write an unsigned long using a variable-length encoding.
-   *
+   * <p>
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
-   *
+   * <p>
    * Note that for integers, this will result in the same encoding as
    * {@link #writeUnsignedVarint}
    *
@@ -678,7 +673,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write a string to the buffer.
-   *
+   * <p>
    * See {@link StringSerializer} for details.
    *
    * @param buffer Buffer to write to
@@ -773,8 +768,7 @@ public final class ByteArrayUtil {
    * @return Integer value
    */
   public static int readUnsignedVarint(ByteBuffer buffer) throws IOException {
-    int val = 0;
-    int bits = 0;
+    int val = 0, bits = 0;
     while(true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
@@ -823,7 +817,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read a string from the buffer.
-   *
+   * <p>
    * Note: this is not 100% symmetric to writeString, as a {@code null} value
    * and the empty string are encoded the same way.
    *
@@ -832,51 +826,5 @@ public final class ByteArrayUtil {
    */
   public static String readString(ByteBuffer buffer) throws IOException {
     return STRING_SERIALIZER.fromByteBuffer(buffer);
-  }
-
-  /**
-   * Unmap a byte buffer.
-   *
-   * @param map Byte buffer to unmap.
-   */
-  public static void unmapByteBuffer(final MappedByteBuffer map) {
-    if(map == null) {
-      return;
-    }
-    map.force();
-    try {
-      if(Runtime.class.getDeclaredMethod("version") != null)
-        return; // At later Java, the hack below will not work anymore.
-    }
-    catch(NoSuchMethodException e) {
-      // This is an ugly hack, but all that Java <8 offers to help freeing
-      // memory allocated using such buffers.
-      // See also: http://bugs.sun.com/view_bug.do?bug_id=4724038
-      AccessController.doPrivileged(new PrivilegedAction<Object>() {
-        @Override
-        public Object run() {
-          try {
-            Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
-            if(getCleanerMethod == null) {
-              return null;
-            }
-            getCleanerMethod.setAccessible(true);
-            Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
-            Method cleanMethod = cleaner.getClass().getMethod("clean");
-            if(cleanMethod == null) {
-              return null;
-            }
-            cleanMethod.invoke(cleaner);
-          }
-          catch(Exception e) {
-            LoggingUtil.exception(e);
-          }
-          return null;
-        }
-      });
-    }
-    catch(SecurityException e1) {
-      // Ignore.
-    }
   }
 }

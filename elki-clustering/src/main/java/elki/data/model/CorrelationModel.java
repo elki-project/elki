@@ -79,7 +79,7 @@ public class CorrelationModel extends SimplePrototypeModel<double[]> {
       out.commentPrintLn(label);
     }
     out.commentPrintLn("Model class: " + getClass().getName());
-    out.commentPrintLn("Centroid: " + getPrototype().toString());
+    out.commentPrintLn("Centroid: " + FormatUtil.format(getPrototype()));
     out.commentPrintLn("Strong Eigenvectors:");
     String strong = FormatUtil.format(getPCAResult().getStrongEigenvectors());
     while(strong.endsWith("\n")) {

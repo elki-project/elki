@@ -120,7 +120,6 @@ public class Tokenizer implements Iter {
           this.quoted = true;
           return this;
         }
-        continue;
       }
       else {
         this.start = index;
@@ -155,8 +154,6 @@ public class Tokenizer implements Iter {
    * @return Current value as substring.
    */
   public String getSubstring() {
-    // TODO: detect Java <6 and make sure we only return the substring?
-    // With java 7, String.substring will arraycopy the characters.
     return input.subSequence(start, end).toString();
   }
 
@@ -166,24 +163,22 @@ public class Tokenizer implements Iter {
    * @return Current value as substring.
    */
   public String getStrippedSubstring() {
-    // TODO: detect Java <6 and make sure we only return the substring?
-    // With java 7, String.substring will arraycopy the characters.
-    int sstart = start, send = end;
-    while(sstart < send) {
+    int sstart = start, ssend = end;
+    while(sstart < ssend) {
       char c = input.charAt(sstart);
       if(c != ' ' || c != '\n' || c != '\r' || c != '\t') {
         break;
       }
       ++sstart;
     }
-    while(--send >= sstart) {
-      char c = input.charAt(send);
+    while(--ssend >= sstart) {
+      char c = input.charAt(ssend);
       if(c != ' ' || c != '\n' || c != '\r' || c != '\t') {
         break;
       }
     }
-    ++send;
-    return (sstart < send) ? input.subSequence(sstart, send).toString() : "";
+    ++ssend;
+    return (sstart < ssend) ? input.subSequence(sstart, ssend).toString() : "";
   }
 
   /**
@@ -192,7 +187,7 @@ public class Tokenizer implements Iter {
    * @return double value
    * @throws NumberFormatException when current value cannot be parsed as double
    */
-  public double getDouble() throws NumberFormatException {
+  public double getDouble() {
     return ParseUtil.parseDouble(input, start, end);
   }
 
@@ -202,7 +197,7 @@ public class Tokenizer implements Iter {
    * @return int value
    * @throws NumberFormatException when current value cannot be parsed as int.
    */
-  public int getIntBase10() throws NumberFormatException {
+  public int getIntBase10() {
     return ParseUtil.parseIntBase10(input, start, end);
   }
 
@@ -212,7 +207,7 @@ public class Tokenizer implements Iter {
    * @return long value
    * @throws NumberFormatException when current value cannot be parsed as long.
    */
-  public long getLongBase10() throws NumberFormatException {
+  public long getLongBase10() {
     return ParseUtil.parseLongBase10(input, start, end);
   }
 
@@ -227,7 +222,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Detect quote characters.
-   *
+   * <p>
    * TODO: support more than one quote character, make sure opening and closing
    * quotes match then.
    *

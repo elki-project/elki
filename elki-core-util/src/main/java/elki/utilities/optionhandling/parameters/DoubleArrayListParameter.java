@@ -86,9 +86,9 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
 
   @Override
   public String getValueAsString() {
-    StringBuilder buf = new StringBuilder();
     List<double[]> val = getValue();
     Iterator<double[]> valiter = val.iterator();
+    StringBuilder buf = new StringBuilder(100 * val.size());
     while(valiter.hasNext()) {
       buf.append(FormatUtil.format(valiter.next(), LIST_SEP));
       // Append separation character
@@ -101,9 +101,9 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
 
   @Override
   public String getDefaultValueAsString() {
-    StringBuilder buf = new StringBuilder();
     List<double[]> val = getDefaultValue();
     Iterator<double[]> valiter = val.iterator();
+    StringBuilder buf = new StringBuilder(100 * val.size());
     while(valiter.hasNext()) {
       buf.append(FormatUtil.format(valiter.next(), LIST_SEP));
       // Append separation character

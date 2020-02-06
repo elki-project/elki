@@ -122,10 +122,9 @@ public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Cluste
     for(Cluster<Model> cur : clusters) {
       Cluster<Model> bestparent = null;
       for(Cluster<Model> oth : clusters) {
-        if(oth != cur && cur.getName().startsWith(oth.getName())) {
-          if(bestparent == null || oth.getName().length() > bestparent.getName().length()) {
-            bestparent = oth;
-          }
+        if(oth != cur && cur.getName().startsWith(oth.getName()) && //
+            (bestparent == null || oth.getName().length() > bestparent.getName().length())) {
+          bestparent = oth;
         }
       }
       if(bestparent != null) {
@@ -140,7 +139,7 @@ public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Cluste
     }
     // Collected noise IDs.
     if(!noiseids.isEmpty()) {
-      Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
+      Cluster<Model> c = new Cluster<>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
       clustering.addToplevelCluster(c);
     }

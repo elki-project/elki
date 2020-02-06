@@ -22,7 +22,6 @@ package elki.database;
 
 import java.util.Collection;
 
-import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeInformation;
 import elki.database.datastore.DataStoreEvent;
 import elki.database.datastore.DataStoreListener;
@@ -68,7 +67,7 @@ public interface Database {
    * @param hints Optimizer hints
    * @return representation
    */
-  <O> Relation<O> getRelation(TypeInformation restriction, Object... hints) throws NoSupportedDataTypeException;
+  <O> Relation<O> getRelation(TypeInformation restriction, Object... hints);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

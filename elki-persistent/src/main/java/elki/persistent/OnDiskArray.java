@@ -35,7 +35,7 @@ import elki.utilities.io.ByteArrayUtil;
 
 /**
  * On Disc Array storage for records of a given size.
- * 
+ * <p>
  * This can be used to implement various fixed size record-based data
  * structures. The file format is designed to have a fixed-size header followed
  * by the actual data.
@@ -50,7 +50,7 @@ import elki.utilities.io.ByteArrayUtil;
 public class OnDiskArray implements AutoCloseable {
   /**
    * Serial version.
-   * 
+   * <p>
    * NOTE: Change this version whenever the file structure is changed in an
    * incompatible way: This will modify the file magic, and thus prevent
    * applications from reading incompatible files.
@@ -86,7 +86,7 @@ public class OnDiskArray implements AutoCloseable {
   /**
    * Random Access File object.
    */
-  final private FileChannel file;
+  private final FileChannel file;
 
   /**
    * Lock for the file that will be kept while writing.
@@ -214,7 +214,7 @@ public class OnDiskArray implements AutoCloseable {
    */
   private synchronized void mapArray() throws IOException {
     if(map != null) {
-      ByteArrayUtil.unmapByteBuffer(map);
+      map.force();
       map = null;
     }
     MapMode mode = writable ? MapMode.READ_WRITE : MapMode.READ_ONLY;
@@ -391,7 +391,7 @@ public class OnDiskArray implements AutoCloseable {
   public synchronized void close() throws IOException {
     writable = false;
     if(map != null) {
-      ByteArrayUtil.unmapByteBuffer(map);
+      map.force();
       map = null;
     }
     if(lock != null) {

@@ -75,13 +75,14 @@ public abstract class AbstractApplication {
    * Get the version number from the properties.
    */
   static {
-    String version = "DEVELOPMENT";
+    String version;
     try {
       Properties prop = new Properties();
       prop.load(AbstractApplication.class.getClassLoader().getResourceAsStream("META-INF/elki.properties"));
       version = prop.getProperty("elki.version");
     }
     catch(Exception e) {
+      version = "DEVELOPMENT"; 
     }
     VERSION = version;
   }
@@ -137,7 +138,7 @@ public abstract class AbstractApplication {
       }
       // Parse debug parameter
       Par.applyLoggingLevels(Par.parseDebugParameter(params));
-      if(params.getErrors().size() > 0) {
+      if(!params.getErrors().isEmpty()) {
         params.logAndClearReportedErrors();
         System.exit(1);
       }
@@ -156,7 +157,7 @@ public abstract class AbstractApplication {
         LOG.verbose(usage(config.getAllParameters()));
         System.exit(1);
       }
-      if(params.getErrors().size() > 0) {
+      if(!params.getErrors().isEmpty()) {
         LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose("ERROR: The following configuration errors prevented execution:");
         for(ParameterException e : params.getErrors()) {
@@ -225,7 +226,7 @@ public abstract class AbstractApplication {
     }
     try {
       LoggingConfiguration.setVerbose(Level.VERBOSE);
-      LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "").toString());
+      LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth()).toString());
     }
     catch(Exception e) {
       LOG.exception("Error instantiating class to describe.", e.getCause());
@@ -261,17 +262,17 @@ public abstract class AbstractApplication {
     /**
      * Flag to obtain help-message.
      */
-    public static final OptionID HELP_ID = new OptionID("h", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
+    public static final OptionID HELP_ID = new OptionID("h", "Request a help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.");
 
     /**
      * Flag to obtain help-message.
      */
-    public static final OptionID HELP_LONG_ID = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
+    public static final OptionID HELP_LONG_ID = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. Causes immediate stop of the program.");
 
     /**
      * Optional Parameter to specify a class to obtain a description for.
      */
-    public static final OptionID DESCRIPTION_ID = new OptionID("description", "Class to obtain a description of. " + "Causes immediate stop of the program.");
+    public static final OptionID DESCRIPTION_ID = new OptionID("description", "Class to obtain a description of. Causes immediate stop of the program.");
 
     /**
      * Optional Parameter to specify a class to enable debugging for.
@@ -295,7 +296,7 @@ public abstract class AbstractApplication {
         Flag verbose2F = new Flag(Par.VERBOSE_ID);
         return (config.grab(verbose2F) && verbose2F.isTrue()) ? Level.VERYVERBOSE : Level.VERBOSE;
       }
-      return Level.WARNING;
+      return java.util.logging.Level.WARNING;
     }
 
     /**
@@ -325,7 +326,7 @@ public abstract class AbstractApplication {
               chunks = new String[] { LoggingConfiguration.TOPLEVEL_PACKAGE, chunks[0] };
             }
             catch(IllegalArgumentException e) {
-              chunks = new String[] { chunks[0], Level.FINEST.getName() };
+              chunks = new String[] { chunks[0], java.util.logging.Level.FINEST.getName() };
             }
           }
           else {

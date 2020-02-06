@@ -21,6 +21,7 @@
 package elki.utilities.optionhandling.parameterization;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import elki.utilities.optionhandling.ParameterException;
@@ -55,9 +56,7 @@ public class ChainedParameterization extends AbstractParameterization {
    * @param ps Parameterizations
    */
   public ChainedParameterization(Parameterization... ps) {
-    for(Parameterization p : ps) {
-      chain.add(p);
-    }
+    chain.addAll(Arrays.asList(ps));
   }
 
   /**

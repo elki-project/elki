@@ -49,12 +49,12 @@ public class ELKIServiceRegistry {
   /**
    * Registry data.
    */
-  private static Map<Class<?>, Entry> data = new HashMap<Class<?>, Entry>();
+  private static Map<Class<?>, Entry> data = new HashMap<>();
 
   /**
    * Value to abuse for failures.
    */
-  final static Class<?> FAILED_LOAD = Entry.class;
+  private static final Class<?> FAILED_LOAD = Entry.class;
 
   /**
    * Do not use constructor.
@@ -157,11 +157,7 @@ public class ELKIServiceRegistry {
    * @param cname Class name
    */
   protected static void register(Class<?> parent, String cname) {
-    Entry e = data.get(parent);
-    if(e == null) {
-      data.put(parent, e = new Entry());
-    }
-    e.addName(cname);
+    data.computeIfAbsent(parent, x -> new Entry()).addName(cname);
   }
 
   /**
@@ -175,10 +171,7 @@ public class ELKIServiceRegistry {
    * @param clazz Implementation
    */
   protected static void register(Class<?> parent, Class<?> clazz) {
-    Entry e = data.get(parent);
-    if(e == null) {
-      data.put(parent, e = new Entry());
-    }
+    Entry e = data.computeIfAbsent(parent, x -> new Entry());
     final String cname = clazz.getCanonicalName();
     e.addHit(cname, clazz);
     if(clazz.isAnnotationPresent(Alias.class)) {
@@ -197,9 +190,7 @@ public class ELKIServiceRegistry {
    * @param cname Class name
    */
   protected static void registerAlias(Class<?> parent, String alias, String cname) {
-    Entry e = data.get(parent);
-    assert (e != null);
-    e.addAlias(alias, cname);
+    data.get(parent).addAlias(alias, cname);
   }
 
   /**
@@ -405,7 +396,7 @@ public class ELKIServiceRegistry {
     if(e != null && e.aliaslen > 0) {
       for(int i = 0; i < e.aliaslen; i += 2) {
         if(e.aliases[i].equalsIgnoreCase(value) || e.aliases[i].equalsIgnoreCase(value2)) {
-          return findImplementation(restrictionClass, e.aliases[++i]);
+          return findImplementation(restrictionClass, e.aliases[i + 1]);
         }
       }
     }

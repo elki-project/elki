@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.birch.CFTree.LeafIterator;
-import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -77,7 +77,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Data Min. Knowl. Discovery", //
     url = "https://doi.org/10.1023/A:1009783824328", //
     bibkey = "DBLP:journals/datamine/ZhangRL97")
-public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class BIRCHLloydKMeans implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
@@ -334,7 +334,7 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    *
    * @author Andreas Lang
    */
-  public static class Par<M extends MeanModel> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * CFTree factory.
      */
@@ -358,10 +358,10 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
-      new IntParameter(AbstractKMeans.K_ID) //
+      new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new IntParameter(AbstractKMeans.MAXITER_ID, 0)//
+      new IntParameter(KMeans.MAXITER_ID, 0)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> maxiter = x);
       // TODO: make parameterizable, implement alternatives?
@@ -369,8 +369,8 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
     }
 
     @Override
-    public BIRCHLloydKMeans<M> make() {
-      return new BIRCHLloydKMeans<M>(cffactory, k, maxiter, initialization);
+    public BIRCHLloydKMeans make() {
+      return new BIRCHLloydKMeans(cffactory, k, maxiter, initialization);
     }
   }
 }

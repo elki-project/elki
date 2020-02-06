@@ -261,7 +261,7 @@ public class Segments implements Iterable<Segment> {
    * split by another clustering in multiple segments, resulting in a segment
    * with unpaired objects, describing the missing pairs between the split
    * cluster / between the segments.
-   * 
+   * <p>
    * Basically we compare only two clusterings at once. If those clusterings do
    * not have the whole cluster in common, we have at least three segments (two
    * cluster), one of them containing the unpaired segment. A segmentID 3-0,

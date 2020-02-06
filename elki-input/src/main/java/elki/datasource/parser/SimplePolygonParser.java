@@ -105,17 +105,17 @@ public class SimplePolygonParser extends AbstractStreamingParser {
   /**
    * (Reused) storage of coordinates.
    */
-  final private List<double[]> coords = new ArrayList<>();
+  private final List<double[]> coords = new ArrayList<>();
 
   /**
    * (Reused) storage of polygons.
    */
-  final private List<Polygon> polys = new ArrayList<>();
+  private final List<Polygon> polys = new ArrayList<>();
 
   /**
    * (Reused) store for labels.
    */
-  final private ArrayList<String> labels = new ArrayList<>();
+  private final ArrayList<String> labels = new ArrayList<>();
 
   @Override
   public Event nextEvent() {

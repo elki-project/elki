@@ -196,12 +196,7 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
       return relation.size();
     }
 
-    /**
-     * Reassign objects, but avoid unnecessary computations based on their
-     * bounds.
-     *
-     * @return number of objects reassigned
-     */
+    @Override
     protected int assignToNearestCluster() {
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

@@ -40,8 +40,8 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
@@ -64,8 +64,6 @@ import net.jafama.FastMath;
  * <p>
  * This is based on the original code provided by Johannes Schneider, with
  * ELKIfications and optimizations by Erich Schubert.
- * <p>
- * TODO: implement one of the Index APIs?
  *
  * @author Johannes Schneider
  * @author Erich Schubert
@@ -76,7 +74,7 @@ import net.jafama.FastMath;
     booktitle = "Proc. 22nd ACM Int. Conf. on Information & Knowledge Management (CIKM 2013)", //
     url = "https://doi.org/10.1145/2505515.2505590", //
     bibkey = "DBLP:conf/cikm/SchneiderV13")
-public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
+public class RandomProjectedNeighborsAndDensities {
   /**
    * Class logger.
    */
@@ -110,7 +108,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
   /**
    * entire point set
    */
-  Relation<V> points;
+  Relation<? extends NumberVector> points;
 
   /**
    * sets that resulted from recursive split of entire point set
@@ -150,16 +148,16 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
    *        partitioned (roughly corresponds to minPts in OPTICS)
    * @param ptList Points that are to be projected
    */
-  public void computeSetsBounds(Relation<V> points, int minSplitSize, DBIDs ptList) {
+  public void computeSetsBounds(Relation<? extends NumberVector> points, int minSplitSize, DBIDs ptList) {
     this.minSplitSize = minSplitSize;
     final int size = points.size();
     final int dim = RelationUtil.dimensionality(points);
     this.points = points;
 
     // perform O(log N+log dim) splits of the entire point sets projections
-    int nPointSetSplits = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1));
+    int nPointSetSplits = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1.));
     // perform O(log N+log dim) projections of the point set onto a random line
-    int nProject1d = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1));
+    int nProject1d = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1.));
 
     LOG.statistics(new LongStatistic(PREFIX + ".partition-size", nPointSetSplits));
     LOG.statistics(new LongStatistic(PREFIX + ".num-projections", nProject1d));
@@ -210,9 +208,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     FiniteProgress splitp = LOG.isVerbose() ? new FiniteProgress("Splitting data", nPointSetSplits, LOG) : null;
     for(int avgP = 0; avgP < nPointSetSplits; avgP++) {
       // shuffle projections
-      for(int i = 0; i < nProject1d; i++) {
-        tmpPro[i] = projectedPoints[i];
-      }
+      System.arraycopy(projectedPoints, 0, tmpPro, 0, nProject1d);
       // Shuffle axes (Fisher-Yates)
       for(int i = 1; i < nProject1d; i++) {
         final int j = rand.nextInt(i);
@@ -368,7 +364,8 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
    *
    * @return list of neighbors for each point
    */
-  public DataStore<? extends DBIDs> getNeighs() {
+  @SuppressWarnings("unchecked")
+  public DataStore<DBIDs> getNeighs() {
     final DBIDs ids = points.getDBIDs();
     // init lists
     WritableDataStore<ModifiableDBIDs> neighs = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ModifiableDBIDs.class);
@@ -395,7 +392,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
       LOG.incrementProcessed(splitp);
     }
     LOG.ensureCompleted(splitp);
-    return neighs;
+    return (DataStore<DBIDs>) (DataStore<?>) neighs;
   }
 
   /**
@@ -414,7 +411,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
       final int len = pinSet.size();
       final int indoff = len >> 1;
       pinSet.assignVar(indoff, v);
-      V midpoint = points.get(v);
+      NumberVector midpoint = points.get(v);
       for(DBIDArrayIter it = pinSet.iter(); it.getOffset() < len; it.advance()) {
         if(DBIDUtil.equal(it, v)) {
           continue;
@@ -470,8 +467,8 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     }
 
     @Override
-    public RandomProjectedNeighborsAndDensities<NumberVector> make() {
-      return new RandomProjectedNeighborsAndDensities<>(rnd);
+    public RandomProjectedNeighborsAndDensities make() {
+      return new RandomProjectedNeighborsAndDensities(rnd);
     }
   }
 }

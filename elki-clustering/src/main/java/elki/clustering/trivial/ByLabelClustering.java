@@ -132,7 +132,7 @@ public class ByLabelClustering implements ClusteringAlgorithm<Clustering<Model>>
         continue;
       }
       // Build a cluster
-      Cluster<Model> c = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
+      Cluster<Model> c = new Cluster<>(entry.getKey(), ids, ClusterModel.CLUSTER);
       if(noisepattern != null && noisepattern.matcher(entry.getKey()).find()) {
         c.setNoise(true);
       }
@@ -140,7 +140,7 @@ public class ByLabelClustering implements ClusteringAlgorithm<Clustering<Model>>
     }
     // Collected noise IDs.
     if(noiseids.size() > 0) {
-      Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
+      Cluster<Model> c = new Cluster<>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
       result.addToplevelCluster(c);
     }

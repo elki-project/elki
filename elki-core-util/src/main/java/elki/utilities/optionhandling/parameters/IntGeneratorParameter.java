@@ -73,7 +73,7 @@ public class IntGeneratorParameter extends AbstractParameter<IntGeneratorParamet
       }
     }
     if(obj instanceof Integer) {
-      return new StaticIntGenerator(new int[] { (Integer) obj });
+      return new StaticIntGenerator(((Integer) obj).intValue());
     }
     throw new WrongParameterValueException(this, obj.toString(), "requires a range of integers!");
   }

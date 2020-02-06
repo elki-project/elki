@@ -35,6 +35,13 @@ import elki.utilities.io.ParseUtil;
  */
 public class ParseIntRanges {
   /**
+   * Utility class, do not instantiate.
+   */
+  private ParseIntRanges() {
+    // Utility class
+  }
+
+  /**
    * Parse integer ranges, in different syntaxes.
    *
    * <code>
@@ -158,7 +165,7 @@ public class ParseIntRanges {
 
   /**
    * Find the next separator.
-   *
+   * <p>
    * TODO: allow other separators, too?
    *
    * @param str String
@@ -169,5 +176,4 @@ public class ParseIntRanges {
     int next = str.indexOf(',', start);
     return next == -1 ? str.length() : next;
   }
-
 }

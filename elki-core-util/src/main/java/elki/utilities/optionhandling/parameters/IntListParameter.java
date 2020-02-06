@@ -66,11 +66,10 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
     if(val.length == 0) {
       return "";
     }
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(10 * val.length);
     buf.append(val[0]);
     for(int i = 1; i < val.length; i++) {
-      buf.append(LIST_SEP);
-      buf.append(val[i]);
+      buf.append(LIST_SEP).append(val[i]);
     }
     return buf.toString();
   }

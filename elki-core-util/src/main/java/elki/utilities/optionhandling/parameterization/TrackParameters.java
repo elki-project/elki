@@ -157,11 +157,7 @@ public class TrackParameters implements Parameterization {
       LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());
     }
     parents.put(opt, owner);
-    List<Object> c = children.get(owner);
-    if(c == null) {
-      c = new ArrayList<>();
-      children.put(owner, c);
-    }
+    List<Object> c = children.computeIfAbsent(owner, x -> new ArrayList<>());
     if(!c.contains(opt)) {
       c.add(opt);
     }

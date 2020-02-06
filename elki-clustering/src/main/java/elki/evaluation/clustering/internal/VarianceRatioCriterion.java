@@ -73,7 +73,7 @@ import elki.utilities.optionhandling.parameters.Flag;
     url = "https://doi.org/10.1080/03610927408827101", //
     bibkey = "doi:10.1080/03610927408827101")
 @Alias({ "calinski-harabasz" })
-public class VarianceRatioCriterion<O> implements Evaluator {
+public class VarianceRatioCriterion implements Evaluator {
   /**
    * Logger for debug output.
    */
@@ -234,7 +234,7 @@ public class VarianceRatioCriterion<O> implements Evaluator {
    *
    * @author Stephan Baier
    */
-  public static class Par<O> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter for the option, how noise should be treated.
      */
@@ -265,8 +265,8 @@ public class VarianceRatioCriterion<O> implements Evaluator {
     }
 
     @Override
-    public VarianceRatioCriterion<? extends NumberVector> make() {
-      return new VarianceRatioCriterion<>(noiseOption, penalize);
+    public VarianceRatioCriterion make() {
+      return new VarianceRatioCriterion(noiseOption, penalize);
     }
   }
 }

@@ -387,7 +387,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
     /**
      * The actual approximation.
      */
-    final private VectorApproximation approx;
+    private final VectorApproximation approx;
 
     /**
      * 

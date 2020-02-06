@@ -59,7 +59,7 @@ public class EditDistance {
     super();
     final int[][] contingency = table.contingency;
     final int r = table.size1, c = table.size2;
-    int editFirst = 0, editSecond = 0;
+    int ed1 = 0, ed2 = 0;
     // We perform the editing the opposite way as in the original paper, hence
     // we switch the output variables. This is minimally simpler, as we do not
     // need to store the target label.
@@ -72,7 +72,7 @@ public class EditDistance {
           largestLabelSet = Math.max(largestLabelSet, contingency[j][i]);
         }
         // Merge, move remaining objects
-        editFirst += 1 + csize - largestLabelSet;
+        ed1 += 1 + csize - largestLabelSet;
       }
     }
     for(int i = 0; i < r; i++) {
@@ -84,11 +84,11 @@ public class EditDistance {
           largestLabelSet = Math.max(largestLabelSet, contingency[i][j]);
         }
         // Merge, move remaining objects
-        editSecond += 1 + csize - largestLabelSet;
+        ed2 += 1 + csize - largestLabelSet;
       }
     }
-    this.editFirst = editFirst;
-    this.editSecond = editSecond;
+    this.editFirst = ed1;
+    this.editSecond = ed2;
     this.editOperationsBaseline = contingency[r][c];
   }
 

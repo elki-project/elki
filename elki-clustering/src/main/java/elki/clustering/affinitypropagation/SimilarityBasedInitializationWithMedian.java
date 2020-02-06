@@ -78,16 +78,17 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
       mat[i][i] = sq.similarity(i1, i1) * .5;
     }
     i1.seek(0);
-    for(int i = 0, j = 0; i < size; i++, i1.advance()) {
+    int j = 0;
+    for(int i = 0; i < size; i++, i1.advance()) {
       final double[] mati = mat[i]; // Probably faster access.
       i2.seek(i + 1);
       for(int k = i + 1; k < size; k++, i2.advance()) {
         mati[k] = sq.similarity(i1, i2) - mati[i] - mat[k][k];
         mat[k][i] = mati[k]; // symmetry.
-        flat[j] = mati[k];
-        j++;
+        flat[j++] = mati[k];
       }
     }
+    assert j == (size * (size - 1)) >>> 1;
     double median = QuickSelect.quantile(flat, quantile);
     // On the diagonal, we place the median
     for(int i = 0; i < size; i++) {

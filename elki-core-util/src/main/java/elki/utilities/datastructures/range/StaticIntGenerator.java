@@ -94,15 +94,11 @@ public class StaticIntGenerator implements IntGenerator {
 
   @Override
   public StringBuilder serializeTo(StringBuilder buf) {
-    if(values.length == 0) {
-      return buf;
-    }
-    buf.append(values[0]);
-    if(values.length == 1) {
-      return buf;
-    }
-    for(int i = 1; i < values.length; i++) {
-      buf.append(',').append(values[i]);
+    if(values.length > 1) {
+      buf.append(values[0]);
+      for(int i = 1; i < values.length; i++) {
+        buf.append(',').append(values[i]);
+      }
     }
     return buf;
   }

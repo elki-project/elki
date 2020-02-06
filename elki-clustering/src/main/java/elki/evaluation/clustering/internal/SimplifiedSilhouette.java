@@ -27,7 +27,6 @@ import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.ModelUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -223,6 +222,8 @@ public class SimplifiedSilhouette implements Evaluator {
         switch(noiseOption){
         case IGNORE_NOISE:
           ignorednoise += cluster.size();
+          centroids[i] = null;
+          continue;
         case TREAT_NOISE_AS_SINGLETONS:
           centroids[i] = null;
           continue;
@@ -241,9 +242,7 @@ public class SimplifiedSilhouette implements Evaluator {
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(result);
-    Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
-
+    Relation<? extends NumberVector> rel = ResultUtil.findDatabase(result).getRelation(this.distance.getInputTypeRestriction());
     for(Clustering<?> c : crs) {
       evaluateClustering(rel, c);
     }

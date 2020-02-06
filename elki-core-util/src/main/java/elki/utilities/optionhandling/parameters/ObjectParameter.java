@@ -27,7 +27,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Parameter class for a parameter representing a single object.
- * 
+ * <p>
  * It can be parameterized by giving a class name or class to instantiate, or an
  * existing instance.
  * 

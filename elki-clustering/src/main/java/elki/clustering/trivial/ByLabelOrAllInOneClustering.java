@@ -27,9 +27,9 @@ import elki.data.model.Model;
 import elki.data.type.NoSupportedDataTypeException;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.DBIDs;
 import elki.result.Metadata;
 import elki.utilities.Priority;
+
 /**
  * Trivial class that will try to cluster by label, and fall back to an
  * "all-in-one" clustering.
@@ -61,11 +61,9 @@ public class ByLabelOrAllInOneClustering extends ByLabelClustering {
     catch(NoSupportedDataTypeException e) {
       // Ignore.
     }
-    final DBIDs ids = database.getRelation(TypeUtil.ANY).getDBIDs();
     Clustering<Model> result = new ReferenceClustering<>();
     Metadata.of(result).setLongName("All-in-one Trivial Clustering");
-    Cluster<Model> c = new Cluster<Model>(ids, ClusterModel.CLUSTER);
-    result.addToplevelCluster(c);
+    result.addToplevelCluster(new Cluster<>(database.getRelation(TypeUtil.ANY).getDBIDs(), ClusterModel.CLUSTER));
     return result;
   }
 }

@@ -94,12 +94,12 @@ public final class SVGUtil {
   /**
    * SVG color names conversion.
    */
-  final private static Object2IntOpenHashMap<String> SVG_COLOR_NAMES;
+  private final static Object2IntOpenHashMap<String> SVG_COLOR_NAMES;
 
   /**
    * Key not found value. Not a reasonable color, fully transparent!
    */
-  final private static int NO_VALUE = 0x00123456;
+  private final static int NO_VALUE = 0x00123456;
 
   static {
     // Build a reasonably sized hashmap. Use 0

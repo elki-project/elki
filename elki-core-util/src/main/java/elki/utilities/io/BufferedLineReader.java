@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 
 /**
  * Class for buffered IO, avoiding some of the overheads of the Java API.
- *
+ * <p>
  * The main difference to the standard Java API is that this implementation will
  * reuse the buffer. <b>After a call to {@code nextLine()}, the buffer will be
  * overwitten!</b>
@@ -97,7 +97,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   *
+   * <p>
    * <b>A previous reader will not be closed automatically!</b>
    *
    * @param r New reader
@@ -109,7 +109,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   *
+   * <p>
    * <b>A previous stream will not be closed automatically!</b>
    *
    * @param in New input stream reader
@@ -121,7 +121,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   *
+   * <p>
    * <b>A previous stream will not be closed automatically!</b>
    *
    * @param in New input stream reader
@@ -133,7 +133,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Get the reader buffer.
-   *
+   * <p>
    * <b>After a call to {@code nextLine()}, the buffer will be overwitten!</b>
    *
    * @return Buffer.

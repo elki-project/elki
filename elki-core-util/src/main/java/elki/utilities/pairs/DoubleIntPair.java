@@ -66,7 +66,6 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
     if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
-
     DoubleIntPair other = (DoubleIntPair) obj;
     return (this.first == other.first) && (this.second == other.second);
   }
@@ -92,10 +91,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
   @Override
   public int compareTo(DoubleIntPair other) {
     int fdiff = Double.compare(this.first, other.first);
-    if(fdiff != 0) {
-      return fdiff;
-    }
-    return this.second - other.second;
+    return fdiff != 0 ? fdiff : this.second - other.second;
   }
 
   /**
@@ -107,10 +103,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
    */
   public int compareSwappedTo(DoubleIntPair other) {
     int fdiff = this.second - other.second;
-    if(fdiff != 0) {
-      return fdiff;
-    }
-    return Double.compare(this.second, other.second);
+    return fdiff != 0 ? fdiff : Double.compare(this.second, other.second);
   }
 
   /**
@@ -134,30 +127,15 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
   /**
    * Comparator to compare by first component only
    */
-  public static final Comparator<DoubleIntPair> BYFIRST_COMPARATOR = new Comparator<DoubleIntPair>() {
-    @Override
-    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
-      return Double.compare(o1.first, o2.first);
-    }
-  };
+  public static final Comparator<DoubleIntPair> BYFIRST_COMPARATOR = (o1, o2) -> Double.compare(o1.first, o2.first);
 
   /**
    * Comparator to compare by second component only
    */
-  public static final Comparator<DoubleIntPair> BYSECOND_COMPARATOR = new Comparator<DoubleIntPair>() {
-    @Override
-    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
-      return o1.second - o2.second;
-    }
-  };
+  public static final Comparator<DoubleIntPair> BYSECOND_COMPARATOR = (o1, o2) -> o1.second - o2.second;
 
   /**
    * Comparator to compare by swapped components
    */
-  public static final Comparator<DoubleIntPair> SWAPPED_COMPARATOR = new Comparator<DoubleIntPair>() {
-    @Override
-    public int compare(DoubleIntPair o1, DoubleIntPair o2) {
-      return o1.compareSwappedTo(o2);
-    }
-  };
+  public static final Comparator<DoubleIntPair> SWAPPED_COMPARATOR = (o1, o2) -> o1.compareSwappedTo(o2);
 }

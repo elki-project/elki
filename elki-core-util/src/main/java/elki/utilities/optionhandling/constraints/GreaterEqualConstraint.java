@@ -35,7 +35,7 @@ import elki.utilities.optionhandling.parameters.NumberParameter;
 public class GreaterEqualConstraint extends AbstractNumberConstraint {
   /**
    * Creates a Greater-Equal parameter constraint.
-   *
+   * <p>
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -47,7 +47,7 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Greater-Equal parameter constraint.
-   *
+   * <p>
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -59,7 +59,7 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint {
 
   /**
    * Creates a Greater-Equal parameter constraint.
-   *
+   * <p>
    * That is, the value of the number parameter given has to be greater equal
    * than the constraint value given.
    * 
@@ -75,7 +75,7 @@ public class GreaterEqualConstraint extends AbstractNumberConstraint {
    */
   @Override
   public void test(Number t) throws ParameterException {
-    if (t.doubleValue() < constraintValue.doubleValue()) {
+    if(t.doubleValue() < constraintValue.doubleValue()) {
       throw new WrongParameterValueException("Parameter Constraint Error: \n" + "The parameter value specified has to be greater equal than " + constraintValue.toString() + ". (current value: " + t.doubleValue() + ")\n");
     }
   }

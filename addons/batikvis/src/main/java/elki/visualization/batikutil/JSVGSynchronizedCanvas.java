@@ -48,7 +48,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   /**
    * Synchronizer to use when synchronizing SVG plots
    */
-  final private JSVGUpdateSynchronizer synchronizer;
+  private final JSVGUpdateSynchronizer synchronizer;
 
   /**
    * Current SVG plot.

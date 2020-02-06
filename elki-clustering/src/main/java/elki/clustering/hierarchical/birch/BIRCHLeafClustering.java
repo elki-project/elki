@@ -102,14 +102,10 @@ public class BIRCHLeafClustering implements ClusteringAlgorithm<Clustering<MeanM
     // The CFTree does not store points. We have to reassign them (and the
     // quality is better than if we used the initial assignment, because centers
     // move in particular in the beginning, so we always had many outliers.
-    Map<ClusteringFeature, ModifiableDBIDs> idmap = new HashMap<ClusteringFeature, ModifiableDBIDs>(tree.leaves);
+    Map<ClusteringFeature, ModifiableDBIDs> idmap = new HashMap<>(tree.leaves);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      ClusteringFeature cf = tree.findLeaf(relation.get(iter));
-      ModifiableDBIDs ids = idmap.get(cf);
-      if(ids == null) {
-        idmap.put(cf, ids = DBIDUtil.newArray(cf.n));
-      }
-      ids.add(iter);
+      idmap.computeIfAbsent(tree.findLeaf(relation.get(iter)), x -> DBIDUtil.newArray(x.n)) //
+          .add(iter);
     }
     Clustering<MeanModel> result = new Clustering<>();
     for(Map.Entry<ClusteringFeature, ModifiableDBIDs> ent : idmap.entrySet()) {

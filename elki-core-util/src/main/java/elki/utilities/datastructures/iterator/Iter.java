@@ -22,22 +22,21 @@ package elki.utilities.datastructures.iterator;
 
 /**
  * Iterator interface for more than one return value.
- * 
+ * <p>
  * The Java standard {@link java.util.Iterator} interface has some drawbacks:
  * <ul>
- * <li>the only way to get the current value is to advance the iterator</li>
- * <li>the iterator can only point to a single value</li>
- * <li>the iterator can only return objects, not primitives</li>
+ * <li>the only way to get the current value is to advance the iterator
+ * <li>the iterator can only point to a single value
+ * <li>the iterator can only return objects, not primitives
  * </ul>
- * 
  * This iterator interface is a bit more flexible. For example on a distance
  * list, we can have a single type of iterator that allows access to the
  * distance, the object ID or the combination of both.
- * 
+ * <p>
  * In some situations, this can save the creation of many small objects, which
  * put load on the garbage collector. This super interface does not have a "get"
  * operation, which is to come from specialized interfaces instead.
- * 
+ * <p>
  * Usage example:
  * 
  * <pre>

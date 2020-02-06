@@ -42,17 +42,17 @@ public class MergedParameterization implements Parameterization {
   /**
    * The parameterization we get the new values from.
    */
-  final private Parameterization inner;
+  private final Parameterization inner;
 
   /**
    * Parameters we used before, but have rewound
    */
-  final private ListParameterization current;
+  private final ListParameterization current;
 
   /**
    * Parameters to rewind.
    */
-  final private List<ParameterPair> used;
+  private final List<ParameterPair> used;
 
   /**
    * Constructor.

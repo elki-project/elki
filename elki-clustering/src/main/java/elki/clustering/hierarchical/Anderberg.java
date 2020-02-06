@@ -158,12 +158,12 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
     besti[0] = Integer.MAX_VALUE; // invalid, but not deactivated
-    for(int x = 1, p = 0; x < size; x++) {
-      assert p == MatrixParadigm.triangleSize(x);
+    int p = 0;
+    for(int x = 1; x < size; x++) {
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
-      for(int y = 0; y < x; y++, p++) {
-        final double v = scratch[p];
+      for(int y = 0; y < x; y++) {
+        final double v = scratch[p++];
         if(v < bestdx) {
           bestdx = v;
           bestix = y;
@@ -173,6 +173,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       bestd[x] = bestdx;
       besti[x] = bestix;
     }
+    assert p == MatrixParadigm.triangleSize(size);
   }
 
   /**
@@ -237,7 +238,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     besti[x] = -1; // Deactivate removed cluster.
     updateMatrix(size, mat.matrix, iy, bestd, besti, builder, mindist, x, y, sizex, sizey);
     if(y > 0) {
-      findBest(size, mat.matrix, bestd, besti, y);
+      findBest(mat.matrix, bestd, besti, y);
     }
   }
 
@@ -270,7 +271,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       final int sizej = builder.getSize(ij);
       final int yb = ybase + j;
       final double d = scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
-      updateCache(size, scratch, bestd, besti, x, y, j, d);
+      updateCache(scratch, bestd, besti, x, y, j, d);
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
@@ -282,7 +283,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       final int sizej = builder.getSize(ij);
       final int jb = jbase + y;
       final double d = scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
-      updateCache(size, scratch, bestd, besti, x, y, j, d);
+      updateCache(scratch, bestd, besti, x, y, j, d);
     }
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
@@ -293,14 +294,13 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       final int sizej = builder.getSize(ij);
       final int jb = jbase + y;
       final double d = scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], sizej, mindist);
-      updateCache(size, scratch, bestd, besti, x, y, j, d);
+      updateCache(scratch, bestd, besti, x, y, j, d);
     }
   }
 
   /**
    * Update the cache.
    *
-   * @param size Working set size
    * @param scratch Scratch matrix
    * @param bestd Best distance
    * @param besti Best index
@@ -309,7 +309,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param j Updated value d(y, j)
    * @param d New distance
    */
-  protected static void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
+  protected static void updateCache(double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
     assert y < x;
     // New best
     if(y < j && d <= bestd[j]) {
@@ -319,20 +319,19 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     }
     // Needs slow update.
     if(besti[j] == x || besti[j] == y) {
-      findBest(size, scratch, bestd, besti, j);
+      findBest(scratch, bestd, besti, j);
     }
   }
 
   /**
    * Find the best in a row of the triangular matrix.
    *
-   * @param size Active size
    * @param scratch Scratch matrix
    * @param bestd Best distances cache
    * @param besti Best indexes cache
    * @param j Row to update
    */
-  protected static void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
+  protected static void findBest(double[] scratch, double[] bestd, int[] besti, int j) {
     // The distance has increased, we may no longer be the best merge.
     double bestdj = Double.POSITIVE_INFINITY;
     int bestij = -1;

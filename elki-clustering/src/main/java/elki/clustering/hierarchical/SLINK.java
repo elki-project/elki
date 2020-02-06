@@ -107,13 +107,12 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Data relation to use
    */
   public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+    final Logging log = getLogger(); // To allow CLINK logger override
     DBIDs ids = relation.getDBIDs();
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     // Temporary storage for m.
     WritableDoubleDataStore m = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-
-    final Logging log = getLogger(); // To allow CLINK logger override
 
     FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Running SLINK", ids.size(), log) : null;
     ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
@@ -149,10 +148,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
     }
 
     log.ensureCompleted(progress);
-    // We don't need m anymore.
     m.destroy();
-    m = null;
-
     return new PointerHierarchyRepresentationResult(ids, pi, lambda, distance.isSquared());
   }
 

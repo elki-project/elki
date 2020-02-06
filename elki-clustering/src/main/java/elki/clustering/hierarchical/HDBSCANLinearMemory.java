@@ -82,7 +82,7 @@ import elki.utilities.documentation.Title;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */

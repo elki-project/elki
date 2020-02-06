@@ -31,7 +31,7 @@ import elki.result.textwriter.TextWriterStream;
  * Generic cluster class, that may or not have hierarchical information. Note
  * that every cluster MUST have a DBIDs, since it implements the interface, too.
  * Calls to the interface are proxied to the inner group object.
- * 
+ * <p>
  * A hierarchy object of class SimpleHierarchy will be created automatically
  * when a list of parents and children is provided. Alternatively, a
  * pre-existing hierarchy object can be provided, e.g. when there is a single
@@ -172,15 +172,7 @@ public class Cluster<M extends Model> implements TextWriteable {
    * @return a name for the cluster
    */
   public String getNameAutomatic() {
-    if(name != null) {
-      return name;
-    }
-    if(isNoise()) {
-      return "Noise";
-    }
-    else {
-      return "Cluster";
-    }
+    return name != null ? name : isNoise() ? "Noise" : "Cluster";
   }
 
   /**
@@ -246,14 +238,14 @@ public class Cluster<M extends Model> implements TextWriteable {
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    String name = getNameAutomatic();
-    if(name != null) {
-      out.commentPrintLn("Cluster name: " + name);
+    String nam = getNameAutomatic();
+    if(nam != null) {
+      out.commentPrintLn("Cluster name: " + nam);
     }
     out.commentPrintLn("Cluster noise flag: " + isNoise());
     out.commentPrintLn("Cluster size: " + ids.size());
     // also print model, if any and printable
-    if(getModel() != null && (getModel() instanceof TextWriteable)) {
+    if(getModel() instanceof TextWriteable) {
       ((TextWriteable) getModel()).writeToText(out, label);
     }
   }
@@ -281,40 +273,16 @@ public class Cluster<M extends Model> implements TextWriteable {
    * clusters. Do NOT use in e.g. a TreeSet since it is
    * <em>inconsistent with equals</em>.
    */
-  public static final Comparator<Cluster<?>> BY_NAME_SORTER = new Comparator<Cluster<?>>() {
-    @Override
-    public int compare(Cluster<?> o1, Cluster<?> o2) {
-      if(o1 == o2) {
-        return 0;
-      }
-      if (o1 == null) {
-        return +1;
-      }
-      if (o2 == null) {
-        return -1;
-      }
-      // sort by label if possible
-      if(o1.name != o2.name) {
-        if (o1.name == null) {
-          return +1;
-        }
-        if (o2.name == null) {
-          return -1;
-        }
-        int lblresult = o1.name.compareTo(o2.name);
-        if(lblresult != 0) {
-          return lblresult;
-        }
-      }
-      return 0;
-    }
-  };
+  public static final Comparator<Cluster<?>> BY_NAME_SORTER = (o1, o2) -> //
+  o1 == o2 ? 0 : o1 == null ? +1 : o2 == null ? -1 : //
+  // sort by label if possible
+      o1.name != o2.name ? (o1.name == null ? +1 : o2.name == null ? -1 : o1.name.compareTo(o2.name)) : 0;
 
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    String mstr = (model == null) ? "null" : model.toString();
-    String nstr = noise ? ",noise" : "";
-    return "Cluster(size=" + size() + ",model=" + mstr + nstr + ")";
+    return "Cluster(size=" + size() + ",model=" //
+        + (model == null ? "null" : model.toString()) //
+        + (noise ? ",noise" : "") + ")";
   }
 }

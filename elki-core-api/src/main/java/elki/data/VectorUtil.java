@@ -36,7 +36,9 @@ import net.jafama.FastMath;
  * Note: obviously, many functions are class methods or database related.
  * <p>
  * TODO: add more precise but slower O(n^2) angle computation according to:
- * Computing the Angle between Vectors, P. Schatte
+ * <p>
+ * Computing the Angle between Vectors<br>
+ * P. Schatte<br>
  * Journal of Computing, Volume 63, Number 1 (1999)
  *
  * @author Erich Schubert
@@ -392,13 +394,12 @@ public final class VectorUtil {
   public static double dotSparseDense(SparseNumberVector v1, NumberVector v2) {
     final int dim2 = v2.getDimensionality();
     double dot = 0.;
-    for(int i1 = v1.iter(); v1.iterValid(i1);) {
+    for(int i1 = v1.iter(); v1.iterValid(i1); i1 = v1.iterAdvance(i1)) {
       final int d1 = v1.iterDim(i1);
       if(d1 >= dim2) {
         break;
       }
       dot += v1.iterDoubleValue(i1) * v2.doubleValue(d1);
-      i1 = v1.iterAdvance(i1);
     }
     return dot;
   }
@@ -475,7 +476,7 @@ public final class VectorUtil {
       super();
       this.data = data;
       this.d = dim;
-    };
+    }
 
     /**
      * Constructor.
@@ -485,7 +486,7 @@ public final class VectorUtil {
     public SortDBIDsBySingleDimension(Relation<? extends NumberVector> data) {
       super();
       this.data = data;
-    };
+    }
 
     /**
      * Get the dimension to sort by.
@@ -507,7 +508,8 @@ public final class VectorUtil {
 
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      final double v1 = data.get(id1).doubleValue(d), v2 = data.get(id2).doubleValue(d);
+      final double v1 = data.get(id1).doubleValue(d),
+          v2 = data.get(id2).doubleValue(d);
       return v1 < v2 ? -1 : v1 > v2 ? +1 : 0;
     }
   }
@@ -531,14 +533,14 @@ public final class VectorUtil {
     public SortVectorsBySingleDimension(int dim) {
       super();
       this.d = dim;
-    };
+    }
 
     /**
      * Constructor.
      */
     public SortVectorsBySingleDimension() {
       super();
-    };
+    }
 
     /**
      * Get the dimension to sort by.
@@ -592,7 +594,8 @@ public final class VectorUtil {
     }
     else {
       double[] newAttributes = new double[card];
-      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0), i = 0; d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
+      int i = 0;
+      for(int d = BitsUtil.nextSetBit(selectedAttributes, 0); d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
         newAttributes[i++] = v.doubleValue(d);
       }
       return factory.newNumberVector(newAttributes);

@@ -61,7 +61,7 @@ public abstract class AbstractDoubleProcessor implements Processor {
    * 
    * @author Erich Schubert
    */
-  public static abstract class Instance implements Processor.Instance {
+  public abstract static class Instance implements Processor.Instance {
     /**
      * Output variable
      */

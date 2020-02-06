@@ -69,7 +69,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
-public abstract class AbstractHDBSCAN<O, R> implements Algorithm {
+public abstract class AbstractHDBSCAN<O> implements Algorithm {
   /**
    * MinPts parameter.
    */
@@ -167,7 +167,7 @@ public abstract class AbstractHDBSCAN<O, R> implements Algorithm {
       assert (data == ids);
       return ids.size();
     }
-  };
+  }
 
   /**
    * Class for collecting the minimum spanning tree edges into a heap.

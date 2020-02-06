@@ -410,8 +410,8 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
         for(ModifiableDBIDs cluster : clusters) {
           cluster.clear();
         }
-        for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-          clusters.get(assignment.intValue(iter)).add(iter);
+        for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+          clusters.get(assignment.intValue(it)).add(it);
         }
       }
       return changed;

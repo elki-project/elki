@@ -152,34 +152,27 @@ public final class FileUtil {
       return f;
     }
     // Try with base directory
-    if(basedir != null) {
-      if((f = new File(basedir, name)).exists()) {
-        return f;
-      }
+    if(basedir != null && (f = new File(basedir, name)).exists()) {
+      return f;
     }
     // try stripping whitespace
     String name2;
-    if(!name.equals(name2 = name.trim())) {
-      if((f = locateFile(name2, basedir)) != null) {
-        return f;
-      }
+    if(!name.equals(name2 = name.trim()) && (f = locateFile(name2, basedir)) != null) {
+      return f;
     }
     // try substituting path separators
-    if(!name.equals(name2 = name.replace('/', File.separatorChar))) {
-      if((f = locateFile(name2, basedir)) != null) {
-        return f;
-      }
+    if(!name.equals(name2 = name.replace('/', File.separatorChar)) && //
+        (f = locateFile(name2, basedir)) != null) {
+      return f;
     }
-    if(!name.equals(name2 = name.replace('\\', File.separatorChar))) {
-      if((f = locateFile(name2, basedir)) != null) {
-        return f;
-      }
+    if(!name.equals(name2 = name.replace('\\', File.separatorChar)) && //
+        (f = locateFile(name2, basedir)) != null) {
+      return f;
     }
     // try stripping extra characters, such as quotes.
-    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"') {
-      if((f = locateFile(name.substring(1, name.length() - 1), basedir)) != null) {
-        return f;
-      }
+    if(name.length() > 2 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"' && //
+        (f = locateFile(name.substring(1, name.length() - 1), basedir)) != null) {
+      return f;
     }
     return null;
   }

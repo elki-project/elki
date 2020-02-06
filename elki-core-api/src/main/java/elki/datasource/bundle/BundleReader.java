@@ -30,12 +30,11 @@ import elki.data.type.TypeInformationSerializer;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDVar;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Read an ELKI bundle file into a data stream.
- * 
+ * <p>
  * TODO: resize buffer when necessary?
  * 
  * @author Erich Schubert
@@ -181,8 +180,8 @@ public class BundleReader implements BundleStreamSource {
     if(meta == null) {
       return Event.META_CHANGED;
     }
-    if(buffer.remaining() == 0) {
-      ByteArrayUtil.unmapByteBuffer(buffer);
+    if(buffer != null && buffer.remaining() == 0) {
+      buffer = null;
       return Event.END_OF_STREAM;
     }
     readObject();

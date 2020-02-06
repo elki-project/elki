@@ -32,7 +32,7 @@ import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the Adjusted Rand Index.
- *
+ * <p>
  * References:
  * <p>
  * L. Hubert, P. Arabie<br>

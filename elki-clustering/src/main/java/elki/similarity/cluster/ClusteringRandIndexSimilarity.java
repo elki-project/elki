@@ -31,7 +31,7 @@ import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Measure the similarity of clusters via the Rand Index.
- *
+ * <p>
  * Reference:
  * <p>
  * W. M. Rand<br>

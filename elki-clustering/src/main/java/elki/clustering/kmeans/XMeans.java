@@ -222,7 +222,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   protected List<Cluster<M>> splitCluster(Cluster<M> parentCluster, Relation<V> relation) {
     // Transform parent cluster into a clustering
-    ArrayList<Cluster<M>> parentClusterList = new ArrayList<Cluster<M>>(1);
+    ArrayList<Cluster<M>> parentClusterList = new ArrayList<>(1);
     parentClusterList.add(parentCluster);
     if(parentCluster.size() <= 1) {
       // Split is not possbile
@@ -379,7 +379,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     @Override
     public XMeans<V, M> make() {
-      return new XMeans<V, M>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
+      return new XMeans<>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }
   }
 }

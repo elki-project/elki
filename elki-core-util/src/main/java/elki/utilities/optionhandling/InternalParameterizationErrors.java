@@ -20,12 +20,12 @@
  */
 package elki.utilities.optionhandling;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
  * Pseudo error class that wraps multiple error reports into one.
- * 
+ * <p>
  * This is meant for reporting re-parameterization errors.
  * 
  * @author Erich Schubert
@@ -40,7 +40,7 @@ public class InternalParameterizationErrors extends ParameterException {
   /**
    * The errors that occurred.
    */
-  private Collection<? extends Exception> internalErrors;
+  private final Collection<Exception> internalErrors;
 
   /**
    * Constructor.
@@ -48,11 +48,11 @@ public class InternalParameterizationErrors extends ParameterException {
    * @param message Error message
    * @param internalErrors internal errors
    */
-  public InternalParameterizationErrors(String message, Collection<? extends Exception> internalErrors) {
+  public InternalParameterizationErrors(String message, Collection<Exception> internalErrors) {
     super(message);
     this.internalErrors = internalErrors;
   }
-  
+
   /**
    * Constructor.
    * 
@@ -61,15 +61,13 @@ public class InternalParameterizationErrors extends ParameterException {
    */
   public InternalParameterizationErrors(String message, Exception internalError) {
     super(message);
-    final ArrayList<Exception> errors = new ArrayList<>(1);
-    errors.add(internalError);
-    this.internalErrors = errors;
+    this.internalErrors = Arrays.asList(internalError);
   }
-  
+
   /**
    * @return the internalErrors
    */
-  protected Collection<? extends Exception> getInternalErrors() {
+  protected Collection<Exception> getInternalErrors() {
     return internalErrors;
   }
 }

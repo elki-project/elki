@@ -20,10 +20,7 @@
  */
 package elki.database.relation;
 
-import java.util.AbstractCollection;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 
 import elki.data.FeatureVector;
 import elki.data.NumberVector;
@@ -228,6 +225,9 @@ public final class RelationUtil {
 
     @Override
     public O next() {
+      if(!iter.valid()) {
+        throw new NoSuchElementException("No further objects");
+      }
       O ret = database.get(iter);
       iter.advance();
       return ret;

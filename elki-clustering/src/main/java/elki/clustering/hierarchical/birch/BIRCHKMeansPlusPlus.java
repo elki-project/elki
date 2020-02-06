@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.birch;
 
 import java.util.Random;
 
-import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -159,7 +159,7 @@ public class BIRCHKMeansPlusPlus {
 
     @Override
     public void configure(Parameterization config) {
-      new RandomParameter(AbstractKMeans.SEED_ID).grab(config, x -> rnd = x);
+      new RandomParameter(KMeans.SEED_ID).grab(config, x -> rnd = x);
     }
 
     @Override

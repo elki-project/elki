@@ -25,13 +25,12 @@ import java.util.RandomAccess;
 
 /**
  * ELKI style Iterator wrapper for collections.
- * 
+ * <p>
  * Note: for collections implementing {@link RandomAccess}, always use
  * {@link ArrayListIter} instead (less wrapping)!
  * 
  * @author Erich Schubert
  * @since 0.7.5
- * 
  * 
  * @param <O> contained object type.
  */

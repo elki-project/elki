@@ -85,7 +85,7 @@ public abstract class AbstractParameterization implements Parameterization {
    * @throws RuntimeException if any error has occurred.
    */
   // TODO: make a multi-exception class?
-  public void failOnErrors() throws AbortException {
+  public void failOnErrors() {
     final int numerror = getErrors().size();
     if(numerror > 0) {
       logAndClearReportedErrors();
@@ -100,7 +100,11 @@ public abstract class AbstractParameterization implements Parameterization {
    */
   @Override
   protected void finalize() throws Throwable {
-    failOnErrors();
+    final int numerror = getErrors().size();
+    if(numerror > 0) {
+      LOG.warning("There were unhandled errors in the class parameterization. Was the API used correctly?");
+      logAndClearReportedErrors();
+    }
     super.finalize();
   }
 }

@@ -75,7 +75,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
 
   @Override
   public String getValueAsString() {
-    StringBuilder buf = new StringBuilder(100);
+    StringBuilder buf = new StringBuilder(100 * getValue().size());
     for(Path p : getValue()) {
       buf.append(p.toString()).append(LIST_SEP);
     }
@@ -85,7 +85,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
 
   @Override
   public String getDefaultValueAsString() {
-    StringBuilder buf = new StringBuilder(100);
+    StringBuilder buf = new StringBuilder(100 * getDefaultValue().size());
     for(Path p : getDefaultValue()) {
       buf.append(p.toString()).append(LIST_SEP);
     }

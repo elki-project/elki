@@ -86,6 +86,7 @@ public class Metadata extends WeakReference<Object> {
       setDaemon(true); // Don't prevent program termination
     }
 
+    @Override
     public void run() {
       LOG.debugFinest("Garbage collection thread started.");
       while(true) {
@@ -115,15 +116,13 @@ public class Metadata extends WeakReference<Object> {
     assert !(o instanceof Reference);
     expungeStaleEntries();
     synchronized(global) {
-      Metadata ret = global.get(o);
-      if(ret == null) {
-        global.put(o, ret = new Metadata(o));
+      return global.computeIfAbsent(o, x -> {
         if(CLEANER == null || !CLEANER.isAlive()) {
           CLEANER = new CleanerThread();
           CLEANER.start();
         }
-      }
-      return ret;
+        return new Metadata(o);
+      });
     }
   }
 
@@ -201,9 +200,9 @@ public class Metadata extends WeakReference<Object> {
    */
   private void cleanup() {
     if(LOG.isDebuggingFine()) {
-      String name = getLongName();
-      name = name != null ? name : get() != null ? get().toString() : "<garbage collected>";
-      LOG.debugFine("Garbage collecting: " + name);
+      String nam = getLongName();
+      nam = nam != null ? nam : get() != null ? get().toString() : "<garbage collected>";
+      LOG.debugFine("Garbage collecting: " + nam);
     }
     listeners = null;
     if(hierarchy.numc > 0) {
@@ -371,7 +370,7 @@ public class Metadata extends WeakReference<Object> {
      * @param parent Parent to add.
      * @return {@code true} when changed
      */
-    synchronized private boolean addParentInt(Metadata parent) {
+    private synchronized boolean addParentInt(Metadata parent) {
       final Object p = parent.get();
       if(p == null) {
         return false;
@@ -400,7 +399,7 @@ public class Metadata extends WeakReference<Object> {
      * @param child Child to add
      * @return {@code true} when changed
      */
-    synchronized private boolean addChildInt(Object child) {
+    private synchronized boolean addChildInt(Object child) {
       if(children == EMPTY_CHILDREN) {
         children = new Object[5];
         children[0] = child;
@@ -425,7 +424,7 @@ public class Metadata extends WeakReference<Object> {
      * @param parent Parent to remove.
      * @return {@code true} when changed
      */
-    synchronized private boolean removeParentInt(Metadata parent) {
+    private synchronized boolean removeParentInt(Metadata parent) {
       if(parents == EMPTY_PARENTS) {
         return false;
       }
@@ -451,13 +450,13 @@ public class Metadata extends WeakReference<Object> {
      * @param child Child to remove.
      * @return {@code true} when changed
      */
-    synchronized private boolean removeChildInt(Object child) {
+    private synchronized boolean removeChildInt(Object child) {
       if(children == EMPTY_CHILDREN) {
         return false;
       }
       for(int i = 0; i < numc; i++) {
         Object ci = children[i];
-        if(child.equals(ci) || ci instanceof Reference && child.equals(ci = ((Reference<?>) ci).get())) {
+        if(child.equals(ci) || ci instanceof Reference && child.equals(((Reference<?>) ci).get())) {
           if(--numc == 0) {
             children = EMPTY_CHILDREN;
           }
@@ -937,7 +936,7 @@ public class Metadata extends WeakReference<Object> {
    *
    * @param <O> Object type
    */
-  private static abstract class EagerIt<O> implements It<O> {
+  private abstract static class EagerIt<O> implements It<O> {
     /**
      * Next object to return.
      */

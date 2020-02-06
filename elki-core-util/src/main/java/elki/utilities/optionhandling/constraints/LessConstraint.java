@@ -72,11 +72,10 @@ public class LessConstraint extends AbstractNumberConstraint {
   /**
    * Checks if the number value given by the number parameter is less than the
    * constraint value. If not, a parameter exception is thrown.
-   * 
    */
   @Override
   public void test(Number t) throws ParameterException {
-    if (t.doubleValue() >= constraintValue.doubleValue()) {
+    if(t.doubleValue() >= constraintValue.doubleValue()) {
       throw new WrongParameterValueException("Parameter Constraint Error: \n" + "The parameter value specified has to be less than " + constraintValue.toString() + ". (current value: " + t.doubleValue() + ")\n");
     }
   }
@@ -85,5 +84,4 @@ public class LessConstraint extends AbstractNumberConstraint {
   public String getDescription(String parameterName) {
     return parameterName + " < " + constraintValue;
   }
-
 }

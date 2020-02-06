@@ -75,7 +75,7 @@ public class LessEqualConstraint extends AbstractNumberConstraint {
    */
   @Override
   public void test(Number t) throws ParameterException {
-    if (t.doubleValue() > constraintValue.doubleValue()) {
+    if(t.doubleValue() > constraintValue.doubleValue()) {
       throw new WrongParameterValueException("Parameter Constraint Error: \n" + "The parameter value specified has to be less equal than " + constraintValue.toString() + ". (current value: " + t.doubleValue() + ")\n");
     }
   }

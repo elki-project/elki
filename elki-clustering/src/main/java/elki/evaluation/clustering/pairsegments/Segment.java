@@ -27,7 +27,7 @@ import elki.database.ids.DBIDs;
 /**
  * A segment represents a set of pairs that share the same clustering
  * properties.
- * 
+ * <p>
  * As such, for each ring (= clustering), a cluster number (or the constant
  * {@link #UNCLUSTERED}) is stored.
  *
@@ -54,7 +54,7 @@ public class Segment implements Comparable<Segment> {
   /**
    * The cluster numbers in each ring
    */
-  protected int[] clusterIds;
+  protected final int[] clusterIds;
 
   /**
    * Constructor.
@@ -149,14 +149,7 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(!(Segment.class.isInstance(obj))) {
-      return false;
-    }
-    Segment other = (Segment) obj;
-    return Arrays.equals(clusterIds, other.clusterIds);
+    return this == obj || obj instanceof Segment && Arrays.equals(clusterIds, ((Segment) obj).clusterIds);
   }
 
   @Override
@@ -167,18 +160,10 @@ public class Segment implements Comparable<Segment> {
   @Override
   public int compareTo(Segment sid) {
     for(int i = 0; i < clusterIds.length; i++) {
-      final int a = this.clusterIds[i];
-      final int b = sid.clusterIds[i];
+      final int a = this.clusterIds[i], b = sid.clusterIds[i];
       if(a != b) {
-        if(a * b > 0) {
-          // Regular comparison
-          return (a < b) ? -1 : +1;
-          // return (a < b) ? +1 : -1;
-        }
-        else {
-          // Inverse, to sort negative last
-          return (a < b) ? +1 : -1;
-        }
+        // Regular comparison, or inverse
+        return (a * b > 0) ? (a < b) ? -1 : +1 : (a < b) ? +1 : -1;
       }
     }
     return 0;

@@ -290,7 +290,7 @@ public class Entropy {
     // Note: we require the cache to be prefilled by at least 1 element,
     // and to be sized large enough.
     final double p = lfac[i - 3];
-    return lfac[i - 2] = p > 0 ? p + FastMath.log(i) : logGamma(i + 1);
+    return lfac[i - 2] = p > 0 ? p + FastMath.log(i) : logGamma(i + 1.);
   }
 
   /**

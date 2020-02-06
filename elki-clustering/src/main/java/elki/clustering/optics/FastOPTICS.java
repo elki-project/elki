@@ -64,6 +64,8 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.7.0
  *
  * @composed - - - RandomProjectedNeighborsAndDensities
+ * 
+ * @param <V> Input vector type
  */
 @Reference(authors = "J. Schneider, M. Vlachos", //
     title = "Fast parameterless density-based clustering via random projections", //
@@ -115,7 +117,7 @@ public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
   /**
    * Index.
    */
-  RandomProjectedNeighborsAndDensities<V> index;
+  RandomProjectedNeighborsAndDensities index;
 
   /**
    * Constructor.
@@ -123,7 +125,7 @@ public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
    * @param minpts Minimum number of neighbors.
    * @param index Index
    */
-  public FastOPTICS(int minpts, RandomProjectedNeighborsAndDensities<V> index) {
+  public FastOPTICS(int minpts, RandomProjectedNeighborsAndDensities index) {
     super();
     this.minPts = minpts;
     this.index = index;
@@ -192,10 +194,7 @@ public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
         if(coredist > nrdist) {
           nrdist = coredist;
         }
-        if(reachDist.doubleValue(it) == UNDEFINED_DISTANCE) {
-          reachDist.put(it, nrdist);
-        }
-        else if(nrdist < reachDist.doubleValue(it)) {
+        if(reachDist.doubleValue(it) == UNDEFINED_DISTANCE || nrdist < reachDist.doubleValue(it)) {
           reachDist.put(it, nrdist);
         }
         heap.add(new OPTICSHeapEntry(DBIDUtil.deref(it), currPt, nrdist));
@@ -227,20 +226,20 @@ public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
     /**
      * Random projection index.
      */
-    RandomProjectedNeighborsAndDensities<V> index;
+    RandomProjectedNeighborsAndDensities index;
 
     @Override
     public void configure(Parameterization config) {
       new IntParameter(AbstractOPTICS.Par.MINPTS_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> minpts = x);
-      Class<RandomProjectedNeighborsAndDensities<V>> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandomProjectedNeighborsAndDensities.class);
+      Class<RandomProjectedNeighborsAndDensities> clz = ClassGenericsUtil.uglyCastIntoSubclass(RandomProjectedNeighborsAndDensities.class);
       index = config.tryInstantiate(clz);
     }
 
     @Override
     public FastOPTICS<V> make() {
-      return new FastOPTICS<V>(minpts, index);
+      return new FastOPTICS<>(minpts, index);
     }
   }
 }

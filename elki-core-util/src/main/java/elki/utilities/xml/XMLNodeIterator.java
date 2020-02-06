@@ -21,6 +21,7 @@
 package elki.utilities.xml;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.w3c.dom.Node;
 
@@ -59,6 +60,9 @@ public final class XMLNodeIterator implements Iterator<Node> {
    */
   @Override
   public Node next() {
+    if(next == null) {
+      throw new NoSuchElementException();
+    }
     Node cur = next;
     next = next.getNextSibling();
     return cur;

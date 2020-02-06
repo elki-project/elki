@@ -25,7 +25,6 @@ package elki.utilities.datastructures.iterator;
  * 
  * @author Erich Schubert
  * @since 0.5.5
- * 
  */
 public interface ArrayIter extends Iter {
   @Override

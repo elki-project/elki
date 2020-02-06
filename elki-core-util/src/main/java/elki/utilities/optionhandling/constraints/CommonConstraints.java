@@ -88,30 +88,39 @@ public final class CommonConstraints {
   /**
    * Constraint for the whole list.
    */
-  public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ZERO_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ZERO_INT_LIST = new ListEachNumberConstraint<>(GREATER_EQUAL_ZERO_INT);
 
   /**
    * List constraint: &gt;= 1
    */
-  public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_EQUAL_ONE_INT);
+  public static final ParameterConstraint<int[]> GREATER_EQUAL_ONE_INT_LIST = new ListEachNumberConstraint<>(GREATER_EQUAL_ONE_INT);
 
   /**
    * List constraint: &gt; 1
    */
-  public static final ParameterConstraint<int[]> GREATER_THAN_ONE_INT_LIST = new ListEachNumberConstraint<int[]>(GREATER_THAN_ONE_INT);
+  public static final ParameterConstraint<int[]> GREATER_THAN_ONE_INT_LIST = new ListEachNumberConstraint<>(GREATER_THAN_ONE_INT);
 
   /**
    * Constraint for the whole list.
    */
-  public static final ParameterConstraint<double[]> GREATER_EQUAL_ZERO_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ZERO_DOUBLE);
+  public static final ParameterConstraint<double[]> GREATER_EQUAL_ZERO_DOUBLE_LIST = new ListEachNumberConstraint<>(GREATER_EQUAL_ZERO_DOUBLE);
 
   /**
    * List constraint: &gt;= 1
    */
-  public static final ParameterConstraint<double[]> GREATER_EQUAL_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_EQUAL_ONE_DOUBLE);
+  public static final ParameterConstraint<double[]> GREATER_EQUAL_ONE_DOUBLE_LIST = new ListEachNumberConstraint<>(GREATER_EQUAL_ONE_DOUBLE);
 
   /**
    * List constraint: &gt; 1
    */
-  public static final ParameterConstraint<double[]> GREATER_THAN_ONE_DOUBLE_LIST = new ListEachNumberConstraint<double[]>(GREATER_THAN_ONE_DOUBLE);
+  public static final ParameterConstraint<double[]> GREATER_THAN_ONE_DOUBLE_LIST = new ListEachNumberConstraint<>(GREATER_THAN_ONE_DOUBLE);
+
+  /**
+   * Utility class, do not instantiate!
+   * Constructor.
+   *
+   */
+  private CommonConstraints() {
+    // Do not instantiate
+  }
 }

@@ -120,24 +120,24 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers:
-        double best = distance(fv, means[0]), second = distance(fv, means[1]);
+        double best = distance(fv, means[0]), sbest = distance(fv, means[1]);
         int minIndex = 0;
-        if(second < best) {
+        if(sbest < best) {
           double tmp = best;
-          best = second;
-          second = tmp;
+          best = sbest;
+          sbest = tmp;
           minIndex = 1;
         }
         for(int j = 2; j < k; j++) {
-          if(second > cdist[minIndex][j]) {
+          if(sbest > cdist[minIndex][j]) {
             double dist = distance(fv, means[j]);
             if(dist < best) {
               minIndex = j;
-              second = best;
+              sbest = best;
               best = dist;
             }
-            else if(dist < second) {
-              second = dist;
+            else if(dist < sbest) {
+              sbest = dist;
             }
           }
         }
@@ -146,17 +146,12 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         assignment.putInt(it, minIndex);
         plusEquals(sums[minIndex], fv);
         upper.putDouble(it, isSquared ? FastMath.sqrt(best) : best);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(second) : second);
+        lower.putDouble(it, isSquared ? FastMath.sqrt(sbest) : sbest);
       }
       return relation.size();
     }
 
-    /**
-     * Reassign objects, but avoid unnecessary computations based on their
-     * bounds.
-     *
-     * @return number of objects reassigned
-     */
+    @Override
     protected int assignToNearestCluster() {
       assert (k == means.length);
       recomputeSeperation(sep, cdist);

@@ -403,8 +403,8 @@ public class HiCO implements GeneralizedOPTICS {
    */
   private void adjust(double[][] v, double[] vector, int corrDim) {
     double[] sum = new double[v.length];
-    for(int k = 0; k < corrDim; k++) {
-      plusTimesEquals(sum, v[k], transposeTimes(vector, v[k]));
+    for(int i = 0; i < corrDim; i++) {
+      plusTimesEquals(sum, v[i], transposeTimes(vector, v[i]));
     }
     v[corrDim] = normalizeEquals(minus(vector, sum));
   }

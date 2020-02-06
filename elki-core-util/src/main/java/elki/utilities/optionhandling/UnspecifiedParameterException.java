@@ -37,7 +37,7 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
   /**
    * Parameter that was missing.
    */
-  private String parameter;
+  private final String parameter;
 
   /**
    * Constructor with missing Parameter

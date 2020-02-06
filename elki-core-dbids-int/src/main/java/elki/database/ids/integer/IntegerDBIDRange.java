@@ -153,12 +153,12 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
     /**
      * Interval length.
      */
-    final private int len;
+    private final int len;
 
     /**
      * Interval start.
      */
-    final private int start;
+    private final int start;
 
     /**
      * Constructor.

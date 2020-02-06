@@ -73,7 +73,7 @@ public class PairCounting {
       LoggingUtil.warning("PairCounting F-Measure is not well defined for overlapping and incomplete clusterings. The number of elements are: " + contingency[table.size1][table.size2 + 1] + " != " + contingency[table.size1 + 1][table.size2] + " elements.");
     }
     // Aggregations
-    long inBoth = 0, in1 = 0, in2 = 0;
+    long inB = 0, in1 = 0, in2 = 0;
     // Process first clustering:
     for(int i = 0; i < table.size1; i++) {
       final int size = contingency[i][table.size2 + 1];
@@ -104,20 +104,20 @@ public class PairCounting {
         final int size = contingency[i1][i2];
         if(breakNoise && (BitsUtil.get(table.noise1, i1) || BitsUtil.get(table.noise2, i2))) {
           if(selfPair) {
-            inBoth += size;
+            inB += size;
           } // else: 0
         }
         else {
-          inBoth += size * (long) (selfPair ? size : (size - 1));
+          inB += size * (long) (selfPair ? size : (size - 1));
         }
       }
     }
     final int tsize = contingency[table.size1][table.size2];
     long total = tsize * (long) (selfPair ? tsize : (tsize - 1));
-    this.inBoth = inBoth;
-    this.inFirst = in1 - inBoth;
-    this.inSecond = in2 - inBoth;
-    this.inNone = total - (inBoth + inFirst + inSecond);
+    this.inBoth = inB;
+    this.inFirst = in1 - inB;
+    this.inSecond = in2 - inB;
+    this.inNone = total - (inB + inFirst + inSecond);
   }
 
   /**
@@ -128,7 +128,7 @@ public class PairCounting {
    */
   public double fMeasure(double beta) {
     final double beta2 = beta * beta;
-    return ((1 + beta2) * inBoth) / (double) ((1 + beta2) * inBoth + beta2 * inFirst + inSecond);
+    return ((1. + beta2) * inBoth) / ((1. + beta2) * inBoth + beta2 * inFirst + inSecond);
   }
 
   /**
@@ -137,7 +137,7 @@ public class PairCounting {
    * @return F1-Measure
    */
   public double f1Measure() {
-    return 2 * inBoth / (double) (2 * inBoth + inFirst + inSecond);
+    return 2. * inBoth / (2. * inBoth + inFirst + inSecond);
   }
 
   /**
@@ -209,7 +209,7 @@ public class PairCounting {
       url = "https://doi.org/10.1007/BF01908075", //
       bibkey = "doi:10.1007/BF01908075")
   public double adjustedRandIndex() {
-    double d = FastMath.sqrt(inBoth + inFirst + inSecond + inNone);
+    double d = FastMath.sqrt((double) inBoth + inFirst + inSecond + inNone);
     // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
     // Because we have O(N^2) pairs, and thus this value is temporarily O(N^4)
     double exp = (inBoth + inFirst) / d * (inBoth + inSecond) / d;

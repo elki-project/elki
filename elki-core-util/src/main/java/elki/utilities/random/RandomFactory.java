@@ -42,7 +42,7 @@ public class RandomFactory {
   /**
    * Global default factory
    */
-  public static RandomFactory DEFAULT = new RandomFactory(getGlobalSeed()) {
+  public static final RandomFactory DEFAULT = new RandomFactory(getGlobalSeed()) {
     @Override
     public String toString() {
       return "GlobalRandom[" + Long.toString(this.seed) + "]";
@@ -71,10 +71,7 @@ public class RandomFactory {
    * @return Instance
    */
   public static RandomFactory get(Long seed) {
-    if(seed == null) {
-      return DEFAULT;
-    }
-    return new RandomFactory(seed);
+    return seed == null ? DEFAULT : new RandomFactory(seed);
   }
 
   /**

@@ -25,10 +25,10 @@ import elki.database.ids.DBIDRef;
 
 /**
  * Distance functions valid in a database context only (i.e. for DBIDs)
- *
+ * <p>
  * For any "distance" that cannot be computed for arbitrary objects, only those
  * that exist in the database and referenced by their ID.
- *
+ * <p>
  * Example: external precomputed distances
  *
  * @author Erich Schubert

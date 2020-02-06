@@ -43,7 +43,7 @@ public interface ByteBufferSerializer<T> {
    * @throws UnsupportedOperationException When functionality not implemented or
    *         available
    */
-  T fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
+  T fromByteBuffer(ByteBuffer buffer) throws IOException;
 
   /**
    * Serialize the object to a byte array (e.g. disk)
@@ -54,7 +54,7 @@ public interface ByteBufferSerializer<T> {
    * @throws UnsupportedOperationException When functionality not implemented or
    *         available
    */
-  void toByteBuffer(ByteBuffer buffer, T object) throws IOException, UnsupportedOperationException;
+  void toByteBuffer(ByteBuffer buffer, T object) throws IOException;
 
   /**
    * Get the size of the object in bytes.
@@ -65,5 +65,5 @@ public interface ByteBufferSerializer<T> {
    * @throws UnsupportedOperationException When functionality not implemented or
    *         available
    */
-  int getByteSize(T object) throws IOException, UnsupportedOperationException;
+  int getByteSize(T object) throws IOException;
 }

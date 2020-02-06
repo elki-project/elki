@@ -192,12 +192,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       return relation.size();
     }
 
-    /**
-     * Reassign objects, but avoid unnecessary computations based on their
-     * bounds.
-     *
-     * @return number of objects reassigned
-     */
+    @Override
     protected int assignToNearestCluster() {
       assert (k == means.length);
       recomputeSeperation(means, sep);
@@ -270,9 +265,8 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
         }
       }
       // We need half the Euclidean distance
-      final boolean issquared = isSquared();
       for(int i = 0; i < k; i++) {
-        sep[i] = .5 * (issquared ? FastMath.sqrt(sep[i]) : sep[i]);
+        sep[i] = .5 * (isSquared ? FastMath.sqrt(sep[i]) : sep[i]);
       }
     }
 

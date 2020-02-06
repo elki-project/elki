@@ -24,13 +24,12 @@ import java.util.List;
 
 /**
  * ELKI style Iterator for array lists.
- * 
+ * <p>
  * Note: this implementation is only efficient for lists with efficient random
  * access and seeking (i.e. ArrayLists, but not Linked Lists!)
  * 
  * @author Erich Schubert
  * @since 0.6.0
- * 
  * 
  * @param <O> contained object type.
  */
