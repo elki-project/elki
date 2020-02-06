@@ -64,8 +64,7 @@ public interface DBIDIter extends DBIDRef, Iter {
    * 
    * @param <T> Collection type
    * @param collection Existing collection
-   * @param iter Iterator to process
-   * @return
+   * @return The existing collection
    */
   default <T extends ModifiableDBIDs> T addTo(T collection) {
     while(valid()) {

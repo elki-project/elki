@@ -238,7 +238,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   private GeneratorMain loadXMLSpecification() {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      dbf.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
       URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
       if(url != null) {
         try {
@@ -677,8 +678,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parse a string into a vector.
-   *
-   * TODO: move this into utility package?
+   * <p>
+   * TODO: Rewrite this using the new Tokenizer
    *
    * @param s String to parse
    * @return Vector

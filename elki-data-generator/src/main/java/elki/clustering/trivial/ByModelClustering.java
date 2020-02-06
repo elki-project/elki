@@ -97,13 +97,7 @@ public class ByModelClustering implements ClusteringAlgorithm<Clustering<Model>>
     // Build model mapping
     HashMap<Model, ModifiableDBIDs> modelMap = new HashMap<>();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Model model = relation.get(iditer);
-      ModifiableDBIDs modelids = modelMap.get(model);
-      if(modelids == null) {
-        modelids = DBIDUtil.newHashSet();
-        modelMap.put(model, modelids);
-      }
-      modelids.add(iditer);
+      modelMap.computeIfAbsent(relation.get(iditer), x -> DBIDUtil.newHashSet()).add(iditer);
     }
 
     Clustering<Model> result = new ReferenceClustering<>();

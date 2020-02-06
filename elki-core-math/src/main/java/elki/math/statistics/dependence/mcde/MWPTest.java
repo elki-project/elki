@@ -115,7 +115,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
 
       if(k > j) {
         double adjusted = (adjust + k) / (double) t;
-        correction += t * (t * t - 1);
+        correction += t * (t * (long) t - 1);
         if(correction < 0) {
           throw new ArithmeticException("Long overflow: too many ties (>2^10)");
         }

@@ -39,20 +39,20 @@ import elki.utilities.exceptions.AbortException;
 
 /**
  * Generate a data set according to a given model.
- *
+ * <p>
  * Key idea of this generator is to re-generate points if they are more likely
  * to belong to a different cluster than the one they were generated for. The
  * benefit is that we should end up with a data set that follows closely the
  * model that we specified.
- *
+ * <p>
  * The drawbacks are that on one hand, specifications might be unsatisfiable.
  * For this a retry count is kept and an {@link AbortException} is
  * thrown when the maximum number of retries is exceeded.
- *
+ * <p>
  * On the other hand, the model might not be exactly as specified. When the
  * generator reports an "Density correction factor estimation" that differs from
  * 1.0 this is an indication that the result is not exact.
- *
+ * <p>
  * On the third hand, rejecting points introduces effects where one generator
  * can influence others, so random generator results will not be stable with
  * respect to the addition of new dimensions and similar if there are any
@@ -156,7 +156,7 @@ public class GeneratorMain {
         List<double[]> newp = curclus.generate(curclus.getSize() - kept);
         for(double[] p : newp) {
           int bestc = assignment.getAssignment(i, p);
-          if(bestc < 0) {
+          if(bestc < 0 && cursclus != null) {
             cursclus.incrementDiscarded();
             continue;
           }
@@ -348,7 +348,7 @@ public class GeneratorMain {
 
   /**
    * Initialize cluster labels and models.
-   *
+   * <p>
    * Clusters that are set to "reassign" will have their labels set to null, or
    * if there is only one possible reassignment, to this target label.
    *

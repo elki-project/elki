@@ -41,7 +41,7 @@ class DoubleIntegerDBIDHeap implements DoubleDBIDHeap {
   /**
    * Constructor.
    *
-   * @param Heap to use
+   * @param heap Heap to use
    */
   protected DoubleIntegerDBIDHeap(DoubleIntegerHeap heap) {
     super();

@@ -22,7 +22,7 @@ package elki.data.synthetic.bymodel;
 
 /**
  * Interface for a dynamic cluster generator.
- * 
+ * <p>
  * A cluster generator is considered dynamic when it allows "rejecting" points
  * and the generation of additional new points.
  * 

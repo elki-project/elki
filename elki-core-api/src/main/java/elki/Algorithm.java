@@ -49,8 +49,8 @@ import elki.utilities.optionhandling.OptionID;
 public interface Algorithm {
   /**
    * Try to auto-run the algorithm on a database by calling a method called
-   * {@link run}, with an optional {@link Database} and with data relations as
-   * specified by {@link #getInputTypeRestriction()}.
+   * {@code run}, with an optional {@link Database} first, and with data
+   * relations as specified by {@link #getInputTypeRestriction()}.
    *
    * @param database the database to run the algorithm on
    * @return the Result computed by this algorithm
@@ -88,13 +88,13 @@ public interface Algorithm {
     private Utils() {
       // Do not use
     }
-    
+
     /**
      * Try to auto-run the algorithm on a database by calling a method called
-     * {@link run}, with an optional {@link Database} and with data relations as
-     * specified by {@link #getInputTypeRestriction()}.
+     * {@code run}, with an optional {@link Database} first, and with data
+     * relations as specified by {@link #getInputTypeRestriction()}.
      *
-     * @param a Algorith to run on
+     * @param a Algorithm to run on
      * @param database the database to run the algorithm on
      * @return the Result computed by this algorithm
      */

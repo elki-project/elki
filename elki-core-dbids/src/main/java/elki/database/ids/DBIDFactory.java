@@ -187,7 +187,7 @@ public interface DBIDFactory {
   DoubleDBIDHeap newMinHeap(int k);
 
   /**
-   * Create a max heap (see also {@link newHeap} for a kNN heap).
+   * Create a max heap (see also {@link #newHeap} for a kNN heap).
    *
    * @param k Design sign
    * @return New heap of size k.

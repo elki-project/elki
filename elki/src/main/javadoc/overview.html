@@ -10,11 +10,11 @@ and their development.
 For background, contact-information, and contributors see
 <a href="https://elki-project.github.io" target="_parent">https://elki-project.github.io/</a>.</p>
 
-<p>This is the documentation for version 0.7.5, published as:<br />
+<p>This is the documentation for version 0.7.5, published as:<br>
 <i>
-  Erich Schubert and Arthur Zimek:<br />
-  ELKI: A large open-source library for data analysis<vr />
-  ELKI Release 0.7.5 "Heidelberg"<br />
+  Erich Schubert and Arthur Zimek:<br>
+  ELKI: A large open-source library for data analysis<br>
+  ELKI Release 0.7.5 "Heidelberg"<br>
   CoRR arXiv 1902.03616
 </i>
 </p>
@@ -58,19 +58,19 @@ This is not just a storage for <code>double[]</code>, as with many other framewo
 It can store various types of objects, and the integrated index structures provide access to fast
 {@link elki.database.query.distance.DistanceQuery distance},
 {@link elki.database.query.similarity.SimilarityQuery similarity},
-{@link elki.database.query.knn.KNNQuery kNN},
-{@link elki.database.query.rknn.RKNNQuery RkNN} and
-{@link elki.database.query.range.RangeQuery range} query methods
+{@link elki.database.query.knn.KNNSearcher kNN},
+{@link elki.database.query.rknn.RKNNSearcher RkNN} and
+{@link elki.database.query.range.RangeSearcher range} query methods
 for a variety of distance functions.</p>
-<p>The standard flow for initializing a database is as depicted here:<br />
-<img src="figures/database-initialization.png" width="600" height="341" alt="Database initialization" /><br />
+<p>The standard flow for initializing a database is as depicted here:<br>
+<img src="figures/database-initialization.png" width="600" height="341" alt="Database initialization" /><br>
 The standard stream-based data sources such as
 {@link elki.datasource.FileBasedDatabaseConnection FileBasedDatabaseConnection}
 will open the stream, feed the contents through a
 {@link elki.datasource.parser.Parser Parser} to obtain an initial
 {@link elki.datasource.bundle.MultipleObjectsBundle MultipleObjectsBundle}. This is
 a <em>temporary</em> container for the data, which can then be modified by arbitrary
-{@link elki.datasource.filter.ObjectFilter ObjectFilter}s.<br />
+{@link elki.datasource.filter.ObjectFilter ObjectFilter}s.<br>
 In the end, the
 {@link elki.datasource.bundle.MultipleObjectsBundle MultipleObjectsBundle}
 is bulk-inserted into a {@link elki.database.Database Database}, which will then
@@ -79,9 +79,9 @@ invoke its {@link elki.index.IndexFactory IndexFactory}s to add
 <p>When a request for a
 {@link elki.database.query.distance.DistanceQuery distance},
 {@link elki.database.query.similarity.SimilarityQuery similarity},
-{@link elki.database.query.knn.KNNQuery kNN},
-{@link elki.database.query.rknn.RKNNQuery RkNN} or
-{@link elki.database.query.range.RangeQuery range} query is received by the database,
+{@link elki.database.query.knn.KNNSearcher kNN},
+{@link elki.database.query.rknn.RKNNSearcher RkNN} or
+{@link elki.database.query.range.RangeSearcher range} query is received by the database,
 it queries all indexes if they have support for this query. If so, an optimized query is returned,
 otherwise a linear scan query can be returned unless
 {@link elki.database.query.QueryBuilder#optimizedOnly}

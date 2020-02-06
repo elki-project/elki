@@ -62,7 +62,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @composed - - - HeapMSTCollector
  *
  * @param <O> Input object type
- * @param <R> Output result type
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //

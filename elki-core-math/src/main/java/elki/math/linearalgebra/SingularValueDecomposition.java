@@ -27,7 +27,7 @@ import net.jafama.FastMath;
  * <p>
  * For an m-by-n matrix A with m &gt;= n, the singular value decomposition is an
  * m-by-n orthogonal matrix U, an n-by-n diagonal matrix S, and an n-by-n
- * ozthogonal matrix V so that A = U*S*V'.
+ * orthogonal matrix V so that A = U*S*V'.
  * <p>
  * The singular values, sigma[k] = S[k][k], are ordered so that sigma[0] &gt;=
  * sigma[1] &gt;= ... &gt;= sigma[n-1].
@@ -201,7 +201,7 @@ public class SingularValueDecomposition {
     final int pp = p - 1;
     final double eps = 0x1p-52, tiny = 0x1p-966;
     while(p > 0) {
-      // TODO: add an iteration limit.
+      // TODO: add an iteration limit?
 
       // This section of the program inspects for
       // negligible elements in the s and e arrays.
@@ -220,7 +220,9 @@ public class SingularValueDecomposition {
       }
       int ks;
       for(ks = p - 1; ks > k; ks--) {
-        double t = (ks != p ? Math.abs(e[ks]) : 0.) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
+        // was originally (but we have ks < p): double t = (ks != p ?
+        // Math.abs(e[ks]) : 0.) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
+        double t = Math.abs(e[ks]) + (ks != k + 1 ? Math.abs(e[ks - 1]) : 0.);
         if(Math.abs(s[ks]) <= tiny + eps * t) {
           s[ks] = 0.0;
           break;

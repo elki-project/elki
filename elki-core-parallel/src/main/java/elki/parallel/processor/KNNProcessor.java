@@ -34,8 +34,6 @@ import elki.parallel.variables.SharedObject;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @param <O> Object type
- *
  * @has - - - Instance
  * @assoc - - - KNNSearcher
  * @assoc - - - SharedObject

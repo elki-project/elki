@@ -45,10 +45,10 @@
  * <ul>
  * <li>{@link elki.database.query.QueryBuilder#distanceQuery}</li>
  * <li>{@link elki.database.query.QueryBuilder#similarityQuery}</li>
- * <li>{@link elki.database.query.QueryBuilder#kNNQuery}</li>
- * <li>{@link elki.database.query.QueryBuilder#rangeQuery}</li>
- * <li>{@link elki.database.query.QueryBuilder#rKNNQuery}</li>
- * <li>{@link elki.database.query.QueryBuilder#prioritySearcher}</li>
+ * <li>{@link elki.database.query.QueryBuilder#kNNByObject}</li>
+ * <li>{@link elki.database.query.QueryBuilder#rangeByObject}</li>
+ * <li>{@link elki.database.query.QueryBuilder#rKNNByObject}</li>
+ * <li>{@link elki.database.query.QueryBuilder#priorityByObject}</li>
  * </ul>
  * as appropriate. See the query class links above for the detailed API. Avoid
  * calling this method within a loop construct!<br>

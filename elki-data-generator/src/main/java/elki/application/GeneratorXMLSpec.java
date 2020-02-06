@@ -83,9 +83,6 @@ public class GeneratorXMLSpec extends AbstractApplication {
     this.generator = generator;
   }
 
-  /**
-   * Runs the wrapper with the specified arguments.
-   */
   @Override
   public void run() {
     MultipleObjectsBundle data = generator.loadData();

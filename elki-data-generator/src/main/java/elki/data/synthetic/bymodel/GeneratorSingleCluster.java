@@ -192,11 +192,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     clipmax = max;
   }
 
-  /**
-   * Get the cluster dimensionality
-   *
-   * @return dimensionality
-   */
   @Override
   public int getDim() {
     return dim;
@@ -220,11 +215,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     return false;
   }
 
-  /**
-   * Generate the given number of additional points.
-   *
-   * @see elki.data.synthetic.bymodel.GeneratorInterface#generate(int)
-   */
   @Override
   public List<double[]> generate(int count) {
     ArrayList<double[]> result = new ArrayList<>(count);
@@ -292,49 +282,26 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     return clipmax;
   }
 
-  /**
-   * Return the size
-   *
-   * @return size of this cluster.
-   */
   @Override
   public int getSize() {
     return size;
   }
 
-  /**
-   * Get cluster name.
-   *
-   * @return name of this cluster.
-   */
   @Override
   public String getName() {
     return name;
   }
 
-  /**
-   * Get number of discarded points
-   *
-   * @return number of discarded points
-   */
   @Override
   public int getDiscarded() {
     return discarded;
   }
 
-  /**
-   * Increase number of discarded points
-   */
   @Override
   public void incrementDiscarded() {
     ++this.discarded;
   }
 
-  /**
-   * Return number of remaining retries.
-   *
-   * @return Number of retries left in this cluster.
-   */
   @Override
   public int getRetries() {
     return retries;
@@ -367,11 +334,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     return new Random(random.nextLong());
   }
 
-  /**
-   * Make a cluster model for this cluster.
-   *
-   * @return Model
-   */
   @Override
   public Model makeModel() {
     return new GeneratorModel(this, computeMean());
@@ -393,9 +355,6 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
     for(int i = 0; i < dim; i++) {
       v[i] = axes.get(i).quantile(0.5);
     }
-    if(trans != null) {
-      v = trans.apply(v);
-    }
-    return v;
+    return trans == null ? v : trans.apply(v);
   }
 }
