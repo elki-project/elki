@@ -303,7 +303,12 @@ public class ELKIServiceRegistry {
    * @param value Class name, relative class name, or nickname.
    * @return Class found or {@code null}
    */
+  @SuppressWarnings("unchecked")
   public static <C> Class<? extends C> findImplementation(Class<? super C> restrictionClass, String value) {
+    Class<?> clazz = tryLoadClass(value);
+    if(clazz != null && restrictionClass.isAssignableFrom(clazz)) {
+      return (Class<? extends C>) clazz.asSubclass(restrictionClass);
+    }
     // Add all from service files (i.e. jars)
     if(!contains(restrictionClass)) {
       ELKIServiceLoader.load(restrictionClass);
@@ -311,7 +316,6 @@ public class ELKIServiceRegistry {
     }
     Entry e = data.get(restrictionClass);
     int pos = -1;
-    Class<?> clazz = null;
     // First, try the lookup cache:
     if(e != null) {
       for(pos = 0; pos < e.len; pos++) {
@@ -350,12 +354,7 @@ public class ELKIServiceRegistry {
         e.clazzes[pos] = clazz;
       }
     }
-    if(clazz == FAILED_LOAD) {
-      return null;
-    }
-    @SuppressWarnings("unchecked")
-    Class<? extends C> ret = (Class<? extends C>) clazz.asSubclass(restrictionClass);
-    return ret;
+    return clazz == FAILED_LOAD ? null : (Class<? extends C>) clazz.asSubclass(restrictionClass);
   }
 
   /**

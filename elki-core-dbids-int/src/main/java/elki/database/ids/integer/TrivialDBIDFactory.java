@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
 import elki.database.ids.DBIDRef;
+import elki.utilities.Priority;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -37,7 +38,8 @@ import elki.utilities.exceptions.AbortException;
  * @opt nodefillcolor LemonChiffon
  * @stereotype factory
  */
-final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
+@Priority(Priority.IMPORTANT)
+public final class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
   /**
    * Keep track of the smallest dynamic DBID offset not used.
    */
@@ -56,8 +58,7 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
     if(id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
     }
-    DBID ret = new IntegerDBID(id);
-    return ret;
+    return new IntegerDBID(id);
   }
 
   @Override
@@ -71,14 +72,13 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
     if(start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
-    DBIDRange alloc = new IntegerDBIDRange(start, size);
-    return alloc;
+    return new IntegerDBIDRange(start, size);
   }
 
   @Override
   public DBIDRange generateStaticDBIDRange(int begin, int size) {
     final int end = begin + size;
-    if(end > Integer.MAX_VALUE) {
+    if(end < 0) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
     DBIDRange alloc = new IntegerDBIDRange(begin, size);

@@ -222,4 +222,22 @@ public final class ClassGenericsUtil {
     }
     throw new AbortException("Cannot find a usable implementation of " + clz.toString(), last);
   }
+
+  /**
+   * Try to load the default for a particular interface (must have a public
+   * default constructor, used for factories).
+   *
+   * @param <T> Type
+   * @param clz Interface to implement
+   * @param def Name of default implementation
+   * @return Instance
+   */
+  public static <T> T loadDefault(Class<T> clz, String def) {
+    try {
+      return clz.cast(ELKIServiceRegistry.findImplementation(clz, def).newInstance());
+    }
+    catch(Exception e) {
+      return instantiateLowlevel(clz);
+    }
+  }
 }

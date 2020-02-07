@@ -25,8 +25,8 @@ import elki.utilities.io.ByteBufferSerializer;
 import elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
- * Factory interface for generating DBIDs. See {@link #FACTORY} for the static
- * instance to use.
+ * Factory interface for generating DBIDs.
+ * See {@link #FACTORY} for the static instance to use.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -45,7 +45,7 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  DBIDFactory FACTORY = ClassGenericsUtil.instantiateLowlevel(DBIDFactory.class);
+  static final DBIDFactory FACTORY = ClassGenericsUtil.loadDefault(DBIDFactory.class, "elki.database.ids.integer.TrivialDBIDFactory");
 
   /**
    * Make a new DBID variable.
@@ -57,8 +57,8 @@ public interface DBIDFactory {
 
   /**
    * Import and integer as DBID.
-   *
-   * Note: this may not be possible for some factories!
+   * <p>
+   * Note: this may not be possible for some factories that are not int-based!
    *
    * @param id Integer ID to import
    * @return DBID
@@ -68,7 +68,7 @@ public interface DBIDFactory {
   /**
    * Assign an integer value to a DBID variable.
    * <p>
-   * Note: this may not be possible for some factories!
+   * Note: this may not be possible for some factories that are not int-based!
    *
    * @param var Variable
    * @param val Integer value
