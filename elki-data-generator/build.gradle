@@ -2,4 +2,5 @@ description = 'ELKI - Data Generator'
 dependencies {
   compile project(':elki-clustering')
   compile project(':elki-outlier')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

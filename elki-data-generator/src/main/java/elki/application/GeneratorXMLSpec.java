@@ -91,10 +91,10 @@ public class GeneratorXMLSpec extends AbstractApplication {
     }
     try {
       if(Files.exists(outputFile) && LOG.isVerbose()) {
-        LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be APPENDED.");
+        LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be OVERWRITTEN.");
       }
       try (
-          BufferedWriter outStream = Files.newBufferedWriter(outputFile, StandardOpenOption.APPEND)) {
+          BufferedWriter outStream = Files.newBufferedWriter(outputFile, StandardOpenOption.CREATE)) {
         writeClusters(outStream, data);
       }
     }

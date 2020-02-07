@@ -22,7 +22,6 @@ package elki.datasource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -33,8 +32,6 @@ import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -238,22 +235,14 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   private GeneratorMain loadXMLSpecification() {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setValidating(false);
       dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-      dbf.setFeature(XMLConstants.ACCESS_EXTERNAL_DTD, false);
-      URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
-      if(url != null) {
-        try {
-          Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(url);
-          dbf.setSchema(schema);
-          dbf.setIgnoringElementContentWhitespace(true);
-        }
-        catch(Exception e) {
-          LOG.warning("Could not set up XML Schema validation for specification file.", e);
-        }
-      }
-      else {
-        LOG.warning("Could not set up XML Schema validation for specification file.");
-      }
+      dbf.setNamespaceAware(true);
+      dbf.setFeature("http://xml.org/sax/features/namespaces", false);
+      dbf.setFeature("http://xml.org/sax/features/validation", false);
+      dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+      dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
       Document doc = dbf.newDocumentBuilder().parse(Files.newInputStream(specfile));
       Node root = doc.getDocumentElement();
       if(TAG_DATASET.equals(root.getNodeName())) {
