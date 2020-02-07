@@ -22,13 +22,12 @@ package elki.datasource;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.Test;
 
-import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.data.type.TypeUtil;
 import elki.database.AbstractDatabase;
 import elki.database.Database;
@@ -42,12 +41,12 @@ import elki.utilities.ELKIBuilder;
  */
 public class GeneratorXMLDatabaseConnectionTest {
   @Test
-  public void testGenerator() throws URISyntaxException {
+  public void testGenerator() throws URISyntaxException, IOException {
     String fn = "elki/testdata/unittests/3clusters-and-noise-2d.xml";
-    Path res = Paths.get(AbstractSimpleAlgorithmTest.class.getClassLoader().getResource(fn).toURI());
+    URI uri = getClass().getClassLoader().getResource(fn).toURI();
     Database db = new ELKIBuilder<>(StaticArrayDatabase.class) //
         .with(AbstractDatabase.Par.DATABASE_CONNECTION_ID, GeneratorXMLDatabaseConnection.class) //
-        .with(GeneratorXMLDatabaseConnection.Par.CONFIGFILE_ID, res) //
+        .with(GeneratorXMLDatabaseConnection.Par.CONFIGFILE_ID, uri) //
         .build();
     db.initialize();
     assertNotNull(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));

@@ -21,13 +21,16 @@
 package elki.utilities.optionhandling.parameters;
 
 import java.io.File;
-import java.nio.file.Files;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import elki.utilities.io.FileUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.WrongParameterValueException;
@@ -40,7 +43,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @author Erich Schubert
  * @since 0.3
  */
-public class FileListParameter extends ListParameter<FileListParameter, List<Path>> {
+public class FileListParameter extends ListParameter<FileListParameter, List<URI>> {
   /**
    * Available types of the files: {@link #INPUT_FILES} denotes input files,
    * {@link #OUTPUT_FILES} denotes output files.
@@ -76,7 +79,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
   @Override
   public String getValueAsString() {
     StringBuilder buf = new StringBuilder(100 * getValue().size());
-    for(Path p : getValue()) {
+    for(URI p : getValue()) {
       buf.append(p.toString()).append(LIST_SEP);
     }
     buf.setLength(buf.length() > LIST_SEP.length() ? buf.length() - LIST_SEP.length() : buf.length());
@@ -86,7 +89,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
   @Override
   public String getDefaultValueAsString() {
     StringBuilder buf = new StringBuilder(100 * getDefaultValue().size());
-    for(Path p : getDefaultValue()) {
+    for(URI p : getDefaultValue()) {
       buf.append(p.toString()).append(LIST_SEP);
     }
     buf.setLength(buf.length() > LIST_SEP.length() ? buf.length() - LIST_SEP.length() : buf.length());
@@ -94,20 +97,32 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
   }
 
   @Override
-  protected List<Path> parseValue(Object obj) throws ParameterException {
+  protected List<URI> parseValue(Object obj) throws ParameterException {
     try {
       List<?> l = List.class.cast(obj);
-      List<Path> r = new ArrayList<>(l.size());
+      List<URI> r = new ArrayList<>(l.size());
       // do extra validation:
       for(Object o : l) {
+        if(o instanceof URI) {
+          r.add((URI) o);
+        }
+        if(o instanceof URL) {
+          try {
+            r.add(((URL) o).toURI());
+          }
+          catch(URISyntaxException e) {
+            throw new WrongParameterValueException(this, o.toString(), e.getMessage());
+          }
+        }
         if(o instanceof Path) {
-          r.add((Path) o);
+          r.add(((Path) o).toUri());
         }
         else if(o instanceof File) {
-          r.add(((File) o).toPath());
+          r.add(((File) o).toURI());
         }
         else if(o instanceof String) {
-          r.add(Paths.get((String) o));
+          URI u = URI.create((String) obj);
+          r.add(u.getScheme() != null ? u : Paths.get((String) o).toUri());
         }
         else {
           throw new WrongParameterValueException(this, obj.toString(), "expected a List<Path> or a String.");
@@ -120,9 +135,10 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<Path> fileValue = new ArrayList<>(values.length);
+      ArrayList<URI> fileValue = new ArrayList<>(values.length);
       for(String val : values) {
-        fileValue.add(Paths.get(val));
+        URI u = URI.create(val);
+        fileValue.add(u.getScheme() != null ? u : Paths.get(val).toUri());
       }
       return fileValue;
     }
@@ -130,14 +146,14 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
   }
 
   @Override
-  protected boolean validate(List<Path> obj) throws ParameterException {
+  protected boolean validate(List<URI> obj) throws ParameterException {
     if(!super.validate(obj)) {
       return false;
     }
     if(filesType.equals(FilesType.INPUT_FILES)) {
-      for(Path file : obj) {
+      for(URI file : obj) {
         try {
-          if(!Files.exists(file)) {
+          if(!FileUtil.exists(file)) {
             throw new WrongParameterValueException(this, getValueAsString(), "File \"" + file + "\" does not exist.");
           }
         }
@@ -171,7 +187,7 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Pat
    * @param consumer Output consumer
    * @return {@code true} if valid
    */
-  public boolean grab(Parameterization config, Consumer<List<Path>> consumer) {
+  public boolean grab(Parameterization config, Consumer<List<URI>> consumer) {
     if(config.grab(this)) {
       if(consumer != null) {
         consumer.accept(getValue());

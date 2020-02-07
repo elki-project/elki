@@ -22,20 +22,16 @@ package elki.index.preprocessed.knn;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
 
-import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.type.TypeUtil;
-import elki.database.AbstractDatabase;
 import elki.database.HashmapDatabase;
 import elki.database.UpdatableDatabase;
 import elki.database.ids.*;
@@ -49,14 +45,11 @@ import elki.database.query.rknn.LinearScanRKNNByObject;
 import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
-import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.FileBasedDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
-import elki.datasource.parser.NumberVectorLabelParser;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.result.Metadata;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIBuilder;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test case to validate the dynamic updates of materialized kNN and RkNN
@@ -82,23 +75,10 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
 
   @Test
   public void testPreprocessor() {
-    UpdatableDatabase db;
-    // get database
-    try (InputStream is = AbstractSimpleAlgorithmTest.open(dataset)) {
-      ListParameterization params = new ListParameterization();
-      // Setup parser and data loading
-      NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(DoubleVector.FACTORY);
-      InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, new ArrayList<>(), parser);
-
-      // We want to allow the use of indexes via "params"
-      params.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, dbc);
-      db = ClassGenericsUtil.parameterizeOrAbort(HashmapDatabase.class, params);
-      db.initialize();
-    }
-    catch(IOException e) {
-      fail("Test data " + dataset + " not found.");
-      return;
-    }
+    UpdatableDatabase db = new ELKIBuilder<>(HashmapDatabase.class) //
+        .with(FileBasedDatabaseConnection.Par.INPUT_ID, getClass().getClassLoader().getResource(dataset)) //
+        .build();
+    db.initialize();
 
     Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> distanceQuery = new QueryBuilder<>(relation, EuclideanDistance.STATIC).distanceQuery();

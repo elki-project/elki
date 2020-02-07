@@ -23,8 +23,7 @@ package elki.distance.external;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
@@ -78,7 +77,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
   /**
    * Input file of distance matrix
    */
-  private Path matrixfile;
+  private URI matrixfile;
 
   /**
    * Minimum and maximum IDs seen.
@@ -97,7 +96,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
    * @param matrixfile input file
    * @param defaultDistance Default distance (when undefined)
    */
-  public FileBasedSparseDoubleDistance(DistanceParser parser, Path matrixfile, double defaultDistance) {
+  public FileBasedSparseDoubleDistance(DistanceParser parser, URI matrixfile, double defaultDistance) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
@@ -109,7 +108,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
     if(cache == null) {
       int size = relation.size();
       try {
-        loadCache(size, new BufferedInputStream(FileUtil.tryGzipInput(Files.newInputStream(matrixfile))));
+        loadCache(size, new BufferedInputStream(FileUtil.open(matrixfile)));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -128,9 +127,8 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
    * 
    * @param size Expected size
    * @param in Input stream
-   * @throws IOException
    */
-  protected void loadCache(int size, InputStream in) throws IOException {
+  protected void loadCache(int size, InputStream in) {
     // Expect a sparse matrix here.
     cache = new Long2DoubleOpenHashMap(size * 20);
     cache.defaultReturnValue(Double.POSITIVE_INFINITY);
@@ -215,7 +213,7 @@ public class FileBasedSparseDoubleDistance extends AbstractDBIDRangeDistance {
     /**
      * Input file.
      */
-    protected Path matrixfile = null;
+    protected URI matrixfile = null;
 
     /**
      * Parser for input file.

@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import elki.application.AbstractApplication;
@@ -222,7 +223,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
           .grab(config, x -> radius = x);
       // Output file parameter
       new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> out = x);
+          .grab(config, x -> out = Paths.get(x));
     }
 
     @Override

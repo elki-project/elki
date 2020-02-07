@@ -22,6 +22,7 @@ package elki.database.lucene;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -127,7 +128,7 @@ public class LuceneDatabase extends AbstractDatabase {
     @Override
     public void configure(Parameterization config) {
       new FileParameter(INDEX_DIR_ID, FileParameter.FileType.INPUT_FILE) //
-          .grab(config, x -> idir = x);
+          .grab(config, x -> idir = Paths.get(x));
     }
 
     @Override

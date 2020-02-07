@@ -21,11 +21,14 @@
 package elki.utilities.optionhandling.parameters;
 
 import java.io.File;
-import java.nio.file.Files;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
+import elki.utilities.io.FileUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -40,7 +43,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.3
  */
 // TODO: turn FileType into a Constraint?
-public class FileParameter extends AbstractParameter<FileParameter, Path> {
+public class FileParameter extends AbstractParameter<FileParameter, URI> {
   /**
    * Available file types: {@link #INPUT_FILE} denotes an input file,
    * {@link #OUTPUT_FILE} denotes an output file.
@@ -79,30 +82,42 @@ public class FileParameter extends AbstractParameter<FileParameter, Path> {
   }
 
   @Override
-  protected Path parseValue(Object obj) throws ParameterException {
+  protected URI parseValue(Object obj) throws ParameterException {
     if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
+    if(obj instanceof URI) {
+      return (URI) obj;
+    }
+    if(obj instanceof URL) {
+      try {
+        return ((URL) obj).toURI();
+      }
+      catch(URISyntaxException e) {
+        throw new WrongParameterValueException(this, obj.toString(), e.getMessage());
+      }
+    }
     if(obj instanceof Path) {
-      return (Path) obj;
+      return ((Path) obj).toUri();
     }
     if(obj instanceof File) {
-      return ((File) obj).toPath();
+      return ((File) obj).toURI();
     }
     if(obj instanceof String) {
-      return Paths.get((String) obj);
+      URI u = URI.create((String) obj);
+      return u.getScheme() != null ? u : Paths.get((String) obj).toUri();
     }
-    throw new WrongParameterValueException("Parameter \"" + getOptionID().getName() + "\": Unsupported value given!");
+    throw new WrongParameterValueException(this, obj.toString(), "Unsupported value");
   }
 
   @Override
-  protected boolean validate(Path obj) throws ParameterException {
+  protected boolean validate(URI obj) throws ParameterException {
     if(!super.validate(obj)) {
       return false;
     }
     if(fileType.equals(FileType.INPUT_FILE)) {
       try {
-        if(Files.exists(obj)) {
+        if(FileUtil.exists(obj)) {
           return true;
         }
         throw new WrongParameterValueException("Given file " + obj + " for parameter \"" + getOptionID().getName() + "\" does not exist!\n");
@@ -140,7 +155,7 @@ public class FileParameter extends AbstractParameter<FileParameter, Path> {
    * @param consumer Output consumer
    * @return {@code true} if valid
    */
-  public boolean grab(Parameterization config, Consumer<Path> consumer) {
+  public boolean grab(Parameterization config, Consumer<URI> consumer) {
     if(config.grab(this)) {
       if(consumer != null) {
         consumer.accept(getValue());

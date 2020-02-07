@@ -22,6 +22,7 @@ package elki.distance.external;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import elki.database.ids.DBIDRange;
 import elki.distance.AbstractDBIDRangeDistance;
@@ -125,8 +126,9 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
     public void configure(Parameterization config) {
       FileParameter param = new FileParameter(MATRIX_ID, FileParameter.FileType.INPUT_FILE);
       param.grab(config, matrixfile -> {
+        // FIXME: use Path here
         try {
-          cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
+          cache = new OnDiskUpperTriangleMatrix(Paths.get(matrixfile), DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
         }
         catch(IOException e) {
           config.reportError(new WrongParameterValueException(param, matrixfile.toString(), e.getMessage(), e));

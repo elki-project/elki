@@ -22,16 +22,11 @@ package elki.algorithm;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-
 import elki.data.type.TypeUtil;
-import elki.database.AbstractDatabase;
 import elki.database.Database;
 import elki.database.StaticArrayDatabase;
 import elki.datasource.AbstractDatabaseConnection;
-import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.FileBasedDatabaseConnection;
 import elki.datasource.filter.FixedDBIDsFilter;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -74,47 +69,23 @@ public abstract class AbstractSimpleAlgorithmTest {
   public static Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params) {
     assertNotNull("Params, if given, must not be null.", params);
     // Allow loading test data from resources.
-    try (InputStream is = open(filename)) {
-      params.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, InputStreamDatabaseConnection.class);
-      params.addParameter(InputStreamDatabaseConnection.Par.STREAM_ID, is);
-      Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
-
-      // Ensure we have no unused parameters:
-      if(params.hasUnusedParameters()) {
-        fail("Unused parameters: " + params.getRemainingParameters());
-      }
-      // And report any parameterization errors:
-      if(params.hasErrors()) {
-        params.logAndClearReportedErrors();
-        fail("Parameterization errors.");
-      }
-
-      db.initialize();
-      // Check the relation has the expected size:
-      if(expectedSize > 0) {
-        assertEquals("Database size does not match.", expectedSize, db.getRelation(TypeUtil.ANY).size());
-      }
-      return db;
+    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params //
+        .addParameter(FileBasedDatabaseConnection.Par.INPUT_ID, //
+            AbstractSimpleAlgorithmTest.class.getClassLoader().getResource(filename)));
+    // Ensure we have no unused parameters:
+    if(params.hasUnusedParameters()) {
+      fail("Unused parameters: " + params.getRemainingParameters());
     }
-    catch(IOException e) {
-      fail("Test data " + filename + " not found.");
-      return null; // Not reached.
+    // And report any parameterization errors:
+    if(params.hasErrors()) {
+      params.logAndClearReportedErrors();
+      fail("Parameterization errors.");
     }
-  }
-
-  /**
-   * Open a resource input stream. Use gzip if the name ends with .gz.
-   * (Autodetection currently does not work on resource streams.)
-   * 
-   * @param filename resource name
-   * @return Input stream
-   * @throws IOException
-   */
-  public static InputStream open(String filename) throws IOException {
-    InputStream is = AbstractSimpleAlgorithmTest.class.getClassLoader().getResourceAsStream(filename);
-    if(is == null) {
-      throw new IOException("Resource not found: " + filename);
+    db.initialize();
+    // Check the relation has the expected size:
+    if(expectedSize > 0) {
+      assertEquals("Database size does not match.", expectedSize, db.getRelation(TypeUtil.ANY).size());
     }
-    return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
+    return db;
   }
 }

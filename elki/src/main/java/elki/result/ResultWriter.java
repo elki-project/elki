@@ -23,6 +23,7 @@ package elki.result;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 import elki.logging.Logging;
@@ -173,7 +174,7 @@ public class ResultWriter implements ResultHandler {
     public void configure(Parameterization config) {
       new FileParameter(OutputStep.Par.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
           .setOptional(true) //
-          .grab(config, x -> out = x);
+          .grab(config, x -> out = Paths.get(x));
       if(out != null || config instanceof UnParameterization /* for documentation */) {
         new Flag(GZIP_OUTPUT_ID).grab(config, x -> gzip = x);
         new Flag(OVERWRITE_OPTION_ID).grab(config, x -> warnoverwrite = !x);

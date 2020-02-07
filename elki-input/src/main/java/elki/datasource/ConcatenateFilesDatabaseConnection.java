@@ -20,11 +20,9 @@
  */
 package elki.datasource;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +58,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   /**
    * Input file list.
    */
-  private List<Path> files;
+  private List<URI> files;
 
   /**
    * The parser.
@@ -74,7 +72,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    * @param parser Parser
    * @param filters Filters
    */
-  public ConcatenateFilesDatabaseConnection(List<Path> files, Parser parser, List<? extends ObjectFilter> filters) {
+  public ConcatenateFilesDatabaseConnection(List<URI> files, Parser parser, List<? extends ObjectFilter> filters) {
     super(filters);
     this.files = files;
     this.parser = parser;
@@ -84,11 +82,9 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle objects = new MultipleObjectsBundle();
     objects.appendColumn(TypeUtil.STRING, new ArrayList<>());
-    for(Path file : files) {
+    for(URI file : files) {
       String filestr = file.toString();
-      try (InputStream fis = Files.newInputStream(file); //
-          BufferedInputStream bis = new BufferedInputStream(fis); //
-          InputStream inputStream = FileUtil.tryGzipInput(bis)) {
+      try (InputStream inputStream = FileUtil.open(file)) {
         final BundleStreamSource source;
         if(parser instanceof StreamingParser) {
           final StreamingParser streamParser = (StreamingParser) parser;
@@ -161,7 +157,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     /**
      * The input files.
      */
-    private List<Path> files;
+    private List<URI> files;
 
     @Override
     public void configure(Parameterization config) {

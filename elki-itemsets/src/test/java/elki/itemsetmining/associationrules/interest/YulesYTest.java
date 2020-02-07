@@ -24,12 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import elki.itemsetmining.AbstractFrequentItemsetAlgorithmTest;
+import elki.algorithm.AbstractSimpleAlgorithmTest;
+import elki.database.Database;
+import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.parser.SimpleTransactionParser;
 import elki.itemsetmining.FPGrowth;
 import elki.itemsetmining.associationrules.AssociationRuleGeneration;
-import elki.database.Database;
 import elki.result.AssociationRuleResult;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Yule's Y metric.
@@ -37,10 +40,11 @@ import elki.utilities.ELKIBuilder;
  * @author Abhishek Sharma
  * @since 0.7.5
  */
-public class YulesYTest extends AbstractFrequentItemsetAlgorithmTest {
+public class YulesYTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testToyExample() {
-    Database db = loadTransactions(UNITTEST + "itemsets/subsets3.txt", 7);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/subsets3.txt", 7, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, -0.11) //

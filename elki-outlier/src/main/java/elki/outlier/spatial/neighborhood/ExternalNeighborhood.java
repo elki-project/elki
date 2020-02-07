@@ -24,8 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,23 +85,21 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     /**
      * The input file.
      */
-    private Path file;
+    private URI file;
 
     /**
      * Constructor.
      * 
      * @param file File to load
      */
-    public Factory(Path file) {
+    public Factory(URI file) {
       super();
       this.file = file;
     }
 
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<?> relation) {
-      DataStore<DBIDs> store = loadNeighbors(database, relation);
-      ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
-      return neighborhood;
+      return new ExternalNeighborhood(loadNeighbors(database, relation));
     }
 
     @Override
@@ -151,7 +148,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       if(LOG.isDebugging()) {
         LOG.verbose("Loading neighborhood file.");
       }
-      try (InputStream in = FileUtil.tryGzipInput(Files.newInputStream(file));
+      try (InputStream in = FileUtil.open(file);
           BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
         for(String line; (line = br.readLine()) != null;) {
           ArrayModifiableDBIDs neighbours = DBIDUtil.newArray();
@@ -198,7 +195,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       /**
        * The input file.
        */
-      Path file;
+      URI file;
 
       @Override
       public void configure(Parameterization config) {

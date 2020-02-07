@@ -22,8 +22,7 @@ package elki.clustering.meta;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.ArrayList;
 
 import elki.clustering.ClusteringAlgorithm;
@@ -90,14 +89,14 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
   /**
    * The file to be reparsed.
    */
-  private Path file;
+  private URI file;
 
   /**
    * Constructor.
    *
    * @param file File to load
    */
-  public ExternalClustering(Path file) {
+  public ExternalClustering(URI file) {
     super();
     this.file = file;
   }
@@ -116,7 +115,7 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
   @Override
   public Clustering<? extends Model> autorun(Database database) {
     Clustering<? extends Model> m = null;
-    try (InputStream in = FileUtil.tryGzipInput(Files.newInputStream(file)); //
+    try (InputStream in = FileUtil.open(file); //
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       reader.reset(in);
@@ -202,7 +201,7 @@ public class ExternalClustering implements ClusteringAlgorithm<Clustering<? exte
     /**
      * The file to be reparsed
      */
-    private Path file;
+    private URI file;
 
     @Override
     public void configure(Parameterization config) {

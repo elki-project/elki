@@ -20,11 +20,9 @@
  */
 package elki.result;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.List;
 
 import elki.data.Cluster;
@@ -42,8 +40,8 @@ import elki.database.relation.Relation;
 import elki.datasource.parser.ClusteringVectorParser;
 import elki.logging.Logging;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -222,7 +220,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     /**
      * Output file.
      */
-    private Path outputFile = null;
+    private Path outputFile;
 
     /**
      * Optional label to force for this output.
@@ -238,7 +236,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     public void configure(Parameterization config) {
       new FileParameter(OUT_ID, FileParameter.FileType.OUTPUT_FILE) //
           .setOptional(true) //
-          .grab(config, x -> outputFile = x);
+          .grab(config, x -> outputFile = Paths.get(x));
       new Flag(APPEND_ID).grab(config, x -> append = x);
       new StringParameter(FORCE_LABEL_ID) //
           .setOptional(true) //

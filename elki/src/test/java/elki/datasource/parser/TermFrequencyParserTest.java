@@ -21,33 +21,27 @@
 package elki.datasource.parser;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.junit.Test;
 
 import elki.algorithm.AbstractSimpleAlgorithmTest;
-import elki.data.SparseDoubleVector;
 import elki.data.SparseNumberVector;
 import elki.data.type.TypeUtil;
-import elki.database.AbstractDatabase;
 import elki.database.Database;
-import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.datasource.InputStreamDatabaseConnection;
 import elki.distance.ArcCosineDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SparseEuclideanDistance;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test the term frequency parser by loading an example data set derived
  * from DBLP.
- * 
+ * <p>
  * TODO: maybe also run an example algorithm?
  * 
  * @author Erich Schubert
@@ -59,33 +53,15 @@ public class TermFrequencyParserTest {
 
   @Test
   public void testDBLPData() throws IOException {
-    InputStream is = AbstractSimpleAlgorithmTest.open(DBLP_DATA);
-    // Setup parser and data loading
-    TermFrequencyParser<SparseDoubleVector> parser = new TermFrequencyParser<>(false, SparseDoubleVector.FACTORY);
-    InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser);
-
-    ListParameterization config = new ListParameterization();
-    config.addParameter(AbstractDatabase.Par.DATABASE_CONNECTION_ID, dbc);
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
-
-    if(config.hasUnusedParameters()) {
-      fail("Unused parameters: " + config.getRemainingParameters());
-    }
-    if(config.hasErrors()) {
-      config.logAndClearReportedErrors();
-      fail("Parameterization errors.");
-    }
-    db.initialize();
-
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DBLP_DATA, 50, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, TermFrequencyParser.class));
     Relation<SparseNumberVector> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH);
 
     // Get first three objects:
     DBIDIter iter = rel.iterDBIDs();
     SparseNumberVector v1 = rel.get(iter);
-    iter.advance();
-    SparseNumberVector v2 = rel.get(iter);
-    iter.advance();
-    SparseNumberVector v3 = rel.get(iter);
+    SparseNumberVector v2 = rel.get(iter.advance());
+    SparseNumberVector v3 = rel.get(iter.advance());
 
     // "Dense" euclidean distance:
     double euclid1_12 = EuclideanDistance.STATIC.distance(v1, v2);

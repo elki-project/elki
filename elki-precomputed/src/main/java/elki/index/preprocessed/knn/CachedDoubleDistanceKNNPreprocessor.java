@@ -25,6 +25,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import elki.application.cache.CacheDoubleDistanceKNNLists;
@@ -170,7 +171,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
         super.configure(config);
         // Input file parameter
         new FileParameter(CACHE_ID, FileParameter.FileType.INPUT_FILE) //
-            .grab(config, x -> filename = x);
+            .grab(config, x -> filename = Paths.get(x));
       }
 
       @Override

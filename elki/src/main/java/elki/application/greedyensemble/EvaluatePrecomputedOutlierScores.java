@@ -20,10 +20,13 @@
  */
 package elki.application.greedyensemble;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.regex.Pattern;
@@ -86,7 +89,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   /**
    * The data input file.
    */
-  Path infile;
+  URI infile;
 
   /**
    * Parser to read input data.
@@ -127,7 +130,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
    * @param outfile Output file name
    * @param name Constant column to prepend
    */
-  public EvaluatePrecomputedOutlierScores(Path infile, StreamingParser parser, Pattern reverse, Path outfile, String name) {
+  public EvaluatePrecomputedOutlierScores(URI infile, StreamingParser parser, Pattern reverse, Path outfile, String name) {
     super();
     this.infile = infile;
     this.parser = parser;
@@ -138,8 +141,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   @Override
   public void run() {
-    try (InputStream fis = Files.newInputStream(infile); //
-        InputStream is = new BufferedInputStream(FileUtil.tryGzipInput(fis)); //
+    try (InputStream is = new BufferedInputStream(FileUtil.open(infile)); //
         FileChannel chan = FileChannel.open(outfile, StandardOpenOption.APPEND); //
         PrintStream fout = new PrintStream(Channels.newOutputStream(chan))) {
       // Setup the input stream.
@@ -307,7 +309,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     /**
      * Data source.
      */
-    Path infile;
+    URI infile;
 
     /**
      * Parser to read input data.

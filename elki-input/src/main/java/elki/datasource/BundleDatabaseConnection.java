@@ -23,6 +23,7 @@ package elki.datasource;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import elki.datasource.bundle.BundleReader;
@@ -104,7 +105,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
       super.configure(config);
       configFilters(config);
       new FileParameter(BUNDLE_ID, FileParameter.FileType.INPUT_FILE) //
-          .grab(config, x -> infile = x);
+          .grab(config, x -> infile = Paths.get(x));
     }
 
     @Override

@@ -24,9 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
 import java.util.List;
 
 import elki.datasource.filter.ObjectFilter;
@@ -56,10 +54,10 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param parser the parser to provide a database
    * @param infile File to load the data from
    */
-  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, Path infile) {
+  public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, URI infile) {
     super(() -> {
       try {
-        return new BufferedInputStream(FileUtil.tryGzipInput(Files.newInputStream(infile)));
+        return new BufferedInputStream(FileUtil.open(infile));
       }
       catch(IOException e) {
         throw new UncheckedIOException("Could not load input file: " + infile, e);
@@ -75,7 +73,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param infile File to load the data from
    */
   public FileBasedDatabaseConnection(List<? extends ObjectFilter> filters, Parser parser, String infile) {
-    this(filters, parser, Paths.get(infile));
+    this(filters, parser, URI.create(infile));
   }
 
   /**
@@ -103,7 +101,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
     /**
      * Input stream to process.
      */
-    protected Path infile;
+    protected URI infile;
 
     @Override
     public void configure(Parameterization config) {
@@ -111,7 +109,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
       new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE) //
           .grab(config, x -> infile = x);
       Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
-      if(infile != null && (infile.getFileName().endsWith(".arff") || infile.getFileName().endsWith(".arff.gz"))) {
+      if(infile != null && (infile.toString().endsWith(".arff") || infile.toString().endsWith(".arff.gz"))) {
         defaultParser = ArffParser.class;
       }
       configParser(config, Parser.class, defaultParser);

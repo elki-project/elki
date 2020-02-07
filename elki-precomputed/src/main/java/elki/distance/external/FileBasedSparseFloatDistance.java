@@ -23,8 +23,7 @@ package elki.distance.external;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.net.URI;
 
 import elki.database.ids.DBID;
 import elki.database.ids.DBIDRange;
@@ -78,7 +77,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
   /**
    * Input file of distance matrix
    */
-  private Path matrixfile;
+  private URI matrixfile;
 
   /**
    * Minimum and maximum IDs seen.
@@ -97,7 +96,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
    * @param matrixfile input file
    * @param defaultDistance Default distance (when undefined)
    */
-  public FileBasedSparseFloatDistance(DistanceParser parser, Path matrixfile, float defaultDistance) {
+  public FileBasedSparseFloatDistance(DistanceParser parser, URI matrixfile, float defaultDistance) {
     super();
     this.parser = parser;
     this.matrixfile = matrixfile;
@@ -108,7 +107,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
   public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> relation) {
     if(cache == null) {
       try {
-        loadCache(relation.size(), new BufferedInputStream(FileUtil.tryGzipInput(Files.newInputStream(matrixfile))));
+        loadCache(relation.size(), new BufferedInputStream(FileUtil.open(matrixfile)));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -127,9 +126,8 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
    * 
    * @param size Expected size
    * @param in Input stream
-   * @throws IOException
    */
-  protected void loadCache(int size, InputStream in) throws IOException {
+  protected void loadCache(int size, InputStream in) {
     // Expect a sparse matrix here
     cache = new Long2FloatOpenHashMap(size * 20);
     cache.defaultReturnValue(Float.POSITIVE_INFINITY);
@@ -211,7 +209,7 @@ public class FileBasedSparseFloatDistance extends AbstractDBIDRangeDistance {
     /**
      * Input file.
      */
-    protected Path matrixfile = null;
+    protected URI matrixfile = null;
 
     /**
      * Parser for input file.

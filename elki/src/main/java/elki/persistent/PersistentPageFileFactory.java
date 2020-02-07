@@ -21,6 +21,7 @@
 package elki.persistent;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
@@ -85,7 +86,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     public void configure(Parameterization config) {
       super.configure(config);
       new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> fileName = x);
+          .grab(config, x -> fileName = Paths.get(x));
     }
 
     @Override

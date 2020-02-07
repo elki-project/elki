@@ -22,8 +22,8 @@ package elki.datasource;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -47,6 +47,7 @@ import elki.datasource.filter.ObjectFilter;
 import elki.logging.Logging;
 import elki.math.statistics.distribution.*;
 import elki.utilities.exceptions.AbortException;
+import elki.utilities.io.FileUtil;
 import elki.utilities.io.ParseUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -164,7 +165,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * The configuration file.
    */
-  Path specfile;
+  URI specfile;
 
   /**
    * Parameter for scaling the cluster sizes.
@@ -201,7 +202,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @param reassignByDistance Reassign objects by distance instead of density
    * @param clusterRandom Random number generator
    */
-  public GeneratorXMLDatabaseConnection(List<? extends ObjectFilter> filters, Path specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
+  public GeneratorXMLDatabaseConnection(List<? extends ObjectFilter> filters, URI specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
     super(filters);
     this.specfile = specfile;
     this.sizescale = sizescale;
@@ -243,15 +244,17 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-      Document doc = dbf.newDocumentBuilder().parse(Files.newInputStream(specfile));
-      Node root = doc.getDocumentElement();
-      if(TAG_DATASET.equals(root.getNodeName())) {
-        GeneratorMain gen = new GeneratorMain();
-        processElementDataset(gen, root);
-        return gen;
-      }
-      else {
-        throw new AbortException("Experiment specification has incorrect document element: " + root.getNodeName());
+      try (InputStream is = FileUtil.open(specfile)) {
+        Document doc = dbf.newDocumentBuilder().parse(is);
+        Node root = doc.getDocumentElement();
+        if(TAG_DATASET.equals(root.getNodeName())) {
+          GeneratorMain gen = new GeneratorMain();
+          processElementDataset(gen, root);
+          return gen;
+        }
+        else {
+          throw new AbortException("Experiment specification has incorrect document element: " + root.getNodeName());
+        }
       }
     }
     catch(FileNotFoundException e) {
@@ -726,7 +729,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * The configuration file.
      */
-    Path specfile = null;
+    URI specfile = null;
 
     /**
      * Parameter for scaling the cluster sizes.

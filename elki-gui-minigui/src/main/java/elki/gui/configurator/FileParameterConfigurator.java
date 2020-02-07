@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -77,7 +78,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
     // fill with value
-    Path f = fp.isDefined() ? fp.getValue() : null;
+    Path f = fp.isDefined() ? Paths.get(fp.getValue()) : null;
     textfield.setText(f == null ? "" : f.toString());
 
     // make a panel
@@ -100,7 +101,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     // Use a new JFileChooser. Inconsistent behaviour otherwise!
     final JFileChooser fc = new JFileChooser(new File("."));
     if(param.isDefined()) {
-      fc.setSelectedFile(param.getValue().toFile());
+      fc.setSelectedFile(Paths.get(param.getValue()).toFile());
     }
 
     if(e.getSource() == button) {

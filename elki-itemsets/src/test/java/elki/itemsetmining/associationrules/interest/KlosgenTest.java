@@ -24,12 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import elki.itemsetmining.AbstractFrequentItemsetAlgorithmTest;
+import elki.algorithm.AbstractSimpleAlgorithmTest;
+import elki.database.Database;
+import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.parser.SimpleTransactionParser;
 import elki.itemsetmining.FPGrowth;
 import elki.itemsetmining.associationrules.AssociationRuleGeneration;
-import elki.database.Database;
 import elki.result.AssociationRuleResult;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Klosgen metric.
@@ -37,10 +40,11 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class KlosgenTest extends AbstractFrequentItemsetAlgorithmTest {
+public class KlosgenTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testToyExample() {
-    Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/increasing5.txt", 5, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     AssociationRuleResult res = new ELKIBuilder<>(AssociationRuleGeneration.class) //
         .with(FPGrowth.Par.MINSUPP_ID, 1) //
         .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 0.26) //

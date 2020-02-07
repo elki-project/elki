@@ -24,9 +24,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.database.Database;
+import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.parser.SimpleTransactionParser;
 import elki.result.FrequentItemsetsResult;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Regression test for Eclat.
@@ -34,10 +38,11 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
+public class EclatTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testMissing() {
-    Database db = loadTransactions(UNITTEST + "itemsets/missing1.txt", 4);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/missing1.txt", 4, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
           .with(Eclat.Par.MINSUPP_ID, 1).build().autorun(db);
@@ -82,7 +87,8 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
 
   @Test
   public void testIncreasing() {
-    Database db = loadTransactions(UNITTEST + "itemsets/increasing.txt", 4);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/increasing.txt", 4, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     {
       FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
           .with(Eclat.Par.MINSUPP_ID, 1).build().autorun(db);
@@ -107,7 +113,8 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
 
   @Test
   public void testLarge() {
-    Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/zutaten.txt.gz", 16401, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     FrequentItemsetsResult res = new ELKIBuilder<>(Eclat.class) //
         .with(Eclat.Par.MINSUPP_ID, 200).build().autorun(db);
     assertEquals("Size not as expected.", 184, res.getItemsets().size());

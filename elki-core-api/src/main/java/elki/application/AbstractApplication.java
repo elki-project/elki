@@ -20,7 +20,9 @@
  */
 package elki.application;
 
+import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
@@ -82,7 +84,7 @@ public abstract class AbstractApplication {
       version = prop.getProperty("elki.version");
     }
     catch(Exception e) {
-      version = "DEVELOPMENT"; 
+      version = "DEVELOPMENT";
     }
     VERSION = version;
   }
@@ -385,7 +387,7 @@ public abstract class AbstractApplication {
      */
     protected Path getParameterOutputFile(Parameterization config, String description) {
       FileParameter outputP = new FileParameter(new OptionID(OUTPUT_ID.getName(), description), FileParameter.FileType.OUTPUT_FILE);
-      return outputP.grab(config, null) ? outputP.getValue() : null;
+      return outputP.grab(config, null) ? Paths.get(outputP.getValue()) : null;
     }
 
     /**
@@ -394,7 +396,7 @@ public abstract class AbstractApplication {
      * @param config Options
      * @return Input file
      */
-    protected Path getParameterInputFile(Parameterization config) {
+    protected URI getParameterInputFile(Parameterization config) {
       return getParameterInputFile(config, "Input filename.");
     }
 
@@ -405,7 +407,7 @@ public abstract class AbstractApplication {
      * @param description Description
      * @return Input file
      */
-    protected Path getParameterInputFile(Parameterization config, String description) {
+    protected URI getParameterInputFile(Parameterization config, String description) {
       FileParameter inputP = new FileParameter(new OptionID(INPUT_ID.getName(), description), FileParameter.FileType.INPUT_FILE);
       return inputP.grab(config, null) ? inputP.getValue() : null;
     }

@@ -24,12 +24,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import elki.itemsetmining.AbstractFrequentItemsetAlgorithmTest;
+import elki.algorithm.AbstractSimpleAlgorithmTest;
+import elki.database.Database;
+import elki.datasource.InputStreamDatabaseConnection;
+import elki.datasource.parser.SimpleTransactionParser;
 import elki.itemsetmining.FPGrowth;
 import elki.itemsetmining.associationrules.AssociationRuleGeneration;
-import elki.database.Database;
 import elki.result.AssociationRuleResult;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Confidence metric.
@@ -37,15 +40,16 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class ConfidenceTest extends AbstractFrequentItemsetAlgorithmTest {
+public class ConfidenceTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testToyExample() {
-    Database db = loadTransactions(UNITTEST + "itemsets/increasing5.txt", 5);
+    Database db = makeSimpleDatabase(UNITTEST + "itemsets/increasing5.txt", 5, new ListParameterization() //
+        .addParameter(InputStreamDatabaseConnection.Par.PARSER_ID, SimpleTransactionParser.class));
     {
       AssociationRuleGeneration ap = new ELKIBuilder<>(AssociationRuleGeneration.class) //
-      .with(FPGrowth.Par.MINSUPP_ID, 3) //
-      .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.) //
-      .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Confidence.class) //
+          .with(FPGrowth.Par.MINSUPP_ID, 3) //
+          .with(AssociationRuleGeneration.Par.MINMEASURE_ID, 1.) //
+          .with(AssociationRuleGeneration.Par.INTERESTMEASURE_ID, Confidence.class) //
           .build();
       AssociationRuleResult res = ap.autorun(db);
       assertEquals("Size not as expected.", 6, res.getRules().size());

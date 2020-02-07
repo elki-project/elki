@@ -22,6 +22,7 @@ package elki.application.cache;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import elki.application.AbstractApplication;
 import elki.database.Database;
@@ -165,7 +166,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O> extends AbstractApplication {
           .grab(config, x -> distance = x);
       // Output file parameter
       new FileParameter(CacheDoubleDistanceInOnDiskMatrix.Par.CACHE_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> out = x);
+          .grab(config, x -> out = Paths.get(x));
     }
 
     @Override

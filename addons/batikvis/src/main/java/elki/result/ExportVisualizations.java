@@ -23,6 +23,7 @@ package elki.result;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import org.apache.batik.util.SVGConstants;
@@ -325,7 +326,7 @@ public class ExportVisualizations implements ResultHandler {
     @Override
     public void configure(Parameterization config) {
       new FileParameter(FOLDER_ID, FileType.OUTPUT_FILE) //
-          .grab(config, x -> output = x);
+          .grab(config, x -> output = Paths.get(x));
       new DoubleParameter(RATIO_ID, 1.33) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> ratio = x);

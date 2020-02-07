@@ -23,6 +23,7 @@ package elki.application.lucene;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -114,9 +115,9 @@ public class SimpleTextLoader extends AbstractApplication {
     public void configure(Parameterization config) {
       super.configure(config);
       new FileParameter(SOURCE_ID, FileParameter.FileType.INPUT_FILE) //
-          .grab(config, x -> source = x);
+          .grab(config, x -> source = Paths.get(x));
       new FileParameter(INDEX_ID, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> index = x);
+          .grab(config, x -> index = Paths.get(x));
     }
 
     @Override

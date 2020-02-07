@@ -25,6 +25,7 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -661,7 +662,7 @@ public class KMLOutputHandler implements ResultHandler {
     public void configure(Parameterization config) {
       OptionID opt = new OptionID(OutputStep.Par.OUTPUT_ID.getName(), "Filename the KMZ file (compressed KML) is written to.");
       new FileParameter(opt, FileParameter.FileType.OUTPUT_FILE) //
-          .grab(config, x -> filename = x);
+          .grab(config, x -> filename = Paths.get(x));
       new ObjectParameter<OutlierScaling>(SCALING_ID, OutlierScaling.class, OutlierLinearScaling.class) //
           .grab(config, x -> scaling = x);
       new Flag(COMPAT_ID).grab(config, x -> compat = x);
