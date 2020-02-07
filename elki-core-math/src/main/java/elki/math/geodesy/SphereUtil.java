@@ -221,7 +221,7 @@ public final class SphereUtil {
     final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
     final double dlat = lat1 - lat2, dlon = lon1 - lon2;
     // Use cosine, cheaper:
-    if(dlat > 0.01 || dlat < -0.01 || dlon > 0.01 || dlat < -0.01) {
+    if(dlat > 0.01 || dlat < -0.01 || dlon > 0.01 || dlon < -0.01) {
       final double a = slat1 * slat2 + clat1 * clat2 * cos(dlon);
       return a < .9999_9999_9999_999 ? acos(a) : 0;
     }
@@ -597,9 +597,9 @@ public final class SphereUtil {
   /**
    * The along track distance, is the distance from S to Q along the track S to
    * E.
-   * 
+   * <p>
    * ATD=acos(cos(dist_SQ)/cos(XTD))
-   * 
+   * <p>
    * TODO: optimize: can we do a faster sign computation?
    * 
    * @param lat1 Latitude of starting point in radians.

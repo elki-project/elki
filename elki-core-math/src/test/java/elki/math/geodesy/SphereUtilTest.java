@@ -44,7 +44,8 @@ public class SphereUtilTest {
         // http://www.movable-type.co.uk/scripts/latlong.html
         // Halifax (north), Sao Paolo and Pelotas (east), Christchurch
         // (southwest), Honolulu (northwest), Guam (southwest)
-        // Kritimati (northwest), Hanga Roa (west)
+        // Kritimati (northwest), Hanga Roa (west), Stromness (southeast),
+        // Machu Picchu Antarctica (south)
         { 44.64533, -63.57239, 7386, 7455, 6371., 1e-4 }, // HX
         { -23.5475, -46.63611, 713.6, 744.4, 6371., 1e-4 }, // SP
         { -31.77194, -52.3425, 122.4, 1118, 6371., 1e-4 }, // PE
@@ -53,12 +54,20 @@ public class SphereUtilTest {
         { 13.4441674, 126.8578317, 15050, 19090, 6371., 7e-4 }, // GU
         { 1.8709366, -157.5032895, 9460, 11520, 6371., 7e-4 }, // KI
         { -27.15474, -109.43241, 3494, 5634, 6371., 1e-4 }, // HR
+        { -62.09158, -58.47245, 768, 4498, 6371., 1e-4 }, // Antarctica
+        { -54.15953, -36.71497, 1091, 3871, 6371., 1e-4 }, // Stromness
+        { -21.78116, -53.63745, 0, 0, 6371, 1e-4 }, // top right, low precision
+        { -21.7811660767, -53.6374511719, 0, 0, 6371, 1e-4 }, // top right
     };
     for(double[] t : tests) {
       assertEquals("Distance does not match", t[2], SphereUtil.latlngMinDistDeg(t[0], t[1], a[0], a[1], a[2], a[3]) * t[4], t[5] * t[4]);
-      assertEquals("Distance does not match", t[2], SphereUtil.latlngMinDistRadFull( MathUtil.deg2rad(t[0]), MathUtil.deg2rad(t[1]),
-          MathUtil.deg2rad(a[0]), MathUtil.deg2rad(a[1]), MathUtil.deg2rad(a[2]), MathUtil.deg2rad(a[3])) * t[4], t[5] * t[4]);
+      assertEquals("Distance does not match", t[2], SphereUtil.latlngMinDistRadFull(MathUtil.deg2rad(t[0]), MathUtil.deg2rad(t[1]), MathUtil.deg2rad(a[0]), MathUtil.deg2rad(a[1]), MathUtil.deg2rad(a[2]), MathUtil.deg2rad(a[3])) * t[4], t[5] * t[4]);
+      // These are pretty crude - all formulas match the same approximation
+      assertEquals("Distance does not match", t[3], SphereUtil.cosineFormulaDeg(t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
       assertEquals("Distance does not match", t[3], SphereUtil.haversineFormulaDeg(t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
+      assertEquals("Distance does not match", t[3], SphereUtil.cosineOrHaversineDeg(t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
+      assertEquals("Distance does not match", t[3], SphereUtil.sphericalVincentyFormulaDeg(t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
+      assertEquals("Distance does not match", t[3], SphereUtil.ellipsoidVincentyFormulaDeg(0., t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
     }
   }
 }
