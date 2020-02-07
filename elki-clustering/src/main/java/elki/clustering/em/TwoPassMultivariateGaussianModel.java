@@ -20,17 +20,13 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.clear;
-import static elki.math.linearalgebra.VMath.copy;
-import static elki.math.linearalgebra.VMath.identity;
-import static elki.math.linearalgebra.VMath.minusEquals;
-import static elki.math.linearalgebra.VMath.squareSum;
+import static elki.math.linearalgebra.VMath.*;
 
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
+
 import net.jafama.FastMath;
 
 /**
@@ -44,16 +40,6 @@ import net.jafama.FastMath;
  * @since 0.7.5
  */
 public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVector, EMModel> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(TwoPassMultivariateGaussianModel.class);
-
-  /**
-   * Constant to avoid singular matrixes.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-10;
-
   /**
    * Mean vector.
    */
@@ -80,14 +66,9 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
   double logNorm, logNormDet;
 
   /**
-   * Weight aggregation sum
+   * Weight aggregation sum.
    */
   double weight, wsum;
-
-  /**
-   * MAP prior / MLE prior.
-   */
-  double prior = 0;
 
   /**
    * Matrix for prior conditioning.
@@ -109,7 +90,7 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
    * 
    * @param weight Cluster weight
    * @param mean Initial mean
-   * @param covariance initial covariance matrix.
+   * @param covariance initial covariance matrix
    */
   public TwoPassMultivariateGaussianModel(double weight, double[] mean, double[][] covariance) {
     this.weight = weight;
@@ -119,7 +100,8 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
     this.covariance = covariance != null ? copy(covariance) : identity(mean.length, mean.length);
     this.priormatrix = covariance != null ? covariance : null;
     this.wsum = 0.;
-    updateCholesky();
+    this.chol = MultivariateGaussianModel.updateCholesky(this.covariance, null);
+    this.logNormDet = FastMath.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
   }
 
   @Override
@@ -139,14 +121,13 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
    */
   @Override
   public void firstPassE(NumberVector vec, double wei) {
-    final int dim = mean.length;
-    assert (vec.getDimensionality() == dim);
-    assert (wei >= 0 && wei < Double.POSITIVE_INFINITY) : wei;
+    assert vec.getDimensionality() == mean.length;
+    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
     if(wei < Double.MIN_NORMAL) {
       return;
     }
     // Aggregate
-    for(int i = 0; i < dim; i++) {
+    for(int i = 0; i < mean.length; i++) {
       mean[i] += vec.doubleValue(i) * wei;
     }
     wsum += wei;
@@ -168,12 +149,12 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
    */
   @Override
   public void updateE(NumberVector vec, double wei) {
-    final int dim = mean.length;
-    assert (vec.getDimensionality() == dim);
-    assert (wei >= 0 && wei < Double.POSITIVE_INFINITY) : wei;
+    assert vec.getDimensionality() == mean.length;
+    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
     if(wei < Double.MIN_NORMAL) {
       return;
     }
+    final int dim = mean.length;
     for(int i = 0; i < dim; i++) {
       // Center the vector:
       double vi = tmp[i] = vec.doubleValue(i) - mean[i], vi_wei = vi * wei;
@@ -186,86 +167,38 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
       cov_i[i] += vi_wei * vi;
       // Other half is NOT updated here, but in finalizeEStep!
     }
-    // Should we assert that the weight sum matches the first step?
   }
 
   @Override
   public void finalizeEStep(double weight, double prior) {
-    this.weight = weight;
-    this.prior = prior;
-    // Restore symmetry, and apply weight:
     final int dim = covariance.length;
-    final double f = (wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY) ? 1. / wsum : 1.;
-    assert (f > 0) : wsum;
-    if(prior > 0 && priormatrix != null) {
-      // MAP
+    this.weight = weight;
+    double f = wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY ? 1. / wsum : 1.;
+    if(prior > 0 && priormatrix != null) { // MAP
       double nu = dim + 2.; // Popular default.
       double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
         double[] row_i = covariance[i], pri_i = priormatrix[i];
-        for(int j = 0; j < i; j++) {
+        for(int j = 0; j < i; j++) { // Restore symmetry & scale
           covariance[j][i] = row_i[j] = (row_i[j] + prior * pri_i[j]) * f2;
         }
-        // Entry on diagonal:
-        row_i[i] = (row_i[i] + prior * pri_i[i]) * f2;
+        row_i[i] = (row_i[i] + prior * pri_i[i]) * f2; // Diagonal
       }
     }
     else { // MLE
       for(int i = 0; i < dim; i++) {
         double[] row_i = covariance[i];
-        for(int j = 0; j < i; j++) {
+        for(int j = 0; j < i; j++) { // Restore symmetry & scale
           covariance[j][i] = row_i[j] *= f;
         }
-        // Entry on diagonal:
-        row_i[i] *= f;
+        row_i[i] *= f; // Diagonal
       }
     }
-    updateCholesky();
+    this.chol = MultivariateGaussianModel.updateCholesky(covariance, null);
+    this.logNormDet = FastMath.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
     if(prior > 0 && priormatrix == null) {
       priormatrix = copy(covariance);
     }
-  }
-
-  /**
-   * Update the cholesky decomposition.
-   */
-  private void updateCholesky() {
-    CholeskyDecomposition nextchol = new CholeskyDecomposition(covariance);
-    if(!nextchol.isSPD()) {
-      // Add a small value to the diagonal, to reduce some rounding problems.
-      double s = 0.;
-      for(int i = 0; i < covariance.length; i++) {
-        s += covariance[i][i];
-      }
-      s *= SINGULARITY_CHEAT / covariance.length;
-      for(int i = 0; i < covariance.length; i++) {
-        covariance[i][i] += s;
-      }
-      nextchol = new CholeskyDecomposition(covariance);
-    }
-    if(!nextchol.isSPD()) {
-      LOG.warning("A cluster has degenerated, likely due to lack of variance in a subset of the data or too extreme magnitude differences.\n" + //
-          "The algorithm will likely stop without converging, and fail to produce a good fit.");
-      nextchol = this.chol != null ? this.chol : nextchol; // Prefer previous
-    }
-    this.chol = nextchol;
-    logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
-  }
-
-  /**
-   * Get 0.5 * log(det) of a cholesky decomposition.
-   * 
-   * @param chol Cholesky Decomposition
-   * @return log determinant.
-   */
-  private double getHalfLogDeterminant(CholeskyDecomposition chol) {
-    double[][] l = chol.getL();
-    double logdet = FastMath.log(l[0][0]);
-    for(int i = 1; i < l.length; i++) {
-      // We get half the log(det), because we did not square values here.
-      logdet += FastMath.log(l[i][i]);
-    }
-    return logdet;
   }
 
   /**

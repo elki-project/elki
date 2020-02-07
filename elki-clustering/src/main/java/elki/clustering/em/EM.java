@@ -125,6 +125,11 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   private EMClusterModelFactory<O, M> mfactory;
 
   /**
+   * Minimum number of iterations to do
+   */
+  private int miniter;
+
+  /**
    * Maximum number of iterations to allow
    */
   private int maxiter;
@@ -184,10 +189,26 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param soft Include soft assignments
    */
   public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory, int maxiter, double prior, boolean soft) {
+    this(k, delta, mfactory, 1, maxiter, prior, soft);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param k k parameter
+   * @param delta delta parameter
+   * @param mfactory EM cluster model factory
+   * @param miniter Minimum number of iterations
+   * @param maxiter Maximum number of iterations
+   * @param prior MAP prior
+   * @param soft Include soft assignments
+   */
+  public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory, int miniter, int maxiter, double prior, boolean soft) {
     super();
     this.k = k;
     this.delta = delta;
     this.mfactory = mfactory;
+    this.miniter = miniter;
     this.maxiter = maxiter;
     this.prior = prior;
     this.soft = soft;
@@ -234,7 +255,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
         lastimprovement = it;
         bestloglikelihood = loglikelihood;
       }
-      if(Math.abs(loglikelihood - oldloglikelihood) <= delta || lastimprovement < it >> 1) {
+      if(it >= miniter && (Math.abs(loglikelihood - oldloglikelihood) <= delta || lastimprovement < it >> 1)) {
         break;
       }
     }
@@ -408,6 +429,11 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     public static final OptionID INIT_ID = new OptionID("em.model", "Model factory.");
 
     /**
+     * Parameter to specify a minimum number of iterations
+     */
+    public static final OptionID MINITER_ID = new OptionID("em.miniter", "Minimum number of iterations.");
+
+    /**
      * Parameter to specify the MAP prior
      */
     public static final OptionID PRIOR_ID = new OptionID("em.map.prior", "Regularization factor for MAP estimation.");
@@ -426,6 +452,11 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
      * Initialization method
      */
     protected EMClusterModelFactory<O, M> initializer;
+
+    /**
+     * Minimum number of iterations.
+     */
+    protected int miniter = 1;
 
     /**
      * Maximum number of iterations.
@@ -447,6 +478,10 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
       new DoubleParameter(DELTA_ID, 1e-7)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
+      new IntParameter(MINITER_ID)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .setOptional(true) //
+          .grab(config, x -> miniter = x);
       new IntParameter(KMeans.MAXITER_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
@@ -459,7 +494,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
     @Override
     public EM<O, M> make() {
-      return new EM<>(k, delta, initializer, maxiter, prior, false);
+      return new EM<>(k, delta, initializer, miniter, maxiter, prior, false);
     }
   }
 }

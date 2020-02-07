@@ -30,19 +30,24 @@ import elki.math.MathUtil;
 import net.jafama.FastMath;
 
 /**
- * Simple spherical Gaussian cluster.
+ * Simple spherical Gaussian cluster (scaled identity matrixes).
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
 public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**
+   * Constant to avoid zero values.
+   */
+  private static final double SINGULARITY_CHEAT = 1E-10;
+
+  /**
    * Mean vector.
    */
   double[] mean;
 
   /**
-   * Variances.
+   * Single variances for all dimensions.
    */
   double variance;
 
@@ -62,7 +67,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   double weight, wsum;
 
   /**
-   * Prior variance, for MAP estimation.
+   * Prior variance.
    */
   double priorvar;
 
@@ -89,7 +94,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
-    this.variance = var > 0 ? var : 1e-10;
+    this.variance = var > 0 ? var : SINGULARITY_CHEAT;
     this.priorvar = this.variance;
     this.wsum = 0.;
   }
@@ -102,13 +107,17 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert (vec.getDimensionality() == mean.length);
+    assert vec.getDimensionality() == mean.length;
+    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
+    if(wei < Double.MIN_NORMAL) {
+      return;
+    }
     final double nwsum = wsum + wei;
+    final double f = wei / nwsum; // Do division only once
     // Compute new means
     for(int i = 0; i < mean.length; i++) {
       final double delta = vec.doubleValue(i) - mean[i];
-      final double rval = delta * wei / nwsum;
-      nmea[i] = mean[i] + rval;
+      nmea[i] = mean[i] + delta * f;
     }
     // Update variances
     for(int i = 0; i < mean.length; i++) {
@@ -126,16 +135,20 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   public void finalizeEStep(double weight, double prior) {
     final int dim = mean.length;
     this.weight = weight;
-    double logDet = 0.;
-    if(prior > 0) { // MAP
+    if(prior > 0 && priorvar > 0) { // MAP
       double nu = dim + 2.; // Popular default.
-      variance /= dim;
-      logDet = FastMath.log(variance = (variance + prior * priorvar) / (wsum + prior * (nu + dim + 2)));
+      variance = variance / dim + prior * priorvar;
+      variance /= (wsum + prior * (nu + dim + 2));
     }
     else if(wsum > 0.) { // MLE
-      logDet = FastMath.log(variance = variance / (wsum * dim));
-    } // Else degenerate
-    logNormDet = FastMath.log(weight) - .5 * logNorm - logDet;
+      variance /= dim * wsum; // variance sum -> average variance
+    } // else: variance must be 0
+    // Note: for dim dimenions, we have dim times the variance
+    double logDet = dim * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
+    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
+    if(prior > 0 && priorvar == 0) {
+      priorvar = variance;
+    }
   }
 
   /**
