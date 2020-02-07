@@ -189,10 +189,10 @@ public class PearsonCorrelationTest {
     double svar = var * size / (size - 1);
     double std = Math.sqrt(var);
     double sstd = Math.sqrt(svar);
-    assertEquals("Stddev X", std, pc0.getNaiveStddevX(), 0.);
-    assertEquals("Var X", var, pc0.getNaiveVarianceX(), 0.);
-    assertEquals("Stddev Y", std, pc0.getNaiveStddevY(), 0.);
-    assertEquals("Var Y", var, pc0.getNaiveVarianceY(), 0.);
+    assertEquals("Stddev X", std, pc0.getPopulationStddevX(), 0.);
+    assertEquals("Var X", var, pc0.getPopulationVarianceX(), 0.);
+    assertEquals("Stddev Y", std, pc0.getPopulationStddevY(), 0.);
+    assertEquals("Var Y", var, pc0.getPopulationVarianceY(), 0.);
     assertEquals("Stddev X", sstd, pc0.getSampleStddevX(), 0.);
     assertEquals("Var X", svar, pc0.getSampleVarianceX(), 0.);
     assertEquals("Stddev Y", sstd, pc0.getSampleStddevY(), 0.);

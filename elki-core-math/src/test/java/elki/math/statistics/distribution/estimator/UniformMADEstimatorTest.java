@@ -43,7 +43,6 @@ public class UniformMADEstimatorTest extends AbstractDistributionEstimatorTest {
     data = this.data.get("random_M1_2");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("min", dist.getMin(), -1., 0.22023127040794166);
-    assertStat("max", dist.getMax(), 2., -0.058064123720787064
-);
+    assertStat("max", dist.getMax(), 2., -0.058064123720787064);
   }
 }

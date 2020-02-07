@@ -36,10 +36,8 @@ public class WeibullLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   public void testEstimator() {
     final WeibullLMMEstimator est = instantiate(WeibullLMMEstimator.class, WeibullDistribution.class);
     load("weibull.ascii.gz");
-    double[] data;
-    WeibullDistribution dist;
-    data = this.data.get("random_01_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01_1");
+    WeibullDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     // FIXME: Pretty large error!
     assertStat("k", dist.getK(), 0.1, 0.09454063929803297);
     assertStat("lambda", dist.getLambda(), 1., 1200.6518885193916);

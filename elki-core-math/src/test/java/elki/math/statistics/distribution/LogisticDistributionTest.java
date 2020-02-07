@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Logistic distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -76,10 +75,9 @@ public class LogisticDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("logistic.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(LogisticDistribution.Par.LOCATION_ID, .1);
-    params.addParameter(LogisticDistribution.Par.SCALE_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(LogisticDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(LogisticDistribution.class) //
+        .with(LogisticDistribution.Par.LOCATION_ID, .1) //
+        .with(LogisticDistribution.Par.SCALE_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_01", 1e-15);
   }
 

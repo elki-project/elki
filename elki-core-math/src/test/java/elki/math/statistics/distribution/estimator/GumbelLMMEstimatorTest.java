@@ -36,10 +36,8 @@ public class GumbelLMMEstimatorTest extends AbstractDistributionEstimatorTest {
   public void testEstimator() {
     final GumbelLMMEstimator est = instantiate(GumbelLMMEstimator.class, GumbelDistribution.class);
     load("gumbel.ascii.gz");
-    double[] data;
-    GumbelDistribution dist;
-    data = this.data.get("random_01_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01_1");
+    GumbelDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("mu", dist.getMu(), 0.1, 0.182483158846056);
     assertStat("beta", dist.getBeta(), 1., 0.1659770406481691);
     data = this.data.get("random_01_10");

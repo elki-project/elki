@@ -36,10 +36,8 @@ public class RayleighLMMEstimatorTest extends AbstractDistributionEstimatorTest 
   public void testEstimator() {
     final RayleighLMMEstimator est = instantiate(RayleighLMMEstimator.class, RayleighDistribution.class);
     load("ray.ascii.gz");
-    double[] data;
-    RayleighDistribution dist;
-    data = this.data.get("random_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_1");
+    RayleighDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("scale", dist.getSigma(), 1, -0.11722290135040081);
     data = this.data.get("random_2");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);

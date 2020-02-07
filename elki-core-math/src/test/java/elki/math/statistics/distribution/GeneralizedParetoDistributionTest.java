@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Generalized Pareto Distribution (GPD) in ELKI.
- * 
+ * <p>
  * The reference values were computed using SciPy.
  * 
  * GNU R has implementations in lmomco, but these do not do bounds checks, and
@@ -68,11 +67,10 @@ public class GeneralizedParetoDistributionTest extends AbstractDistributionTest 
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("gpd.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(GeneralizedParetoDistribution.Par.LOCATION_ID, .1);
-    params.addParameter(GeneralizedParetoDistribution.Par.SCALE_ID, .5);
-    params.addParameter(GeneralizedParetoDistribution.Par.SHAPE_ID, .1);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedParetoDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(GeneralizedParetoDistribution.class) //
+        .with(GeneralizedParetoDistribution.Par.LOCATION_ID, .1) //
+        .with(GeneralizedParetoDistribution.Par.SCALE_ID, .5) //
+        .with(GeneralizedParetoDistribution.Par.SHAPE_ID, .1).build();
     assertPDF(dist, "pdf_scipy_01_05_01", 1e-15);
   }
 

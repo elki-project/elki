@@ -36,10 +36,8 @@ public class LogNormalBilkovaLMMEstimatorTest extends AbstractDistributionEstima
   public void testEstimator() {
     final LogNormalBilkovaLMMEstimator est = instantiate(LogNormalBilkovaLMMEstimator.class, LogNormalDistribution.class);
     load("lognorm.ascii.gz");
-    LogNormalDistribution dist;
-    double[] data;
-    data = this.data.get("random_0_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_0_1");
+    LogNormalDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("logmean", dist.getLogMean(), 0, 0.012954431446844161);
     assertStat("stddev", dist.getLogStddev(), 1, 0.014397745529324268);
     assertStat("shift", dist.getShift(), 0., 0.019737855078490796);

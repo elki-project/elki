@@ -24,9 +24,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Halton pseudo-Uniform distribution in ELKI.
@@ -74,10 +73,9 @@ public class HaltonUniformDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("unif.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(UniformDistribution.Par.MIN_ID, 0.);
-    params.addParameter(UniformDistribution.Par.MAX_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(HaltonUniformDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(HaltonUniformDistribution.class) //
+        .with(UniformDistribution.Par.MIN_ID, 0.) //
+        .with(UniformDistribution.Par.MAX_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_0_1", 1e-15);
   }
 

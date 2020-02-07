@@ -78,8 +78,6 @@ public class KernelDensityFittingTest {
     // verify data set size.
     assertEquals("Data set size doesn't match parameters.", realsize, data.size());
 
-    double splitval = 0.5;
-
     double[] fulldata = data.toArray();
     Arrays.sort(fulldata);
 
@@ -94,6 +92,7 @@ public class KernelDensityFittingTest {
     assertEquals("Full Mean after fitting", 0.64505, fullfit[0], 0.01);
     assertEquals("Full Stddev after fitting", 1.5227889, fullfit[1], 0.01);
 
+    double splitval = 0.5;
     int splitpoint = 0;
     while(fulldata[splitpoint] < splitval && splitpoint < fulldata.length) {
       splitpoint++;
@@ -113,22 +112,12 @@ public class KernelDensityFittingTest {
   }
 
   private double[] estimateInitialParameters(double[] data) {
-    double[] params = new double[3];
-    // compute averages
-    MeanVariance mv = new MeanVariance();
-    for(double d : data) {
-      mv.put(d);
-    }
-
-    params[0] = mv.getMean();
-    params[1] = mv.getSampleStddev();
+    MeanVarianceMinMax mv = new MeanVarianceMinMax().put(data);
+    double m = mv.getMean(), s = mv.getSampleStddev();
     // guess initial amplitude for an gaussian distribution.
-    double c1 = NormalDistribution.erf(Math.abs(data[0] - params[0]) / (params[1] * Math.sqrt(2)));
-    double c2 = NormalDistribution.erf(Math.abs(data[data.length - 1] - params[0]) / (params[1] * Math.sqrt(2)));
-    params[2] = 1.0 / Math.min(c1, c2);
-    // System.out.println("Mean: " + params[0] + " Stddev: " + params[1] +
-    // " Amp: " + params[2]);
-    return params;
+    double c1 = NormalDistribution.erf(Math.abs(mv.getMin() - m) / (s * MathUtil.SQRT2));
+    double c2 = NormalDistribution.erf(Math.abs(mv.getMax() - m) / (s * MathUtil.SQRT2));
+    return new double[] { m, s, 1.0 / Math.min(c1, c2) };
   }
 
   private double[] run(double[] data, double[] params) {
@@ -136,16 +125,7 @@ public class KernelDensityFittingTest {
     boolean[] dofit = { true, true, true };
     KernelDensityEstimator de = new KernelDensityEstimator(data, GaussianKernelDensityFunction.KERNEL, 1e-10);
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(func, params, dofit, data, de.getDensity(), de.getVariance());
-    // for(int i = 0; i < 100; i++) {
-    // fit.iterate();
-    // double[] ps = fit.getParams();
-    // System.out.println("Mean: " + ps[0] + " Stddev: " + ps[1] + " Amp: " +
-    // ps[2]+" Chi: "+fit.getChiSq());
-    // }
     fit.run();
-    // double[] ps = fit.getParams();
-    // System.out.println("Result: "+ps[0]+" "+ps[1]+" "+ps[2]+" Chi:
-    // "+fit.getChiSq()+" Iter: "+fit.maxruns);
     return fit.getParams();
   }
 }

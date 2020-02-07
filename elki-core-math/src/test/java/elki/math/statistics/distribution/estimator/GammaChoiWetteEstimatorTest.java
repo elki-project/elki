@@ -36,10 +36,8 @@ public class GammaChoiWetteEstimatorTest extends AbstractDistributionEstimatorTe
   public void testEstimator() {
     final GammaChoiWetteEstimator est = instantiate(GammaChoiWetteEstimator.class, GammaDistribution.class);
     load("gamma.ascii.gz");
-    double[] data;
-    GammaDistribution dist;
-    data = this.data.get("random_01_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01_1");
+    GammaDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), 0.1, -0.011009099958955534);
     assertStat("theta", dist.getTheta(), 1., -0.38544240435289345);
     data = this.data.get("random_01_10");

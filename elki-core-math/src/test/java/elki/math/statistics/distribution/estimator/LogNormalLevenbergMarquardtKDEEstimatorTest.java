@@ -37,10 +37,8 @@ public class LogNormalLevenbergMarquardtKDEEstimatorTest extends AbstractDistrib
   public void testEstimator() {
     final LogNormalLevenbergMarquardtKDEEstimator est = instantiate(LogNormalLevenbergMarquardtKDEEstimator.class, LogNormalDistribution.class);
     load("lognorm.ascii.gz");
-    LogNormalDistribution dist;
-    double[] data;
-    data = this.data.get("random_0_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_0_1");
+    LogNormalDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("logmean", dist.getLogMean(), 0, -0.04064829672787483);
     assertStat("stddev", dist.getLogStddev(), 1, 0.06714852682167516);
     assertStat("shift", dist.getShift(), 0., 0);

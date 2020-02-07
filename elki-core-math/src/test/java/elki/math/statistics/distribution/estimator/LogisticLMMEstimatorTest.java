@@ -36,10 +36,8 @@ public class LogisticLMMEstimatorTest extends AbstractDistributionEstimatorTest 
   public void testEstimator() {
     final LogisticLMMEstimator est = instantiate(LogisticLMMEstimator.class, LogisticDistribution.class);
     load("logistic.ascii.gz");
-    double[] data;
-    LogisticDistribution dist;
-    data = this.data.get("random_01");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01");
+    LogisticDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("location", dist.getLocation(), .1, -0.005195757237340115);
     assertStat("scale", dist.getScale(), 1., -0.01176712896963572);
     data = this.data.get("random_05");

@@ -36,10 +36,8 @@ public class GammaMOMEstimatorTest extends AbstractDistributionEstimatorTest {
   public void testEstimator() {
     final GammaMOMEstimator est = instantiate(GammaMOMEstimator.class, GammaDistribution.class);
     load("gamma.ascii.gz");
-    double[] data;
-    GammaDistribution dist;
-    data = this.data.get("random_01_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01_1");
+    GammaDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), 0.1, -0.011436882562034872);
     assertStat("theta", dist.getTheta(), 1., -0.38839660582615465);
     data = this.data.get("random_01_10");

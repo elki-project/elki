@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Weibull distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -128,10 +127,9 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("weibull.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(WeibullDistribution.Par.SHAPE_ID, .1);
-    params.addParameter(WeibullDistribution.Par.SCALE_ID, 4.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(WeibullDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(WeibullDistribution.class) //
+        .with(WeibullDistribution.Par.SHAPE_ID, .1) //
+        .with(WeibullDistribution.Par.SCALE_ID, 4.).build();
     assertPDF(dist, "pdf_scipy_01_4", 1e-15);
   }
 

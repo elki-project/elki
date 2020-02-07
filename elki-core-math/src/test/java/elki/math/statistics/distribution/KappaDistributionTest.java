@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the four-parameter Kappa distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -158,12 +157,11 @@ public class KappaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("kappa.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(KappaDistribution.Par.LOCATION_ID, .1);
-    params.addParameter(KappaDistribution.Par.SCALE_ID, .2);
-    params.addParameter(KappaDistribution.Par.SHAPE1_ID, .3);
-    params.addParameter(KappaDistribution.Par.SHAPE2_ID, .4);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(KappaDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(KappaDistribution.class) //
+        .with(KappaDistribution.Par.LOCATION_ID, .1) //
+        .with(KappaDistribution.Par.SCALE_ID, .2) //
+        .with(KappaDistribution.Par.SHAPE1_ID, .3) //
+        .with(KappaDistribution.Par.SHAPE2_ID, .4).build();
     assertPDF(dist, "pdf_scipy_01_02_03_04", 1e-14);
   }
 

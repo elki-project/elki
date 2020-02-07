@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the inverse gaussian distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -76,10 +75,9 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("invgauss.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(InverseGaussianDistribution.Par.LOCATION_ID, .5);
-    params.addParameter(InverseGaussianDistribution.Par.SHAPE_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(InverseGaussianDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(InverseGaussianDistribution.class) //
+        .with(InverseGaussianDistribution.Par.LOCATION_ID, .5) //
+        .with(InverseGaussianDistribution.Par.SHAPE_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_05_1", 1e-15);
   }
 

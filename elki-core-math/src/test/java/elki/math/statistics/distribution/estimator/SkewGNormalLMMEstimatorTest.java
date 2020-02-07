@@ -39,10 +39,8 @@ public class SkewGNormalLMMEstimatorTest extends AbstractDistributionEstimatorTe
   public void testEstimator() {
     final SkewGNormalLMMEstimator est = instantiate(SkewGNormalLMMEstimator.class, SkewGeneralizedNormalDistribution.class);
     load("norm.ascii.gz");
-    SkewGeneralizedNormalDistribution dist;
-    double[] data;
-    data = this.data.get("random_0_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_0_1");
+    SkewGeneralizedNormalDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("loc", dist.getLocation(), 0., 0.02039022923745077);
     assertStat("scale", dist.getScale(), 1., -0.024058107085344838);
     assertStat("skew", dist.getSkew(), 0., 0.08831652708468758);

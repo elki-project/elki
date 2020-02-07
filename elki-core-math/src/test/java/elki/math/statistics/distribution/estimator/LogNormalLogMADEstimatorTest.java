@@ -36,10 +36,8 @@ public class LogNormalLogMADEstimatorTest extends AbstractDistributionEstimatorT
   public void testEstimator() {
     final LogNormalLogMADEstimator est = instantiate(LogNormalLogMADEstimator.class, LogNormalDistribution.class);
     load("lognorm.ascii.gz");
-    LogNormalDistribution dist;
-    double[] data;
-    data = this.data.get("random_0_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_0_1");
+    LogNormalDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("logmean", dist.getLogMean(), 0, -0.03436369913718115);
     assertStat("stddev", dist.getLogStddev(), 1, -0.07952272581038411);
     assertStat("shift", dist.getShift(), 0., 0.);

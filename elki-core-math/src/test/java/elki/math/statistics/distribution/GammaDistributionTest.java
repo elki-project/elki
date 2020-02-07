@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Gamma distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -128,10 +127,9 @@ public class GammaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("gamma.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(GammaDistribution.Par.K_ID, 2.);
-    params.addParameter(GammaDistribution.Par.THETA_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GammaDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(GammaDistribution.class) //
+        .with(GammaDistribution.Par.K_ID, 2.) //
+        .with(GammaDistribution.Par.THETA_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 

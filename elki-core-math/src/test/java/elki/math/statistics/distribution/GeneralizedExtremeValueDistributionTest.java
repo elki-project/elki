@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Generalized Extreme Value (GEV) distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using SciPy nad R (lmomco).
  * 
  * @author Erich Schubert
@@ -178,11 +177,10 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("gev.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(GeneralizedExtremeValueDistribution.Par.SHAPE_ID, .8);
-    params.addParameter(GeneralizedExtremeValueDistribution.Par.LOCATION_ID, .2);
-    params.addParameter(GeneralizedExtremeValueDistribution.Par.SCALE_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GeneralizedExtremeValueDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(GeneralizedExtremeValueDistribution.class) //
+        .with(GeneralizedExtremeValueDistribution.Par.SHAPE_ID, .8) //
+        .with(GeneralizedExtremeValueDistribution.Par.LOCATION_ID, .2) //
+        .with(GeneralizedExtremeValueDistribution.Par.SCALE_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_08_02_1", 1e-15);
   }
 

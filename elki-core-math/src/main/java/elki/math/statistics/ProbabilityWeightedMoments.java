@@ -20,6 +20,8 @@
  */
 package elki.math.statistics;
 
+import java.util.Arrays;
+
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 
@@ -76,8 +78,7 @@ public final class ProbabilityWeightedMoments {
       final double val = adapter.getDouble(data, i);
       xmom[0] += weight * val;
       for(int j = 1; j < nmom; j++) {
-        weight *= (n - i - j + 1) / (n - j + 1);
-        xmom[j] += weight * val;
+        xmom[j] += val * (weight *= (n - i - j + 1) / (n - j + 1));
       }
     }
     return xmom;
@@ -100,8 +101,7 @@ public final class ProbabilityWeightedMoments {
       final double val = adapter.getDouble(data, i);
       xmom[0] += weight * val;
       for(int j = 1; j < nmom; j++) {
-        weight *= (i - j + 1) / (n - j + 1);
-        xmom[j] += weight * val;
+        xmom[j] += val * (weight *= (i - j + 1) / (n - j + 1));
       }
     }
     return xmom;
@@ -126,10 +126,8 @@ public final class ProbabilityWeightedMoments {
       xmom[0] += aweight * val;
       xmom[1] += bweight * val;
       for(int j = 1, k = 2; j < nmom; j++, k += 2) {
-        aweight *= (n - i - j + 1) / (n - j + 1);
-        bweight *= (i - j + 1) / (n - j + 1);
-        xmom[k + 1] += aweight * val;
-        xmom[k + 1] += bweight * val;
+        xmom[k + 1] += val * (aweight *= (n - i - j + 1) / (n - j + 1));
+        xmom[k + 1] += val * (bweight *= (i - j + 1) / (n - j + 1));
       }
     }
     return xmom;
@@ -156,23 +154,19 @@ public final class ProbabilityWeightedMoments {
       }
       sum[0] += term;
       for(int j = 1, z = i; j < nmom; j++, z--) {
-        term *= z;
-        sum[j] += term;
+        sum[j] += (term *= z);
       }
     }
     // Normalize by "n choose (j + 1)"
     sum[0] /= n;
     double z = n;
     for(int j = 1; j < nmom; j++) {
-      z *= n - j;
-      sum[j] /= z;
+      sum[j] /= (z *= n - j);
     }
     normalizeLMR(sum, nmom);
     // Handle case when lambda2 == 0, by setting tau3...tauN = 0:
     if(sum[1] == 0) {
-      for(int i = 2; i < nmom; i++) {
-        sum[i] = 0.; // tau3...tauN = 0.
-      }
+      Arrays.fill(sum, 2, nmom, 0.);
       return sum;
     }
     // Map lambda3...lambdaN to tau3...tauN
@@ -194,8 +188,7 @@ public final class ProbabilityWeightedMoments {
       double temp = p * sum[0];
       for(int i = 0; i < k; i++) {
         double ai = i + 1.;
-        p *= -(k + ai) * (k - i) / (ai * ai);
-        temp += p * sum[i + 1];
+        temp += sum[i + 1] * (p *= -(k + ai) * (k - i) / (ai * ai));
       }
       sum[k] = temp;
     }

@@ -36,10 +36,8 @@ public class LaplaceMADEstimatorTest extends AbstractDistributionEstimatorTest {
   public void testEstimator() {
     final LaplaceMADEstimator est = instantiate(LaplaceMADEstimator.class, LaplaceDistribution.class);
     load("lap.ascii.gz");
-    double[] data;
-    LaplaceDistribution dist;
-    data = this.data.get("random_1_3");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_1_3");
+    LaplaceDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("rate", dist.getRate(), 1, 0.046455781235775984);
     assertStat("loc", dist.getLocation(), 3, -0.04027330298719978);
     data = this.data.get("random_4_05");

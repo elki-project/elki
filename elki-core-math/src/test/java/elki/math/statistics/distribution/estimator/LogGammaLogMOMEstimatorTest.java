@@ -37,10 +37,8 @@ public class LogGammaLogMOMEstimatorTest extends AbstractDistributionEstimatorTe
     final LogGammaLogMOMEstimator est = instantiate(LogGammaLogMOMEstimator.class, LogGammaDistribution.class);
     // TODO: generate loggamma test data.
     load("gamma.ascii.gz");
-    double[] data;
-    LogGammaDistribution dist;
-    data = exp(this.data.get("random_01_1"));
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = exp(this.data.get("random_01_1"));
+    LogGammaDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), 0.1, -0.011436882562034872);
     assertStat("theta", dist.getTheta(), 1., -0.38839660582615465);
     data = exp(this.data.get("random_01_10"));

@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the skew generalized Normal distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R.
  * 
  * @author Erich Schubert
@@ -71,11 +70,10 @@ public class SkewGeneralizedNormalDistributionTest extends AbstractDistributionT
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("skewnorm.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(SkewGeneralizedNormalDistribution.Par.LOCATION_ID, 1.);
-    params.addParameter(SkewGeneralizedNormalDistribution.Par.SCALE_ID, 2.);
-    params.addParameter(SkewGeneralizedNormalDistribution.Par.SKEW_ID, 3.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(SkewGeneralizedNormalDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(SkewGeneralizedNormalDistribution.class) //
+        .with(SkewGeneralizedNormalDistribution.Par.LOCATION_ID, 1.) //
+        .with(SkewGeneralizedNormalDistribution.Par.SCALE_ID, 2.) //
+        .with(SkewGeneralizedNormalDistribution.Par.SKEW_ID, 3.).build();
     assertPDF(dist, "pdf_gnur_1_2_3", 1e-15);
   }
 

@@ -24,12 +24,16 @@ import elki.data.NumberVector;
 import net.jafama.FastMath;
 
 /**
- * Class to incrementally compute pearson correlation.
- * 
- * In fact, this actually computes Var(X), Var(Y) and Cov(X, Y), all of which
- * can be obtained from this class. If you need more than two variables, use
+ * Class to compute the Pearson correlation coefficient (PCC) also known as
+ * Pearson product-moment correlation coefficient (PPMCC).
+ * <p>
+ * This computes Var(X), Var(Y) and Cov(X, Y), all of which can be obtained from
+ * this class. If you need more than two variables, use
  * {@link elki.math.linearalgebra.CovarianceMatrix} which uses
  * slightly more memory (by using arrays) but essentially does the same.
+ * <p>
+ * This method used a numerically more stable approach than the popular
+ * \( E[XY]-E[X]E[Y] \) based version.
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -54,12 +58,7 @@ public class PearsonCorrelation {
    * Constructor.
    */
   public PearsonCorrelation() {
-    sumXX = 0.;
-    sumYY = 0.;
-    sumXY = 0.;
-    sumX = 0.;
-    sumY = 0.;
-    sumWe = 0.;
+    sumXX = sumYY = sumXY = sumX = sumY = sumWe = 0.;
   }
 
   /**
@@ -80,8 +79,7 @@ public class PearsonCorrelation {
       return;
     }
     // Delta to previous mean
-    final double deltaX = x * sumWe - sumX;
-    final double deltaY = y * sumWe - sumY;
+    final double deltaX = x * sumWe - sumX, deltaY = y * sumWe - sumY;
     final double oldWe = sumWe;
     // Incremental update
     sumWe += w;
@@ -110,8 +108,7 @@ public class PearsonCorrelation {
       return;
     }
     // Delta to previous mean
-    final double deltaX = x * sumWe - sumX;
-    final double deltaY = y * sumWe - sumY;
+    final double deltaX = x * sumWe - sumX, deltaY = y * sumWe - sumY;
     final double oldWe = sumWe;
     // Incremental update
     sumWe += 1;
@@ -186,12 +183,12 @@ public class PearsonCorrelation {
 
   /**
    * Return the naive variance (not taking sampling into account)
-   * 
-   * Note: usually, you should be using {@link #getSampleVarianceX} instead!
+   * <p>
+   * Note: often you should be using {@link #getSampleVarianceX} instead!
    * 
    * @return variance
    */
-  public double getNaiveVarianceX() {
+  public double getPopulationVarianceX() {
     return sumXX / sumWe;
   }
 
@@ -207,13 +204,13 @@ public class PearsonCorrelation {
 
   /**
    * Return standard deviation using the non-sample variance
-   * 
-   * Note: usually, you should be using {@link #getSampleStddevX} instead!
+   * <p>
+   * Note: often you should be using {@link #getSampleStddevX} instead!
    * 
    * @return standard deviation
    */
-  public double getNaiveStddevX() {
-    return FastMath.sqrt(getNaiveVarianceX());
+  public double getPopulationStddevX() {
+    return FastMath.sqrt(getPopulationVarianceX());
   }
 
   /**
@@ -227,12 +224,12 @@ public class PearsonCorrelation {
 
   /**
    * Return the naive variance (not taking sampling into account)
-   * 
-   * Note: usually, you should be using {@link #getSampleVarianceY} instead!
+   * <p>
+   * Note: often you should be using {@link #getSampleVarianceY} instead!
    * 
    * @return variance
    */
-  public double getNaiveVarianceY() {
+  public double getPopulationVarianceY() {
     return sumYY / sumWe;
   }
 
@@ -248,13 +245,13 @@ public class PearsonCorrelation {
 
   /**
    * Return standard deviation using the non-sample variance
-   * 
-   * Note: usually, you should be using {@link #getSampleStddevY} instead!
+   * <p>
+   * Note: often you should be using {@link #getSampleStddevY} instead!
    * 
    * @return stddev
    */
-  public double getNaiveStddevY() {
-    return FastMath.sqrt(getNaiveVarianceY());
+  public double getPopulationStddevY() {
+    return FastMath.sqrt(getPopulationVarianceY());
   }
 
   /**
@@ -274,16 +271,14 @@ public class PearsonCorrelation {
   }
 
   /**
-   * Compute the Pearson product-moment correlation coefficient for two
-   * FeatureVectors.
+   * Compute the Pearson product-moment correlation coefficient.
    *
-   * @param x first FeatureVector
-   * @param y second FeatureVector
+   * @param x first data array
+   * @param y second data array
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double coefficient(double[] x, double[] y) {
-    final int xdim = x.length;
-    final int ydim = y.length;
+    final int xdim = x.length, ydim = y.length;
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: arrays differ in length.");
     }
@@ -298,8 +293,7 @@ public class PearsonCorrelation {
     while(i < xdim) {
       final double xv = x[i], yv = y[i];
       // Delta to previous mean
-      final double deltaX = xv * i - sumX;
-      final double deltaY = yv * i - sumY;
+      final double deltaX = xv * i - sumX, deltaY = yv * i - sumY;
       // Increment count first
       final double oldi = i; // Convert to double!
       ++i;
@@ -314,10 +308,8 @@ public class PearsonCorrelation {
       sumY += yv;
     }
     // One or both series were constant:
-    if(!(sumXX > 0. && sumYY > 0.)) {
-      return (sumXX == sumYY) ? 1. : 0.;
-    }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
+        sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -329,8 +321,7 @@ public class PearsonCorrelation {
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double coefficient(NumberVector x, NumberVector y) {
-    final int xdim = x.getDimensionality();
-    final int ydim = y.getDimensionality();
+    final int xdim = x.getDimensionality(), ydim = y.getDimensionality();
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
     }
@@ -345,8 +336,7 @@ public class PearsonCorrelation {
     while(i < xdim) {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i);
       // Delta to previous mean
-      final double deltaX = xv * i - sumX;
-      final double deltaY = yv * i - sumY;
+      final double deltaX = xv * i - sumX, deltaY = yv * i - sumY;
       // Increment count first
       final double oldi = i; // Convert to double!
       ++i;
@@ -361,24 +351,20 @@ public class PearsonCorrelation {
       sumY += yv;
     }
     // One or both series were constant:
-    if(!(sumXX > 0. && sumYY > 0.)) {
-      return (sumXX == sumYY) ? 1. : 0.;
-    }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
+        sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
-   * Compute the Pearson product-moment correlation coefficient for two
-   * FeatureVectors.
+   * Compute the Pearson product-moment correlation coefficient.
    *
-   * @param x first FeatureVector
-   * @param y second FeatureVector
+   * @param x first data array
+   * @param y second data array
    * @param weights Weights
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double weightedCoefficient(double[] x, double[] y, double[] weights) {
-    final int xdim = x.length;
-    final int ydim = y.length;
+    final int xdim = x.length, ydim = y.length;
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: arrays differ in length.");
     }
@@ -395,8 +381,7 @@ public class PearsonCorrelation {
     for(int i = 1; i < xdim; ++i) {
       final double xv = x[i], yv = y[i], w = weights[i];
       // Delta to previous mean
-      final double deltaX = xv * sumWe - sumX;
-      final double deltaY = yv * sumWe - sumY;
+      final double deltaX = xv * sumWe - sumX, deltaY = yv * sumWe - sumY;
       // Increment count first
       final double oldWe = sumWe; // Convert to double!
       sumWe += w;
@@ -411,10 +396,8 @@ public class PearsonCorrelation {
       sumY += yv * w;
     }
     // One or both series were constant:
-    if(!(sumXX > 0. && sumYY > 0.)) {
-      return (sumXX == sumYY) ? 1. : 0.;
-    }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
+        sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -427,8 +410,7 @@ public class PearsonCorrelation {
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double weightedCoefficient(NumberVector x, NumberVector y, double[] weights) {
-    final int xdim = x.getDimensionality();
-    final int ydim = y.getDimensionality();
+    final int xdim = x.getDimensionality(), ydim = y.getDimensionality();
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
     }
@@ -445,8 +427,7 @@ public class PearsonCorrelation {
     for(int i = 1; i < xdim; ++i) {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i), w = weights[i];
       // Delta to previous mean
-      final double deltaX = xv * sumWe - sumX;
-      final double deltaY = yv * sumWe - sumY;
+      final double deltaX = xv * sumWe - sumX, deltaY = yv * sumWe - sumY;
       // Increment count first
       final double oldWe = sumWe; // Convert to double!
       sumWe += w;
@@ -461,24 +442,20 @@ public class PearsonCorrelation {
       sumY += yv * w;
     }
     // One or both series were constant:
-    if(!(sumXX > 0. && sumYY > 0.)) {
-      return (sumXX == sumYY) ? 1. : 0.;
-    }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
+        sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
-   * Compute the Pearson product-moment correlation coefficient for two
-   * FeatureVectors.
+   * Compute the Pearson product-moment correlation coefficient,
    *
-   * @param x first FeatureVector
-   * @param y second FeatureVector
+   * @param x first NumberVector
+   * @param y second NumerVector
    * @param weights Weights
    * @return the Pearson product-moment correlation coefficient for x and y
    */
   public static double weightedCoefficient(NumberVector x, NumberVector y, NumberVector weights) {
-    final int xdim = x.getDimensionality();
-    final int ydim = y.getDimensionality();
+    final int xdim = x.getDimensionality(), ydim = y.getDimensionality();
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
@@ -496,8 +473,7 @@ public class PearsonCorrelation {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i);
       final double w = weights.doubleValue(i);
       // Delta to previous mean
-      final double deltaX = xv * sumWe - sumX;
-      final double deltaY = yv * sumWe - sumY;
+      final double deltaX = xv * sumWe - sumX, deltaY = yv * sumWe - sumY;
       // Increment count first
       final double oldWe = sumWe; // Convert to double!
       sumWe += w;
@@ -512,9 +488,7 @@ public class PearsonCorrelation {
       sumY += yv * w;
     }
     // One or both series were constant:
-    if(!(sumXX > 0. && sumYY > 0.)) {
-      return (sumXX == sumYY) ? 1. : 0.;
-    }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
+        sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 }

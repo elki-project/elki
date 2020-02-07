@@ -26,9 +26,8 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the constant distribution in ELKI.
@@ -87,9 +86,8 @@ public class ConstantDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testParameterizer() throws ClassInstantiationException {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ConstantDistribution.Par.CONSTANT_ID, 2.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ConstantDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(ConstantDistribution.class) //
+        .with(ConstantDistribution.Par.CONSTANT_ID, 2.).build();
     assertEquals(dist.nextRandom(new Random(0L)), 2, 0.);
   }
 

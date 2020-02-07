@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Gumbel distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using SciPy and GNUR
  * 
  * @author Erich Schubert
@@ -121,10 +120,9 @@ public class GumbelDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("gumbel.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(GumbelDistribution.Par.LOCATION_ID, 2.);
-    params.addParameter(GumbelDistribution.Par.SHAPE_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(GumbelDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(GumbelDistribution.class) //
+        .with(GumbelDistribution.Par.LOCATION_ID, 2.) //
+        .with(GumbelDistribution.Par.SHAPE_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 

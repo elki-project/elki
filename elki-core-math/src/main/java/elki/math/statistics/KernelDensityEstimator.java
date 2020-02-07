@@ -20,14 +20,13 @@
  */
 package elki.math.statistics;
 
-import java.util.Arrays;
-
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
+
 import net.jafama.FastMath;
 
 /**
  * Estimate density given an array of points.
- * 
+ * <p>
  * Estimates a density using a variable width kernel density estimation.
  * 
  * @author Erich Schubert
@@ -61,6 +60,19 @@ public class KernelDensityEstimator {
   }
 
   /**
+   * Process an array of data
+   * 
+   * @param data data to process (must be sorted!)
+   * @param kernel Kernel function to use.
+   * @param epsilon Precision threshold
+   */
+  public KernelDensityEstimator(double[] data, KernelDensityFunction kernel, double epsilon) {
+    this(data, data[0], data[data.length - 1], kernel,
+        // Heuristic for choosing the window size:
+        1 + (int) FastMath.log(data.length), epsilon);
+  }
+
+  /**
    * Process a new array
    * 
    * @param data data to use (must be sorted!)
@@ -75,59 +87,33 @@ public class KernelDensityEstimator {
     var = new double[data.length];
 
     // This is the desired bandwidth of the kernel.
-    double halfwidth = ((max - min) / window) * .5;
+    double halfwidth = window > 0 ? 0.5 * (max - min) / window : (max - min);
+    double ihalfwidth = max > min ? 2 * window / (max - min) : 0.;
 
-    for (int current = 0; current < data.length; current++) {
+    double prev = data[0];
+    for(int current = 0; current < data.length; current++) {
+      if(prev > (prev = data[current])) {
+        throw new IllegalStateException("Input data must be sorted.");
+      }
       double value = 0.0;
-      for (int i = current; i >= 0; i--) {
-        double delta = Math.abs(data[i] - data[current]) / halfwidth;
-        final double contrib = kernel.density(delta);
+      for(int i = current; i >= 0; i--) {
+        final double contrib = kernel.density(Math.abs(data[i] - data[current]) * ihalfwidth);
         value += contrib;
-        if (contrib < epsilon) {
+        if(contrib < epsilon) {
           break;
         }
       }
-      for (int i = current + 1; i < data.length; i++) {
-        double delta = Math.abs(data[i] - data[current]) / halfwidth;
-        final double contrib = kernel.density(delta);
+      for(int i = current + 1; i < data.length; i++) {
+        final double contrib = kernel.density(Math.abs(data[i] - data[current]) * ihalfwidth);
         value += contrib;
-        if (contrib < epsilon) {
+        if(contrib < epsilon) {
           break;
         }
       }
-      double realwidth = (Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth));
-      double weight = realwidth / (2 * halfwidth);
+      double realwidth = Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth);
       dens[current] = value / (data.length * realwidth * .5);
-      var[current] = 1 / weight;
+      var[current] = 2 * halfwidth / realwidth;
     }
-  }
-
-  /**
-   * Process an array of data
-   * 
-   * @param data data to process
-   * @param kernel Kernel function to use.
-   * @param epsilon Precision threshold
-   */
-  public KernelDensityEstimator(double[] data, KernelDensityFunction kernel, double epsilon) {
-    boolean needsort = false;
-    for (int i = 1; i < data.length; i++) {
-      if (data[i - 1] > data[i]) {
-        needsort = true;
-        break;
-      }
-    }
-    // Duplicate and sort when needed:
-    if (needsort) {
-      data = data.clone();
-      Arrays.sort(data);
-    }
-    final double min = data[0];
-    final double max = data[data.length - 1];
-    // Heuristic for choosing the window size.
-    int windows = 1 + (int) (FastMath.log(data.length));
-
-    process(data, min, max, kernel, windows, epsilon);
   }
 
   /**

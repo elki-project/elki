@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the exponential distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -104,10 +103,9 @@ public class ExponentialDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("exp.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ExponentialDistribution.Par.LOCATION_ID, 0.);
-    params.addParameter(ExponentialDistribution.Par.RATE_ID, .1);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentialDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(ExponentialDistribution.class) //
+        .with(ExponentialDistribution.Par.LOCATION_ID, 0.) //
+        .with(ExponentialDistribution.Par.RATE_ID, .1).build();
     assertPDF(dist, "pdf_scipy_01", 1e-15);
   }
 

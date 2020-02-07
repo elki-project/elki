@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Beta distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -266,10 +265,9 @@ public class BetaDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("beta.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(BetaDistribution.Par.ALPHA_ID, 2.);
-    params.addParameter(BetaDistribution.Par.BETA_ID, 1.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(BetaDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(BetaDistribution.class) //
+        .with(BetaDistribution.Par.ALPHA_ID, 2.) //
+        .with(BetaDistribution.Par.BETA_ID, 1.).build();
     assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
 

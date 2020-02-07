@@ -93,8 +93,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    * Empty constructor
    */
   public StatisticalMoments() {
-    m3 = 0;
-    m4 = 0;
+    m3 = m4 = 0;
   }
 
   /**
@@ -110,11 +109,6 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     this.m4 = other.m4;
   }
 
-  /**
-   * Add a single value with weight 1.0
-   * 
-   * @param val Value
-   */
   @Override
   public void put(double val) {
     if(this.n == 0) {
@@ -140,12 +134,6 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     max = Math.max(max, val);
   }
 
-  /**
-   * Add data with a given weight.
-   * 
-   * @param val data
-   * @param weight weight
-   */
   @Override
   public void put(double val, double weight) {
     if(weight <= 0) {
@@ -182,7 +170,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
   }
 
   /**
-   * Join the data of another MeanVariance instance.
+   * Join the data of another StatisticalMoments instance.
    * 
    * @param other Data to join with
    */
@@ -323,20 +311,6 @@ public class StatisticalMoments extends MeanVarianceMinMax {
     return (n * m4) / (m2 * m2) - 3;
   }
 
-  /**
-   * Create and initialize a new array of MeanVariance
-   * 
-   * @param dimensionality Dimensionality
-   * @return New and initialized Array
-   */
-  public static StatisticalMoments[] newArray(int dimensionality) {
-    StatisticalMoments[] arr = new StatisticalMoments[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      arr[i] = new StatisticalMoments();
-    }
-    return arr;
-  }
-
   @Override
   public String toString() {
     return "StatisticalMoments(mean=" + getMean() + ",m2=" + m2 + ",m3=" + m3 + ",m4=" + m4 + ",n=" + n + ")";
@@ -345,8 +319,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
   @Override
   public StatisticalMoments reset() {
     super.reset();
-    m3 = 0;
-    m4 = 0;
+    m3 = m4 = 0;
     return this;
   }
 }

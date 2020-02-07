@@ -26,13 +26,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Normal distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
@@ -91,10 +90,9 @@ public class NormalDistributionTest extends AbstractDistributionTest {
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("norm.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(NormalDistribution.Par.LOCATION_ID, 1.);
-    params.addParameter(NormalDistribution.Par.SCALE_ID, 3.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(NormalDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(NormalDistribution.class) //
+        .with(NormalDistribution.Par.LOCATION_ID, 1.) //
+        .with(NormalDistribution.Par.SCALE_ID, 3.).build();
     assertPDF(dist, "pdf_scipy_1_3", 1e-15);
   }
 

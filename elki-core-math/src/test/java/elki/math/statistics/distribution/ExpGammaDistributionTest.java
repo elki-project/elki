@@ -24,15 +24,14 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the ExpGamma distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using SciPy
- * 
+ * <p>
  * FIXME: some values do not make sense.
  * 
  * @author Erich Schubert
@@ -58,11 +57,16 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
     assertLogPDF(new ExpGammaDistribution(1., 1., 0.), "logpdf_scipy_1_1", 1e-15);
     assertLogPDF(new ExpGammaDistribution(2., 1., 0.), "logpdf_scipy_2_1", 1e-15);
     assertLogPDF(new ExpGammaDistribution(4., 1., 0.), "logpdf_scipy_4_1", 1e-15);
-    // For the following, SciPy appears to lose numerical precision and returns inf values:
-    // checkLogPDF(new LogGammaAlternateDistribution(4., 10, 0.), "logpdf_scipy_4_10", 1e-14);
-    // checkLogPDF(new LogGammaAlternateDistribution(.1, 10, 0.), "logpdf_scipy_01_10", 1e-15);
-    // checkLogPDF(new LogGammaAlternateDistribution(.1, 20, 0.), "logpdf_scipy_01_20", 1e-14);
-    // checkLogPDF(new LogGammaAlternateDistribution(.1, 4., 0.), "logpdf_scipy_01_4", 1e-15);
+    // For the following, SciPy appears to lose numerical precision and returns
+    // inf values:
+    // checkLogPDF(new LogGammaAlternateDistribution(4., 10, 0.),
+    // "logpdf_scipy_4_10", 1e-14);
+    // checkLogPDF(new LogGammaAlternateDistribution(.1, 10, 0.),
+    // "logpdf_scipy_01_10", 1e-15);
+    // checkLogPDF(new LogGammaAlternateDistribution(.1, 20, 0.),
+    // "logpdf_scipy_01_20", 1e-14);
+    // checkLogPDF(new LogGammaAlternateDistribution(.1, 4., 0.),
+    // "logpdf_scipy_01_4", 1e-15);
     assertLogPDF(new ExpGammaDistribution(.1, 1., 0.), "logpdf_scipy_01_1", 1e-15);
   }
 
@@ -87,23 +91,25 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
     assertQuantile(new ExpGammaDistribution(4., 1., 0.), "quant_scipy_4_1", 1e-14);
     // Here, sklearn appears to have numeric problems (inf) again
     assertQuantile(new ExpGammaDistribution(4., 10, 0.), "quant_scipy_4_10", 1e0);
-    // checkQuantile(new ExpGammaDistribution(.1, 10, 0.), "quant_scipy_01_10", 1e-14);
-    // checkQuantile(new ExpGammaDistribution(.1, 20, 0.), "quant_scipy_01_20", 1e-14);
-    // checkQuantile(new ExpGammaDistribution(.1, 4., 0.), "quant_scipy_01_4", 1e-14);
-    // checkQuantile(new ExpGammaDistribution(.1, 1., 0.), "quant_scipy_01_1", 1e-14);
+    // checkQuantile(new ExpGammaDistribution(.1, 10, 0.), "quant_scipy_01_10",
+    // 1e-14);
+    // checkQuantile(new ExpGammaDistribution(.1, 20, 0.), "quant_scipy_01_20",
+    // 1e-14);
+    // checkQuantile(new ExpGammaDistribution(.1, 4., 0.), "quant_scipy_01_4",
+    // 1e-14);
+    // checkQuantile(new ExpGammaDistribution(.1, 1., 0.), "quant_scipy_01_1",
+    // 1e-14);
   }
 
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("expgamma.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ExpGammaDistribution.Par.K_ID, 2.);
-    params.addParameter(ExpGammaDistribution.Par.THETA_ID, 1.);
-    params.addParameter(ExpGammaDistribution.Par.SHIFT_ID, 0.);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExpGammaDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(ExpGammaDistribution.class) //
+        .with(ExpGammaDistribution.Par.K_ID, 2.) //
+        .with(ExpGammaDistribution.Par.THETA_ID, 1.) //
+        .with(ExpGammaDistribution.Par.SHIFT_ID, 0.).build();
     assertPDF(dist, "pdf_scipy_2_1", 1e-15);
   }
-
 
   @Test
   public void testRandom() {

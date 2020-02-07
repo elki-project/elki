@@ -24,13 +24,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import elki.utilities.ClassGenericsUtil;
+import elki.utilities.ELKIBuilder;
 import elki.utilities.exceptions.ClassInstantiationException;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Unit test for the Normal distribution in ELKI.
- * 
+ * <p>
  * The reference values were computed using SciPy and GNU R.
  * 
  * @author Erich Schubert
@@ -60,11 +59,10 @@ public class ExponentiallyModifiedGaussianDistributionTest extends AbstractDistr
   @Test
   public void testParameterizer() throws ClassInstantiationException {
     load("emg.ascii.gz");
-    ListParameterization params = new ListParameterization();
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.LOCATION_ID, 1.);
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.SCALE_ID, 3);
-    params.addParameter(ExponentiallyModifiedGaussianDistribution.Par.RATE_ID, .5);
-    Distribution dist = ClassGenericsUtil.parameterizeOrAbort(ExponentiallyModifiedGaussianDistribution.class, params);
+    Distribution dist = new ELKIBuilder<>(ExponentiallyModifiedGaussianDistribution.class) //
+        .with(ExponentiallyModifiedGaussianDistribution.Par.LOCATION_ID, 1.) //
+        .with(ExponentiallyModifiedGaussianDistribution.Par.SCALE_ID, 3) //
+        .with(ExponentiallyModifiedGaussianDistribution.Par.RATE_ID, .5).build();
     assertPDF(dist, "pdf_gnur_1_3_05", 1e-15);
   }
 

@@ -36,10 +36,8 @@ public class WeibullLogMADEstimatorTest extends AbstractDistributionEstimatorTes
   public void testEstimator() {
     final WeibullLogMADEstimator est = instantiate(WeibullLogMADEstimator.class, WeibullDistribution.class);
     load("weibull.ascii.gz");
-    double[] data;
-    WeibullDistribution dist;
-    data = this.data.get("random_01_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_01_1");
+    WeibullDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), 0.1, 0.03132733662170675);
     assertStat("lambda", dist.getLambda(), 1., -0.52933465431451);
     data = this.data.get("random_01_4");

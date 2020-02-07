@@ -37,10 +37,8 @@ public class GeneralizedExtremeValueLMMEstimatorTest extends AbstractDistributio
   public void testEstimator() {
     final GeneralizedExtremeValueLMMEstimator est = instantiate(GeneralizedExtremeValueLMMEstimator.class, GeneralizedExtremeValueDistribution.class);
     load("gev.ascii.gz");
-    GeneralizedExtremeValueDistribution dist;
-    double[] data;
-    data = this.data.get("random_08_02_1");
-    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    double[] data = this.data.get("random_08_02_1");
+    GeneralizedExtremeValueDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), 0.8, -0.03040821352889378);
     assertStat("mu", dist.getMu(), 0.2, -0.0887929566709296);
     assertStat("sigma", dist.getSigma(), 1., -0.05744869446017087);

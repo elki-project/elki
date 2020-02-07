@@ -29,7 +29,7 @@ import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
  * Regression test the Olivier Norberg estimation for the EMG distribution.
- * 
+ * <p>
  * Note: this estimator works only for positively skewed data?
  * 
  * @author Erich Schubert
