@@ -74,11 +74,11 @@ import it.unimi.dsi.fastutil.ints.IntComparator;
  *
  * @param <V> Vector type
  */
-public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
+public class SameSizeKMeans<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(SameSizeKMeansAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(SameSizeKMeans.class);
 
   /**
    * Constructor.
@@ -88,7 +88,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
+  public SameSizeKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
     super(distance, k, maxiter, initializer);
   }
 
@@ -486,8 +486,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     }
 
     @Override
-    public SameSizeKMeansAlgorithm<V> make() {
-      return new SameSizeKMeansAlgorithm<>(distance, k, maxiter, initializer);
+    public SameSizeKMeans<V> make() {
+      return new SameSizeKMeans<>(distance, k, maxiter, initializer);
     }
   }
 }

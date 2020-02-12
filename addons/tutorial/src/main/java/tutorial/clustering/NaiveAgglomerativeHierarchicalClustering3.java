@@ -322,7 +322,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> implements Algorithm {
     final Clustering<Model> dendrogram = new Clustering<>();
     Metadata.of(dendrogram).setLongName("Hierarchical-Clustering");
     for(int x = 0; x < size; x++) {
-      if(height[x] < Double.POSITIVE_INFINITY) {
+      if(height[x] == Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
         if(cids == null) {
           ix.seek(x);
@@ -359,7 +359,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> implements Algorithm {
     /**
      * Option ID for linkage parameter.
      */
-    private static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
+    public static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
 
     /**
      * The distance function to use.

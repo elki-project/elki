@@ -307,7 +307,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
     /**
      * Option ID for linkage parameter.
      */
-    private static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
+    public static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Parameter to choose the linkage strategy.");
 
     /**
      * The distance function to use.

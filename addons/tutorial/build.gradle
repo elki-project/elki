@@ -1,4 +1,7 @@
 description = 'ELKI - Tutorial Algorithms'
 dependencies {
   compile project(':elki')
+  testCompile project(path: ':elki-clustering', configuration: 'testOutput')
+  testCompile project(path: ':elki-outlier', configuration: 'testOutput')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

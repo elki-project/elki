@@ -46,6 +46,15 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Tutorial code for Clustering by fast search and find of density peaks.
  * <p>
+ * While the authors named this "fast", the runtime clearly is O(n²) making this
+ * a rather slow method compared to k-means. The Science paper also does not do
+ * a good comparison to existing methods such as HDBSCAN, OPTICS, and mean-shift
+ * clustering.
+ * <p>
+ * This is an adaptation of the original method to use priority search for
+ * accelerations, so the runtime can be better than pairwise distance
+ * computations (but supposedly still is O(n²))
+ * <p>
  * Reference:
  * <p>
  * A. Rodriguez and A. Laio<br>
