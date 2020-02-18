@@ -30,27 +30,26 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.SetDBIDs;
 import elki.evaluation.Evaluator;
 import elki.evaluation.scores.ROCEvaluation;
-import elki.evaluation.scores.adapter.DBIDsTest;
+import elki.evaluation.scores.ROCEvaluation.ROCurve;
 import elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import elki.evaluation.scores.adapter.SimpleAdapter;
 import elki.logging.Logging;
-import elki.math.geometry.XYCurve;
 import elki.result.EvaluationResult;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.OrderingResult;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Compute a ROC curve to evaluate a ranking algorithm and compute the
- * corresponding ROCAUC value.
+ * corresponding AUROC value.
  * <p>
- * The parameter {@code -rocauc.positive} specifies the class label of
+ * The parameter {@code -AUROC.positive} specifies the class label of
  * "positive" hits.
  * <p>
  * The nested algorithm {@code -algorithm} will be run, the result will be
@@ -67,9 +66,9 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  */
 public class OutlierROCCurve implements Evaluator {
   /**
-   * The label we use for marking ROCAUC values.
+   * The label we use for marking AUROC values.
    */
-  public static final String ROCAUC_LABEL = "ROC AUC";
+  public static final String AUROC_LABEL = "AUROC";
 
   /**
    * The logger.
@@ -91,18 +90,6 @@ public class OutlierROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(SetDBIDs positiveids, DBIDs order) {
-    XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new SimpleAdapter(order.iter()));
-    double rocauc = XYCurve.areaUnderCurve(roccurve);
-    return new ROCResult(roccurve, rocauc);
-  }
-
-  private ROCResult computeROCResult(SetDBIDs positiveids, OutlierResult or) {
-    XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new OutlierScoreAdapter(or));
-    double rocauc = XYCurve.areaUnderCurve(roccurve);
-    return new ROCResult(roccurve, rocauc);
-  }
-
   @Override
   public void processNewResult(Object result) {
     Database db = ResultUtil.findDatabase(result);
@@ -119,12 +106,12 @@ public class OutlierROCCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      ROCResult rocres = computeROCResult(positiveids, o);
-      Metadata.hierarchyOf(o).addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING);
-      MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
-      if(!g.hasMeasure(ROCAUC_LABEL)) {
-        g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
+      ROCurve roc = ROCEvaluation.materializeROC(new OutlierScoreAdapter(positiveids, o));
+      Metadata.hierarchyOf(o).addChild(roc);
+      MeasurementGroup g = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING) //
+          .findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(AUROC_LABEL)) {
+        g.addMeasure(AUROC_LABEL, roc.getAUC(), 0., 1., false);
       }
       // Process each ordering only once.
       orderings.remove(o.getOrdering());
@@ -138,50 +125,19 @@ public class OutlierROCCurve implements Evaluator {
       if(sorted.size() != or.getDBIDs().size()) {
         throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
       }
-      ROCResult rocres = computeROCResult(positiveids, sorted);
-      Metadata.hierarchyOf(or).addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING);
-      MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
-      if(!g.hasMeasure(ROCAUC_LABEL)) {
-        g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
+      ROCurve roc = ROCEvaluation.materializeROC(new SimpleAdapter(positiveids, sorted.iter()));
+      Metadata.hierarchyOf(or).addChild(roc);
+      MeasurementGroup g = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING) //
+          .findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(AUROC_LABEL)) {
+        g.addMeasure(AUROC_LABEL, roc.getAUC(), 0., 1., false);
       }
       nonefound = false;
     }
 
     if(nonefound) {
-      // LOG.warning("No results found to process with ROC curve analyzer.
+      // LOG.warning("No results found to process with ROCurve analyzer.
       // Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
-    }
-  }
-
-  /**
-   * Result object for ROC curves.
-   *
-   * @author Erich Schubert
-   */
-  public static class ROCResult extends XYCurve {
-    /**
-     * AUC value
-     */
-    private double auc;
-
-    /**
-     * Constructor.
-     *
-     * @param col roc curve
-     * @param rocauc ROC AUC value
-     */
-    public ROCResult(XYCurve col, double rocauc) {
-      super(col);
-      this.auc = rocauc;
-      Metadata.of(this).setLongName("ROC Curve");
-    }
-
-    /**
-     * @return the area under curve
-     */
-    public double getAUC() {
-      return auc;
     }
   }
 
@@ -194,7 +150,7 @@ public class OutlierROCCurve implements Evaluator {
     /**
      * The pattern to identify positive classes.
      */
-    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("rocauc.positive", "Class label for the 'positive' class.");
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("auroc.positive", "Class label for the 'positive' class.");
 
     /**
      * Pattern for positive class.

@@ -35,20 +35,20 @@ public class MaximumF1Evaluation implements ScoreEvaluation {
   public static final MaximumF1Evaluation STATIC = new MaximumF1Evaluation();
 
   @Override
-  public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
-    final int postot = predicate.numPositive();
+  public double evaluate(Adapter adapter) {
+    final int postot = adapter.numPositive();
     int poscnt = 0, cnt = 0;
     double maxf1 = 0.;
-    while(iter.valid()) {
+    while(adapter.valid()) {
       // positive or negative match?
       do {
-        if(predicate.test(iter)) {
+        if(adapter.test()) {
           ++poscnt;
         }
         ++cnt;
-        iter.advance();
+        adapter.advance();
       } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
+      while(adapter.valid() && adapter.tiedToPrevious());
       // New F1 value:
       double p = poscnt / (double) cnt, r = poscnt / (double) postot;
       double f1 = 2. * p * r / (p + r);

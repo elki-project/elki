@@ -35,30 +35,30 @@ public class AveragePrecisionEvaluation implements ScoreEvaluation {
   public static final AveragePrecisionEvaluation STATIC = new AveragePrecisionEvaluation();
 
   @Override
-  public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
+  public double evaluate(Adapter adapter) {
     int poscnt = 0, negcnt = 0, pospre = 0;
     double acc = 0.;
-    while(iter.valid()) {
+    while(adapter.valid()) {
       // positive or negative match?
       do {
-        if(predicate.test(iter)) {
+        if(adapter.test()) {
           ++poscnt;
         }
         else {
           ++negcnt;
         }
-        iter.advance();
+        adapter.advance();
       } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
+      while(adapter.valid() && adapter.tiedToPrevious());
       // Add a new point.
       if(poscnt > pospre) {
         acc += (poscnt / (double) (poscnt + negcnt)) * (poscnt - pospre);
         pospre = poscnt;
       }
     }
-    return (poscnt > 0) ? acc / poscnt : 0.;
+    return adapter.numPositive() > 0 ? acc / adapter.numPositive() : 0.;
   }
-  
+
   @Override
   public double expected(int pos, int all) {
     return pos / (double) all;

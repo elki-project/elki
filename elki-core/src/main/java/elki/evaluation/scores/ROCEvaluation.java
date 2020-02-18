@@ -25,14 +25,14 @@ import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
- * 
+ * <p>
  * A ROC curve compares the true positive rate (y-axis) and false positive rate
  * (x-axis).
- * 
+ * <p>
  * It was first used in radio signal detection, but has since found widespread
  * use in information retrieval, in particular for evaluating binary
  * classification problems.
- * 
+ * <p>
  * ROC curves are particularly useful to evaluate a ranking of objects with
  * respect to a binary classification problem: a random sampling will
  * approximately achieve a ROC value of 0.5, while a perfect separation will
@@ -52,8 +52,8 @@ public class ROCEvaluation implements ScoreEvaluation {
   public static final ROCEvaluation STATIC = new ROCEvaluation();
 
   @Override
-  public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
-    return computeROCAUC(predicate, iter);
+  public double evaluate(Adapter adapter) {
+    return computeAUROC(adapter);
   }
 
   /**
@@ -61,38 +61,71 @@ public class ROCEvaluation implements ScoreEvaluation {
    * (comparable, ID)s, where the comparable object is used to decided when two
    * objects are interchangeable.
    * 
-   * @param <I> Iterator type
-   * @param predicate Predicate to test for positive objects
-   * @param iter Iterator over results, with ties.
+   * @param adapter Adapter for different input data types
    * @return area under curve
    */
-  public static <I extends ScoreIter> XYCurve materializeROC(Predicate<? super I> predicate, I iter) {
+  public static ROCurve materializeROC(Adapter adapter) {
+    ROCurve curve = new ROCurve();
+    double acc = 0.;
     int poscnt = 0, negcnt = 0;
-    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate");
-
-    // start in bottom left
     curve.add(0.0, 0.0);
-
-    while(iter.valid()) {
+    while(adapter.valid()) {
+      final int pospre = poscnt, negpre = negcnt;
       // positive or negative match?
       do {
-        if(predicate.test(iter)) {
+        if(adapter.test()) {
           ++poscnt;
         }
         else {
           ++negcnt;
         }
-        iter.advance();
+        adapter.advance();
       } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
-      // Add a new point.
+      while(adapter.valid() && adapter.tiedToPrevious());
+      // Add a new point, update AUC.
       curve.addAndSimplify(negcnt, poscnt);
+      acc += negcnt > negpre ? (poscnt + pospre) * .5 * (negcnt - negpre) : 0;
     }
     // Ensure we end up in the top right corner.
     // Simplification will skip this if we already were.
     curve.addAndSimplify(negcnt, poscnt);
-    curve.rescale(1. / negcnt, 1. / poscnt);
+    curve.rescale(1. / negcnt, 1. / adapter.numPositive());
+    curve.setAxes(0, 0, 1, 1);
+    acc /= negcnt * (long) poscnt;
+    curve.auc = Double.isNaN(acc) ? 0.5 : acc;
     return curve;
+  }
+
+  /**
+   * Compute the area under the ROC curve given a set of positive IDs and a
+   * sorted list of (comparable, ID)s, where the comparable object is used to
+   * decided when two objects are interchangeable.
+   * 
+   * @param adapter Adapter for different input data types
+   * @return area under curve
+   */
+  public static double computeAUROC(Adapter adapter) {
+    int poscnt = 0, negcnt = 0;
+    double acc = 0.;
+    while(adapter.valid()) {
+      final int pospre = poscnt, negpre = negcnt;
+      // positive or negative match?
+      do {
+        if(adapter.test()) {
+          ++poscnt;
+        }
+        else {
+          ++negcnt;
+        }
+        adapter.advance();
+      } // Loop while tied:
+      while(adapter.valid() && adapter.tiedToPrevious());
+      if(negcnt > negpre) {
+        acc += (poscnt + pospre) * .5 * (negcnt - negpre);
+      }
+    }
+    acc /= negcnt * (long) poscnt;
+    return Double.isNaN(acc) ? 0.5 : acc; /* Detect NaN */
   }
 
   @Override
@@ -101,38 +134,29 @@ public class ROCEvaluation implements ScoreEvaluation {
   }
 
   /**
-   * Compute the area under the ROC curve given a set of positive IDs and a
-   * sorted list of (comparable, ID)s, where the comparable object is used to
-   * decided when two objects are interchangeable.
-   * 
-   * @param <I> Iterator type
-   * @param predicate Predicate to test for positive objects
-   * @param iter Iterator over results, with ties.
-   * @return area under curve
+   * ROC Curve
+   *
+   * @author Erich Schubert
    */
-  public static <I extends ScoreIter> double computeROCAUC(Predicate<? super I> predicate, I iter) {
-    int poscnt = 0, negcnt = 0, pospre = 0, negpre = 0;
-    double acc = 0.;
-    while(iter.valid()) {
-      // positive or negative match?
-      do {
-        if(predicate.test(iter)) {
-          ++poscnt;
-        }
-        else {
-          ++negcnt;
-        }
-        iter.advance();
-      } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
-      if(negcnt > negpre) {
-        acc += (poscnt + pospre) * .5 * (negcnt - negpre);
-        negpre = negcnt;
-      }
-      pospre = poscnt;
+  public static class ROCurve extends XYCurve {
+    /**
+     * Area under the curve cache.
+     */
+    private double auc = Double.NaN;
+
+    /**
+     * Constructor.
+     */
+    public ROCurve() {
+      super("False Positive Rate", "True Positive Rate");
     }
-    acc /= negcnt * (long) poscnt;
-    return acc == acc ? acc : 0.5; /* Detect NaN */
+
+    /**
+     * @return area under the curve.
+     */
+    public double getAUC() {
+      return auc;
+    }
   }
 
   /**

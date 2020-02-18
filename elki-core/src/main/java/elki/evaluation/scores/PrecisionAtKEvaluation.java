@@ -28,7 +28,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Evaluate using Precision@k, or R-precision (when {@code k=0}).
- * 
+ * <p>
  * When {@code k=0}, then it is set to the number of positive objects, and the
  * returned value is the R-precision, or the precision-recall break-even-point
  * (BEP).
@@ -57,21 +57,21 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
   }
 
   @Override
-  public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
-    final int k = (this.k > 0) ? this.k : predicate.numPositive();
+  public double evaluate(Adapter adapter) {
+    final int k = (this.k > 0) ? this.k : adapter.numPositive();
     int total = 0;
     double score = 0.;
-    while(iter.valid() && total < k) {
+    while(adapter.valid() && total < k) {
       int posthis = 0, cntthis = 0;
       // positive or negative match?
       do {
-        if(predicate.test(iter)) {
+        if(adapter.test()) {
           ++posthis;
         }
         ++cntthis;
-        iter.advance();
+        adapter.advance();
       } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
+      while(adapter.valid() && adapter.tiedToPrevious());
       // Special tie computations only when we reach k.
       if(total + cntthis > k) {
         // p = posthis / cntthis chance of being positive
@@ -102,7 +102,7 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
      * Option ID for the k parameter.
      */
     public static final OptionID K_ID = new OptionID("precision.k", //
-    "k value for precision@k. Can be set to 0, to get R-precision, or the precision-recall-break-even-point.");
+        "k value for precision@k. Can be set to 0, to get R-precision, or the precision-recall-break-even-point.");
 
     /**
      * K parameter
@@ -112,8 +112,8 @@ public class PrecisionAtKEvaluation implements ScoreEvaluation {
     @Override
     public void configure(Parameterization config) {
       new IntParameter(K_ID) //
-      .setDefaultValue(0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .setDefaultValue(0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .grab(config, x -> k = x);
     }
 

@@ -21,6 +21,7 @@
 package elki.evaluation.outlier;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import elki.database.Database;
@@ -30,16 +31,17 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.SetDBIDs;
 import elki.evaluation.Evaluator;
 import elki.evaluation.scores.*;
-import elki.evaluation.scores.adapter.DBIDsTest;
 import elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import elki.evaluation.scores.adapter.SimpleAdapter;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
-import elki.result.*;
+import elki.result.EvaluationResult;
 import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.OrderingResult;
+import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
@@ -80,94 +82,70 @@ public class OutlierRankingEvaluation implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private void evaluateOutlierResult(EvaluationResult res, int size, SetDBIDs positiveids, OutlierResult or) {
-    DBIDsTest test = new DBIDsTest(positiveids);
-
-    final int pos = positiveids.size();
+  /**
+   * Produce various evaluation statistics
+   *
+   * @param res Result to output to
+   * @param size Total size
+   * @param pos Number of positive hits
+   * @param test Test predicate
+   * @param adapter Adapter
+   */
+  private void evaluate(EvaluationResult res, int size, int pos, Supplier<ScoreEvaluation.Adapter> adapter) {
     final double rate = pos / (double) size;
     MeasurementGroup g = res.findOrCreateGroup("Evaluation measures");
-    double rocauc = ROCEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    if(!g.hasMeasure("ROC AUC")) {
-      g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
+    MeasurementGroup ag = res.findOrCreateGroup("Adjusted for chance");
+    // Area under Receiver Operating Curve
+    double auroc = ROCEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".auroc", auroc));
+    if(!g.hasMeasure("AUROC")) { // Avoid duplicate
+      g.addMeasure("AUROC", auroc, 0., 1., .5, false);
     }
-    double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
+    double adjauroc = 2 * auroc - 1;
+    ag.addMeasure("Adjusted AUROC", adjauroc, 0., 1., 0., false);
+    LOG.statistics(new DoubleStatistic(key + ".auroc.adjusted", adjauroc));
+    // Area under Precision-Recall-Curve
+    double auprc = AUPRCEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".auprc", auprc));
+    if(!g.hasMeasure("AUPRC")) { // Avoid duplicate
+      g.addMeasure("AUPRC", auprc, 0., 1., rate, false);
+    }
+    double adjauprc = (auprc - rate) / (1 - rate);
+    LOG.statistics(new DoubleStatistic(key + ".auprc.adjusted", adjauprc));
+    ag.addMeasure("Adjusted AUPRC", adjauprc, 0., 1., 0., false);
+    // Average precision
+    double avep = AveragePrecisionEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".average-precision.", avep));
     g.addMeasure("Average Precision", avep, 0., 1., rate, false);
-    double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
-    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
-    double maxdcg = DCGEvaluation.maximum(pos);
-    double dcg = DCGEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("DCG", dcg, 0., maxdcg, DCGEvaluation.STATIC.expected(pos, size), false);
-    double ndcg = NDCGEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("NDCG", ndcg, 0., 1., NDCGEvaluation.STATIC.expected(pos, size), false);
-
-    g = res.findOrCreateGroup("Adjusted for chance");
-    double adjauc = 2 * rocauc - 1;
-    g.addMeasure("Adjusted AUC", adjauc, 0., 1., 0., false);
     double adjavep = (avep - rate) / (1 - rate);
-    g.addMeasure("Adjusted AveP", adjavep, 0., 1., 0., false);
+    LOG.statistics(new DoubleStatistic(key + ".average-precision.adjusted", adjavep));
+    ag.addMeasure("Adjusted AveP", adjavep, 0., 1., 0., false);
+    // R-precision
+    double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".r-precision", rprec));
+    g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
     double adjrprec = (rprec - rate) / (1 - rate);
-    g.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
+    LOG.statistics(new DoubleStatistic(key + ".r-precision.adjusted", adjrprec));
+    ag.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
+    // Maximum F1 measure
+    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".maximum-f1", maxf1));
+    g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
     double adjmaxf1 = (maxf1 - rate) / (1 - rate);
-    g.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
+    LOG.statistics(new DoubleStatistic(key + ".maximum-f1.adjusted", adjmaxf1));
+    ag.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
+    // Maximum DCG, Normalized DCG
+    double maxdcg = DCGEvaluation.maximum(pos);
+    double dcg = DCGEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".dcg", dcg));
+    g.addMeasure("DCG", dcg, 0., maxdcg, DCGEvaluation.STATIC.expected(pos, size), false);
+    double ndcg = NDCGEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".dcg.normalized", ndcg));
+    g.addMeasure("NDCG", ndcg, 0., 1., NDCGEvaluation.STATIC.expected(pos, size), false);
     double endcg = NDCGEvaluation.STATIC.expected(pos, size);
     double adjndcg = (ndcg - endcg) / (1. - endcg);
-    g.addMeasure("Adjusted DCG", adjndcg, 0., 1., 0., false);
-
-    if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".rocauc.adjusted", adjauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average", avep));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average.adjusted", adjavep));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r", rprec));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r.adjusted", adjrprec));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
-      LOG.statistics(new DoubleStatistic(key + ".dcg", dcg));
-      LOG.statistics(new DoubleStatistic(key + ".dcg.normalized", ndcg));
-      LOG.statistics(new DoubleStatistic(key + ".dcg.adjusted", adjndcg));
-    }
-  }
-
-  private void evaluateOrderingResult(EvaluationResult res, int size, SetDBIDs positiveids, DBIDs order) {
-    if(order.size() != size) {
-      throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
-    }
-
-    DBIDsTest test = new DBIDsTest(positiveids);
-
-    double rate = positiveids.size() / (double) size;
-    MeasurementGroup g = res.newGroup("Evaluation measures:");
-    double rocauc = ROCEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
-    double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Average Precision", avep, 0., 1., rate, false);
-    double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
-    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
-
-    g = res.newGroup("Adjusted for chance:");
-    double adjauc = 2 * rocauc - 1;
-    g.addMeasure("Adjusted AUC", adjauc, 0., 1., 0., false);
-    double adjavep = (avep - rate) / (1 - rate);
-    g.addMeasure("Adjusted AveP", adjavep, 0., 1., 0., false);
-    double adjrprec = (rprec - rate) / (1 - rate);
-    g.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
-    double adjmaxf1 = (maxf1 - rate) / (1 - rate);
-    g.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
-
-    if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".rocauc.adjusted", adjauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average", avep));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average.adjusted", adjavep));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r", rprec));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r.adjusted", adjrprec));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
-    }
+    LOG.statistics(new DoubleStatistic(key + ".dcg.adjusted", adjndcg));
+    ag.addMeasure("Adjusted DCG", adjndcg, 0., 1., 0., false);
   }
 
   @Override
@@ -185,8 +163,8 @@ public class OutlierRankingEvaluation implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      EvaluationResult res = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING);
-      evaluateOutlierResult(res, o.getScores().size(), positiveids, o);
+      evaluate(EvaluationResult.findOrCreate(o, EvaluationResult.RANKING), //
+          o.getScores().size(), positiveids.size(), () -> new OutlierScoreAdapter(positiveids, o));
       // Process them only once.
       orderings.remove(o.getOrdering());
       nonefound = false;
@@ -196,8 +174,12 @@ public class OutlierRankingEvaluation implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      EvaluationResult res = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING);
-      evaluateOrderingResult(res, or.getDBIDs().size(), positiveids, sorted);
+      int size = or.getDBIDs().size();
+      if(sorted.size() != size) {
+        throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
+      }
+      evaluate(EvaluationResult.findOrCreate(or, EvaluationResult.RANKING), //
+          size, positiveids.size(), () -> new SimpleAdapter(positiveids, sorted.iter()));
       nonefound = false;
     }
 

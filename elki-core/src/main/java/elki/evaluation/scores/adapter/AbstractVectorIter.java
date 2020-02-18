@@ -21,7 +21,7 @@
 package elki.evaluation.scores.adapter;
 
 import elki.data.NumberVector;
-import elki.evaluation.scores.ScoreEvaluation.ScoreIter;
+import elki.evaluation.scores.ScoreEvaluation;
 import elki.utilities.datastructures.iterator.ArrayIter;
 
 /**
@@ -32,11 +32,16 @@ import elki.utilities.datastructures.iterator.ArrayIter;
  * 
  * @composed - - - NumberVector
  */
-public abstract class AbstractVectorIter implements ScoreIter, ArrayIter {
+public abstract class AbstractVectorIter implements ScoreEvaluation.Adapter, ArrayIter {
   /**
    * Order of dimensions.
    */
   protected int[] sort;
+
+  /**
+   * Vector of positive examples.
+   */
+  protected NumberVector positive;
 
   /**
    * Data vector.
@@ -46,15 +51,27 @@ public abstract class AbstractVectorIter implements ScoreIter, ArrayIter {
   /**
    * Current position.
    */
-  int pos = 0;
+  protected int pos = 0;
+
+  /**
+   * Number of positive examples in the vector.
+   */
+  protected int numPositive;
 
   /**
    * Constructor.
    * 
+   * @param positive Positive examples
    * @param vec Vector to iterate over.
    */
-  public AbstractVectorIter(NumberVector vec) {
+  public AbstractVectorIter(NumberVector positive, NumberVector vec) {
+    this.positive = positive;
     this.vec = vec;
+    for(int i = 0, l = vec.getDimensionality(); i < l; i++) {
+      if(vec.doubleValue(i) > 0) {
+        ++numPositive;
+      }
+    }
   }
 
   /**
@@ -103,5 +120,15 @@ public abstract class AbstractVectorIter implements ScoreIter, ArrayIter {
   public AbstractVectorIter seek(int off) {
     pos = off;
     return this;
+  }
+
+  @Override
+  public boolean test() {
+    return positive.doubleValue(pos) > 0;
+  }
+
+  @Override
+  public int numPositive() {
+    return numPositive;
   }
 }

@@ -21,9 +21,9 @@
 package elki.evaluation.scores.adapter;
 
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDs;
 import elki.database.relation.DoubleRelation;
-import elki.evaluation.scores.ScoreEvaluation.ScoreIter;
+import elki.evaluation.scores.ScoreEvaluation;
 import elki.result.outlier.OutlierResult;
 
 /**
@@ -39,7 +39,12 @@ import elki.result.outlier.OutlierResult;
  * 
  * @composed - - - OutlierResult
  */
-public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
+public class OutlierScoreAdapter implements ScoreEvaluation.Adapter {
+  /**
+   * Set of positive objects
+   */
+  private DBIDs set;
+
   /**
    * Original iterator.
    */
@@ -53,15 +58,17 @@ public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
   /**
    * Previous value.
    */
-  double prev = Double.NaN;
+  private double prev = Double.NaN;
 
   /**
    * Constructor.
    * 
+   * @param positive Positive objects
    * @param o Result
    */
-  public OutlierScoreAdapter(OutlierResult o) {
+  public OutlierScoreAdapter(DBIDs positive, OutlierResult o) {
     super();
+    this.set = positive;
     this.iter = o.getOrdering().order(o.getScores().getDBIDs()).iter();
     this.scores = o.getScores();
   }
@@ -84,7 +91,12 @@ public class OutlierScoreAdapter implements ScoreIter, DBIDRefIter {
   }
 
   @Override
-  public DBIDRef getRef() {
-    return iter;
+  public boolean test() {
+    return set.contains(iter);
+  }
+
+  @Override
+  public int numPositive() {
+    return set.size();
   }
 }

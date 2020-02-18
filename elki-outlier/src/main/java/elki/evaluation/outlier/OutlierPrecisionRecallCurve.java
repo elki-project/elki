@@ -25,30 +25,56 @@ import java.util.regex.Pattern;
 
 import elki.database.Database;
 import elki.database.DatabaseUtil;
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.SetDBIDs;
-import elki.database.relation.DoubleRelation;
 import elki.evaluation.Evaluator;
+import elki.evaluation.scores.AUPRCEvaluation;
+import elki.evaluation.scores.AUPRCEvaluation.PRCurve;
+import elki.evaluation.scores.adapter.OutlierScoreAdapter;
+import elki.evaluation.scores.adapter.SimpleAdapter;
 import elki.logging.Logging;
 import elki.math.geometry.XYCurve;
-import elki.result.*;
+import elki.result.EvaluationResult;
+import elki.result.EvaluationResult.MeasurementGroup;
+import elki.result.Metadata;
+import elki.result.OrderingResult;
+import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Compute a curve containing the precision values for an outlier detection
- * method.
+ * method. Unfortunately, there are quite different variations of this curve
+ * in use, which is why tools may yield different results:
+ * <ul>
+ * <li>tie handling: on identical scores, many implementations evaluate a random
+ * order, or perform linear interpolation; neither of which is proper
+ * <li>at a recall of 0, the value is not defined; one could either begin
+ * computing the area beginning at a recall of 1 object, or assume that the
+ * recall at 0 is the recall at the first object (which appears to be more
+ * common)
+ * </ul>
+ * References:
+ * <p>
+ * J. Davis and M. Goadrich<br>
+ * The relationship between Precision-Recall and ROC curves<br>
+ * Proc. 23rd Int. Conf. Machine Learning (ICML)
  *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @has - - - PRCurve
  */
+@Reference(authors = "J. Davis and M. Goadrich", //
+    title = "The relationship between Precision-Recall and ROC curves", //
+    booktitle = "Proc. 23rd Int. Conf. Machine Learning (ICML)", //
+    url = "https://doi.org/10.1145/1143844.1143874", //
+    bibkey = "DBLP:conf/icml/DavisG06")
 public class OutlierPrecisionRecallCurve implements Evaluator {
   /**
    * AUC value for PR curve
@@ -90,11 +116,13 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
-      PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), o.getScores());
+      PRCurve curve = AUPRCEvaluation.materializePRC(new OutlierScoreAdapter(positiveids, o));
       Metadata.hierarchyOf(o).addChild(curve);
-      EvaluationResult ev = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING);
-      ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
+      MeasurementGroup g = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING) //
+          .findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(PRAUC_LABEL)) {
+        g.addMeasure(PRAUC_LABEL, XYCurve.areaUnderCurve(curve), 0., 1., false);
+      }
       // Process them only once.
       orderings.remove(o.getOrdering());
     }
@@ -103,90 +131,13 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), null);
+      PRCurve curve = AUPRCEvaluation.materializePRC(new SimpleAdapter(positiveids, sorted.iter()));
       Metadata.hierarchyOf(or).addChild(curve);
-      EvaluationResult ev = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING);
-      ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
-    }
-  }
-
-  private PRCurve computePrecisionResult(SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
-    final int postot = ids.size();
-    int poscnt = 0, total = 0;
-    PRCurve curve = new PRCurve(postot + 2, postot);
-
-    double prevscore = Double.NaN;
-    for(; iter.valid(); iter.advance()) {
-      // Previous precision rate - y axis
-      final double curprec = ((double) poscnt) / total;
-      // Previous recall rate - x axis
-      final double curreca = ((double) poscnt) / postot;
-
-      // Analyze next point
-      // positive or negative match?
-      if(ids.contains(iter)) {
-        poscnt += 1;
+      MeasurementGroup g = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING) //
+          .findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(PRAUC_LABEL)) {
+        g.addMeasure(PRAUC_LABEL, XYCurve.areaUnderCurve(curve), 0., 1., false);
       }
-      total += 1;
-      // First iteration ends here
-      if(total == 1) {
-        continue;
-      }
-      // defer calculation for ties
-      if(scores != null) {
-        double curscore = scores.doubleValue(iter);
-        if(Double.compare(prevscore, curscore) == 0) {
-          continue;
-        }
-        prevscore = curscore;
-      }
-      // Add a new point (for the previous entry - because of tie handling!)
-      curve.addAndSimplify(curreca, curprec);
-    }
-    // End curve - always at all positives found.
-    curve.addAndSimplify(1.0, postot / total);
-    return curve;
-  }
-
-  /**
-   * P/R Curve
-   *
-   * @author Erich Schubert
-   */
-  public static class PRCurve extends XYCurve {
-    /**
-     * Area under curve
-     */
-    double auc = Double.NaN;
-
-    /**
-     * Number of positive observations
-     */
-    int positive;
-
-    /**
-     * Constructor.
-     *
-     * @param size Size estimation
-     * @param positive Number of positive elements (for AUC correction)
-     */
-    public PRCurve(int size, int positive) {
-      super("Recall", "Precision", size);
-      this.positive = positive;
-      Metadata.of(this).setLongName("Precision-Recall-Curve");
-    }
-
-    /**
-     * Get AUC value
-     *
-     * @return AUC value
-     */
-    public double getAUC() {
-      if(Double.isNaN(auc)) {
-        double max = 1 - 1. / positive;
-        auc = areaUnderCurve(this) / max;
-      }
-      return auc;
     }
   }
 

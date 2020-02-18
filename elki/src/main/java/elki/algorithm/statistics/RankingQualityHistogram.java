@@ -57,7 +57,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
- * neighbors are sorted by distance, then the ROC AUC is computed. A score of 1
+ * neighbors are sorted by distance, then the AUROC is computed. A score of 1
  * means that the distance function provides a perfect ordering of relevant
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
@@ -125,7 +125,7 @@ public class RankingQualityHistogram<O> implements Algorithm {
     if(LOG.isVerbose()) {
       LOG.verbose("Processing points...");
     }
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing AUROC values", relation.size(), LOG) : null;
 
     ROCEvaluation roc = new ROCEvaluation();
     MeanVariance mv = new MeanVariance();

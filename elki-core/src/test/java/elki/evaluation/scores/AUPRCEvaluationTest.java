@@ -27,19 +27,19 @@ import org.junit.Test;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.HashSetModifiableDBIDs;
 import elki.database.ids.ModifiableDoubleDBIDList;
-import elki.evaluation.scores.ROCEvaluation.ROCurve;
+import elki.evaluation.scores.AUPRCEvaluation.PRCurve;
 import elki.evaluation.scores.adapter.DistanceResultAdapter;
 import elki.math.geometry.XYCurve;
 
 /**
- * Test to validate receiver operating curve computation.
+ * Test to validate PR curve computation.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class ROCEvaluationTest {
+public class AUPRCEvaluationTest {
   @Test
-  public void testROCurve() {
+  public void testPRCurve() {
     HashSetModifiableDBIDs positive = DBIDUtil.newHashSet();
     positive.add(DBIDUtil.importInteger(1));
     positive.add(DBIDUtil.importInteger(2));
@@ -48,21 +48,22 @@ public class ROCEvaluationTest {
     positive.add(DBIDUtil.importInteger(5));
 
     final ModifiableDoubleDBIDList distances = DBIDUtil.newDistanceDBIDList();
-    // Starting point: ................................ 0.0,0. ++
-    distances.add(0.0, DBIDUtil.importInteger(1)); // + 0.0,.2 -- redundant
-    distances.add(1.0, DBIDUtil.importInteger(2)); // + 0.0,.4 ++
-    distances.add(2.0, DBIDUtil.importInteger(6)); // - .25,.4 ++
-    distances.add(3.0, DBIDUtil.importInteger(7)); // -
-    distances.add(3.0, DBIDUtil.importInteger(3)); // + .50,.6 -- redundant
-    distances.add(4.0, DBIDUtil.importInteger(8)); // -
-    distances.add(4.0, DBIDUtil.importInteger(4)); // + .75,.8 ++
-    distances.add(5.0, DBIDUtil.importInteger(9)); // - 1.0,.8 ++
-    distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,1. ++
+    // Starting point: ................................ 0.0,1.0 ++
+    distances.add(0.0, DBIDUtil.importInteger(1)); // + 0.2,1.0 -- redundant
+    distances.add(1.0, DBIDUtil.importInteger(2)); // + 0.4,1.0 ++
+    distances.add(2.0, DBIDUtil.importInteger(6)); // - 0.4,.66 ++
+    distances.add(3.0, DBIDUtil.importInteger(7)); // - 0.5,.63 ++ tied...
+    distances.add(3.0, DBIDUtil.importInteger(3)); // + 0.6,.60 ++ tied...
+    distances.add(4.0, DBIDUtil.importInteger(8)); // - 0.7,.58 ++ tied...
+    distances.add(4.0, DBIDUtil.importInteger(4)); // + 0.8,.57 ++ tied...
+    distances.add(5.0, DBIDUtil.importInteger(9)); // - 0.8,.50 ++
+    distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,.56 ++
 
-    ROCurve curve = ROCEvaluation.materializeROC(new DistanceResultAdapter(positive, distances.iter()));
-    assertEquals("ROC curve too complex", 6, curve.size());
-    assertEquals("AUROC (cached) not correct.", 0.6, curve.getAUC(), 1e-14);
-    assertEquals("AUROC (direct) not correct.", 0.6, new ROCEvaluation().evaluate(positive, distances), 1e-14);
-    assertEquals("AUROC (curve) not correct.", 0.6, XYCurve.areaUnderCurve(curve), 1e-14);
+    PRCurve curve = AUPRCEvaluation.materializePRC(new DistanceResultAdapter(positive, distances.iter()));
+    assertEquals("PR curve too complex", 9, curve.size());
+    assertEquals("AUPRC (cached) not correct.", 0.7481384, curve.getAUC(), 1e-7);
+    assertEquals("AUPRC (direct) not correct.", 0.7481384, new AUPRCEvaluation().evaluate(positive, distances), 1e-7);
+    // This is only an approximation:
+    assertEquals("AUPRC (curve) not correct.", 0.7482936, XYCurve.areaUnderCurve(curve), 1e-7);
   }
 }

@@ -22,6 +22,7 @@ package elki.evaluation.scores.adapter;
 
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDListIter;
 
 /**
@@ -39,13 +40,14 @@ public class FilteredDistanceResultAdapter extends DistanceResultAdapter {
   DBIDRef skip;
 
   /**
-   * Constructor
+   * Constructor.
    * 
+   * @param set Set of positive examples
    * @param iter Iterator for distance results
    * @param skip DBID to skip (reference must remain stable!)
    */
-  public FilteredDistanceResultAdapter(DoubleDBIDListIter iter, DBIDRef skip) {
-    super(iter);
+  public FilteredDistanceResultAdapter(DBIDs set, DoubleDBIDListIter iter, DBIDRef skip) {
+    super(set, iter);
     this.skip = skip;
     if(iter.valid() && DBIDUtil.equal(iter, skip)) {
       iter.advance();

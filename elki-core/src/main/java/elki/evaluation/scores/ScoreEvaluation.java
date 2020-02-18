@@ -20,10 +20,8 @@
  */
 package elki.evaluation.scores;
 
-import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.DoubleDBIDList;
-import elki.evaluation.scores.adapter.DBIDsTest;
 import elki.evaluation.scores.adapter.DistanceResultAdapter;
 import elki.utilities.datastructures.iterator.Iter;
 
@@ -33,23 +31,17 @@ import elki.utilities.datastructures.iterator.Iter;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - ScoreIter
- * @assoc - - - Predicate
+ * @assoc - - - Adapter
  * @assoc - - - DoubleDBIDList
- * @assoc - - - Cluster
- * @assoc - - - DBIDs
- * @assoc - - - OutlierResult
  */
 public interface ScoreEvaluation {
   /**
    * Evaluate a given predicate and iterator.
    *
-   * @param predicate Predicate (for positives)
-   * @param iter Iterator
+   * @param adapter Input data adapter
    * @return Score
-   * @param <I> Iterator type
    */
-  <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter);
+  double evaluate(Adapter adapter);
 
   /**
    * Evaluate given a list of positives and a scoring.
@@ -59,7 +51,7 @@ public interface ScoreEvaluation {
    * @return Score
    */
   default double evaluate(DBIDs ids, DoubleDBIDList nei) {
-    return evaluate(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
+    return evaluate(new DistanceResultAdapter(ids, nei.iter()));
   }
 
   /**
@@ -72,11 +64,18 @@ public interface ScoreEvaluation {
   double expected(int pos, int all);
 
   /**
-   * Iterator for comparing scores.
+   * Predicate to test whether an object is a true positive or false positive.
    *
    * @author Erich Schubert
    */
-  interface ScoreIter extends Iter {
+  interface Adapter extends Iter {
+    /**
+     * True if the current object is a positive example.
+     *
+     * @return {@code true} when positive.
+     */
+    boolean test();
+
     /**
      * Test whether the score is the same as the previous objects score.
      *
@@ -85,23 +84,6 @@ public interface ScoreEvaluation {
      * @return Boolean
      */
     boolean tiedToPrevious();
-  }
-
-  /**
-   * Predicate to test whether an object is a true positive or false positive.
-   *
-   * @author Erich Schubert
-   *
-   * @param <T> Data type
-   */
-  interface Predicate<T> {
-    /**
-     * Test a result.
-     *
-     * @param o Object to test
-     * @return {@code true} when positive.
-     */
-    boolean test(T o);
 
     /**
      * Return the number of positive ids.

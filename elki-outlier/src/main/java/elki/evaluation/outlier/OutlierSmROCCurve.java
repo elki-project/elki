@@ -71,9 +71,9 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
     bibkey = "DBLP:conf/pkdd/KlementFJM11")
 public class OutlierSmROCCurve implements Evaluator {
   /**
-   * The label we use for marking ROCAUC values.
+   * The label we use for marking AUROC values.
    */
-  public static final String SMROCAUC_LABEL = "ROCAUC";
+  public static final String SMAUROC_LABEL = "AUROC";
 
   /**
    * The logger.
@@ -162,12 +162,12 @@ public class OutlierSmROCCurve implements Evaluator {
       curve.addAndSimplify(x, y);
     }
 
-    double rocauc = XYCurve.areaUnderCurve(curve) / (x * y);
+    double auroc = XYCurve.areaUnderCurve(curve) / (x * y);
     if(LOG.isVerbose()) {
-      LOG.verbose(SMROCAUC_LABEL + ": " + rocauc);
+      LOG.verbose(SMAUROC_LABEL + ": " + auroc);
     }
-    curve.rocauc = rocauc;
-
+    curve.auc = auroc;
+    curve.setAxes(0, 0, 1, 1);
     return curve;
   }
 
@@ -195,9 +195,9 @@ public class OutlierSmROCCurve implements Evaluator {
    */
   public static class SmROCResult extends XYCurve {
     /**
-     * ROC AUC score
+     * AUC score
      */
-    double rocauc = Double.NaN;
+    double auc = Double.NaN;
 
     /**
      * Constructor.
@@ -212,10 +212,10 @@ public class OutlierSmROCCurve implements Evaluator {
     /**
      * SmROC AUC value
      *
-     * @return SmROC auc value
+     * @return SmROC AUC value
      */
     public double getAUC() {
-      return rocauc;
+      return auc;
     }
   }
 

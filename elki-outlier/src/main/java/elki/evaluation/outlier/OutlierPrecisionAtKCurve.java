@@ -121,6 +121,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       }
       curve.addAndSimplify(k, pos / (double) k);
     }
+    curve.setAxes(1, 0, lastk, 1);
     return curve;
   }
 

@@ -35,7 +35,6 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.evaluation.scores.ROCEvaluation;
 import elki.evaluation.scores.adapter.DecreasingVectorIter;
-import elki.evaluation.scores.adapter.VectorNonZero;
 import elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import elki.logging.Logging;
@@ -144,9 +143,6 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final int dim = RelationUtil.dimensionality(relation);
     final NumberVector refvec = relation.get(firstid);
 
-    // Build the truth vector
-    VectorNonZero pos = new VectorNonZero(refvec);
-
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     ids.remove(firstid);
     ids.sort();
@@ -162,30 +158,20 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
         final NumberVector veca = relation.get(id);
         // Direct AUC score:
-        {
-          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(veca));
-          data[a][a] = auc;
-          // minmax.put(auc);
-          LOG.incrementProcessed(prog);
-        }
+        data[a][a] = ROCEvaluation.computeAUROC(new DecreasingVectorIter(refvec, veca));
+        LOG.incrementProcessed(prog);
         // Compare to others, exploiting symmetry
         DBIDArrayIter id2 = ids.iter();
-        id2.seek(a + 1);
-        for(int b = a + 1; b < size; b++, id2.advance()) {
-          final NumberVector vecb = relation.get(id2);
+        for(int b = a + 1; b < size; b++) {
+          final NumberVector vecb = relation.get(id2.seek(b));
           double[] combined = new double[dim];
           for(int d = 0; d < dim; d++) {
             buf[0] = veca.doubleValue(d);
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(DoubleVector.wrap(combined)));
-          // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
-          // labels.get(ids.get(b)));
-          data[a][b] = auc;
-          data[b][a] = auc;
+          data[b][a] = ROCEvaluation.computeAUROC(new DecreasingVectorIter(refvec, DoubleVector.wrap(combined)));
           commax.put(data[a][b]);
-          // minmax.put(auc);
           LOG.incrementProcessed(prog);
         }
       }
@@ -194,11 +180,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     for(int a = 0; a < size; a++) {
       for(int b = a + 1; b < size; b++) {
         double ref = Math.max(data[a][a], data[b][b]);
-        data[a][b] = (data[a][b] - ref) / (1 - ref);
-        data[b][a] = (data[b][a] - ref) / (1 - ref);
-        // logger.verbose(data[a][b] + " " + labels.get(ids.get(a)) + " " +
-        // labels.get(ids.get(b)));
-        minmax.put(data[a][b]);
+        minmax.put(data[b][a] = data[a][b] = (data[a][b] - ref) / (1 - ref));
       }
     }
     for(int a = 0; a < size; a++) {
@@ -207,15 +189,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     LOG.verbose("Gain: " + minmax.toString() + " AUC: " + commax.toString());
 
-    boolean hasneg = (minmax.getMin() < -1E-3);
-    LinearScaling scale;
-    if(!hasneg) {
-      scale = LinearScaling.fromMinMax(0., minmax.getMax());
-    }
-    else {
-      scale = LinearScaling.fromMinMax(0.0, Math.max(minmax.getMax(), -minmax.getMin()));
-    }
-    scale = LinearScaling.fromMinMax(0., .5);
+    // boolean hasneg = (minmax.getMin() < -1E-3);
+    // LinearScaling scale = !hasneg ? LinearScaling.fromMinMax(0.,
+    // minmax.getMax()) : LinearScaling.fromMinMax(0.0,
+    // Math.max(minmax.getMax(), -minmax.getMin()));
+    LinearScaling scale = LinearScaling.fromMinMax(0., .5);
 
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
     for(int x = 0; x < size; x++) {

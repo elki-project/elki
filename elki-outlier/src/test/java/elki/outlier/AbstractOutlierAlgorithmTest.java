@@ -30,6 +30,7 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.evaluation.outlier.OutlierROCCurve;
+import elki.evaluation.scores.ROCEvaluation.ROCurve;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
@@ -37,7 +38,7 @@ import elki.utilities.ELKIBuilder;
 
 /**
  * Abstract test for outlier algorithms.
- *
+ * <p>
  * Includes convenience functions for evaluation.
  *
  * @author Erich Schubert
@@ -62,7 +63,7 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
     // Compute ROC and AUC:
     rocCurve.processNewResult(result);
     // Find the ROC results
-    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(result, OutlierROCCurve.ROCResult.class);
+    Collection<ROCurve> rocs = ResultUtil.filterResults(result, ROCurve.class);
     assertTrue("No ROC result found.", !rocs.isEmpty());
     double auc = rocs.iterator().next().getAUC();
     assertFalse("More than one ROC result found.", rocs.size() > 1);

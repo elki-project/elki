@@ -153,21 +153,17 @@ public class XYCurve {
     final int len = data.size();
     if(len >= 4) {
       // Look at the previous 2 points
-      final double l1x = data.get(len - 4);
-      final double l1y = data.get(len - 3);
-      final double l2x = data.get(len - 2);
-      final double l2y = data.get(len - 1);
+      final double l1x = data.get(len - 4), l1y = data.get(len - 3);
+      final double l2x = data.get(len - 2), l2y = data.get(len - 1);
       // Differences:
-      final double ldx = l2x - l1x;
-      final double ldy = l2y - l1y;
-      final double cdx = x - l2x;
-      final double cdy = y - l2y;
+      final double ldx = l2x - l1x, ldy = l2y - l1y;
+      final double cdx = x - l2x, cdy = y - l2y;
       // X simplification
-      if((ldx == 0) && (cdx == 0)) {
+      if(ldx == 0 && cdx == 0) {
         data.remove(len - 2, 2);
       }
       // horizontal simplification
-      else if((ldy == 0) && (cdy == 0)) {
+      else if(ldy == 0 && cdy == 0) {
         data.remove(len - 2, 2);
       }
       // diagonal simplification
@@ -261,12 +257,29 @@ public class XYCurve {
    * @param sy Scaling factor for Y axis
    */
   public void rescale(double sx, double sy) {
-    for(int i = 0; i < data.size(); i += 2) {
-      data.set(i, sx * data.get(i));
-      data.set(i + 1, sy * data.get(i + 1));
+    double[] d = data.data;
+    int i = 0;
+    while(i < data.size()) {
+      d[i++] *= sx;
+      d[i++] *= sy;
     }
     maxx *= sx;
     maxy *= sy;
+  }
+
+  /**
+   * Set the range of the plot.
+   *
+   * @param minx Minimum x
+   * @param miny Minimum y
+   * @param maxx Maximum x
+   * @param maxy Maximum y
+   */
+  public void setAxes(double minx, double miny, double maxx, double maxy) {
+    this.minx = minx;
+    this.miny = miny;
+    this.maxx = maxx;
+    this.maxy = maxy;
   }
 
   /**
@@ -285,17 +298,13 @@ public class XYCurve {
    * positions is using "next" in Java style. Here, we can have two getters for
    * current values!
    * <p>
-   * Instead, use this style of iteration: <blockquote>
+   * Instead, use this style of iteration:
    * 
    * <pre>
-   * {@code
-   * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
+   * for(XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
    *   doSomethingWith(it.getX(), it.getY());
    * }
-   * }
    * </pre>
-   * 
-   * </blockquote>
    *
    * @return Iterator
    */

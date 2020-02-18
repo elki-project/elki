@@ -24,9 +24,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.evaluation.outlier.OutlierPrecisionRecallCurve;
-import elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurve;
 import elki.evaluation.outlier.OutlierROCCurve;
-import elki.evaluation.outlier.OutlierROCCurve.ROCResult;
+import elki.evaluation.scores.AUPRCEvaluation.PRCurve;
+import elki.evaluation.scores.ROCEvaluation.ROCurve;
 import elki.logging.LoggingUtil;
 import elki.math.geometry.XYCurve;
 import elki.math.scales.LinearScale;
@@ -125,10 +125,10 @@ public class XYCurveVisualization implements VisFactory {
     }
 
     // Add AUC value when found
-    if(curve instanceof ROCResult) {
-      double rocauc = ((ROCResult) curve).getAUC();
-      String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF.format(rocauc);
-      if(rocauc <= 0.5) {
+    if(curve instanceof ROCurve) {
+      double auroc = ((ROCurve) curve).getAUC();
+      String lt = OutlierROCCurve.AUROC_LABEL + ": " + FormatUtil.NF.format(auroc);
+      if(auroc <= 0.5) {
         Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
@@ -140,9 +140,9 @@ public class XYCurveVisualization implements VisFactory {
       }
     }
     if(curve instanceof PRCurve) {
-      double prauc = ((PRCurve) curve).getAUC();
-      String lt = OutlierPrecisionRecallCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(prauc);
-      if(prauc <= 0.5) {
+      double auprc = ((PRCurve) curve).getAUC();
+      String lt = OutlierPrecisionRecallCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(auprc);
+      if(auprc <= 0.5) {
         Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);

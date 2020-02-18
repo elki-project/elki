@@ -33,7 +33,6 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.evaluation.Evaluator;
 import elki.evaluation.scores.ScoreEvaluation;
-import elki.evaluation.scores.adapter.DBIDsTest;
 import elki.evaluation.scores.adapter.DistanceResultAdapter;
 import elki.logging.Logging;
 import elki.math.MeanVariance;
@@ -101,7 +100,7 @@ public class EvaluateClustering implements Evaluator {
    * @return Score
    */
   public static double evaluateRanking(ScoreEvaluation eval, Cluster<?> clus, DoubleDBIDList ranking) {
-    return eval.evaluate(new DBIDsTest(DBIDUtil.ensureSet(clus.getIDs())), new DistanceResultAdapter(ranking.iter()));
+    return eval.evaluate(new DistanceResultAdapter(DBIDUtil.ensureSet(clus.getIDs()), ranking.iter()));
   }
 
   @Override

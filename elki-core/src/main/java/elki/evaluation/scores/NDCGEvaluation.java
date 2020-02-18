@@ -55,8 +55,8 @@ public class NDCGEvaluation implements ScoreEvaluation {
   public static final NDCGEvaluation STATIC = new NDCGEvaluation();
 
   @Override
-  public <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter) {
-    return computeNDCG(predicate, iter);
+  public double evaluate(Adapter adapter) {
+    return computeNDCG(adapter);
   }
 
   @Override
@@ -72,25 +72,23 @@ public class NDCGEvaluation implements ScoreEvaluation {
    * Compute the DCG given a set of positive IDs and a sorted list of entries,
    * which may include ties.
    * 
-   * @param <I> Iterator type
-   * @param predicate Predicate to test for positive objects
-   * @param iter Iterator over results, with ties.
+   * @param adapter Adapter for different input data types
    * @return area under curve
    */
-  public static <I extends ScoreIter> double computeNDCG(Predicate<? super I> predicate, I iter) {
+  public static double computeNDCG(Adapter adapter) {
     double sum = 0.;
     int i = 0, positive = 0, tied = 0, totalpos = 0;
-    while(iter.valid()) {
+    while(adapter.valid()) {
       // positive or negative match?
       do {
-        if(predicate.test(iter)) {
+        if(adapter.test()) {
           ++positive;
         }
         ++tied;
         ++i;
-        iter.advance();
+        adapter.advance();
       } // Loop while tied:
-      while(iter.valid() && iter.tiedToPrevious());
+      while(adapter.valid() && adapter.tiedToPrevious());
       // We only support binary labeling, and can ignore negative weight.
       if(positive > 0) {
         sum += tied == 1 ? 1. / FastMath.log(i + 1) : //

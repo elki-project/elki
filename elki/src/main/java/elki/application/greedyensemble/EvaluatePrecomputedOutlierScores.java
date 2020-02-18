@@ -43,7 +43,6 @@ import elki.evaluation.scores.*;
 import elki.evaluation.scores.adapter.AbstractVectorIter;
 import elki.evaluation.scores.adapter.DecreasingVectorIter;
 import elki.evaluation.scores.adapter.IncreasingVectorIter;
-import elki.evaluation.scores.adapter.VectorNonZero;
 import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FileUtil;
@@ -114,12 +113,12 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   /**
    * Vector of positive values.
    */
-  VectorNonZero positive;
+  NumberVector positive;
 
   /**
    * Normalization term E[NDCG].
    */
-  double endcg;
+  double endcg = 0;
 
   /**
    * Constructor.
@@ -202,17 +201,17 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   private void writeHeader(PrintStream fout) {
     // Write CSV header:
-    if(name != null) {
-      fout.append("\"Name\",");
-    }
-    fout.append("\"Algorithm\",\"k\"") //
-        .append(",\"ROC AUC\"") //
+    fout.append(name != null ? "\"Name\"," : "") //
+        .append("\"Algorithm\",\"k\"") //
+        .append(",\"AUROC\"") //
+        .append(",\"AUPRC\"") //
         .append(",\"Average Precision\"") //
         .append(",\"R-Precision\"") //
         .append(",\"Maximum F1\"") //
         .append(",\"DCG\"") //
         .append(",\"NDCG\"") //
-        .append(",\"Adjusted ROC AUC\"") //
+        .append(",\"Adjusted AUROC\"") //
+        .append(",\"Adjusted AUPRC\"") //
         .append(",\"Adjusted Average Precision\"") //
         .append(",\"Adjusted R-Precision\"") //
         .append(",\"Adjusted Maximum F1\"") //
@@ -229,22 +228,24 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
       if(!label.matches("bylabel")) {
         throw new AbortException("No 'by label' reference outlier found, which is needed for evaluation!");
       }
-      positive = new VectorNonZero(vec);
-      endcg = NDCGEvaluation.STATIC.expected(positive.numPositive(), positive.getDimensionality());
+      positive = vec;
       return;
     }
-    AbstractVectorIter iter = reverse.matcher(label).find() ? new IncreasingVectorIter(vec) : new DecreasingVectorIter(vec);
-    double expected = positive.numPositive() / (double) positive.getDimensionality();
-    double auc = ROCEvaluation.STATIC.evaluate(positive, iter.seek(0));
-    double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
-    double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(positive, iter.seek(0));
-    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(positive, iter.seek(0));
-    double dcg = DCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
-    double ndcg = NDCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
-    double adjauc = 2 * auc - 1;
-    double adjrprecision = (rprecision - expected) / (1 - expected);
+    AbstractVectorIter iter = reverse.matcher(label).find() ? new IncreasingVectorIter(positive, vec) : new DecreasingVectorIter(positive, vec);
+    double expected = iter.numPositive() / (double) positive.getDimensionality();
+    double auroc = ROCEvaluation.STATIC.evaluate(iter.seek(0));
+    double adjauroc = 2 * auroc - 1;
+    double auprc = AUPRCEvaluation.STATIC.evaluate(iter.seek(0));
+    double adjauprc = (auprc - expected) / (1 - expected);
+    double avep = AveragePrecisionEvaluation.STATIC.evaluate(iter.seek(0));
     double adjavep = (avep - expected) / (1 - expected);
+    double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(iter.seek(0));
+    double adjrprecision = (rprecision - expected) / (1 - expected);
+    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(iter.seek(0));
     double adjmaxf1 = (maxf1 - expected) / (1 - expected);
+    double dcg = DCGEvaluation.STATIC.evaluate(iter.seek(0));
+    double ndcg = NDCGEvaluation.STATIC.evaluate(iter.seek(0));
+    endcg = endcg > 0 ? endcg : NDCGEvaluation.STATIC.expected(iter.numPositive(), positive.getDimensionality());
     double adjdcg = (ndcg - endcg) / (1 - endcg);
     final int p = label.lastIndexOf('-');
     String prefix = label.substring(0, p);
@@ -255,13 +256,15 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     }
     fout.append('"').append(prefix).append('"') //
         .append(',').append(Integer.toString(k)) //
-        .append(',').append(Double.toString(auc)) //
+        .append(',').append(Double.toString(auroc)) //
+        .append(',').append(Double.toString(auprc)) //
         .append(',').append(Double.toString(avep)) //
         .append(',').append(Double.toString(rprecision)) //
         .append(',').append(Double.toString(maxf1)) //
         .append(',').append(Double.toString(dcg)) //
         .append(',').append(Double.toString(ndcg)) //
-        .append(',').append(Double.toString(adjauc)) //
+        .append(',').append(Double.toString(adjauroc)) //
+        .append(',').append(Double.toString(adjauprc)) //
         .append(',').append(Double.toString(adjavep)) //
         .append(',').append(Double.toString(adjrprecision)) //
         .append(',').append(Double.toString(adjmaxf1)) //
@@ -278,7 +281,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   private boolean checkForNaNs(NumberVector vec) {
     for(int i = 0, d = vec.getDimensionality(); i < d; i++) {
       double v = vec.doubleValue(i);
-      if(v != v) { // NaN!
+      if(Double.isNaN(v)) {
         return true;
       }
     }

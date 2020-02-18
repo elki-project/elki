@@ -26,7 +26,6 @@ import java.util.List;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.DoubleRelation;
 import elki.evaluation.scores.ScoreEvaluation;
-import elki.evaluation.scores.adapter.DBIDsTest;
 import elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import elki.result.Metadata;
 import elki.result.Metadata.Hierarchy;
@@ -123,6 +122,6 @@ public class OutlierResult {
    * @return Score
    */
   double evaluateBy(ScoreEvaluation eval) {
-    return eval.evaluate(new DBIDsTest(DBIDUtil.ensureSet(scores.getDBIDs())), new OutlierScoreAdapter(this));
+    return eval.evaluate(new OutlierScoreAdapter(DBIDUtil.ensureSet(scores.getDBIDs()), this));
   }
 }

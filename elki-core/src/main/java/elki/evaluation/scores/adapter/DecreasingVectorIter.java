@@ -38,10 +38,11 @@ public class DecreasingVectorIter extends AbstractVectorIter implements IntCompa
   /**
    * Constructor.
    * 
+   * @param positive Vector of positive values
    * @param vec Vector to iterate over.
    */
-  public DecreasingVectorIter(NumberVector vec) {
-    super(vec);
+  public DecreasingVectorIter(NumberVector positive, NumberVector vec) {
+    super(positive, vec);
     this.sort = MathUtil.sequence(0, vec.getDimensionality());
     IntegerArrayQuickSort.sort(sort, this);
   }
