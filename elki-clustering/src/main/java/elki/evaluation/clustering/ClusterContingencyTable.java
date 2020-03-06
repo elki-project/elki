@@ -87,6 +87,16 @@ public class ClusterContingencyTable {
   protected SetMatchingPurity smp = null;
 
   /**
+   * Maximum Matching Accuracy
+   */
+  protected MaximumMatchingAccuracy mmacc = null;
+
+  /**
+   * Pair Sets Index Measures
+   */
+  protected PairSetsIndex psi = null;
+
+  /**
    * Edit-Distance measures
    */
   protected EditDistance edit = null;
@@ -219,12 +229,30 @@ public class ClusterContingencyTable {
   }
 
   /**
-   * The set-matching measures
+   * The set-matching purity measures
    * 
-   * @return Set-Matching measures
+   * @return Set-Matching purity measures
    */
-  public SetMatchingPurity getSetMatching() {
+  public SetMatchingPurity getSetMatchingPurity() {
     return smp != null ? smp : (smp = new SetMatchingPurity(this));
+  }
+
+  /**
+   * The Maximum Matching Accuracy
+   * 
+   * @return Maximum Matching Accuracy
+   */
+  public MaximumMatchingAccuracy getMaximumMatchingAccuracy() {
+    return mmacc != null ? mmacc : (mmacc = new MaximumMatchingAccuracy(this));
+  }
+
+  /**
+   * The Pair Sets Index measures
+   * 
+   * @return Pair Sets Index measures
+   */
+  public PairSetsIndex getPairSetsIndex() {
+    return psi != null ? psi : (psi = new PairSetsIndex(this));
   }
 
   /**

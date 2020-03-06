@@ -242,11 +242,15 @@ public class EvaluateClustering implements Evaluator {
           .addMeasure("Precision", bcubed.precision(), 0, 1, false) //
           .addMeasure("Recall", bcubed.recall(), 0, 1, false);
 
-      SetMatchingPurity setm = contmat.getSetMatching();
-      newGroup("Set matching") //
-          .addMeasure("F1-Measure", setm.f1Measure(), 0, 1, false) //
+      MaximumMatchingAccuracy kmwacc = contmat.getMaximumMatchingAccuracy();
+      SetMatchingPurity setm = contmat.getSetMatchingPurity();
+      PairSetsIndex psi = contmat.getPairSetsIndex();
+      newGroup("Set Matching") //
+          .addMeasure("Maximum Accuracy", kmwacc.getAccuracy(), 0, 1, false) //
           .addMeasure("Purity", setm.purity(), 0, 1, false) //
-          .addMeasure("Inverse Purity", setm.inversePurity(), 0, 1, false);
+          .addMeasure("Inverse Purity", setm.inversePurity(), 0, 1, false) //
+          .addMeasure("F1-Measure", setm.f1Measure(), 0, 1, false) //
+          .addMeasure("Pair Sets Index", psi.psi, 0, 1, false);
 
       EditDistance edit = contmat.getEdit();
       newGroup("Edit Distance") //
