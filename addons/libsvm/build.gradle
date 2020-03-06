@@ -3,4 +3,5 @@ dependencies {
   compile project(':elki-outlier')
   compile group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  testCompile project(path: ':elki-outlier', configuration: 'testOutput')
 }
