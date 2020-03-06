@@ -23,7 +23,6 @@ package elki.evaluation.outlier;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import elki.database.Database;
 import elki.database.DatabaseUtil;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -34,7 +33,6 @@ import elki.evaluation.scores.AUPRCEvaluation.PRCurve;
 import elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import elki.evaluation.scores.adapter.SimpleAdapter;
 import elki.logging.Logging;
-import elki.math.geometry.XYCurve;
 import elki.result.EvaluationResult;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
@@ -79,7 +77,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   /**
    * AUC value for PR curve
    */
-  public static final String PRAUC_LABEL = "PR AUC";
+  public static final String PRAUC_LABEL = "AUPRC";
 
   /**
    * The logger.
@@ -87,7 +85,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   private static final Logging LOG = Logging.getLogger(OutlierPrecisionRecallCurve.class);
 
   /**
-   * Stores the "positive" class.
+   * Matcher for the "positive" class.
    */
   private Pattern positiveClassName;
 
@@ -103,10 +101,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
   @Override
   public void processNewResult(Object result) {
-    Database db = ResultUtil.findDatabase(result);
-    // Prepare
-    SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
-
+    SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(ResultUtil.findDatabase(result), positiveClassName));
     if(positiveids.size() == 0) {
       LOG.warning("Computing a P/R curve failed - no objects matched.");
       return;
@@ -121,7 +116,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       MeasurementGroup g = EvaluationResult.findOrCreate(o, EvaluationResult.RANKING) //
           .findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(PRAUC_LABEL)) {
-        g.addMeasure(PRAUC_LABEL, XYCurve.areaUnderCurve(curve), 0., 1., false);
+        g.addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
       }
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -136,7 +131,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       MeasurementGroup g = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING) //
           .findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(PRAUC_LABEL)) {
-        g.addMeasure(PRAUC_LABEL, XYCurve.areaUnderCurve(curve), 0., 1., false);
+        g.addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
       }
     }
   }
@@ -152,6 +147,9 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
 
+    /**
+     * Matcher for the "positive" class.
+     */
     protected Pattern positiveClassName = null;
 
     @Override
