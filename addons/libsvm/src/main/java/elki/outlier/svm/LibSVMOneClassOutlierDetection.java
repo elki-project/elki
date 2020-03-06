@@ -34,6 +34,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
+import elki.logging.statistics.LongStatistic;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -43,6 +44,7 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.EnumParameter;
@@ -105,15 +107,22 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
   double nu = 0.05;
 
   /**
+   * Gamma parameter (not for linear kernel)
+   */
+  double gamma = 0;
+
+  /**
    * Constructor.
    * 
    * @param kernel Kernel to use with SVM.
    * @param nu Nu parameter
+   * @param gamma Gamma parameter
    */
-  public LibSVMOneClassOutlierDetection(SVMKernel kernel, double nu) {
+  public LibSVMOneClassOutlierDetection(SVMKernel kernel, double nu, double gamma) {
     super();
     this.kernel = kernel;
     this.nu = nu;
+    this.gamma = gamma;
   }
 
   @Override
@@ -136,7 +145,9 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     svm_parameter param = new svm_parameter();
     param.svm_type = svm_parameter.ONE_CLASS;
     param.kernel_type = svm_parameter.LINEAR;
-    param.degree = 3;
+    param.degree = 1;
+    param.nu = nu;
+    param.gamma = gamma > 0 ? gamma : 1. / dim;
     switch(kernel){
     case LINEAR:
       param.kernel_type = svm_parameter.LINEAR;
@@ -159,18 +170,16 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
       throw new AbortException("Invalid kernel parameter: " + kernel);
     }
     // TODO: expose additional parameters to the end user!
-    param.nu = nu;
-    param.coef0 = 0.;
+    param.coef0 = 1.;
     param.cache_size = 10000;
-    param.C = 1;
+    param.C = 1; // not used by one-class (nu svm)?
     param.eps = 1e-4; // not used by one-class?
     param.p = 0.1; // not used by one-class?
-    param.shrinking = 0;
+    param.shrinking = 1;
     param.probability = 0;
     param.nr_weight = 0;
     param.weight_label = new int[0];
     param.weight = new double[0];
-    param.gamma = 1. / dim;
 
     // Transform data:
     svm_problem prob = new svm_problem();
@@ -198,9 +207,10 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     }
     String err = svm.svm_check_parameter(prob, param);
     if(err != null) {
-      LOG.warning("svm_check_parameter: " + err);
+      LOG.error("svm_check_parameter: " + err);
     }
     svm_model model = svm.svm_train(prob, param);
+    LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.l));
 
     if(LOG.isVerbose()) {
       LOG.verbose("Predicting...");
@@ -263,6 +273,11 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     public static final OptionID NU_ID = new OptionID("svm.nu", "SVM nu parameter.");
 
     /**
+     * SVM gamma parameter
+     */
+    public static final OptionID GAMMA_ID = new OptionID("svm.gamma", "SVM gamma parameter (use 0 for 1/dim heuristic).");
+
+    /**
      * Kernel in use.
      */
     protected SVMKernel kernel = SVMKernel.RBF;
@@ -272,17 +287,30 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
      */
     protected double nu = 0.05;
 
+    /**
+     * Gamma parameter (not for linear kernel)
+     */
+    double gamma = 0;
+
     @Override
     public void configure(Parameterization config) {
       new EnumParameter<SVMKernel>(KERNEL_ID, SVMKernel.class, SVMKernel.RBF) //
           .grab(config, x -> kernel = x);
       new DoubleParameter(NU_ID, 0.05) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
           .grab(config, x -> nu = x);
+      if(kernel != SVMKernel.LINEAR) {
+        new DoubleParameter(GAMMA_ID) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+            .setOptional(true) //
+            .grab(config, x -> gamma = x);
+      }
     }
 
     @Override
     public LibSVMOneClassOutlierDetection<V> make() {
-      return new LibSVMOneClassOutlierDetection<>(kernel, nu);
+      return new LibSVMOneClassOutlierDetection<>(kernel, nu, gamma);
     }
   }
 }

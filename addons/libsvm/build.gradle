@@ -2,4 +2,5 @@ description = 'ELKI - LibSVM based extensions'
 dependencies {
   compile project(':elki-outlier')
   compile group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
