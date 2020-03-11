@@ -102,22 +102,7 @@ public class BetaDistribution implements Distribution {
 
   @Override
   public double cdf(double x) {
-    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
-      return Double.NaN;
-    }
-    if(x <= 0.0) {
-      return 0.0;
-    }
-    if(x >= 1.0) {
-      return 1.0;
-    }
-    if(alpha > SWITCH && beta > SWITCH) {
-      return regularizedIncBetaQuadrature(alpha, beta, x);
-    }
-    double bt = FastMath.exp(-logbab + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
-    return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
-        ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
-        : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
+    return regularizedIncBeta(x, alpha, beta, logbab);
   }
 
   @Override
@@ -224,6 +209,35 @@ public class BetaDistribution implements Distribution {
   }
 
   /**
+   * Computes the regularized incomplete beta function I_x(a, b) which is also
+   * the CDF of the beta distribution. Based on the book "Numerical Recipes"
+   * 
+   * @param x Parameter x
+   * @param alpha Parameter a
+   * @param beta Parameter b
+   * @param logbaB Cached logBeta(alpha, beta)
+   * @return Value of the regularized incomplete beta function
+   */
+  protected static double regularizedIncBeta(double x, double alpha, double beta, double logbab) {
+    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
+      return Double.NaN;
+    }
+    if(x <= 0.0) {
+      return 0.0;
+    }
+    if(x >= 1.0) {
+      return 1.0;
+    }
+    if(alpha > SWITCH && beta > SWITCH) {
+      return regularizedIncBetaQuadrature(alpha, beta, x);
+    }
+    double bt = FastMath.exp(-logbab + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
+    return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
+        ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
+        : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
+  }
+
+  /**
    * Returns the regularized incomplete beta function I_x(a, b) Includes the
    * continued fraction way of computing, based on the book "Numerical Recipes".
    * 
@@ -234,16 +248,12 @@ public class BetaDistribution implements Distribution {
    */
   protected static double regularizedIncBetaCF(double alpha, double beta, double x) {
     final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
-    double qab = alpha + beta;
-    double qap = alpha + 1.0;
-    double qam = alpha - 1.0;
-    double c = 1.0;
-    double d = 1.0 - qab * x / qap;
+    final double qab = alpha + beta, qap = alpha + 1.0, qam = alpha - 1.0;
+    double c = 1.0, d = 1.0 - qab * x / qap;
     if(Math.abs(d) < FPMIN) {
       d = FPMIN;
     }
-    d = 1.0 / d;
-    double h = d;
+    double h = d = 1.0 / d;
     for(int m = 1; m < 10000; m++) {
       int m2 = 2 * m;
       double aa = m * (beta - m) * x / ((qam + m2) * (alpha + m2));
@@ -286,12 +296,9 @@ public class BetaDistribution implements Distribution {
    * @return result
    */
   protected static double regularizedIncBetaQuadrature(double alpha, double beta, double x) {
-    final double alphapbeta = alpha + beta;
-    final double a1 = alpha - 1.0;
-    final double b1 = beta - 1.0;
+    final double alphapbeta = alpha + beta, a1 = alpha - 1.0, b1 = beta - 1.0;
     final double mu = alpha / alphapbeta;
-    final double lnmu = FastMath.log(mu);
-    final double lnmuc = FastMath.log1p(-mu);
+    final double lnmu = FastMath.log(mu), lnmuc = FastMath.log1p(-mu);
     double t = FastMath.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
     final double xu;
     if(x > alpha / alphapbeta) {
@@ -340,91 +347,79 @@ public class BetaDistribution implements Distribution {
    * @return Position
    */
   protected static double rawQuantile(double p, double alpha, double beta, final double logbeta) {
+    // Very fast approximation of y.
+    final double tmp = FastMath.sqrt(-2 * FastMath.log(p));
+    double ya = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
+
     // Initial estimate for x
     double x;
-    {
-      // Very fast approximation of y.
-      double tmp = FastMath.sqrt(-2 * FastMath.log(p));
-      double y = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
-
-      if(alpha > 1 && beta > 1) {
-        double r = (y * y - 3.) / 6.;
-        double s = 1. / (alpha + alpha - 1.);
-        double t = 1. / (beta + beta - 1.);
-        double h = 2. / (s + t);
-        double w = y * FastMath.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
-        x = alpha / (alpha + beta * FastMath.exp(w + w));
+    if(alpha > 1 && beta > 1) {
+      final double r = (ya * ya - 3.) / 6., s = 1. / (alpha + alpha - 1.);
+      final double t = 1. / (beta + beta - 1.), h = 2. / (s + t);
+      double w = ya * FastMath.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
+      x = alpha / (alpha + beta * FastMath.exp(w + w));
+    }
+    else {
+      double r = beta + beta, t = 1. / (9. * beta);
+      final double a = 1. - t + ya * FastMath.sqrt(t);
+      t = r * a * a * a;
+      if(t <= 0.) {
+        x = 1. - FastMath.exp((FastMath.log1p(-p) + FastMath.log(beta) + logbeta) / beta);
       }
       else {
-        double r = beta + beta;
-        double t = 1. / (9. * beta);
-        final double a = 1. - t + y * FastMath.sqrt(t);
-        t = r * a * a * a;
-        if(t <= 0.) {
-          x = 1. - FastMath.exp((FastMath.log1p(-p) + FastMath.log(beta) + logbeta) / beta);
-        }
-        else {
-          t = (4. * alpha + r - 2.) / t;
-          if(t <= 1.) {
-            x = FastMath.exp((FastMath.log(p * alpha) + logbeta) / alpha);
-          }
-          else {
-            x = 1. - 2. / (t + 1.);
-          }
-        }
-      }
-      // Degenerate initial approximations
-      if(x < 3e-308 || x > 1 - 2.22e-16) {
-        x = 0.5;
+        t = (4. * alpha + r - 2.) / t;
+        x = t <= 1 ? FastMath.exp((FastMath.log(p * alpha) + logbeta) / alpha) //
+            : 1. - 2. / (t + 1.);
       }
     }
+    // Degenerate initial approximations
+    if(x < 3e-308 || x > 1 - 2.22e-16) {
+      x = 0.5;
+    }
 
-    // Newon-Raphson method using the CDF
-    {
-      final double ialpha = 1 - alpha;
-      final double ibeta = 1 - beta;
+    // Newton-Raphson method using the CDF
+    final double ialpha = 1 - alpha, ibeta = 1 - beta;
 
-      // Desired accuracy, as from GNU R adoption of AS 109
-      final double acu = Math.max(1e-300, FastMath.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
-      double prevstep = 0., y = 0., stepsize = 1;
+    // Desired accuracy, as from GNU R adoption of AS 109
+    final double acu = Math.max(1e-300, FastMath.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
+    double prevstep = 0., y = 0., stepsize = 1;
 
-      for(int outer = 0; outer < 1000; outer++) {
-        // Current CDF value
-        double ynew = cdf(x, alpha, beta);
-        if(Double.isInfinite(ynew)) { // Degenerated.
-          return Double.NaN;
-        }
-        // Error gradient
-        ynew = (ynew - p) * FastMath.exp(logbeta + ialpha * FastMath.log(x) + ibeta * FastMath.log1p(-x));
-        if(ynew * y <= 0.) {
-          prevstep = Math.max(Math.abs(stepsize), 3e-308);
-        }
-        // Inner loop: try different step sizes: y * 3^-i
-        double g = 1, xnew = 0.;
-        for(int inner = 0; inner < 1000; inner++) {
-          stepsize = g * ynew;
-          if(Math.abs(stepsize) < prevstep) {
-            xnew = x - stepsize; // Candidate x
-            if(xnew >= 0. && xnew <= 1.) {
-              // Close enough
-              if(prevstep <= acu || Math.abs(ynew) <= acu) {
-                return x;
-              }
-              if(xnew != 0. && xnew != 1.) {
-                break;
-              }
+    for(int outer = 0; outer < 1000; outer++) {
+      // Current CDF value
+      double ynew = regularizedIncBeta(x, alpha, beta, logbeta);
+      if(Double.isInfinite(ynew)) { // Degenerated.
+        return Double.NaN;
+      }
+      // Error gradient
+      ynew = (ynew - p) * FastMath.exp(logbeta + ialpha * FastMath.log(x) + ibeta * FastMath.log1p(-x));
+      if(ynew * y <= 0.) {
+        prevstep = Math.max(Math.abs(stepsize), 3e-308);
+      }
+      // Inner loop: try different step sizes: y * 3^-i
+      double g = 1, xnew = 0.;
+      for(int inner = 0; inner < 1000; inner++) {
+        stepsize = g * ynew;
+        if(Math.abs(stepsize) < prevstep) {
+          xnew = x - stepsize; // Candidate x
+          if(xnew >= 0. && xnew <= 1.) {
+            // Close enough
+            if(prevstep <= acu || Math.abs(ynew) <= acu) {
+              return x;
+            }
+            if(xnew != 0. && xnew != 1.) {
+              break;
             }
           }
-          g /= 3.;
         }
-        // Convergence
-        if(Math.abs(xnew - x) < 1e-15 * x) {
-          return x;
-        }
-        // Iterate with new values
-        x = xnew;
-        y = ynew;
+        g /= 3.;
       }
+      // Convergence
+      if(Math.abs(xnew - x) < 1e-15 * x) {
+        return x;
+      }
+      // Iterate with new values
+      x = xnew;
+      y = ynew;
     }
     // Not converged in Newton-Raphson
     throw new ArithmeticException("Beta quantile computation did not converge.");
