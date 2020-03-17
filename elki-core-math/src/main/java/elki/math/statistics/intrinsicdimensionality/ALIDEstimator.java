@@ -24,6 +24,7 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -56,7 +57,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   public static final ALIDEstimator STATIC = new ALIDEstimator();
 
   @Override
-  public double estimate(KNNSearcher<DBIDRef> knnq, DBIDRef cur, int k) {
+  public double estimate(KNNSearcher<DBIDRef> knnq, DistanceQuery<?> distq, DBIDRef cur, int k) {
     int a = 0;
     double sum = 0;
     final KNNList kl = knnq.getKNN(cur, k);
@@ -84,7 +85,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
   }
 
   @Override
-  public double estimate(RangeSearcher<DBIDRef> rnq, DBIDRef cur, double range) {
+  public double estimate(RangeSearcher<DBIDRef> rnq, DistanceQuery<?> distq, DBIDRef cur, double range) {
     int a = 0;
     double sum = 0;
     final double halfw = 0.5 * range;

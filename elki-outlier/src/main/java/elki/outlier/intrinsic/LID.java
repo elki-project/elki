@@ -29,6 +29,7 @@ import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.query.QueryBuilder;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -121,7 +122,9 @@ public class LID<O> implements OutlierAlgorithm {
    * @return Outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    final KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);
+    QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    DistanceQuery<O> distQ = qb.distanceQuery();
+    KNNSearcher<DBIDRef> knnQ = qb.kNNByDBID(kplus);
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
@@ -130,7 +133,7 @@ public class LID<O> implements OutlierAlgorithm {
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double id = 0.;
       try {
-        id = estimator.estimate(knnQuery, iditer, kplus);
+        id = estimator.estimate(knnQ, distQ, iditer, kplus);
       }
       catch(ArithmeticException e) {
         // pass, use 0.

@@ -23,6 +23,7 @@ package elki.math.statistics.intrinsicdimensionality;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDListIter;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
 import elki.utilities.datastructures.arraylike.DoubleArray;
@@ -84,11 +85,12 @@ public interface IntrinsicDimensionalityEstimator {
    * Estimate from a Reference Point, a KNNSearcher and the neighborhood size k.
    * 
    * @param knnq KNNSearcher
+   * @param distq Distance query for additional distances
    * @param cur reference point
    * @param k neighborhood size
    * @return Estimated intrinsic dimensionality
    */
-  default double estimate(KNNSearcher<DBIDRef> knnq, DBIDRef cur, int k) {
+  default double estimate(KNNSearcher<DBIDRef> knnq, DistanceQuery<?> distq, DBIDRef cur, int k) {
     double[] buf = new double[k];
     int p = 0;
     for(DoubleDBIDListIter it = knnq.getKNN(cur, k).iter(); it.valid() && p < k; it.advance()) {
@@ -107,11 +109,12 @@ public interface IntrinsicDimensionalityEstimator {
    * Estimate from a distance list.
    * 
    * @param rnq RangeSearcher
+   * @param distq Distance query for additional distances
    * @param cur reference point
    * @param range neighborhood radius
    * @return Estimated intrinsic dimensionality
    */
-  default double estimate(RangeSearcher<DBIDRef> rnq, DBIDRef cur, double range) {
+  default double estimate(RangeSearcher<DBIDRef> rnq, DistanceQuery<?> distq, DBIDRef cur, double range) {
     DoubleArray buf = new DoubleArray();
     int p = 0;
     for(DoubleDBIDListIter it = rnq.getRange(cur, range).iter(); it.valid(); it.advance()) {

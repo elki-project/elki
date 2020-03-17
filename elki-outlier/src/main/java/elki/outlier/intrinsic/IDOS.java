@@ -29,6 +29,7 @@ import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -134,13 +135,15 @@ public class IDOS<O> implements OutlierAlgorithm {
     if(stepprog != null) {
       stepprog.beginStep(1, "Precomputing neighborhoods", LOG);
     }
-    KNNSearcher<DBIDRef> knnQ = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(Math.max(k_c, k_r) + 1);
+    QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
+    DistanceQuery<O> distQ = qb.distanceQuery();
+    KNNSearcher<DBIDRef> knnQ = qb.precomputed().kNNByDBID(Math.max(k_c, k_r) + 1);
     DBIDs ids = relation.getDBIDs();
 
     if(stepprog != null) {
       stepprog.beginStep(2, "Computing intrinsic dimensionalities", LOG);
     }
-    DoubleDataStore intDims = computeIDs(ids, knnQ);
+    DoubleDataStore intDims = computeIDs(ids, knnQ, distQ);
     if(stepprog != null) {
       stepprog.beginStep(3, "Computing IDOS scores", LOG);
     }
@@ -159,15 +162,16 @@ public class IDOS<O> implements OutlierAlgorithm {
    *
    * @param ids the DBIDs to process
    * @param knnQ the KNN query
+   * @param distQ the distance query
    * @return The computed intrinsic dimensionalities.
    */
-  protected DoubleDataStore computeIDs(DBIDs ids, KNNSearcher<DBIDRef> knnQ) {
+  protected DoubleDataStore computeIDs(DBIDs ids, KNNSearcher<DBIDRef> knnQ, DistanceQuery<?> distQ) {
     WritableDoubleDataStore intDims = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Intrinsic dimensionality", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double id = 0.;
       try {
-        id = estimator.estimate(knnQ, iter, k_c + 1);
+        id = estimator.estimate(knnQ, distQ, iter, k_c + 1);
       }
       catch(ArithmeticException e) {
         id = 0; // Too many duplicates, etc.

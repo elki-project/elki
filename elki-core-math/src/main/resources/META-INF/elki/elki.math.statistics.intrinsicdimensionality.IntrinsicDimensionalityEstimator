@@ -8,4 +8,5 @@ elki.math.statistics.intrinsicdimensionality.GEDEstimator
 elki.math.statistics.intrinsicdimensionality.PWMEstimator
 elki.math.statistics.intrinsicdimensionality.PWM2Estimator
 elki.math.statistics.intrinsicdimensionality.ALIDEstimator
+elki.math.statistics.intrinsicdimensionality.TightLIDEstimator
 elki.math.statistics.intrinsicdimensionality.EnsembleEstimator
