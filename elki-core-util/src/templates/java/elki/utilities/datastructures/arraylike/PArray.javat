@@ -157,6 +157,24 @@ public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classnam
   }
 
   /**
+   * Swap two values.
+   *
+   * @param p1 First position
+   * @param p2 Second position
+   */
+  public void swap(int p1, int p2) {
+    if(p1 < 0 || p1 > size) {
+      throw new ArrayIndexOutOfBoundsException(p1);
+    }
+    if(p2 < 0 || p2 > size) {
+      throw new ArrayIndexOutOfBoundsException(p2);
+    }
+    ${type} tmp = data[p1];
+    data[p1] = data[p2];
+    data[p2] = tmp;
+  }
+
+  /**
    * Remove a range from the array.
    *
    * @param start Start
