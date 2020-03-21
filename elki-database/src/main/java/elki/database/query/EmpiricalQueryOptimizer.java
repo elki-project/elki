@@ -167,7 +167,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       }
     }
     // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 || maxk <= relation.size()) {
+    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
       return null;
     }
     long freeMemory = getFreeMemory();
@@ -212,7 +212,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       }
     }
     // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 || maxk <= relation.size()) {
+    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
       return null;
     }
     long freeMemory = getFreeMemory();
@@ -304,6 +304,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   private <O> DistancePriorityIndex<O> makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
+    // TODO: make sure there is not matrix already!
     if(matrixIndex == null || relation.size() > 65536) {
       return null;
     }
@@ -333,6 +334,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   private <O> DistancePriorityIndex<O> makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance) {
+    // TODO: make sure there is no such cover tree already!
     if(coverIndex == null || !distance.isMetric()) {
       return null;
     }
@@ -352,6 +354,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance) {
+    // TODO: make sure there is no such k-d-tree already!
     TypeInformation type = relation.getDataTypeInformation();
     if(kdIndex == null // not available
         || !TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type) //

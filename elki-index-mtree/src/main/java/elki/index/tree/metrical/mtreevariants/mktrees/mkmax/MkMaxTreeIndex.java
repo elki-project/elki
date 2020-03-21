@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -120,26 +121,30 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeKNNByObject<>(this, distanceQuery) : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+            new MTreeKNNByObject<>(this, distanceQuery) : null;
   }
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeKNNByDBID<>(this, distanceQuery) : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+            new MTreeKNNByDBID<>(this, distanceQuery) : null;
   }
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeRangeByObject<>(this, distanceQuery) : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+            new MTreeRangeByObject<>(this, distanceQuery) : null;
   }
 
   @Override
   public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
-    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MTreeRangeByDBID<>(this, distanceQuery) : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+            new MTreeRangeByDBID<>(this, distanceQuery) : null;
   }
 
   @Override
@@ -149,7 +154,8 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
 
   @Override
   public RKNNSearcher<DBIDRef> rkNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
-        new MkTreeRKNNQuery<>(this, distanceQuery) : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.getDistance().equals(distanceQuery.getDistance()) ? //
+            new MkTreeRKNNQuery<>(this, distanceQuery) : null;
   }
 }

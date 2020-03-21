@@ -334,7 +334,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
+    return (flags & (QueryBuilder.FLAG_EXACT_ONLY | QueryBuilder.FLAG_PRECOMPUTE)) != 0 ? null : // approximate
         new SpaceFillingKNNQuery(distanceQuery);
   }
 

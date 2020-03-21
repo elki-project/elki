@@ -26,6 +26,7 @@ import java.util.List;
 
 import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -292,38 +293,44 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeRangeObjectSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreeRangeObjectSearcher() : null;
   }
 
   @Override
   public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreeRangeDBIDSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreeRangeDBIDSearcher() : null;
   }
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreePriorityObjectSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreePriorityObjectSearcher() : null;
   }
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreePriorityDBIDSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreePriorityDBIDSearcher() : null;
   }
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreePriorityObjectSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreePriorityObjectSearcher() : null;
   }
 
   @Override
   public PrioritySearcher<DBIDRef> priorityByDBID(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
-    return distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
-        new CoverTreePriorityDBIDSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new CoverTreePriorityDBIDSearcher() : null;
   }
 
   @Override
