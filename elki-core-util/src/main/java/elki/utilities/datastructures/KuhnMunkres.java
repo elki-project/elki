@@ -249,7 +249,7 @@ public class KuhnMunkres {
   }
 
   /**
-   * Remove cost h (if >0) found to be unavoidable.
+   * Remove cost h (if &gt; 0) found to be unavoidable.
    *
    * @param h Cost to remove
    */

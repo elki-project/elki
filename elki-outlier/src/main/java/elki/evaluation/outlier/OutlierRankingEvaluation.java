@@ -88,7 +88,6 @@ public class OutlierRankingEvaluation implements Evaluator {
    * @param res Result to output to
    * @param size Total size
    * @param pos Number of positive hits
-   * @param test Test predicate
    * @param adapter Adapter
    */
   private void evaluate(EvaluationResult res, int size, int pos, Supplier<ScoreEvaluation.Adapter> adapter) {

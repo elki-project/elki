@@ -215,7 +215,7 @@ public class BetaDistribution implements Distribution {
    * @param x Parameter x
    * @param alpha Parameter a
    * @param beta Parameter b
-   * @param logbaB Cached logBeta(alpha, beta)
+   * @param logbab Cached logBeta(alpha, beta)
    * @return Value of the regularized incomplete beta function
    */
   protected static double regularizedIncBeta(double x, double alpha, double beta, double logbab) {
