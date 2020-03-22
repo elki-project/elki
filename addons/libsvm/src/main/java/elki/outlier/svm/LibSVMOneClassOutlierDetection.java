@@ -72,7 +72,7 @@ import libsvm.*;
  * @author Erich Schubert
  * @since 0.7.0
  * 
- * @param V vector type
+ * @param <V> vector type
  */
 @Reference(authors = "B. Schölkopf, J. C. Platt, J. Shawe-Taylor, A. J. Smola, R. C. Williamson", //
     title = "Estimating the support of a high-dimensional distribution", //
