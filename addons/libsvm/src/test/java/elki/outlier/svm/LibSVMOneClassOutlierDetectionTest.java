@@ -39,10 +39,10 @@ public class LibSVMOneClassOutlierDetectionTest extends AbstractOutlierAlgorithm
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
     OutlierResult result = new ELKIBuilder<>(LibSVMOneClassOutlierDetection.class) //
         .with(LibSVMOneClassOutlierDetection.Par.KERNEL_ID, SVMKernel.RBF) //
-        .with(LibSVMOneClassOutlierDetection.Par.NU_ID, .5) //
+        .with(LibSVMOneClassOutlierDetection.Par.NU_ID, .05) //
         .with(LibSVMOneClassOutlierDetection.Par.GAMMA_ID, 1 / 6.) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.9505);
-    assertSingleScore(result, 1293, 0.53315);
+    assertAUC(db, "Noise", result, 0.9512);
+    assertSingleScore(result, 1293, 0.12824);
   }
 }

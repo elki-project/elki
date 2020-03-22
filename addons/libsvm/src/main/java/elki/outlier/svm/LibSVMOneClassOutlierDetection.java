@@ -27,7 +27,7 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
@@ -139,6 +139,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
   public OutlierResult run(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    final DBIDArrayIter iter = ids.iter();
 
     svm.svm_set_print_string_function(LOG_HELPER);
 
@@ -171,7 +172,7 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     }
     // TODO: expose additional parameters to the end user!
     param.coef0 = 1.;
-    param.cache_size = 10000;
+    param.cache_size = 1000;
     param.C = 1; // not used by one-class (nu svm)?
     param.eps = 1e-4; // not used by one-class?
     param.p = 0.1; // not used by one-class?
@@ -186,20 +187,17 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     prob.l = relation.size();
     prob.x = new svm_node[prob.l][];
     prob.y = new double[prob.l];
-    {
-      DBIDIter iter = ids.iter();
-      for(int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
-        V vec = relation.get(iter);
-        // TODO: support compact sparse vectors, too!
-        svm_node[] x = new svm_node[dim];
-        for(int d = 0; d < dim; d++) {
-          x[d] = new svm_node();
-          x[d].index = d + 1;
-          x[d].value = vec.doubleValue(d);
-        }
-        prob.x[i] = x;
-        prob.y[i] = +1;
+    for(iter.seek(0); iter.valid(); iter.advance()) {
+      V vec = relation.get(iter);
+      // TODO: support compact sparse vectors, too!
+      svm_node[] x = new svm_node[dim];
+      for(int d = 0; d < dim; d++) {
+        x[d] = new svm_node();
+        x[d].index = d + 1;
+        x[d].value = vec.doubleValue(d);
       }
+      prob.x[iter.getOffset()] = x;
+      prob.y[iter.getOffset()] = +1;
     }
 
     if(LOG.isVerbose()) {
@@ -217,23 +215,14 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
     }
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
-    {
-      DBIDIter iter = ids.iter();
-      double[] buf = new double[svm.svm_get_nr_class(model)];
-      for(int i = 0; i < prob.l && iter.valid(); iter.advance(), i++) {
-        V vec = relation.get(iter);
-        svm_node[] x = new svm_node[dim];
-        for(int d = 0; d < dim; d++) {
-          x[d] = new svm_node();
-          x[d].index = d + 1;
-          x[d].value = vec.doubleValue(d);
-        }
-        svm.svm_predict_values(model, x, buf);
-        double score = -buf[0]; // / param.gamma; // Heuristic rescaling, sorry.
-        // Unfortunately, libsvm one-class currently yields a binary decision.
-        scores.putDouble(iter, score);
-        mm.put(score);
+    int nextidx = 0;
+    for(iter.seek(0); iter.valid(); iter.advance()) {
+      double score = 0;
+      if(nextidx < model.l && iter.getOffset() == model.sv_indices[nextidx]) {
+        score = model.sv_coef[0][nextidx++];
       }
+      scores.putDouble(iter, score);
+      mm.put(score);
     }
     DoubleRelation scoreResult = new MaterializedDoubleRelation("One-Class SVM Decision", ids, scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.);
