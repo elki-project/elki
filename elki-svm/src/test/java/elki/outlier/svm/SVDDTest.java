@@ -24,25 +24,37 @@ import org.junit.Test;
 
 import elki.database.Database;
 import elki.outlier.AbstractOutlierAlgorithmTest;
-import elki.outlier.svm.LibSVMOneClassOutlierDetection.SVMKernel;
 import elki.result.outlier.OutlierResult;
+import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for libSVM one-class outlier detection.
+ * Unit test for Support Vector Data Description (SVDD) outlier detection.
  *
  * @author Erich Schubert
  */
-public class LibSVMOneClassOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
+public class SVDDTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testOneClassOutlier() {
+  public void testGamma() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
-    OutlierResult result = new ELKIBuilder<>(LibSVMOneClassOutlierDetection.class) //
-        .with(LibSVMOneClassOutlierDetection.Par.KERNEL_ID, SVMKernel.RBF) //
-        .with(LibSVMOneClassOutlierDetection.Par.NU_ID, .05) //
-        .with(LibSVMOneClassOutlierDetection.Par.GAMMA_ID, 1 / 6.) //
+    OutlierResult result = new ELKIBuilder<>(SVDD.class) //
+        .with(SVDD.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
+        .with(SVDD.Par.C_ID, .05) //
+        .with(RadialBasisFunctionKernel.Par.GAMMA_ID, 1 / 6.) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.9567);
-    assertSingleScore(result, 1293, 0.12765);
+    assertAUC(db, "Noise", result, 0.9538);
+    assertSingleScore(result, 1293, 0.0019);
+  }
+
+  @Test
+  public void testSigma() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
+    OutlierResult result = new ELKIBuilder<>(SVDD.class) //
+        .with(SVDD.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
+        .with(SVDD.Par.C_ID, .05) //
+        .with(RadialBasisFunctionKernel.Par.SIGMA_ID, Math.sqrt(3)) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.9538);
+    assertSingleScore(result, 1293, 0.0019);
   }
 }

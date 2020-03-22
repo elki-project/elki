@@ -131,7 +131,7 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
     for(int i = 0, p = 0; i < l; i++) {
       if(nonzero[i]) {
         // model.SV.add(x.get(perm[i]));
-        model.sv_indices[p++] = perm[i] + 1;
+        model.sv_indices[p++] = perm[i];
       }
     }
 

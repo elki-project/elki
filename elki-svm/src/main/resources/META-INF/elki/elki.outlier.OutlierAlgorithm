@@ -1,0 +1,2 @@
+elki.outlier.svm.OCSVM
+elki.outlier.svm.SVDD

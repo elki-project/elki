@@ -33,6 +33,6 @@ public class Model {
   public double[] rho; // constants in decision functions (rho[k*(k-1)/2])
 
   public int[] sv_indices; // sv_indices[0,...,nSV-1] are values in
-  // [1,...,num_traning_data] to indicate SVs in
+  // [0,...,num_traning_data-1] to indicate SVs in
   // the training set
 };

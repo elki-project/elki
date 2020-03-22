@@ -110,13 +110,13 @@ public abstract class AbstractSVR extends AbstractSingleSVM {
     }
     model.l = nSV;
     // model.SV = new ArrayList<Object>(nSV);
-    model.sv_coef[0] = new double[nSV];
+    double[] coef = model.sv_coef[0] = new double[nSV];
     model.sv_indices = new int[nSV];
     for(int i = 0, j = 0; i < x.size(); i++) {
       if(nonzero(si.alpha[i])) {
         // model.SV.add(x.get(i));
-        model.sv_coef[0][j] = si.alpha[i];
-        model.sv_indices[j] = i + 1;
+        coef[j] = si.alpha[i];
+        model.sv_indices[j] = i;
         ++j;
       }
     }
