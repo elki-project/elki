@@ -1,0 +1,6 @@
+description = 'ELKI - Support Vector Machines'
+dependencies {
+  api project(':elki-outlier')
+  api project(':elki-classification')
+  testFixturesApi(testFixtures(project(path: ':elki-outlier')))
+}
