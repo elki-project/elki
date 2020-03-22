@@ -42,18 +42,18 @@ import net.jafama.FastMath;
 @Alias("rbf")
 public class RadialBasisFunctionKernel extends AbstractVectorSimilarity {
   /**
-   * Scaling factor gamma. (= - 1/(2sigma^2))
+   * Scaling factor mgamma = -1/(2 sigma^2).
    */
-  private final double gamma;
+  private final double mgamma;
 
   /**
    * Constructor.
    * 
-   * @param sigma Scaling parameter sigma
+   * @param gamma Scaling parameter gamma
    */
-  public RadialBasisFunctionKernel(double sigma) {
+  public RadialBasisFunctionKernel(double gamma) {
     super();
-    this.gamma = -.5 / (sigma * sigma);
+    this.mgamma = -gamma;
   }
 
   @Override
@@ -64,7 +64,7 @@ public class RadialBasisFunctionKernel extends AbstractVectorSimilarity {
       final double v = o1.doubleValue(i) - o2.doubleValue(i);
       sim += v * v;
     }
-    return FastMath.exp(gamma * sim);
+    return FastMath.exp(mgamma * sim);
   }
 
   /**
@@ -74,25 +74,38 @@ public class RadialBasisFunctionKernel extends AbstractVectorSimilarity {
    */
   public static class Par implements Parameterizer {
     /**
-     * Sigma parameter: standard deviation.
+     * Gamma parameter.
      */
-    public static final OptionID SIGMA_ID = new OptionID("kernel.rbf.sigma", "Standard deviation of the Gaussian RBF kernel.");
+    public static final OptionID GAMMA_ID = new OptionID("kernel.rbf.gamma", "Gamma parameter of the Gaussian RBF kernel (alternative to sigma).");
 
     /**
-     * Sigma parameter
+     * Sigma parameter: standard deviation.
      */
-    protected double sigma = 1.;
+    public static final OptionID SIGMA_ID = new OptionID("kernel.rbf.sigma", "Standard deviation of the Gaussian RBF kernel (alternative to gamma).");
+
+    /**
+     * Gamma scaling parameter
+     */
+    protected double gamma = .5;
 
     @Override
     public void configure(Parameterization config) {
-      new DoubleParameter(SIGMA_ID, 1.) //
+      DoubleParameter g = new DoubleParameter(GAMMA_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .grab(config, x -> sigma = x);
+          .setOptional(true);
+      if(config.grab(g)) {
+        gamma = g.doubleValue();
+      }
+      else {
+        new DoubleParameter(SIGMA_ID, 1.) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .grab(config, x -> gamma = .5 / (x * x));
+      }
     }
 
     @Override
     public RadialBasisFunctionKernel make() {
-      return new RadialBasisFunctionKernel(sigma);
+      return new RadialBasisFunctionKernel(gamma);
     }
   }
 }
