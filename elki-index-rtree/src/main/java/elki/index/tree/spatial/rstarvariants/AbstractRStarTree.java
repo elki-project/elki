@@ -49,7 +49,7 @@ import elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
- *
+ * <p>
  * Implementation Note: The restriction on NumberVector (as opposed to e.g.
  * FeatureVector) is intentional, because we have spatial requirements.
  *
@@ -124,8 +124,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         if(SpatialUtil.intersects(node.getEntry(i), mbr)) {
-          IndexTreePath<E> childSubtree = new IndexTreePath<>(subtree, node.getEntry(i), i);
-          IndexTreePath<E> path = findPathToObject(childSubtree, mbr, id);
+          IndexTreePath<E> path = findPathToObject( //
+              new IndexTreePath<>(subtree, node.getEntry(i), i), mbr, id);
           if(path != null) {
             return path;
           }
@@ -143,54 +143,29 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     settings.getOverflowTreatment().reinitialize();
 
     preInsert(leaf);
-    insertLeafEntry(leaf);
+    insertEntry(leaf, height);
 
     doExtraIntegrityChecks();
   }
 
   /**
-   * Inserts the specified leaf entry into this R*-Tree.
+   * Inserts the specified entry at the specified level into this R*-Tree.
    *
-   * @param entry the leaf entry to be inserted
+   * @param entry the entry to be inserted
+   * @param depth the depth at which the entry is to be inserted
    */
-  protected void insertLeafEntry(E entry) {
+  protected void insertEntry(E entry, int depth) {
     lastInsertedEntry = entry;
-    // choose subtree for insertion
-    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, height, 1);
-    assert height == subtree.getPathCount();
-
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insertion-subtree " + subtree);
-    }
-
-    N parent = getNode(subtree.getEntry());
-    parent.addEntry(entry);
-    writeNode(parent);
-
-    // adjust the tree from subtree to root
-    adjustTree(subtree);
-  }
-
-  /**
-   * Inserts the specified directory entry at the specified level into this
-   * R*-Tree.
-   *
-   * @param entry the directory entry to be inserted
-   * @param depth the depth at which the directory entry is to be inserted
-   */
-  protected void insertDirectoryEntry(E entry, int depth) {
-    lastInsertedEntry = entry;
-    // choose node for insertion of o
+    // choose node for insertion
     IndexTreePath<E> subtree = choosePath(getRootPath(), entry, depth, 1);
     assert depth == subtree.getPathCount();
     if(getLogger().isDebugging()) {
-      getLogger().debugFine("subtree " + subtree);
+      getLogger().debugFine("insert at " + subtree);
     }
 
     N parent = getNode(subtree.getEntry());
     parent.addEntry(entry);
     writeNode(parent);
-
     // adjust the tree from subtree to root
     adjustTree(subtree);
   }
@@ -219,7 +194,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       if(node.isLeaf()) {
         for(int i = 0; i < node.getNumEntries(); i++) {
           settings.getOverflowTreatment().reinitialize(); // Intended?
-          this.insertLeafEntry(node.getEntry(i));
+          this.insertEntry(node.getEntry(i), height);
         }
       }
       else {
@@ -627,12 +602,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       if(log.isDebugging()) {
         log.debug("reinsert " + entry + " at " + (depth + height - oldheight));
       }
-      if(node.isLeaf()) {
-        insertLeafEntry(entry);
-      }
-      else {
-        insertDirectoryEntry(entry, (depth + height - oldheight));
-      }
+      insertEntry(entry, (depth + height - oldheight));
     }
   }
 

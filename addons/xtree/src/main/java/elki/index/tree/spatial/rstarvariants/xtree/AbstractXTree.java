@@ -831,85 +831,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     return split(node, splitAxis);
   }
 
-  // /**
-  // * Compute the centroid of the MBRs or data objects contained by
-  // * <code>node</code>. Was intended to lead to more central re-insert
-  // * distributions, however, this variant rarely avoids a supernode, and
-  // * definitely costs more time.
-  // *
-  // * @param node
-  // * @return
-  // */
-  // protected O compute_centroid(N node) {
-  // double[] d = new double[node.getDimensionality()];
-  // for(int i = 0; i < node.getNumEntries(); i++) {
-  // if(node.isLeaf()) {
-  // double[] values = ((SpatialLeafEntry) node.getEntry(i)).getValues();
-  // for(int j = 0; j < values.length; j++) {
-  // d[j] += values[j];
-  // }
-  // }
-  // else {
-  // ModifiableHyperBoundingBox mbr = new
-  // ModifiableHyperBoundingBox(node.getEntry(i).getMBR());
-  // double[] min = mbr.getMinRef();
-  // double[] max = mbr.getMaxRef();
-  // for(int j = 0; j < min.length; j++) {
-  // d[j] += min[j] + max[j];
-  // }
-  // }
-  // }
-  // for(int j = 0; j < d.length; j++) {
-  // if(node.isLeaf()) {
-  // d[j] /= node.getNumEntries();
-  // }
-  // else {
-  // d[j] /= (node.getNumEntries() * 2);
-  // }
-  // }
-  // // FIXME: make generic (or just hope DoubleVector is fine)
-  // return (O) new DoubleVector(d);
-  // }
-
-  /**
-   * Inserts the specified leaf entry into this R*-Tree.
-   * 
-   * @param entry the leaf entry to be inserted
-   */
   @Override
-  protected void insertLeafEntry(SpatialEntry entry) {
-    // choose subtree for insertion
-    IndexTreePath<SpatialEntry> subtree = choosePath(getRootPath(), entry, height, 1);
-
-    if(getLogger().isDebugging()) {
-      getLogger().debugFine("insertion-subtree " + subtree + "\n");
-    }
-
-    N parent = getNode(subtree.getEntry());
-    parent.addEntry(entry);
-    writeNode(parent);
-
-    // since adjustEntry is expensive, try to avoid unnecessary subtree updates
-    if(!hasOverflow(parent) && // no overflow treatment
-        (isRoot(parent) || // is root
-        // below: no changes in the MBR
-            SpatialUtil.contains(subtree.getEntry(), entry))) {
-      return; // no need to adapt subtree
-    }
-
-    // adjust the tree from subtree to root
-    adjustTree(subtree);
-  }
-
-  /**
-   * Inserts the specified directory entry at the specified level into this
-   * R*-Tree.
-   * 
-   * @param entry the directory entry to be inserted
-   * @param level the level at which the directory entry is to be inserted
-   */
-  @Override
-  protected void insertDirectoryEntry(SpatialEntry entry, int level) {
+  protected void insertEntry(SpatialEntry entry, int level) {
     // choose node for insertion of o
     IndexTreePath<SpatialEntry> subtree = choosePath(getRootPath(), entry, height, level);
     if(getLogger().isDebugging()) {
@@ -922,8 +845,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
     if(!hasOverflow(parent) && // no overflow treatment
-        (isRoot(parent) || // is root
-        // below: no changes in the MBR
+        (isRoot(parent) || // is root or no changes in the MBR:
             SpatialUtil.contains(subtree.getEntry(), entry))) {
       return; // no need to adapt subtree
     }
