@@ -29,10 +29,7 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStore;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNList;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -152,7 +149,7 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
     if(LOG.isVerbose()) {
       LOG.verbose("Performing kNN join");
     }
-    DataStore<KNNList> knns = new KNNJoin<V, DeLiCluNode, DeLiCluEntry>(distance, minpts).run(index, relation.getDBIDs());
+    DataStore<KNNList> knns = new KNNJoin(distance, minpts).run(index, relation.getDBIDs());
     DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -163,7 +160,7 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
     heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue
-    DBID startID = DBIDUtil.deref(ids.iter());
+    DBIDRef startID = ids.iter();
     clusterOrder.add(startID, Double.POSITIVE_INFINITY, null);
     int numHandled = 1;
     index.setHandled(startID, relation.get(startID));

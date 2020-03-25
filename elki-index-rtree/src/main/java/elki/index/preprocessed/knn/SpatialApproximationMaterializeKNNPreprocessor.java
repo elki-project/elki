@@ -32,8 +32,8 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.SpatialIndexTree;
-import elki.index.tree.spatial.SpatialNode;
+import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MeanVariance;
@@ -47,9 +47,9 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
- *
+ * <p>
  * Used for example by {@link elki.outlier.lof.LOF}.
- *
+ * p>
  * TODO correct handling of datastore events
  *
  * @author Erich Schubert
@@ -57,12 +57,11 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
  *
  * @assoc - - - SpatialIndexTree
  *
- * @param <N> the type of spatial nodes in the spatial index
- * @param <E> the type of spatial entries in the spatial index
+ * @param <O> Data type to process
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O> {
+public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger to use
    */
@@ -82,7 +81,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   @Override
   protected void preprocess() {
     DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
-    SpatialIndexTree<N, E> index = getSpatialIndex(relation);
+    AbstractRStarTree<?, ?, ?> index = getSpatialIndex(relation);
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance pagesize = new MeanVariance();
@@ -92,10 +91,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       log.verbose("Approximating nearest neighbor lists to database objects");
     }
 
-    List<E> leaves = index.getLeaves();
+    List<? extends SpatialEntry> leaves = index.getLeaves();
     FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Processing leaf nodes", leaves.size(), log) : null;
-    for(E leaf : leaves) {
-      N node = index.getNode(leaf);
+    for(SpatialEntry leaf : leaves) {
+      AbstractRStarTreeNode<?, ?> node = index.getNode(leaf);
       int size = node.getNumEntries();
       pagesize.put(size);
       if(log.isDebuggingFinest()) {
@@ -140,14 +139,14 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
   }
 
-  protected SpatialIndexTree<N, E> getSpatialIndex(Relation<O> relation) {
-    SpatialIndexTree<N, E> ret = null;
-    for(It<SpatialIndexTree<N, E>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
+  protected AbstractRStarTree<?, ?, ?> getSpatialIndex(Relation<O> relation) {
+    AbstractRStarTree<?, ?, ?> ret = null;
+    for(It<AbstractRStarTree<?, ?, ?>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one spatial index found - this is not supported!");
       }
       // FIXME: check we got the right the representation
-      ret = (SpatialIndexTree<N, E>) iter.get();
+      ret = iter.get();
     }
     if(ret == null) {
       throw new IllegalStateException("No spatial index found!");
@@ -167,11 +166,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    *
    * @stereotype factory
    * @navassoc - creates - SpatialApproximationMaterializeKNNPreprocessor
-   *
-   * @param <N> the type of spatial nodes in the spatial index
-   * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector> {
+  public static class Factory extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector> {
     /**
      * Constructor.
      *
@@ -183,9 +179,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
 
     @Override
-    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instantiate(Relation<NumberVector> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distance, k);
-      return instance;
+    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector> instantiate(Relation<NumberVector> relation) {
+      return new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distance, k);
     }
 
     /**
@@ -193,10 +188,10 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      *
      * @author Erich Schubert
      */
-    public static class Par<N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Par<NumberVector> {
+    public static class Par extends AbstractMaterializeKNNPreprocessor.Factory.Par<NumberVector> {
       @Override
-      public Factory<N, E> make() {
-        return new Factory<>(k, distance);
+      public Factory make() {
+        return new Factory(k, distance);
       }
     }
   }

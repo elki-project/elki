@@ -21,12 +21,10 @@
 package elki.index.preprocessed.knn;
 
 import elki.algorithm.KNNJoin;
-import elki.data.NumberVector;
+import elki.data.spatial.SpatialComparable;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.SpatialPrimitiveDistance;
-import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.logging.Logging;
 
 /**
@@ -37,7 +35,7 @@ import elki.logging.Logging;
  *
  * @param <V> vector type
  */
-public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor<V> {
+public class KNNJoinMaterializeKNNPreprocessor<V extends SpatialComparable> extends AbstractMaterializeKNNPreprocessor<V> {
   /**
    * Logging class.
    */
@@ -56,10 +54,8 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
 
   @Override
   protected void preprocess() {
-    SpatialPrimitiveDistance<? super V> distFunction = (SpatialPrimitiveDistance<? super V>) distance;
-    // Run KNNJoin
-    KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distFunction, k);
-    storage = knnjoin.run(relation, relation.getDBIDs());
+    SpatialPrimitiveDistance<?> distFunction = (SpatialPrimitiveDistance<?>) distance;
+    storage = new KNNJoin(distFunction, k).run(relation, relation.getDBIDs());
   }
 
   @Override
@@ -88,7 +84,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
    *
    * @param <O> The object type
    */
-  public static class Factory<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
+  public static class Factory<O extends SpatialComparable> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
     /**
      * Constructor.
      *
@@ -113,7 +109,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
      *
      * @param <O> Object type
      */
-    public static class Par<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
+    public static class Par<O extends SpatialComparable> extends AbstractMaterializeKNNPreprocessor.Factory.Par<O> {
       @Override
       public KNNJoinMaterializeKNNPreprocessor.Factory<O> make() {
         return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distance);

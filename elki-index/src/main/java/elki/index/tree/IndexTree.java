@@ -172,7 +172,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @param entry the entry representing the node to be returned
    * @return the node that is represented by the specified entry
    */
-  public final N getNode(E entry) {
+  public final N getNode(Entry entry) {
     return getNode(getPageID(entry));
   }
 

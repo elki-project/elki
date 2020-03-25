@@ -23,7 +23,9 @@ package elki.index.tree.spatial.rstarvariants;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 import elki.data.HyperBoundingBox;
 import elki.data.ModifiableHyperBoundingBox;
@@ -31,13 +33,9 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
-import elki.index.tree.BreadthFirstEnumeration;
-import elki.index.tree.IndexTreePath;
-import elki.index.tree.LeafEntry;
-import elki.index.tree.TreeIndexHeader;
+import elki.index.tree.*;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.SpatialIndexTree;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
 import elki.logging.Logging;
@@ -63,8 +61,9 @@ import elki.utilities.exceptions.AbortException;
  *
  * @param <N> Node type
  * @param <E> Entry type
+ * @param <S> Settings container
  */
-public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends RTreeSettings> extends SpatialIndexTree<N, E> {
+public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends RTreeSettings> extends IndexTree<N, E> {
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
@@ -135,7 +134,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     return null;
   }
 
-  @Override
+  /**
+   * Add a new leaf entry to the tree.
+   *
+   * @param leaf Leaf entry
+   */
   public void insertLeaf(E leaf) {
     if(!initialized) {
       initialize(leaf);
@@ -721,7 +724,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
   }
 
-  @Override
+  /**
+   * Returns a list of entries pointing to the leaf entries of this spatial
+   * index.
+   *
+   * @return a list of entries pointing to the leaf entries of this spatial
+   *         index
+   */
   public final List<E> getLeaves() {
     List<E> result = new ArrayList<>();
     if(height == 1) {

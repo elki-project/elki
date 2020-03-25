@@ -139,7 +139,7 @@ public class KNNJoinTest {
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     { // Euclidean
-      Relation<KNNList> result = new KNNJoin<>(EuclideanDistance.STATIC, 2).autorun(db);
+      Relation<KNNList> result = new KNNJoin(EuclideanDistance.STATIC, 2).autorun(db);
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
         meansize.put(result.get(id).size());
@@ -148,7 +148,7 @@ public class KNNJoinTest {
       org.junit.Assert.assertEquals("Euclidean variance 2NN", var2nnEuclid, meansize.getSampleVariance(), 0.00001);
     }
     { // Manhattan
-      Relation<KNNList> result = new KNNJoin<>(ManhattanDistance.STATIC, 2).autorun(db);
+      Relation<KNNList> result = new KNNJoin(ManhattanDistance.STATIC, 2).autorun(db);
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
         meansize.put(result.get(id).size());

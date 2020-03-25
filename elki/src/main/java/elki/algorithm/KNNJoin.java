@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.Algorithm;
-import elki.data.NumberVector;
+import elki.data.spatial.SpatialComparable;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
@@ -38,9 +38,9 @@ import elki.distance.SpatialPrimitiveDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.SpatialIndexTree;
-import elki.index.tree.spatial.SpatialNode;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
+import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
@@ -75,15 +75,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.1
  *
  * @composed - - - Task
- *
- * @param <V> the type of FeatureVector handled by this Algorithm
- * @param <N> the type of node used in the spatial index structure
- * @param <E> the type of entry used in the spatial node
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
 @Priority(Priority.DEFAULT - 10) // Mostly used inside others.
-public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> implements Algorithm {
+public class KNNJoin implements Algorithm {
   /**
    * The logger for this class.
    */
@@ -92,7 +88,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
   /**
    * Distance function used.
    */
-  protected SpatialPrimitiveDistance<? super V> distance;
+  protected SpatialPrimitiveDistance<?> distance;
 
   /**
    * The k parameter.
@@ -105,7 +101,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param distance Distance function
    * @param k k parameter
    */
-  public KNNJoin(SpatialPrimitiveDistance<? super V> distance, int k) {
+  public KNNJoin(SpatialPrimitiveDistance<?> distance, int k) {
     super();
     this.distance = distance;
     this.k = k;
@@ -113,12 +109,12 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(TypeUtil.SPATIAL_OBJECT);
   }
 
   @Override
   public Relation<KNNList> autorun(Database database) {
-    return run(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
+    return run(database.getRelation(TypeUtil.SPATIAL_OBJECT));
   }
 
   /**
@@ -127,7 +123,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param relation Relation to process
    * @return result
    */
-  public Relation<KNNList> run(Relation<V> relation) {
+  public Relation<KNNList> run(Relation<? extends SpatialComparable> relation) {
     DBIDs ids = relation.getDBIDs();
     WritableDataStore<KNNList> knnLists = run(relation, ids);
     // Wrap as relation:
@@ -142,12 +138,12 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param ids Object IDs
    * @return Data store
    */
-  public WritableDataStore<KNNList> run(Relation<V> relation, DBIDs ids) {
-    It<SpatialIndexTree<N, E>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(SpatialIndexTree.class);
+  public WritableDataStore<KNNList> run(Relation<? extends SpatialComparable> relation, DBIDs ids) {
+    It<AbstractRStarTree<?, ?, ?>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class);
     if(!indexes.valid()) {
       throw new MissingPrerequisitesException("KNNJoin found no spatial indexes, expected exactly one.");
     }
-    SpatialIndexTree<N, E> index = indexes.get();
+    AbstractRStarTree<?, ?, ?> index = indexes.get();
     if(indexes.advance().valid()) {
       throw new MissingPrerequisitesException("KNNJoin found more than one spatial indexes, expected exactly one.");
     }
@@ -162,9 +158,9 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param ids Object IDs
    * @return Data store
    */
-  public WritableDataStore<KNNList> run(SpatialIndexTree<N, E> index, DBIDs ids) {
+  public WritableDataStore<KNNList> run(AbstractRStarTree<?, ?, ?> index, DBIDs ids) {
     // data pages
-    List<E> ps_candidates = new ArrayList<>(index.getLeaves());
+    List<? extends SpatialEntry> ps_candidates = index.getLeaves();
     // knn heaps
     List<List<KNNHeap>> heaps = new ArrayList<>(ps_candidates.size());
 
@@ -181,14 +177,14 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     }
     FiniteProgress mprogress = LOG.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, LOG) : null;
     for(int i = 0; i < ps_candidates.size(); i++) {
-      E pr_entry = ps_candidates.get(i);
-      N pr = index.getNode(pr_entry);
+      SpatialEntry pr_entry = ps_candidates.get(i);
+      AbstractRStarTreeNode<?, ?> pr = index.getNode(pr_entry);
       List<KNNHeap> pr_heaps = heaps.get(i);
       double pr_knn_distance = computeStopDistance(pr_heaps);
 
       for(int j = i + 1; j < ps_candidates.size(); j++) {
-        E ps_entry = ps_candidates.get(j);
-        N ps = index.getNode(ps_entry);
+        SpatialEntry ps_entry = ps_candidates.get(j);
+        AbstractRStarTreeNode<?, ?> ps = index.getNode(ps_entry);
         List<KNNHeap> ps_heaps = heaps.get(j);
         double ps_knn_distance = computeStopDistance(ps_heaps);
         double minDist = distance.minDist(pr_entry, ps_entry);
@@ -216,8 +212,8 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
       boolean dor = task.mindist <= pr_knn_distance;
       boolean dos = task.mindist <= ps_knn_distance;
       if(dor || dos) {
-        N pr = index.getNode(ps_candidates.get(task.i));
-        N ps = index.getNode(ps_candidates.get(task.j));
+        AbstractRStarTreeNode<?, ?> pr = index.getNode(ps_candidates.get(task.i));
+        AbstractRStarTreeNode<?, ?> ps = index.getNode(ps_candidates.get(task.j));
         if(dor && dos) {
           processDataPages(distance, pr_heaps, ps_heaps, pr, ps);
         }
@@ -237,7 +233,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     WritableDataStore<KNNList> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
     FiniteProgress pageprog = LOG.isVerbose() ? new FiniteProgress("Number of processed data pages", ps_candidates.size(), LOG) : null;
     for(int i = 0; i < ps_candidates.size(); i++) {
-      N pr = index.getNode(ps_candidates.get(i));
+      AbstractRStarTreeNode<?, ?> pr = index.getNode(ps_candidates.get(i));
       List<KNNHeap> pr_heaps = heaps.get(i);
 
       // Finalize lists
@@ -259,7 +255,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param pr Node to initialize for
    * @return List of heaps
    */
-  private List<KNNHeap> initHeaps(SpatialPrimitiveDistance<? super V> distFunction, N pr) {
+  private List<KNNHeap> initHeaps(SpatialPrimitiveDistance<?> distFunction, AbstractRStarTreeNode<?, ?> pr) {
     List<KNNHeap> pr_heaps = new ArrayList<>(pr.getNumEntries());
     // Create for each data object a knn heap
     for(int j = 0; j < pr.getNumEntries(); j++) {
@@ -281,7 +277,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
    */
-  private void processDataPages(SpatialPrimitiveDistance<? super V> df, List<KNNHeap> pr_heaps, List<KNNHeap> ps_heaps, N pr, N ps) {
+  private void processDataPages(SpatialPrimitiveDistance<?> df, List<KNNHeap> pr_heaps, List<KNNHeap> ps_heaps, AbstractRStarTreeNode<?, ?> pr, AbstractRStarTreeNode<?, ?> ps) {
     // Compare pairwise
     for(int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
@@ -312,10 +308,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
       double kdist = knnList.getKNNDistance();
       pr_knn_distance = (kdist < pr_knn_distance) ? pr_knn_distance : kdist;
     }
-    if(pr_knn_distance != pr_knn_distance) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return pr_knn_distance;
+    return pr_knn_distance != pr_knn_distance ? Double.POSITIVE_INFINITY : pr_knn_distance;
   }
 
   /**
@@ -364,7 +357,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned, must be
      * an integer greater than 0. Default value: 1.
@@ -379,11 +372,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     /**
      * The distance function to use.
      */
-    protected SpatialPrimitiveDistance<? super V> distance;
+    protected SpatialPrimitiveDistance<?> distance;
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<SpatialPrimitiveDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
+      new ObjectParameter<SpatialPrimitiveDistance<?>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, SpatialPrimitiveDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
       new IntParameter(K_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -391,8 +384,8 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     }
 
     @Override
-    public KNNJoin<V, N, E> make() {
-      return new KNNJoin<>(distance, k);
+    public KNNJoin make() {
+      return new KNNJoin(distance, k);
     }
   }
 }

@@ -31,9 +31,9 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.index.tree.AbstractNode;
 import elki.index.tree.Entry;
+import elki.index.tree.Node;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.SpatialNode;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
 import elki.logging.LoggingConfiguration;
 
@@ -41,11 +41,13 @@ import elki.logging.LoggingConfiguration;
  * Abstract superclass for nodes in a R*-Tree.
  *
  * @author Elke Achtert
+ *
  * @since 0.1
+ *
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<E> implements SpatialNode<N, E> {
+public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<E> implements Node<E> {
   /**
    * Empty constructor for Externalizable interface.
    */

@@ -88,9 +88,9 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
    * @param obj the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
-  public synchronized IndexTreePath<DeLiCluEntry> setHandled(DBID id, O obj) {
+  public synchronized IndexTreePath<DeLiCluEntry> setHandled(DBIDRef id, O obj) {
     if(LOG.isDebugging()) {
-      LOG.debugFine("setHandled " + id + ", " + obj + "\n");
+      LOG.debugFine("setHandled " + DBIDUtil.toString(id) + ", " + obj + "\n");
     }
 
     // find the leaf node containing o
@@ -118,7 +118,6 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
       parentEntry.setHasUnhandled(hasUnhandled);
       parentEntry.setHasHandled(hasHandled);
     }
-
     return pathToObject;
   }
 

@@ -32,8 +32,8 @@ import elki.evaluation.Evaluator;
 import elki.index.tree.Node;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
-import elki.index.tree.spatial.SpatialIndexTree;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
+import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.math.MeanVariance;
 import elki.result.CollectionResult;
 import elki.result.Metadata;
@@ -60,12 +60,12 @@ public class IndexPurity implements Evaluator {
   @Override
   public void processNewResult(Object newResult) {
     Database database = ResultUtil.findDatabase(newResult);
-    final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, SpatialIndexTree.class);
+    final ArrayList<AbstractRStarTree<?, ?, ?>> indexes = ResultUtil.filterResults(newResult, AbstractRStarTree.class);
     if(indexes == null || indexes.isEmpty()) {
       return;
     }
     Relation<String> lblrel = DatabaseUtil.guessLabelRepresentation(database);
-    for(SpatialIndexTree<?, ?> index : indexes) {
+    for(AbstractRStarTree<?, ?, ?> index : indexes) {
       List<? extends SpatialEntry> leaves = index.getLeaves();
       MeanVariance mv = new MeanVariance();
       for(SpatialEntry e : leaves) {
@@ -76,8 +76,7 @@ public class IndexPurity implements Evaluator {
         Object2IntOpenHashMap<String> map = new Object2IntOpenHashMap<>(total);
         for(int i = 0; i < total; i++) {
           DBID id = ((SpatialPointLeafEntry) n.getEntry(i)).getDBID();
-          String label = lblrel.get(id);
-          map.addTo(label, 1);
+          map.addTo(lblrel.get(id), 1);
         }
         double gini = 0.0;
         for(IntIterator it = map.values().iterator(); it.hasNext();) {
