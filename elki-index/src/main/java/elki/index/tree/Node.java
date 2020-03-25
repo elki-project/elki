@@ -68,27 +68,14 @@ public interface Node<E extends Entry> extends Page {
   E getEntry(int index);
 
   /**
-   * Adds a new leaf entry to this node's children and returns the index of the
-   * entry in this node's children array. An UnsupportedOperationException will
-   * be thrown if the entry is not a leaf entry or this node is not a leaf node.
-   * 
-   * @param entry the leaf entry to be added
+   * Adds a new entry to this node's children and returns the index of
+   * the entry in the children array. An IllegalStateException will be thrown
+   * when inserting leaf entries into directory nodes or conversely.
+   *
+   * @param entry the entry to be added
    * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a leaf entry or this
-   *         node is not a leaf node
+   * @throws IllegalStateException when inserting leaf entries into non-leaf
+   *         nodes or conversely
    */
-  int addLeafEntry(E entry);
-
-  /**
-   * Adds a new directory entry to this node's children and returns the index of
-   * the entry in this node's children array. An UnsupportedOperationException
-   * will be thrown if the entry is not a directory entry or this node is not a
-   * directory node.
-   * 
-   * @param entry the directory entry to be added
-   * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a directory entry or
-   *         this node is not a directory node
-   */
-  int addDirectoryEntry(E entry);
+  int addEntry(E entry);
 }

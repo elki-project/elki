@@ -886,7 +886,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     }
 
     N parent = getNode(subtree.getEntry());
-    parent.addLeafEntry(entry);
+    parent.addEntry(entry);
     writeNode(parent);
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
@@ -917,7 +917,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     }
 
     N parent = getNode(subtree.getEntry());
-    parent.addDirectoryEntry(entry);
+    parent.addEntry(entry);
     writeNode(parent);
 
     // since adjustEntry is expensive, try to avoid unnecessary subtree updates
@@ -989,7 +989,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
               getLogger().debugFine("parent " + parent);
             }
             SpatialEntry newEntry = createNewDirectoryEntry(split);
-            parent.addDirectoryEntry(newEntry);
+            parent.addEntry(newEntry);
 
             // The below variant does not work in the persistent version
             // E oldEntry = subtree.getEntry();
@@ -1095,8 +1095,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     catch(CloneNotSupportedException e) {
       throw new RuntimeException("Clone of a split history should not throw an Exception", e);
     }
-    root.addDirectoryEntry(oldRootEntry);
-    root.addDirectoryEntry(newNodeEntry);
+    root.addEntry(oldRootEntry);
+    root.addEntry(newNodeEntry);
 
     writeNode(root);
     writeNode(oldRoot);

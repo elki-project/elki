@@ -152,47 +152,14 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     return (isLeaf ? "LeafNode " : "DirNode ") + getPageID();
   }
 
-  /**
-   * Adds a new leaf entry to this node's children and returns the index of the
-   * entry in the children array. An IllegalStateException will be thrown if the
-   * entry is not a leaf entry or this node is not a leaf node.
-   *
-   * @param entry the leaf entry to be added
-   * @return the index of the entry in this node's children array
-   */
   @Override
-  public final int addLeafEntry(E entry) {
-    // entry is not a leaf entry
-    if(!(entry instanceof LeafEntry)) {
-      throw new IllegalStateException("Entry is not a leaf entry!");
+  public final int addEntry(E entry) {
+    if((entry instanceof LeafEntry) != isLeaf()) {
+      throw new IllegalStateException("Inserting " + (entry instanceof LeafEntry ? "leaf" : "directory") //
+          + " entry into a " + (isLeaf() ? "leaf" : "directory") + "node.");
     }
-    // this is a not a leaf node
-    if(!isLeaf()) {
-      throw new IllegalStateException("Node is not a leaf node!");
-    }
-    // leaf node
-    return addEntry(entry);
-  }
-
-  /**
-   * Adds a new directory entry to this node's children and returns the index of
-   * the entry in the children array. An IllegalStateException will be thrown if
-   * the entry is not a directory entry or this node is not a directory node.
-   *
-   * @param entry the directory entry to be added
-   * @return the index of the entry in this node's children array
-   */
-  @Override
-  public final int addDirectoryEntry(E entry) {
-    // entry is not a directory entry
-    if(entry instanceof LeafEntry) {
-      throw new IllegalStateException("Entry is not a directory entry!");
-    }
-    // this is a not a directory node
-    if(isLeaf()) {
-      throw new IllegalStateException("Node is not a directory node!");
-    }
-    return addEntry(entry);
+    entries[numEntries] = entry;
+    return numEntries++;
   }
 
   /**
@@ -245,18 +212,6 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       }
     }
     return result;
-  }
-
-  /**
-   * Adds the specified entry to the entries array and increases the numEntries
-   * counter.
-   *
-   * @param entry the entry to be added
-   * @return the current number of entries
-   */
-  private int addEntry(E entry) {
-    entries[numEntries++] = entry;
-    return numEntries - 1;
   }
 
   /**

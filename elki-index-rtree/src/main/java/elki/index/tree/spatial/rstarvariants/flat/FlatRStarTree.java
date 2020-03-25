@@ -71,8 +71,7 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     dirCapacity = nextPageID;
     root = createNewDirectoryNode();
     for(int i = 1; i < nextPageID; i++) {
-      FlatRStarTreeNode node = getNode(i);
-      root.addDirectoryEntry(createNewDirectoryEntry(node));
+      root.addEntry(createNewDirectoryEntry(getNode(i)));
     }
 
     if(LOG.isDebugging()) {
@@ -112,7 +111,7 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
 
     root.increaseEntries(nodes.size());
     for(SpatialEntry entry : nodes) {
-      root.addDirectoryEntry(entry);
+      root.addEntry(entry);
     }
     ((SpatialDirectoryEntry) getRootEntry()).setMBR(root.computeMBR());
     writeNode(root);
@@ -135,7 +134,7 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     writeNode(leaf);
     assert leaf.getPageID() != root.getPageID() : "Page numbering inconsistent!?!";
     ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(new double[exampleLeaf.getDimensionality()], new double[exampleLeaf.getDimensionality()]);
-    root.addDirectoryEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
+    root.addEntry(new SpatialDirectoryEntry(leaf.getPageID(), mbr));
     writeNode(root);
 
     setHeight(2);

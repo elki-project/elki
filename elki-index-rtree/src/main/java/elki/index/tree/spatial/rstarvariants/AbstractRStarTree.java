@@ -164,7 +164,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N parent = getNode(subtree.getEntry());
-    parent.addLeafEntry(entry);
+    parent.addEntry(entry);
     writeNode(parent);
 
     // adjust the tree from subtree to root
@@ -188,7 +188,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N parent = getNode(subtree.getEntry());
-    parent.addDirectoryEntry(entry);
+    parent.addEntry(entry);
     writeNode(parent);
 
     // adjust the tree from subtree to root
@@ -347,7 +347,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
       // insert data
       for(E o : partition) {
-        leafNode.addLeafEntry(o);
+        leafNode.addEntry(o);
       }
       // write to file
       writeNode(leafNode);
@@ -447,8 +447,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     root.setPageID(getRootID());
-    root.addDirectoryEntry(createNewDirectoryEntry(oldRoot));
-    root.addDirectoryEntry(createNewDirectoryEntry(newNode));
+    root.addEntry(createNewDirectoryEntry(oldRoot));
+    root.addEntry(createNewDirectoryEntry(newNode));
 
     writeNode(root);
     writeNode(oldRoot);
@@ -671,7 +671,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
           if(log.isDebugging()) {
             log.debugFine("parent " + parent);
           }
-          parent.addDirectoryEntry(createNewDirectoryEntry(split));
+          parent.addEntry(createNewDirectoryEntry(split));
 
           // adjust the entry representing the (old) node, that has
           // been split
@@ -740,20 +740,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       if(hasUnderflow(node) && node.getNumEntries() == 1 && !node.isLeaf()) {
         N child = getNode(node.getEntry(0));
-        final N newRoot;
-        if(child.isLeaf()) {
-          newRoot = createNewLeafNode();
-          newRoot.setPageID(getRootID());
-          for(int i = 0; i < child.getNumEntries(); i++) {
-            newRoot.addLeafEntry(child.getEntry(i));
-          }
-        }
-        else {
-          newRoot = createNewDirectoryNode();
-          newRoot.setPageID(getRootID());
-          for(int i = 0; i < child.getNumEntries(); i++) {
-            newRoot.addDirectoryEntry(child.getEntry(i));
-          }
+        N newRoot = child.isLeaf() ? createNewLeafNode() : createNewDirectoryNode();
+        newRoot.setPageID(getRootID());
+        for(int i = 0; i < child.getNumEntries(); i++) {
+          newRoot.addEntry(child.getEntry(i));
         }
         writeNode(newRoot);
         height--;

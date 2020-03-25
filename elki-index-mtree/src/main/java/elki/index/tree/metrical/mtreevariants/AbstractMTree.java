@@ -179,7 +179,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
     // get parent node
     N parent = getNode(parentEntry);
-    parent.addLeafEntry(entry);
+    parent.addEntry(entry);
     writeNode(parent);
 
     // adjust the tree from subtree to root
@@ -334,7 +334,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
         double parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
         // logger.warning("parent: "+parent.toString()+" split: " +
         // splitNode.toString()+ " dist:"+parentDistance2);
-        parent.addDirectoryEntry(createNewDirectoryEntry(newNode, assignments.getSecondRoutingObject(), parentDistance2));
+        parent.addEntry(createNewDirectoryEntry(newNode, assignments.getSecondRoutingObject(), parentDistance2));
 
         // adjust the entry representing the (old) node, that has been split
         double parentDistance1 = distance(parentEntry.getRoutingObjectID(), assignments.getFirstRoutingObject());
@@ -407,19 +407,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     root.setPageID(getRootID());
-    // FIXME: doesn't the root by definition not have a routing object?
-    // D parentDistance1 = distance(getRootEntry().getRoutingObjectID(),
-    // firstRoutingObjectID);
-    // D parentDistance2 = distance(getRootEntry().getRoutingObjectID(),
-    // secondRoutingObjectID);
-    E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, 0.);
-    E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, 0.);
-    root.addDirectoryEntry(oldRootEntry);
-    root.addDirectoryEntry(newRootEntry);
-
-    // logger.warning("new root: " + getRootEntry().toString() + " childs: " +
-    // oldRootEntry.toString() + "," + newRootEntry.toString() + " dists: " +
-    // parentDistance1 + ", " + parentDistance2);
+    root.addEntry(createNewDirectoryEntry(oldRoot, firstRoutingObjectID, 0.));
+    root.addEntry(createNewDirectoryEntry(newNode, secondRoutingObjectID, 0.));
 
     writeNode(root);
     writeNode(oldRoot);
@@ -427,7 +416,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     if(getLogger().isDebugging()) {
       getLogger().debugFine("Create new Root: ID=" + root.getPageID() + "\nchild1 " + oldRoot + "\nchild2 " + newNode);
     }
-
     return new IndexTreePath<>(null, getRootEntry(), -1);
   }
 
@@ -456,7 +444,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
   public int getHeight() {
     int levels = 0;
     N node = getRoot();
-
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {
         node = getNode(node.getEntry(0));
