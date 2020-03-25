@@ -20,6 +20,7 @@
  */
 package elki.application;
 
+import java.awt.GraphicsEnvironment;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -52,9 +53,11 @@ public final class ELKILauncher {
   static {
     Class<? extends AbstractApplication> clz = KDDCLIApplication.class;
     try {
-      @SuppressWarnings("unchecked")
-      Class<? extends AbstractApplication> minigui = (Class<? extends AbstractApplication>) Class.forName("elki.gui.minigui.MiniGUI");
-      clz = minigui;
+      if(!GraphicsEnvironment.isHeadless()) {
+        @SuppressWarnings("unchecked")
+        Class<? extends AbstractApplication> minigui = (Class<? extends AbstractApplication>) Class.forName("elki.gui.minigui.MiniGUI");
+        clz = minigui;
+      }
     }
     catch(ClassNotFoundException e) {
       // MiniGUI probably not included.
