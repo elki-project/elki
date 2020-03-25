@@ -15,64 +15,70 @@
 <h1>Some examples for completely parameterized calls of ELKI</h1>
 <p>Here, we provide just some examples of usage of ELKI for some algorithms. Hopefully, from here you can easily extend to other algorithms and data sets.
 Throughout all examples, we assume you have the executable jar-archive <code>elki.jar</code> in some directory locally reachable from your console as <code>mypath</code>,
-and downloaded the example data file from (<a href="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt">http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt</a>)
-to a location reachable from your console as <code>mydata/exampledata.txt</code>.
+and downloaded the example data file from (<a href="https://github.com/elki-project/elki/blob/master/data/synthetic/Vorlesung/mouse.csv">https://github.com/elki-project/elki/blob/master/data/synthetic/Vorlesung/mouse.csv</a>)
+to a location reachable from your console as <code>mydata/mouse.csv</code>.
 </p>
 
 <h2>Example: DBSCAN</h2>
 <h3>Basic Call:</h3>
 <p>
 <pre>
-java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10
+java -jar mypath/elki.jar KDDCLIApplication -algorithm clustering.dbscan.DBSCAN -dbc.in mydata/mouse.csv -dbscan.epsilon 0.05 -dbscan.minpts 10
 </pre>
-This requests the algorithm DBSCAN to cluster the data set using DBSCAN parameters <code>epsilon=20</code> and <code>minpts=10</code>. The clustering result is just printed to the console.
+This requests the algorithm DBSCAN to cluster the data set using DBSCAN parameters <code>epsilon=0.05</code> and <code>minpts=10</code>. The clustering result is just printed to the console by default.
 </p>
 
 <h3>Call with specified output file/directory:</h3>
 <p>
 <pre>
-java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10 -out myresults/DBSCANeps20min10
+java -jar mypath/elki.jar KDDCLIApplication -algorithm clustering.dbscan.DBSCAN -dbc.in mydata/mouse.csv -dbscan.epsilon 0.05 -dbscan.minpts 10 -out myresults/DBSCANeps02min10
 </pre>
 Same as before but, this time, a directory for collecting the output is explicitly specified.
-This results in one file per cluster as found by DBSCAN within the specified directory <code>myresults/DBSCANeps20min10</code>.
+This results in one file per cluster as found by DBSCAN within the specified directory <code>myresults/DBSCANeps005min10</code>.
 Each file starts with providing metadata information and information concerning the used parameters before listing the data points contained in the cluster.
 For example, in this case, the file for cluster 0 starts like:
 <pre>
-###############################################################
 # Settings:
-# de.lmu.ifi.dbs.elki.workflow.InputStep
+# elki.workflow.InputStep
 # -db StaticArrayDatabase
-#·
-# de.lmu.ifi.dbs.elki.database.StaticArrayDatabase
+# 
+# elki.database.StaticArrayDatabase
 # -dbc FileBasedDatabaseConnection
-#·
-# de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection
-# -dbc.in mydata/exampledata.txt
-# -dbc.parser DoubleVectorLabelParser
-#·
-# de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser
-# -parser.colsep \s+
-# -parser.quote "
+# 
+# elki.datasource.FileBasedDatabaseConnection
+# -dbc.in mypath/mouse.csv
+# -dbc.parser NumberVectorLabelParser
+# 
+# elki.datasource.parser.CSVReaderFormat
+# -parser.colsep \s*[,;\s]\s*
+# -parser.quote "'
+# -string.comment ^\s*(#|//|;).*$
+# 
+# elki.datasource.parser.NumberVectorLabelParser
 # -parser.labelIndices [unset]
-#·
-# de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection
+# -parser.vector-type DoubleVector
+# 
+# elki.datasource.FileBasedDatabaseConnection
 # -dbc.filter [unset]
-#·
-# de.lmu.ifi.dbs.elki.database.StaticArrayDatabase
+# 
+# elki.database.StaticArrayDatabase
 # -db.index [unset]
-#·
-# de.lmu.ifi.dbs.elki.workflow.AlgorithmStep
-# -algorithm clustering.DBSCAN
-#·
-# de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
-# -algorithm.distancefunction EuclideanDistanceFunction
-# -dbscan.epsilon 20.0
+# 
+# elki.workflow.AlgorithmStep
+# -time false
+# -algorithm clustering.dbscan.DBSCAN
+# 
+# elki.clustering.dbscan.DBSCAN
+# -algorithm.distancefunction minkowski.EuclideanDistance
+# -dbscan.epsilon 0.05
 # -dbscan.minpts 10
-#·
-# de.lmu.ifi.dbs.elki.workflow.EvaluationStep
-# -evaluator [unset]
-###############################################################
+# 
+# elki.workflow.EvaluationStep
+# -evaluator AutomaticEvaluation
 # Cluster: Cluster 0
+# Cluster name: Cluster
+# Cluster noise flag: false
+# Cluster size: 368
 </pre>
 <p>Most of the parameters shown here are set implicitly with default values or not used
 (<code>[unset]</code> or <code>false</code>).</p>
@@ -83,17 +89,17 @@ options not affecting the algorithm result such as <code>-verbose</code> which o
 <p>Unused was also the possibility of normalizing the data. Normalization is available as a filter for the input step,
 using the <code>-dbc.filter</code> option and is done during loading the data set.
 As option value, a comma separated list of filter classes is expected. ELKI provides for example the
-<a href="de/lmu/ifi/dbs/elki/datasource/filter/AttributeWiseMinMaxNormalization.html">AttributeWiseMinMaxNormalization</a> as a possibility.
+<a href="elki/datasource/filter/normalization/columnwise/AttributeWiseMinMaxNormalization.html">AttributeWiseMinMaxNormalization</a> as a possibility.
 Other normalization procedures could easily be provided by any user by implementing the interface
-<a href="de/lmu/ifi/dbs/elki/datasource/filter/ObjectFilter.html">de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter</a>.
+<a href="elki/datasource/filter/ObjectFilter.html">elki.datasource.filter.ObjectFilter</a>.
 Note that the resulting files will contain the normalized data vectors, since
-ELKI by default doesn't keep a copy of the denormalized data.
+ELKI by default does not keep a copy of the denormalized data to conserve memory.
 </p>
 
 <h3>Example call requesting time and verbose messages and using a normalization:</h3>
 <p>
 <pre>
-java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbc.filter AttributeWiseMinMaxNormalization -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -evaluator paircounting.EvaluatePairCountingFMeasure -verbose -enableDebug de.lmu.ifi.dbs.elki.workflow.AlgorithmStep
+java -jar mypath/elki.jar KDDCLIApplication -algorithm clustering.dbscan.DBSCAN -dbc.in mydata/mouse.csv -dbc.filter AttributeWiseMinMaxNormalization -dbscan.epsilon 0.05 -dbscan.minpts 10 -out myresults/DBSCANeps005min10 -evaluator paircounting.EvaluatePairCountingFMeasure -verbose -enableDebug elki.workflow.AlgorithmStep
 </pre>
 Note that the value for <code>dbscan.epsilon</code> is decreased considerably to suit the normalized data
 (the AttributeWiseMinMaxNormalization normalizes all attribute values to the range <code>[0:1]</code>).
@@ -102,41 +108,41 @@ We also added an evaluation module for the clustering, which will output the pai
 </p>
 
 <p>For notes about fair benchmarking with ELKI, please read the comments on
-<a href="http://elki.dbs.ifi.lmu.de/wiki/Benchmarking">Benchmarking in the
-Wiki</a>.  Do not benchmark ELKI against other software, since there is an
+<a href="https://elki-project.github.io/benchmarking">Benchmarking</a> on our web page.
+Do not blindly benchmark ELKI against other software, since there is an
 obvious cost in the generality of the implementation, and you for example do
 not want to benchmark Java versus C. To benchmark the performance of actual
-algorithms, you <em>must</em> implement them within the ELKI framework to get
-sound results.</p>
+algorithms (and not implementations), you <em>need</em> to implement them within
+the same framework to get sound results.</p>
 
 <h2>Different algorithms</h2>
 To become acquainted with an unknown algorithm, try the option <code>-description</code>. For example, here, we request a description of how to use
-the algorithm <a href="de/lmu/ifi/dbs/elki/algorithm/clustering/correlation/FourC.html">clustering.correlation.FourC</a>:
+the algorithm <a href="elki/clustering/correlation/FourC.html">clustering.correlation.FourC</a>:
 <pre>
-java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -description de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC
+java -cp mypath/elki.jar elki.application.KDDCLIApplication -description elki.clustering.correlation.FourC
 </pre>
 The output describes the parameters available for FourC with default values. Setting for example a different distance function may in turn produce addtional parameters.</p>
 
 <p>Note that we here gave the full name of the class <code>FourC</code> (i.e., including the complete package name),
-while we ommitted the prefix <code>de.lmu.ifi.dbs.elki.algorithm.</code> for <code>clustering.DBSCAN</code> above.
+while we ommitted the prefix <code>elki.</code> for <code>clustering.dbscan.DBSCAN</code> above.
 The reason for this difference is as follows:</p>
 <p>If as a parameter value a class name is expected, usually also a restriction class is known,
 i.e., an interface or a class which must be implemented or extended by the specified parameter value.
 For example,
 <ul>
 	<li>the restriction class for the parameter value of <code>-algorithm</code> is
-<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.</li>
+<a href="elki/Algorithm.html">elki.Algorithm</a>.</li>
 	<li>the restriction class for the parameter value of <code>-algorithm.distancefunction</code> is
-<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.distance.distancefunction</a>.</li>
+<a href="elki/distance/Distance.html">elki.distance.Distance</a>.</li>
     <li>the restriction class for the parameter value of <code>-description</code> is <code>java.lang.Object</code>.</li>
 </ul>
 If the specified class cannot be initialized by the given name, the initialization tries the same class name using as prefix the
 package of the restriction class. Thus,
 <ul>
-	<li>the value for parameter <code>-algorithm</code>, <code>clustering.DBSCAN</code>
+	<li>the value for parameter <code>-algorithm</code>, <code>clustering.dbscan.DBSCAN</code>
 		(which is not a valid class name per se),
 		will be automatically completed with the prefix
-		<code>de.lmu.ifi.dbs.elki.algorithm.</code>,</li>
+		<code>elki.</code>,</li>
 	<li>the corresponding incomplete value for parameter <code>-description</code>,
 		<code>clustering.correlation.FourC</code>,
 		however, would be automatically completed with the prefix
@@ -152,78 +158,202 @@ On the other hand, would we like to use FourC as algorithm, as parameter value f
 are listed in the parameter description. See, e.g., the description of <code>-algorithm</code> (as provided after using <code>-description</code> as above or using <code>-help</code>):
 <pre>
 -algorithm &lt;object_1|class_1,...,object_n|class_n&gt;
-   Algorithm to run.
-   Implementing de.lmu.ifi.dbs.elki.algorithm.Algorithm
-   Known classes (default package de.lmu.ifi.dbs.elki.algorithm.):
-   -&gt; NullAlgorithm
-   -&gt; clustering.DBSCAN
-   -&gt; clustering.DeLiClu
-   -&gt; clustering.EM
-   -&gt; clustering.KMeans
-   -&gt; clustering.OPTICSXi
-   -&gt; clustering.OPTICS
-   -&gt; clustering.SLINK
-   -&gt; clustering.SNNClustering
-   -&gt; clustering.correlation.CASH
-   -&gt; clustering.correlation.COPAC
-   -&gt; clustering.correlation.ERiC
-   -&gt; clustering.correlation.FourC
-   -&gt; clustering.correlation.HiCO
-   -&gt; clustering.correlation.ORCLUS
-   -&gt; clustering.subspace.CLIQUE
-   -&gt; clustering.subspace.DiSH
-   -&gt; clustering.subspace.HiSC
-   -&gt; clustering.subspace.PreDeCon
-   -&gt; clustering.subspace.PROCLUS
-   -&gt; clustering.subspace.SUBCLU
-   -&gt; clustering.trivial.ByLabelClustering
-   -&gt; clustering.trivial.ByLabelHierarchicalClustering
-   -&gt; clustering.trivial.TrivialAllInOne
-   -&gt; clustering.trivial.TrivialAllNoise
-   -&gt; outlier.ABOD
-   -&gt; outlier.AggarwalYuEvolutionary
-   -&gt; outlier.AggarwalYuNaive
-   -&gt; outlier.DBOutlierDetection
-   -&gt; outlier.DBOutlierScore
-   -&gt; outlier.EMOutlier
-   -&gt; outlier.GaussianModel
-   -&gt; outlier.GaussianUniformMixture
-   -&gt; outlier.INFLO
-   -&gt; outlier.KNNOutlier
-   -&gt; outlier.KNNWeightOutlier
-   -&gt; outlier.LDOF
-   -&gt; outlier.LOCI
-   -&gt; outlier.LOF
-   -&gt; outlier.LoOP
-   -&gt; outlier.OPTICSOF
-   -&gt; outlier.ReferenceBasedOutlierDetection
-   -&gt; outlier.SOD
-   -&gt; outlier.OnlineLOF
-   -&gt; outlier.spatial.CTLuGLSBackwardSearchAlgorithm
-   -&gt; outlier.spatial.CTLuMeanMultipleAttributes
-   -&gt; outlier.spatial.CTLuMedianAlgorithm
-   -&gt; outlier.spatial.CTLuMedianMultipleAttributes
-   -&gt; outlier.spatial.CTLuMoranScatterplotOutlier
-   -&gt; outlier.spatial.CTLuRandomWalkEC
-   -&gt; outlier.spatial.CTLuScatterplotOutlier
-   -&gt; outlier.spatial.CTLuZTestOutlier
-   -&gt; outlier.spatial.SLOM
-   -&gt; outlier.spatial.SOF
-   -&gt; outlier.spatial.TrimmedMeanApproach
-   -&gt; outlier.meta.ExternalDoubleOutlierScore
-   -&gt; outlier.meta.FeatureBagging
-   -&gt; outlier.meta.RescaleMetaOutlierAlgorithm
-   -&gt; outlier.trivial.ByLabelOutlier
-   -&gt; outlier.trivial.TrivialAllOutlier
-   -&gt; outlier.trivial.TrivialNoOutlier
-   -&gt; statistics.EvaluateRankingQuality
-   -&gt; statistics.RankingQualityHistogram
-   -&gt; statistics.DistanceStatisticsWithClasses
-   -&gt; APRIORI
-   -&gt; DependencyDerivator
-   -&gt; KNNDistanceOrder
-   -&gt; KNNJoin
-   -&gt; MaterializeDistances
+Algorithm to run.
+Implementing elki.Algorithm
+Known classes (default package elki):
+-&gt; algorithm.DependencyDerivator
+-&gt; algorithm.KNNDistancesSampler
+-&gt; algorithm.KNNJoin
+-&gt; algorithm.NullAlgorithm
+-&gt; algorithm.statistics.AddSingleScale
+-&gt; algorithm.statistics.AddUniformScale
+-&gt; algorithm.statistics.AveragePrecisionAtK
+-&gt; algorithm.statistics.DistanceQuantileSampler
+-&gt; algorithm.statistics.DistanceStatisticsWithClasses
+-&gt; algorithm.statistics.EvaluateRankingQuality
+-&gt; algorithm.statistics.EvaluateRetrievalPerformance
+-&gt; algorithm.statistics.HopkinsStatisticClusteringTendency
+-&gt; algorithm.statistics.RankingQualityHistogram
+-&gt; clustering.CFSFDP
+-&gt; clustering.CanopyPreClustering
+-&gt; clustering.Leader
+-&gt; clustering.NaiveMeanShiftClustering
+-&gt; clustering.SNNClustering
+-&gt; clustering.affinitypropagation.AffinityPropagation
+-&gt; clustering.biclustering.ChengAndChurch
+-&gt; clustering.correlation.CASH
+-&gt; clustering.correlation.COPAC
+-&gt; clustering.correlation.ERiC
+-&gt; clustering.correlation.FourC
+-&gt; clustering.correlation.HiCO
+-&gt; clustering.correlation.LMCLUS
+-&gt; clustering.correlation.ORCLUS
+-&gt; clustering.dbscan.DBSCAN
+-&gt; clustering.dbscan.GeneralizedDBSCAN
+-&gt; clustering.dbscan.GriDBSCAN
+-&gt; clustering.dbscan.LSDBC
+-&gt; clustering.dbscan.parallel.ParallelGeneralizedDBSCAN
+-&gt; clustering.em.EM
+-&gt; clustering.hierarchical.AGNES
+-&gt; clustering.hierarchical.Anderberg
+-&gt; clustering.hierarchical.CLINK
+-&gt; clustering.hierarchical.HDBSCANLinearMemory
+-&gt; clustering.hierarchical.MiniMax
+-&gt; clustering.hierarchical.MiniMaxAnderberg
+-&gt; clustering.hierarchical.MiniMaxNNChain
+-&gt; clustering.hierarchical.NNChain
+-&gt; clustering.hierarchical.SLINK
+-&gt; clustering.hierarchical.SLINKHDBSCANLinearMemory
+-&gt; clustering.hierarchical.birch.BIRCHLeafClustering
+-&gt; clustering.hierarchical.birch.BIRCHLloydKMeans
+-&gt; clustering.hierarchical.extraction.ClustersWithNoiseExtraction
+-&gt; clustering.hierarchical.extraction.CutDendrogramByHeight
+-&gt; clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
+-&gt; clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
+-&gt; clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
+-&gt; clustering.kmeans.AnnulusKMeans
+-&gt; clustering.kmeans.BestOfMultipleKMeans
+-&gt; clustering.kmeans.BisectingKMeans
+-&gt; clustering.kmeans.CompareMeans
+-&gt; clustering.kmeans.ElkanKMeans
+-&gt; clustering.kmeans.ExponionKMeans
+-&gt; clustering.kmeans.HamerlyKMeans
+-&gt; clustering.kmeans.KDTreeFilteringKMeans
+-&gt; clustering.kmeans.KDTreePruningKMeans
+-&gt; clustering.kmeans.KMeansMinusMinus
+-&gt; clustering.kmeans.KMediansLloyd
+-&gt; clustering.kmeans.LloydKMeans
+-&gt; clustering.kmeans.MacQueenKMeans
+-&gt; clustering.kmeans.SimplifiedElkanKMeans
+-&gt; clustering.kmeans.SingleAssignmentKMeans
+-&gt; clustering.kmeans.SortMeans
+-&gt; clustering.kmeans.XMeans
+-&gt; clustering.kmeans.parallel.ParallelLloydKMeans
+-&gt; clustering.kmedoids.AlternatingKMedoids
+-&gt; clustering.kmedoids.CLARA
+-&gt; clustering.kmedoids.CLARANS
+-&gt; clustering.kmedoids.FastCLARA
+-&gt; clustering.kmedoids.FastCLARANS
+-&gt; clustering.kmedoids.FastPAM
+-&gt; clustering.kmedoids.FastPAM1
+-&gt; clustering.kmedoids.PAM
+-&gt; clustering.kmedoids.ReynoldsPAM
+-&gt; clustering.kmedoids.SingleAssignmentKMedoids
+-&gt; clustering.meta.ExternalClustering
+-&gt; clustering.onedimensional.KNNKernelDensityMinimaClustering
+-&gt; clustering.optics.DeLiClu
+-&gt; clustering.optics.FastOPTICS
+-&gt; clustering.optics.OPTICSHeap
+-&gt; clustering.optics.OPTICSList
+-&gt; clustering.optics.OPTICSXi
+-&gt; clustering.subspace.CLIQUE
+-&gt; clustering.subspace.DOC
+-&gt; clustering.subspace.DiSH
+-&gt; clustering.subspace.FastDOC
+-&gt; clustering.subspace.HiSC
+-&gt; clustering.subspace.P3C
+-&gt; clustering.subspace.PROCLUS
+-&gt; clustering.subspace.PreDeCon
+-&gt; clustering.subspace.SUBCLU
+-&gt; clustering.trivial.ByLabelClustering
+-&gt; clustering.trivial.ByLabelHierarchicalClustering
+-&gt; clustering.trivial.ByLabelOrAllInOneClustering
+-&gt; clustering.trivial.ByModelClustering
+-&gt; clustering.trivial.TrivialAllInOne
+-&gt; clustering.trivial.TrivialAllNoise
+-&gt; clustering.uncertain.CKMeans
+-&gt; clustering.uncertain.CenterOfMassMetaClustering
+-&gt; clustering.uncertain.FDBSCAN
+-&gt; clustering.uncertain.RepresentativeUncertainClustering
+-&gt; clustering.uncertain.UKMeans
+-&gt; itemsetmining.APRIORI
+-&gt; itemsetmining.Eclat
+-&gt; itemsetmining.FPGrowth
+-&gt; itemsetmining.associationrules.AssociationRuleGeneration
+-&gt; outlier.COP
+-&gt; outlier.DWOF
+-&gt; outlier.GaussianModel
+-&gt; outlier.GaussianUniformMixture
+-&gt; outlier.OPTICSOF
+-&gt; outlier.SimpleCOP
+-&gt; outlier.anglebased.ABOD
+-&gt; outlier.anglebased.FastABOD
+-&gt; outlier.anglebased.LBABOD
+-&gt; outlier.clustering.CBLOF
+-&gt; outlier.clustering.EMOutlier
+-&gt; outlier.clustering.KMeansOutlierDetection
+-&gt; outlier.clustering.SilhouetteOutlierDetection
+-&gt; outlier.distance.DBOutlierDetection
+-&gt; outlier.distance.DBOutlierScore
+-&gt; outlier.distance.HilOut
+-&gt; outlier.distance.KNNDD
+-&gt; outlier.distance.KNNOutlier
+-&gt; outlier.distance.KNNSOS
+-&gt; outlier.distance.KNNWeightOutlier
+-&gt; outlier.distance.LocalIsolationCoefficient
+-&gt; outlier.distance.ODIN
+-&gt; outlier.distance.ReferenceBasedOutlierDetection
+-&gt; outlier.distance.SOS
+-&gt; outlier.distance.parallel.ParallelKNNOutlier
+-&gt; outlier.distance.parallel.ParallelKNNWeightOutlier
+-&gt; outlier.intrinsic.IDOS
+-&gt; outlier.intrinsic.ISOS
+-&gt; outlier.intrinsic.LID
+-&gt; outlier.lof.ALOCI
+-&gt; outlier.lof.COF
+-&gt; outlier.lof.FlexibleLOF
+-&gt; outlier.lof.INFLO
+-&gt; outlier.lof.KDEOS
+-&gt; outlier.lof.LDF
+-&gt; outlier.lof.LDOF
+-&gt; outlier.lof.LOCI
+-&gt; outlier.lof.LOF
+-&gt; outlier.lof.LoOP
+-&gt; outlier.lof.OnlineLOF
+-&gt; outlier.lof.SimpleKernelDensityLOF
+-&gt; outlier.lof.SimplifiedLOF
+-&gt; outlier.lof.VarianceOfVolume
+-&gt; outlier.lof.parallel.ParallelLOF
+-&gt; outlier.lof.parallel.ParallelSimplifiedLOF
+-&gt; outlier.meta.ExternalDoubleOutlierScore
+-&gt; outlier.meta.FeatureBagging
+-&gt; outlier.meta.HiCS
+-&gt; outlier.meta.RescaleMetaOutlierAlgorithm
+-&gt; outlier.meta.SimpleOutlierEnsemble
+-&gt; outlier.spatial.CTLuGLSBackwardSearchAlgorithm
+-&gt; outlier.spatial.CTLuMeanMultipleAttributes
+-&gt; outlier.spatial.CTLuMedianAlgorithm
+-&gt; outlier.spatial.CTLuMedianMultipleAttributes
+-&gt; outlier.spatial.CTLuMoranScatterplotOutlier
+-&gt; outlier.spatial.CTLuRandomWalkEC
+-&gt; outlier.spatial.CTLuScatterplotOutlier
+-&gt; outlier.spatial.CTLuZTestOutlier
+-&gt; outlier.spatial.SLOM
+-&gt; outlier.spatial.SOF
+-&gt; outlier.spatial.TrimmedMeanApproach
+-&gt; outlier.subspace.AggarwalYuEvolutionary
+-&gt; outlier.subspace.AggarwalYuNaive
+-&gt; outlier.subspace.OUTRES
+-&gt; outlier.subspace.OutRankS1
+-&gt; outlier.subspace.SOD
+-&gt; outlier.svm.LibSVMOneClassOutlierDetection
+-&gt; outlier.trivial.ByLabelOutlier
+-&gt; outlier.trivial.TrivialAllOutlier
+-&gt; outlier.trivial.TrivialAverageCoordinateOutlier
+-&gt; outlier.trivial.TrivialGeneratedOutlier
+-&gt; outlier.trivial.TrivialNoOutlier
+-&gt; projection.BarnesHutTSNE
+-&gt; projection.SNE
+-&gt; projection.TSNE
+-&gt; timeseries.OfflineChangePointDetectionAlgorithm
+-&gt; timeseries.SigniTrendChangeDetection
+-&gt; tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
+-&gt; tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
+-&gt; tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
+-&gt; tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
+-&gt; tutorial.clustering.SameSizeKMeans
+-&gt; tutorial.outlier.DistanceStddevOutlier
+-&gt; tutorial.outlier.ODIN
 </pre>
 </body>
 </html>
