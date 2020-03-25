@@ -24,7 +24,6 @@ import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
 import elki.persistent.PageFile;
-import elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract super class for all tree based index classes.
@@ -125,15 +124,6 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
   }
 
   /**
-   * Reads the root node of this index from the file.
-   *
-   * @return the root node of this index
-   */
-  public N getRoot() {
-    return file.readPage(getPageID(rootEntry));
-  }
-
-  /**
    * Test if a given ID is the root.
    *
    * @param page Page to test
@@ -150,8 +140,8 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return Page ID
    */
   protected int getPageID(Entry entry) {
-    if(entry instanceof LeafEntry) {
-      throw new AbortException("Leafs do not have page ids!");
+    if(!(entry instanceof DirectoryEntry)) {
+      throw new IllegalStateException("Leafs do not have page ids!");
     }
     return ((DirectoryEntry) entry).getPageID();
   }
@@ -163,7 +153,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return the node with the specified id
    */
   public N getNode(int nodeID) {
-    return nodeID == getPageID(rootEntry) ? getRoot() : file.readPage(nodeID);
+    return file.readPage(nodeID);
   }
 
   /**
@@ -172,7 +162,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @param entry the entry representing the node to be returned
    * @return the node that is represented by the specified entry
    */
-  public final N getNode(Entry entry) {
+  public N getNode(Entry entry) {
     return getNode(getPageID(entry));
   }
 
@@ -308,9 +298,6 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
     // Default is no-op.
   }
 
-  /**
-   * Log some statistics, if enabled.
-   */
   @Override
   public void logStatistics() {
     file.logStatistics();
@@ -323,24 +310,6 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    */
   protected int getPageSize() {
     return file.getPageSize();
-  }
-
-  /**
-   * Get the minimum fill of a directory page (except root).
-   *
-   * @return Minimum fill
-   */
-  public int getDirMinimum() {
-    return dirMinimum;
-  }
-
-  /**
-   * Get the minimum fill of a leaf page (except root).
-   *
-   * @return Minimum fill
-   */
-  public int getLeafMinimum() {
-    return leafMinimum;
   }
 
   /**

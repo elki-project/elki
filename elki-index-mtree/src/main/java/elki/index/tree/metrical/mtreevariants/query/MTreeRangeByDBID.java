@@ -111,7 +111,7 @@ public class MTreeRangeByDBID<O> implements RangeSearcher<DBIDRef> {
   @Override
   public ModifiableDoubleDBIDList getRange(DBIDRef query, double range, ModifiableDoubleDBIDList result) {
     index.statistics.countRangeQuery();
-    doRangeQuery(null, index.getRoot(), query, range, result);
+    doRangeQuery(null, index.getNode(index.getRootID()), query, range, result);
     return result;
   }
 }

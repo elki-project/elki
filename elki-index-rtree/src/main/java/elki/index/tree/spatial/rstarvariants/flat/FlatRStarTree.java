@@ -80,8 +80,8 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
   }
 
   @Override
-  public FlatRStarTreeNode getRoot() {
-    return root;
+  public FlatRStarTreeNode getNode(int nodeID) {
+    return nodeID == getRootID() ? root : super.getNode(nodeID);
   }
 
   @Override
@@ -119,7 +119,7 @@ public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode,
     setHeight(2);
 
     if(LOG.isDebuggingFine()) {
-      LOG.debugFine("  root = " + getRoot() + "\n  numNodes = " + numNodes + "\n  height = " + getHeight());
+      LOG.debugFine("  root = " + root + "\n  numNodes = " + numNodes + "\n  height = " + getHeight());
     }
     doExtraIntegrityChecks();
   }

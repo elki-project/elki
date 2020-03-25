@@ -91,7 +91,7 @@ public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNod
     }
 
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    doReverseKNNQuery(k, id, null, getRoot(), result);
+    doReverseKNNQuery(k, id, null, getNode(getRootID()), result);
     return result.sort();
   }
 

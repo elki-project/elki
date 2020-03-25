@@ -20,11 +20,8 @@
  */
 package elki.index.tree.metrical.mtreevariants;
 
-import java.util.logging.Logger;
-
 import elki.database.ids.DBID;
 import elki.index.tree.AbstractNode;
-import elki.logging.LoggingConfiguration;
 import elki.utilities.exceptions.InconsistentDataException;
 
 /**
@@ -70,10 +67,10 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
    * @return {@code true} if adjustment of parent is needed
    */
   public boolean adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
-    boolean changed = entry.setRoutingObjectID(routingObjectID);
-    changed |= entry.setParentDistance(parentDistance);
-    changed |= entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
-    return changed;
+    // NOT "||". no short-circuiting here!
+    return entry.setRoutingObjectID(routingObjectID) //
+        | entry.setParentDistance(parentDistance) //
+        | entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
   }
 
   /**
@@ -100,8 +97,7 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
    * @param entry the entry representing this node
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractMTree<O, N, E, ?> mTree, E entry) {
-    // leaf node
+  protected final void integrityCheck(AbstractMTree<O, N, E, ?> mTree, E entry) {
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
@@ -112,46 +108,31 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
           throw new InconsistentDataException("i >= numEntries && entry != null");
         }
       }
+      return;
     }
     // dir node
-    else {
-      N tmp = mTree.getNode(getEntry(0));
-      boolean childIsLeaf = tmp.isLeaf();
-
-      for(int i = 0; i < getCapacity(); i++) {
-        E e = getEntry(i);
-
-        if(i < getNumEntries() && e == null) {
-          throw new InconsistentDataException("i < numEntries && entry == null");
-        }
-
-        if(i >= getNumEntries() && e != null) {
-          throw new InconsistentDataException("i >= numEntries && entry != null");
-        }
-
-        if(e != null) {
-          N node = mTree.getNode(e);
-
-          if(childIsLeaf && !node.isLeaf()) {
-            for(int k = 0; k < getNumEntries(); k++) {
-              mTree.getNode(getEntry(k));
-            }
-
-            throw new InconsistentDataException("Wrong Child in " + this + " at " + i);
-          }
-
-          if(!childIsLeaf && node.isLeaf()) {
-            throw new InconsistentDataException("Wrong Child: child id no leaf, but node is leaf!");
-          }
-
-          // noinspection unchecked
-          node.integrityCheckParameters(entry, (N) this, i, mTree);
-          node.integrityCheck(mTree, e);
-        }
+    boolean childIsLeaf = mTree.getNode(getEntry(0)).isLeaf();
+    for(int i = 0; i < getCapacity(); i++) {
+      E e = getEntry(i);
+      if(i < getNumEntries() && e == null) {
+        throw new InconsistentDataException("i < numEntries && entry == null");
       }
-
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
+      if(i >= getNumEntries() && e != null) {
+        throw new InconsistentDataException("i >= numEntries && entry != null");
+      }
+      if(e != null) {
+        N node = mTree.getNode(e);
+        if(childIsLeaf && !node.isLeaf()) {
+          for(int k = 0; k < getNumEntries(); k++) {
+            mTree.getNode(getEntry(k));
+          }
+          throw new InconsistentDataException("Wrong Child in " + this + " at " + i);
+        }
+        if(!childIsLeaf && node.isLeaf()) {
+          throw new InconsistentDataException("Wrong Child: child id no leaf, but node is leaf!");
+        }
+        node.integrityCheckParameters(entry, (N) this, i, mTree);
+        node.integrityCheck(mTree, e);
       }
     }
   }

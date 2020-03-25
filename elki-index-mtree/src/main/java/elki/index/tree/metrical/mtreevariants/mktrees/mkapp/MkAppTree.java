@@ -112,7 +112,6 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
     }
 
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
-
     // insert
     for(MkAppEntry entry : entries) {
       ids.add(entry.getRoutingObjectID());
@@ -120,15 +119,10 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
       super.insert(entry, false);
     }
 
-    // do batch nn
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.kmax + 1);
+    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax + 1);
 
-    // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
-
-    if(EXTRA_INTEGRITY_CHECKS) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+    doExtraIntegrityChecks();
   }
 
   /**

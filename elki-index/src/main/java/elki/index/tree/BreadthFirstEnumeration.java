@@ -98,7 +98,7 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
    */
   @Override
   public boolean hasNext() {
-    return (!queue.isEmpty() && (queue.peek()).hasNext());
+    return !queue.isEmpty() && (queue.peek()).hasNext();
   }
 
   /**
@@ -112,21 +112,15 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
   public IndexTreePath<E> next() {
     Iterator<IndexTreePath<E>> enumeration = queue.peek();
     IndexTreePath<E> nextPath = enumeration.next();
-
-    Iterator<IndexTreePath<E>> children;
-    if(nextPath.getEntry() instanceof LeafEntry) {
-      children = EMPTY_ENUMERATION;
-    }
-    else {
-      N node = index.getNode(nextPath.getEntry());
-      children = node.children(nextPath);
-    }
-
     if(!enumeration.hasNext()) {
       queue.remove();
     }
-    if(children.hasNext()) {
-      queue.offer(children);
+    final E ent = nextPath.getEntry();
+    if(ent instanceof DirectoryEntry) {
+      Iterator<IndexTreePath<E>> children = index.getNode(ent).children(nextPath);
+      if(children.hasNext()) {
+        queue.offer(children);
+      }
     }
     return nextPath;
   }

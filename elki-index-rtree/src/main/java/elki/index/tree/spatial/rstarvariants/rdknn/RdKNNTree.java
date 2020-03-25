@@ -120,7 +120,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
   protected void postDelete(RdKNNEntry entry) {
     // reverse knn of o
     ModifiableDoubleDBIDList rnns = DBIDUtil.newDistanceDBIDList();
-    doReverseKNN(getRoot(), ((RdKNNLeafEntry) entry).getDBID(), rnns);
+    doReverseKNN(getNode(getRootID()), ((RdKNNLeafEntry) entry).getDBID(), rnns);
     // knn of rnn
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rnns);
     ids.sort(); // Sort by ID, not by distance!
@@ -164,7 +164,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
 
     // get candidates
     ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList();
-    doReverseKNN(getRoot(), oid, candidates);
+    doReverseKNN(getNode(getRootID()), oid, candidates);
 
     if(k == settings.k_max) {
       return candidates.sort();

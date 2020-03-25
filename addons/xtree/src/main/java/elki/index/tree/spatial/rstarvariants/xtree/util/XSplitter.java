@@ -26,7 +26,6 @@ import elki.data.HyperBoundingBox;
 import elki.data.ModifiableHyperBoundingBox;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
-import elki.index.tree.DirectoryEntry;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.xtree.AbstractXTree;
@@ -568,10 +567,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    */
   @SuppressWarnings("unchecked")
   private List<SpatialEntry>[] generateDistribution(SplitSorting sorting) {
-    List<SpatialEntry>[] distibution;
-    distibution = new List[2];
-    distibution[0] = new ArrayList<>();
-    distibution[1] = new ArrayList<>();
+    List<SpatialEntry>[] distibution = new List[] { new ArrayList<>(), new ArrayList<>() };
     List<SpatialEntry> sorted_entries = sorting.getSortedEntries();
     for(int i = 0; i < sorting.getSplitPoint(); i++) {
       distibution[0].add(sorted_entries.get(i));
@@ -671,9 +667,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
       pastOverlap = minOverlap; // the first range is better
       return ret1;
     }
-    else {
-      return chooseMinimumOverlapSplit(this.splitAxis, minFanout, maxEntries, false);
-    }
+    return chooseMinimumOverlapSplit(this.splitAxis, minFanout, maxEntries, false);
   }
 
   /**
@@ -764,8 +758,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
         }
       }
       else {
-        N node = tree.getNode(((DirectoryEntry) entry).getPageID());
-        countXingDataEntries(node.getEntries(), mbr, numOf);
+        countXingDataEntries(tree.getNode(entry).getChildren(), mbr, numOf);
       }
     }
     return numOf;

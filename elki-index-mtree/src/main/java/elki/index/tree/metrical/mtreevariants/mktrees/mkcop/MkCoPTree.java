@@ -110,13 +110,11 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     if(LOG.isDebugging()) {
       LOG.debugFine("insert " + entries + "\n");
     }
-
     if(!initialized) {
       initialize(entries.get(0));
     }
 
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
-
     // insert
     for(MkCoPEntry entry : entries) {
       ids.add(entry.getRoutingObjectID());
@@ -124,15 +122,10 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       super.insert(entry, false);
     }
 
-    // perform nearest neighbor queries
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.kmax);
+    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax);
 
-    // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
-
-    if(EXTRA_INTEGRITY_CHECKS) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+    doExtraIntegrityChecks();
   }
 
   /**
@@ -154,7 +147,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     doReverseKNNQuery(k, id, result, candidates);
 
     // refinement of candidates
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), candidates, k);
+    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), candidates, k);
 
     result.sort();
     // Collections.sort(candidates);

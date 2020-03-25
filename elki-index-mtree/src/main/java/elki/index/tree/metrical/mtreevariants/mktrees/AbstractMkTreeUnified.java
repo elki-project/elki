@@ -79,7 +79,6 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
     }
 
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
-
     // insert sequentially
     for (E entry : entries) {
       ids.add(entry.getRoutingObjectID());
@@ -87,15 +86,11 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
       super.insert(entry, false);
     }
 
-    // do batch nn
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.kmax);
+    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax);
 
-    // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
 
-    if (EXTRA_INTEGRITY_CHECKS) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+    doExtraIntegrityChecks();
   }
 
   /**

@@ -35,7 +35,9 @@ import elki.utilities.exceptions.AbortException;
  * Abstract superclass for nodes in an tree based index structure.
  *
  * @author Elke Achtert
+ *
  * @since 0.1
+ *
  * @param <E> the type of Entry used in the index
  */
 public abstract class AbstractNode<E extends Entry> extends AbstractExternalizablePage implements Node<E> {
@@ -195,26 +197,6 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   }
 
   /**
-   * Returns a list of the entries.
-   *
-   * @return a list of the entries
-   *
-   * @deprecated Using this method means an extra copy - usually at the cost of
-   *             performance.
-   */
-  @SuppressWarnings("unchecked")
-  @Deprecated
-  public final List<E> getEntries() {
-    List<E> result = new ArrayList<>(numEntries);
-    for(Entry entry : entries) {
-      if(entry != null) {
-        result.add((E) entry);
-      }
-    }
-    return result;
-  }
-
-  /**
    * Remove entries according to the given mask.
    *
    * @param mask Mask to remove
@@ -227,15 +209,13 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     int src = BitsUtil.nextSetBit(mask, dest);
     while(src < numEntries) {
       if(!BitsUtil.get(mask, src)) {
-        entries[dest] = entries[src];
-        dest++;
+        entries[dest++] = entries[src];
       }
       src++;
     }
     int rm = src - dest;
     while(dest < numEntries) {
-      entries[dest] = null;
-      dest++;
+      entries[dest++] = null;
     }
     numEntries -= rm;
   }
@@ -315,23 +295,19 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       throw new AbortException("No bits set in splitting mask.");
     }
     // FIXME: use faster iteration/testing
-    int pos = dest;
-    while(pos < numEntries) {
+    for(int pos = dest; pos < numEntries; pos++) {
       if(BitsUtil.get(assignment, pos)) {
         // Move to new node
         newNode.addEntry(getEntry(pos));
       }
       else {
         // Move to new position
-        entries[dest] = entries[pos];
-        dest++;
+        entries[dest++] = entries[pos];
       }
-      pos++;
     }
     final int rm = numEntries - dest;
     while(dest < numEntries) {
-      entries[dest] = null;
-      dest++;
+      entries[dest++] = null;
     }
     numEntries -= rm;
   }

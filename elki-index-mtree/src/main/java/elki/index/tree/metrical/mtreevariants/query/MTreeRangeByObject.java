@@ -111,7 +111,7 @@ public class MTreeRangeByObject<O> implements RangeSearcher<O> {
   @Override
   public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
     index.statistics.countRangeQuery();
-    doRangeQuery(null, index.getRoot(), obj, range, result);
+    doRangeQuery(null, index.getNode(index.getRootID()), obj, range, result);
     return result;
   }
 }

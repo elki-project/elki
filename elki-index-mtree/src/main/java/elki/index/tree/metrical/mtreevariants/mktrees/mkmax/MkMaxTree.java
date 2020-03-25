@@ -85,7 +85,7 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
 
     // get the candidates
     ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList();
-    doReverseKNNQuery(id, getRoot(), null, candidates);
+    doReverseKNNQuery(id, getNode(getRootID()), null, candidates);
 
     if (k == this.getKmax()) {
       // FIXME: re-add statistics.
@@ -99,7 +99,7 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
     for (DBIDIter candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
       candidateIDs.add(candidate);
     }
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), candidateIDs, k);
+    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), candidateIDs, k);
 
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {

@@ -187,14 +187,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
       capacity_to_be_filled = capacity;
       return;
     }
-    // the following causes a null pointer -- something is obviously missing
-    // entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity);
-    if(isLeaf()) {
-      entries = (Entry[]) new SpatialPointLeafEntry[capacity];
-    }
-    else {
-      entries = (Entry[]) new XTreeDirectoryEntry[capacity];
-    }
+    entries = new Entry[capacity];
     for(int i = 0; i < numEntries; i++) {
       SpatialEntry s = isLeaf() ? new SpatialPointLeafEntry() : new XTreeDirectoryEntry();
       s.readExternal(in);
@@ -260,38 +253,28 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
   }
 
   /**
-   * @return A list of all contained children in this node. In contrast to
-   *         {@link #getEntries()} this listing ONLY contains existing children
-   *         and not empty slots for filling up the capacity.
+   * @return A list of all contained children in this node.
    */
-  public List<Entry> getChildren() {
-    List<Entry> children = new ArrayList<>(getNumEntries());
+  public List<SpatialEntry> getChildren() {
+    List<SpatialEntry> children = new ArrayList<>(getNumEntries());
     for(int i = 0; i < getNumEntries(); i++) {
-      children.add(entries[i]);
+      children.add((SpatialEntry) entries[i]);
     }
     return children;
   }
 
-  /**
-   * Tests, if the parameters of the entry representing this node, are correctly
-   * set. Subclasses may need to overwrite this method.
-   * 
-   * @param parent the parent holding the entry representing this node
-   * @param index the index of the entry in the parents child array
-   */
   @Override
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
     SpatialEntry entry = parent.getEntry(index);
     HyperBoundingBox mbr = computeMBR();
-
     if(/*entry.getMBR() == null && */ mbr == null) {
       return;
     }
     if(!SpatialUtil.equals(entry, mbr)) {
-      String soll = mbr.toString();
-      String ist = (new HyperBoundingBox(entry)).toString();
-      throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new RuntimeException("Wrong MBR in node " + parent.getPageID() + " at index " + index //
+          + " (child " + entry + ")" + "\nsoll: " + mbr.toString() //
+          + ",\n ist: " + (new HyperBoundingBox(entry)).toString());
     }
     if(isSuperNode() && isLeaf()) {
       throw new RuntimeException("Node " + toString() + " is a supernode and a leaf");

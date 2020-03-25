@@ -94,6 +94,6 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase("elki/testdata/unittests/hierarchical-3d2d1d.csv", 600, inputparams);
     It<RStarTreeIndex<?>> it = Metadata.hierarchyOf(db).iterDescendants().filter(RStarTreeIndex.class);
     assertTrue("No R*-tree found?", it.valid());
-    it.get().getRoot().integrityCheck(it.get());
+    it.get().getNode(it.get().getRootID()).integrityCheck(it.get());
   }
 }

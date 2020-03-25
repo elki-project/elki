@@ -738,7 +738,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       return result;
     }
 
-    getLeafNodes(getRoot(), result, height);
+    getLeafNodeEntries(getNode(getRootID()), result, height);
     return result;
   }
 
@@ -749,7 +749,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param result the result to store the ids in
    * @param currentLevel the level of the node in the R-Tree
    */
-  private void getLeafNodes(N node, List<E> result, int currentLevel) {
+  private void getLeafNodeEntries(N node, List<E> result, int currentLevel) {
     // Level 1 are the leaf nodes, Level 2 is the one atop!
     if(currentLevel == 2) {
       for(int i = 0; i < node.getNumEntries(); i++) {
@@ -758,7 +758,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        getLeafNodes(getNode(node.getEntry(i)), result, (currentLevel - 1));
+        getLeafNodeEntries(getNode(node.getEntry(i)), result, currentLevel - 1);
       }
     }
   }
@@ -768,7 +768,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   public void doExtraIntegrityChecks() {
     if(EXTRA_INTEGRITY_CHECKS) {
-      getRoot().integrityCheck(this);
+      getNode(getRootID()).integrityCheck(this);
     }
   }
 
@@ -861,58 +861,42 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
   }
 
-  /**
-   * Returns a string representation of this R*-Tree.
-   *
-   * @return a string representation of this R*-Tree
-   */
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    int dirNodes = 0;
-    int leafNodes = 0;
-    int objects = 0;
-    int levels = 0;
+    StringBuilder result = new StringBuilder(1000);
+    if(!initialized) {
+      return result.append(getClass().getName()).append(" is not initialized.").toString();
+    }
+    N node = getNode(getRootID());
+    int dim = getRootEntry().getDimensionality();
 
-    if(initialized) {
-      N node = getRoot();
-      int dim = getRootEntry().getDimensionality();
-
-      while(!node.isLeaf()) {
-        if(node.getNumEntries() > 0) {
-          E entry = node.getEntry(0);
-          node = getNode(entry);
-          levels++;
-        }
+    int dirNodes = 0, leafNodes = 0, objects = 0, levels = 0;
+    while(!node.isLeaf()) {
+      if(node.getNumEntries() > 0) {
+        node = getNode(node.getEntry(0));
+        levels++;
       }
+    }
 
-      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-      while(enumeration.hasNext()) {
-        IndexTreePath<E> indexPath = enumeration.next();
-        E entry = indexPath.getEntry();
-        if(entry instanceof LeafEntry) {
-          objects++;
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
+    while(enumeration.hasNext()) {
+      E entry = enumeration.next().getEntry();
+      if(entry instanceof LeafEntry) {
+        objects++;
+      }
+      else {
+        node = getNode(entry);
+        if(node.isLeaf()) {
+          leafNodes++;
         }
         else {
-          node = getNode(entry);
-          if(node.isLeaf()) {
-            leafNodes++;
-          }
-          else {
-            dirNodes++;
-          }
+          dirNodes++;
         }
       }
-      result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n") //
-          .append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity).append(", min = ").append(dirMinimum).append(")\n") //
-          .append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity).append(", min = ").append(leafMinimum).append(")\n") //
-          .append(objects).append(' ').append(dim).append("-dim. Punkte im Baum \n");
-      // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     }
-    else {
-      result.append(getClass().getName()).append(" is empty!\n");
-    }
-
-    return result.toString();
+    return result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n") //
+        .append(dirNodes).append(" directory node (max = ").append(dirCapacity).append(", min = ").append(dirMinimum).append(")\n") //
+        .append(leafNodes).append(" leaf node (max = ").append(leafCapacity).append(", min = ").append(leafMinimum).append(")\n") //
+        .append(objects).append(' ').append(dim).append("-dim. objects").toString();
   }
 }

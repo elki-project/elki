@@ -47,56 +47,22 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     super(pagefile, settings);
   }
 
-  /**
-   * Returns true if in the specified node an overflow occurred, false
-   * otherwise.
-   * 
-   * @param node the node to be tested for overflow
-   * @return true if in the specified node an overflow occurred, false otherwise
-   */
   @Override
   protected boolean hasOverflow(N node) {
-    if(node.isLeaf()) {
-      return node.getNumEntries() == leafCapacity;
-    }
-    else {
-      return node.getNumEntries() == dirCapacity;
-    }
+    return node.getNumEntries() == (node.isLeaf() ? leafCapacity : dirCapacity);
   }
 
-  /**
-   * Returns true if in the specified node an underflow occurred, false
-   * otherwise.
-   * 
-   * @param node the node to be tested for underflow
-   * @return true if in the specified node an underflow occurred, false
-   *         otherwise
-   */
   @Override
   protected boolean hasUnderflow(N node) {
-    if(node.isLeaf()) {
-      return node.getNumEntries() < leafMinimum;
-    }
-    else {
-      return node.getNumEntries() < dirMinimum;
-    }
+    return node.getNumEntries() < (node.isLeaf() ? leafMinimum : dirMinimum);
   }
 
-  /**
-   * Computes the height of this RTree. Is called by the constructor. and should
-   * be overwritten by subclasses if necessary.
-   * 
-   * @return the height of this RTree
-   */
   @Override
   protected int computeHeight() {
-    N node = getRoot();
+    N node = getNode(getRootID());
     int height = 1;
-
-    // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
-      E entry = node.getEntry(0);
-      node = getNode(entry);
+      node = getNode(node.getEntry(0));
       height++;
     }
     return height;
@@ -104,22 +70,17 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
 
   @Override
   protected void createEmptyRoot(E exampleLeaf) {
-    N root = createNewLeafNode();
-    writeNode(root);
+    writeNode(createNewLeafNode());
     setHeight(1);
   }
 
-  /**
-   * Performs a bulk load on this RTree with the specified data. Is called by
-   * the constructor and should be overwritten by subclasses if necessary.
-   */
   @Override
   protected void bulkLoad(List<E> spatialObjects) {
     if(!initialized) {
       initialize(spatialObjects.get(0));
     }
 
-    StringBuilder msg = getLogger().isDebuggingFine() ? new StringBuilder() : null;
+    StringBuilder msg = getLogger().isDebuggingFine() ? new StringBuilder(500) : null;
 
     // Tiny tree that fits into a single page
     if(spatialObjects.size() <= leafCapacity) {
@@ -163,9 +124,8 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       }
     }
     if(msg != null) {
-      msg.append("\n  height = ").append(getHeight());
-      msg.append("\n  root ").append(getRoot());
-      getLogger().debugFine(msg.toString());
+      getLogger().debugFine(msg.append("\n  height = ").append(getHeight()) //
+          .append("\n  root ").append(getNode(getRootID())).toString());
     }
   }
 
@@ -176,20 +136,14 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * @return the directory nodes containing the nodes
    */
   private List<E> createBulkDirectoryNodes(List<E> nodes) {
-    int minEntries = dirMinimum;
-    int maxEntries = dirCapacity - 1;
+    int minEntries = dirMinimum, maxEntries = dirCapacity - 1;
 
     ArrayList<E> result = new ArrayList<>();
-    List<List<E>> partitions = settings.bulkSplitter.partition(nodes, minEntries, maxEntries);
-
-    for(List<E> partition : partitions) {
-      // create node
+    for(List<E> partition : settings.bulkSplitter.partition(nodes, minEntries, maxEntries)) {
       N dirNode = createNewDirectoryNode();
-      // insert nodes
       for(E o : partition) {
         dirNode.addEntry(o);
       }
-      // write to file
       writeNode(dirNode);
 
       result.add(createNewDirectoryEntry(dirNode));
@@ -211,15 +165,11 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
    * @return the root node
    */
   private N createRoot(N root, List<E> objects) {
-    // insert data
     for(E entry : objects) {
       root.addEntry(entry);
     }
-
-    // set root mbr
     ((SpatialDirectoryEntry) getRootEntry()).setMBR(root.computeMBR());
 
-    // write to file
     writeNode(root);
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("pageNo " + root.getPageID());

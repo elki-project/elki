@@ -27,7 +27,6 @@ import elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  * @since 0.4.0
- * 
  */
 public interface LeafEntry extends Entry {
   /**

@@ -23,7 +23,6 @@ package elki.index.tree.spatial.rstarvariants;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.logging.Logger;
 
 import elki.data.HyperBoundingBox;
 import elki.data.ModifiableHyperBoundingBox;
@@ -35,7 +34,6 @@ import elki.index.tree.Node;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
-import elki.logging.LoggingConfiguration;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.
@@ -130,7 +128,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   }
 
   /**
-   * Tests this node (for debugging purposes).
+   * Tests this node (public for debugging purposes).
    *
    * @param tree Tree context
    * @return levels below
@@ -180,9 +178,6 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
         }
         below = b;
       }
-    }
-    if(LoggingConfiguration.DEBUG) {
-      Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
     }
     return below + 1;
   }

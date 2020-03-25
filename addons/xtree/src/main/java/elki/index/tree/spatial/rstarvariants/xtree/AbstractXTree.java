@@ -140,43 +140,32 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     if(node.isLeaf()) {
       return node.getNumEntries() < leafMinimum;
     }
-    else {
-      if(node.isSuperNode()) {
-        if(node.getCapacity() - node.getNumEntries() >= dirCapacity) {
-          int newCapacity = node.shrinkSuperNode(dirCapacity);
-          if(newCapacity == dirCapacity) {
-            assert !node.isSuperNode();
-            // convert into a normal node (and insert into the index file)
-            if(node.isSuperNode()) {
-              throw new IllegalStateException("This node should not be a supernode anymore");
-            }
-            N n = supernodes.remove(Long.valueOf(node.getPageID()));
-            assert (n != null);
-            // update the old reference in the file
-            writeNode(node);
-          }
-        }
-        return false;
-      }
+    if(!node.isSuperNode()) {
       return node.getNumEntries() < dirMinimum;
     }
+    if(node.getCapacity() - node.getNumEntries() >= dirCapacity) {
+      int newCapacity = node.shrinkSuperNode(dirCapacity);
+      if(newCapacity == dirCapacity) {
+        assert !node.isSuperNode();
+        // convert into a normal node (and insert into the index file)
+        if(node.isSuperNode()) {
+          throw new IllegalStateException("This node should not be a supernode anymore");
+        }
+        N n = supernodes.remove(Long.valueOf(node.getPageID()));
+        assert n != null;
+        // update the old reference in the file
+        writeNode(node);
+      }
+    }
+    return false;
   }
 
-  /**
-   * Computes the height of this XTree. Is called by the constructor. and should
-   * be overwritten by subclasses if necessary.
-   * 
-   * @return the height of this XTree
-   */
   @Override
   protected int computeHeight() {
-    N node = getRoot();
+    N node = getNode(getRootID());
     int tHeight = 1;
-
-    // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
-      SpatialEntry entry = node.getEntry(0);
-      node = getNode(entry);
+      node = getNode(node.getEntry(0));
       tHeight++;
     }
     return tHeight;
@@ -1044,7 +1033,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     long totalCapacity = 0;
     int levels = 0;
 
-    N node = getRoot();
+    N node = getNode(getRootID());
 
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {

@@ -25,7 +25,6 @@ package elki.index.tree;
  * 
  * @author Erich Schubert
  * @since 0.4.0
- * 
  */
 public interface DirectoryEntry extends Entry {
   /**

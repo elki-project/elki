@@ -59,7 +59,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
   /**
    * Debugging flag: do extra integrity checks.
    */
-  protected static final boolean EXTRA_INTEGRITY_CHECKS = false;
+  private static final boolean EXTRA_INTEGRITY_CHECKS = false;
 
   /**
    * Tree settings.
@@ -96,13 +96,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    */
   @Override
   public String toString() {
-    int dirNodes = 0;
-    int leafNodes = 0;
-    int objects = 0;
-    int levels = 0;
-
-    N node = getRoot();
-
+    int dirNodes = 0, leafNodes = 0, objects = 0, levels = 0;
+    N node = getNode(getRootID());
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {
         E entry = node.getEntry(0);
@@ -124,7 +119,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
         node = getNode(entry);
         result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries()) //
             .append('\n').append(entry.toString());
-
         if(node.isLeaf()) {
           leafNodes++;
         }
@@ -182,13 +176,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     parent.addEntry(entry);
     writeNode(parent);
 
-    // adjust the tree from subtree to root
     adjustTree(subtree);
-
-    // test
-    if(EXTRA_INTEGRITY_CHECKS) {
-      getRoot().integrityCheck(this, getRootEntry());
-    }
+    doExtraIntegrityChecks();
   }
 
   /**
@@ -443,7 +432,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    */
   public int getHeight() {
     int levels = 0;
-    N node = getRoot();
+    N node = getNode(getRootID());
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {
         node = getNode(node.getEntry(0));
@@ -460,6 +449,15 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     if(log.isStatistics()) {
       log.statistics(new LongStatistic(this.getClass().getName() + ".height", getHeight()));
       statistics.logStatistics();
+    }
+  }
+
+  /**
+   * Perform additional integrity checks.
+   */
+  protected void doExtraIntegrityChecks() {
+    if(EXTRA_INTEGRITY_CHECKS) {
+      getNode(getRootID()).integrityCheck(this, getRootEntry());
     }
   }
 
@@ -540,5 +538,4 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       }
     }
   }
-
 }
