@@ -20,6 +20,8 @@
  */
 package elki.gui;
 
+import java.awt.AWTError;
+
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
@@ -61,7 +63,7 @@ public final class GUIUtil {
       // Fallback:
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch(Exception e) {
+    catch(Exception | AWTError e) {
       // ignore
     }
   }
