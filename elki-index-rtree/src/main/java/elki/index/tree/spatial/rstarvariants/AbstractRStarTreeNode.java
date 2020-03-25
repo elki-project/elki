@@ -129,9 +129,12 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   /**
    * Tests this node (for debugging purposes).
+   *
+   * @param tree Tree context
+   * @return levels below
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractRStarTree<N, E, ?> tree) {
+  public final int integrityCheck(AbstractRStarTree<N, E, ?> tree) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -143,38 +146,43 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
           throw new IllegalStateException("i >= numEntries && entry != null");
         }
       }
+      return 0;
     }
     // dir node
-    else {
-      N tmp = tree.getNode(getEntry(0));
-      boolean childIsLeaf = tmp.isLeaf();
-      for(int i = 0; i < getCapacity(); i++) {
-        E e = getEntry(i);
-        if(i < getNumEntries() && e == null) {
-          throw new IllegalStateException("i < numEntries && entry == null");
-        }
-        if(i >= getNumEntries() && e != null) {
-          throw new IllegalStateException("i >= numEntries && entry != null");
-        }
-        if(e != null) {
-          N node = tree.getNode(e);
-          if(childIsLeaf && !node.isLeaf()) {
-            for(int k = 0; k < getNumEntries(); k++) {
-              tree.getNode(getEntry(k));
-            }
-            throw new IllegalStateException("Wrong Child in " + this + " at " + i);
-          }
-          if(!childIsLeaf && node.isLeaf()) {
-            throw new IllegalStateException("Wrong Child: child id no leaf, but node is leaf!");
-          }
-          node.integrityCheckParameters((N) this, i);
-          node.integrityCheck(tree);
-        }
+    N tmp = tree.getNode(getEntry(0));
+    boolean childIsLeaf = tmp.isLeaf();
+    int below = -1;
+    for(int i = 0; i < getCapacity(); i++) {
+      E e = getEntry(i);
+      if(i < getNumEntries() && e == null) {
+        throw new IllegalStateException("i < numEntries && entry == null");
       }
-      if(LoggingConfiguration.DEBUG) {
-        Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
+      if(i >= getNumEntries() && e != null) {
+        throw new IllegalStateException("i >= numEntries && entry != null");
+      }
+      if(e != null) {
+        N node = tree.getNode(e);
+        if(childIsLeaf && !node.isLeaf()) {
+          for(int k = 0; k < getNumEntries(); k++) {
+            tree.getNode(getEntry(k));
+          }
+          throw new IllegalStateException("Wrong Child in " + this + " at " + i);
+        }
+        if(!childIsLeaf && node.isLeaf()) {
+          throw new IllegalStateException("Wrong Child: child id no leaf, but node is leaf!");
+        }
+        node.integrityCheckParameters((N) this, i);
+        int b = node.integrityCheck(tree);
+        if(below >= 0 && b != below) {
+          throw new IllegalStateException("Tree is not balanced.");
+        }
+        below = b;
       }
     }
+    if(LoggingConfiguration.DEBUG) {
+      Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
+    }
+    return below + 1;
   }
 
   /**
@@ -192,9 +200,9 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
       return;
     }
     if(!SpatialUtil.equals(entry, mbr)) {
-      String soll = mbr.toString();
-      String ist = new HyperBoundingBox(entry).toString();
-      throw new IllegalStateException("Wrong MBR in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+      throw new IllegalStateException("Wrong MBR in node " + parent.getPageID() + //
+          " at index " + index + " (child " + entry + ")" + //
+          "\nsoll: " + mbr.toString() + ",\n ist: " + new HyperBoundingBox(entry).toString());
     }
   }
 

@@ -144,10 +144,7 @@ public class IndexTreePath<E extends Entry> {
       c.add("@" + p.index + ":" + entry.toString());
     }
     for(int counter = c.size() - 1; counter >= 0; --counter) {
-      buffer.append(c.get(counter));
-      if(counter > 0) {
-        buffer.append(", ");
-      }
+      buffer.append(c.get(counter)).append(counter > 0 ? ", ": "");
     }
     return buffer.append(']').toString();
   }

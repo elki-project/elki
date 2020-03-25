@@ -157,6 +157,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     lastInsertedEntry = entry;
     // choose subtree for insertion
     IndexTreePath<E> subtree = choosePath(getRootPath(), entry, height, 1);
+    assert height == subtree.getPathCount();
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree);
@@ -181,6 +182,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     lastInsertedEntry = entry;
     // choose node for insertion of o
     IndexTreePath<E> subtree = choosePath(getRootPath(), entry, depth, 1);
+    assert depth == subtree.getPathCount();
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -528,8 +530,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     N childNode = getNode(node.getEntry(0));
     int num = settings.insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, cur);
     newSubtree = new IndexTreePath<>(subtree, node.getEntry(num), num);
-    ++cur;
-    if(cur == depth) {
+    if(++cur == depth) {
       return newSubtree;
     }
     // children are leafs
@@ -620,18 +621,17 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     // reinsert the first entries
     final Logging log = getLogger();
+    // Tree could grow during reinsertions, this is messy.
+    final int oldheight = height;
     for(E entry : reInsertEntries) {
+      if(log.isDebugging()) {
+        log.debug("reinsert " + entry + " at " + (depth + height - oldheight));
+      }
       if(node.isLeaf()) {
-        if(log.isDebugging()) {
-          log.debug("reinsert " + entry);
-        }
         insertLeafEntry(entry);
       }
       else {
-        if(log.isDebugging()) {
-          log.debug("reinsert " + entry + " at " + depth);
-        }
-        insertDirectoryEntry(entry, depth);
+        insertDirectoryEntry(entry, (depth + height - oldheight));
       }
     }
   }

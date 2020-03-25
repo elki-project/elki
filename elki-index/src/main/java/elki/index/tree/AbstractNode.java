@@ -154,51 +154,44 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Adds a new leaf entry to this node's children and returns the index of the
-   * entry in this node's children array. An UnsupportedOperationException will
-   * be thrown if the entry is not a leaf entry or this node is not a leaf node.
+   * entry in the children array. An IllegalStateException will be thrown if the
+   * entry is not a leaf entry or this node is not a leaf node.
    *
    * @param entry the leaf entry to be added
    * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a leaf entry or this
-   *         node is not a leaf node
    */
   @Override
   public final int addLeafEntry(E entry) {
     // entry is not a leaf entry
     if(!(entry instanceof LeafEntry)) {
-      throw new UnsupportedOperationException("Entry is not a leaf entry!");
+      throw new IllegalStateException("Entry is not a leaf entry!");
     }
     // this is a not a leaf node
     if(!isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a leaf node!");
+      throw new IllegalStateException("Node is not a leaf node!");
     }
-
     // leaf node
     return addEntry(entry);
   }
 
   /**
    * Adds a new directory entry to this node's children and returns the index of
-   * the entry in this node's children array. An UnsupportedOperationException
-   * will be thrown if the entry is not a directory entry or this node is not a
-   * directory node.
+   * the entry in the children array. An IllegalStateException will be thrown if
+   * the entry is not a directory entry or this node is not a directory node.
    *
    * @param entry the directory entry to be added
    * @return the index of the entry in this node's children array
-   * @throws UnsupportedOperationException if entry is not a directory entry or
-   *         this node is not a directory node
    */
   @Override
   public final int addDirectoryEntry(E entry) {
     // entry is not a directory entry
     if(entry instanceof LeafEntry) {
-      throw new UnsupportedOperationException("Entry is not a directory entry!");
+      throw new IllegalStateException("Entry is not a directory entry!");
     }
     // this is a not a directory node
     if(isLeaf()) {
-      throw new UnsupportedOperationException("Node is not a directory node!");
+      throw new IllegalStateException("Node is not a directory node!");
     }
-
     return addEntry(entry);
   }
 
