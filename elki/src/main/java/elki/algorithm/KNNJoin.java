@@ -139,11 +139,11 @@ public class KNNJoin implements Algorithm {
    * @return Data store
    */
   public WritableDataStore<KNNList> run(Relation<? extends SpatialComparable> relation, DBIDs ids) {
-    It<AbstractRStarTree<?, ?, ?>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class);
+    It<AbstractRStarTree<?, SpatialEntry, ?>> indexes = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class);
     if(!indexes.valid()) {
       throw new MissingPrerequisitesException("KNNJoin found no spatial indexes, expected exactly one.");
     }
-    AbstractRStarTree<?, ?, ?> index = indexes.get();
+    AbstractRStarTree<?, SpatialEntry, ?> index = indexes.get();
     if(indexes.advance().valid()) {
       throw new MissingPrerequisitesException("KNNJoin found more than one spatial indexes, expected exactly one.");
     }
@@ -154,14 +154,14 @@ public class KNNJoin implements Algorithm {
    * Inner run method. This returns a double store, and is used by
    * {@link elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor}
    *
-   * @param index Index to process
+   * @param idx Index to process
    * @param ids Object IDs
    * @return Data store
    */
-  public WritableDataStore<KNNList> run(AbstractRStarTree<?, ?, ?> index, DBIDs ids) {
-    // data pages
+  public WritableDataStore<KNNList> run(AbstractRStarTree<?, ?, ?> idx, DBIDs ids) {
+    @SuppressWarnings("unchecked")
+    AbstractRStarTree<?, SpatialEntry, ?> index = (AbstractRStarTree<?, SpatialEntry, ?>) idx;
     List<? extends SpatialEntry> ps_candidates = index.getLeaves();
-    // knn heaps
     List<List<KNNHeap>> heaps = new ArrayList<>(ps_candidates.size());
 
     // Initialize with the page self-pairing

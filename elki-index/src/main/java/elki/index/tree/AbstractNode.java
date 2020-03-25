@@ -23,7 +23,10 @@ package elki.index.tree;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import elki.logging.Logging;
 import elki.logging.LoggingConfiguration;
@@ -40,7 +43,7 @@ import elki.utilities.exceptions.AbortException;
  *
  * @param <E> the type of Entry used in the index
  */
-public abstract class AbstractNode<E extends Entry> extends AbstractExternalizablePage implements Node<E> {
+public abstract class AbstractNode<E> extends AbstractExternalizablePage implements Node<E> {
   /**
    * The number of entries in this node.
    */
@@ -49,7 +52,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   /**
    * The entries (children) of this node.
    */
-  protected Entry[] entries;
+  protected Object[] entries;
 
   /**
    * Indicates whether this node is a leaf node.
@@ -73,7 +76,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public AbstractNode(int capacity, boolean isLeaf) {
     super();
     this.numEntries = 0;
-    this.entries = new Entry[capacity];
+    this.entries = new Object[capacity];
     this.isLeaf = isLeaf;
   }
 

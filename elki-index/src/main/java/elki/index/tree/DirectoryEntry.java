@@ -20,15 +20,17 @@
  */
 package elki.index.tree;
 
+import java.io.Externalizable;
+
 /**
- * Directory Entry
+ * Directory entry of an index.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public interface DirectoryEntry extends Entry {
+public interface DirectoryEntry extends Externalizable {
   /**
-   * Get the page ID of this leaf entry.
+   * Get the page ID of this directory entry.
    */
   int getPageID();
 }

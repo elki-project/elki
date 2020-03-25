@@ -20,8 +20,9 @@
  */
 package elki.index.tree.metrical.mtreevariants;
 
+import java.io.Externalizable;
+
 import elki.database.ids.DBID;
-import elki.index.tree.Entry;
 
 /**
  * Defines the requirements for an entry in an M-Tree node.
@@ -29,7 +30,7 @@ import elki.index.tree.Entry;
  * @author Elke Achtert
  * @since 0.1
  */
-public interface MTreeEntry extends Entry {
+public interface MTreeEntry extends Externalizable {
   /**
    * Returns the id of the underlying database object of this entry, if this
    * entry is a leaf entry, the id of the routing object, otherwise.

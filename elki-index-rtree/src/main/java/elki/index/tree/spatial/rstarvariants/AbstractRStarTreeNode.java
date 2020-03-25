@@ -29,7 +29,6 @@ import elki.data.ModifiableHyperBoundingBox;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.index.tree.AbstractNode;
-import elki.index.tree.Entry;
 import elki.index.tree.Node;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
@@ -207,16 +206,17 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Calls the super method and writes the id of this node, the numEntries and
    * the entries array to the specified stream.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     // TODO: do we need to write/read the capacity?
     out.writeInt(entries.length);
-    for(Entry entry : entries) {
+    for(Object entry : entries) {
       if(entry == null) {
         break;
       }
-      entry.writeExternal(out);
+      ((E) entry).writeExternal(out);
     }
   }
 

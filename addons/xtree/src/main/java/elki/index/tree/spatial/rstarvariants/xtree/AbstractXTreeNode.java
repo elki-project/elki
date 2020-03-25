@@ -28,7 +28,6 @@ import java.util.List;
 
 import elki.data.HyperBoundingBox;
 import elki.data.spatial.SpatialUtil;
-import elki.index.tree.Entry;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
@@ -91,10 +90,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
     if(getNumEntries() < getCapacity()) {
       throw new IllegalStateException("This node is not yet overflowing (only " + getNumEntries() + " of " + getCapacity() + " entries)");
     }
-    Entry[] old_nodes = super.entries.clone();
-    assert old_nodes[old_nodes.length - 1] != null;
-    super.entries = (Entry[]) java.util.Arrays.copyOfRange(old_nodes, 0, getCapacity() * 2 - 1, entries.getClass());
-    assert super.entries.length == old_nodes.length * 2 - 1;
+    super.entries = java.util.Arrays.copyOfRange(super.entries, 0, getCapacity() * 2 - 1);
     return getCapacity();
   }
 
@@ -130,9 +126,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
     if(numEntries >= newCapacity) {
       throw new IllegalStateException("This node is not yet underflowing and cannot be shrunken yet.");
     }
-    Entry[] new_entries = java.util.Arrays.copyOfRange(super.entries, 0, newCapacity);
-    assert new_entries[newCapacity - 1] == null;
-    super.entries = new_entries;
+    super.entries = java.util.Arrays.copyOfRange(super.entries, 0, newCapacity);
     if(dirCapacity == getCapacity()) {
       supernode = false; // this node is no more a supernode
     }
@@ -155,11 +149,11 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
     out.writeInt(entries.length);
     if(isSuperNode())
       return; // cannot fit this into out
-    for(Entry entry : entries) {
+    for(Object entry : entries) {
       if(entry == null) {
         break;
       }
-      entry.writeExternal(out);
+      ((SpatialEntry) entry).writeExternal(out);
     }
   }
 
@@ -187,7 +181,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
       capacity_to_be_filled = capacity;
       return;
     }
-    entries = new Entry[capacity];
+    entries = new Object[capacity];
     for(int i = 0; i < numEntries; i++) {
       SpatialEntry s = isLeaf() ? new SpatialPointLeafEntry() : new XTreeDirectoryEntry();
       s.readExternal(in);
@@ -208,11 +202,11 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
     }
     // write header
     writeExternal(out);
-    for(Entry entry : entries) {
+    for(Object entry : entries) {
       if(entry == null) {
         break;
       }
-      entry.writeExternal(out);
+      ((SpatialEntry) entry).writeExternal(out);
     }
   }
 
@@ -237,7 +231,7 @@ public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends 
       throw new IllegalStateException("A supernode is cannot be a leaf");
     }
     // TODO: verify
-    entries = new Entry[capacity_to_be_filled];
+    entries = new Object[capacity_to_be_filled];
     // old way:
     // entries = (E[]) new XDirectoryEntry[capacity_to_be_filled];
     capacity_to_be_filled = 0;

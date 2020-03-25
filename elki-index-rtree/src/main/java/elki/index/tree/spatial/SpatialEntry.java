@@ -20,15 +20,16 @@
  */
 package elki.index.tree.spatial;
 
+import java.io.Externalizable;
+
 import elki.data.spatial.SpatialComparable;
-import elki.index.tree.Entry;
 
 /**
- * Defines the requirements for an entry in a node of a Spatial Index.
+ * Defines the requirements for an entry in a node of a spatial index.
  * 
  * @author Elke Achtert
  * @since 0.1
  */
-public interface SpatialEntry extends Entry, SpatialComparable {
+public interface SpatialEntry extends Externalizable, SpatialComparable {
   // Emtpy - just combining the two interfaces above.
 }

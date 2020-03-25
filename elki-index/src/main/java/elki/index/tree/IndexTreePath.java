@@ -32,7 +32,7 @@ import java.util.ArrayList;
  *
  * @param <E> the type of Entry used in the index
  */
-public class IndexTreePath<E extends Entry> {
+public class IndexTreePath<E> {
   /**
    * Path representing the parent, null if lastPathComponent represents the
    * root.
@@ -144,7 +144,7 @@ public class IndexTreePath<E extends Entry> {
       c.add("@" + p.index + ":" + entry.toString());
     }
     for(int counter = c.size() - 1; counter >= 0; --counter) {
-      buffer.append(c.get(counter)).append(counter > 0 ? ", ": "");
+      buffer.append(c.get(counter)).append(counter > 0 ? ", " : "");
     }
     return buffer.append(']').toString();
   }

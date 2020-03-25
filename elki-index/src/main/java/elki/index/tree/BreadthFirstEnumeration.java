@@ -34,7 +34,7 @@ import java.util.*;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements Iterator<IndexTreePath<E>> {
+public class BreadthFirstEnumeration<N extends Node<E>, E> implements Iterator<IndexTreePath<E>> {
   /**
    * Represents an empty enumeration.
    */

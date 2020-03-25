@@ -20,8 +20,9 @@
  */
 package elki.index.tree.spatial.rstarvariants.xtree;
 
+import java.io.Externalizable;
+
 import elki.data.spatial.SpatialComparable;
-import elki.index.tree.Entry;
 import elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
 
 /**
@@ -30,7 +31,7 @@ import elki.index.tree.spatial.rstarvariants.xtree.util.SplitHistory;
  * @author Marisa Thoma
  * @since 0.7.5
  */
-public interface SplitHistorySpatialEntry extends Entry, SpatialComparable {
+public interface SplitHistorySpatialEntry extends Externalizable, SpatialComparable {
   /**
    * Get the split history of this entry's node.
    * 

@@ -38,7 +38,7 @@ import elki.persistent.PageFile;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class IndexTree<N extends Node<E>, E extends Entry> implements Index {
+public abstract class IndexTree<N extends Node<E>, E> implements Index {
   /**
    * The file storing the entries of this index.
    */
@@ -139,7 +139,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @param entry Entry
    * @return Page ID
    */
-  protected int getPageID(Entry entry) {
+  protected int getPageID(E entry) {
     if(!(entry instanceof DirectoryEntry)) {
       throw new IllegalStateException("Leafs do not have page ids!");
     }
@@ -162,7 +162,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @param entry the entry representing the node to be returned
    * @return the node that is represented by the specified entry
    */
-  public N getNode(Entry entry) {
+  public N getNode(E entry) {
     return getNode(getPageID(entry));
   }
 

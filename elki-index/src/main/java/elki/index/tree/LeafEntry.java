@@ -20,15 +20,17 @@
  */
 package elki.index.tree;
 
+import java.io.Externalizable;
+
 import elki.database.ids.DBID;
 
 /**
- * Leaf entry
+ * Leaf entry of an index.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public interface LeafEntry extends Entry {
+public interface LeafEntry extends Externalizable {
   /**
    * Get the DBID of this leaf entry.
    */

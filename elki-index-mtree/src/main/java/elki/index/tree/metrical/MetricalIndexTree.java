@@ -23,7 +23,6 @@ package elki.index.tree.metrical;
 import java.util.List;
 
 import elki.distance.Distance;
-import elki.index.tree.Entry;
 import elki.index.tree.IndexTree;
 import elki.index.tree.Node;
 import elki.persistent.PageFile;
@@ -38,7 +37,7 @@ import elki.persistent.PageFile;
  * @param <N> the type of nodes used in the metrical index
  * @param <E> the type of entries used in the metrical index
  */
-public abstract class MetricalIndexTree<O, N extends Node<E>, E extends Entry> extends IndexTree<N, E> {
+public abstract class MetricalIndexTree<O, N extends Node<E>, E> extends IndexTree<N, E> {
   /**
    * Constructor.
    * 

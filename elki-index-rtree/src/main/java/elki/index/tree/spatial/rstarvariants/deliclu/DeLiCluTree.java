@@ -20,7 +20,6 @@
  */
 package elki.index.tree.spatial.rstarvariants.deliclu;
 
-import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import elki.logging.Logging;
@@ -69,7 +68,7 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
    * @param entry1 the first node
    * @param entry2 the second node
    */
-  public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
+  public void setExpanded(DeLiCluEntry entry1, DeLiCluEntry entry2) {
     IntSet exp1 = expanded.get(getPageID(entry1));
     if(exp1 == null) {
       exp1 = new IntOpenHashSet();
@@ -84,7 +83,7 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
    * @param entry the id of the node for which the expansions should be returned
    * @return the nodes which are already expanded with the specified node
    */
-  public IntSet getExpanded(SpatialEntry entry) {
+  public IntSet getExpanded(DeLiCluEntry entry) {
     IntSet exp = expanded.get(getPageID(entry));
     return (exp != null) ? exp : IntSets.EMPTY_SET;
   }

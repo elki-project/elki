@@ -36,7 +36,7 @@ import elki.persistent.Page;
  * 
  * @param <E> the type of Entry used in the index
  */
-public interface Node<E extends Entry> extends Page {
+public interface Node<E> extends Page {
   /**
    * Returns an enumeration of the children paths of this node.
    * 

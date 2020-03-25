@@ -81,7 +81,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   @Override
   protected void preprocess() {
     DistanceQuery<O> distanceQuery = new QueryBuilder<>(relation, distance).distanceQuery();
-    AbstractRStarTree<?, ?, ?> index = getSpatialIndex(relation);
+    AbstractRStarTree<?, SpatialEntry, ?> index = getSpatialIndex(relation);
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance pagesize = new MeanVariance();
@@ -139,9 +139,9 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
   }
 
-  protected AbstractRStarTree<?, ?, ?> getSpatialIndex(Relation<O> relation) {
-    AbstractRStarTree<?, ?, ?> ret = null;
-    for(It<AbstractRStarTree<?, ?, ?>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class); iter.valid(); iter.advance()) {
+  protected AbstractRStarTree<?, SpatialEntry, ?> getSpatialIndex(Relation<O> relation) {
+    AbstractRStarTree<?, SpatialEntry, ?> ret = null;
+    for(It<AbstractRStarTree<?, SpatialEntry, ?>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one spatial index found - this is not supported!");
       }

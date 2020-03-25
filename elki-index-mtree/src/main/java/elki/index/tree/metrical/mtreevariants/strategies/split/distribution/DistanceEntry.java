@@ -20,8 +20,6 @@
  */
 package elki.index.tree.metrical.mtreevariants.strategies.split.distribution;
 
-import elki.index.tree.Entry;
-
 /**
  * Helper class: encapsulates an entry in an Index and a distance value
  * belonging to this entry.
@@ -29,11 +27,9 @@ import elki.index.tree.Entry;
  * @author Elke Achtert
  * @since 0.1
  * 
- * @assoc - - - Entry
- * 
  * @param <E> the type of Entry used in the index
  */
-public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<E>> {
+public class DistanceEntry<E> implements Comparable<DistanceEntry<E>> {
   /**
    * The entry of the Index.
    */

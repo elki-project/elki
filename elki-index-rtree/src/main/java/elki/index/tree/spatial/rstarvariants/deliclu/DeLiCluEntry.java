@@ -24,44 +24,42 @@ import elki.index.tree.spatial.SpatialEntry;
 
 /**
  * Defines the requirements for an entry in an DeLiClu-Tree node.
- * Additionally to an entry in an R*-Tree two boolean flags that indicate whether this entry's node
- * contains handled or unhandled data objects.
+ * Additionally to an entry in an R*-Tree two boolean flags that indicate
+ * whether this entry's node contains handled or unhandled data objects.
  *
  * @author Elke Achtert
  * @since 0.1
  */
 public interface DeLiCluEntry extends SpatialEntry {
   /**
-   * Returns true, if the node (or its child nodes) which is represented by this entry
-   * contains handled data objects.
+   * Returns true, if the node (or its child nodes) which is represented by this
+   * entry contains handled data objects.
    *
-   * @return true, if the node (or its child nodes) which is represented by this entry
-   *         contains handled data objects,
-   *         false otherwise.
+   * @return true, if the node (or its child nodes) which is represented by this
+   *         entry contains handled data objects, false otherwise.
    */
   boolean hasHandled();
 
   /**
-   * Returns true, if the node (or its child nodes) which is represented by this entry
-   * contains unhandled data objects.
+   * Returns true, if the node (or its child nodes) which is represented by this
+   * entry contains unhandled data objects.
    *
-   * @return true, if the node (or its child nodes) which is represented by this entry
-   *         contains unhandled data objects,
-   *         false otherwise.
+   * @return true, if the node (or its child nodes) which is represented by this
+   *         entry contains unhandled data objects, false otherwise.
    */
   boolean hasUnhandled();
 
   /**
-   * Sets the flag to marks the node (or its child nodes) which is represented by this entry
-   * to contain handled data objects.
+   * Sets the flag to marks the node (or its child nodes) which is represented
+   * by this entry to contain handled data objects.
    *
    * @param hasHandled the flag to be set
    */
   void setHasHandled(boolean hasHandled);
 
   /**
-   * Sets the flag to marks the node (or its child nodes) which is represented by this entry
-   * to contain unhandled data objects.
+   * Sets the flag to marks the node (or its child nodes) which is represented
+   * by this entry to contain unhandled data objects.
    *
    * @param hasUnhandled the flag to be set
    */
