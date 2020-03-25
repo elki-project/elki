@@ -20,12 +20,14 @@
  */
 package elki.utilities.optionhandling.parameters;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 import elki.logging.Logging;
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
+import elki.utilities.ELKIServiceScanner;
 import elki.utilities.exceptions.ClassInstantiationException;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
@@ -147,23 +149,42 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   }
 
   @Override
-  public StringBuilder describeValues(StringBuilder info) {
+  public StringBuilder describeValues(StringBuilder buf) {
+    return describeImplementations(buf, restrictionClass, getKnownImplementations());
+  }
+
+  /**
+   * Print the available implementations.
+   * 
+   * @param buf Output buffer
+   * @param restrictionClass Restriction class
+   * @param imp Implementations
+   * @return the output buffer, for chaining
+   */
+  protected static StringBuilder describeImplementations(StringBuilder buf, Class<?> restrictionClass, List<Class<?>> imp) {
     if(restrictionClass == null || restrictionClass == Object.class) {
-      return info;
+      return buf;
     }
-    info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
+    buf.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
         .append(restrictionClass.getName()) //
         .append(FormatUtil.NEWLINE);
 
-    List<Class<?>> known = getKnownImplementations();
-    if(!known.isEmpty()) {
+    if(!imp.isEmpty()) {
+      String pkgName = restrictionClass.getPackage().getName();
+      buf.append("Known classes (default package ").append(pkgName).append("):") //
+          .append(FormatUtil.NEWLINE);
+      Class<?>[] known = imp.toArray(new Class<?>[imp.size()]);
+      // TODO: sort by priority, build a tree, output tree?
+      Arrays.sort(known, ELKIServiceScanner.SORT_BY_NAME);
       for(Class<?> c : known) {
-        info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
-            .append(canonicalClassName(c, getRestrictionClass())) //
+        String name = c.getName();
+        boolean stripPrefix = name.length() > pkgName.length() && name.startsWith(pkgName) && name.charAt(pkgName.length()) == '.';
+        buf.append("->").append(FormatUtil.NONBREAKING_SPACE) //
+            .append(name, stripPrefix ? pkgName.length() + 1 : 0, name.length()) //
             .append(FormatUtil.NEWLINE);
       }
     }
-    return info;
+    return buf;
   }
 
   @Override

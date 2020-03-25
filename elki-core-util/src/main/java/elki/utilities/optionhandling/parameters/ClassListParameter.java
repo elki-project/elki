@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 
 import elki.utilities.ClassGenericsUtil;
 import elki.utilities.ELKIServiceRegistry;
-import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -215,27 +214,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   @Override
   public StringBuilder describeValues(StringBuilder buf) {
-    if(restrictionClass == null || restrictionClass == Object.class) {
-      return buf;
-    }
-    buf.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
-        .append(restrictionClass.getName()) //
-        .append(FormatUtil.NEWLINE);
-
-    List<Class<?>> known = getKnownImplementations();
-    if(!known.isEmpty()) {
-      String pkgName = restrictionClass.getPackage().getName();
-      buf.append("Known classes (default package ").append(pkgName).append("):") //
-          .append(FormatUtil.NEWLINE);
-      for(Class<?> c : known) {
-        String name = c.getName();
-        final boolean stripPrefix = name.length() > pkgName.length() && name.startsWith(pkgName) && name.charAt(pkgName.length()) == '.';
-        buf.append("->").append(FormatUtil.NONBREAKING_SPACE) //
-            .append(name, stripPrefix ? pkgName.length() + 1 : 0, name.length()) //
-            .append(FormatUtil.NEWLINE);
-      }
-    }
-    return buf;
+    return ClassParameter.describeImplementations(buf, restrictionClass, getKnownImplementations());
   }
 
   @Override
