@@ -67,8 +67,8 @@ public abstract class AbstractVectorIter implements ScoreEvaluation.Adapter, Arr
   public AbstractVectorIter(NumberVector positive, NumberVector vec) {
     this.positive = positive;
     this.vec = vec;
-    for(int i = 0, l = vec.getDimensionality(); i < l; i++) {
-      if(vec.doubleValue(i) > 0) {
+    for(int i = 0, l = positive.getDimensionality(); i < l; i++) {
+      if(positive.doubleValue(i) > 0) {
         ++numPositive;
       }
     }
@@ -124,7 +124,7 @@ public abstract class AbstractVectorIter implements ScoreEvaluation.Adapter, Arr
 
   @Override
   public boolean test() {
-    return positive.doubleValue(pos) > 0;
+    return positive.doubleValue(sort[pos]) > 0;
   }
 
   @Override

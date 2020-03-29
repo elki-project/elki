@@ -54,8 +54,7 @@ import elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Class to load an outlier detection summary file, as produced by
- * {@link ComputeKNNOutlierScores}, and compute popular evaluation metrics for
- * it.
+ * {@link ComputeKNNOutlierScores}, and compute popular evaluation metrics.
  * <p>
  * File format description:
  * <ul>
@@ -141,7 +140,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   @Override
   public void run() {
     try (InputStream is = new BufferedInputStream(FileUtil.open(infile)); //
-        FileChannel chan = FileChannel.open(outfile, StandardOpenOption.APPEND); //
+        FileChannel chan = FileChannel.open(outfile, StandardOpenOption.APPEND, StandardOpenOption.CREATE); //
         PrintStream fout = new PrintStream(Channels.newOutputStream(chan))) {
       // Setup the input stream.
       parser.initStream(is);
