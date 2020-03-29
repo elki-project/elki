@@ -236,24 +236,12 @@ public class ParameterTable extends JTable {
           int flags = parameters.getNode(row).flags;
           // TODO: don't hardcode black - maybe mix the other colors, too?
           c.setForeground(Color.BLACK);
-          if((flags & DynamicParameters.BIT_INVALID) != 0) {
-            c.setBackground(COLOR_SYNTAX_ERROR);
-          }
-          else if((flags & DynamicParameters.BIT_SYNTAX_ERROR) != 0) {
-            c.setBackground(COLOR_SYNTAX_ERROR);
-          }
-          else if((flags & DynamicParameters.BIT_INCOMPLETE) != 0) {
-            c.setBackground(COLOR_INCOMPLETE);
-          }
-          else if((flags & DynamicParameters.BIT_DEFAULT_VALUE) != 0) {
-            c.setBackground(COLOR_DEFAULT_VALUE);
-          }
-          else if((flags & DynamicParameters.BIT_OPTIONAL) != 0) {
-            c.setBackground(COLOR_OPTIONAL);
-          }
-          else {
-            c.setBackground(null);
-          }
+          c.setBackground((flags & DynamicParameters.BIT_INVALID) != 0 ? COLOR_SYNTAX_ERROR : //
+              (flags & DynamicParameters.BIT_SYNTAX_ERROR) != 0 ? COLOR_SYNTAX_ERROR : //
+                  (flags & DynamicParameters.BIT_INCOMPLETE) != 0 ? COLOR_INCOMPLETE : //
+                      (flags & DynamicParameters.BIT_DEFAULT_VALUE) != 0 ? COLOR_DEFAULT_VALUE : //
+                          (flags & DynamicParameters.BIT_OPTIONAL) != 0 ? COLOR_OPTIONAL : //
+                              null); // Default
         }
       }
       return c;
@@ -481,7 +469,7 @@ public class ParameterTable extends JTable {
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           mode = FileParameter.FileType.INPUT_FILE.equals(fp.getFileType()) ? FileDialog.LOAD : FileDialog.SAVE;
-          textfield.setText(fp.isDefined() ? fp.getValue().toString() : "");
+          textfield.setText(fp.isDefined() ? fp.getValueAsString() : "");
         }
       }
       textfield.requestFocus();
@@ -676,10 +664,7 @@ public class ParameterTable extends JTable {
    * text editor, sometimes a ComboBox to offer known choices, and sometime a
    * file selector dialog.
    *
-   * TODO: class list parameters etc.
-   *
    * @author Erich Schubert
-   *
    */
   private class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
     /**
@@ -743,37 +728,20 @@ public class ParameterTable extends JTable {
           value = s.substring(DynamicParameters.STRING_USE_DEFAULT.length());
         }
       }
-      if(row < parameters.size()) {
-        Parameter<?> option = parameters.getNode(row).param;
-        if(option instanceof Flag) {
-          activeEditor = dropdownEditor;
-          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
-        if(option instanceof ClassListParameter<?>) {
-          activeEditor = classListEditor;
-          return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
-        if(option instanceof ClassParameter<?>) {
-          activeEditor = classListEditor;
-          return classListEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
-        if(option instanceof FileParameter) {
-          activeEditor = fileNameEditor;
-          return fileNameEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
-        if(option instanceof EnumParameter<?>) {
-          activeEditor = dropdownEditor;
-          return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
-      }
-      activeEditor = plaintextEditor;
-      return plaintextEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
+      Parameter<?> option = row < parameters.size() ? parameters.getNode(row).param : null;
+      activeEditor = option instanceof Flag ? dropdownEditor : //
+          option instanceof ClassListParameter<?> ? activeEditor = classListEditor : //
+              option instanceof ClassParameter<?> ? activeEditor = classListEditor : //
+                  option instanceof FileParameter ? activeEditor = fileNameEditor : //
+                      option instanceof EnumParameter<?> ? activeEditor = dropdownEditor : //
+                          plaintextEditor; // Default
+      return activeEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
     }
   }
 
   /**
    * This is a panel that will dispatch keystrokes to a particular component.
-   *
+   * <p>
    * This makes the tabular GUI much more user friendly.
    *
    * @author Erich Schubert

@@ -25,14 +25,9 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import elki.gui.icons.StockIcon;
 import elki.logging.LoggingUtil;
@@ -77,9 +72,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     button = new JButton(StockIcon.getStockIcon(StockIcon.DOCUMENT_OPEN));
     button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
-    // fill with value
-    Path f = fp.isDefined() ? Paths.get(fp.getValue()) : null;
-    textfield.setText(f == null ? "" : f.toString());
+    textfield.setText(fp.getValueAsString());
 
     // make a panel
     GridBagConstraints constraints = new GridBagConstraints();

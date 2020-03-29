@@ -78,7 +78,8 @@ public class FileParameter extends AbstractParameter<FileParameter, URI> {
 
   @Override
   public String getValueAsString() {
-    return getValue().normalize().toString();
+    final URI v = getValue();
+    return "file".equals(v.getScheme()) ? Paths.get(v).toString() : v.normalize().toString();
   }
 
   @Override
