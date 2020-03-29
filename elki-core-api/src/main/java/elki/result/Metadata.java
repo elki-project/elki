@@ -199,13 +199,13 @@ public class Metadata extends WeakReference<Object> {
    * Cleanup function to help garbage collection.
    */
   private void cleanup() {
-    if(LOG.isDebuggingFine()) {
-      String nam = getLongName();
-      nam = nam != null ? nam : get() != null ? get().toString() : "<garbage collected>";
-      LOG.debugFine("Garbage collecting: " + nam);
-    }
     listeners = null;
     if(hierarchy.numc > 0) {
+      if(LOG.isDebuggingFine()) {
+        String nam = getLongName();
+        nam = nam != null ? nam : get() != null ? get().toString() : "<garbage collected>";
+        LOG.debugFinest("Garbage collecting: " + nam);
+      }
       synchronized(global) {
         for(int i = hierarchy.numc - 1; i >= 0; i--) {
           Metadata ret = global.get(hierarchy.children[i]);
