@@ -42,6 +42,8 @@ import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
 import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
@@ -292,9 +294,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           k -> new ISOS<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
       // Run FastABOD
-      runForEachK("FastABOD", 3, maxksq, //
-          k -> new FastABOD<O>(LinearKernel.STATIC, k) //
-              .run(relation), out);
+      if(EuclideanDistance.STATIC.equals(distance) || SquaredEuclideanDistance.STATIC.equals(distance)) {
+        runForEachK("FastABOD", 3, maxksq, //
+            k -> new FastABOD<O>(LinearKernel.STATIC, k) //
+                .run(relation), out);
+      }
     }
     catch(IOException e) {
       throw new AbortException("IO error writing output file.", e);
