@@ -90,7 +90,8 @@ public class LinearIntGenerator implements IntGenerator {
 
   @Override
   public StringBuilder serializeTo(StringBuilder buf) {
-    return buf.append(start).append(",+=").append(step).append(',').append(stop);
+    return step == 1 ? buf.append(start).append(",+,").append(stop) : //
+        buf.append(start).append(",+=").append(step).append(',').append(stop);
   }
 
   @Override

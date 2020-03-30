@@ -38,9 +38,15 @@ public class ParseIntRangesTest {
   @Test
   public void examples() {
     IntGenerator r;
+    r = parseIntRanges("1");
+    assertArrayEquals("Single", new int[] { 1 }, collect(r));
     r = parseIntRanges("1,2,3,...,10");
     assertArrayEquals("Simple", new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, collect(r));
     assertTrue("Not simplified", r instanceof LinearIntGenerator);
+    r = parseIntRanges("1,+,10");
+    assertArrayEquals("Increment", new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, collect(r));
+    r = parseIntRanges("1,++,10");
+    assertArrayEquals("Increment", new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, collect(r));
     r = parseIntRanges("1,3,,10");
     assertArrayEquals("Variants", new int[] { 1, 3, 5, 7, 9 }, collect(r));
     r = parseIntRanges("1,3,..,10");
