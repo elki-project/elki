@@ -90,8 +90,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     // add listener
     KNNListener l = new LOFKNNListener(lofResult);
-    ((MaterializeKNNPreprocessor<DBIDRef>) ((PreprocessorKNNQuery<DBIDRef>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
-    ((MaterializeKNNPreprocessor<DBIDRef>) ((PreprocessorKNNQuery<DBIDRef>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<?>) ((PreprocessorKNNQuery) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<?>) ((PreprocessorKNNQuery) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
 
     return lofResult.getResult();
   }
@@ -174,8 +174,8 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
 
     @Override
     public void kNNsChanged(KNNChangeEvent e) {
-      AbstractMaterializeKNNPreprocessor<DBIDRef> p1 = ((PreprocessorKNNQuery<DBIDRef>) lofResult.getKNNRefer()).getPreprocessor();
-      AbstractMaterializeKNNPreprocessor<DBIDRef> p2 = ((PreprocessorKNNQuery<DBIDRef>) lofResult.getKNNReach()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<?> p1 = ((PreprocessorKNNQuery) lofResult.getKNNRefer()).getPreprocessor();
+      AbstractMaterializeKNNPreprocessor<?> p2 = ((PreprocessorKNNQuery) lofResult.getKNNReach()).getPreprocessor();
 
       if(firstEventReceived == null) {
         if(e.getSource().equals(p1) && e.getSource().equals(p2)) {

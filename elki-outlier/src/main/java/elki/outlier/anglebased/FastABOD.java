@@ -181,7 +181,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           }
         }
       }
-      final double abof = s.getPopulationVariance();
+      final double abof = s.getCount() > 0 ? s.getPopulationVariance() : Double.POSITIVE_INFINITY;
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
     }
@@ -245,7 +245,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           s.put(numerator * div, FastMath.sqrt(div));
         }
       }
-      final double abof = s.getPopulationVariance();
+      final double abof = s.getCount() > 0 ? s.getPopulationVariance() : Double.POSITIVE_INFINITY;
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
     }

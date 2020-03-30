@@ -232,10 +232,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
       runForEachK("ODIN", 0, maxk, //
           k -> new ODIN<O>(distance, k) //
               .run(relation), out);
-      // Run FastABOD
-      runForEachK("FastABOD", 3, maxksq, //
-          k -> new FastABOD<O>(LinearKernel.STATIC, k) //
-              .run(relation), out);
       // Run KDEOS with intrinsic dimensionality 2.
       runForEachK("KDEOS", 2, maxk, //
           k -> new KDEOS<O>(distance, k, k, GaussianKernelDensityFunction.KERNEL, 0., //
@@ -295,9 +291,17 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
       runForEachK("ISOS", 2, maxk, //
           k -> new ISOS<O>(distance, k, AggregatedHillEstimator.STATIC) //
               .run(relation), out);
+      // Run FastABOD
+      runForEachK("FastABOD", 3, maxksq, //
+          k -> new FastABOD<O>(LinearKernel.STATIC, k) //
+              .run(relation), out);
     }
     catch(IOException e) {
       throw new AbortException("IO error writing output file.", e);
+    }
+    // Prevent garbage collection
+    if(!(knnq instanceof PreprocessorKNNQuery)) {
+      LOG.warning("Not using preprocessor knn query. Runtime is suboptimal.");
     }
   }
 

@@ -160,7 +160,6 @@ public class LDF<O extends NumberVector> implements OutlierAlgorithm {
       final KNNList neighbors = knnq.getKNN(it, kplus);
       double sum = 0.0;
       int count = 0;
-      // Fast version for double distances
       for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         if(DBIDUtil.equal(neighbor, it)) {
           continue;

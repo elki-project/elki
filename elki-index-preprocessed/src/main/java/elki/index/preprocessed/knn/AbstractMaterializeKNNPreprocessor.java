@@ -29,9 +29,12 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.knn.PreprocessorKNNQuery;
+import elki.database.query.knn.PreprocessorSqrtKNNQuery;
+import elki.database.query.knn.PreprocessorSquaredKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.IndexFactory;
 import elki.index.KNNIndex;
 import elki.logging.Logging;
@@ -162,16 +165,30 @@ public abstract class AbstractMaterializeKNNPreprocessor<O> implements KNNIndex<
     }
   }
 
+  /**
+   * @deprecated not possible
+   */
+  @Deprecated
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     return null; // not possible
   }
 
   @Override
-  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distQ, int maxk, int flags) {
-    return relation == distQ.getRelation() && distance.equals(distQ.getDistance()) //
-        && (maxk == Integer.MAX_VALUE || maxk <= k) ? //
-            new PreprocessorKNNQuery<O>(relation, this) : null;
+  public PreprocessorKNNQuery kNNByDBID(DistanceQuery<O> distQ, int maxk, int flags) {
+    if(relation == distQ.getRelation() && (maxk == Integer.MAX_VALUE || maxk <= k)) {
+      final Distance<? super O> odist = distQ.getDistance();
+      if(distance.equals(odist)) {
+        return new PreprocessorKNNQuery(relation, this);
+      }
+      else if(EuclideanDistance.STATIC.equals(distance) && SquaredEuclideanDistance.STATIC.equals(odist)) {
+        return new PreprocessorSquaredKNNQuery(relation, this);
+      }
+      else if(SquaredEuclideanDistance.STATIC.equals(distance) && EuclideanDistance.STATIC.equals(odist)) {
+        return new PreprocessorSqrtKNNQuery(relation, this);
+      }
+    }
+    return null;
   }
 
   /**

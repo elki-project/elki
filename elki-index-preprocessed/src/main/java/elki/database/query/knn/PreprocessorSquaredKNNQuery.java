@@ -27,31 +27,15 @@ import elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import elki.logging.Logging;
 
 /**
- * Use precomputed kNN.
+ * Use the squared values of precomputed kNN.
  *
  * @author Erich Schubert
- * @since 0.4.0
  */
-public class PreprocessorKNNQuery implements KNNSearcher<DBIDRef> {
+public class PreprocessorSquaredKNNQuery extends PreprocessorKNNQuery {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(PreprocessorKNNQuery.class);
-
-  /**
-   * The data to use for this query
-   */
-  protected final Relation<?> relation;
-
-  /**
-   * The last preprocessor result
-   */
-  private final AbstractMaterializeKNNPreprocessor<?> preprocessor;
-
-  /**
-   * Warn only once.
-   */
-  private boolean warned = false;
+  private static final Logging LOG = Logging.getLogger(PreprocessorSquaredKNNQuery.class);
 
   /**
    * Constructor.
@@ -59,29 +43,14 @@ public class PreprocessorKNNQuery implements KNNSearcher<DBIDRef> {
    * @param relation Relation to query
    * @param preprocessor Preprocessor instance to use
    */
-  public PreprocessorKNNQuery(Relation<?> relation, AbstractMaterializeKNNPreprocessor<?> preprocessor) {
-    super();
-    this.relation = relation;
-    this.preprocessor = preprocessor;
+  public PreprocessorSquaredKNNQuery(Relation<?> relation, AbstractMaterializeKNNPreprocessor<?> preprocessor) {
+    super(relation, preprocessor);
   }
 
   @Override
   public KNNList getKNN(DBIDRef id, int k) {
-    if(!warned && k > preprocessor.getK()) {
-      getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
-      warned = true;
-    }
-    final KNNList knnList = preprocessor.get(id);
-    return knnList != null ? knnList.subList(k) : null;
-  }
-
-  /**
-   * Get the preprocessor instance.
-   *
-   * @return preprocessor instance
-   */
-  public AbstractMaterializeKNNPreprocessor<?> getPreprocessor() {
-    return preprocessor;
+    final KNNList knnList = super.getKNN(id, k);
+    return knnList != null ? knnList.map(x -> x * x) : null;
   }
 
   /**

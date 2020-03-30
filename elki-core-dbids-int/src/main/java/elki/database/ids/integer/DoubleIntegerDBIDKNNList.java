@@ -20,7 +20,10 @@
  */
 package elki.database.ids.integer;
 
+import java.util.function.DoubleUnaryOperator;
+
 import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.KNNList;
 
 /**
  * kNN list, but without automatic sorting. Use with care, as others may expect
@@ -29,7 +32,7 @@ import elki.database.ids.DoubleDBIDListIter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements IntegerDBIDKNNList {
+class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements KNNList, DoubleIntegerDBIDList {
   /**
    * The k value this list was generated for.
    */
@@ -65,6 +68,11 @@ class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements Int
   }
 
   @Override
+  public KNNList subList(int k) {
+    return new IntegerDBIDKNNSubList(this, k);
+  }
+
+  @Override
   public String toString() {
     StringBuilder buf = new StringBuilder(size() * 20 + 20).append("kNNList[");
     DoubleDBIDListIter iter = this.iter();
@@ -75,5 +83,16 @@ class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements Int
       buf.append(',').append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
     }
     return buf.append(']').toString();
+  }
+
+  @Override
+  public KNNList map(DoubleUnaryOperator f) {
+    DoubleIntegerDBIDKNNList n = new DoubleIntegerDBIDKNNList(k, size);
+    System.arraycopy(ids, 0, n.ids, 0, size);
+    for(int i = 0; i < size; i++) {
+      n.dists[i] = f.applyAsDouble(dists[i]);
+    }
+    n.size = size;
+    return n;
   }
 }

@@ -20,6 +20,8 @@
  */
 package elki.database.ids.integer;
 
+import java.util.function.DoubleUnaryOperator;
+
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
@@ -32,7 +34,7 @@ import elki.database.ids.KNNList;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
+public class IntegerDBIDKNNSubList implements KNNList, DoubleIntegerDBIDList {
   /**
    * Parameter k.
    */
@@ -46,7 +48,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
   /**
    * Wrapped inner result.
    */
-  private final IntegerDBIDKNNList inner;
+  private final DoubleIntegerDBIDKNNList inner;
 
   /**
    * Constructor.
@@ -54,7 +56,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
    * @param inner Inner instance
    * @param k k value
    */
-  public IntegerDBIDKNNSubList(IntegerDBIDKNNList inner, int k) {
+  public IntegerDBIDKNNSubList(DoubleIntegerDBIDKNNList inner, int k) {
     this.inner = inner;
     this.k = k;
     // Compute list size
@@ -131,6 +133,17 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
       buf.append(',').append(iter.doubleValue()).append(':').append(iter.internalGetIndex());
     }
     return buf.append(']').toString();
+  }
+
+  @Override
+  public KNNList map(DoubleUnaryOperator f) {
+    DoubleIntegerDBIDKNNList n = new DoubleIntegerDBIDKNNList(k, size);
+    System.arraycopy(inner.ids, 0, n.ids, 0, size);
+    for(int i = 0; i < size; i++) {
+      n.dists[i] = f.applyAsDouble(inner.dists[i]);
+    }
+    n.size = size;
+    return n;
   }
 
   /**

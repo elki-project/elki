@@ -20,6 +20,8 @@
  */
 package elki.database.ids;
 
+import java.util.function.DoubleUnaryOperator;
+
 /**
  * Interface for kNN results.
  * <p>
@@ -74,4 +76,12 @@ public interface KNNList extends DoubleDBIDList {
    * @return KNN result for the smaller k.
    */
   KNNList subList(int k);
+
+  /**
+   * Function to project the knn list.
+   *
+   * @param f Function to transform values
+   * @return projected list
+   */
+  KNNList map(DoubleUnaryOperator f);
 }

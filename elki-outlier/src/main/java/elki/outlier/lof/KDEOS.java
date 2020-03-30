@@ -183,7 +183,6 @@ public class KDEOS<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> rel) {
     final DBIDs ids = rel.getDBIDs();
-    LOG.verbose("Running kNN preprocessor.");
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(rel, distance).precomputed().kNNByDBID(kmax + 1);
 
     // Initialize store for densities
