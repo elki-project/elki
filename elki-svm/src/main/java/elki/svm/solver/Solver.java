@@ -47,14 +47,15 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * SMO solver for support vector machines, derived from libSVM.
  * <p>
  * An SMO algorithm in Fan et al., JMLR 6(2005), p. 1889--1918
+ * <p>
  * Solves:
  * <br>
  * \[\min 0.5(\alpha^T Q \alpha) + p^T \alpha\]
  * <br>
  * \[y^T \alpha = \delta\]
- * \[y_i = +1 or -1\]
- * \[0 &leq; alpha_i &leq; Cp for y_i = 1\]
- * \[0 &leq; alpha_i &leq; Cn for y_i = -1\]
+ * \[y_i = \pm 1\]
+ * \[0 &leq; alpha_i &leq; Cp \text{for} y_i = 1\]
+ * \[0 &leq; alpha_i &leq; Cn \text{for} y_i = -1\]
  * <br>
  * Given:
  * <br>
@@ -163,11 +164,11 @@ public class Solver {
       }
     }
 
-    if(2 * nr_free < active_size) {
-      LOG.info("WARNING: using -h 0 may be faster");
+    if(nr_free << 1 < active_size) {
+      LOG.info("The optimization may be faster with shrinknig disabled.");
     }
 
-    if(nr_free * l > 2 * active_size * (l - active_size)) {
+    if(nr_free * l > (active_size << 1) * (l - active_size)) {
       for(int i = active_size; i < l; i++) {
         Q.get_Q(i, active_size, Q_i);
         for(int j = 0; j < active_size; j++) {
@@ -214,10 +215,9 @@ public class Solver {
     int counter = Math.min(l, 1000) + 1;
     int[] working_set = new int[2];
 
-    int iter;
-    for(iter = 0; iter < max_iter; ++iter) {
+    int iter = 0;
+    while(++iter <= max_iter) {
       // show progress and do shrinking
-
       if(--counter == 0) {
         counter = Math.min(l, 1000);
         if(shrinking) {

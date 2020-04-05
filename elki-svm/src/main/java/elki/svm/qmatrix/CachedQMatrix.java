@@ -37,37 +37,50 @@
  */
 package elki.svm.qmatrix;
 
+import java.util.Arrays;
+
 import elki.utilities.datastructures.arrays.ArrayUtil;
 
-//
-// Kernel Cache
-//
-// l is the number of total data items
-// size is the cache size limit in bytes
-//
 /**
  * This is the original cache from the libSVN implementation.
  * The code is very C stylish, and probably not half as effective on Java due to
  * garbage collection.
  */
 public final class CachedQMatrix implements QMatrix {
+  /**
+   * Constant for parameterization in megabytes
+   */
   private static final long MEGABYTES = 1 << 20;
 
+  /**
+   * Remaining memory (in floats)
+   */
   private long size;
 
-  private static final class head_t {
-    head_t prev, next; // a circular list
+  /**
+   * Wrapped inner matrix
+   */
+  private final QMatrix inner;
 
-    float[] data;
+  /**
+   * Data storage
+   */
+  private final float[][] data;
 
-    int len; // data[0,len) is cached in this entry
-  }
+  /**
+   * Number of valid entries in each buffer
+   */
+  private final int[] len;
 
-  private final head_t[] head;
+  /**
+   * LRU head
+   */
+  private int lru = 0;
 
-  private head_t lru_head;
-
-  QMatrix inner;
+  /**
+   * LRU: backward and forward chaining
+   */
+  private final int[] chain;
 
   public CachedQMatrix(int l, double cache_size, QMatrix inner) {
     this(l, (long) (cache_size * MEGABYTES), inner);
@@ -75,18 +88,20 @@ public final class CachedQMatrix implements QMatrix {
 
   public CachedQMatrix(int l, long size_, QMatrix inner) {
     this.inner = inner;
-    head = new head_t[l];
+    chain = new int[l << 1]; // zeros
     for(int i = 0; i < l; i++) {
-      head[i] = new head_t();
+      selflink(i);
     }
-    // 8 bytes chaining, 4 bytes len, 4 bytes data ref,
-    // + 4 bytes in head array + 8 bytes Java object overhead
-    size = size_ - l * 28;
+    len = new int[l];
+    data = new float[l][];
+    // Per entry: 8 bytes chain, 4 bytes len
+    // data: each used entry will cost 24, too.
+    // Each of these arrays: 24 bytes overhead (once)
+    // This structure: ~32 bytes (note: for compressed pointers!)
+    size = size_ - l * 36 - 24 * 4 - 32;
     size >>= 2; // Bytes to floats.
-    // Minimum cache size is two columns:
-    size = Math.max(size, 2 * l);
-    lru_head = new head_t();
-    lru_head.next = lru_head.prev = lru_head;
+    // Minimum feasible cache size is two columns:
+    size = Math.max(size, l << 1);
   }
 
   @Override
@@ -94,54 +109,106 @@ public final class CachedQMatrix implements QMatrix {
     inner.initialize();
   }
 
-  private void lru_delete(head_t h) {
-    // delete from current location
-    h.prev.next = h.next;
-    h.next.prev = h.prev;
+  /**
+   * Get the next element in the LRU chain.
+   *
+   * @param i Entry
+   * @return Next
+   */
+  private final int next(int i) {
+    return chain[i << 1];
   }
 
-  private void lru_insert(head_t h) {
-    // insert to last position
-    h.next = lru_head;
-    h.prev = lru_head.prev;
-    h.prev.next = h;
-    h.next.prev = h;
+  /**
+   * Get the previous element in the LRU chain.
+   *
+   * @param i Entry
+   * @return Prev
+   */
+  private final int prev(int i) {
+    return chain[(i << 1) + 1];
   }
 
-  float[] get_data(int index, int len) {
-    head_t h = head[index];
-    if(h.len > 0) {
+  /**
+   * Link two objects in the LRU chain.
+   *
+   * @param p Previous object
+   * @param n Next pbject
+   */
+  private final void link(int p, int n) {
+    chain[p << 1] = n;
+    chain[(n << 1) + 1] = p;
+  }
+
+  /**
+   * Link an element to itself only.
+   * 
+   * @param p Element to link
+   */
+  private final void selflink(int p) {
+    int p2 = p << 1;
+    chain[p2++] = chain[p2] = p;
+  }
+
+  /**
+   * Insert into the last position of the LRU list.
+   *
+   * @param h Object to be inserted
+   */
+  private final void lru_insert(int h) {
+    assert next(h) == h && prev(h) == h : h + " already linked";
+    link(prev(lru), h);
+    link(h, lru);
+  }
+
+  /**
+   * Delete from the LRU list.
+   *
+   * @param h Object index to be deleted
+   */
+  private final void lru_delete(int h) {
+    final int next = next(h);
+    lru = lru == h ? next : lru;
+    link(prev(h), next);
+    selflink(h);
+  }
+
+  /**
+   * Discard a cache entry.
+   *
+   * @param h entry index
+   */
+  private final void discard(int h) {
+    lru_delete(h);
+    size += data[h].length;
+    data[h] = null;
+    len[h] = 0;
+  }
+
+  float[] get_data(int h, int len) {
+    int hlen = this.len[h];
+    float[] hdata = data[h];
+    if(hlen > 0) {
       lru_delete(h);
     }
-    final int more = len - h.len;
+    final int more = len - hlen;
     if(more > 0) {
-      // free old space
       while(size < more) {
-        head_t old = lru_head.next;
-        lru_delete(old);
-        size += old.len;
-        old.data = null;
-        old.len = 0;
+        discard(lru != h ? lru : h);
       }
 
-      // allocate new space
-      float[] new_data = new float[len];
-      if(h.data != null) {
-        System.arraycopy(h.data, 0, new_data, 0, h.len);
+      size -= len - (hdata != null ? hdata.length : 0);
+      float[] new_data = hdata != null ? Arrays.copyOf(hdata, hlen) : new float[len];
+      for(int j = hlen; j < len; ++j) {
+        new_data[j] = (float) inner.similarity(h, j);
       }
-      // Compute missing distances:
-      for(int j = h.len; j < len; ++j) {
-        new_data[j] = (float) inner.similarity(index, j);
-      }
-      h.data = new_data;
-      h.len = len;
-      size -= more;
+      hdata = data[h] = new_data;
+      hlen = this.len[h] = len;
     }
-
-    if(h.len > 0) {
+    if(hlen > 0) {
       lru_insert(h);
     }
-    return h.data;
+    return hdata;
   }
 
   @Override
@@ -149,30 +216,64 @@ public final class CachedQMatrix implements QMatrix {
     if(i == j) {
       return;
     }
-    // Swap in index:
-    ArrayUtil.swap(head, i, j);
-
     // Ensure i < j
     if(i > j) {
       int tmp = i;
       i = j;
       j = tmp;
     }
-    // Swap in cached lists:
-    for(head_t h = lru_head.next; h != lru_head; h = h.next) {
-      if(h.len > i) {
-        if(h.len > j) {
-          ArrayUtil.swap(h.data, i, j);
-        }
-        else {
-          // Discard this cache:
-          lru_delete(h);
-          size += h.len;
-          h.data = null;
-          h.len = 0;
-        }
+    // Swap in index:
+    ArrayUtil.swap(data, i, j);
+    ArrayUtil.swap(len, i, j);
+    // Update chain:
+    int nei = next(i), pri = prev(i), nej = next(j), prj = prev(j);
+    // System.err.println("Chain: " + prev(i) + " > " + next(prev(i)) + "=" + i
+    // + "=" + prev(next(i)) + " > " + next(i) + " " + prev(j) + " > " +
+    // next(prev(j)) + "=" + j + "=" + prev(next(j)) + " > " + next(j));
+    assert prev(next(i)) == i && next(prev(i)) == i : prev(next(i)) + " != " + next(prev(i)) + " != " + i;
+    assert prev(next(j)) == j && next(prev(j)) == j : prev(next(j)) + " != " + next(prev(j)) + " != " + j;
+    assert (pri == i) == (nei == i) : "Double-linked list inconsistent.";
+    assert (prj == j) == (nej == j) : "Double-linked list inconsistent.";
+    if(pri != j || nei != j) { // Avoid mutual-link special case on low memory.
+      if(prj == j) {
+        selflink(i);
+      }
+      else {
+        link(prj != i ? prj : j, i);
+        link(i, nej != i ? nej : j);
+      }
+      if(pri == i) {
+        selflink(j);
+      }
+      else {
+        link(pri != j ? pri : i, j);
+        link(j, nei != j ? nei : i);
       }
     }
+    // System.err.println("After: " + prev(i) + " > " + next(prev(i)) + "=" + i
+    // + "=" + prev(next(i)) + " > " + next(i) + " " + prev(j) + " > " +
+    // next(prev(j)) + "=" + j + "=" + prev(next(j)) + " > " + next(j));
+    assert prev(next(i)) == i && next(prev(i)) == i : prev(next(i)) + " != " + next(prev(i)) + " != " + i;
+    assert prev(next(j)) == j && next(prev(j)) == j : prev(next(j)) + " != " + next(prev(j)) + " != " + j;
+    lru = i == lru ? j : j == lru ? i : lru;
+
+    // Swap in cached lists:
+    for(int h = lru, next = -1; next != lru; h = next) {
+      int prev = prev(h);
+      next = next(h); // could get trashed by discard below
+      final int lenh = len[h];
+      if(lenh > j) {
+        ArrayUtil.swap(data[h], i, j);
+      }
+      else if(lenh > i /* but < j */) {
+        discard(h); // Don't have the value for j.
+        // TODO: rather fill the one missing value instead?
+        // TODO: or just reduce lenh?
+        assert prev(next) == prev;
+        assert next == next(prev);
+      } // else: contains neither i nor j.
+    }
+
     inner.swap_index(i, j);
   }
 
