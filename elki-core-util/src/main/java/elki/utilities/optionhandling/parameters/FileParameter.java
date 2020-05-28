@@ -121,7 +121,7 @@ public class FileParameter extends AbstractParameter<FileParameter, URI> {
         if(FileUtil.exists(obj)) {
           return true;
         }
-        throw new WrongParameterValueException("Given file " + obj + " for parameter \"" + getOptionID().getName() + "\" does not exist!\n");
+        throw new WrongParameterValueException("Given file " + obj + " for parameter \"" + getOptionID().getName() + "\" does not exist!");
       }
       catch(SecurityException e) {
         throw new WrongParameterValueException("Given file \"" + obj + "\" cannot be read, access denied!\n" + e.getMessage());
