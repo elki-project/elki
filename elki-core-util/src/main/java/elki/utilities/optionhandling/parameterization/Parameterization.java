@@ -23,7 +23,6 @@ package elki.utilities.optionhandling.parameterization;
 import java.util.Collection;
 
 import elki.utilities.ClassGenericsUtil;
-import elki.utilities.optionhandling.InternalParameterizationErrors;
 import elki.utilities.optionhandling.ParameterException;
 import elki.utilities.optionhandling.parameters.ClassParameter;
 import elki.utilities.optionhandling.parameters.Parameter;
@@ -137,7 +136,7 @@ public interface Parameterization {
     }
     catch(Exception e) {
       String msg = e.getMessage();
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName() //
+      reportError(new ParameterException("Error instantiating internal class: " + c.getName() //
           + " " + (msg != null ? msg : e.getClass().getName()), e));
       return null;
     }

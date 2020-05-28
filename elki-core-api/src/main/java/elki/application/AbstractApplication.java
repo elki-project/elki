@@ -125,11 +125,9 @@ public abstract class AbstractApplication {
   public static void runCLIApplication(Class<?> cls, String[] args) {
     SerializedParameterization params = new SerializedParameterization(args);
     Flag helpF = new Flag(Par.HELP_ID);
-    helpF.grab(params, x -> {
-    });
+    params.grab(helpF);
     Flag helpLongF = new Flag(Par.HELP_LONG_ID);
-    helpLongF.grab(params, x -> {
-    });
+    params.grab(helpLongF);
     try {
       ClassParameter<Object> descriptionP = new ClassParameter<Object>(Par.DESCRIPTION_ID, Object.class) //
           .setOptional(true);
@@ -163,7 +161,11 @@ public abstract class AbstractApplication {
         LoggingConfiguration.setVerbose(Level.VERBOSE);
         LOG.verbose("ERROR: The following configuration errors prevented execution:");
         for(ParameterException e : params.getErrors()) {
-          LOG.verbose(e.getMessage() + "\n");
+          if (LOG.isDebugging()) {
+            LOG.debug(e.getMessage(), e);
+          } else {
+            LOG.verbose(e.getMessage());
+          }
         }
         params.logUnusedParameters();
         LOG.verbose("Stopping execution because of configuration errors above.");

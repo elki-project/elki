@@ -103,7 +103,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public void logUnusedParameters() {
     if(hasUnusedParameters()) {
-      LoggingUtil.warning("The following parameters were not processed: " + parameters);
+      LoggingUtil.warning("The following parameters were not successfully processed: " + parameters);
     }
   }
 
