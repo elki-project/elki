@@ -92,11 +92,14 @@ public final class FileUtil {
     }
     FileSystem fs;
     try {
-      fs = FileSystems.getFileSystem(file.resolve("/"));
+      fs = FileSystems.getFileSystem(file);
     }
     catch(FileSystemNotFoundException e) {
       // Do not close this FileSystem, this will break reading from jar files
-      fs = FileSystems.newFileSystem(file.resolve("/"), Collections.emptyMap());
+      fs = FileSystems.newFileSystem(file, Collections.emptyMap());
+    }
+    catch(IllegalArgumentException e) {
+      throw new IOException(e.getMessage(), e);
     }
     return tryGzipInput(Files.newInputStream(fs.provider().getPath(file), opts));
   }
@@ -111,20 +114,24 @@ public final class FileUtil {
     if(file == null) {
       return false;
     }
-    if("file".equals(file.getScheme()) && Paths.get(file).toFile().exists()) {
-      return true;
+    if("file".equals(file.getScheme())) {
+      return Paths.get(file).toFile().exists();
     }
     try {
-      return Files.exists(FileSystems.getFileSystem(file.resolve("/")).provider().getPath(file));
+      return Files.exists(FileSystems.getFileSystem(file).provider().getPath(file));
     }
     catch(FileSystemNotFoundException e) {
       try {
         // Do not close this FileSystem, this will break reading from jar files
-        return Files.exists(FileSystems.newFileSystem(file.resolve("/"), Collections.emptyMap()).provider().getPath(file));
+        return Files.exists(FileSystems.newFileSystem(file, Collections.emptyMap()).provider().getPath(file));
       }
       catch(IOException e2) {
         return false;
       }
+    }
+    catch(IllegalArgumentException e) {
+      // UnixFileSystemProvider could throw this
+      return false;
     }
   }
 

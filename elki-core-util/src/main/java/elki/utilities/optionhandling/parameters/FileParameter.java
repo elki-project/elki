@@ -105,8 +105,19 @@ public class FileParameter extends AbstractParameter<FileParameter, URI> {
       return ((File) obj).toURI();
     }
     if(obj instanceof String) {
-      URI u = URI.create((String) obj);
-      return u.getScheme() != null ? u : Paths.get((String) obj).toUri();
+      String str = (String) obj;
+      if(!str.isEmpty() && str.charAt(0) != '/') {
+        try {
+          URI u = new URI(str);
+          if(u.getScheme() != null) {
+            return u;
+          }
+        }
+        catch(URISyntaxException e) {
+          // Fallback to path-based parsing below.
+        }
+      }
+      return Paths.get(str).toUri();
     }
     throw new WrongParameterValueException(this, obj.toString(), "Unsupported value");
   }

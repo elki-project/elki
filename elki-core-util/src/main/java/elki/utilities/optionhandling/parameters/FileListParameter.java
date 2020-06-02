@@ -121,8 +121,20 @@ public class FileListParameter extends ListParameter<FileListParameter, List<URI
           r.add(((File) o).toURI());
         }
         else if(o instanceof String) {
-          URI u = URI.create((String) obj);
-          r.add(u.getScheme() != null ? u : Paths.get((String) o).toUri());
+          String str = (String) o;
+          if(!str.isEmpty() && str.charAt(0) != '/') {
+            try {
+              URI u = new URI(str);
+              if(u.getScheme() != null) {
+                r.add(u);
+                continue;
+              }
+            }
+            catch(URISyntaxException e) {
+              // Fallback to path-based parsing below.
+            }
+          }
+          r.add(Paths.get(str).toUri());
         }
         else {
           throw new WrongParameterValueException(this, obj.toString(), "expected a List<Path> or a String.");
