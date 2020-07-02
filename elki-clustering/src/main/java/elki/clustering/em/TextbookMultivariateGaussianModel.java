@@ -207,4 +207,16 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
   public EMModel finalizeCluster() {
     return new EMModel(mean, covariance);
   }
+
+  @Override
+  public void setCenter(double[] center) {
+    this.mean = center;
+  }
+
+  @Override
+  public void updateCovariance(double[][] cov) {
+    //this.covariance = cov;
+    //updateCholesky(cov, chol);
+    //this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
+  }
 }

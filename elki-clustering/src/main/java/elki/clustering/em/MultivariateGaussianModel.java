@@ -86,7 +86,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
    * Constructor.
    * 
    * @param weight Cluster weight
-   * @param mean Initial mean
+   * @param mean   Initial mean
    */
   public MultivariateGaussianModel(double weight, double[] mean) {
     this(weight, mean, null);
@@ -95,8 +95,8 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   /**
    * Constructor.
    * 
-   * @param weight Cluster weight
-   * @param mean Initial mean
+   * @param weight     Cluster weight
+   * @param mean       Initial mean
    * @param covariance Initial covariance matrix
    */
   public MultivariateGaussianModel(double weight, double[] mean, double[][] covariance) {
@@ -187,7 +187,8 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
    * Update the cholesky decomposition.
    * 
    * @param covariance Covariance matrix
-   * @param prev Previous Cholesky decomposition (reused in case of instability)
+   * @param prev       Previous Cholesky decomposition (reused in case of
+   *                   instability)
    * @return New Cholesky decomposition
    */
   protected static CholeskyDecomposition updateCholesky(double[][] covariance, CholeskyDecomposition prev) {
@@ -269,5 +270,17 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, covariance);
+  }
+
+  @Override
+  public void setCenter(double[] center) {
+    this.mean = center;
+  }
+
+  @Override
+  public void updateCovariance(double[][] cov) {
+    this.covariance = cov;
+    this.chol = updateCholesky(cov, chol);
+    this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 }

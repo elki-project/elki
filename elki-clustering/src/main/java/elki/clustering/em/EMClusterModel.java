@@ -111,4 +111,18 @@ public interface EMClusterModel<O, M extends Model> {
    * @param weight Cluster weight
    */
   void setWeight(double weight);
+  
+  /**
+   * Set the cluster center.
+   * 
+   * @param center Cluster center
+   */
+  void setCenter(double[] center);
+  
+  /**
+   * Set the cluster covariance matrix and do according updates.
+   * 
+   * @param cov Cluster covariance matrix
+   */
+  void updateCovariance(double[][]cov);
 }

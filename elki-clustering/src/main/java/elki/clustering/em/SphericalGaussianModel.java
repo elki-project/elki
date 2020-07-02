@@ -200,4 +200,14 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   public EMModel finalizeCluster() {
     return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
   }
+
+  @Override
+  public void setCenter(double[] center) {
+    this.mean = center;
+  }
+
+  @Override
+  public void updateCovariance(double[][] cov) {
+    
+  }
 }
