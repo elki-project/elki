@@ -128,9 +128,9 @@ public class KuhnMunkres {
     }
     this.rmark = new int[rowlen];
     this.cmark = csel.clone();
-    Arrays.fill(rmark, -1);
     // Iterative refinement:
     for(long maxit = rowlen * (long) collen; maxit >= 0 && selected < rowlen; maxit--) {
+      Arrays.fill(rmark, -1);
       while(true) {
         double h = findUncoveredMinimum(); // O(n²)
         debugLogMatrix(Level.FINEST, maxit, "Select min");
@@ -139,7 +139,6 @@ public class KuhnMunkres {
         if(!pivot()) {
           debugLogMatrix(Level.FINEST, maxit, "Update stars");
           updateStars();
-          Arrays.fill(rmark, -1);
           System.arraycopy(csel, 0, cmark, 0, csel.length);
           break;
         }
@@ -156,7 +155,7 @@ public class KuhnMunkres {
    * 
    * @param ocost Original cost matrix
    */
-  private void initialize(double[][] ocost) {
+  protected void initialize(double[][] ocost) {
     double[][] cost = this.cost = new double[ocost.length][];
     final int rowlen = ocost.length, collen = ocost[0].length;
     for(int i = 0; i < rowlen; i++) {
@@ -199,7 +198,7 @@ public class KuhnMunkres {
    * Select the last zero in each row to make an initial selection, which may
    * already yield a solution.
    */
-  private void initialCover() {
+  protected void initialCover() {
     final double[][] cost = this.cost;
     final int rowlen = cost.length, collen = cost[0].length;
     int[] rsel = this.rsel = new int[rowlen];

@@ -94,10 +94,10 @@ public class KuhnMunkresWong extends KuhnMunkres {
     this.cmark = csel.clone();
     this.rmin = new double[rowlen];
     this.rptr = new int[rowlen];
-    Arrays.fill(rmark, -1);
-    initUncoveredMinimum(); // O(n²)
     // Iterative refinement:
     for(long maxit = rowlen * (long) collen; maxit >= 0 && selected < rowlen; maxit--) {
+      // O(n³) total, because this gets executed at most n times?
+      initUncoveredMinimum(); // O(n²)
       while(true) {
         double h = findUncoveredMinimum(); // improved version O(n)
         debugLogMatrix(Level.FINEST, maxit, "Select min");
@@ -106,10 +106,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
         if(!pivot()) {
           debugLogMatrix(Level.FINEST, maxit, "Update stars");
           updateStars();
-          Arrays.fill(rmark, -1);
           System.arraycopy(csel, 0, cmark, 0, csel.length);
-          initUncoveredMinimum(); // Still O(n²)
-          // O(n³) total, because this gets executed at most n times?
           break;
         }
         debugLogMatrix(Level.FINEST, maxit, "Pivoted");
@@ -120,12 +117,8 @@ public class KuhnMunkresWong extends KuhnMunkres {
     return rsel;
   }
 
-  /**
-   * Initialize the row- and column adjustments.
-   * 
-   * @param cost Cost matrix
-   */
-  private void initialize(double[][] cost) {
+  @Override
+  protected void initialize(double[][] cost) {
     this.cost = cost;
     final int rowlen = cost.length, collen = cost[0].length;
     double[] radj = this.radj = new double[rowlen];
@@ -165,11 +158,8 @@ public class KuhnMunkresWong extends KuhnMunkres {
     }
   }
 
-  /**
-   * Select the last zero in each row to make an initial selection, which may
-   * already yield a solution.
-   */
-  private void initialCover() {
+  @Override
+  protected void initialCover() {
     final double[][] cost = this.cost;
     final int rowlen = cost.length, collen = cost[0].length;
     int[] rsel = this.rsel = new int[rowlen];
@@ -195,14 +185,15 @@ public class KuhnMunkresWong extends KuhnMunkres {
   /**
    * Initialize values for finding the minima efficiently.
    */
-  private void initUncoveredMinimum() {
+  protected void initUncoveredMinimum() {
+    Arrays.fill(rmark, -1);
     for(int i = 0; i < cost.length; i++) {
       final double[] rowi = cost[i];
       final double radji = radj[i];
       double m = Double.POSITIVE_INFINITY;
       int b = -1;
       for(int j = 0; j < rowi.length; j++) {
-        if(cmark[j] < 0 || rmark[cmark[j]] == i) {
+        if(cmark[j] < 0) {
           final double v = rowi[j] - radji - cadj[j];
           if(v < m) {
             m = v;
@@ -220,7 +211,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
    *
    * @return Minimum in uncovered rows
    */
-  private double findUncoveredMinimum() {
+  protected double findUncoveredMinimum() {
     minr = minc = -1;
     double h = Double.POSITIVE_INFINITY;
     for(int i = 0; i < rmin.length; i++) {
@@ -242,7 +233,7 @@ public class KuhnMunkresWong extends KuhnMunkres {
    *
    * @param h Cost to remove
    */
-  private void removeCost(double h) {
+  protected void removeCost(double h) {
     if(h > 0) {
       for(int i = 0; i < rmark.length; i++) {
         if(rmark[i] >= 0) {
@@ -253,7 +244,8 @@ public class KuhnMunkresWong extends KuhnMunkres {
         }
       }
       for(int j = 0; j < cmark.length; j++) {
-        if(cmark[j] < 0 || rmark[cmark[j]] == minr) {
+        final int r = cmark[j];
+        if(r < 0 || rmark[r] == minr) {
           cadj[j] += h;
         }
       }
