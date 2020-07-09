@@ -20,7 +20,8 @@
  */
 package elki.application.greedyensemble;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -65,10 +66,7 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.IntGeneratorParameter;
-import elki.utilities.optionhandling.parameters.IntParameter;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.PatternParameter;
+import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.scaling.IdentityScaling;
 import elki.utilities.scaling.ScalingFunction;
 import elki.utilities.scaling.outlier.OutlierScaling;
@@ -143,6 +141,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
   int ksquarestop = 1000;
 
   /**
+   * Timelimit for computation (not strictly enforced). In ms.
+   */
+  long timelimit;
+
+  /**
    * Constructor.
    *
    * @param inputstep Input step
@@ -153,8 +156,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * @param scaling Scaling function
    * @param disable Pattern for disabling methods
    * @param ksquarestop Maximum k for O(k^2) methods
+   * @param timelimit Time limit in seconds
    */
-  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distance, IntGenerator krange, ByLabelOutlier bylabel, Path outfile, ScalingFunction scaling, Pattern disable, int ksquarestop) {
+  public ComputeKNNOutlierScores(InputStep inputstep, Distance<? super O> distance, IntGenerator krange, ByLabelOutlier bylabel, Path outfile, ScalingFunction scaling, Pattern disable, int ksquarestop, long timelimit) {
     super(inputstep, distance);
     this.krange = krange;
     this.bylabel = bylabel;
@@ -162,6 +166,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     this.scaling = scaling;
     this.disable = disable;
     this.ksquarestop = ksquarestop;
+    this.timelimit = timelimit * 1000;
   }
 
   @Override
@@ -356,17 +361,47 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     LOG.verbose("Running " + prefix);
     final int digits = (int) FastMath.ceil(FastMath.log10(krange.getMax() + 1));
     final String format = "%s-%0" + digits + "d";
-    krange.forEach(k -> {
-      if(k >= mink && k <= maxk) {
-        Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
-        OutlierResult result = runner.apply(k);
-        LOG.statistics(time.end());
-        if(result != null) {
-          out.accept(String.format(Locale.ROOT, format, prefix, k), result);
-          ResultUtil.removeRecursive(result);
+    try {
+      krange.forEach(k -> {
+        if(k >= mink && k <= maxk) {
+          Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
+          OutlierResult result = runner.apply(k);
+          LOG.statistics(time.end());
+          if(result != null) {
+            out.accept(String.format(Locale.ROOT, format, prefix, k), result);
+            ResultUtil.removeRecursive(result);
+          }
+          if(timelimit > 0 && time.getDuration() > timelimit) {
+            throw new TimeoutException("Timeout in " + prefix + " at k=" + k + ": " + time.getDuration());
+          }
         }
-      }
-    });
+      });
+    }
+    catch(TimeoutException e) {
+      LOG.error(e.getMessage()); // The stack trace is not helpful.
+    }
+  }
+
+  /**
+   * Exception used in timeout logic.
+   *
+   * @author Erich Schubert
+   */
+  private static class TimeoutException extends RuntimeException {
+    /**
+     * Serialization version
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     *
+     * @param msg Message
+     */
+    public TimeoutException(String msg) {
+      super(msg);
+    }
+
   }
 
   /**
@@ -406,6 +441,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
     public static final OptionID KSQUARE_ID = new OptionID("ksquaremax", "Maximum k for methods with O(k^2) cost.");
 
     /**
+     * Option ID to limit the maximum time for an iteration
+     */
+    public static final OptionID TIMELIMIT_ID = new OptionID("timelimit", "Maximum run time per iteration in seconds (NOT strictly enforced).");
+
+    /**
      * k step size
      */
     IntGenerator krange;
@@ -435,6 +475,11 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
      */
     int ksquarestop = 100;
 
+    /**
+     * Timelimit
+     */
+    long timelimit = -1;
+
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
@@ -451,11 +496,13 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
           .grab(config, x -> disable = x);
       new IntParameter(KSQUARE_ID, 100) //
           .grab(config, x -> ksquarestop = x);
+      new LongParameter(TIMELIMIT_ID, 12 * 60 * 60) //
+          .grab(config, x -> timelimit = x);
     }
 
     @Override
     public ComputeKNNOutlierScores<O> make() {
-      return new ComputeKNNOutlierScores<>(inputstep, distance, krange, bylabel, outfile, scaling, disable, ksquarestop);
+      return new ComputeKNNOutlierScores<>(inputstep, distance, krange, bylabel, outfile, scaling, disable, ksquarestop, timelimit);
     }
   }
 
