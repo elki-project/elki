@@ -59,7 +59,7 @@ public class ROCEvaluationTest {
     distances.add(5.0, DBIDUtil.importInteger(9)); // - 1.0,.8 ++
     distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,1. ++
 
-    ROCurve curve = ROCEvaluation.materializeROC(new DistanceResultAdapter(positive, distances.iter()));
+    ROCurve curve = ROCEvaluation.materializeROC(new DistanceResultAdapter(positive, distances.iter(), distances.size()));
     assertEquals("ROC curve too complex", 6, curve.size());
     assertEquals("AUROC (cached) not correct.", 0.6, curve.getAUC(), 1e-14);
     assertEquals("AUROC (direct) not correct.", 0.6, new ROCEvaluation().evaluate(positive, distances), 1e-14);

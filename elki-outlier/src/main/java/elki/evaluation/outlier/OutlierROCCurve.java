@@ -125,7 +125,7 @@ public class OutlierROCCurve implements Evaluator {
       if(sorted.size() != or.getDBIDs().size()) {
         throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
       }
-      ROCurve roc = ROCEvaluation.materializeROC(new SimpleAdapter(positiveids, sorted.iter()));
+      ROCurve roc = ROCEvaluation.materializeROC(new SimpleAdapter(positiveids, sorted.iter(), sorted.size()));
       Metadata.hierarchyOf(or).addChild(roc);
       MeasurementGroup g = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING) //
           .findOrCreateGroup("Evaluation measures");

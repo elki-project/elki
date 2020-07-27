@@ -100,7 +100,7 @@ public class EvaluateClustering implements Evaluator {
    * @return Score
    */
   public static double evaluateRanking(ScoreEvaluation eval, Cluster<?> clus, DoubleDBIDList ranking) {
-    return eval.evaluate(new DistanceResultAdapter(DBIDUtil.ensureSet(clus.getIDs()), ranking.iter()));
+    return eval.evaluate(new DistanceResultAdapter(DBIDUtil.ensureSet(clus.getIDs()), ranking.iter(), ranking.size()));
   }
 
   @Override

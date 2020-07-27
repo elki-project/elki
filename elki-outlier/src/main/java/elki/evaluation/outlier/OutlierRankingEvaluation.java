@@ -178,7 +178,7 @@ public class OutlierRankingEvaluation implements Evaluator {
         throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
       }
       evaluate(EvaluationResult.findOrCreate(or, EvaluationResult.RANKING), //
-          size, positiveids.size(), () -> new SimpleAdapter(positiveids, sorted.iter()));
+          size, positiveids.size(), () -> new SimpleAdapter(positiveids, sorted.iter(), sorted.size()));
       nonefound = false;
     }
 

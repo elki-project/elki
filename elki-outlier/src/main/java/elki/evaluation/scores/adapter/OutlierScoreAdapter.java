@@ -99,4 +99,9 @@ public class OutlierScoreAdapter implements ScoreEvaluation.Adapter {
   public int numPositive() {
     return set.size();
   }
+
+  @Override
+  public int numTotal() {
+    return scores.size();
+  }
 }

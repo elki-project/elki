@@ -131,4 +131,9 @@ public abstract class AbstractVectorIter implements ScoreEvaluation.Adapter, Arr
   public int numPositive() {
     return numPositive;
   }
+
+  @Override
+  public int numTotal() {
+    return positive.getDimensionality();
+  }
 }

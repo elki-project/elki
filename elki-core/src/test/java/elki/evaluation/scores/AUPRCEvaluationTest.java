@@ -59,7 +59,7 @@ public class AUPRCEvaluationTest {
     distances.add(5.0, DBIDUtil.importInteger(9)); // - 0.8,.50 ++
     distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,.56 ++
 
-    PRCurve curve = AUPRCEvaluation.materializePRC(new DistanceResultAdapter(positive, distances.iter()));
+    PRCurve curve = AUPRCEvaluation.materializePRC(new DistanceResultAdapter(positive, distances.iter(), distances.size()));
     assertEquals("PR curve too complex", 9, curve.size());
     assertEquals("AUPRC (cached) not correct.", 0.7481384, curve.getAUC(), 1e-7);
     assertEquals("AUPRC (direct) not correct.", 0.7481384, new AUPRCEvaluation().evaluate(positive, distances), 1e-7);

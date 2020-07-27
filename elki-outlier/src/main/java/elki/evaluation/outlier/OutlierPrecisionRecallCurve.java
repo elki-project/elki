@@ -126,7 +126,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      PRCurve curve = AUPRCEvaluation.materializePRC(new SimpleAdapter(positiveids, sorted.iter()));
+      PRCurve curve = AUPRCEvaluation.materializePRC(new SimpleAdapter(positiveids, sorted.iter(), sorted.size()));
       Metadata.hierarchyOf(or).addChild(curve);
       MeasurementGroup g = EvaluationResult.findOrCreate(or, EvaluationResult.RANKING) //
           .findOrCreateGroup("Evaluation measures");

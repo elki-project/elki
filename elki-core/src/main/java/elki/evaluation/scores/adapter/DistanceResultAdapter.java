@@ -46,6 +46,11 @@ public class DistanceResultAdapter implements ScoreEvaluation.Adapter {
   protected DoubleDBIDListIter iter;
 
   /**
+   * Number of IDs
+   */
+  private int size;
+
+  /**
    * Distance of previous.
    */
   protected double prevDist = Double.NaN;
@@ -55,11 +60,13 @@ public class DistanceResultAdapter implements ScoreEvaluation.Adapter {
    * 
    * @param set Set of positive examples
    * @param iter Iterator for distance results
+   * @param size Number of IDs
    */
-  public DistanceResultAdapter(DBIDs set, DoubleDBIDListIter iter) {
+  public DistanceResultAdapter(DBIDs set, DoubleDBIDListIter iter, int size) {
     super();
     this.set = set;
     this.iter = iter;
+    this.size = size;
   }
 
   @Override
@@ -82,6 +89,11 @@ public class DistanceResultAdapter implements ScoreEvaluation.Adapter {
   @Override
   public int numPositive() {
     return set.size();
+  }
+
+  @Override
+  public int numTotal() {
+    return size;
   }
 
   @Override

@@ -51,7 +51,7 @@ public interface ScoreEvaluation {
    * @return Score
    */
   default double evaluate(DBIDs ids, DoubleDBIDList nei) {
-    return evaluate(new DistanceResultAdapter(ids, nei.iter()));
+    return evaluate(new DistanceResultAdapter(ids, nei.iter(), nei.size()));
   }
 
   /**
@@ -91,5 +91,12 @@ public interface ScoreEvaluation {
      * @return Number of positive elements
      */
     int numPositive();
+
+    /**
+     * Return the number of all ids.
+     *
+     * @return Number of all elements
+     */
+    int numTotal();
   }
 }

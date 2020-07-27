@@ -47,15 +47,22 @@ public class SimpleAdapter implements ScoreEvaluation.Adapter {
   private DBIDIter iter;
 
   /**
+   * Number of IDs
+   */
+  private int size;
+
+  /**
    * Constructor
    * 
    * @param set Set of positive examples
    * @param iter Iterator for object IDs
+   * @param size Number of IDs
    */
-  public SimpleAdapter(DBIDs set, DBIDIter iter) {
+  public SimpleAdapter(DBIDs set, DBIDIter iter, int size) {
     super();
     this.set = set;
     this.iter = iter;
+    this.size = size;
   }
 
   @Override
@@ -82,5 +89,10 @@ public class SimpleAdapter implements ScoreEvaluation.Adapter {
   @Override
   public int numPositive() {
     return set.size();
+  }
+
+  @Override
+  public int numTotal() {
+    return size;
   }
 }

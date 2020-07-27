@@ -44,10 +44,11 @@ public class FilteredDistanceResultAdapter extends DistanceResultAdapter {
    * 
    * @param set Set of positive examples
    * @param iter Iterator for distance results
+   * @param size Number of IDs
    * @param skip DBID to skip (reference must remain stable!)
    */
-  public FilteredDistanceResultAdapter(DBIDs set, DoubleDBIDListIter iter, DBIDRef skip) {
-    super(set, iter);
+  public FilteredDistanceResultAdapter(DBIDs set, DoubleDBIDListIter iter, int size, DBIDRef skip) {
+    super(set, iter, size);
     this.skip = skip;
     if(iter.valid() && DBIDUtil.equal(iter, skip)) {
       iter.advance();
