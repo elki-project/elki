@@ -98,7 +98,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
         if(recG >= 0) {
           slices.add(recG * preG);
         }
-        if(/*preG >= 0 &&*/ recG >= 0) {
+        if(preG >= 0 && recG >= 0) {
           curve.addAndSimplify(0, preG);
           curve.addAndSimplify(recG, preG);
         }
@@ -122,9 +122,9 @@ public class PRGCEvaluation implements ScoreEvaluation {
           double width = recG - recGp;
           double height = (preG + preGp) / 2;
           slices.add(width * height);
-          // if(preG >=0) {
-          curve.addAndSimplify(recG, preG);
-          // }
+          if(preG >= 0) {
+            curve.addAndSimplify(recG, preG);
+          }
         }
         recGp = recG;
         preGp = preG;
