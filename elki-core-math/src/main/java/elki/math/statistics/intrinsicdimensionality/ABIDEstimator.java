@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2018
+ * Copyright (C) 2020
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,68 +21,36 @@
 package elki.math.statistics.intrinsicdimensionality;
 
 import elki.database.ids.DBIDRef;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
-import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Angle based intrinsic dimensionality (ABID) estimator.
+ * <p>
+ * Reference:
+ * <p>
+ * Erik Thordsen and Erich Schubert<br>
+ * ABID: Angle Based Intrinsic Dimensionality<br>
+ * Proc. 13th Int. Conf. Similarity Search and Applications (SISAP'2020)
  *
  * @author Erik Thordsen
  */
-public class ABIDEstimator implements IntrinsicDimensionalityEstimator {
+@Reference(authors = "Erik Thordsen and Erich Schubert", //
+    title = "ABID: Angle Based Intrinsic Dimensionality", //
+    booktitle = "Proc. 13th Int. Conf. Similarity Search and Applications (SISAP'2020)", //
+    url = "https://arxiv.org/abs/2006.12880", //
+    bibkey = "DBLP:journals/corr/abs-2006-12880")
+public class ABIDEstimator extends RABIDEstimator {
   /**
    * Static instance.
    */
   public static final ABIDEstimator STATIC = new ABIDEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, int size) {
-    throw new UnsupportedOperationException("The ABIDEstimator can only be used with neighbour queries.");
-  }
-
-  /* Squared cosine from squared triangle side lengths */
-  private final double cos2(final double sideA2, final double sideB2, final double oppositeSide2) {
-    final double numerator = sideA2 + sideB2 - oppositeSide2;
-    return numerator * numerator / (4 * sideA2 * sideB2);
-  }
-
-  @Override
   public double estimate(KNNSearcher<DBIDRef> knnq, DistanceQuery<?> distq, DBIDRef cur, int k) {
-    final boolean issquared = distq.getDistance().isSquared();
-    final KNNList kl = knnq.getKNN(cur, k);
-    /* Removing the query point from k. */
-    k -= 1;
-
-    double ssq = 0;
-    // We fill the upper triangle only,
-    final DoubleDBIDListIter ii = kl.iter();
-    final DoubleDBIDListIter ij = kl.iter();
-    /* Compute squared cosines */
-    /* Offset by 1 to avoid the point itself */
-    for (ii.seek(1); ii.valid(); ii.advance()) {
-      final double kdi = ii.doubleValue();
-      final double Di2 = issquared ? kdi : kdi * kdi;
-      if(Di2 == 0) {
-        continue;
-      }
-      for (ij.seek(ii.getOffset() + 1); ij.valid(); ij.advance()) {
-        final double kdj = ij.doubleValue();
-        final double Dj2 = issquared ? kdj : kdj * kdj;
-        final double Vh = distq.distance(ii, ij);
-        final double V2 = issquared ? Vh : Vh * Vh;
-        ssq += cos2(Di2, Dj2, V2);
-      }
-    }
-    /* Times two for lower half and plus k for diagonal. */
-    ssq = 2*ssq + k;
-    return k*k/ssq;
+    return computeABID(distq, knnq.getKNN(cur, k), true /* ABID: false */);
   }
 
   /**
