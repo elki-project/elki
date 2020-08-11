@@ -5,3 +5,4 @@ tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
 tutorial.clustering.SameSizeKMeans
 tutorial.outlier.DistanceStddevOutlier
 tutorial.outlier.ODIN
+tutorial.clustering.CFSFDP
