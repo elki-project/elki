@@ -128,9 +128,9 @@ public class CompareMeans<V extends NumberVector> extends AbstractKMeans<V, KMea
       final int k = means.length;
       for(int i = 1; i < k; i++) {
         double[] mi = means[i];
+        final double[] cdisti = cdist[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, means[j]);
-          cdist[i][j] = cdist[j][i] = .5 * d;
+          cdisti[j] = cdist[j][i] = .5 * distance(mi, means[j]);
         }
       }
     }

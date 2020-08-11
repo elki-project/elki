@@ -413,7 +413,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     }
 
     /**
-     * Compute a distance (and count the distance computations).
+     * Compute the squared distance (and count the distance computations).
      *
      * @param x First object
      * @param y Second object
@@ -425,7 +425,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     }
 
     /**
-     * Compute a distance (and count the distance computations).
+     * Compute the squared distance (and count the distance computations).
      *
      * @param x First object
      * @param y Second object
@@ -448,7 +448,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     }
 
     /**
-     * Compute a distance (and count the distance computations).
+     * Compute the squared distance (and count the distance computations).
      *
      * @param x First object
      * @param y Second object
@@ -468,6 +468,45 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
         return v;
       }
       return df.distance(DoubleVector.wrap(x), DoubleVector.wrap(y));
+    }
+
+    /**
+     * Compute the distance (and count the distance computations).
+     * If the distance is squared, also compute the square root.
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double sqrtdistance(NumberVector x, NumberVector y) {
+      final double d = distance(x, y);
+      return isSquared ? FastMath.sqrt(d) : d;
+    }
+
+    /**
+     * Compute the distance (and count the distance computations).
+     * If the distance is squared, also compute the square root.
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double sqrtdistance(NumberVector x, double[] y) {
+      final double d = distance(x, y);
+      return isSquared ? FastMath.sqrt(d) : d;
+    }
+
+    /**
+     * Compute the distance (and count the distance computations).
+     * If the distance is squared, also compute the square root.
+     *
+     * @param x First object
+     * @param y Second object
+     * @return Distance
+     */
+    protected double sqrtdistance(double[] x, double[] y) {
+      final double d = distance(x, y);
+      return isSquared ? FastMath.sqrt(d) : d;
     }
 
     /**
@@ -583,11 +622,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       for(int i = 1; i < k; i++) {
         double[] mi = means[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, means[j]);
-          d = .5 * (isSquared ? FastMath.sqrt(d) : d);
-          cdist[i][j] = cdist[j][i] = d;
-          sep[i] = (d < sep[i]) ? d : sep[i];
-          sep[j] = (d < sep[j]) ? d : sep[j];
+          double halfd = 0.5 * sqrtdistance(mi, means[j]);
+          cdist[i][j] = cdist[j][i] = halfd;
+          sep[i] = (halfd < sep[i]) ? halfd : sep[i];
+          sep[j] = (halfd < sep[j]) ? halfd : sep[j];
         }
       }
     }
@@ -602,8 +640,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       for(int i = 1; i < k; i++) {
         double[] mi = means[i];
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, means[j]);
-          cdist[i][j] = cdist[j][i] = .5 * (isSquared ? FastMath.sqrt(d) : d);
+          cdist[i][j] = cdist[j][i] = .5 * sqrtdistance(mi, means[j]);
         }
       }
     }
@@ -636,8 +673,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       assert newmeans.length == means.length && dists.length == means.length;
       double max = 0.;
       for(int i = 0; i < means.length; i++) {
-        double d = distance(means[i], newmeans[i]);
-        dists[i] = d = isSquared ? FastMath.sqrt(d) : d;
+        double d = dists[i] = sqrtdistance(means[i], newmeans[i]);
         max = (d > max) ? d : max;
       }
       return max;

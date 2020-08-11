@@ -30,8 +30,6 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
  * <p>
@@ -114,13 +112,11 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
         NumberVector fv = relation.get(it);
         double[] l = lower.get(it);
         // Check all (other) means:
-        double best = distance(fv, means[0]);
-        l[0] = best = isSquared ? FastMath.sqrt(best) : best;
+        double best = l[0] = sqrtdistance(fv, means[0]);
         int minIndex = 0;
         for(int j = 1; j < k; j++) {
           if(best > cdist[minIndex][j]) {
-            double dist = distance(fv, means[j]);
-            l[j] = dist = isSquared ? FastMath.sqrt(dist) : dist;
+            double dist = l[j] = sqrtdistance(fv, means[j]);
             if(dist < best) {
               minIndex = j;
               best = dist;
@@ -163,16 +159,14 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
             continue; // Condition #3 i-iii not satisfied
           }
           if(recompute_u) { // Need to update bound? #3a
-            u = distance(fv, means[cur]);
-            u = isSquared ? FastMath.sqrt(u) : u;
+            u = sqrtdistance(fv, means[cur]);
             upper.putDouble(it, u);
             recompute_u = false; // Once only
             if(u <= l[j] || u <= cdist[cur][j]) { // #3b
               continue;
             }
           }
-          double dist = distance(fv, means[j]);
-          dist = isSquared ? FastMath.sqrt(dist) : dist;
+          double dist = sqrtdistance(fv, means[j]);
           l[j] = dist;
           if(dist < u) {
             cur = j;

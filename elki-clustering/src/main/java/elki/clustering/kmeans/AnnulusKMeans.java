@@ -182,10 +182,9 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         cdist[i] = VMath.euclideanLength(mi);
         cnum[i] = i;
         for(int j = 0; j < i; j++) {
-          double d = distance(mi, means[j]);
-          d = 0.5 * (isSquared ? FastMath.sqrt(d) : d);
-          sep[i] = (d < sep[i]) ? d : sep[i];
-          sep[j] = (d < sep[j]) ? d : sep[j];
+          double halfd = 0.5 * sqrtdistance(mi, means[j]);
+          sep[i] = halfd < sep[i] ? halfd : sep[i];
+          sep[j] = halfd < sep[j] ? halfd : sep[j];
         }
       }
       DoubleIntegerArrayQuickSort.sort(cdist, cnum, k);
