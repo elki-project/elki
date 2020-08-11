@@ -41,6 +41,7 @@ elki.clustering.kmeans.SingleAssignmentKMeans
 elki.clustering.kmeans.SimplifiedElkanKMeans
 elki.clustering.kmeans.SortMeans
 elki.clustering.kmeans.parallel.ParallelLloydKMeans
+elki.clustering.kmeans.YinYangKMeans
 elki.clustering.kmeans.XMeans
 elki.clustering.kmedoids.FastPAM
 elki.clustering.kmedoids.FastPAM1
