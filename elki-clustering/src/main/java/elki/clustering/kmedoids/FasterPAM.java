@@ -29,6 +29,7 @@ import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.utilities.documentation.Reference;
 
 /**
  * Variation of FastPAM that eagerly performs any swap that yields an
@@ -36,6 +37,13 @@ import elki.logging.statistics.LongStatistic;
  * all current medoids together, and chooses the best of these; hence apart from
  * computing candidate swaps O(k) times faster, it will also be able to
  * sometimes choose better swaps.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert and Peter J. Rousseeuw<br>
+ * Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM,
+ * CLARA, and CLARANS Algorithms<br>
+ * Preprint
  *
  * @author Erich Schubert
  *
@@ -44,6 +52,11 @@ import elki.logging.statistics.LongStatistic;
  *
  * @param <O> object datatype
  */
+@Reference(authors = "Erich Schubert and Peter J. Rousseeuw", //
+    title = "Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "arXiv preprint", //
+    url = "https://arxiv.org/abs/2008.05171", //
+    bibkey = "DBLP:journals/corr/abs-2008-05171")
 public class FasterPAM<O> extends FastPAM<O> {
   /**
    * The logger for this class.

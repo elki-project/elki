@@ -62,10 +62,10 @@ import elki.utilities.random.RandomFactory;
  * <p>
  * Reference:
  * <p>
- * Erich Schubert, Peter J. Rousseeuw<br>
- * Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS
- * Algorithms<br>
- * preprint, to appear
+ * Erich Schubert and Peter J. Rousseeuw<br>
+ * Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM,
+ * CLARA, and CLARANS Algorithms<br>
+ * Preprint
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -74,11 +74,11 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <V> Data type
  */
-@Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
-    title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
-    booktitle = "preprint, to appear", //
-    url = "https://arxiv.org/abs/1810.05691", //
-    bibkey = "DBLP:journals/corr/abs-1810-05691")
+@Reference(authors = "Erich Schubert and Peter J. Rousseeuw", //
+    title = "Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM, CLARA, and CLARANS Algorithms", //
+    booktitle = "arXiv preprint", //
+    url = "https://arxiv.org/abs/2008.05171", //
+    bibkey = "DBLP:journals/corr/abs-2008-05171")
 public class FasterCLARA<V> extends FasterPAM<V> {
   /**
    * Class logger.
