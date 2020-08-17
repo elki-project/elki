@@ -24,8 +24,10 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.evaluation.outlier.OutlierPrecisionRecallCurve;
+import elki.evaluation.outlier.OutlierPrecisionRecallGainCurve;
 import elki.evaluation.outlier.OutlierROCCurve;
 import elki.evaluation.scores.AUPRCEvaluation.PRCurve;
+import elki.evaluation.scores.PRGCEvaluation.PRGCurve;
 import elki.evaluation.scores.ROCEvaluation.ROCurve;
 import elki.logging.LoggingUtil;
 import elki.math.geometry.XYCurve;
@@ -94,11 +96,14 @@ public class XYCurveVisualization implements VisFactory {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
-    LinearScale scalex = new LinearScale(curve.getMinx(), curve.getMaxx());
-    LinearScale scaley = new LinearScale(curve.getMiny(), curve.getMaxy());
+    LinearScale scalex = new LinearScale(curve.getMindx(), curve.getMaxdx());
+    LinearScale scaley = new LinearScale(curve.getMindy(), curve.getMaxdy());
     // plot the line
     SVGPath path = new SVGPath();
     for(XYCurve.Itr iterator = curve.iterator(); iterator.valid(); iterator.advance()) {
+      if(!curve.isInDrawingBounds(iterator)) {
+        continue;
+      }
       final double x = scalex.getScaled(iterator.getX());
       final double y = 1 - scaley.getScaled(iterator.getY());
       path.drawTo(sizex * x, sizey * y);
@@ -143,6 +148,20 @@ public class XYCurveVisualization implements VisFactory {
       double auprc = ((PRCurve) curve).getAUC();
       String lt = OutlierPrecisionRecallCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(auprc);
       if(auprc <= 0.5) {
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
+        SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
+        layer.appendChild(auclbl);
+      }
+      else {
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.95, lt);
+        SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
+        layer.appendChild(auclbl);
+      }
+    }
+    if(curve instanceof PRGCurve) {
+      double auprgc = ((PRGCurve) curve).getAUC();
+      String lt = OutlierPrecisionRecallGainCurve.AUPRGC_LABEL + ": " + FormatUtil.NF.format(auprgc);
+      if(auprgc <= 0.5) {
         Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);

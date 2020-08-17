@@ -67,6 +67,18 @@ public class XYCurve {
       maxy = Double.NEGATIVE_INFINITY;
 
   /**
+   * Drawing bounds for x
+   */
+  protected double mindx = Double.NEGATIVE_INFINITY,
+      maxdx = Double.POSITIVE_INFINITY;
+
+  /**
+   * Drawing bounds for y
+   */
+  protected double mindy = Double.NEGATIVE_INFINITY,
+      maxdy = Double.POSITIVE_INFINITY;
+
+  /**
    * Constructor with labels
    *
    * @param labelx Label for X axis
@@ -231,6 +243,42 @@ public class XYCurve {
   }
 
   /**
+   * Lower drawing bound on x axis.
+   *
+   * @return lower drawing bound on X
+   */
+  public double getMindx() {
+    return mindx > Double.NEGATIVE_INFINITY ? mindx : minx;
+  }
+
+  /**
+   * upper drawing bound on x axis.
+   *
+   * @return upper drawing bound on X
+   */
+  public double getMaxdx() {
+    return maxdx < Double.POSITIVE_INFINITY ? maxdx : maxx;
+  }
+
+  /**
+   * Lower drawing bound on y axis.
+   *
+   * @return lower drawing bound on Y
+   */
+  public double getMindy() {
+    return mindy > Double.NEGATIVE_INFINITY ? mindy : miny;
+  }
+
+  /**
+   * Upper drawing bound on y axis.
+   *
+   * @return upper drawing bound on Y
+   */
+  public double getMaxdy() {
+    return maxdy < Double.POSITIVE_INFINITY ? maxdy : maxy;
+  }
+
+  /**
    * Curve X value at given position
    *
    * @param off Offset
@@ -280,6 +328,32 @@ public class XYCurve {
     this.miny = miny;
     this.maxx = maxx;
     this.maxy = maxy;
+  }
+
+  /**
+   * Set the drawing bounds of the plot.
+   *
+   * @param mindx lower drawing x
+   * @param mindy lower drawing y
+   * @param maxdx upper drawing x
+   * @param maxdy upper drawing y
+   */
+  public void setDrawingBounds(double mindx, double mindy, double maxdx, double maxdy) {
+    this.mindx = mindx;
+    this.mindy = mindy;
+    this.maxdx = maxdx;
+    this.maxdy = maxdy;
+  }
+
+  /**
+   * Checks if a point is inside the drawing bounds of this curve
+   *
+   * @param it Iterator describing the point
+   * @return whether the point is in the drawing bounds
+   */
+  public boolean isInDrawingBounds(Itr it) {
+    return mindx <= it.getX() && it.getX() <= maxdx //
+        && mindy <= it.getY() && it.getY() <= maxdy;
   }
 
   /**
