@@ -61,16 +61,17 @@ public class PRGCEvaluation implements ScoreEvaluation {
   public static PRGCurve materializePRGC(Adapter adapter) {
     PRGCurve curve = new PRGCurve();
     int pos = 0, rank = 0;
-    double recG = .0, preG = .0;
+    double recG = 0., preG = 0.;
     int amountPositiveIDs = adapter.numPositive();
     int posnotfound = amountPositiveIDs;
     boolean recallPositive = false;
     double pi = amountPositiveIDs / (double) adapter.numTotal();
-    double acc = .0;
+    double acc = 0.;
 
     while(adapter.valid()) {
       final int prevpos = pos, prevrank = rank;
       double prevpreG = preG, prevrecG = recG;
+      boolean dontSimplify = false;
       // positive or negative match?
       do {
         if(adapter.test()) {
@@ -145,7 +146,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
         else {
           alpha = ((adapter.numTotal() - amountPositiveIDs) / (adapter.numTotal() - amountPositiveIDs) * prevpos - (prevrank - prevpos)) / ((rank - prevrank) - newpos);
         }
-        // new = pre + delta*alhpa
+        // new = pre + delta * alpha
         double ttp = prevpos + alpha * newpos;
         double tfn = amountPositiveIDs - ttp;
         double temprecG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfn / ttp);
@@ -153,13 +154,19 @@ public class PRGCEvaluation implements ScoreEvaluation {
         curve.addAndSimplify(temprecG, 0);
         acc += calcSliceArea(prevrecG, temprecG, prevpreG, 0);
 
+        dontSimplify = true;
         prevpreG = 0;
         prevrecG = temprecG;
       }
       // add the new point
-      curve.addAndSimplify(recG, preG);
+      if(dontSimplify) {
+        curve.add(recG, preG);
+      }
+      else {
+        curve.addAndSimplify(recG, preG);
+      }
       // add the slice
-      acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
+      acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
     }
     curve.setAxes(0, 0, 1, 1);
     curve.auc = acc;
@@ -176,12 +183,12 @@ public class PRGCEvaluation implements ScoreEvaluation {
    */
   private static double computePRGAURC(Adapter adapter) {
     int pos = 0, rank = 0;
-    double recG = .0, preG = .0;
+    double recG = 0., preG = 0.;
     int amountPositiveIDs = adapter.numPositive();
     int posnotfound = amountPositiveIDs;
     boolean recallPositive = false;
     double pi = amountPositiveIDs / (double) adapter.numTotal();
-    double acc = .0;
+    double acc = 0.;
 
     while(adapter.valid()) {
       final int prevpos = pos, prevrank = rank;
@@ -224,13 +231,13 @@ public class PRGCEvaluation implements ScoreEvaluation {
         if(newpos > 0) {
           alpha = (amountPositiveIDs * pi - prevpos) / newpos;
         }
-        // new = pre + delta*alhpa
+        // new = pre + delta * alpha
         double ttp = prevpos + alpha * newpos;
         double tfp = (prevrank - prevpos) + alpha * (prevrank - prevpos);
         prevpreG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfp / ttp);
         prevrecG = 0.;
 
-        acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
+        acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
 
         recallPositive = true;
         continue;
@@ -245,10 +252,8 @@ public class PRGCEvaluation implements ScoreEvaluation {
         recG = 1.;
         preG = 0.;
       }
-
-      // the original implementation adds y = 0 crosses as well
       // add the slice
-      acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
+      acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
     }
     return acc;
   }
@@ -259,7 +264,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
 
   @Override
   public double expected(int pos, int all) {
-    return .0;
+    return 0.;
   }
 
   public static class PRGCurve extends XYCurve {
