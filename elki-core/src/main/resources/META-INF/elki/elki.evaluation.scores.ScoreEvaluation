@@ -5,3 +5,4 @@ elki.evaluation.scores.PrecisionAtKEvaluation
 elki.evaluation.scores.ROCEvaluation
 elki.evaluation.scores.DCGEvaluation
 elki.evaluation.scores.AUPRCEvaluation
+elki.evaluation.scores.PRGCEvaluation

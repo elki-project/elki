@@ -97,21 +97,22 @@ public class OutlierRankingEvaluation implements Evaluator {
     // Area under Receiver Operating Curve
     double auroc = ROCEvaluation.STATIC.evaluate(adapter.get());
     LOG.statistics(new DoubleStatistic(key + ".auroc", auroc));
-    if(!g.hasMeasure("AUROC")) { // Avoid duplicate
-      g.addMeasure("AUROC", auroc, 0., 1., .5, false);
-    }
+    g.addMeasure("AUROC", auroc, 0., 1., .5, false);
     double adjauroc = 2 * auroc - 1;
     ag.addMeasure("Adjusted AUROC", adjauroc, 0., 1., 0., false);
     LOG.statistics(new DoubleStatistic(key + ".auroc.adjusted", adjauroc));
     // Area under Precision-Recall-Curve
     double auprc = AUPRCEvaluation.STATIC.evaluate(adapter.get());
     LOG.statistics(new DoubleStatistic(key + ".auprc", auprc));
-    if(!g.hasMeasure("AUPRC")) { // Avoid duplicate
-      g.addMeasure("AUPRC", auprc, 0., 1., rate, false);
-    }
+    g.addMeasure("AUPRC", auprc, 0., 1., rate, false);
     double adjauprc = (auprc - rate) / (1 - rate);
     LOG.statistics(new DoubleStatistic(key + ".auprc.adjusted", adjauprc));
     ag.addMeasure("Adjusted AUPRC", adjauprc, 0., 1., 0., false);
+    // Area under Precision-Recall-Gain-Curve
+    double auprgc = PRGCEvaluation.STATIC.evaluate(adapter.get());
+    LOG.statistics(new DoubleStatistic(key + ".auprgc", auprgc));
+    g.addMeasure("AUPRGC", auprgc, 0., 1., .5, false);
+    ag.addMeasure("Adjusted AUPRGC", (auprgc - 0.5) * 2, 0., 1., 0., false);
     // Average precision
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(adapter.get());
     LOG.statistics(new DoubleStatistic(key + ".average-precision.", avep));

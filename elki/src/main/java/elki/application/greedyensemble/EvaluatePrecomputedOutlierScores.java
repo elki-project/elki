@@ -160,8 +160,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
           break loop;
         case META_CHANGED:
           BundleMeta meta = parser.getMeta();
-          lcol = -1;
-          dcol = -1;
+          lcol = dcol = -1;
           for(int i = 0; i < meta.size(); i++) {
             SimpleTypeInformation<?> m = meta.get(i);
             if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(m)) {
@@ -204,6 +203,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         .append("\"Algorithm\",\"k\"") //
         .append(",\"AUROC\"") //
         .append(",\"AUPRC\"") //
+        .append(",\"AUPRGC\"") //
         .append(",\"Average Precision\"") //
         .append(",\"R-Precision\"") //
         .append(",\"Maximum F1\"") //
@@ -211,6 +211,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         .append(",\"NDCG\"") //
         .append(",\"Adjusted AUROC\"") //
         .append(",\"Adjusted AUPRC\"") //
+        .append(",\"Adjusted AUPRGC\"") //
         .append(",\"Adjusted Average Precision\"") //
         .append(",\"Adjusted R-Precision\"") //
         .append(",\"Adjusted Maximum F1\"") //
@@ -236,6 +237,8 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     double adjauroc = 2 * auroc - 1;
     double auprc = AUPRCEvaluation.STATIC.evaluate(iter.seek(0));
     double adjauprc = (auprc - expected) / (1 - expected);
+    double auprgc = PRGCEvaluation.STATIC.evaluate(iter.seek(0));
+    double adjauprgc = (auprgc - 0.5) * 2;
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(iter.seek(0));
     double adjavep = (avep - expected) / (1 - expected);
     double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(iter.seek(0));
@@ -257,6 +260,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         .append(',').append(Integer.toString(k)) //
         .append(',').append(Double.toString(auroc)) //
         .append(',').append(Double.toString(auprc)) //
+        .append(',').append(Double.toString(auprgc)) //
         .append(',').append(Double.toString(avep)) //
         .append(',').append(Double.toString(rprecision)) //
         .append(',').append(Double.toString(maxf1)) //
@@ -264,6 +268,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         .append(',').append(Double.toString(ndcg)) //
         .append(',').append(Double.toString(adjauroc)) //
         .append(',').append(Double.toString(adjauprc)) //
+        .append(',').append(Double.toString(adjauprgc)) //
         .append(',').append(Double.toString(adjavep)) //
         .append(',').append(Double.toString(adjrprecision)) //
         .append(',').append(Double.toString(adjmaxf1)) //

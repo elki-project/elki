@@ -68,6 +68,11 @@ public class AutomaticEvaluation implements Evaluator {
     autoEvaluateOutliers(newResult);
   }
 
+  /**
+   * Automatically evaluate outlier results.
+   *
+   * @param newResult New results
+   */
   protected void autoEvaluateOutliers(Object newResult) {
     Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
     if(LOG.isDebuggingFinest() || (LOG.isDebugging() && !outliers.isEmpty())) {
@@ -114,13 +119,20 @@ public class AutomaticEvaluation implements Evaluator {
       new OutlierROCCurve(pat).processNewResult(newResult);
       // Compute Precision at k
       new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(newResult);
-      // Compute ROC curve
+      // Compute PR curve
       new OutlierPrecisionRecallCurve(pat).processNewResult(newResult);
+      // Compute PRG curve
+      new OutlierPrecisionRecallGainCurve(pat).processNewResult(newResult);
       // Compute outlier histogram
       new ComputeOutlierHistogram(pat, 50, new LinearScaling(), false).processNewResult(newResult);
     }
   }
 
+  /**
+   * Automatically evaluate clustering results.
+   *
+   * @param newResult New results
+   */
   protected void autoEvaluateClusterings(Object newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     if(LOG.isDebuggingFinest() || (LOG.isDebugging() && !clusterings.isEmpty())) {
