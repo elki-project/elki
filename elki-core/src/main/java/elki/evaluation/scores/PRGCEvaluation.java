@@ -24,7 +24,9 @@ import java.util.LinkedList;
 
 import elki.math.geometry.XYCurve;
 import elki.result.Metadata;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
+
 /**
  * Compute the area under the precision-recall-gain curve
  * <p>
@@ -32,11 +34,15 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * P. Flach and M. Knull<br>
  * Precision-Recall-Gain Curves: PR Analysis Done Right<br>
- * https://papers.nips.cc/paper/5867-precision-recall-gain-curves-pr-analysis-done-right
+ * Neural Information Processing Systems (NIPS 2015)
  * 
  * @author Robert Gehde
- *
  */
+@Reference(authors = "P. Flach and M. Knull", //
+    title = "Precision-Recall-Gain Curves: {PR} Analysis Done Right", //
+    booktitle = "Neural Information Processing Systems (NIPS 2015)", //
+    url = "http://papers.nips.cc/paper/5867-precision-recall-gain-curves-pr-analysis-done-right", //
+    bibkey = "DBLP:conf/nips/FlachK15")
 public class PRGCEvaluation implements ScoreEvaluation {
   /**
    * Static instance
@@ -77,7 +83,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
       if(rank == prevrank) {
         continue;
       }
-      
+
       final int newpos = pos - prevpos, ties = rank - prevrank;
       posnotfound -= newpos;
       // Interpolation based on Davis and Goadrich (class: AUPRCEval..)
@@ -98,9 +104,9 @@ public class PRGCEvaluation implements ScoreEvaluation {
         }
         continue;
       }
-      
+
       assert (prevpos + prevposnotfound == amountPositiveIDs);
-      
+
       double recGp = 1 - (pi / (1 - pi)) * (prevposnotfound / (double) prevpos);
       double preGp = 1 - (pi / (1 - pi)) * ((prevrank - prevpos) / (double) prevpos);
 
@@ -142,7 +148,6 @@ public class PRGCEvaluation implements ScoreEvaluation {
    * @return area under curve
    */
   private static double computePRGAURC(Adapter adapter) {
-
     PRGCurve curve = new PRGCurve();
     int pos = 0, rank = 0;
     int amountPositiveIDs = adapter.numPositive();
@@ -165,7 +170,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
       if(rank == prevrank) {
         continue;
       }
-      
+
       final int newpos = pos - prevpos, ties = rank - prevrank;
       posnotfound -= newpos;
       // Interpolation based on Davis and Goadrich (class: AUPRCEval..)
@@ -182,9 +187,9 @@ public class PRGCEvaluation implements ScoreEvaluation {
         }
         continue;
       }
-      
+
       assert (prevpos + prevposnotfound == amountPositiveIDs);
-      
+
       double recGp = 1 - (pi / (1 - pi)) * (prevposnotfound / (double) prevpos);
       double preGp = 1 - (pi / (1 - pi)) * ((prevrank - prevpos) / (double) prevpos);
 

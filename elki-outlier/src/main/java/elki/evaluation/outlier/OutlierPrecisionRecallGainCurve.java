@@ -40,6 +40,7 @@ import elki.result.OrderingResult;
 import elki.result.ResultUtil;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.outlier.OutlierResult;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -53,11 +54,15 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  * <p>
  * P. Flach and M. Knull<br>
  * Precision-Recall-Gain Curves: PR Analysis Done Right<br>
- * https://papers.nips.cc/paper/5867-precision-recall-gain-curves-pr-analysis-done-right
+ * Neural Information Processing Systems (NIPS 2015)
  * 
  * @author Robert Gehde
- *
  */
+@Reference(authors = "P. Flach and M. Knull", //
+    title = "Precision-Recall-Gain Curves: {PR} Analysis Done Right", //
+    booktitle = "Neural Information Processing Systems (NIPS 2015)", //
+    url = "http://papers.nips.cc/paper/5867-precision-recall-gain-curves-pr-analysis-done-right", //
+    bibkey = "DBLP:conf/nips/FlachK15")
 public class OutlierPrecisionRecallGainCurve implements Evaluator {
   /**
    * AUC Label for PRG Curve.
