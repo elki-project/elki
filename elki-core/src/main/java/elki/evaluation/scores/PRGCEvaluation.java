@@ -20,8 +20,6 @@
  */
 package elki.evaluation.scores;
 
-import java.util.LinkedList;
-
 import elki.math.geometry.XYCurve;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
@@ -63,14 +61,16 @@ public class PRGCEvaluation implements ScoreEvaluation {
   public static PRGCurve materializePRGC(Adapter adapter) {
     PRGCurve curve = new PRGCurve();
     int pos = 0, rank = 0;
+    double recG = .0, preG = .0;
     int amountPositiveIDs = adapter.numPositive();
     int posnotfound = amountPositiveIDs;
+    boolean recallPositive = false;
     double pi = amountPositiveIDs / (double) adapter.numTotal();
-    LinkedList<Double> slices = new LinkedList<Double>();
+    double acc = .0;
 
     while(adapter.valid()) {
       final int prevpos = pos, prevrank = rank;
-      final int prevposnotfound = posnotfound;
+      double prevpreG = preG, prevrecG = recG;
       // positive or negative match?
       do {
         if(adapter.test()) {
@@ -84,57 +84,84 @@ public class PRGCEvaluation implements ScoreEvaluation {
         continue;
       }
 
-      final int newpos = pos - prevpos, ties = rank - prevrank;
+      final int newpos = pos - prevpos;
       posnotfound -= newpos;
-      // Interpolation based on Davis and Goadrich (class: AUPRCEval..)
-      double f = newpos / (double) ties;
       // pos == 0 means that auc is infinite and not point is printed anyways
       if(pos == 0) {
         continue;
       }
-      double recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
-      double preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
-      if(prevpos == 0) {
-        if(recG >= 0) {
-          slices.add(recG * preG);
-        }
-        if(preG >= 0 && recG >= 0) {
-          curve.addAndSimplify(0, preG);
+      recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
+      preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
+
+      // detect first positive incident
+      if(!recallPositive && recG >= 0) {
+        // check if the new point is directly on 0
+        if(recG == 0) {
+          // this creates no slice
           curve.addAndSimplify(recG, preG);
+          recallPositive = true;
+          continue;
         }
+        // calculate a position for recG = 0
+        // this seems to not yield recG = 0 but something close.
+
+        // taken from the original implementation (see citation)
+        double alpha = .5;
+        if(newpos > 0) {
+          alpha = (amountPositiveIDs * pi - prevpos) / newpos;
+        }
+        // new = pre + delta * alpha
+        double ttp = prevpos + alpha * newpos;
+        double tfp = (prevrank - prevpos) + alpha * (prevrank - prevpos);
+        prevpreG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfp / ttp);
+        prevrecG = 0.;
+
+        curve.addAndSimplify(prevrecG, prevpreG);
+        curve.addAndSimplify(recG, preG);
+        acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
+
+        recallPositive = true;
         continue;
       }
-
-      assert (prevpos + prevposnotfound == amountPositiveIDs);
-
-      double recGp = 1 - (pi / (1 - pi)) * (prevposnotfound / (double) prevpos);
-      double preGp = 1 - (pi / (1 - pi)) * ((prevrank - prevpos) / (double) prevpos);
-
-      for(int i = 1; i <= ties; i++) {
-        double tpipol = prevpos + f * i;
-        double fnipol = prevposnotfound - f * i;
-
-        recG = 1 - (pi / (1 - pi)) * (fnipol / (double) tpipol);
-        preG = 1 - (pi / (1 - pi)) * (((prevrank + i) - tpipol) / (double) tpipol);
-        // the boundary for auc calculation was taken from the original
-        // implementation
-        if(recGp >= 0) { // this also assures recG > 0
-          double width = recG - recGp;
-          double height = (preG + preGp) / 2;
-          slices.add(width * height);
-          if(preG >= 0) {
-            curve.addAndSimplify(recG, preG);
-          }
-        }
-        recGp = recG;
-        preGp = preG;
+      // we can ignore everything in the negative recall area
+      if(!recallPositive) {
+        continue;
       }
+      // check trailing point
+      if(rank == adapter.numTotal()) {
+        // fix possible floating point errors
+        recG = 1.;
+        preG = 0.;
+      }
+
+      // the original implementation adds y = 0 crosses as well
+      // also taken from original impl.
+      if(preG * prevpreG < 0) {
+        double x = prevrecG + (-prevpreG) / (preG - prevpreG) * (recG - prevrecG);
+        double alpha = .5;
+        if(newpos > 0) {
+          alpha = (amountPositiveIDs * amountPositiveIDs / (adapter.numTotal() - (adapter.numTotal() - amountPositiveIDs) * x) - prevpos) / newpos;
+        }
+        else {
+          alpha = ((adapter.numTotal() - amountPositiveIDs) / (adapter.numTotal() - amountPositiveIDs) * prevpos - (prevrank - prevpos)) / ((rank - prevrank) - newpos);
+        }
+        // new = pre + delta*alhpa
+        double ttp = prevpos + alpha * newpos;
+        double tfn = amountPositiveIDs - ttp;
+        double temprecG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfn / ttp);
+
+        curve.addAndSimplify(temprecG, 0);
+        acc += calcSliceArea(prevrecG, temprecG, prevpreG, 0);
+
+        prevpreG = 0;
+        prevrecG = temprecG;
+      }
+      // add the new point
+      curve.addAndSimplify(recG, preG);
+      // add the slice
+      acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
     }
     curve.setAxes(0, 0, 1, 1);
-    double acc = .0;
-    for(int i = 0; i < slices.size(); i++) {
-      acc += slices.get(i);
-    }
     curve.auc = acc;
     return curve;
   }
@@ -148,16 +175,17 @@ public class PRGCEvaluation implements ScoreEvaluation {
    * @return area under curve
    */
   private static double computePRGAURC(Adapter adapter) {
-    PRGCurve curve = new PRGCurve();
     int pos = 0, rank = 0;
+    double recG = .0, preG = .0;
     int amountPositiveIDs = adapter.numPositive();
     int posnotfound = amountPositiveIDs;
+    boolean recallPositive = false;
     double pi = amountPositiveIDs / (double) adapter.numTotal();
-    LinkedList<Double> slices = new LinkedList<Double>();
+    double acc = .0;
 
     while(adapter.valid()) {
       final int prevpos = pos, prevrank = rank;
-      final int prevposnotfound = posnotfound;
+      double prevpreG = preG, prevrecG = recG;
       // positive or negative match?
       do {
         if(adapter.test()) {
@@ -171,51 +199,62 @@ public class PRGCEvaluation implements ScoreEvaluation {
         continue;
       }
 
-      final int newpos = pos - prevpos, ties = rank - prevrank;
+      final int newpos = pos - prevpos;
       posnotfound -= newpos;
-      // Interpolation based on Davis and Goadrich (class: AUPRCEval..)
-      double f = newpos / (double) ties;
       // pos == 0 means that auc is infinite and not point is printed anyways
       if(pos == 0) {
         continue;
       }
-      double recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
-      double preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
-      if(prevpos == 0) {
-        if(recG >= 0) {
-          slices.add(recG * preG);
+      recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
+      preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
+
+      // detect first positive incident
+      if(!recallPositive && recG >= 0) {
+        // check if the new point is directly on 0
+        if(recG == 0) {
+          // this creates no slice
+          recallPositive = true;
+          continue;
         }
+        // calculate a position for recG = 0
+        // this seems to not yield recG = 0 but something close.
+
+        // taken from the original implementation (see citation)
+        double alpha = .5;
+        if(newpos > 0) {
+          alpha = (amountPositiveIDs * pi - prevpos) / newpos;
+        }
+        // new = pre + delta*alhpa
+        double ttp = prevpos + alpha * newpos;
+        double tfp = (prevrank - prevpos) + alpha * (prevrank - prevpos);
+        prevpreG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfp / ttp);
+        prevrecG = 0.;
+
+        acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
+
+        recallPositive = true;
         continue;
       }
-
-      assert (prevpos + prevposnotfound == amountPositiveIDs);
-
-      double recGp = 1 - (pi / (1 - pi)) * (prevposnotfound / (double) prevpos);
-      double preGp = 1 - (pi / (1 - pi)) * ((prevrank - prevpos) / (double) prevpos);
-
-      for(int i = 1; i <= ties; i++) {
-        double tpipol = prevpos + f * i;
-        double fnipol = prevposnotfound - f * i;
-
-        recG = 1 - (pi / (1 - pi)) * (fnipol / (double) tpipol);
-        preG = 1 - (pi / (1 - pi)) * (((prevrank + i) - tpipol) / (double) tpipol);
-        // the boundary for auc calculation was taken from the original
-        // implementation
-        if(recGp >= 0) { // this also assures recG > 0
-          double width = recG - recGp;
-          double height = (preG + preGp) / 2;
-          slices.add(width * height);
-        }
-        recGp = recG;
-        preGp = preG;
+      // we can ignore everything in the negative recall area
+      if(!recallPositive) {
+        continue;
       }
-    }
-    curve.setAxes(0, 0, 1, 1);
-    double acc = .0;
-    for(int i = 0; i < slices.size(); i++) {
-      acc += slices.get(i);
+      // check trailing point
+      if(rank == adapter.numTotal()) {
+        // fix possible floating point errors
+        recG = 1.;
+        preG = 0.;
+      }
+
+      // the original implementation adds y = 0 crosses as well
+      // add the slice
+      acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
     }
     return acc;
+  }
+
+  private static double calcSliceArea(double prevRG, double rG, double prevPG, double pG) {
+    return (rG - prevRG) * (prevPG + pG) * 0.5;
   }
 
   @Override
