@@ -348,12 +348,12 @@ public class XYCurve {
   /**
    * Checks if a point is inside the drawing bounds of this curve
    *
-   * @param it Iterator describing the point
+   * @param x X value
+   * @param y Y value
    * @return whether the point is in the drawing bounds
    */
-  public boolean isInDrawingBounds(Itr it) {
-    return mindx <= it.getX() && it.getX() <= maxdx //
-        && mindy <= it.getY() && it.getY() <= maxdy;
+  public boolean isInDrawingBounds(double x, double y) {
+    return mindx <= x && x <= maxdx && mindy <= y && y <= maxdy;
   }
 
   /**

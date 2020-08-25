@@ -100,13 +100,28 @@ public class XYCurveVisualization implements VisFactory {
     LinearScale scaley = new LinearScale(curve.getMindy(), curve.getMaxdy());
     // plot the line
     SVGPath path = new SVGPath();
-    for(XYCurve.Itr iterator = curve.iterator(); iterator.valid(); iterator.advance()) {
-      if(!curve.isInDrawingBounds(iterator)) {
-        continue;
+
+    // Variables for draw bounding box crossings
+    // initialize values according to first point to ensure correct handling
+    XYCurve.Itr iterator = curve.iterator();
+    double preX = iterator.getX(), preY = iterator.getY();
+    boolean preinbounds = curve.isInDrawingBounds(preX, preY);
+    if(preinbounds) {
+      path.moveTo(sizex * scalex.getScaled(preX), sizey * (1 - scaley.getScaled(preY)));
+    }
+    // build curve
+    for(; iterator.valid(); iterator.advance()) {
+      final double ix = iterator.getX(), iy = iterator.getY();
+      boolean inbounds = curve.isInDrawingBounds(ix, iy);
+      if(!preinbounds || !inbounds) {
+        clipDraw(path, curve, preX, preY, ix, iy, scalex, scaley, sizex, sizey);
       }
-      final double x = scalex.getScaled(iterator.getX());
-      final double y = 1 - scaley.getScaled(iterator.getY());
-      path.drawTo(sizex * x, sizey * y);
+      if(inbounds) {
+        path.drawTo(sizex * scalex.getScaled(ix), sizey * (1 - scaley.getScaled(iy)));
+      }
+      preinbounds = inbounds;
+      preX = ix;
+      preY = iy;
     }
     Element line = path.makeElement(plot, SERIESID);
 
@@ -175,6 +190,67 @@ public class XYCurveVisualization implements VisFactory {
 
     layer.appendChild(line);
     return new StaticVisualizationInstance(context, task, plot, width, height, layer);
+  }
+
+  /**
+   * Clipped drawing function for an edge.
+   * 
+   * @param path Path object to draw to
+   * @param curve Curve object to draw (for drawing bounds)
+   * @param preX starting x coordinate of the edge
+   * @param preY starting y coordinate of the edge
+   * @param x ending x coordinate of the edge
+   * @param y ending y coordinate of the edge
+   * @param scalex x-scale factor of the plot
+   * @param scaley y-scale factor of the plot
+   * @param sizex x-size of the plot
+   * @param sizey y-size of the plot
+   */
+  private void clipDraw(SVGPath path, XYCurve curve, double preX, double preY, double x, double y, LinearScale scalex, LinearScale scaley, double sizex, double sizey) {
+    final double minx = curve.getMindx(), maxx = curve.getMaxdx();
+    final double miny = curve.getMindy(), maxy = curve.getMaxdy();
+    if((x < minx && preX < minx) || (x > maxx && preX > maxx) || //
+        (y < miny && preY < miny) || (y > maxy && preY > maxy)) {
+      return; // Completely out of bounds
+    }
+    // Incoming
+    {
+      double tx = preX, ty = preY;
+      tx = preX < x && preX < minx ? minx : tx;
+      tx = preX > x && preX > maxx ? maxx : tx;
+      ty = preY < y && preY < miny ? miny : ty;
+      ty = preY > y && preY > maxy ? maxy : ty;
+      if(tx != preX || ty != preY) {
+        final double fx = x != preX ? (tx - preX) / (x - preX) : 0;
+        final double fy = y != preY ? (ty - preY) / (y - preY) : 0;
+        if(fx < fy) {
+          tx = preX + fy * (x - preX);
+        }
+        else {
+          ty = preY + fx * (y - preY);
+        }
+        path.moveTo(sizex * scalex.getScaled(tx), sizey * (1 - scaley.getScaled(ty)));
+      }
+    }
+    // Outgoing: destination is not in bounds
+    {
+      double tx = x, ty = y;
+      tx = preX < x && x > maxx ? maxx : tx;
+      tx = preX > x && x < minx ? minx : tx;
+      ty = preY < y && y > maxy ? maxy : ty;
+      ty = preY > y && y < miny ? miny : ty;
+      if(tx != x || ty != y) {
+        final double fx = x != preX ? (tx - preX) / (x - preX) : 1;
+        final double fy = y != preY ? (ty - preY) / (y - preY) : 1;
+        if(fx > fy) {
+          tx = preX + fy * (x - preX);
+        }
+        else {
+          ty = preY + fx * (y - preY);
+        }
+        path.drawTo(sizex * scalex.getScaled(tx), sizey * (1 - scaley.getScaled(ty)));
+      }
+    }
   }
 
   /**
