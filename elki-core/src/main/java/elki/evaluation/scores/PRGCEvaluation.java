@@ -33,8 +33,9 @@ import elki.utilities.optionhandling.Parameterizer;
  * P. Flach and M. Knull<br>
  * Precision-Recall-Gain Curves: PR Analysis Done Right<br>
  * Neural Information Processing Systems (NIPS 2015)
- * 
+ *
  * @author Robert Gehde
+ * @author Erich Schubert
  */
 @Reference(authors = "P. Flach and M. Knull", //
     title = "Precision-Recall-Gain Curves: {PR} Analysis Done Right", //
@@ -49,7 +50,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
 
   @Override
   public double evaluate(Adapter adapter) {
-    return computePRGAURC(adapter);
+    return computePRGAUC(adapter, null);
   }
 
   /**
@@ -60,134 +61,23 @@ public class PRGCEvaluation implements ScoreEvaluation {
    */
   public static PRGCurve materializePRGC(Adapter adapter) {
     PRGCurve curve = new PRGCurve();
-    int pos = 0, rank = 0;
-    double recG = 0., preG = 0.;
-    int amountPositiveIDs = adapter.numPositive();
-    int posnotfound = amountPositiveIDs;
-    boolean recallPositive = false;
-    double pi = amountPositiveIDs / (double) adapter.numTotal();
-    double acc = 0.;
-
-    while(adapter.valid()) {
-      final int prevpos = pos, prevrank = rank;
-      double prevpreG = preG, prevrecG = recG;
-      boolean dontSimplify = false;
-      // positive or negative match?
-      do {
-        if(adapter.test()) {
-          ++pos;
-        }
-        ++rank;
-        adapter.advance();
-      } // Loop while tied:
-      while(adapter.valid() && adapter.tiedToPrevious());
-      if(rank == prevrank) {
-        continue;
-      }
-
-      final int newpos = pos - prevpos;
-      posnotfound -= newpos;
-      // pos == 0 means that auc is infinite and not point is printed anyways
-      if(pos == 0) {
-        continue;
-      }
-      recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
-      preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
-
-      // detect first positive incident
-      if(!recallPositive && recG >= 0) {
-        // check if the new point is directly on 0
-        if(recG == 0) {
-          // this creates no slice
-          curve.addAndSimplify(recG, preG);
-          recallPositive = true;
-          continue;
-        }
-        // calculate a position for recG = 0
-        // this seems to not yield recG = 0 but something close.
-
-        // taken from the original implementation (see citation)
-        double alpha = .5;
-        if(newpos > 0) {
-          alpha = (amountPositiveIDs * pi - prevpos) / newpos;
-        }
-        // new = pre + delta * alpha
-        double ttp = prevpos + alpha * newpos;
-        double tfp = (prevrank - prevpos) + alpha * (prevrank - prevpos);
-        prevpreG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfp / ttp);
-        prevrecG = 0.;
-
-        curve.addAndSimplify(prevrecG, prevpreG);
-        curve.addAndSimplify(recG, preG);
-        acc += (calcSliceArea(prevrecG, recG, prevpreG, preG));
-
-        recallPositive = true;
-        continue;
-      }
-      // we can ignore everything in the negative recall area
-      if(!recallPositive) {
-        continue;
-      }
-      // check trailing point
-      if(rank == adapter.numTotal()) {
-        // fix possible floating point errors
-        recG = 1.;
-        preG = 0.;
-      }
-
-      // the original implementation adds y = 0 crosses as well
-      // also taken from original impl.
-      if(preG * prevpreG < 0) {
-        double x = prevrecG + (-prevpreG) / (preG - prevpreG) * (recG - prevrecG);
-        double alpha = .5;
-        if(newpos > 0) {
-          alpha = (amountPositiveIDs * amountPositiveIDs / (adapter.numTotal() - (adapter.numTotal() - amountPositiveIDs) * x) - prevpos) / newpos;
-        }
-        else {
-          alpha = ((adapter.numTotal() - amountPositiveIDs) / (adapter.numTotal() - amountPositiveIDs) * prevpos - (prevrank - prevpos)) / ((rank - prevrank) - newpos);
-        }
-        // new = pre + delta * alpha
-        double ttp = prevpos + alpha * newpos;
-        double tfn = amountPositiveIDs - ttp;
-        double temprecG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfn / ttp);
-
-        curve.addAndSimplify(temprecG, 0);
-        acc += calcSliceArea(prevrecG, temprecG, prevpreG, 0);
-
-        dontSimplify = true;
-        prevpreG = 0;
-        prevrecG = temprecG;
-      }
-      // add the new point
-      if(dontSimplify) {
-        curve.add(recG, preG);
-      }
-      else {
-        curve.addAndSimplify(recG, preG);
-      }
-      // add the slice
-      acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
-    }
-    curve.setAxes(0, 0, 1, 1);
-    curve.auc = acc;
+    computePRGAUC(adapter, curve);
     return curve;
   }
 
   /**
-   * Compute the area under the PRG curve given a set of positive IDs and a
-   * sorted list of (comparable, ID)s, where the comparable object is used to
-   * decided when two objects are interchangeable.
-   * 
-   * @param adapter Adapter for different input data types
-   * @return area under curve
+   * Compute the precision-recall-gain-curve
+   *
+   * @param adapter Input adapter
+   * @param curve Optional output curve (may be {@code null})
+   * @return AUC value
    */
-  private static double computePRGAURC(Adapter adapter) {
+  private static double computePRGAUC(Adapter adapter, PRGCurve curve) {
     int pos = 0, rank = 0;
-    double recG = 0., preG = 0.;
-    int amountPositiveIDs = adapter.numPositive();
-    int posnotfound = amountPositiveIDs;
-    boolean recallPositive = false;
-    double pi = amountPositiveIDs / (double) adapter.numTotal();
+    double recG = Double.NEGATIVE_INFINITY, preG = Double.NEGATIVE_INFINITY;
+    final int numpos = adapter.numPositive();
+    final double pi = numpos / (double) adapter.numTotal();
+    final double odds = pi / (1. - pi);
     double acc = 0.;
 
     while(adapter.valid()) {
@@ -202,64 +92,46 @@ public class PRGCEvaluation implements ScoreEvaluation {
         adapter.advance();
       } // Loop while tied:
       while(adapter.valid() && adapter.tiedToPrevious());
-      if(rank == prevrank) {
-        continue;
-      }
-
-      final int newpos = pos - prevpos;
-      posnotfound -= newpos;
-      // pos == 0 means that auc is infinite and not point is printed anyways
+      // For pos == 0, the recall gain is minus infinity
       if(pos == 0) {
         continue;
       }
-      recG = 1 - (pi / (1 - pi)) * (posnotfound / (double) pos);
-      preG = 1 - (pi / (1 - pi)) * ((rank - pos) / (double) pos);
-
-      // detect first positive incident
-      if(!recallPositive && recG >= 0) {
-        // check if the new point is directly on 0
-        if(recG == 0) {
-          // this creates no slice
-          recallPositive = true;
-          continue;
-        }
-        // calculate a position for recG = 0
-        // this seems to not yield recG = 0 but something close.
-
-        // taken from the original implementation (see citation)
-        double alpha = .5;
-        if(newpos > 0) {
-          alpha = (amountPositiveIDs * pi - prevpos) / newpos;
-        }
-        // new = pre + delta * alpha
-        double ttp = prevpos + alpha * newpos;
-        double tfp = (prevrank - prevpos) + alpha * (prevrank - prevpos);
-        prevpreG = 1. - (amountPositiveIDs / (double) (adapter.numTotal() - amountPositiveIDs)) * (tfp / ttp);
-        prevrecG = 0.;
-
-        acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
-
-        recallPositive = true;
-        continue;
-      }
+      recG = 1 - odds * (numpos - pos) / (double) pos;
+      preG = 1 - odds * (rank - pos) / (double) pos;
       // we can ignore everything in the negative recall area
-      if(!recallPositive) {
+      if(recG < 0) {
         continue;
       }
-      // check trailing point
-      if(rank == adapter.numTotal()) {
-        // fix possible floating point errors
-        recG = 1.;
-        preG = 0.;
+      // last value, avoid slight numerical difference from 0:
+      if(!adapter.valid()) {
+        recG = 1;
+        preG = 0;
       }
-      // add the slice
-      acc += calcSliceArea(prevrecG, recG, prevpreG, preG);
+
+      final int newpos = pos - prevpos, newneg = (rank - prevrank) - newpos;
+      if(prevrecG < 0 && recG > 0) {
+        // interpolate the position for recG = 0
+        // based on the original implementation
+        double alpha = newpos > 0 ? (numpos * pi - prevpos) / newpos : .5;
+        prevpreG = 1 - odds * ((prevrank - prevpos) + alpha * newneg) / (prevpos + alpha * newpos);
+        prevrecG = 0;
+        if(curve != null) {
+          curve.addAndSimplify(prevrecG, prevpreG);
+        }
+      }
+      if(curve != null && recG >= 0) {
+        curve.addAndSimplify(recG, preG);
+      }
+      if(recG > 0) {
+        acc += (recG - prevrecG) * (prevpreG + preG) * 0.5;
+      }
+    }
+    if(curve != null) {
+      curve.setAxes(0, 0, 1, 1);
+      curve.setDrawingBounds(0, 0, 1, 1);
+      curve.auc = acc;
     }
     return acc;
-  }
-
-  private static double calcSliceArea(double prevRG, double rG, double prevPG, double pG) {
-    return (rG - prevRG) * (prevPG + pG) * 0.5;
   }
 
   @Override
@@ -267,6 +139,11 @@ public class PRGCEvaluation implements ScoreEvaluation {
     return 0.;
   }
 
+  /**
+   * Precision-Recall-Gain curve.
+   *
+   * @author Robert Gehde
+   */
   public static class PRGCurve extends XYCurve {
     /**
      * Area under the curve cache.
