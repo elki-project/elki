@@ -35,6 +35,8 @@ import elki.logging.Logging;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.pairs.DoubleDoublePair;
 import elki.clustering.em.QuadraticProblem;
+import elki.clustering.em.QuadraticProblem.ProblemData;
+
 import net.jafama.FastMath;
 
 class KDTree {
@@ -56,8 +58,11 @@ class KDTree {
 
   Boundingbox hyperboundingbox;
 
-  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimwidth, double mbw, Logging parentLog) {
+  ProblemData[] cache;
+
+  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimwidth, double mbw, Logging parentLog, ProblemData[] arraycache) {
     this.PARENTLOG = parentLog;
+    this.cache = arraycache;
     /**
      * other kdtrees seem to look at [left, right[
      */
@@ -138,8 +143,8 @@ class KDTree {
         isLeaf = true;
         return;
       }
-      leftChild = new KDTree(relation, sorted, left, r, dimwidth, mbw, PARENTLOG);
-      rightChild = new KDTree(relation, sorted, r, right, dimwidth, mbw, PARENTLOG);
+      leftChild = new KDTree(relation, sorted, left, r, dimwidth, mbw, PARENTLOG, arraycache);
+      rightChild = new KDTree(relation, sorted, r, right, dimwidth, mbw, PARENTLOG, arraycache);
 
       // fill up statistics from childnodes
       summedPoints = plus(leftChild.summedPoints, rightChild.summedPoints);
@@ -160,9 +165,11 @@ class KDTree {
    */
   public int[] checkStoppingCondition(Boundingbox hyperboundingbox, int numP, ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] weightsKnown, int[] indices, double tau) {
     DoubleDoublePair[] limits = new DoubleDoublePair[models.size()];
+    double[][] maxpnts = new double[models.size()][summedPoints.length];
+    double[][] minpnts = new double[models.size()][summedPoints.length];
     if(models.get(0) instanceof MultivariateGaussianModel) {
       for(int i : indices) {
-        limits[i] = evaluateGaussianLimits(hyperboundingbox, (MultivariateGaussianModel) models.get(i));
+        limits[i] = evaluateGaussianLimits(hyperboundingbox, (MultivariateGaussianModel) models.get(i),minpnts[i], maxpnts[i]);
       }
     }
     else {
@@ -204,11 +211,33 @@ class KDTree {
         prune = false;
       // System.out.println("wtotal: " + wtotal + "; maxerror: " + maxerror);
     }
-    // TODO check for large loglikelihood deviation
+    /*
+    if(!isLeaf && prune) {
+      // for every model
+      for(int i : indices) {
+      //check log likelihood
+        
+        double minweights = 0.0;
+        double maxweights = 0.0;
+        for(int j : indices) {
+          minweights += models.get(j).getWeight() * FastMath.exp(models.get(j).estimateLogDensity(new DoubleVector(minpnts[i])));
+          maxweights += models.get(j).getWeight() * FastMath.exp(models.get(j).estimateLogDensity(new DoubleVector(maxpnts[i])));
+        }
+        double minloglike = size * FastMath.log(minweights);
+        double maxloglike = size * FastMath.log(maxweights);
+        //likelihood_tau = 0.01 for high acc, 0.5 for normal, 0.9 for approximate
+        if(maxloglike - minloglike > .5 * FastMath.max(100.0, FastMath.abs(0.0))) {
+          // TODO NEXT HIER MUSS BISHER GEFUNDENE LOGLIKELIHOOD REIN anstelle von 0.0
+          prune = false;
+        }
+      }
+            
+    }
+    */
     if(!prune) {
       IntegerArray result = new IntegerArray();
       for(int i : indices) {
-        if(wmaxs[i] > 0.01 * wmin_max) {
+        if(wmaxs[i] > 1e-4 * wmin_max) {
           // value from original impl. in paper its 10^-4
           result.add(i);
         }
@@ -228,7 +257,7 @@ class KDTree {
    * @param a
    * @return
    */
-  public DoubleDoublePair evaluateGaussianLimits(Boundingbox hyperboundingbox, MultivariateGaussianModel model) {
+  public DoubleDoublePair evaluateGaussianLimits(Boundingbox hyperboundingbox, MultivariateGaussianModel model, double[] minpnt, double[] maxpnt) {
     // translate problem by mean
     double[] mean = model.mean;
     double[][] hrTranslated = new double[3][mean.length];
@@ -253,9 +282,14 @@ class KDTree {
     // maximizes mahalanobis dist
     QuadraticProblem quadmax = constrMahalanobisSqdMax(bbTranslated, covInv);
     double mahalanobisSQDmax = quadmax.maximumvalue;
-    // minimizes mahalanobis dist
-    QuadraticProblem quadmin = constrMahalanobisSqdMin(bbTranslated, covInv);
-    double mahalanobisSQDmin = quadmin.maximumvalue;
+    if(maxpnt != null)
+      System.arraycopy(quadmax.maxpoint, 0, maxpnt, 0, quadmax.maxpoint.length);
+    // minimizes mahalanobis dist (invert covinv and result
+    QuadraticProblem quadmin = constrMahalanobisSqdMax(bbTranslated, times(covInv, -1.0));
+    double mahalanobisSQDmin = -1.0 * quadmin.maximumvalue;
+    if(minpnt != null)
+      System.arraycopy(quadmax.maxpoint, 0, minpnt, 0, quadmax.maxpoint.length);
+
     double amin = calculateGaussMahaSQDCovdet(mahalanobisSQDmax, covdet, mean.length);
     double amax = calculateGaussMahaSQDCovdet(mahalanobisSQDmin, covdet, mean.length);
 
@@ -275,18 +309,18 @@ class KDTree {
   private double calculateGaussMahaSQDCovdet(double mahalanobisSQD, double covdet, int dim) {
     double num = (mahalanobisSQD / 2 > 400) ? 0.0 : FastMath.exp(-mahalanobisSQD / 2);
     // 400 is from original implementation
-    double den = FastMath.pow(2.5066283, (dim)) * FastMath.sqrt(covdet);
+    double den = /*FastMath.pow(FastMath.sqrt(FastMath.PI), dim)*/ cache[dim - 1].piPow * FastMath.sqrt(covdet);
     // root 2 pi from original impl
-    // TODO in original impl the power is cached
     return num / den;
   }
-
-  private QuadraticProblem constrMahalanobisSqdMin(Boundingbox bbTranslated, double[][] a) {
-    double[][] ma = times(a, -1.0);
-    QuadraticProblem qp = constrMahalanobisSqdMax(bbTranslated, ma);
-    qp.maximumvalue *= -1;
-    return qp;
-  }
+  //
+  // private QuadraticProblem constrMahalanobisSqdMin(Boundingbox bbTranslated,
+  // double[][] a) {
+  // double[][] ma = times(a, -1.0);
+  // QuadraticProblem qp = constrMahalanobisSqdMax(bbTranslated, ma);
+  // qp.maximumvalue *= -1;
+  // return qp;
+  // }
 
   /**
    * constrained_mahalanobis_sqd_max in gaussian.c
@@ -301,7 +335,7 @@ class KDTree {
   private QuadraticProblem constrMahalanobisSqdMax(Boundingbox bbTranslated, double[][] a) {
     double c = 0.0;
     double[] b = new double[a.length];
-    QuadraticProblem qp = new QuadraticProblem(a, b, c, bbTranslated);
+    QuadraticProblem qp = new QuadraticProblem(a, b, c, bbTranslated, cache);
     qp.maximumvalue *= 2; // because we have a .5 factor in the calculation
     return qp;
   }
@@ -309,6 +343,7 @@ class KDTree {
   ////////////////////////////////////// gaussian.c
   /**
    * calculate sufficient stats to update clusters
+   * 
    * @param numP
    * @param models
    * @param knownWeights
@@ -320,7 +355,7 @@ class KDTree {
   public double makeStats(int numP, ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] knownWeights, int[] indices, ClusterData[] resultData, double tau) {
     int k = models.size();
     boolean prune = isLeaf;
-    int[] nextIndices = null;
+    int[] nextIndices = indices;
     if(!prune) {
       nextIndices = checkStoppingCondition(hyperboundingbox, numP, models, knownWeights, indices, tau);
       if(nextIndices.length == 0) {
@@ -413,6 +448,12 @@ class KDTree {
 
     public double[] getAllDiffs() {
       return hyperboundingbox[2];
+    }
+
+    public void setDim(int d, double low, double high, double diff) {
+      hyperboundingbox[0][d] = low;
+      hyperboundingbox[1][d] = high;
+      hyperboundingbox[2][d] = diff;
     }
 
     public double[] getMidPoint() {

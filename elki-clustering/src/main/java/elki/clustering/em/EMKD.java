@@ -30,6 +30,7 @@ import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.em.KDTree.ClusterData;
+import elki.clustering.em.QuadraticProblem.ProblemData;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -46,6 +47,7 @@ import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -119,10 +121,18 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
+
+    DBIDIter iter = relation.iterDBIDs();
+    int d = relation.get(iter).getDimensionality();
+    
+    ProblemData[] dataArrays = new ProblemData[d];
+    for(int i = 0; i < d; i++) {
+      dataArrays[i] = new ProblemData(i+1);
+    }
     // build kd-tree
     sorted = DBIDUtil.newArray(relation.getDBIDs());
     double[] dimwidth = analyseDimWidth(relation);
-    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimwidth, mbw, LOG);
+    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimwidth, mbw, LOG, dataArrays);
 
     // initial models
     ArrayList<? extends EMClusterModel<NumberVector, M>> models = new ArrayList<EMClusterModel<NumberVector, M>>(mfactory.buildInitialModels(relation, k));
@@ -160,7 +170,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       }
 
     }
-    // LOG.statistics(new LongStatistic(KEY + ".iterations", it));
 
     // fill result with clusters and models
     List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
@@ -170,6 +179,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
+    LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
+    LOG.statistics(likestat.setDouble(loglikelihood));
+    
     // provide a hard clustering
     // add each point to cluster of max density
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
