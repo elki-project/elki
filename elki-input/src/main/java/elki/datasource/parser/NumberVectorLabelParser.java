@@ -340,7 +340,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       if(columnnames != null && mindim <= columnnames.size()) {
         colnames = new String[mindim];
         int j = 0;
-        for(int i = 0; i < mindim; i++) {
+        for(int i = 0; j < mindim; i++) {
           if(isLabelColumn(i)) {
             continue;
           }
