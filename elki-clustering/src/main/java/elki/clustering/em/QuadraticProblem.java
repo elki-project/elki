@@ -20,12 +20,14 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.scalarProduct;
 import static elki.math.linearalgebra.VMath.times;
+import static elki.math.linearalgebra.VMath.scalarProduct;
+import static elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.Arrays;
 
 import elki.clustering.em.KDTree.Boundingbox;
+import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
 import elki.utilities.pairs.DoubleDoublePair;
 import elki.utilities.pairs.IntIntPair;
@@ -34,16 +36,21 @@ import net.jafama.FastMath;
 
 public class QuadraticProblem {
 
-  //////////////////////////////////////////////////////////////////////// from
-  //////////////////////////////////////////////////////////////////////// quopt
-  // private final int ATT_LOLIM = 0, ATT_HILIM = 1, UNCONSTR = 2, CONSTR = 3;
+  /**
+   * maximum value
+   */
+  public double maximumValue;
 
-  public double maximumvalue;
-
-  public double[] maxpoint;
+  /**
+   * point at maximum value
+   */
+  public double[] argmaxPoint;
 
   private ProblemData[] cache;
 
+  /**
+   * possibility to ignore point calculation, currently not supported in KDTree
+   */
   boolean calcPoint = true;
 
   public QuadraticProblem() {
@@ -66,13 +73,13 @@ public class QuadraticProblem {
     this.cache = arrayCache;
     AttributeState[] attTypes = cache[b.length - 1].attTypes;
     Arrays.fill(attTypes, AttributeState.CONSTR);
-    maxpoint = new double[b.length];
-    maximumvalue = constrained_quadopt(a, b, c, box, attTypes, true, maxpoint, maximumvalue);
+    argmaxPoint = new double[b.length];
+    maximumValue = evaluateConstrainedQuadraticFunction(a, b, c, box, attTypes, true, argmaxPoint, maximumValue);
   }
 
   public void reinit() {
-    maximumvalue = Double.NEGATIVE_INFINITY;
-    maxpoint = null;
+    maximumValue = Double.NEGATIVE_INFINITY;
+    argmaxPoint = null;
   }
 
   /**
@@ -90,7 +97,6 @@ public class QuadraticProblem {
    */
   private IntIntPair find_known_lo_or_hi_att_num(double[][] a, double[] b, Boundingbox hyperboundingbox) {
     for(int i = 0; i < b.length; i++) {
-      // comp deriv limits
       DoubleDoublePair limits = calculateLinearDerivativeLimits(a, b, hyperboundingbox, i);
 
       // if hi < 0 or lo > 0 -> hit
@@ -103,8 +109,9 @@ public class QuadraticProblem {
   }
 
   /**
-   * calculates the min and max value of a linear function in the
-   * hyperboundingbox
+   * calculates the min and max value of a linear derivative of a quadratic
+   * function in the hyperboundingbox.
+   * The function is in the form 0.5ax^2 + bx + c
    * 
    * @param ak gradient/slope
    * @param bk y axis crossing
@@ -112,44 +119,38 @@ public class QuadraticProblem {
    * @return
    */
   private DoubleDoublePair calculateLinearDerivativeLimits(double[][] a, double[] b, Boundingbox hyperboundingbox, int dim) {
-    double[] ak = cache[b.length - 1].derA;// new double[b.length];
-    double bk = createPartialDerivative(a, b, dim, ak);
+    double bk = b[dim];
     // initialize with value at 0^k
     double min = bk;
     double max = bk;
-    // then for each attribute add the y- diference to the bounds to the
+    // then for each attribute add the y-difference to the bounds to the
     // according limits
-
-    for(int i = 0; i < ak.length; i++) {
-      double slope = ak[i];
-      double hi_bound = hyperboundingbox.getHi(i);
-      double lo_bound = hyperboundingbox.getLo(i);
+    for(int i = 0; i < b.length; i++) {
+      // get slope of the derivative, is a[dim][i]
+      double slope = a[dim][i];
+      double upperBound = hyperboundingbox.getUpperBound(i);
+      double lowerBound = hyperboundingbox.getLowerBound(i);
       if(slope < 0) {
-        min += hi_bound * slope;
-        max += lo_bound * slope;
+        min += upperBound * slope;
+        max += lowerBound * slope;
       }
       else {
-        max += hi_bound * slope;
-        min += lo_bound * slope;
+        max += upperBound * slope;
+        min += lowerBound * slope;
       }
     }
     return new DoubleDoublePair(min, max);
   }
 
-  private DoubleDoublePair[] ComputeAllLinearDerivativeLimits(double[][] a, double[] b, Boundingbox hyperboundingbox) {
-    DoubleDoublePair[] result = new DoubleDoublePair[b.length];
-    for(int i = 0; i < result.length; i++) {
-      result[i] = calculateLinearDerivativeLimits(a, b, hyperboundingbox, i);
-    }
-    return result;
-  }
+  private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, Boundingbox boundingbox, DoubleDoublePair[] limits) {
+    double[] upper = boundingbox.getUpperBounds();
+    double[] lower = boundingbox.getLowerBounds();
+    double[] middle = boundingbox.getMidPoint();
 
-  private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, Boundingbox hyperboundingbox, DoubleDoublePair[] limits) {
-    double[] mid = hyperboundingbox.getMidPoint();
-    double fm = evalueateQuadraticFormula(a, b, c, mid);
+    double fm = evalueateQuadraticFormula(a, b, c, middle);
 
-    for(int i = 0; i < mid.length; i++) {
-      double halfdist = (hyperboundingbox.getHi(i) - hyperboundingbox.getLo(i)) / 2.0;
+    for(int i = 0; i < middle.length; i++) {
+      double halfdist = (upper[i] - lower[i]) / 2.0;
       DoubleDoublePair derlim = limits[i];
       fm += halfdist * FastMath.max(-derlim.first, derlim.second);
     }
@@ -166,39 +167,29 @@ public class QuadraticProblem {
    * @param b
    * @param c
    * @param bounds
-   * @param att_types
-   * @param do_cutoff_check
+   * @param attributeTypes
+   * @param cutoffCheck
    */
-  private double constrained_quadopt(double[][] a, double[] b, double c, Boundingbox bounds, AttributeState[] att_types, boolean do_cutoff_check, double[] result, double resultValue)
-  // dyv **r_xopt,double *r_opt_value return values
-  {
+  private double evaluateConstrainedQuadraticFunction(double[][] a, double[] b, double c, Boundingbox bounds, AttributeState[] attributeTypes, boolean cutoffCheck, double[] result, double resultValue) {
     // case for one attribute
-    if(att_types.length == 1) {
-      double res1d = constrained_quadopt_1d(a[0][0], b[0], c, bounds.getLo(0), bounds.getHi(0), result, resultValue);
+    if(attributeTypes.length == 1) {
+      double res1d = evaluateConstrainedQuadraticFunction1D(a[0][0], b[0], c, bounds.getLowerBound(0), bounds.getUpperBound(0), result, resultValue);
       assert res1d >= resultValue;
       return res1d; // 1 dimensional solution
     }
 
     // find first constrained attribute
     int constrAtt = -1;
-    for(int i = 0; i < att_types.length; i++) {
-      if(att_types[i] == AttributeState.CONSTR) {
+    for(int i = 0; i < attributeTypes.length; i++) {
+      if(attributeTypes[i] == AttributeState.CONSTR) {
         constrAtt = i;
         break;
       }
     }
     // check if we have no constrained attribute -> we worked all attributes
+    // then we just check if the maximum is inside the given bounds
     if(constrAtt < 0) {
-      double[] opt = null;
-      // if(att_types.length == 0) {
-      // // do i actually need to do anything then?
-      // // it would assume all attributes were driven to a limit in this pass
-      // // and the value is set
-      // opt = new double[0];
-      // }
-      // else {
-      opt = findMaximumWithCholesky(a, b);
-      // }
+      double[] opt = findMaximumWithfunctionValue(a, b);
       if(opt == null) {
         return resultValue; // no optimum with constraints
       }
@@ -214,8 +205,8 @@ public class QuadraticProblem {
       }
     }
     else { // we found a constrained attribute
-      if(do_cutoff_check) {
-        double[] opt = findMaximumWithCholesky(a, b);
+      if(cutoffCheck) {
+        double[] opt = findMaximumWithfunctionValue(a, b);
         if(opt != null) {
           double optValue = evalueateQuadraticFormula(a, b, c, opt);
           if(bounds.weaklyInsideBounds(opt)) {
@@ -246,15 +237,19 @@ public class QuadraticProblem {
         IntIntPair drivenAttribute = find_known_lo_or_hi_att_num(a, b, bounds);
         if(drivenAttribute.first >= 0) {
           // we found a value that can be driven to lo or hi
-          double redVal = startReducedProblem(a, b, c, bounds, att_types, drivenAttribute.first, (drivenAttribute.second == 1 ? AttributeState.ATT_HILIM : AttributeState.ATT_LOLIM), result, resultValue);
+          double redVal = startReducedProblem(a, b, c, bounds, attributeTypes, drivenAttribute.first, (drivenAttribute.second == 1 ? AttributeState.UPLIM : AttributeState.LOLIM), result, resultValue);
           assert redVal >= resultValue;
           return redVal;
         }
         else {
           // if we cannot find such a value, make sure we can still find a good
           // value in the given bounds
+
           // get derivative limits
-          DoubleDoublePair[] limits = ComputeAllLinearDerivativeLimits(a, b, bounds);
+          DoubleDoublePair[] limits = new DoubleDoublePair[b.length];
+          for(int i = 0; i < limits.length; i++) {
+            limits[i] = calculateLinearDerivativeLimits(a, b, bounds, i);
+          }
           double maxPossValue = computeMaximumPossibleFuncValue(a, b, c, bounds, limits);
           if(maxPossValue <= resultValue) {
             return resultValue; // we cannot get any better in this
@@ -269,27 +264,27 @@ public class QuadraticProblem {
       // only do unconstrained child if its not the last constrained
       // count values in array
       int acc = 0;
-      for(int i = 0; i < att_types.length; i++) {
-        if(att_types[i] == AttributeState.CONSTR)
+      for(int i = 0; i < attributeTypes.length; i++) {
+        if(attributeTypes[i] == AttributeState.CONSTR)
           acc += 1;
       }
       double lastResult = resultValue;
       if(acc > 1) {
-        lastResult = startReducedProblem(a, b, c, bounds, att_types, constrAtt, AttributeState.UNCONSTR, result, resultValue);
+        lastResult = startReducedProblem(a, b, c, bounds, attributeTypes, constrAtt, AttributeState.UNCONSTR, result, resultValue);
         assert lastResult >= resultValue;
         resultValue = lastResult;
       }
-      lastResult = startReducedProblem(a, b, c, bounds, att_types, constrAtt, AttributeState.ATT_LOLIM, result, resultValue);
+      lastResult = startReducedProblem(a, b, c, bounds, attributeTypes, constrAtt, AttributeState.LOLIM, result, resultValue);
       assert lastResult >= resultValue;
       resultValue = lastResult;
-      lastResult = startReducedProblem(a, b, c, bounds, att_types, constrAtt, AttributeState.ATT_HILIM, result, resultValue);
+      lastResult = startReducedProblem(a, b, c, bounds, attributeTypes, constrAtt, AttributeState.UPLIM, result, resultValue);
       assert lastResult >= resultValue;
       return lastResult; // best of the children or old
     }
     return resultValue; // we havent found anything better so return last result
   }
 
-  private double constrained_quadopt_1d(double a, double b, double c, double lo, double hi, double[] result, double resultValue) {
+  private double evaluateConstrainedQuadraticFunction1D(double a, double b, double c, double lower, double upper, double[] result, double resultValue) {
     // has max if a <0
     boolean hasMax = a < 0.0;
     double optimum = Double.NaN;
@@ -298,14 +293,14 @@ public class QuadraticProblem {
 
     if(hasMax) {
       optimum = -b / a;
-      foundmax = optimum >= lo && optimum <= hi;
+      foundmax = optimum >= lower && optimum <= upper;
       optvalue = 0.5 * a * optimum * optimum + b * optimum + c;
     }
     if(!foundmax) {
-      double lovalue = 0.5 * a * lo * lo + b * lo + c;
-      double hivalue = 0.5 * a * hi * hi + b * hi + c;
+      double lovalue = 0.5 * a * lower * lower + b * lower + c;
+      double hivalue = 0.5 * a * upper * upper + b * upper + c;
       optvalue = lovalue >= hivalue ? lovalue : hivalue;
-      optimum = lovalue >= hivalue ? lo : hi;
+      optimum = lovalue >= hivalue ? lower : upper;
     }
 
     if(optvalue > resultValue) {
@@ -331,7 +326,7 @@ public class QuadraticProblem {
    */
   private double startReducedProblem(double[][] a, double[] b, double c, Boundingbox bounds, AttributeState[] attTypes, int reducedAtt, AttributeState reducedTo, double[] result, double resultValue) {
     assert attTypes[reducedAtt] == AttributeState.CONSTR : "trying to reduce on allready reduced attribute";
-    assert reducedTo == AttributeState.UNCONSTR || reducedTo == AttributeState.ATT_LOLIM || reducedTo == AttributeState.ATT_HILIM : "trying to reduce to constrained att type";
+    assert reducedTo == AttributeState.UNCONSTR || reducedTo == AttributeState.LOLIM || reducedTo == AttributeState.UPLIM : "trying to reduce to constrained att type";
 
     if(reducedTo == AttributeState.UNCONSTR) {
       // AttributeState[] redAttTypes = new AttributeState[attTypes.length];
@@ -340,13 +335,13 @@ public class QuadraticProblem {
       attTypes[reducedAtt] = reducedTo;
       // contrained quadopt should only update result, if the new result is
       // better than the old
-      double childResValue = constrained_quadopt(a, b, c, bounds, attTypes, false, result, resultValue);
+      double childResValue = evaluateConstrainedQuadraticFunction(a, b, c, bounds, attTypes, false, result, resultValue);
       attTypes[reducedAtt] = tas;
       assert childResValue >= resultValue;
       return childResValue;
     }
     else {
-      double reduceToValue = reducedTo == AttributeState.ATT_LOLIM ? bounds.getLo(reducedAtt) : bounds.getHi(reducedAtt);
+      double reduceToValue = reducedTo == AttributeState.LOLIM ? bounds.getLowerBound(reducedAtt) : bounds.getUpperBound(reducedAtt);
       int redSize = b.length - 1;
       double[][] redA = cache[redSize - 1].a;// new double[redSize][redSize];
       double[] redB = cache[redSize - 1].b;// new double[redSize];
@@ -355,14 +350,14 @@ public class QuadraticProblem {
       Boundingbox redBounds = cache[redSize - 1].box;// new Boundingbox(null);
       double redC = reduceEquation(a, b, c, redA, redB, reducedAtt, reduceToValue);
       reduceConstraints(bounds, redBounds, attTypes, redAttTypes, reducedAtt);
-      
+
       double[] redRes = null;
       if(calcPoint) {
         redRes = reduceSolution(reducedAtt, result);
       }
       // reduce solution to make it temporarily usable
 
-      double redResValue = constrained_quadopt(redA, redB, redC, redBounds, redAttTypes, true, redRes, resultValue);
+      double redResValue = evaluateConstrainedQuadraticFunction(redA, redB, redC, redBounds, redAttTypes, true, redRes, resultValue);
 
       // if we found a better value than the one saved in result_value, update
       // result.
@@ -397,26 +392,27 @@ public class QuadraticProblem {
     double[] redRes = null;
     if(result != null) {
       redRes = cache[result.length - 2].result;// new double[result.length - 1];
-      for(int i = 0; i < redRes.length; i++) {
-        int oRefi = i < reducedAtt ? i : i + 1;
-        redRes[i] = result[oRefi];
-      }
+      if(reducedAtt > 0)
+        System.arraycopy(result, 0, redRes, 0, reducedAtt);
+      if(redRes.length - (reducedAtt) > 0)
+        System.arraycopy(result, reducedAtt + 1, redRes, reducedAtt, redRes.length - reducedAtt);
     }
     return redRes;
   }
 
   private void reduceConstraints(Boundingbox bounds, Boundingbox redBounds, AttributeState[] attTypes, AttributeState[] redAttTypes, int reducedAtt) {
-    int redSize = attTypes.length - 1;
-    // double[][] bs = new double[3][redSize];
-    for(int i = 0; i < redSize; i++) {
-      int oRefi = i < reducedAtt ? i : i + 1;
-      // bs[0][i] = bounds.getLo(oRefi);
-      // bs[1][i] = bounds.getHi(oRefi);
-      // bs[2][i] = bounds.getDiff(oRefi);
-      redBounds.setDim(i, bounds.getLo(oRefi), bounds.getHi(oRefi), bounds.getDiff(oRefi));
-      redAttTypes[i] = attTypes[oRefi];
-      // redBounds.setBB(bs);
+    if(reducedAtt > 0) {
+      System.arraycopy(attTypes, 0, redAttTypes, 0, reducedAtt);
     }
+
+    if(redAttTypes.length - (reducedAtt) > 0) {
+      System.arraycopy(attTypes, reducedAtt + 1, redAttTypes, reducedAtt, redAttTypes.length - reducedAtt);
+    }
+    // for(int i = 0; i < redSize; i++) {
+    // int oRefi = i < reducedAtt ? i : i + 1;
+    // redAttTypes[i] = attTypes[oRefi];
+    // }
+    bounds.reduceBoundingboxTo(redBounds, reducedAtt);
   }
 
   private double reduceEquation(double[][] a, double[] b, double c, double[][] redA, double[] redB, int reducedAtt, double reduceToValue) {
@@ -433,13 +429,13 @@ public class QuadraticProblem {
   }
 
   /**
-   * mk_zdpoint in original impl
+   * Finds the argmax for 1/2 * a * x^2 + b * x
    * 
    * @param a
    * @param b
    * @return
    */
-  private double[] findMaximumWithCholesky(double[][] a, double[] b) {
+  private double[] findMaximumWithfunctionValue(double[][] a, double[] b) {
     double[][] am = times(a, -1);
     CholeskyDecomposition chol = new CholeskyDecomposition(am);
     if(chol.isSPD()) {
@@ -449,40 +445,20 @@ public class QuadraticProblem {
   }
 
   public double evalueateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
-    return 0.5 * scalarProduct(point, times(a, point)) + scalarProduct(point, b) + c;
-  }
-
-  /**
-   * y(x) = 0.5 * x^T a x + b^T x
-   * 
-   * y'(x) = result^T x + return
-   * 
-   * return = b[k]
-   * result[i] = a[k,i]
-   * 
-   * @param a
-   * @param b
-   * @param result
-   * @return
-   */
-  private double createPartialDerivative(double[][] a, double[] b, int k, double[] result) {
-    for(int i = 0; i < result.length; i++) {
-      result[i] = a[k][i];
-    }
-    return b[k];
+    return 0.5 * transposeTimesTimes(point, a, point) + scalarProduct(point, b) + c;
   }
 
   //////////////////////////////////////////////////////////////////////// from
   //////////////////////////////////////////////////////////////////////// quopt
 
   private enum AttributeState {
-    ATT_LOLIM, ATT_HILIM, UNCONSTR, CONSTR
+    LOLIM, UPLIM, UNCONSTR, CONSTR
   }
 
   public static class ProblemData {
     double[][] a;
 
-    double[] b, derA, result;
+    double[] b, result;
 
     double piPow;
 
@@ -494,10 +470,9 @@ public class QuadraticProblem {
       a = new double[size][size];
       b = new double[size];
       result = new double[size];
-      derA = new double[size];
-      piPow = FastMath.pow(FastMath.sqrt(FastMath.PI), size);
+      piPow = FastMath.pow(MathUtil.SQRTPI, size);
       attTypes = new AttributeState[size];
-      box = new Boundingbox(new double[3][size]);
+      box = new Boundingbox(new double[size], new double[size]);
     }
   }
 }
