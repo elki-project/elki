@@ -367,7 +367,6 @@ class KDTree {
       double logDenSum = logSumExp(logProb);
       logProb = minus(logProb, logDenSum);
       for(int c = 0; c < logProb.length; c++) {
-
         double prob = FastMath.exp(logProb[c]);
         double logAPrio = logProb[c] + FastMath.log(size);
         double[] tCenter = times(summedPoints, prob);

@@ -51,6 +51,7 @@ import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -274,7 +275,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       lowerBounds[i] = Double.MAX_VALUE;
       upperBounds[i] = Double.MIN_VALUE;
     }
-    double[] result = new double[d];
     for(; it.valid(); it.advance()) {
       NumberVector x = relation.get(it);
       for(int i = 0; i < d; i++) {
@@ -283,10 +283,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         upperBounds[i] = upperBounds[i] > t ? upperBounds[i] : t;
       }
     }
-    for(int i = 0; i < d; i++) {
-      result[i] = upperBounds[i] - lowerBounds[i];
-    }
-    return result;
+    return VMath.minus(upperBounds, lowerBounds);
   }
 
   /**
