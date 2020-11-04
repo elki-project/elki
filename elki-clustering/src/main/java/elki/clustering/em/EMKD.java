@@ -58,6 +58,7 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -115,13 +116,19 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    */
   private double tauClass;
 
+  /**
+   * if true, will check the difference of upper and lower limits of the models
+   * to check for pruning opportunities
+   */
+  private boolean ignorePrune;
+
   private int miniter;
 
   private int maxiter;
 
   protected ArrayModifiableDBIDs sorted;
 
-  public EMKD(int k, double mbw, double tau, double tauloglike, double tauclass, double delta, EMClusterModelFactory<NumberVector, M> mfactory, int miniter, int maxiter, boolean soft) {
+  public EMKD(int k, double mbw, double tau, double tauloglike, double tauclass, double delta, EMClusterModelFactory<NumberVector, M> mfactory, int miniter, int maxiter, boolean ignorePrune, boolean soft) {
     this.k = k;
     this.mbw = mbw;
     this.tau = tau;
@@ -131,6 +138,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     this.mfactory = mfactory;
     this.miniter = miniter;
     this.maxiter = maxiter;
+    this.ignorePrune = ignorePrune;
     this.soft = soft;
   }
 
@@ -146,7 +154,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
-    
+
     DBIDIter iter = relation.iterDBIDs();
     int d = relation.get(iter).getDimensionality();
 
@@ -170,7 +178,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     // double exactloglikelihood = assignProbabilitiesToInstances(relation,
     // models, probClusterIGivenX);
     DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
-    
+
     // Array that contains indices used in makeStats
     // Necessary because we drop unlikely classes in the progress
     int[] indices = new int[models.size()];
@@ -189,7 +197,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
       // recalculate probabilities
       ClusterData[] newstats = new ClusterData[k];
-      logLikelihood = tree.makeStats(relation.size(), models, new double[k], indices, newstats, tau, tauLoglike, tauClass) / relation.size();
+      logLikelihood = tree.makeStats(relation.size(), models, new double[k], indices, newstats, tau, tauLoglike, tauClass, !ignorePrune) / relation.size();
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood
@@ -411,6 +419,11 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     public static final OptionID PRIOR_ID = new OptionID("emkd.map.prior", "Regularization factor for MAP estimation.");
 
     /**
+     * Parameter to specify if pruning should be ignored
+     */
+    public static final OptionID IGNORE_PRUNE_ID = new OptionID("emkd.ignorePrune", "Set to ignore pruning checks during calculation.");
+
+    /**
      * Number of clusters.
      */
     protected int k;
@@ -455,6 +468,11 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
      */
     protected int maxiter = -1;
 
+    /**
+     * Pruning on or off
+     */
+    protected boolean ignorePrune = true;
+
     @Override
     public void configure(Parameterization config) {
       new IntParameter(K_ID) //
@@ -464,6 +482,8 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .grab(config, x -> mbw = x);
+      new Flag(IGNORE_PRUNE_ID) //
+          .grab(config, x -> ignorePrune = x);
       new DoubleParameter(TAU_ID, 0.01)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -493,7 +513,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     @Override
     public EMKD<M> make() {
-      return new EMKD<>(k, mbw, tau, tauloglike, tauclass, delta, initializer, miniter, maxiter, false);
+      return new EMKD<>(k, mbw, tau, tauloglike, tauclass, delta, initializer, miniter, maxiter, ignorePrune, false);
     }
   }
 

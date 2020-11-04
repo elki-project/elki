@@ -346,11 +346,11 @@ class KDTree {
    * @param tau
    * @return
    */
-  public double makeStats(int numP, ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] knownWeights, int[] indices, ClusterData[] resultData, double tau, double tauLoglike, double tauClass) {
+  public double makeStats(int numP, ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] knownWeights, int[] indices, ClusterData[] resultData, double tau, double tauLoglike, double tauClass, boolean pruneFlag) {
     int k = models.size();
     boolean prune = isLeaf;
     int[] nextIndices = indices;
-    if(!prune) {
+    if(!prune && pruneFlag) {
       nextIndices = checkStoppingCondition(boundingBox, models, knownWeights, resultData, indices, tau, tauLoglike, tauClass);
       if(nextIndices.length == 0) {
         prune = true;
@@ -385,8 +385,8 @@ class KDTree {
     }
     else {
       assert nextIndices != null;
-      double l = leftChild.makeStats(numP, models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass);
-      double r = rightChild.makeStats(numP, models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass);
+      double l = leftChild.makeStats(numP, models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass, pruneFlag);
+      double r = rightChild.makeStats(numP, models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass, pruneFlag);
       return l + r;
     }
   }
