@@ -50,6 +50,7 @@ import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
@@ -166,7 +167,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     // build kd-tree
     sorted = DBIDUtil.newArray(relation.getDBIDs());
     double[] dimWidth = analyseDimWidth(relation);
+    Duration buildtime = LOG.newDuration(this.getClass().getName() + ".Tree.buildtime").begin();
     KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimWidth, mbw, LOG, dataArrays);
+    LOG.statistics(buildtime.end());
 
     // initial models
     ArrayList<? extends EMClusterModel<NumberVector, M>> models = new ArrayList<EMClusterModel<NumberVector, M>>(mfactory.buildInitialModels(relation, k));
@@ -177,7 +180,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     // double exactloglikelihood = assignProbabilitiesToInstances(relation,
     // models, probClusterIGivenX);
-    DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
+    DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
 
     // Array that contains indices used in makeStats
     // Necessary because we drop unlikely classes in the progress
@@ -222,7 +225,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     logLikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
 
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
-    LOG.statistics(likeStat.setDouble(logLikelihood));
+    LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", logLikelihood));
 
     // provide a hard clustering
     // add each point to cluster of max density
@@ -248,8 +251,8 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * update Cluster models according to the statistics calculated by makestats
    * 
    * @param newstats new statistics
-   * @param models models to update
-   * @param size number of elements to cluster
+   * @param models   models to update
+   * @param size     number of elements to cluster
    */
   private void updateClusters(ClusterData[] newstats, ArrayList<? extends EMClusterModel<NumberVector, M>> models, int size) {
     for(int i = 0; i < k; i++) {
@@ -301,10 +304,10 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 
-   * @param relation the database used for assignment to instances
-   * @param models Cluster models
+   * @param relation           the database used for assignment to instances
+   * @param models             Cluster models
    * @param probClusterIGivenX Output storage for cluster probabilities
-   * @param <O> Object type
+   * @param <O>                Object type
    * @return the expectation value of the current mixture of distributions
    */
   public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
