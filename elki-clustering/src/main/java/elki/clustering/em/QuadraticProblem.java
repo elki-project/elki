@@ -29,11 +29,34 @@ import java.util.Arrays;
 import elki.clustering.em.KDTree.Boundingbox;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
+import elki.utilities.documentation.Reference;
 import elki.utilities.pairs.DoubleDoublePair;
 import elki.utilities.pairs.IntIntPair;
 
 import net.jafama.FastMath;
 
+/**
+ * Class to Solve a constrained quadratic equation in the form 0.5 * x^tax +
+ * b^tx + c constrained by the given Boundingbox.
+ * 
+ * Works by recursion over the dimensions, searches the different possible
+ * outcomes until it finds the best solution.
+ *
+ * Reference:
+ * <p>
+ * A. Moore:<br>
+ * Very Fast EM-based Mixture Model Clustering using Multiresolution
+ * kd-trees.<br>
+ * Neural Information Processing Systems (NIPS 1998)
+ * <p>
+ * 
+ * @author Robert Gehde
+ * @param <M> model type to produce
+ */
+@Reference(authors = "Andrew W. Moore", //
+    booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
+    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
+    bibkey = "DBLP:conf/nips/Moore98")
 public class QuadraticProblem {
 
   /**
@@ -46,6 +69,9 @@ public class QuadraticProblem {
    */
   public double[] argmaxPoint;
 
+  /**
+   * ArrayCache object
+   */
   private ProblemData[] cache;
 
   /**
@@ -58,11 +84,12 @@ public class QuadraticProblem {
    * we use it in KDTrees with b = (0)^d and c = 0. If you use it like this you
    * can multiply the result with 2 to get x^tax + b + c.
    * Constructor.
-   *
-   * @param a
-   * @param b
-   * @param c
-   * @param box
+   * 
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @param c c coefficient of the function
+   * @param box The bounds in which the maximum is calculated
+   * @param arrayCache ArrayCache object
    */
   public QuadraticProblem(double[][] a, double[] b, double c, Boundingbox box, ProblemData[] arrayCache) {
     maximumValue = Double.NEGATIVE_INFINITY;
@@ -82,10 +109,10 @@ public class QuadraticProblem {
    * This does NOT mean that the non-found dimensions are not driven to a limit.
    * This is just an implication, not an equivalence
    * 
-   * @param a
-   * @param b
-   * @param hyperboundingbox
-   * @return
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @param hyperboundingbox bounds in which to check derivative
+   * @return pair (dimension, lo=0 | hi =1) or (-1,-1) if none
    */
   private IntIntPair findLimitedDimensionWithDerivative(double[][] a, double[] b, Boundingbox hyperboundingbox) {
     for(int i = 0; i < b.length; i++) {
@@ -107,7 +134,7 @@ public class QuadraticProblem {
    * @param ak gradient/slope
    * @param bk y axis crossing
    * @param hyperboundingbox limitation of min max search
-   * @return
+   * @return double pair (min, max)
    */
   private DoubleDoublePair calculateLinearDerivativeLimits(double[][] a, double[] b, Boundingbox hyperboundingbox, int dim) {
     double bk = b[dim];
@@ -238,7 +265,7 @@ public class QuadraticProblem {
         // get a good value
         IntIntPair drivenDimension = findLimitedDimensionWithDerivative(a, b, bounds);
         if(drivenDimension.first >= 0) {
-          // we found a value that can be driven to lo or hi
+          // we found a value that can be driven to lower or upper limit
           double redVal = startReducedProblem(a, b, c, bounds, dimensionStates, drivenDimension.first, (drivenDimension.second == 1 ? DimensionState.UPLIM : DimensionState.LOLIM), result, resultValue);
           assert redVal >= resultValue;
           return redVal;
@@ -276,6 +303,20 @@ public class QuadraticProblem {
     return resultValue; // we havent found anything better so return last result
   }
 
+  /**
+   * Finds the maximum for a 1d constrained quadratic function. If a new maximum
+   * is found, the argmax contained in result will be overwritten with the new
+   * argmax.
+   * 
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @param c c coefficient of the function
+   * @param lowerBound lower bound of valid input
+   * @param upperBound upper bound of valid input
+   * @param result the - so far - argmax
+   * @param resultValue the - so far - max
+   * @return the new max
+   */
   private double evaluateConstrainedQuadraticFunction1D(double a, double b, double c, double lowerBound, double upperBound, double[] result, double resultValue) {
     // has max if a <0
     boolean hasMax = a < 0.0;
@@ -316,9 +357,11 @@ public class QuadraticProblem {
    * @param c c coefficient of the function
    * @param bounds The bounds in which the maximum is calculated
    * @param dimStates Current calculation state of the dimensions
-   * @param reducedDim
-   * @param reducedTo
-   * @return
+   * @param reducedDim the dimension to reduce
+   * @param reducedTo the state the dimension is reduced to
+   * @param result the - so far - argmax
+   * @param resultValue the - so far - max
+   * @return the new max value
    */
   private double startReducedProblem(double[][] a, double[] b, double c, Boundingbox bounds, DimensionState[] dimStates, int reducedDim, DimensionState reducedTo, double[] result, double resultValue) {
     assert dimStates[reducedDim] == DimensionState.CONSTR : "trying to reduce on allready reduced dimension";
@@ -346,7 +389,7 @@ public class QuadraticProblem {
 
       double[] redRes = null;
       if(calcPoint) {
-        redRes = reduceSolution(reducedDim, result);
+        redRes = reduceSolution(result, reducedDim);
       }
       // reduce solution to make it temporarily usable
 
@@ -364,6 +407,14 @@ public class QuadraticProblem {
     }
   }
 
+  /**
+   * expands the redRes to a problem with dim+1 and saves it into result
+   * 
+   * @param result the result
+   * @param redRes the the reduced result
+   * @param reducedDim the dimension that was reduced to gain redRes
+   * @param reduceToValue the value the dimension was reduced to to gain redRes
+   */
   private void expandNewSolution(double[] result, double[] redRes, int reducedDim, double reduceToValue) {
     if(redRes != null) {
 
@@ -379,7 +430,14 @@ public class QuadraticProblem {
     }
   }
 
-  private double[] reduceSolution(int reducedDim, double[] result) {
+  /**
+   * reduce the solution to a problem with dim-1
+   * 
+   * @param result result of the array
+   * @param reducedDim dimension to reduce
+   * @return reduced result
+   */
+  private double[] reduceSolution(double[] result, int reducedDim) {
     double[] redRes = null;
     if(result != null) {
       redRes = cache[result.length - 2].result;// new double[result.length - 1];
@@ -391,6 +449,15 @@ public class QuadraticProblem {
     return redRes;
   }
 
+  /**
+   * reduces the constrains to a problem with dim-1
+   * 
+   * @param bounds boundingbox of the problem
+   * @param redBounds result boundingbox
+   * @param dimStates dimension states of the problem
+   * @param redDimStates result array for dimension states
+   * @param reducedDim dimension to reduce
+   */
   private void reduceConstraints(Boundingbox bounds, Boundingbox redBounds, DimensionState[] dimStates, DimensionState[] redDimStates, int reducedDim) {
     if(reducedDim > 0) {
       System.arraycopy(dimStates, 0, redDimStates, 0, reducedDim);
@@ -402,6 +469,19 @@ public class QuadraticProblem {
     bounds.reduceBoundingboxTo(redBounds, reducedDim);
   }
 
+  /**
+   * reduces the equation/function the a problem with dim-1 given the
+   * information
+   *
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @param c c coefficient of the function
+   * @param redA reduced a result array
+   * @param redB reduced b result array
+   * @param reducedDim dimension to reduce
+   * @param reduceToValue state to reduce the dimension to
+   * @return reduced c
+   */
   private double reduceEquation(double[][] a, double[] b, double c, double[][] redA, double[] redB, int reducedDim, double reduceToValue) {
     int redSize = b.length - 1;
     for(int i = 0; i < redSize; i++) {
@@ -418,9 +498,9 @@ public class QuadraticProblem {
   /**
    * Finds the argmax for 1/2 * a * x^2 + b * x
    * 
-   * @param a
-   * @param b
-   * @return
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @return the argmax of the given function
    */
   private double[] findMaximumWithfunctionValue(double[][] a, double[] b) {
     double[][] am = times(a, -1);
@@ -431,14 +511,34 @@ public class QuadraticProblem {
     return null;
   }
 
+  /**
+   * calculate 0.5 point^t a point + point^t b + c for the given values
+   * 
+   * @param a a coefficient matrix of the function
+   * @param b b coefficient vector of the function
+   * @param c c coefficient of the function
+   * @param point to calculate the function at
+   * @return function value
+   */
   public double evalueateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
     return 0.5 * transposeTimesTimes(point, a, point) + scalarProduct(point, b) + c;
   }
 
+  /**
+   * Describes the calculation state of a Dimension
+   */
   private enum DimensionState {
-    LOLIM, UPLIM, UNCONSTR, CONSTR
+    LOLIM, // driven to lower boundingbox limit
+    UPLIM, // driven to upper boundingbox limit
+    UNCONSTR, // constrains lifted (results are ignored if outside of bounds)
+    CONSTR // constrained (not yet visited)
   }
 
+  /**
+   * contains arrays for a specific size needed for the problem calculation
+   * using this object saves the creation of all those arrays, because we can
+   * just reuse them
+   */
   public static class ProblemData {
     double[][] a;
 

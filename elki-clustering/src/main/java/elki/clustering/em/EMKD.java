@@ -54,6 +54,9 @@ import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
+import elki.utilities.documentation.Description;
+import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -65,6 +68,29 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
+/**
+ * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
+ * Mixture Modeling (GMM), using a KD Tree as calculation base. If supported,
+ * tries to prune during calculation.
+ *
+ * 
+ * Reference:
+ * <p>
+ * A. Moore:<br>
+ * Very Fast EM-based Mixture Model Clustering using Multiresolution
+ * kd-trees.<br>
+ * Neural Information Processing Systems (NIPS 1998)
+ * <p>
+ * 
+ * @author Robert Gehde
+ * @param <M> model type to produce
+ */
+@Title("EMKD-Clustering: Clustering by Expectation Maximization on a KD-Tree")
+@Description("Cluster data via Gaussian mixture modeling and the EMKD algorithm")
+@Reference(authors = "Andrew W. Moore", //
+    booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
+    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
+    bibkey = "DBLP:conf/nips/Moore98")
 public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering<M>> {
   //
   /**
@@ -96,17 +122,12 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   private double mbw;
 
   /**
-   * from original impl
-   * original values for tau
-   * Set tau = 0.01 for very high accuracy;
-   * Set tau = 0.2 for typical performance;
-   * Set tau = 0.6 for fast but innaccurate;
+   * tau, low for accurate results
    */
   private double tau;
 
   /**
-   * likelihood_tau = 0.01 for high acc, 0.5 for normal, 0.9 for
-   * approximate. Currently used as tau
+   * likelihood_tau, low for accurate results
    */
   private double tauLoglike;
 
@@ -144,11 +165,12 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   }
 
   /**
-   * I took the run method from EM.java and I am rewriting it to work on KD
-   * trees.
+   * Calculates the EM Clustering with the given values by calling makeStats and
+   * calculation the new models from the given results
    * 
-   * @param relation
-   * @return
+   * 
+   * @param relation Relation
+   * @return Clustering result
    */
   public Clustering<M> run(Relation<? extends NumberVector> relation) {
 
@@ -200,7 +222,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
       // recalculate probabilities
       ClusterData[] newstats = new ClusterData[k];
-      logLikelihood = tree.makeStats(relation.size(), models, new double[k], indices, newstats, tau, tauLoglike, tauClass, !ignorePrune) / relation.size();
+      logLikelihood = tree.makeStats(models, new double[k], indices, newstats, tau, tauLoglike, tauClass, !ignorePrune) / relation.size();
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood
@@ -251,8 +273,8 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * update Cluster models according to the statistics calculated by makestats
    * 
    * @param newstats new statistics
-   * @param models   models to update
-   * @param size     number of elements to cluster
+   * @param models models to update
+   * @param size number of elements to cluster
    */
   private void updateClusters(ClusterData[] newstats, ArrayList<? extends EMClusterModel<NumberVector, M>> models, int size) {
     for(int i = 0; i < k; i++) {
@@ -304,10 +326,10 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 
-   * @param relation           the database used for assignment to instances
-   * @param models             Cluster models
+   * @param relation the database used for assignment to instances
+   * @param models Cluster models
    * @param probClusterIGivenX Output storage for cluster probabilities
-   * @param <O>                Object type
+   * @param <O> Object type
    * @return the expectation value of the current mixture of distributions
    */
   public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
@@ -415,11 +437,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
      * Parameter to specify a minimum number of iterations
      */
     public static final OptionID MINITER_ID = new OptionID("emkd.miniter", "Minimum number of iterations.");
-
-    /**
-     * Parameter to specify the MAP prior
-     */
-    public static final OptionID PRIOR_ID = new OptionID("emkd.map.prior", "Regularization factor for MAP estimation.");
 
     /**
      * Parameter to specify if pruning should be ignored
