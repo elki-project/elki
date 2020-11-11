@@ -54,14 +54,13 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * A. Moore:<br>
+ * A. W. Moore:<br>
  * Very Fast EM-based Mixture Model Clustering using Multiresolution
  * kd-trees.<br>
  * Neural Information Processing Systems (NIPS 1998)
  * <p>
  * 
  * @author Robert Gehde
- * @param <M> model type to produce
  */
 @Reference(authors = "Andrew W. Moore", //
     booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
@@ -325,7 +324,7 @@ class KDTree {
           result.add(i);
         }
       }
-      // return updated lis of indices
+      // return updated list of indices
       return result.toArray();
     }
     // return empty array -> full prune
@@ -376,22 +375,21 @@ class KDTree {
   /**
    * Calculates gaussian density from covdet and squared mahalanobis distance
    * 
-   * @param squaredMahalanobis squared mahalanobix distance
+   * @param squaredMahalanobis squared mahalanobis distance
    * @param covarianceDet covariance determinant of the model
    * @param dim dimensions of the model
    * @return density of the model at the given mahalanobis distance
    */
   private double calculateGaussian(double squaredMahalanobis, double covarianceDet, int dim) {
+    // TODO does this cause the error?
     double num = /*(mahalanobisSQD / 2 > 400) ? 0.0 :*/ FastMath.exp(-squaredMahalanobis / 2);
-    // 400 is from original implementation
     double den = cache[dim - 1].piPow * FastMath.sqrt(covarianceDet);
     return num / den;
   }
 
   /**
-   * calculates the maximum squared mahalanobis distance for the given
-   * inverted covariance matrix and (translated) bounding box. The mean of the
-   * model is
+   * calculates the maximum squared mahalanobis distance for the given inverted
+   * covariance matrix and (translated) bounding box. The center of the model is
    * considered to be at 0.
    * 
    * @param bbTranslated translated boundingbox of the node
@@ -407,15 +405,21 @@ class KDTree {
   }
 
   /**
-   * calculate sufficient stats to update clusters
+   * calculates the statistics on the kd-tree needed for the calculation of the
+   * new models
    * 
-   * @param numP
-   * @param models
-   * @param knownWeights
-   * @param indices
-   * @param resultData
-   * @param tau
-   * @return
+   * @param models list of all models
+   * @param knownWeights result target array for known weights, topmost call
+   *        with new array
+   * @param indices list of indices to use in calculation, topmost call with all
+   *        indices
+   * @param resultData result target array for statistics, topmost call with
+   *        empty ClusterData array
+   * @param tau parameter for calculation pruning by weight error
+   * @param tauLoglike parameter for calculation pruning by log like error
+   * @param tauClass parameter for class dropping if class is not impactfull
+   * @param pruneFlag flag if pruning should be done
+   * @return log likelihood of the model
    */
   public double makeStats(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] knownWeights, int[] indices, ClusterData[] resultData, double tau, double tauLoglike, double tauClass, boolean pruneFlag) {
     int k = models.size();
@@ -482,7 +486,6 @@ class KDTree {
   /**
    * Bounding box of a KDTree Node
    * 
-   *
    */
   static public class Boundingbox {
 
@@ -676,7 +679,7 @@ class KDTree {
   /**
    * ensures d to be in [0,1]
    * 
-   * @param d double param
+   * @param d double to be bound to [0,1]
    * @return 0 if d < 0, 1 if d > 0, d else
    */
   private static double bound(double d) {

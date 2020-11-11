@@ -70,13 +70,12 @@ import net.jafama.FastMath;
 
 /**
  * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
- * Mixture Modeling (GMM), using a KD Tree as calculation base. If supported,
- * tries to prune during calculation.
+ * Mixture Modeling (GMM), calculated on a kd-tree. If supported, tries to prune
+ * during calculation.
  *
- * 
  * Reference:
  * <p>
- * A. Moore:<br>
+ * A. W. Moore:<br>
  * Very Fast EM-based Mixture Model Clustering using Multiresolution
  * kd-trees.<br>
  * Neural Information Processing Systems (NIPS 1998)
@@ -92,12 +91,14 @@ import net.jafama.FastMath;
     title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
     bibkey = "DBLP:conf/nips/Moore98")
 public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering<M>> {
-  //
   /**
    * Factory for producing the initial cluster model.
    */
   private EMClusterModelFactory<NumberVector, M> mfactory;
 
+  /**
+   * Logging object
+   */
   private static final Logging LOG = Logging.getLogger(EMKD.class);
 
   private static final double MIN_LOGLIKELIHOOD = -100000;
@@ -117,17 +118,23 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    */
   public static final SimpleTypeInformation<double[]> SOFT_TYPE = new SimpleTypeInformation<>(double[].class);
 
+  /**
+   * number of models
+   */
   private int k = 3;
 
+  /**
+   * minimum leaf size
+   */
   private double mbw;
 
   /**
-   * tau, low for accurate results
+   * tau, low for precise, high for fast results.
    */
   private double tau;
 
   /**
-   * likelihood_tau, low for accurate results
+   * likelihood_tau, low for precise, high for fast results.
    */
   private double tauLoglike;
 
@@ -144,8 +151,14 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    */
   private boolean ignorePrune;
 
+  /**
+   * minimum amount of iterations
+   */
   private int miniter;
 
+  /**
+   * maximum amount of iterations
+   */
   private int maxiter;
 
   protected ArrayModifiableDBIDs sorted;
@@ -169,8 +182,8 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * calculation the new models from the given results
    * 
    * 
-   * @param relation Relation
-   * @return Clustering result
+   * @param relation Data Relation
+   * @return Clustering EMKD Clustering
    */
   public Clustering<M> run(Relation<? extends NumberVector> relation) {
 
@@ -235,7 +248,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       if(it >= miniter && (Math.abs(logLikelihood - oldLogLikelihood) <= delta || lastImprovement < it >> 1)) {
         break;
       }
-
     }
 
     // fill result with clusters and models
@@ -296,8 +308,8 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   /**
    * helper method to retrieve the widths of all data in all dimensions
    * 
-   * @param relation
-   * @return
+   * @param relation Relation to analyze
+   * @return width of each dimension
    */
   private double[] analyseDimWidth(Relation<? extends NumberVector> relation) {
     DBIDIter it = relation.iterDBIDs();
@@ -308,6 +320,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       lowerBounds[i] = Double.MAX_VALUE;
       upperBounds[i] = Double.MIN_VALUE;
     }
+    // find upper and lower bound
     for(; it.valid(); it.advance()) {
       NumberVector x = relation.get(it);
       for(int i = 0; i < d; i++) {
@@ -316,10 +329,14 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         upperBounds[i] = upperBounds[i] > t ? upperBounds[i] : t;
       }
     }
+    // calculate widths
     return VMath.minus(upperBounds, lowerBounds);
   }
 
   /**
+   * Taken from EM, used for final model assignment.
+   * 
+   * 
    * Assigns the current probability values to the instances in the database and
    * compute the expectation value of the current mixture of distributions.
    * <p>
@@ -380,6 +397,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * @author Robert Gehde
    */
   public static class Par<M extends MeanModel> implements Parameterizer {
     /**
@@ -389,9 +407,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     public static final OptionID K_ID = new OptionID("emkd.k", "The number of clusters to find.");
 
     /**
-     * Parameter to specify the termination criterion for KD-Tree construction.
+     * Parameter to specify the termination criterion for kd-tree construction.
      * Stop splitting nodes when the width is smaller then mbw * dataset_width.
-     * Musst be between 0 and 1.
+     * Must be between 0 and 1.
      */
     public static final OptionID MBW_ID = new OptionID("emkd.mbw", //
         "Pruning criterion for the KD-Tree during construction. Stop splitting when leafwidth < mbw * width.");
@@ -399,16 +417,16 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     /**
      * Parameter to specify the pruning criterium during the algorithm.
      * Stop going down the kd-tree when possible weight error e < tau *
-     * totalweight. Musst be between 0 and 1. 0.01 for exact, 0.2 for typical
-     * performance and 0.6 for fast but inacurate.
+     * totalweight. Musst be between 0 and 1. Low for precise, high for fast
+     * results.
      */
     public static final OptionID TAU_ID = new OptionID("emkd.tau", //
         "Pruning criterion for the KD-Tree during algorithm. Stop traversing when error e < tau * totalweight.");
 
     /**
      * Safety parameter for pruning. Does not prune if loglike can deviate by
-     * tauloglike in this node. Must be between 0 and 1. 0.01 for exact, 0.5 for
-     * typical performance and 0.9 for fast but inacurate.
+     * tauloglike in this node. Must be between 0 and 1. Low for precise, high
+     * for fast results.
      */
     public static final OptionID TAU_LOGLIKE_ID = new OptionID("emkd.tauloglike", //
         "Savety parameter for pruning. Does not prune if loglike can deviate by tauloglike in this node.");

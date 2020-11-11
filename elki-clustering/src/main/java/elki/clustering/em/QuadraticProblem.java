@@ -44,14 +44,13 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * A. Moore:<br>
+ * A. W. Moore:<br>
  * Very Fast EM-based Mixture Model Clustering using Multiresolution
  * kd-trees.<br>
  * Neural Information Processing Systems (NIPS 1998)
  * <p>
  * 
  * @author Robert Gehde
- * @param <M> model type to produce
  */
 @Reference(authors = "Andrew W. Moore", //
     booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
@@ -70,7 +69,7 @@ public class QuadraticProblem {
   public double[] argmaxPoint;
 
   /**
-   * ArrayCache object
+   * arrayCache object
    */
   private ProblemData[] cache;
 
@@ -247,7 +246,7 @@ public class QuadraticProblem {
               }
               resultValue = optValue;
             }
-            return resultValue; // found value in cutoffcheck
+            return resultValue; // found value in cutoff check
             // no point in checking children, because we found a value in bounds
             // and will not get anything better
           }
@@ -370,7 +369,7 @@ public class QuadraticProblem {
     if(reducedTo == DimensionState.UNCONSTR) {
       DimensionState dimState = dimStates[reducedDim];
       dimStates[reducedDim] = reducedTo;
-      // contrained quadopt should only update result, if the new result is
+      // child call should only update result, if the new result is
       // better than the old
       double childResValue = evaluateConstrainedQuadraticFunction(a, b, c, bounds, dimStates, false, result, resultValue);
       dimStates[reducedDim] = dimState;
