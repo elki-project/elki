@@ -65,7 +65,7 @@ public class MaximumMatchingAccuracy {
     int[] chosen = new KuhnMunkresStern().run(costs);
     // read off maximum matching
     double correctAssociations = 0;
-    for(int i = 0; i < maxlen; i++) {
+    for(int i = 0; i < rowlen; i++) {
       correctAssociations += chosen[i] < collen ? cont[i][chosen[i]] : 0;
     }
     accuracy = correctAssociations / cont[rowlen][collen];
