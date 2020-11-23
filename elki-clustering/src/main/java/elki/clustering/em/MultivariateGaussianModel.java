@@ -27,7 +27,6 @@ import elki.data.model.EMModel;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
-
 import net.jafama.FastMath;
 
 /**
@@ -279,8 +278,36 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
 
   @Override
   public void updateCovariance(double[][] cov) {
+    CholeskyDecomposition tmp = new CholeskyDecomposition(cov);
+    if(!tmp.isSPD()) {
+      int c = 0;
+      // calculate s
+      double s = 0.;
+      for(int i = 0; i < cov.length; i++) {
+        s += cov[i][i];
+      }
+      s = s * SINGULARITY_CHEAT;
+      if(!(s > 0)) {
+        s = 1e-10 * SINGULARITY_CHEAT;
+      }
+      // repeat the cheat but double s in every step
+      while(!tmp.isSPD()) {
+        c++;
+        for(int i = 0; i < cov.length; i++) {
+          cov[i][i] += s;
+        }
+        tmp = new CholeskyDecomposition(cov);
+        s += s;
+      }
+      // this if keeps the original behavior of a silent level 1 sing. cheat
+      if(c > 1) {
+        LOG.warning("A Cluster has degenerated. For further operability, A Singualrity cheat was applied.\n"//
+            + "This drives the covariance matrix towards the unit matrix");
+        LOG.warning("singularity cheat used " + c + " times!");
+      }
+    }
     this.covariance = cov;
-    this.chol = updateCholesky(cov, chol);
+    this.chol = tmp;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 }

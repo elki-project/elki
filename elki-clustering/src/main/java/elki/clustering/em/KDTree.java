@@ -357,10 +357,12 @@ class KDTree {
         }
       }
     }
+    
     // maximizes mahalanobis dist
     QuadraticProblem quadmax = calcConstrainedSQDMahalMax(bbTranslated, covInv);
     double mahalanobisSQDmax = quadmax.maximumValue;
     System.arraycopy(quadmax.argmaxPoint, 0, maxpnt, 0, quadmax.argmaxPoint.length);
+    
     // minimizes mahalanobis dist (invert covinv and result
     QuadraticProblem quadmin = calcConstrainedSQDMahalMax(bbTranslated, times(covInv, -1.0));
     double mahalanobisSQDmin = -1.0 * quadmin.maximumValue;
