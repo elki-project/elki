@@ -122,6 +122,8 @@ public interface EMClusterModel<O, M extends Model> {
   /**
    * Set the cluster covariance matrix and do according updates.
    * 
+   * For Diagonal Gaussian Model it saves the diagonal matrix as variances.
+   * 
    * @param cov Cluster covariance matrix
    */
   void updateCovariance(double[][]cov);

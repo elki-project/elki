@@ -27,7 +27,6 @@ import java.util.Arrays;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.math.MathUtil;
-
 import net.jafama.FastMath;
 
 /**
@@ -225,8 +224,15 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
 
   @Override
   public void updateCovariance(double[][] cov) {
-//    this.covariance = cov;
-//    updateCholesky(cov, chol);
-//    this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
+    for(int i = 0; i < variances.length; i++) {
+      variances[i] = MathUtil.max(cov[i][i], SINGULARITY_CHEAT);
+
+    }
+    priordiag = copy(variances);
+    double logDet = 0;
+    for(double d : variances) {
+      logDet += FastMath.log(d);
+    }
+    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
   }
 }
