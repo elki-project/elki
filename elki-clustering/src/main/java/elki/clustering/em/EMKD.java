@@ -190,6 +190,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
+    if(k == 0) {
+      throw new IllegalArgumentException("k is 0: no clusters to calculate");
+    }
 
     DBIDIter iter = relation.iterDBIDs();
     int d = relation.get(iter).getDimensionality();
@@ -210,9 +213,16 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     ArrayList<? extends EMClusterModel<NumberVector, M>> models = new ArrayList<EMClusterModel<NumberVector, M>>(mfactory.buildInitialModels(relation, k));
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     if(!KDTree.supportsStoppingCondition(models)) {
-      LOG.warning("Model list contains models that does not support the calculation of stopping conditions! This will lead to a slower runtime.");
+      LOG.warning("Model list contains models that does not support the calculation of stopping conditions!");
     }
-
+    // assuming all models are the same
+    if(models.get(0) instanceof TwoPassMultivariateGaussianModel) {
+      LOG.warning("TwoPassMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
+    }
+    if(models.get(0) instanceof TextbookMultivariateGaussianModel) {
+      LOG.warning("TextbookMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
+    }
+    
     // double exactloglikelihood = assignProbabilitiesToInstances(relation,
     // models, probClusterIGivenX);
     DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
