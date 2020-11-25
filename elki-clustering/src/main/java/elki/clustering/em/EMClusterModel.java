@@ -124,6 +124,8 @@ public interface EMClusterModel<O, M extends Model> {
    * 
    * For Diagonal Gaussian Model it saves the diagonal matrix as variances.
    * 
+   * For Spherical Gaussian Model it saves the variance as average of dimensional variances.
+   * 
    * @param cov Cluster covariance matrix
    */
   void updateCovariance(double[][]cov);

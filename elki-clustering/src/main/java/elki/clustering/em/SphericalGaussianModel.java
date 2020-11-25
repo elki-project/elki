@@ -208,6 +208,13 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
 
   @Override
   public void updateCovariance(double[][] cov) {
-    
+    double var = 0.0;
+    for(int i = 0; i < cov.length; i++) {
+      var += cov[i][i];
+    }
+    this.variance = var/cov.length;
+    double logDet = cov.length * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
+    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
+        
   }
 }
