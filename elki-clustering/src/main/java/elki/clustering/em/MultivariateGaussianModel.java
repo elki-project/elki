@@ -200,7 +200,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
     for(int i = 0; i < covariance.length; i++) {
       s += covariance[i][i];
     }
-    s *= SINGULARITY_CHEAT / covariance.length;
+    s = s > 1e-100 ? (s * SINGULARITY_CHEAT / covariance.length) : 1e-50;
     for(int i = 0; i < covariance.length; i++) {
       covariance[i][i] += s;
     }
