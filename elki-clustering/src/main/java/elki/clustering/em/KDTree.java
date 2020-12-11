@@ -38,10 +38,10 @@ import elki.data.model.MeanModel;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.pairs.DoubleDoublePair;
+
 import elki.clustering.em.QuadraticProblem;
 import elki.clustering.em.QuadraticProblem.ProblemData;
 
@@ -67,10 +67,6 @@ import net.jafama.FastMath;
     title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
     bibkey = "DBLP:conf/nips/Moore98")
 class KDTree {
-  /**
-   * parent logging object
-   */
-  private final Logging PARENTLOG;
 
   /**
    * child-trees
@@ -126,11 +122,9 @@ class KDTree {
    *        complete dataset
    * @param mbw factor when to stop construction. Stop if splitdimwidth < mbw *
    *        dimwidth[splitdim]
-   * @param parentLog Logging for the GUI
    * @param arrayCache ArrayCache object for Quadratic Problem calls
    */
-  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimWidth, double mbw, Logging parentLog, ProblemData[] arrayCache) {
-    this.PARENTLOG = parentLog;
+  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimWidth, double mbw, ProblemData[] arrayCache) {
     this.cache = arrayCache;
     /**
      * other kdtrees seem to look at [left, right[
@@ -211,8 +205,8 @@ class KDTree {
         isLeaf = true;
         return;
       }
-      leftChild = new KDTree(relation, sorted, left, r, dimWidth, mbw, PARENTLOG, arrayCache);
-      rightChild = new KDTree(relation, sorted, r, right, dimWidth, mbw, PARENTLOG, arrayCache);
+      leftChild = new KDTree(relation, sorted, left, r, dimWidth, mbw, arrayCache);
+      rightChild = new KDTree(relation, sorted, r, right, dimWidth, mbw, arrayCache);
 
       // fill up statistics from childnodes
       summedPoints = plus(leftChild.summedPoints, rightChild.summedPoints);
@@ -229,19 +223,16 @@ class KDTree {
    * error of all remaining models is small enough to consider this node a leaf
    * node.
    * 
-   * @param boundingBox Bounding box of the KDTree node
    * @param models list of all models
-   * @param weightsKnown the weight for each model of so far visited elements
    * @param summedData accumulator object for statistics needed for emkd
    *        clustering
    * @param indices list of indices to check
    * @param tau maximum error, stop if all models have w_max - w_min < tau *
    *        w_total
-   * @param tauLoglike maximum loglike error, just as tau, but for loglikelihood
    * @param tauClass drop model if w_max < tauClass * max(W_min)
    * @return indices that are not pruned
    */
-  public int[] checkStoppingCondition(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] weightsKnown, ClusterData[] summedData, int[] indices, double tau, double tauLoglike, double tauClass) {
+  public int[] checkStoppingCondition(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, ClusterData[] summedData, int[] indices, double tau, double tauClass) {
     // Calculate Limits of the given Model inside the boundingbox
     DoubleDoublePair[] limits = new DoubleDoublePair[models.size()];
     double[][] maxPnts = new double[models.size()][summedPoints.length];
@@ -274,42 +265,13 @@ class KDTree {
       maxMinWeight = wmin > maxMinWeight ? wmin : maxMinWeight;
       // calculate maximum weight estimation
       wmaxs[i] = bound((weight * limits[i].second) / wmaxDenom);
-      double minPossibleWeight = weightsKnown[i] + wmin * size;
+      double minPossibleWeight = summedData[i].summedLogWeights_apriori + wmin * size;
       // calculate the maximum possible error in this node
       double maximumError = size * (wmaxs[i] - wmin);
       // pruning check, if error to big for this model, dont prune
       if(maximumError > tau * minPossibleWeight)
         prune = false;
     }
-    // check for possible log likelihood derivation
-    if(prune) {
-      // est loglike
-      double[] estloglikes = new double[summedData.length];
-      for(int j = 0; j < summedData.length; j++) {
-        estloglikes[j] = summedData[j] == null ? 0 : summedData[j].summedLoglike;
-      }
-      double estloglike = logSumExp(estloglikes);
-      // for every model
-      for(int i : indices) {
-        // check log likelihood
-
-        double minWeights = 0.0;
-        double maxWeights = 0.0;
-        for(int j : indices) {
-          minWeights += models.get(j).getWeight() * FastMath.exp(models.get(j).estimateLogDensity(new DoubleVector(minPnts[i])));
-          maxWeights += models.get(j).getWeight() * FastMath.exp(models.get(j).estimateLogDensity(new DoubleVector(maxPnts[i])));
-        }
-
-        double minLoglike = size * FastMath.log(minWeights);
-        double maxLoglike = size * FastMath.log(maxWeights);
-
-        // check
-        if(maxLoglike - minLoglike > tauLoglike * FastMath.max(100.0, FastMath.abs(estloglike))) {
-          prune = false;
-        }
-      }
-    }
-
     // if no complete prune is possible, check dropping of classes
     if(!prune) {
       if(tauClass == 0.0) {
@@ -357,12 +319,12 @@ class KDTree {
         }
       }
     }
-    
+
     // maximizes mahalanobis dist
     QuadraticProblem quadmax = calcConstrainedSQDMahalMax(bbTranslated, covInv);
     double mahalanobisSQDmax = quadmax.maximumValue;
     System.arraycopy(quadmax.argmaxPoint, 0, maxpnt, 0, quadmax.argmaxPoint.length);
-    
+
     // minimizes mahalanobis dist (invert covinv and result
     QuadraticProblem quadmin = calcConstrainedSQDMahalMax(bbTranslated, times(covInv, -1.0));
     double mahalanobisSQDmin = -1.0 * quadmin.maximumValue;
@@ -383,8 +345,7 @@ class KDTree {
    * @return density of the model at the given mahalanobis distance
    */
   private double calculateGaussian(double squaredMahalanobis, double covarianceDet, int dim) {
-    // TODO does this cause the error?
-    double num = /*(mahalanobisSQD / 2 > 400) ? 0.0 :*/ FastMath.exp(-squaredMahalanobis / 2);
+    double num = FastMath.exp(-squaredMahalanobis / 2);
     double den = cache[dim - 1].piPow * FastMath.sqrt(covarianceDet);
     return num / den;
   }
@@ -411,62 +372,53 @@ class KDTree {
    * new models
    * 
    * @param models list of all models
-   * @param knownWeights result target array for known weights, topmost call
-   *        with new array
    * @param indices list of indices to use in calculation, topmost call with all
    *        indices
    * @param resultData result target array for statistics, topmost call with
    *        empty ClusterData array
    * @param tau parameter for calculation pruning by weight error
-   * @param tauLoglike parameter for calculation pruning by log like error
    * @param tauClass parameter for class dropping if class is not impactfull
    * @param pruneFlag flag if pruning should be done
    * @return log likelihood of the model
    */
-  public double makeStats(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, double[] knownWeights, int[] indices, ClusterData[] resultData, double tau, double tauLoglike, double tauClass, boolean pruneFlag) {
+  public double makeStats(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, int[] indices, ClusterData[] resultData, double tau, double tauClass, boolean pruneFlag) {
     int k = models.size();
     boolean prune = isLeaf;
-    int[] nextIndices = indices;
+    int[] nextIndices = new int[indices.length];
     // check for pruning possibility
     if(!prune && pruneFlag) {
-      nextIndices = checkStoppingCondition(models, knownWeights, resultData, indices, tau, tauLoglike, tauClass);
+      nextIndices = checkStoppingCondition(models, resultData, indices, tau, tauClass);
       if(nextIndices.length == 0) {
         prune = true;
       }
     }
     if(prune) {
       // logarithmic probabilities of clusters in this node
-      double[] logProb = new double[k];
+      double[] logProbr = new double[k];
       DoubleVector midpoint = new DoubleVector(times(summedPoints, 1.0 / size));
       for(int i = 0; i < k; i++) {
-        logProb[i] = models.get(i).estimateLogDensity(midpoint);
+        logProbr[i] = models.get(i).estimateLogDensity(midpoint);
       }
-
-      double logDenSum = logSumExp(logProb);
-      logProb = minus(logProb, logDenSum);
+      double logDenSum = logSumExp(logProbr);
+      double[] logProb = minus(logProbr, logDenSum);
       // calculate necessary statistics at this node
-      for(int c = 0; c < logProb.length; c++) {
+      for(int c : indices) { // for(int c = 0; c < logProb.length; c++) {
         double prob = FastMath.exp(logProb[c]);
         double logAPrio = logProb[c] + FastMath.log(size);
         double[] tCenter = times(summedPoints, prob);
         double[][] tCovariance = times(summedPointsXPointsT, prob);
-        knownWeights[c] += FastMath.exp(logAPrio);
 
         // combine with exisiting statistics
-        if(resultData[c] != null) {
-          resultData[c].increment(logAPrio, tCenter, tCovariance, logProb[c] * size);
-        }
-        else {
-          resultData[c] = new ClusterData(logAPrio, tCenter, tCovariance);
-        }
+        // objects should be created in caller
+        resultData[c].increment(logAPrio, tCenter, tCovariance);
       }
       return logDenSum * size;
     }
     else {
       // if this is not a leaf node, call child nodes
       assert nextIndices != null;
-      double l = leftChild.makeStats(models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass, pruneFlag);
-      double r = rightChild.makeStats(models, knownWeights, nextIndices, resultData, tau, tauLoglike, tauClass, pruneFlag);
+      double l = leftChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag);
+      double r = rightChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag);
       return l + r;
     }
   }
@@ -633,7 +585,7 @@ class KDTree {
     /**
      * summed likelihoods
      */
-    double summedLogWeights_apriori, summedLoglike;
+    double summedLogWeights_apriori;
 
     /**
      * summed points, used for mean calculation
@@ -644,6 +596,16 @@ class KDTree {
      * summed squared points, used for covariance calculation
      */
     double[][] summedPointsSquared_cov;
+
+    /**
+     * 
+     * 
+     */
+    public ClusterData(int d) {
+      this.summedLogWeights_apriori = Double.NEGATIVE_INFINITY;
+      this.summedPoints_mean = new double[d];
+      this.summedPointsSquared_cov = new double[d][d];
+    }
 
     /**
      * 
@@ -658,7 +620,6 @@ class KDTree {
       this.summedLogWeights_apriori = logApriori;
       this.summedPoints_mean = scaledSummedPoints;
       this.summedPointsSquared_cov = scaledSummedPointsSquared;
-      summedLoglike = 0.0;
     }
 
     /**
@@ -670,11 +631,15 @@ class KDTree {
      *        node
      * @param loglike log likelihood in this node
      */
-    void increment(double logApriori, double[] scaledSummedPoints, double[][] scaledSummedPointsSquared, double loglike) {
-      this.summedLogWeights_apriori = FastMath.log(FastMath.exp(logApriori) + FastMath.exp(this.summedLogWeights_apriori));
+    void increment(double logApriori, double[] scaledSummedPoints, double[][] scaledSummedPointsSquared) {
+      if(this.summedLogWeights_apriori == Double.NEGATIVE_INFINITY) {
+        this.summedLogWeights_apriori = logApriori;
+      }
+      else {
+        this.summedLogWeights_apriori = FastMath.log(FastMath.exp(logApriori) + FastMath.exp(this.summedLogWeights_apriori));
+      }
       this.summedPoints_mean = plusEquals(this.summedPoints_mean, scaledSummedPoints);
       this.summedPointsSquared_cov = plusEquals(this.summedPointsSquared_cov, scaledSummedPointsSquared);
-      this.summedLoglike = FastMath.log(FastMath.exp(this.summedLoglike) + FastMath.exp(loglike));
     }
   }
 

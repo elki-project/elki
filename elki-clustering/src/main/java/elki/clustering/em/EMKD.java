@@ -134,11 +134,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   private double tau;
 
   /**
-   * likelihood_tau, low for precise, high for fast results.
-   */
-  private double tauLoglike;
-
-  /**
    * drop one class if the maximum weight of a class in the bounding box is
    * lower than tauClass * wmin_max, where wmin_max is the maximum minimum
    * weight of all classes
@@ -163,11 +158,25 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
   protected ArrayModifiableDBIDs sorted;
 
-  public EMKD(int k, double mbw, double tau, double tauloglike, double tauclass, double delta, EMClusterModelFactory<NumberVector, M> mfactory, int miniter, int maxiter, boolean ignorePrune, boolean soft) {
+  /**
+   * 
+   * Constructor.
+   *
+   * @param k number of classes
+   * @param mbw minimum relative size of leaf nodes
+   * @param tau pruning parameter
+   * @param tauclass pruning parameter for single classes
+   * @param delta delta parameter
+   * @param mfactory EM cluster model factory
+   * @param miniter Minimum number of iterations
+   * @param maxiter Maximum number of iterations
+   * @param ignorePrune dont prune during calculation
+   * @param soft Include soft assignments
+   */
+  public EMKD(int k, double mbw, double tau, double tauclass, double delta, EMClusterModelFactory<NumberVector, M> mfactory, int miniter, int maxiter, boolean ignorePrune, boolean soft) {
     this.k = k;
     this.mbw = mbw;
     this.tau = tau;
-    this.tauLoglike = tauloglike;
     this.tauClass = tauclass;
     this.delta = delta;
     this.mfactory = mfactory;
@@ -206,7 +215,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     sorted = DBIDUtil.newArray(relation.getDBIDs());
     double[] dimWidth = analyseDimWidth(relation);
     Duration buildtime = LOG.newDuration(this.getClass().getName() + ".Tree.buildtime").begin();
-    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimWidth, mbw, LOG, dataArrays);
+    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimWidth, mbw, dataArrays);
     LOG.statistics(buildtime.end());
 
     // initial models
@@ -222,17 +231,10 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     if(models.get(0) instanceof TextbookMultivariateGaussianModel) {
       LOG.warning("TextbookMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
     }
-    
+
     // double exactloglikelihood = assignProbabilitiesToInstances(relation,
     // models, probClusterIGivenX);
     DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
-
-    // Array that contains indices used in makeStats
-    // Necessary because we drop unlikely classes in the progress
-    int[] indices = new int[models.size()];
-    for(int i = 0; i < indices.length; i++) {
-      indices[i] = i;
-    }
 
     // iteration unless no change
     int it = 0, lastImprovement = 0;
@@ -241,14 +243,26 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     // double bestloglikelihood = loglikelihood; // For detecting instabilities.
     for(; it < maxiter || maxiter < 0; it++) {
+      // Array that contains indices used in makeStats
+      // Necessary because we drop unlikely classes in the progress
+      int[] indices = new int[models.size()];
+      for(int i = 0; i < indices.length; i++) {
+        indices[i] = i;
+      }
+
       final double oldLogLikelihood = logLikelihood;
 
       // recalculate probabilities
       ClusterData[] newstats = new ClusterData[k];
-      logLikelihood = tree.makeStats(models, new double[k], indices, newstats, tau, tauLoglike, tauClass, !ignorePrune) / relation.size();
+      for(int i = 0; i < newstats.length; i++) {
+        newstats[i] = new ClusterData(d);
+      }
+      logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, !ignorePrune) / relation.size();
+      // LOG.warning(it+"; "+ Arrays.toString(KDTree.debugCount));
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood
+
       LOG.statistics(likeStat.setDouble(logLikelihood));
       // check stopping condition
       if(logLikelihood - bestLogLikelihood > delta) {
@@ -267,7 +281,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     }
 
     logLikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
-
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
     LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", logLikelihood));
 
@@ -300,6 +313,10 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    */
   private void updateClusters(ClusterData[] newstats, ArrayList<? extends EMClusterModel<NumberVector, M>> models, int size) {
     for(int i = 0; i < k; i++) {
+      if(newstats[i].summedLogWeights_apriori == Double.NEGATIVE_INFINITY) {
+        LOG.warning("A model wasn't visited during tree traversion. The model has not been updated!");
+        continue;
+      }
       // for this model
       EMClusterModel<NumberVector, M> model = models.get(i);
 
@@ -434,14 +451,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         "Pruning criterion for the KD-Tree during algorithm. Stop traversing when error e < tau * totalweight.");
 
     /**
-     * Safety parameter for pruning. Does not prune if loglike can deviate by
-     * tauloglike in this node. Must be between 0 and 1. Low for precise, high
-     * for fast results.
-     */
-    public static final OptionID TAU_LOGLIKE_ID = new OptionID("emkd.tauloglike", //
-        "Savety parameter for pruning. Does not prune if loglike can deviate by tauloglike in this node.");
-
-    /**
      * drop one class if the maximum weight of a class in the bounding box is
      * lower than tauClass * wmin_max, where wmin_max is the maximum minimum
      * weight of all classes
@@ -489,11 +498,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     /**
      * cutoff safety threshold
      */
-    protected double tauloglike;
-
-    /**
-     * cutoff safety threshold
-     */
     protected double tauclass;
 
     /**
@@ -536,10 +540,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .grab(config, x -> tau = x);
-      new DoubleParameter(TAU_LOGLIKE_ID, 0.01)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
-          .grab(config, x -> tauloglike = x);
       new DoubleParameter(TAU_CLASS_ID, 0.0001)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -561,7 +561,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     @Override
     public EMKD<M> make() {
-      return new EMKD<>(k, mbw, tau, tauloglike, tauclass, delta, initializer, miniter, maxiter, ignorePrune, false);
+      return new EMKD<>(k, mbw, tau, tauclass, delta, initializer, miniter, maxiter, ignorePrune, false);
     }
   }
 
