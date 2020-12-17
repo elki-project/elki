@@ -30,7 +30,7 @@ import elki.utilities.exceptions.AbortException;
 /**
  * Shared code for algorithms that work on a strict matrix paradigm.
  * <p>
- * Note that this requires \(O(n^2)\) memory (and often \(O(n^3)\) runtime).
+ * Note that this requires O(n²) memory (and often O(n³) runtime).
  * <p>
  * This class bridges the gap from the relational (indexed by identifiers) and
  * the matrix view (indexed by integers 0...n-1).
@@ -88,7 +88,7 @@ public class MatrixParadigm {
   /**
    * Get a value from the (upper triangular) distance matrix.
    * <p>
-   * Note: in many cases, linear iteration over the matrix will be fastet than
+   * Note: in many cases, linear iteration over the matrix will be faster than
    * repeated calls to this method!
    *
    * @param x First object
@@ -111,7 +111,7 @@ public class MatrixParadigm {
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       final int x = ix.getOffset();
-      assert (pos == triangleSize(x));
+      assert pos == triangleSize(x);
       for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
         matrix[pos++] = dq.distance(ix, iy);
       }

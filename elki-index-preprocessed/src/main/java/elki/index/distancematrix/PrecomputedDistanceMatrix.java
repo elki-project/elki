@@ -51,7 +51,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * symmetry as well as strictness. This way, it only stores the upper triangle
  * matrix with double precision. It has to store (n-1) * (n-2) distance values
  * in memory, requiring 8 * (n-1) * (n-2) bytes. Since Java has a size limit of
- * arrays of 31 bits (signed integer), we can store at most \(2^16\) objects
+ * arrays of 31 bits (signed integer), we can store at most \(2^{16}\) objects
  * (precisely, 65536 objects) in a single array, which needs about 16 GB of RAM.
  *
  * @author Erich Schubert
@@ -124,8 +124,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeInde
     for(ix.seek(0); ix.valid(); ix.advance()) {
       // y < x -- must match {@link #getOffset}!
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-        matrix[pos] = distanceQuery.distance(ix, iy);
-        pos++;
+        matrix[pos++] = distanceQuery.distance(ix, iy);
       }
       if(prog != null) {
         prog.setProcessed(prog.getProcessed() + ix.getOffset(), LOG);
