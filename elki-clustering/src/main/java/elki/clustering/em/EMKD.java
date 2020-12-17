@@ -232,8 +232,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       LOG.warning("TextbookMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
     }
 
-    // double exactloglikelihood = assignProbabilitiesToInstances(relation,
-    // models, probClusterIGivenX);
     DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
 
     // iteration unless no change
@@ -258,7 +256,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         newstats[i] = new ClusterData(d);
       }
       logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, !ignorePrune) / relation.size();
-      // LOG.warning(it+"; "+ Arrays.toString(KDTree.debugCount));
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood

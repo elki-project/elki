@@ -598,7 +598,9 @@ class KDTree {
     double[][] summedPointsSquared_cov;
 
     /**
+     * Constructor for a clusterdata object with no data so far for d Dimensions
      * 
+     * @param d Dimension
      * 
      */
     public ClusterData(int d) {

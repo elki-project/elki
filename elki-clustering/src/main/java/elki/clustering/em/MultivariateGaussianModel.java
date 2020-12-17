@@ -22,8 +22,6 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import java.util.Arrays;
-
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.logging.Logging;
