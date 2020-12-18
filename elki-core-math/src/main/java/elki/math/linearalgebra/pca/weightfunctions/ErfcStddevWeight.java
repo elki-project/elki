@@ -24,10 +24,10 @@ import elki.math.MathUtil;
 import elki.math.statistics.distribution.NormalDistribution;
 
 /**
- * Gaussian Error Function Weight function, scaled using stddev. This probably
- * is the most statistically sound weight.
- * 
- * erfc(1 / sqrt(2) * distance / stddev)
+ * Gaussian Error Function Weight function, scaled using stddev using:
+ * \( \text{erfc}(\frac{1}{\sqrt{2}} \frac{\text{distance}}{\sigma}) \).
+ * <p>
+ * This probably is the most statistically sound weight.
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -38,9 +38,6 @@ public final class ErfcStddevWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(stddev <= 0) {
-      return 1;
-    }
-    return NormalDistribution.erfc(MathUtil.SQRTHALF * distance / stddev);
+    return stddev <= 0 ? 1 : NormalDistribution.erfc(MathUtil.SQRTHALF * distance / stddev);
   }
 }

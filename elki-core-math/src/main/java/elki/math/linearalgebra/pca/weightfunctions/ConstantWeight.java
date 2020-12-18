@@ -21,8 +21,8 @@
 package elki.math.linearalgebra.pca.weightfunctions;
 
 /**
- * Constant Weight function
- * 
+ * Constant weight function.
+ * <p>
  * The result is always 1.0
  * 
  * @author Erich Schubert

@@ -88,9 +88,8 @@ public class WeakEigenPairFilter implements EigenPairFilter {
   public static class Par implements Parameterizer {
     /**
      * OptionID for the weak alpha value of {@link WeakEigenPairFilter},
-     * {@link elki.math.linearalgebra.pca.filter.ProgressiveEigenPairFilter}
-     * and
-     * {@link elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter}
+     * {@link ProgressiveEigenPairFilter}, and
+     * {@link SignificantEigenPairFilter}
      */
     public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
 

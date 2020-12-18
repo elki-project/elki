@@ -24,14 +24,13 @@ import net.jafama.FastMath;
 
 /**
  * Exponential Weight function, scaled such that the result it 0.1 at distance
- * == max
- * 
- * exp(-2.3025850929940455 * distance/max)
- * 
+ * equal max, so it does not completely disappear using:
+ * \( \exp(-2.3025850929940455 \frac{\text{distance}}{\max}) \)
+ * <p>
  * This is similar to the Gaussian weight function, except distance/max is not
  * squared.
- * 
- * -2.3025850929940455 is log(-.1) to achieve the intended range of 1.0 - 0.1
+ * <p>
+ * -2.3025850929940455 is log(-.1) to achieve the intended range of 1.0 to 0.1
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -42,11 +41,8 @@ public final class ExponentialWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(max <= 0) {
-      return 1.0;
-    }
-    double relativedistance = distance / max;
-    // scaling -2.303 is log(-.1) to suit the intended range of 1.0-0.1
-    return FastMath.exp(-2.3025850929940455 * relativedistance);
+    return max <= 0 ? 1 : //
+    // scaling -2.303 is log(-.1) to suit the intended range of 1.0 to 0.1
+        FastMath.exp(-2.3025850929940455 * (distance / max));
   }
 }

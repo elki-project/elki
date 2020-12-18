@@ -21,12 +21,13 @@
 package elki.math.linearalgebra.pca.weightfunctions;
 
 /**
- * Inverse Linear Weight Function.
- * 
+ * Inverse linear weight function using \(.1+0.9\frac{\text{distance}}{\max}\).
+ * <p>
  * This weight is not particularly reasonable. Instead it serves the purpose of
  * testing the effects of a badly chosen weight function.
- * 
- * This function has increasing weight, from 0.1 to 1.0 at distance == max.
+ * <p>
+ * This function has increasing weight, from 0.1 to 1.0 when the distance equals
+ * the maximum.
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -34,15 +35,11 @@ package elki.math.linearalgebra.pca.weightfunctions;
 public final class InverseLinearWeight implements WeightFunction {
   /**
    * Linear increasing weight, from 0.1 to 1.0
-   * 
+   * <p>
    * NOTE: increasing weights are non-standard, and mostly for testing
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(max <= 0) {
-      return 0.1;
-    }
-    double relativedistance = distance / max;
-    return .1 + relativedistance * .9;
+    return max <= 0 ? 0.1 : .1 + (distance / max) * .9;
   }
 }

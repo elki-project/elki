@@ -32,7 +32,7 @@ package elki.math.linearalgebra.pca.weightfunctions;
 public interface WeightFunction {
   /**
    * Evaluate weight function with given parameters.
-   * 
+   * <p>
    * Note that usually implementations will ignore either max or stddev.
    * 
    * @param distance distance of the query point

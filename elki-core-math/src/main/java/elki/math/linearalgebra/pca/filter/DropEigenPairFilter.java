@@ -102,6 +102,9 @@ public class DropEigenPairFilter implements EigenPairFilter {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
+    /**
+     * The noise tolerance level for weak eigenvectors
+     */
     private double walpha;
 
     @Override

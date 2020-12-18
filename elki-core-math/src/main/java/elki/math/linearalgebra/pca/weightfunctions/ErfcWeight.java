@@ -24,10 +24,9 @@ import elki.math.statistics.distribution.NormalDistribution;
 
 /**
  * Gaussian Error Function Weight function, scaled such that the result it 0.1
- * at distance == max
- * 
- * erfc(1.1630871536766736 * distance / max)
- * 
+ * when the distance is the maximum using:
+ * \( \text{erfc}(1.1630871536766736 \frac{\text{distance}}{\max}) \).
+ * <p>
  * The value of 1.1630871536766736 is erfcinv(0.1), to achieve the intended
  * scaling.
  * 
@@ -40,12 +39,9 @@ public final class ErfcWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(max <= 0) {
-      return 1.0;
-    }
-    double relativedistance = distance / max;
+    return max <= 0 ? 1 :
     // the scaling was picked such that getWeight(a,a,0) is 0.1
     // since erfc(1.1630871536766736) == 1.0
-    return NormalDistribution.erfc(1.1630871536766736 * relativedistance);
+        NormalDistribution.erfc(1.1630871536766736 * (distance / max));
   }
 }

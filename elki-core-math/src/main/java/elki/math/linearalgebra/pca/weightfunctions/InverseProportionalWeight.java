@@ -21,9 +21,8 @@
 package elki.math.linearalgebra.pca.weightfunctions;
 
 /**
- * Inverse proportional weight function, scaled using the maximum.
- * 
- * 1 / (1 + distance/max)
+ * Inverse proportional weight function, scaled using the maximum using:
+ * \( 1 / (1 + \frac{\text{distance}}{\max} ) \)
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -34,10 +33,6 @@ public final class InverseProportionalWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(max <= 0) {
-      return 1.0;
-    }
-    double relativedistance = distance / max;
-    return 1 / (1 + 9 * relativedistance);
+    return max <= 0 ? 1 : 1 / (1 + 9 * (distance / max));
   }
 }

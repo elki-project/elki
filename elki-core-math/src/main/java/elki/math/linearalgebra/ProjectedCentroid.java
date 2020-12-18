@@ -29,10 +29,10 @@ import elki.utilities.datastructures.BitsUtil;
 
 /**
  * Centroid only using a subset of dimensions.
- * 
+ * <p>
  * This class abstracts the mathematics of efficient and numerically stable
  * computation of projected centroids.
- * 
+ * <p>
  * See {@link elki.database.DatabaseUtil DatabaseUtil} for
  * easier to use APIs.
  * 

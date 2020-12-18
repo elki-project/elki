@@ -31,12 +31,12 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * The SignificantEigenPairFilter sorts the eigenpairs in descending order of
  * their eigenvalues and chooses the contrast of an Eigenvalue to the remaining
  * Eigenvalues is maximal.
- *
+ * <p>
  * It is closely related to the WeakEigenPairFilter and RelativeEigenPairFilter.
  * But while the RelativeEigenPairFilter chooses the highest dimensionality that
  * satisfies the relative alpha levels, the SignificantEigenPairFilter will
  * chose the local dimensionality such that the 'contrast' is maximal.
- *
+ * <p>
  * There are some situations where one or the other is superior, especially when
  * it comes to handling nested clusters and strong global correlations that are
  * not too interesting. These benefits usually only make a difference at higher
@@ -103,6 +103,9 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
+    /**
+     * The noise tolerance level for weak eigenvectors
+     */
     private double walpha;
 
     @Override

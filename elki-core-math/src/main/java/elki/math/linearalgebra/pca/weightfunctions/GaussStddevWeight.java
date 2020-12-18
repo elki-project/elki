@@ -25,19 +25,12 @@ import net.jafama.FastMath;
 
 /**
  * Gaussian weight function, scaled using standard deviation
- * \( 1/\sqrt(2\pi) \exp(-\frac{\text{dist}^2}{2\sigma^2}) \)
+ * \( \frac{1}{\sqrt{2\pi}} \exp(-\frac{\text{dist}^2}{2\sigma^2}) \)
  * 
  * @author Erich Schubert
  * @since 0.2
  */
 public final class GaussStddevWeight implements WeightFunction {
-  /**
-   * Constant scaling factor of Gaussian distribution.
-   * 
-   * In fact, in most use cases we could leave this away.
-   */
-  private static final double scaling = 1 / MathUtil.SQRTTWOPI;
-
   /**
    * Get Gaussian Weight using standard deviation for scaling. max is ignored.
    */
@@ -47,6 +40,6 @@ public final class GaussStddevWeight implements WeightFunction {
       return 1;
     }
     double normdistance = distance / stddev;
-    return scaling * FastMath.exp(-.5 * normdistance * normdistance) / stddev;
+    return MathUtil.ONE_BY_SQRTTWOPI * FastMath.exp(-.5 * normdistance * normdistance) / stddev;
   }
 }

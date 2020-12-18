@@ -23,11 +23,9 @@ package elki.math.linearalgebra.pca.weightfunctions;
 import net.jafama.FastMath;
 
 /**
- * Exponential Weight function, scaled such that the result it 0.1 at distance
- * == max
- * 
- * stddev * exp(-.5 * distance/stddev)
- * 
+ * Exponential Weight function, scaled using the standard deviation using:
+ * \( \sigma \exp(-\frac{1}{2} \frac{\text{distance}}{\sigma}) \).
+ * <p>
  * This is similar to the Gaussian weight function, except distance/stddev is
  * not squared.
  * 
@@ -40,10 +38,6 @@ public final class ExponentialStddevWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(stddev <= 0) {
-      return 1;
-    }
-    double scaleddistance = distance / stddev;
-    return stddev * FastMath.exp(-.5 * scaleddistance);
+    return stddev <= 0 ? 1 : stddev * FastMath.exp(-.5 * distance / stddev);
   }
 }

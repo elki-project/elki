@@ -32,10 +32,10 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * The RelativeEigenPairFilter sorts the eigenpairs in descending order of their
  * eigenvalues and marks the first eigenpairs who are a certain factor above the
  * average of the remaining eigenvalues.
- * 
- * It is closely related to the WeakEigenPairFilter, and differs mostly by
- * comparing to the remaining Eigenvalues, not to the total sum.
- * 
+ * <p>
+ * It is closely related to the {@link WeakEigenPairFilter}, and differs mostly
+ * by comparing to the remaining Eigenvalues, not to the total sum.
+ * <p>
  * There are some situations where one or the other is superior, especially when
  * it comes to handling nested clusters and strong global correlations that are
  * not too interesting. These benefits usually only make a difference at higher
@@ -67,9 +67,6 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     this.ralpha = ralpha;
   }
 
-  /**
-   * Filter eigenpairs
-   */
   @Override
   public int filter(double[] eigenValues) {
     // find the last eigenvector that is considered 'strong' by the weak rule
@@ -95,12 +92,16 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
      * Parameter relative alpha.
      */
     public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
+
+    /**
+     * The noise tolerance level for weak eigenvectors
+     */
     protected double ralpha;
 
     @Override
     public void configure(Parameterization config) {
       new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> ralpha = x);
     }
 

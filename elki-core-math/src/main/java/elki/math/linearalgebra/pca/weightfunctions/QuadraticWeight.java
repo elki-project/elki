@@ -22,9 +22,7 @@ package elki.math.linearalgebra.pca.weightfunctions;
 
 /**
  * Quadratic weight function, scaled using the maximum to reach 0.1 at that
- * point.
- * <p>
- * 1.0 - 0.9 * (distance/max)²
+ * point using: \( 1.0 - 0.9 \frac{\text{dist}^2}{\max^2}\} \)
  * 
  * @author Erich Schubert
  * @since 0.2

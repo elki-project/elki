@@ -32,7 +32,7 @@ import net.jafama.FastMath;
 
 /**
  * Affine transformations implemented using homogeneous coordinates.
- *
+ * <p>
  * The use of homogeneous coordinates allows the combination of multiple affine
  * transformations (rotations, translations, scaling) into a single matrix
  * operation (of dimensionality dim+1), and also the construction of an inverse
@@ -51,7 +51,7 @@ public class AffineTransformation {
   private final int dim;
 
   /**
-   * The transformation matrix of dim+1 x dim+1 for homogeneous coordinates
+   * the transformation matrix of dim+1 x dim+1 for homogeneous coordinates
    */
   private double[][] trans;
 
@@ -87,7 +87,7 @@ public class AffineTransformation {
 
   /**
    * Generate a transformation that reorders axes in the given way.
-   *
+   * <p>
    * The list of axes to be used should not contain duplicates, or the resulting
    * matrix will not be invertible. It does not have to be complete however, in
    * particular an empty list will result in the identity transform: unmentioned
@@ -157,7 +157,7 @@ public class AffineTransformation {
 
   /**
    * Add a matrix operation to the matrix.
-   *
+   * <p>
    * Be careful to use only invertible matrices if you want an invertible affine
    * transformation.
    *

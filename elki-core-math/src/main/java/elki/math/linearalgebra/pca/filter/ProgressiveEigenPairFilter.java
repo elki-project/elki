@@ -70,7 +70,6 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  *
  * @author Erich Schubert
  * @since 0.2
- *
  */
 @Title("Progressive Eigenpair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues explains more than the a certain percentage of the unexpected variance, where the percentage increases with subspace dimensionality.")
@@ -108,9 +107,6 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     this.walpha = walpha;
   }
 
-  /**
-   * Filter eigenpairs.
-   */
   @Override
   public int filter(double[] eigenValues) {
     // determine sum of eigenvalues

@@ -21,9 +21,8 @@
 package elki.math.linearalgebra.pca.weightfunctions;
 
 /**
- * Inverse proportional weight function, scaled using the standard deviation.
- * 
- * 1 / (1 + distance/stddev)
+ * Inverse proportional weight function, scaled using the standard deviation
+ * using: \( 1 / (1 + \frac{distance}{\sigma}) \)
  * 
  * @author Erich Schubert
  * @since 0.2
@@ -34,10 +33,6 @@ public final class InverseProportionalStddevWeight implements WeightFunction {
    */
   @Override
   public double getWeight(double distance, double max, double stddev) {
-    if(stddev <= 0) {
-      return 1;
-    }
-    double scaleddistance = distance / stddev;
-    return 1 / (1 + scaleddistance);
+    return stddev <= 0 ? 1 : 1 / (1 + (distance / stddev));
   }
 }
