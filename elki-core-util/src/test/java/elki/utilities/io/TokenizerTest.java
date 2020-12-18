@@ -58,7 +58,7 @@ public class TokenizerTest {
 
   @Test
   public void testSpecials() {
-    final String input = "nan inf -∞ NaN infinity NA";
+    final String input = "nan inf -\u221E NaN infinity NA";
     final Object[] expect = { Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NaN, Double.POSITIVE_INFINITY, Double.NaN };
     t.initialize(input, 0, input.length());
     tokenizerTest(expect);

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2020
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,8 @@
 package elki.utilities.io;
 
 import static org.junit.Assert.*;
+
+import java.io.IOException;
 
 import org.junit.Test;
 
@@ -91,7 +93,7 @@ public class ParseUtilTest {
   }
 
   @Test
-  public void testBytes() {
+  public void testBytes() throws IOException {
     assertEquals(0., parseBytes("0"), 0.);
     assertEquals(0., parseBytes("0.0"), 0.);
     assertEquals(0., parseBytes("0."), 0.);
@@ -149,8 +151,8 @@ public class ParseUtilTest {
     assertEquals(1, parseBytes("+1"), 0.);
   }
 
-  private static double parseBytes(String string) {
-    byte[] bytes = string.getBytes();
+  private static double parseBytes(String string) throws IOException {
+    byte[] bytes = string.getBytes("UTF-8");
     return ParseUtil.parseDouble(bytes, 0, bytes.length);
   }
 
@@ -176,7 +178,7 @@ public class ParseUtilTest {
   }
 
   @Test
-  public void testExceptionsBytes() {
+  public void testExceptionsBytes() throws IOException {
     for(String bad : BAD_FLOATS) {
       try {
         parseBytes(bad);
