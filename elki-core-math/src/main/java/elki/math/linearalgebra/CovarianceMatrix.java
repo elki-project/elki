@@ -34,12 +34,12 @@ import elki.database.relation.RelationUtil;
 /**
  * Class for computing covariance matrixes using stable mean and variance
  * computations.
- * 
+ * <p>
  * This class encapsulates the mathematical aspects of computing this matrix.
- * 
+ * <p>
  * See {@link elki.database.DatabaseUtil DatabaseUtil} for
  * easier to use APIs.
- * 
+ * <p>
  * For use in algorithms, it is more appropriate to use
  * {@link elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder
  * StandardCovarianceMatrixBuilder} since this class can be overridden with a
@@ -262,7 +262,7 @@ public class CovarianceMatrix {
   /**
    * Obtain the covariance matrix according to the sample statistics: (n-1)
    * degrees of freedom.
-   * 
+   * <p>
    * This method duplicates the matrix contents, so it does allow further
    * updates. Use {@link #destroyToSampleMatrix()} if you do not need further
    * updates.
@@ -279,7 +279,7 @@ public class CovarianceMatrix {
   /**
    * Obtain the covariance matrix according to the population statistics: n
    * degrees of freedom.
-   * 
+   * <p>
    * This method duplicates the matrix contents, so it does allow further
    * updates. Use {@link #destroyToPopulationMatrix()} if you do not need further
    * updates.
@@ -296,7 +296,7 @@ public class CovarianceMatrix {
   /**
    * Obtain the covariance matrix according to the sample statistics: (n-1)
    * degrees of freedom.
-   * 
+   * <p>
    * This method doesn't require matrix duplication, but will not allow further
    * updates, the object should be discarded. Use {@link #makeSampleMatrix()} if
    * you want to perform further updates.
@@ -313,7 +313,7 @@ public class CovarianceMatrix {
   /**
    * Obtain the covariance matrix according to the population statistics: n
    * degrees of freedom.
-   * 
+   * <p>
    * This method doesn't require matrix duplication, but will not allow further
    * updates, the object should be discarded. Use {@link #makePopulationMatrix()} if
    * you want to perform further updates.
@@ -329,7 +329,7 @@ public class CovarianceMatrix {
 
   /**
    * Reset the covariance matrix.
-   * 
+   * <p>
    * This function <em>may</em> be called after a "destroy".
    */
   public void reset() {

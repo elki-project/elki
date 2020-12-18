@@ -32,34 +32,34 @@ import elki.database.relation.Relation;
  */
 public interface CovarianceMatrixBuilder {
   /**
-   * Compute Covariance Matrix for a complete relation.
+   * Compute covariance matrix for a complete relation.
    * 
    * @param relation the relation to run on
-   * @return Covariance Matrix
+   * @return covariance matrix
    */
   default double[][] processRelation(Relation<? extends NumberVector> relation) {
     return processIds(relation.getDBIDs(), relation);
   }
 
   /**
-   * Compute Covariance Matrix for a collection of database IDs.
+   * Compute covariance matrix for a collection of database IDs.
    * 
    * @param ids a collection of ids
    * @param database the database used
-   * @return Covariance Matrix
+   * @return covariance matrix
    */
   double[][] processIds(DBIDs ids, Relation<? extends NumberVector> database);
 
   /**
-   * Compute Covariance Matrix for a QueryResult Collection.
-   * 
+   * Compute covariance matrix for a QueryResult collection.
+   * <p>
    * By default it will just run processIds, but subclasses <em>may</em> use the
    * distances for weighting.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
    * @param k the number of entries to process
-   * @return Covariance Matrix
+   * @return covariance matrix
    */
   default double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
     if(results.size() > k) {
@@ -73,14 +73,14 @@ public interface CovarianceMatrixBuilder {
   }
 
   /**
-   * Compute Covariance Matrix for a QueryResult Collection.
-   * 
+   * Compute covariance matrix for a QueryResult Collection.
+   * <p>
    * By default it will just collect the ids and run processIds, but subclasses
    * <em>may</em> use the distance for weighting.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
-   * @return Covariance Matrix
+   * @return covariance matrix
    */
   default double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     return processQueryResults(results, database, results.size());

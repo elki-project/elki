@@ -26,7 +26,7 @@ import elki.database.relation.Relation;
 import elki.math.linearalgebra.CovarianceMatrix;
 
 /**
- * Class for building a "traditional" covariance matrix vai
+ * Class for building a "traditional" covariance matrix via
  * {@link CovarianceMatrix}.
  * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
