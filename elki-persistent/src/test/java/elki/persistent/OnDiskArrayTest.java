@@ -28,6 +28,8 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,15 +41,45 @@ import org.junit.Test;
 // TODO: also test with a static sample file.
 public class OnDiskArrayTest {
   /**
+   * File we are using.
+   */
+  Path file;
+
+  /**
+   * Set up the temp file for testing.
+   *
+   * @throws IOException
+   */
+  @Before
+  public void setup() throws IOException {
+    file = Files.createTempFile("ELKIUnitTest", null);
+    file.toFile().deleteOnExit();
+  }
+
+  /**
+   * Delete the file after the test.
+   *
+   * @throws IOException
+   */
+  @After
+  public void cleanup() {
+    System.gc(); // maybe helps unmap the file
+    try {
+      Files.delete(file); // Note: probably fails on Windows.
+    }
+    catch(IOException e) {
+      // We cannot reliably delete mmaped files on Windows, apparently.
+      elki.logging.LoggingUtil.exception(e);
+    }
+  }
+
+  /**
    * Test the OnDiskArray class.
    *
    * @throws IOException on errors.
    */
   @Test
   public void dotestOnDiskArray() throws IOException {
-    Path file = Files.createTempFile("ELKIUnitTest", null);
-    file.toFile().deleteOnExit();
-
     final int extraheadersize = 2;
     final int recsize = 3;
     int numrec = 4;
@@ -89,8 +121,5 @@ public class OnDiskArrayTest {
     roarray.getRecordBuffer(3).get(buf);
     assertArrayEquals("Record 3 doesn't match.", record1, buf);
     roarray.close();
-
-    Files.delete(file); // Note: probably fails on Windows.
-    // We cannot reliably delete mmaped files on Windows, apparently.
   }
 }
