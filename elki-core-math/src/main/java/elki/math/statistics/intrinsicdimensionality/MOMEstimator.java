@@ -45,7 +45,7 @@ import elki.utilities.optionhandling.Parameterizer;
     booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
     url = "https://doi.org/10.1145/2783258.2783405", //
     bibkey = "DBLP:conf/kdd/AmsalegCFGHKN15")
-public class MOMEstimator implements IntrinsicDimensionalityEstimator {
+public class MOMEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

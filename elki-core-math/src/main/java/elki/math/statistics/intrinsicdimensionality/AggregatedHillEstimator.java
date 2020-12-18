@@ -43,7 +43,7 @@ import net.jafama.FastMath;
     booktitle = "Journal of Business & Economic Statistics", //
     url = "https://doi.org/10.1198/073500101316970421", //
     bibkey = "doi:10.1198/073500101316970421")
-public class AggregatedHillEstimator implements IntrinsicDimensionalityEstimator {
+public class AggregatedHillEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

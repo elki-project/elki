@@ -44,7 +44,7 @@ import net.jafama.FastMath;
     booktitle = "The annals of statistics 3(5)", //
     url = "https://doi.org/10.1214/aos/1176343247", //
     bibkey = "doi:10.1214/aos/1176343247")
-public class HillEstimator implements IntrinsicDimensionalityEstimator {
+public class HillEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */

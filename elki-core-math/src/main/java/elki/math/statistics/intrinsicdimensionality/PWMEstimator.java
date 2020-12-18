@@ -60,7 +60,7 @@ import elki.utilities.optionhandling.Parameterizer;
     booktitle = "Water Resources Research 15(5)", //
     url = "https://doi.org/10.1029/WR015i005p01055", //
     bibkey = "doi:10.1029/WR015i005p01055")
-public class PWMEstimator implements IntrinsicDimensionalityEstimator {
+public class PWMEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -68,7 +68,7 @@ public class PWMEstimator implements IntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
+    final int begin = DistanceBasedIntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     if(end - begin < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }

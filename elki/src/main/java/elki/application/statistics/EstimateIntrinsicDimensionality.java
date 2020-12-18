@@ -73,7 +73,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
   /**
    * Estimation method.
    */
-  protected IntrinsicDimensionalityEstimator estimator;
+  protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
   /**
    * Constructor.
@@ -84,7 +84,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
    * @param krate kNN rate
    * @param samples Sample size
    */
-  public EstimateIntrinsicDimensionality(InputStep inputstep, Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, double krate, double samples) {
+  public EstimateIntrinsicDimensionality(InputStep inputstep, Distance<? super O> distance, IntrinsicDimensionalityEstimator<? super O> estimator, double krate, double samples) {
     super(inputstep, distance);
     this.estimator = estimator;
     this.krate = krate;
@@ -143,7 +143,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     /**
      * Estimation method.
      */
-    protected IntrinsicDimensionalityEstimator estimator;
+    protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
     /**
      * Number of neighbors to use.
@@ -158,7 +158,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedApp
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class) //
+      new ObjectParameter<IntrinsicDimensionalityEstimator<? super O>>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class) //
           .grab(config, x -> estimator = x);
       new DoubleParameter(KRATE_ID, 50) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //

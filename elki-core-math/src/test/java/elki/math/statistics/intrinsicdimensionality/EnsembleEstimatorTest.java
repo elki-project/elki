@@ -33,7 +33,7 @@ import elki.utilities.ELKIBuilder;
 public class EnsembleEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testEnsemble() {
-    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(EnsembleEstimator.class).build();
+    DistanceBasedIntrinsicDimensionalityEstimator est = new ELKIBuilder<>(EnsembleEstimator.class).build();
     regressionTest(est, 5, 1000, 0L, 4.8704752769340836);
     regressionTest(est, 7, 10000, 0L, 6.946161496762817);
   }

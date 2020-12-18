@@ -33,7 +33,7 @@ import elki.utilities.ELKIBuilder;
 public class MOMEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testMOM() {
-    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(MOMEstimator.class).build();
+    DistanceBasedIntrinsicDimensionalityEstimator est = new ELKIBuilder<>(MOMEstimator.class).build();
     regressionTest(est, 5, 1000, 0L, 4.8704752769340836);
     regressionTest(est, 7, 10000, 0L, 6.946161496762817);
   }

@@ -35,7 +35,7 @@ import elki.math.MathUtil;
 import elki.math.Mean;
 import elki.math.MeanVariance;
 import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
-import elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
+import elki.math.statistics.intrinsicdimensionality.DistanceBasedIntrinsicDimensionalityEstimator;
 import elki.utilities.datastructures.arraylike.DoubleArray;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
@@ -84,7 +84,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
   /**
    * Estimator of intrinsic dimensionality.
    */
-  IntrinsicDimensionalityEstimator estimator;
+  DistanceBasedIntrinsicDimensionalityEstimator estimator;
 
   /**
    * Constructor.
@@ -93,7 +93,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param perplexity Perplexity
    * @param estimator Estimator of intrinsic dimensionality
    */
-  public IntrinsicNearestNeighborAffinityMatrixBuilder(Distance<? super O> distance, double perplexity, IntrinsicDimensionalityEstimator estimator) {
+  public IntrinsicNearestNeighborAffinityMatrixBuilder(Distance<? super O> distance, double perplexity, DistanceBasedIntrinsicDimensionalityEstimator estimator) {
     super(distance, perplexity);
     this.estimator = estimator;
   }
@@ -253,12 +253,12 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     /**
      * Estimator of intrinsic dimensionality.
      */
-    IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
+    DistanceBasedIntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
 
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
+      new ObjectParameter<DistanceBasedIntrinsicDimensionalityEstimator>(ESTIMATOR_ID, DistanceBasedIntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
           .grab(config, x -> estimator = x);
     }
 

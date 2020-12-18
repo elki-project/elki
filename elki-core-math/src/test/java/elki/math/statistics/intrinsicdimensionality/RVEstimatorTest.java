@@ -33,7 +33,7 @@ import elki.utilities.ELKIBuilder;
 public class RVEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testRV() {
-    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(RVEstimator.class).build();
+    DistanceBasedIntrinsicDimensionalityEstimator est = new ELKIBuilder<>(RVEstimator.class).build();
     regressionTest(est, 5, 1000, 0L, 5.05005440246909);
     regressionTest(est, 7, 10000, 0L, 6.9778378824587275);
   }

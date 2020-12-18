@@ -33,7 +33,7 @@ import elki.utilities.ELKIBuilder;
 public class HillEstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testHill() {
-    IntrinsicDimensionalityEstimator e = new ELKIBuilder<>(HillEstimator.class).build();
+    DistanceBasedIntrinsicDimensionalityEstimator e = new ELKIBuilder<>(HillEstimator.class).build();
     regressionTest(e, 5, 1000, 0L, 4.848665990083162);
     regressionTest(e, 7, 10000, 0L, 6.945428878740164);
   }

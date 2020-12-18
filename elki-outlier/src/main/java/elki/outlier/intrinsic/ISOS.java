@@ -38,7 +38,7 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.DoubleMinMax;
 import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
-import elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
+import elki.math.statistics.intrinsicdimensionality.DistanceBasedIntrinsicDimensionalityEstimator;
 import elki.outlier.OutlierAlgorithm;
 import elki.outlier.distance.SOS;
 import elki.result.outlier.OutlierResult;
@@ -95,7 +95,7 @@ public class ISOS<O> implements OutlierAlgorithm {
   /**
    * Estimator of intrinsic dimensionality.
    */
-  protected IntrinsicDimensionalityEstimator estimator;
+  protected DistanceBasedIntrinsicDimensionalityEstimator estimator;
 
   /**
    * Expected outlier rate.
@@ -109,7 +109,7 @@ public class ISOS<O> implements OutlierAlgorithm {
    * @param k Number of neighbors to consider
    * @param estimator Estimator of intrinsic dimensionality.
    */
-  public ISOS(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
+  public ISOS(Distance<? super O> distance, int k, DistanceBasedIntrinsicDimensionalityEstimator estimator) {
     super();
     this.distance = distance;
     this.k = k;
@@ -288,7 +288,7 @@ public class ISOS<O> implements OutlierAlgorithm {
     /**
      * Estimator of intrinsic dimensionality.
      */
-    protected IntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
+    protected DistanceBasedIntrinsicDimensionalityEstimator estimator = AggregatedHillEstimator.STATIC;
 
     @Override
     public void configure(Parameterization config) {
@@ -297,7 +297,7 @@ public class ISOS<O> implements OutlierAlgorithm {
       new IntParameter(KNN_ID, 100) //
           .addConstraint(new GreaterEqualConstraint(5)) //
           .grab(config, x -> k = x);
-      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
+      new ObjectParameter<DistanceBasedIntrinsicDimensionalityEstimator>(ESTIMATOR_ID, DistanceBasedIntrinsicDimensionalityEstimator.class, AggregatedHillEstimator.class) //
           .grab(config, x -> estimator = x);
     }
 

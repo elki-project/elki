@@ -64,7 +64,7 @@ import net.jafama.FastMath;
     booktitle = "Bernoulli 11(6)", //
     url = "https://doi.org/10.3150/bj/1137421635", //
     bibkey = "doi:10.3150/bj/1137421635")
-public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
+public class ZipfEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -72,7 +72,7 @@ public class ZipfEstimator implements IntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
+    final int begin = DistanceBasedIntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     final int len = end - begin;
     if(len < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");

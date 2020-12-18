@@ -103,7 +103,7 @@ public class IDEstimatorTest {
    * @param seed Random seed
    * @param edim Dimensionality the estimator is known to return.
    */
-  protected static void regressionTest(IntrinsicDimensionalityEstimator est, int dim, int size, int k, long seed, double edim) {
+  protected static void regressionTest(IntrinsicDimensionalityEstimator<? super DoubleVector> est, int dim, int size, int k, long seed, double edim) {
     Random r = new Random(seed);
     double[][] data = new double[size][dim];
     // Note: query point at 0.

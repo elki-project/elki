@@ -46,7 +46,7 @@ import net.jafama.FastMath;
     booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
     url = "https://doi.org/10.1109/ICDMW.2012.94", //
     bibkey = "DBLP:conf/icdm/HouleKN12")
-public class GEDEstimator implements IntrinsicDimensionalityEstimator {
+public class GEDEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -59,7 +59,7 @@ public class GEDEstimator implements IntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
+    final int begin = DistanceBasedIntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     if(end - begin < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }

@@ -101,7 +101,7 @@ public class IDOS<O> implements OutlierAlgorithm {
   /**
    * Estimator for intrinsic dimensionality.
    */
-  protected IntrinsicDimensionalityEstimator estimator;
+  protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
   /**
    * Constructor.
@@ -111,7 +111,7 @@ public class IDOS<O> implements OutlierAlgorithm {
    * @param kc the context set size for the ID computation
    * @param kr the neighborhood size to use in score computation
    */
-  public IDOS(Distance<? super O> distance, IntrinsicDimensionalityEstimator estimator, int kc, int kr) {
+  public IDOS(Distance<? super O> distance, IntrinsicDimensionalityEstimator<? super O> estimator, int kc, int kr) {
     super();
     this.distance = distance;
     this.estimator = estimator;
@@ -165,7 +165,7 @@ public class IDOS<O> implements OutlierAlgorithm {
    * @param distQ the distance query
    * @return The computed intrinsic dimensionalities.
    */
-  protected DoubleDataStore computeIDs(DBIDs ids, KNNSearcher<DBIDRef> knnQ, DistanceQuery<?> distQ) {
+  protected DoubleDataStore computeIDs(DBIDs ids, KNNSearcher<DBIDRef> knnQ, DistanceQuery<O> distQ) {
     WritableDoubleDataStore intDims = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Intrinsic dimensionality", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -251,7 +251,7 @@ public class IDOS<O> implements OutlierAlgorithm {
     /**
      * Estimator for intrinsic dimensionality.
      */
-    protected IntrinsicDimensionalityEstimator estimator;
+    protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
     /**
      * kNN for the context set (ID computation).
@@ -267,7 +267,7 @@ public class IDOS<O> implements OutlierAlgorithm {
     public void configure(Parameterization config) {
       new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
-      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class) //
+      new ObjectParameter<IntrinsicDimensionalityEstimator<? super O>>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class) //
           .grab(config, x -> estimator = x);
       new IntParameter(KC_ID) //
           .addConstraint(new GreaterEqualConstraint(5)) //

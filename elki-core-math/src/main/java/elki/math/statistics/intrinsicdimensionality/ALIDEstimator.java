@@ -27,9 +27,9 @@ import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
-import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -50,7 +50,7 @@ import net.jafama.FastMath;
     title = "Enhanced Estimation of Local Intrinsic Dimensionality Using Auxiliary Distances", //
     booktitle = "Contributed to ELKI", //
     bibkey = "tr/nii/ChellyHK16")
-public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
+public class ALIDEstimator implements IntrinsicDimensionalityEstimator<Object> {
   /**
    * Static instance.
    */
@@ -108,11 +108,6 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
       }
     }
     return -a / sum;
-  }
-
-  @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, int size) {
-    throw new UnsupportedOperationException("The ALID estimator can only be used with neighbor queries.");
   }
 
   /**

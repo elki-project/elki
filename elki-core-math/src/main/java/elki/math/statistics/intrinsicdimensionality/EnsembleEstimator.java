@@ -24,17 +24,17 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Ensemble estimator taking the median of three of our best estimators.
- *
+ * <p>
  * However, the method-of-moments estimator seems to work best at least on
  * artificial distances - you don't benefit from always choosing the second
  * best, so this ensemble approach does not appear to help.
- *
+ * <p>
  * This is an experimental estimator. Please cite ELKI when using.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class EnsembleEstimator implements IntrinsicDimensionalityEstimator {
+public class EnsembleEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -46,12 +46,12 @@ public class EnsembleEstimator implements IntrinsicDimensionalityEstimator {
     double mle = HillEstimator.STATIC.estimate(data, adapter, end);
     double rve = RVEstimator.STATIC.estimate(data, adapter, end);
     return (mom < mle) //
-    ? (mle < rve) ? mle : //
-    // A2) mom,rve < mle
-    (mom < rve) ? rve : mom //
-    // B) mle < mom
-    : (mom < rve) ? mom : //
-    // B2) mle, rve < mom
-    (mle < rve) ? rve : mle;
+        ? (mle < rve) ? mle : //
+        // A2) mom,rve < mle
+            (mom < rve) ? rve : mom //
+        // B) mle < mom
+        : (mom < rve) ? mom : //
+        // B2) mle, rve < mom
+            (mle < rve) ? rve : mle;
   }
 }

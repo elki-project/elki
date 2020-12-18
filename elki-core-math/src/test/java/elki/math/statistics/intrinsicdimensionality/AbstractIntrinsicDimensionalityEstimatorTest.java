@@ -41,7 +41,7 @@ public abstract class AbstractIntrinsicDimensionalityEstimatorTest {
    * @param seed Random seed
    * @param edim Dimensionality the estimator is known to return.
    */
-  protected static void regressionTest(IntrinsicDimensionalityEstimator est, int dim, int size, long seed, double edim) {
+  protected static void regressionTest(DistanceBasedIntrinsicDimensionalityEstimator est, int dim, int size, long seed, double edim) {
     Random r = new Random(seed);
     final int zeros = 100;
     double[] data = new double[size + zeros];
@@ -59,7 +59,7 @@ public abstract class AbstractIntrinsicDimensionalityEstimatorTest {
    *
    * @param est Estimator.
    */
-  protected static void testZeros(IntrinsicDimensionalityEstimator est) {
+  protected static void testZeros(DistanceBasedIntrinsicDimensionalityEstimator est) {
     est.estimate(new double[] { 0., 0., 0., 0. });
     est.estimate(new double[] { 0., 0., 0., 1. });
     est.estimate(new double[] { 0., 0., 0., 1., 2. });

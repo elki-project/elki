@@ -27,16 +27,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import elki.application.AbstractApplication;
-import elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
-import elki.math.statistics.intrinsicdimensionality.GEDEstimator;
-import elki.math.statistics.intrinsicdimensionality.HillEstimator;
-import elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
-import elki.math.statistics.intrinsicdimensionality.LMomentsEstimator;
-import elki.math.statistics.intrinsicdimensionality.MOMEstimator;
-import elki.math.statistics.intrinsicdimensionality.PWM2Estimator;
-import elki.math.statistics.intrinsicdimensionality.PWMEstimator;
-import elki.math.statistics.intrinsicdimensionality.RVEstimator;
-import elki.math.statistics.intrinsicdimensionality.ZipfEstimator;
+import elki.math.statistics.intrinsicdimensionality.*;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
@@ -46,6 +37,7 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
+
 import net.jafama.FastMath;
 
 /**
@@ -100,7 +92,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
   @Override
   public void run() {
     ArrayList<String> abbreviat = new ArrayList<>();
-    ArrayList<IntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
+    ArrayList<DistanceBasedIntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
     // Hill estimator
     abbreviat.add("Hill");
     estimators.add(HillEstimator.STATIC);
@@ -157,8 +149,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
         // Prefer independent samples.
         double[] dists = makeSample(l);
         for(int i = 0; i < estimators.size(); i++) {
-          IntrinsicDimensionalityEstimator est = estimators.get(i);
-          v[i][p] = est.estimate(dists, l);
+          v[i][p] = estimators.get(i).estimate(dists, l);
         }
       }
       switch(format){
@@ -396,6 +387,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     },
     // Last alternative.
     ;
+
     /**
      * Aggregate values.
      *

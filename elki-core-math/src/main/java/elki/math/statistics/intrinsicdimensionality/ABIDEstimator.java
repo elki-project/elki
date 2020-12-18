@@ -40,8 +40,8 @@ import elki.utilities.optionhandling.Parameterizer;
 @Reference(authors = "Erik Thordsen and Erich Schubert", //
     title = "ABID: Angle Based Intrinsic Dimensionality", //
     booktitle = "Proc. 13th Int. Conf. Similarity Search and Applications (SISAP'2020)", //
-    url = "https://arxiv.org/abs/2006.12880", //
-    bibkey = "DBLP:journals/corr/abs-2006-12880")
+    url = "https://doi.org/10.1007/978-3-030-60936-8_17", //
+    bibkey = "DBLP:conf/sisap/ThordsenS20")
 public class ABIDEstimator extends RABIDEstimator {
   /**
    * Static instance.

@@ -94,7 +94,7 @@ public class LID<O> implements OutlierAlgorithm {
   /**
    * Estimator for intrinsic dimensionality.
    */
-  protected IntrinsicDimensionalityEstimator estimator;
+  protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
   /**
    * Constructor.
@@ -103,7 +103,7 @@ public class LID<O> implements OutlierAlgorithm {
    * @param k Neighborhood size
    * @param estimator Estimator for intrinsic dimensionality
    */
-  public LID(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator estimator) {
+  public LID(Distance<? super O> distance, int k, IntrinsicDimensionalityEstimator<? super O> estimator) {
     super();
     this.distance = distance;
     this.kplus = k + 1; // + query point
@@ -177,7 +177,7 @@ public class LID<O> implements OutlierAlgorithm {
     /**
      * Estimator for intrinsic dimensionality.
      */
-    protected IntrinsicDimensionalityEstimator estimator;
+    protected IntrinsicDimensionalityEstimator<? super O> estimator;
 
     @Override
     public void configure(Parameterization config) {
@@ -186,7 +186,7 @@ public class LID<O> implements OutlierAlgorithm {
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<IntrinsicDimensionalityEstimator>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, MOMEstimator.class) //
+      new ObjectParameter<IntrinsicDimensionalityEstimator<? super O>>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, MOMEstimator.class) //
           .grab(config, x -> estimator = x);
     }
 

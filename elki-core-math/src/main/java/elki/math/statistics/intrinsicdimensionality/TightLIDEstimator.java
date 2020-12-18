@@ -21,11 +21,12 @@
 package elki.math.statistics.intrinsicdimensionality;
 
 import elki.database.ids.DBIDRef;
+import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.DoubleDBIDListIter;
 import elki.database.ids.KNNList;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
-import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import elki.database.query.range.RangeSearcher;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
@@ -49,19 +50,63 @@ import net.jafama.FastMath;
     booktitle = "Proc. 2019 SIAM International Conference on Data Mining (SDM)", //
     url = "https://doi.org/10.1137/1.9781611975673.21", //
     bibkey = "DBLP:conf/sdm/AmsalegCHKRT19")
-public class TightLIDEstimator implements IntrinsicDimensionalityEstimator {
+public class TightLIDEstimator implements IntrinsicDimensionalityEstimator<Object> {
   /**
    * Static instance.
    */
   public static final TightLIDEstimator STATIC = new TightLIDEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, int size) {
-    throw new UnsupportedOperationException("The TLE estimator can only be used with neighbor queries.");
+  public double estimate(RangeSearcher<DBIDRef> rnq, DistanceQuery<? extends Object> distq, DBIDRef cur, double range) {
+    final boolean issquared = distq.getDistance().isSquared();
+    final DoubleDBIDList kl = rnq.getRange(cur, range);
+    // FIXME: or use the maximum distance observed?
+    final double r = range, r2 = issquared ? r : r * r;
+
+    double sum = 0;
+    // We fill the upper triangle only,
+    DoubleDBIDListIter ii = kl.iter(), ij = kl.iter();
+    long valid = 0;
+    // Compute pairwise distances:
+    for(ii.seek(0); ii.valid(); ii.advance()) {
+      final double kdi = ii.doubleValue();
+      if(kdi <= 0. || kdi >= r) {
+        continue;
+      }
+      double Di2 = issquared ? kdi : kdi * kdi;
+      double r2mDi2 = 2 * (r2 - Di2), ir2mDi2 = 1. / r2mDi2;
+      for(ij.seek(ii.getOffset() + 1); ij.valid(); ij.advance()) {
+        final double kdj = ij.doubleValue();
+        if(kdj <= 0. || kdj >= r) {
+          continue;
+        }
+        final double d = distq.distance(ii, ij);
+        double Dj2 = issquared ? kdj : kdj * kdj, V2 = issquared ? d : d * d;
+        // Real point:
+        double S = Di2 + V2 - Dj2;
+        S = (FastMath.sqrt(S * S + 2 * V2 * r2mDi2) - S) * ir2mDi2;
+        if(S <= 0) {
+          continue;
+        }
+        // Virtual point:
+        double Z2 = 2 * Di2 + 2 * Dj2 - V2;
+        double T = Di2 + Z2 - Dj2;
+        T = (FastMath.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
+        if(T > 0) {
+          sum += 2 * (FastMath.log(T) + FastMath.log(S));
+          valid += 2;
+        }
+      }
+      // Square cancels out with taking this twice.
+      sum += FastMath.log(Di2 / r2);
+      ++valid;
+    }
+    // TODO: there are still some special cases missing?
+    return sum < 0 ? -valid / sum * (issquared ? 2 : 1) : 1;
   }
 
   @Override
-  public double estimate(KNNSearcher<DBIDRef> knnq, DistanceQuery<?> distq, DBIDRef cur, int k) {
+  public double estimate(KNNSearcher<DBIDRef> knnq, DistanceQuery<? extends Object> distq, DBIDRef cur, int k) {
     final boolean issquared = distq.getDistance().isSquared();
     final KNNList kl = knnq.getKNN(cur, k);
     final double r = kl.getKNNDistance(), r2 = issquared ? r : r * r;

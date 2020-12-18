@@ -33,7 +33,7 @@ import elki.utilities.ELKIBuilder;
 public class PWM2EstimatorTest extends AbstractIntrinsicDimensionalityEstimatorTest {
   @Test
   public void testPWM2() {
-    IntrinsicDimensionalityEstimator est = new ELKIBuilder<>(PWM2Estimator.class).build();
+    DistanceBasedIntrinsicDimensionalityEstimator est = new ELKIBuilder<>(PWM2Estimator.class).build();
     regressionTest(est, 5, 1000, 0L, 4.88144168533192);
     regressionTest(est, 7, 10000, 0L, 6.9603914177038435);
   }

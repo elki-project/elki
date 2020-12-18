@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.Parameterizer;
     title = "Fortran routines for use with the method of L-moments Version 3.03", //
     booktitle = "IBM Research Technical Report", //
     bibkey = "tr/ibm/Hosking00")
-public class LMomentsEstimator implements IntrinsicDimensionalityEstimator {
+public class LMomentsEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
@@ -63,7 +63,7 @@ public class LMomentsEstimator implements IntrinsicDimensionalityEstimator {
 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
-    final int begin = IntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
+    final int begin = DistanceBasedIntrinsicDimensionalityEstimator.countLeadingZeros(data, adapter, end);
     final int len = end - begin;
     if(len < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
