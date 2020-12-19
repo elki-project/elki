@@ -1,7 +1,7 @@
 description = 'ELKI - Data Input'
 dependencies {
   // For length normalization and MDS:
-  compile project(':elki-core-distance')
+  api project(':elki-core-distance')
   // For testing
   testRuntimeOnly project(':elki-core-dbids-int')
   testImplementation group: 'junit', name: 'junit', version:'[4.8,)'

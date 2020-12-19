@@ -139,8 +139,8 @@ task generateCodeHeaps(description: "Generate code from templates") {
 tasks.compileJava.dependsOn generateCodeHeaps
 
 dependencies {
-  compile project(':elki-logging')
-  compile group: 'net.jafama', name: 'jafama', version:'[2.3.0,3)'
-  compile group: 'it.unimi.dsi', name: 'fastutil', version: '[8,9)'
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  api project(':elki-logging')
+  api group: 'net.jafama', name: 'jafama', version:'[2.3.0,3)'
+  api group: 'it.unimi.dsi', name: 'fastutil', version: '[8,9)'
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

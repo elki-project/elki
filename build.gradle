@@ -24,7 +24,7 @@ allprojects  {
   ext.isSnapshot = version.endsWith("-SNAPSHOT")
 
   // For tests depending on other module's tests
-  configurations { testOutput.extendsFrom testCompile }
+  configurations { testOutput.extendsFrom testImplementation }
 
   test.testLogging.showStandardStreams = true
 }

@@ -1,4 +1,5 @@
 description = 'ELKI - Documentation Utilities'
 dependencies {
-  compile project(':elki-core-util')
+  api project(':elki-core-util')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

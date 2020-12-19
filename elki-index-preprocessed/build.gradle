@@ -1,5 +1,7 @@
 description = 'ELKI - Indexes based on preprocessing'
 dependencies {
-  compile project(':elki-database')
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  api project(':elki-database')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

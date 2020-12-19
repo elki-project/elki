@@ -1,22 +1,23 @@
 description = 'ELKI - Main Module'
 dependencies {
-  compile project(':elki-clustering')
-  // Also via elki-timeseries: compile project(':elki-outlier')
-  compile project(':elki-itemsets')
-  compile project(':elki-classification')
-  compile project(':elki-timeseries')
-  compile project(':elki-data-generator')
-  compile project(':elki-index-rtree')
-  compile project(':elki-index-mtree')
-  compile project(':elki-index-lsh')
-  compile project(':elki-index-various')
-  compile project(':elki-precomputed')
-  compile project(':elki-geo')
+  api project(':elki-clustering')
+  api project(':elki-outlier')
+  api project(':elki-itemsets')
+  api project(':elki-classification')
+  api project(':elki-timeseries')
+  api project(':elki-data-generator')
+  api project(':elki-index-rtree')
+  api project(':elki-index-mtree')
+  api project(':elki-index-lsh')
+  api project(':elki-index-various')
+  api project(':elki-precomputed')
+  api project(':elki-geo')
   api project(':elki-core-dbids-int')
-  testCompile project(':elki-docutil')
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
-  testCompile project(path: ':elki-outlier', configuration: 'testOutput')
-  testCompile project(path: ':elki-clustering', configuration: 'testOutput')
+  testImplementation project(':elki-docutil')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testImplementation project(path: ':elki-outlier', configuration: 'testOutput')
+  testImplementation project(path: ':elki-clustering', configuration: 'testOutput')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }
 
 jar {
@@ -27,7 +28,7 @@ jar {
     }
     attributes(
       "Main-Class" : "elki.application.ELKILauncher",
-      "Class-Path": configurations.runtime.collect { "lib/"+it.getName() }.join(' ')
+      "Class-Path": configurations.runtimeClasspath.collect { "lib/"+it.getName() }.join(' ')
     )
   }
 }

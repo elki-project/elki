@@ -1,6 +1,8 @@
 description = 'ELKI - Data Generator'
 dependencies {
-  compile project(':elki-clustering')
-  compile project(':elki-outlier')
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  api project(':elki-clustering')
+  api project(':elki-outlier')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

@@ -68,3 +68,14 @@ allprojects  {
   tasks.eclipse.dependsOn eclipseBuildshipPreferences
   eclipse.synchronizationTasks eclipseUIPreferences, eclipseBuildshipPreferences, eclipseJdt
 }
+
+allprojects {
+  apply plugin: 'eclipse'
+  eclipse.classpath.file.whenMerged {
+    entries.each {
+      // if (it in org.gradle.plugins.ide.eclipse.model.ProjectDependency) println it
+      if (it in org.gradle.plugins.ide.eclipse.model.ProjectDependency)
+        it.entryAttributes['without_test_code'] = false
+    }
+  }
+}

@@ -1,7 +1,9 @@
 description = 'ELKI - LibSVM based extensions'
 dependencies {
-  compile project(':elki-outlier')
-  compile group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
-  testCompile project(path: ':elki-outlier', configuration: 'testOutput')
+  api project(':elki-outlier')
+  implementation group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
+  testImplementation project(path: ':elki-outlier', configuration: 'testOutput')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

@@ -1,5 +1,5 @@
 description = 'ELKI - Core Mathematics and Statistics'
 dependencies {
-  compile project(':elki-core-api')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  api project(':elki-core-api')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

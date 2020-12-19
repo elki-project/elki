@@ -1,4 +1,5 @@
 description = 'ELKI - Uncertain data handling'
 dependencies {
-  compile project(':elki-clustering')
+  api project(':elki-clustering')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

@@ -1,6 +1,8 @@
 description = 'ELKI - Geography Module'
 dependencies {
-  // compile project(':elki-core')
-  compile project(':elki-index') // For projected indexes
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  api project(':elki-core')
+  api project(':elki-index') // For projected indexes
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

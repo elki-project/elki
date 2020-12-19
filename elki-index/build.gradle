@@ -1,6 +1,6 @@
 description = 'ELKI - Index Core'
 dependencies {
-  compile project(':elki-index-preprocessed') // Used by m-tree, r-tree approximations, otherwise elki-database would be enough.
-  compile project(':elki-persistent')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  api project(':elki-index-preprocessed') // Used by m-tree, r-tree approximations, otherwise elki-database would be enough.
+  api project(':elki-persistent')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

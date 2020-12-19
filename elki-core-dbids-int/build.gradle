@@ -1,5 +1,5 @@
 description = 'ELKI - Core DBIDs Integer Implementation'
 dependencies {
-  compile project(':elki-core-dbids')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  api project(':elki-core-dbids')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

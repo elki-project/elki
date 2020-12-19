@@ -16,12 +16,14 @@ sourceSets { javadoc { java.srcDirs = ["$rootDir/elki/src/main/javadoc"] } }
 dependencies {
   // Depend on all subprojects, except those listed
   project.parent.subprojects.findAll { !bundleExclude.contains(it.path) }.each {
-    compile it
+    api it
     doc files(it.sourceSets.main.java.srcDirs)
-    testRuntime files(it.sourceSets.main.java.outputDir)
+    testRuntimeOnly files(it.sourceSets.main.java.outputDir)
   }
-  testCompile project(':elki-docutil')
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  testImplementation project(':elki-docutil')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }
 
 jar {
@@ -32,11 +34,11 @@ jar {
     }
     attributes(
       "Main-Class" : "elki.application.ELKILauncher",
-      "Class-Path": configurations.runtime.collect { "lib/"+it.getName() }.join(' ')
+      "Class-Path": configurations.runtimeClasspath.collect { "lib/"+it.getName() }.join(' ')
     )
   }
   // Reorganize license information into a consistent folder
-  configurations.runtime.resolvedConfiguration.resolvedArtifacts.findAll
+  configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.findAll
   { !it.name.startsWith("elki") && !it.name.contains("xml-apis-ext") }.each { dep ->
     from(zipTree(dep.file)) {
       include("META-INF/LICENSE*")
@@ -71,7 +73,7 @@ shadowJar {
   dependsOn jar
   from jar.outputs.files // To include the bundle jar with above notices!
   configurations = [ project.configurations.runtime ]
-  destinationDir = project.parent.rootDir
+  destinationDirectory = project.parent.rootDir
   classifier = null
   manifest {
     attributes("Class-Path" : "")

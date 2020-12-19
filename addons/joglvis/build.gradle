@@ -1,8 +1,8 @@
-
 description = 'ELKI - OpenGL-based Visualization'
 dependencies {
-  compile project(':elki')
-    compile group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.1.5-01'
-    compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.1.5-01'
-  compile project(':elki-batik-visualization')
+  api project(':elki')
+  api project(':elki-batik-visualization')
+  implementation group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.1.5-01'
+  implementation group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.1.5-01'
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

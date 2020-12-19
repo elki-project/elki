@@ -1,9 +1,11 @@
 description = 'ELKI - External Distances'
 dependencies {
-  compile project(':elki-index-preprocessed')
-  compile project(':elki-persistent')
-  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  api project(':elki-index-preprocessed')
+  api project(':elki-persistent')
   // We use clustering algorithms in testing.
-  testCompile project(':elki-clustering')
-  testCompile project(path: ':elki-clustering', configuration: 'testOutput')
+  testImplementation project(path: ':elki-clustering')
+  testImplementation project(path: ':elki-clustering', configuration: 'testOutput')
+  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
+  testRuntimeOnly project(':elki-core-dbids-int')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

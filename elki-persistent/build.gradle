@@ -1,5 +1,5 @@
 description = 'ELKI - Persistence Layer'
 dependencies {
-  compile project(':elki-core-util')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  api project(':elki-core-util')
+  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }
