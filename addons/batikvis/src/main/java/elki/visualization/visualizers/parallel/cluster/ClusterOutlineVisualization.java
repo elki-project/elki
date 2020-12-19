@@ -34,10 +34,9 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.math.DoubleMinMax;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
@@ -56,7 +55,6 @@ import elki.visualization.svg.SVGPlot;
 import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.Visualization;
 import elki.visualization.visualizers.parallel.AbstractParallelVisualization;
-import elki.visualization.visualizers.scatterplot.cluster.ClusterHullVisualization;
 
 /**
  * Generates a SVG-Element that visualizes the area covered by a cluster.
@@ -266,19 +264,12 @@ public class ClusterOutlineVisualization implements VisFactory {
     public static final OptionID STRAIGHT_ID = new OptionID("parallel.clusteroutline.straight", "Draw straight lines");
 
     /**
-     * Alpha value
-     */
-    double alpha = Double.POSITIVE_INFINITY;
-
-    /**
      * Use bend curves
      */
     private boolean bend = true;
 
     @Override
     public void configure(Parameterization config) {
-      new DoubleParameter(ClusterHullVisualization.Par.ALPHA_ID, Double.POSITIVE_INFINITY) //
-          .grab(config, x -> alpha = x);
       new Flag(STRAIGHT_ID).grab(config, x -> bend = !x);
     }
 

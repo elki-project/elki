@@ -31,10 +31,10 @@ import org.junit.Test;
 import elki.data.spatial.Polygon;
 
 /**
- * Unit test for Alpha Shapes.#
- *
+ * Unit test for Alpha Shapes.
+ * <p>
  * FIXME: test for actual alpha shapes, not convex hulls!
- *
+ * <p>
  * FIXME: return lines and points for degenerate cases?
  *
  * @author Erich Schubert
@@ -139,7 +139,6 @@ public class AlphaShapeTest {
     assertEquals("Hull size not as expected.", 12, polys.get(0).size());
   }
 
-
   @Test
   public void classic() {
     ArrayList<double[]> t = new ArrayList<>();
@@ -157,8 +156,14 @@ public class AlphaShapeTest {
     t.add(new double[] { 3, 0 });
     t.add(new double[] { 2, 0 });
     t.add(new double[] { 1, 0 });
+    // second component:
+    t.add(new double[] { 10, 10 });
+    t.add(new double[] { 11, 10 });
+    t.add(new double[] { 11, 11 });
+    t.add(new double[] { 10, 11 });
     List<Polygon> polys = new AlphaShape(t, .75).compute();
-    assertEquals("Too many polys.", 1, polys.size());
-    assertEquals("Hull size not as expected.", 11, polys.get(0).size());
+    assertEquals("Wrong number of polys.", 2, polys.size());
+    assertEquals("Hull size not as expected.", 12, polys.get(0).size());
+    assertEquals("Hull size not as expected.", 4, polys.get(1).size());
   }
 }

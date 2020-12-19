@@ -20,7 +20,6 @@
  */
 package elki.visualization.visualizers.scatterplot.cluster;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,15 +36,11 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.math.geometry.AlphaShape;
 import elki.math.geometry.FilteredConvexHull2D;
 import elki.utilities.datastructures.hierarchy.Hierarchy;
 import elki.utilities.datastructures.iterator.ArrayListIter;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.optionhandling.Parameterizer;
-import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.pairs.DoubleObjPair;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
@@ -67,8 +62,7 @@ import elki.visualization.visualizers.Visualization;
 import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
- * Visualizer for generating an SVG-Element containing the convex hull / alpha
- * shape of each cluster.
+ * Visualizer of the convex hull of each cluster.
  *
  * @author Robert Rödler
  * @author Erich Schubert
@@ -77,25 +71,17 @@ import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualizati
  * @stereotype factory
  * @navassoc - create - Instance
  */
-public class ClusterHullVisualization implements VisFactory {
+public class ClusterConvexHullVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Cluster Hull";
 
   /**
-   * Settings
-   */
-  Par settings;
-
-  /**
    * Constructor.
-   *
-   * @param settings Settings
    */
-  public ClusterHullVisualization(Par settings) {
+  public ClusterConvexHullVisualization() {
     super();
-    this.settings = settings;
   }
 
   @Override
@@ -125,8 +111,7 @@ public class ClusterHullVisualization implements VisFactory {
    * @author Erich Schubert
    *
    * @navhas - visualizes - Clustering
-   * @assoc - - - GrahamScanConvexHull2D
-   * @assoc - - - AlphaShape
+   * @assoc - - - FilteredConvexHull2D
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
@@ -168,71 +153,38 @@ public class ClusterHullVisualization implements VisFactory {
       List<Cluster<Model>> clusters = clustering.getAllClusters();
       List<Cluster<Model>> topc = clustering.getToplevelClusters();
       Hierarchy<Cluster<Model>> hier = clustering.getClusterHierarchy();
-      boolean flat = (clusters.size() == topc.size());
-      // Heuristic value for transparency:
-      double baseopacity = flat ? 0.5 : 0.5;
-
-      // Convex hull mode:
-      if(settings.alpha >= Double.POSITIVE_INFINITY) {
-        // Build the convex hulls (reusing the hulls of nested clusters!)
-        Map<Object, DoubleObjPair<Polygon>> hullmap = new HashMap<>(clusters.size());
-        for(Cluster<Model> clu : topc) {
-          buildHullsRecursively(clu, hier, hullmap);
-        }
-
-        // This way, we draw each cluster only once.
-        // Unfortunately, not depth ordered (TODO!)
-        for(Cluster<Model> clu : clusters) {
-          DoubleObjPair<Polygon> pair = hullmap.get(clu),
-              mpair = hullmap.get(clu.getModel());
-          // Plot the convex hull:
-          if(pair != null && pair.second != null && pair.second.size() > 1) {
-            SVGPath path = new SVGPath(pair.second);
-            // Approximate area (using bounding box)
-            double hullarea = SpatialUtil.volume(pair.second);
-            final double relativeArea = 1 - (hullarea / projarea);
-            final double relativeSize = pair.first / rel.size();
-            final double corefact = (mpair == null) ? 1.0 : .5;
-            final double opacity = corefact * baseopacity * Math.sqrt(relativeSize * relativeArea);
-            addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
-            layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
-          }
-          // For core density models, over-plot the core:
-          if(mpair != null && mpair.second != null && mpair.second.size() > 1) {
-            SVGPath path = new SVGPath(mpair.second);
-            // Approximate area (using bounding box)
-            double hullarea = SpatialUtil.volume(mpair.second);
-            final double relativeArea = 1 - (hullarea / projarea);
-            final double relativeSize = mpair.first / rel.size();
-            final double opacity = .5 * baseopacity * Math.sqrt(relativeSize * relativeArea);
-            addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
-            layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
-          }
-        }
+      // Build the convex hulls (reusing the hulls of nested clusters!)
+      Map<Object, DoubleObjPair<Polygon>> hullmap = new HashMap<>(clusters.size());
+      for(Cluster<Model> clu : topc) {
+        buildHullsRecursively(clu, hier, hullmap);
       }
-      else {
-        // Alpha shape mode.
-        // For alpha shapes we can't use the shortcut of convex hulls,
-        // but have to revisit all child clusters.
-        for(Cluster<Model> clu : clusters) {
-          ArrayList<double[]> ps = new ArrayList<>();
-          double weight = addRecursively(ps, hier, clu);
-          List<Polygon> polys;
-          if(ps.isEmpty()) {
-            continue;
-          }
-          if(ps.size() > 2) {
-            polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
-          }
-          else {
-            // Trivial polygon. Might still degenerate to a single point though.
-            polys = new ArrayList<>(1);
-            polys.add(new Polygon(ps));
-          }
-          for(Polygon p : polys) {
-            addCSSClasses(svgp, cpol.getStyleForCluster(clu), baseopacity * weight / rel.size());
-            layer.appendChild(new SVGPath(p).makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
-          }
+
+      // This way, we draw each cluster only once.
+      // Unfortunately, not depth ordered (TODO!)
+      for(Cluster<Model> clu : clusters) {
+        DoubleObjPair<Polygon> pair = hullmap.get(clu),
+            mpair = hullmap.get(clu.getModel());
+        // Plot the convex hull:
+        if(pair != null && pair.second != null && pair.second.size() > 1) {
+          SVGPath path = new SVGPath(pair.second);
+          // Approximate area (using bounding box)
+          final double hullarea = SpatialUtil.volume(pair.second);
+          final double relativeArea = 1 - (hullarea / projarea);
+          final double relativeSize = pair.first / rel.size();
+          final double opacity = ((mpair == null) ? .5 : .25) * Math.sqrt(relativeSize * relativeArea);
+          addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
+          layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
+        }
+        // For core density models, over-plot the core:
+        if(mpair != null && mpair.second != null && mpair.second.size() > 1) {
+          SVGPath path = new SVGPath(mpair.second);
+          // Approximate area (using bounding box)
+          final double hullarea = SpatialUtil.volume(mpair.second);
+          final double relativeArea = 1 - (hullarea / projarea);
+          final double relativeSize = mpair.first / rel.size();
+          final double opacity = .25 * Math.sqrt(relativeSize * relativeArea);
+          addCSSClasses(svgp, cpol.getStyleForCluster(clu), opacity);
+          layer.appendChild(path.makeElement(svgp, CLUSTERHULL + cpol.getStyleForCluster(clu)));
         }
       }
     }
@@ -245,28 +197,27 @@ public class ClusterHullVisualization implements VisFactory {
      * @param hulls Hull map
      */
     private DoubleObjPair<Polygon> buildHullsRecursively(Cluster<Model> clu, Hierarchy<Cluster<Model>> hier, Map<Object, DoubleObjPair<Polygon>> hulls) {
-      final Model model = clu.getModel();
       final DBIDs ids = clu.getIDs();
-      boolean coremodel = false;
+      final Model model = clu.getModel();
       DBIDs cids = null;
       if(model instanceof CoreObjectsModel) {
         cids = ((CoreObjectsModel) model).getCoreObjects();
-        coremodel = cids.size() > 0;
+        cids = cids.isEmpty() ? null : cids;
       }
 
       FilteredConvexHull2D hull = new FilteredConvexHull2D();
-      FilteredConvexHull2D hull2 = coremodel ? new FilteredConvexHull2D() : null;
+      FilteredConvexHull2D hull2 = cids != null ? new FilteredConvexHull2D() : null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         final double[] projv = proj.fastProjectDataToRenderSpace(rel.get(iter));
         if(projv[0] != projv[0] || projv[1] != projv[1]) {
           continue; // NaN!
         }
         hull.add(projv);
-        if(coremodel && cids.contains(iter)) {
+        if(cids != null && cids.contains(iter)) {
           hull2.add(projv);
         }
       }
-      double weight = ids.size(), cweight = coremodel ? cids.size() : 0.0;
+      double weight = ids.size(), cweight = cids != null ? cids.size() : 0.0;
       if(hier != null) {
         final int numc = hier.numChildren(clu);
         if(numc > 0) {
@@ -281,7 +232,7 @@ public class ClusterHullVisualization implements VisFactory {
               hull.add(vi.get());
             }
             // For a core model, include the inner core, too.
-            if(coremodel) {
+            if(cids != null) {
               DoubleObjPair<Polygon> ipoly = hulls.get(iclu.getModel());
               if(ipoly != null) {
                 for(ArrayListIter<double[]> vi = ipoly.second.iter(); vi.valid(); vi.advance()) {
@@ -296,34 +247,10 @@ public class ClusterHullVisualization implements VisFactory {
       }
       DoubleObjPair<Polygon> pair = new DoubleObjPair<>(weight, hull.getHull());
       hulls.put(clu, pair);
-      if(coremodel) {
+      if(cids != null) {
         hulls.put(model, new DoubleObjPair<>(cweight, hull2.getHull()));
       }
       return pair;
-    }
-
-    /**
-     * Recursively add a cluster and its children.
-     *
-     * @param hull Hull to add to
-     * @param hier Cluster hierarchy
-     * @param clus Current cluster
-     * @return Weight for visualization
-     */
-    private double addRecursively(ArrayList<double[]> hull, Hierarchy<Cluster<Model>> hier, Cluster<Model> clus) {
-      final DBIDs ids = clus.getIDs();
-      double weight = ids.size();
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
-        if(projP[0] != projP[0] || projP[1] != projP[1]) {
-          continue; // NaN!
-        }
-        hull.add(projP);
-      }
-      for(It<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
-        weight += .5 * addRecursively(hull, hier, iter.get());
-      }
-      return weight;
     }
 
     /**
@@ -353,25 +280,9 @@ public class ClusterHullVisualization implements VisFactory {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
-    /**
-     * Alpha-Value for alpha-shapes
-     */
-    public static final OptionID ALPHA_ID = new OptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
-
-    /**
-     * Alpha value
-     */
-    double alpha = Double.POSITIVE_INFINITY;
-
     @Override
-    public void configure(Parameterization config) {
-      new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY) //
-          .grab(config, x -> alpha = x);
-    }
-
-    @Override
-    public ClusterHullVisualization make() {
-      return new ClusterHullVisualization(this);
+    public ClusterConvexHullVisualization make() {
+      return new ClusterConvexHullVisualization();
     }
   }
 }

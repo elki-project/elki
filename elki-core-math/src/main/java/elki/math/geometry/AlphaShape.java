@@ -25,9 +25,17 @@ import java.util.List;
 
 import elki.data.spatial.Polygon;
 import elki.utilities.datastructures.BitsUtil;
+import elki.utilities.datastructures.arraylike.IntegerArray;
+import elki.utilities.documentation.Reference;
 
 /**
- * Compute the alpha-Shape of a point set, using Delaunay triangulation.
+ * Compute the alpha-shape of a point set, using Delaunay triangulation.
+ * <p>
+ * Reference:
+ * <p>
+ * H. Edelsbrunner, D. G. Kirkpatrick, R. Seidel<br>
+ * On the shape of a set of points in the plane<br>
+ * IEEE Trans. Inf. Theory 29(4)
  *
  * @author Erich Schubert
  * @since 0.5.0
@@ -35,12 +43,17 @@ import elki.utilities.datastructures.BitsUtil;
  * @assoc - - - SweepHullDelaunay2D
  * @has - - - Polygon
  */
+@Reference(authors = "H. Edelsbrunner, D. G. Kirkpatrick, R. Seidel", //
+    title = "On the shape of a set of points in the plane", //
+    booktitle = "IEEE Trans. Inf. Theory 29(4)", //
+    url = "https://doi.org/10.1109/TIT.1983.1056714", //
+    bibkey = "DBLP:journals/tit/EdelsbrunnerKS83")
 public class AlphaShape {
   /**
    * Alpha shape
    */
   private double alpha2;
-  
+
   /**
    * Points
    */
@@ -54,69 +67,104 @@ public class AlphaShape {
   /**
    * Constructor.
    *
-   * @param points Point set
-   * @param alpha
+   * @param points point set
+   * @param alpha alpha parameter
    */
   public AlphaShape(List<double[]> points, double alpha) {
     this.alpha2 = alpha * alpha;
     this.points = points;
   }
 
+  /**
+   * Compute the alpha shape.
+   *
+   * @return polygons
+   */
   public List<Polygon> compute() {
     // Compute delaunay triangulation:
     delaunay = (new SweepHullDelaunay2D(points)).getDelaunay();
 
     List<Polygon> polys = new ArrayList<>();
+    List<IntegerArray> open = new ArrayList<>();
 
     // Working data
-    long[] used = BitsUtil.zero(delaunay.size());
-    List<double[]> cur = new ArrayList<>();
-
-    for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = BitsUtil.nextClearBit(used, i + 1)) {
-      if(BitsUtil.get(used, i)) {
-        continue;
-      }
-      BitsUtil.setI(used, i);
+    long[] visited = BitsUtil.zero(delaunay.size());
+    // Find an unprocessed triangle to start with:
+    for(int i = 0; i < delaunay.size() && i >= 0; i = BitsUtil.nextClearBit(visited, i + 1)) {
+      assert !BitsUtil.get(visited, i);
+      BitsUtil.setI(visited, i);
       SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
       if(tri.r2 <= alpha2) {
         // Check neighbors
-        processNeighbor(cur, used, i, tri.ab, tri.b);
-        processNeighbor(cur, used, i, tri.bc, tri.c);
-        processNeighbor(cur, used, i, tri.ca, tri.a);
+        processNeighbor(open, visited, i, tri.ab, tri.a, tri.b);
+        processNeighbor(open, visited, i, tri.bc, tri.b, tri.c);
+        processNeighbor(open, visited, i, tri.ca, tri.c, tri.a);
       }
-      if(!cur.isEmpty()) {
+      for(IntegerArray po : open) {
+        List<double[]> cur = new ArrayList<>(po.size);
+        for(int j = 0; j < po.size; j++) {
+          cur.add(points.get(po.data[j]));
+        }
         polys.add(new Polygon(cur));
-        cur = new ArrayList<>();
       }
+      open.clear();
     }
-
     return polys;
   }
 
-  private void processNeighbor(List<double[]> cur, long[] used, int i, int ab, int b) {
-    if(ab >= 0) {
-      if(BitsUtil.get(used, ab)) {
-        return;
+  private void processNeighbor(List<IntegerArray> open, long[] visited, int i, int ab, int a, int b) {
+    if(ab < 0) { // Nonexistant neighbor
+      addEdge(open, a, b);
+      return;
+    }
+    final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
+    if(BitsUtil.get(visited, ab)) {
+      // We already discarded the neighbor polygon, but we still get an edge.
+      if(next.r2 > alpha2) {
+        addEdge(open, a, b);
       }
-      BitsUtil.setI(used, ab);
-      final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
-      if(next.r2 <= alpha2) {
-        // Continue where we left off...
-        if(next.ab == i) {
-          processNeighbor(cur, used, ab, next.bc, next.c);
-          processNeighbor(cur, used, ab, next.ca, next.a);
-        }
-        else if(next.bc == i) {
-          processNeighbor(cur, used, ab, next.ca, next.a);
-          processNeighbor(cur, used, ab, next.ab, next.b);
-        }
-        else if(next.ca == i) {
-          processNeighbor(cur, used, ab, next.ab, next.b);
-          processNeighbor(cur, used, ab, next.bc, next.c);
-        }
+      return;
+    }
+    BitsUtil.setI(visited, ab);
+    if(next.r2 <= alpha2) {
+      // Walk 'around' the next triangle
+      if(next.ab == i) {
+        assert next.b == a && next.a == b;
+        processNeighbor(open, visited, ab, next.bc, a, next.c);
+        processNeighbor(open, visited, ab, next.ca, next.c, b);
+      }
+      else if(next.bc == i) {
+        assert next.c == a && next.b == b;
+        processNeighbor(open, visited, ab, next.ca, a, next.a);
+        processNeighbor(open, visited, ab, next.ab, next.a, b);
+      }
+      else /* if(next.ca == i) */ {
+        assert next.ca == i;
+        assert next.a == a && next.c == b;
+        processNeighbor(open, visited, ab, next.ab, a, next.b);
+        processNeighbor(open, visited, ab, next.bc, next.b, b);
+      }
+      return;
+    }
+    addEdge(open, a, b);
+  }
+
+  /**
+   * Add an edge to the corresponding polygon. This handles holes.
+   * 
+   * @param open List of open polygons
+   * @param a previous point
+   * @param b next point
+   */
+  private void addEdge(List<IntegerArray> open, int a, int b) {
+    for(IntegerArray cur : open) {
+      if(cur.data[cur.size - 1] == a) {
+        cur.add(b);
         return;
       }
     }
-    cur.add(points.get(b));
+    IntegerArray cur = new IntegerArray();
+    cur.add(b);
+    open.add(cur);
   }
 }

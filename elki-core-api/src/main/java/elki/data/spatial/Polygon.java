@@ -36,7 +36,7 @@ import elki.utilities.datastructures.iterator.ArrayListIter;
  * 
  * @composed - - - double[]
  */
-public class Polygon implements SpatialComparable {
+public class Polygon implements SpatialComparable, Iterable<double[]> {
   /**
    * The actual points
    */
@@ -281,5 +281,10 @@ public class Polygon implements SpatialComparable {
     }
     agg += first[0] * py - first[1] * px;
     return Math.abs(agg * .5);
+  }
+
+  @Override
+  public Iterator<double[]> iterator() {
+    return points.iterator();
   }
 }

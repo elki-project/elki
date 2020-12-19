@@ -27,11 +27,11 @@ import elki.data.spatial.Polygon;
 
 /**
  * Accelerate computing the convex hull with a simple filter.
- *
+ * <p>
  * For this filter, we maintain a simple box that is guaranteed to be fully
  * inside the convex hull. Points in this rectangle will be skipped.
- * 
- * TODO: allow using this with other bounding box agorithms, too.
+ * <p>
+ * TODO: allow using this with other bounding box algorithms, too.
  *
  * @author Erich Schubert
  * @since 0.7.5

@@ -403,7 +403,7 @@ public class SweepHullDelaunay2D {
    * @param len Number of points
    * @return Best triangle
    */
-  public Triangle findSmallest(int seedid, int seed2id, double[] sortd, int[] sorti, int len) {
+  protected Triangle findSmallest(int seedid, int seed2id, double[] sortd, int[] sorti, int len) {
     Triangle besttri = new Triangle(seedid, seed2id, -1);
     besttri.r2 = Double.MAX_VALUE;
     Triangle testtri = new Triangle(seedid, seed2id, -1);

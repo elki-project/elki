@@ -185,7 +185,7 @@ public class SVGPath {
 
   /**
    * Draw a line given a series of coordinates.
-   *
+   * <p>
    * Helper function that will use "move" for the first point, "lineto" for the
    * remaining.
    *
@@ -199,7 +199,7 @@ public class SVGPath {
 
   /**
    * Draw a line given a series of coordinates.
-   *
+   * <p>
    * Helper function that will use "move" for the first point, "lineto" for the
    * remaining.
    *
@@ -683,7 +683,6 @@ public class SVGPath {
 
   /**
    * Turn the path buffer into an SVG element.
-   * O
    * 
    * @param plot Plot context (= element factory)
    * @param cssclass CSS class
