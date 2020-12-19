@@ -5,6 +5,7 @@ description = "ELKI - Parent Project"
 eclipse.project.name = 'elki-project'
 
 allprojects  {
+  apply plugin: 'java-test-fixtures'
   apply plugin: 'java-library'
   apply plugin: 'maven-publish' // Not strictly necessary, but convenient
   repositories { jcenter(); }
@@ -22,9 +23,6 @@ allprojects  {
 
   ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
   ext.isSnapshot = version.endsWith("-SNAPSHOT")
-
-  // For tests depending on other module's tests
-  configurations { testOutput.extendsFrom testImplementation }
 
   test.testLogging.showStandardStreams = true
 }

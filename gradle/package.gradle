@@ -48,12 +48,6 @@ subprojects {
       into "license"
     }
   }
-  // Build test jars:
-  task testJar(type: Jar) {
-    classifier = 'tests'
-    from sourceSets.test.output
-  }
-  artifacts.testOutput testJar
   // Build source jars:
   task sourceJar(type: Jar) {
     classifier = 'sources'

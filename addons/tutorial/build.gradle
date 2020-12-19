@@ -1,9 +1,7 @@
 description = 'ELKI - Tutorial Algorithms'
 dependencies {
   api project(':elki')
-  testImplementation project(path: ':elki-clustering', configuration: 'testOutput')
-  testImplementation project(path: ':elki-outlier', configuration: 'testOutput')
-  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
-  testRuntimeOnly project(':elki-core-dbids-int')
-  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+  testImplementation(testFixtures(project(path: ':elki-clustering')))
+  testImplementation(testFixtures(project(path: ':elki-outlier')))
+  testImplementation(testFixtures(project(path: ':elki-test-core')))
 }

@@ -1,7 +1,5 @@
 description = 'ELKI - Various indexes'
 dependencies {
   api project(':elki-index')
-  testImplementation project(path: ':elki-test-core', configuration: 'testOutput')
-  testRuntimeOnly project(':elki-core-dbids-int')
-  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+  testImplementation(testFixtures(project(path: ':elki-test-core')))
 }
