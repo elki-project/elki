@@ -2,7 +2,7 @@ description = 'ELKI - 3D Parallel Coordinate Trees Visualization'
 dependencies {
   api project(':elki')
   api project(':elki-batik-visualization')
-  implementation group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.1.5-01'
+  api group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.1.5-01'
   implementation group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.1.5-01'
   testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }

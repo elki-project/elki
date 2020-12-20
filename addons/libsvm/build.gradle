@@ -1,7 +1,7 @@
 description = 'ELKI - LibSVM based extensions'
 dependencies {
   api project(':elki-outlier')
-  implementation group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
+  api group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
   testImplementation(testFixtures(project(path: ':elki-outlier')))
   testImplementation(testFixtures(project(path: ':elki-test-core')))
 }
