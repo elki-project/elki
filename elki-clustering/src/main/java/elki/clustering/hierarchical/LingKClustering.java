@@ -114,11 +114,15 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
 
     // The algorithm operates on distance ranks
     calculateRanks(adbids, rankmat, relation, kthOcc);
-
     List<ModifiableDBIDs> clusterCandidates, topLevelClusters;
 
     Clustering<DendrogramModel> clustering = new Clustering<>();
+    // for tracking old clusters for parent history
     Map<ModifiableDBIDs, List<Cluster<DendrogramModel>>> oldclusters = new HashMap<>();
+    // TODO Maybe there is a better solution?
+    // for tracking child ids, as the childClusters are allready not complete,
+    // we cannot use them
+    Map<ModifiableDBIDs, ModifiableDBIDs> childids = new HashMap<>();
     IntegerArray inclusters = new IntegerArray(adbids.size());
     IntegerArray toprocess = new IntegerArray(adbids.size()),
         notinclusters = new IntegerArray(adbids.size());
@@ -162,20 +166,32 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
           }
           assert clusterCandidates.size() == 1;
           if(topLevelClusters.size() == 1) {
+            // child clusters
             oldclusters.put(clusterCandidates.get(0), oldclusters.get(topLevelClusters.get(0)));
             oldclusters.remove(topLevelClusters.get(0));
+            // child ids
+            childids.put(clusterCandidates.get(0), childids.get(topLevelClusters.get(0)));
+            childids.remove(topLevelClusters.get(0));
           }
           else {
             LinkedList<Cluster<DendrogramModel>> clist = new LinkedList<Cluster<DendrogramModel>>();
+            ModifiableDBIDs idacc = DBIDUtil.newHashSet();
             for(ModifiableDBIDs cluster : topLevelClusters) {
-              Cluster<DendrogramModel> cn = new Cluster<DendrogramModel>(cluster, new DendrogramModel(r));
+              // create the cluster without child cluster points
+              ModifiableDBIDs clu = DBIDUtil.newHashSet(cluster);
+              // delete old points
+              clu.removeDBIDs(childids.get(cluster));
+              Cluster<DendrogramModel> cn = new Cluster<DendrogramModel>(clu, new DendrogramModel(r));
               clist.add(cn);
+              idacc.addDBIDs(cluster);
               for(Cluster<DendrogramModel> co : oldclusters.get(cluster)) {
                 clustering.addChildCluster(cn, co);
               }
               oldclusters.remove(cluster);
+              childids.remove(cluster);
             }
             oldclusters.put(clusterCandidates.get(0), clist);
+            childids.put(clusterCandidates.get(0), idacc);
           }
           DBIDIter it = clusterCandidates.get(0).iter();
           DBID pivot = DBIDUtil.deref(it);
@@ -200,7 +216,9 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       rankindex = raiseRank(r, toprocess, kthOcc, rankindex);
     }
     for(ModifiableDBIDs tlc : oldclusters.keySet()) {
-      Cluster<DendrogramModel> cn = new Cluster<>(tlc, new DendrogramModel(r));
+      ModifiableDBIDs tlc2 = DBIDUtil.newHashSet(tlc);
+      tlc2.removeDBIDs(childids.get(tlc));
+      Cluster<DendrogramModel> cn = new Cluster<>(tlc2, new DendrogramModel(r));
       for(Cluster<DendrogramModel> co : oldclusters.get(tlc)) {
         clustering.addChildCluster(cn, co);
       }
@@ -237,6 +255,8 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       final int x = itx.getOffset();
       assert pos == MatrixParadigm.triangleSize(x);
       for(DBIDArrayIter ity = iter2.seek(0); ity.getOffset() < x; ity.advance()) {
+        assert (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5) == x;
+        assert pos - MatrixParadigm.triangleSize((int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5)) == ity.getOffset();
         dists[pos++] = dist.distance(itx, ity);
       }
       if(prog != null) {
@@ -348,6 +368,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         // if not enough close elements, move id to 'out' and note change
         if(c < k) {
           change = true;
+          // ?
           proc.remove(i--, 1);
           out.add(x);
         }
@@ -387,7 +408,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         for(int j = 0; j < s.size; j++) {
           int y = s.data[j];
           if(rankmat[offset(x, y)] < r) {
-            s.remove(j, 1);
+            s.remove(j--, 1);
             q.offer(y);
           }
         }
