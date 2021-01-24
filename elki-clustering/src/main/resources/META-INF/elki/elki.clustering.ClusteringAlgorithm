@@ -28,6 +28,7 @@ elki.clustering.kmeans.KMeansMinusMinus
 elki.clustering.kmeans.KMediansLloyd
 elki.clustering.kmeans.LloydKMeans lloyd forgy
 elki.clustering.kmeans.MacQueenKMeans
+elki.clustering.kmeans.ShallotKMeans
 elki.clustering.kmeans.SingleAssignmentKMeans
 elki.clustering.kmeans.SimplifiedElkanKMeans
 elki.clustering.kmeans.SortMeans
