@@ -308,7 +308,7 @@ public class FastPAM1<V> extends PAM<V> {
         if(pj == m) { // Nearest medoid is gone.
           if(dist_h < distsec) { // Replace nearest.
             nearest.putDouble(j, dist_h);
-            assignment.putInt(j, m | (po << 16));
+            // assignment.putInt(j, m | (po << 16));
           }
           else { // Second is new nearest.
             nearest.putDouble(j, distsec);
