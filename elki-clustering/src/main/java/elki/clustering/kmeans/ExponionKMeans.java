@@ -24,9 +24,6 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -36,7 +33,7 @@ import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
 /**
- * Newlings's exponion k-means algorithm, exploiting the triangle inequality.
+ * Newlings's Exponion k-means algorithm, exploiting the triangle inequality.
  * <p>
  * This is <b>not</b> a complete implementation, the approximative sorting part
  * is missing. We also had to guess on the paper how to make best use of F.
@@ -92,11 +89,6 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
    */
   protected static class Instance extends HamerlyKMeans.Instance {
     /**
-     * Second nearest cluster.
-     */
-    WritableIntegerDataStore second;
-
-    /**
      * Cluster center distances.
      */
     double[][] cdist;
@@ -106,9 +98,15 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
      */
     int[][] cnum;
 
+    /**
+     * Constructor.
+     *
+     * @param relation Data relation
+     * @param df Distance function
+     * @param means Initial means
+     */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
-      second = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
       cdist = new double[k][k];
       cnum = new int[k][k - 1];
     }
