@@ -20,6 +20,7 @@
  */
 package elki.visualization.visualizers.scatterplot.cluster;
 
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.clustering.optics.ClusterOrder;
@@ -107,6 +108,11 @@ public class ClusterOrderVisualization implements VisFactory {
     protected ClusterOrder result;
 
     /**
+     * Visualize the cluster order sequence, not the predecessor.
+     */
+    protected boolean order = false;
+
+    /**
      * Constructor.
      *
      * @param context Visualizer context
@@ -127,18 +133,42 @@ public class ClusterOrderVisualization implements VisFactory {
       setupCanvas();
       final StyleLibrary style = context.getStyleLibrary();
       CSSClass cls = new CSSClass(this, CSSNAME);
-      style.lines().formatCSSClass(cls, 0, style.getLineWidth(StyleLibrary.CLUSTERORDER));
-
+      style.lines().formatCSSClass(cls, -1, style.getLineWidth(StyleLibrary.CLUSTERORDER));
+      cls.setStatement(SVGConstants.CSS_MARKER_END_PROPERTY, "url(#opticshead)");
+      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
       svgp.addCSSClassOrLogError(cls);
+
+      if(svgp.getIdElement("opticshead") == null) {
+        Element head = svgp.svgElement(SVGConstants.SVG_MARKER_TAG);
+        head.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, "opticshead");
+        head.setAttribute(SVGConstants.SVG_ORIENT_ATTRIBUTE, SVGConstants.SVG_AUTO_VALUE);
+        head.setAttribute(SVGConstants.SVG_MARKER_WIDTH_ATTRIBUTE, "4");
+        head.setAttribute(SVGConstants.SVG_MARKER_HEIGHT_ATTRIBUTE, "4");
+        head.setAttribute(SVGConstants.SVG_REF_X_ATTRIBUTE, SVGUtil.fmt(4 - 2 * style.getLineWidth(StyleLibrary.CLUSTERORDER)));
+        head.setAttribute(SVGConstants.SVG_REF_Y_ATTRIBUTE, "2");
+        Element path = svgp.svgElement(SVGConstants.SVG_PATH_TAG);
+        path.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, "M0,0 L2,2 L0,4 L4,2 Z");
+        path.setAttribute(SVGConstants.CSS_COLOR_PROPERTY, style.getColorSet(StyleLibrary.PLOT).getColor(-1));
+        head.appendChild(path);
+        svgp.getDefs().appendChild(head);
+      }
 
       DBIDVar prev = DBIDUtil.newVar();
       for(DBIDIter it = result.iter(); it.valid(); it.advance()) {
-        result.getPredecessor(it, prev);
+        if(!order) {
+          result.getPredecessor(it, prev);
+        }
         if(prev.isEmpty()) {
+          if(order) {
+            prev.set(it);
+          }
           continue;
         }
         double[] thisVec = proj.fastProjectDataToRenderSpace(rel.get(it));
         double[] prevVec = proj.fastProjectDataToRenderSpace(rel.get(prev));
+        if(order) {
+          prev.set(it);
+        }
 
         if(thisVec[0] != thisVec[0] || thisVec[1] != thisVec[1]) {
           continue; // NaN!
