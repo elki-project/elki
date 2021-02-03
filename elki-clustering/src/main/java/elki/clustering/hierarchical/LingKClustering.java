@@ -105,6 +105,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
   }
 
   public Clustering<DendrogramModel> run(Relation<O> relation) {
+
     final ArrayDBIDs adbids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int trisize = MatrixParadigm.triangleSize(adbids.size());
     // pairwise distance rank matrix
@@ -135,7 +136,10 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
     // keep track of clusters
     UnionFind uf = UnionFindUtil.make(DBIDUtil.makeUnmodifiable(adbids));
     int rankindex = raiseRank(r, toprocess, kthOcc, 0);
-
+    int lowestkthocc = Integer.MAX_VALUE;
+    for(long l : kthOcc) {
+      lowestkthocc = lowestkthocc < first(l) ? lowestkthocc : first(l);
+    }
     while(r < rsfound.length && !(oldclusters.size() == 1 && oldclusters.keySet().iterator().next().size() == relation.size())) {
       // sort toprocess into inclusters and notinclusters
       klink(inclusters, toprocess, notinclusters, r, rankmat);
@@ -155,6 +159,15 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
               it.remove();
               it2.remove();
               continue;
+            }
+          }
+        }
+        if(clusterCandidates.size() > 1) {
+          int minrank = Integer.MAX_VALUE;
+          for(DBIDMIter it = clusterCandidates.get(0).iter(); it.valid(); it.advance()) {
+            for(DBIDMIter it2 = clusterCandidates.get(1).iter(); it2.valid(); it2.advance()) {
+              int i = rankmat[offset(it.internalGetIndex(), it2.internalGetIndex())];
+              minrank = minrank > i ? i : minrank;
             }
           }
         }
@@ -228,8 +241,14 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
   }
 
   private static int raiseRank(int r, IntegerArray toprocess, long[] kthOcc, int index) {
-    while(index < kthOcc.length && first(kthOcc[index]) <= r) {
-      toprocess.add(second(kthOcc[index++]));
+    if(index == 0) {
+      while(index < kthOcc.length && first(kthOcc[index]) <= r) {
+        toprocess.add(second(kthOcc[index++]));
+      }
+    }
+    else {
+      if(index < kthOcc.length)
+        toprocess.add(second(kthOcc[index++]));
     }
     return index;
   }
@@ -276,10 +295,10 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       final int x = (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * p) + 0.5);
       final int y = p - MatrixParadigm.triangleSize(x);
       assert y < x;
-      if(++count[x] == k) {
+      if(++count[x] == 1) {
         kthOcc[x] = pair(i, x);
       }
-      if(++count[y] == k) {
+      if(++count[y] == 1) {
         kthOcc[y] = pair(i, y);
       }
     }
@@ -327,6 +346,17 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
   private static int offset(int x, int y) {
     return x < y ? (MatrixParadigm.triangleSize(y) + x) : (MatrixParadigm.triangleSize(x) + y);
   }
+  /**
+   * x,y to triangle index.
+  *
+  * @param x Coordinate 1
+  * @param y Coordinate 2
+  * @param possible shortcut for triangle size x
+  * @return Offset
+  */
+ private static int offset(int x, int y, int trix) {
+   return x < y ? (MatrixParadigm.triangleSize(y) + x) : (trix + y);
+ }
 
   /**
    * Calculates the maximal (k,r)-bonded sets of the database by removing
@@ -350,18 +380,19 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       // definition
       for(int i = 0; i < proc.size; i++) {
         final int x = proc.data[i];
+        final int trix = MatrixParadigm.triangleSize(x);
         int c = 0;
         // find close elements in in and proc
         for(int j = 0; j < in.size; j++) {
           final int y = in.data[j];
-          // FIXME: don't recompute triangleSize all the time.
-          if(rankmat[offset(x, y)] <= r) {
+          // FIXME: don't recompute triangleSize all the time. Makes it stable, but not necassarily faster
+          if(rankmat[offset(x, y, trix)] <= r) {
             c++;
           }
         }
-        for(int y = 0; y < proc.size; y++) {
-          final int j = proc.data[y];
-          if(x != j && rankmat[offset(x, j)] <= r) {
+        for(int j = 0; j < proc.size; j++) {
+          final int y = proc.data[j];
+          if(x != y && rankmat[offset(x, y,trix)] <= r) {
             c++;
           }
         }
@@ -407,7 +438,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         int x = q.poll();
         for(int j = 0; j < s.size; j++) {
           int y = s.data[j];
-          if(rankmat[offset(x, y)] < r) {
+          if(rankmat[offset(x, y)] <= r) {
             s.remove(j--, 1);
             q.offer(y);
           }
