@@ -135,42 +135,20 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
 
     // keep track of clusters
     UnionFind uf = UnionFindUtil.make(DBIDUtil.makeUnmodifiable(adbids));
-    int rankindex = raiseRank(r, toprocess, kthOcc, 0);
-    int lowestkthocc = Integer.MAX_VALUE;
-    for(long l : kthOcc) {
-      lowestkthocc = lowestkthocc < first(l) ? lowestkthocc : first(l);
-    }
+    int rankindex = raiseIndexToRank(r, toprocess, kthOcc, 0);
     while(r < rsfound.length && !(oldclusters.size() == 1 && oldclusters.keySet().iterator().next().size() == relation.size())) {
+
       // sort toprocess into inclusters and notinclusters
       klink(inclusters, toprocess, notinclusters, r, rankmat);
-
+      // now inclusters contains the maximal (k,r)-bonded set
       if(!inclusters.isEmpty()) {
+        // partition the max (k,r)-bonded set into r-connected sets
         clusterCandidates = link1(adbids, inclusters, r, rankmat, rsfound);
-        topLevelClusters = new ArrayList<>(oldclusters.keySet());
+        // now clusterCandidates conatains all k-clusters of the given rank
 
-        // find the new cluster (according to paper only 1 new cluster try to
-        // delete all clusters that didn't change (same size and sharing ids)
-        for(Iterator<ModifiableDBIDs> it = clusterCandidates.iterator(); it.hasNext();) {
-          ModifiableDBIDs cand = it.next();
-          DBIDRef c = cand.iter(); // some cluster representative
-          for(Iterator<ModifiableDBIDs> it2 = topLevelClusters.iterator(); it2.hasNext();) {
-            ModifiableDBIDs cluster = it2.next();
-            if(cand.size() == cluster.size() && uf.isConnected(c, cluster.iter())) {
-              it.remove();
-              it2.remove();
-              continue;
-            }
-          }
-        }
-        if(clusterCandidates.size() > 1) {
-          int minrank = Integer.MAX_VALUE;
-          for(DBIDMIter it = clusterCandidates.get(0).iter(); it.valid(); it.advance()) {
-            for(DBIDMIter it2 = clusterCandidates.get(1).iter(); it2.valid(); it2.advance()) {
-              int i = rankmat[offset(it.internalGetIndex(), it2.internalGetIndex())];
-              minrank = minrank > i ? i : minrank;
-            }
-          }
-        }
+        // find the new cluster (according to paper only 1 new cluster exists)
+        topLevelClusters = new ArrayList<>(oldclusters.keySet());
+        filterClusterList(clusterCandidates, topLevelClusters, uf);
 
         // process the new cluster
         if(!clusterCandidates.isEmpty()) {
@@ -178,41 +156,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
             LOG.verbose(clusterCandidates.size() + " Candidates and " + topLevelClusters.size() + " old clusters");
           }
           assert clusterCandidates.size() == 1;
-          if(topLevelClusters.size() == 1) {
-            // child clusters
-            oldclusters.put(clusterCandidates.get(0), oldclusters.get(topLevelClusters.get(0)));
-            oldclusters.remove(topLevelClusters.get(0));
-            // child ids
-            childids.put(clusterCandidates.get(0), childids.get(topLevelClusters.get(0)));
-            childids.remove(topLevelClusters.get(0));
-          }
-          else {
-            LinkedList<Cluster<DendrogramModel>> clist = new LinkedList<Cluster<DendrogramModel>>();
-            ModifiableDBIDs idacc = DBIDUtil.newHashSet();
-            for(ModifiableDBIDs cluster : topLevelClusters) {
-              // create the cluster without child cluster points
-              ModifiableDBIDs clu = DBIDUtil.newHashSet(cluster);
-              // delete old points
-              clu.removeDBIDs(childids.get(cluster));
-              Cluster<DendrogramModel> cn = new Cluster<DendrogramModel>(clu, new DendrogramModel(r));
-              clist.add(cn);
-              idacc.addDBIDs(cluster);
-              for(Cluster<DendrogramModel> co : oldclusters.get(cluster)) {
-                clustering.addChildCluster(cn, co);
-              }
-              oldclusters.remove(cluster);
-              childids.remove(cluster);
-            }
-            oldclusters.put(clusterCandidates.get(0), clist);
-            childids.put(clusterCandidates.get(0), idacc);
-          }
-          DBIDIter it = clusterCandidates.get(0).iter();
-          DBID pivot = DBIDUtil.deref(it);
-          for(it.advance(); it.valid(); it.advance()) {
-            if(!uf.isConnected(pivot, it)) {
-              uf.union(pivot, it);
-            }
-          }
+          addClusterToRepresentation(clusterCandidates.get(0), topLevelClusters, uf, oldclusters, clustering, childids, r);
         }
       }
       // chose first r* bigger than current r and not in a cluster
@@ -226,8 +170,9 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         r++;
       }
       while(r < rsfound.length && rsfound[r]);
-      rankindex = raiseRank(r, toprocess, kthOcc, rankindex);
+      rankindex = raiseIndexToRank(r, toprocess, kthOcc, rankindex);
     }
+    // process the last toplevel clusters
     for(ModifiableDBIDs tlc : oldclusters.keySet()) {
       ModifiableDBIDs tlc2 = DBIDUtil.newHashSet(tlc);
       tlc2.removeDBIDs(childids.get(tlc));
@@ -239,124 +184,6 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
     }
     return clustering;
   }
-
-  private static int raiseRank(int r, IntegerArray toprocess, long[] kthOcc, int index) {
-    if(index == 0) {
-      while(index < kthOcc.length && first(kthOcc[index]) <= r) {
-        toprocess.add(second(kthOcc[index++]));
-      }
-    }
-    else {
-      if(index < kthOcc.length)
-        toprocess.add(second(kthOcc[index++]));
-    }
-    return index;
-  }
-
-  /**
-   * Calculates the distance ranks and populates the rank matrix and the array
-   * of k-th occurrence. The k-th occurrence is the minimum rank where the id
-   * can be in a cluster.
-   * 
-   * @param adbids original DBID Data
-   * @param rankmat pairwise distance-rank-matrix
-   * @param relation original input relation
-   * @param kthOcc Array for storing necessary condition
-   */
-  private void calculateRanks(ArrayDBIDs adbids, int[] rankmat, Relation<O> relation, long[] kthOcc) {
-    DistanceQuery<O> dist = new QueryBuilder<>(relation, distanceFunction).distanceQuery();
-    // Get a modifiable, serialized triangle distance matrix:
-    double[] dists = new double[rankmat.length];
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", rankmat.length, LOG) : null;
-    int pos = 0;
-    DBIDArrayIter iter2 = adbids.iter();
-    for(DBIDArrayIter itx = adbids.iter(); itx.valid(); itx.advance()) {
-      final int x = itx.getOffset();
-      assert pos == MatrixParadigm.triangleSize(x);
-      for(DBIDArrayIter ity = iter2.seek(0); ity.getOffset() < x; ity.advance()) {
-        assert (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5) == x;
-        assert pos - MatrixParadigm.triangleSize((int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5)) == ity.getOffset();
-        dists[pos++] = dist.distance(itx, ity);
-      }
-      if(prog != null) {
-        prog.setProcessed(pos, LOG);
-      }
-    }
-    assert pos == dists.length;
-    if(LOG.isVerbose()) {
-      LOG.verbose("Converting to rank matrix");
-    }
-    int[] idx = MathUtil.sequence(0, rankmat.length);
-    DoubleIntegerArrayQuickSort.sort(dists, idx, dists.length);
-    int[] count = new int[adbids.size()];
-    for(int i = 0; i < pos; i++) {
-      int p = idx[i];
-      rankmat[p] = i;
-      final int x = (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * p) + 0.5);
-      final int y = p - MatrixParadigm.triangleSize(x);
-      assert y < x;
-      if(++count[x] == 1) {
-        kthOcc[x] = pair(i, x);
-      }
-      if(++count[y] == 1) {
-        kthOcc[y] = pair(i, y);
-      }
-    }
-    Arrays.sort(kthOcc);
-  }
-
-  /**
-   * Store an int,int pair as a long.
-   *
-   * @param p1 first part
-   * @param p2 second part
-   * @return Pair
-   */
-  private static long pair(int p1, int p2) {
-    return (((long) p1) << 32) | p2;
-  }
-
-  /**
-   * First part of a int,int pair stored as long.
-   *
-   * @param p pair
-   * @return First part
-   */
-  private static int first(long p) {
-    return (int) (p >>> 32);
-  }
-
-  /**
-   * Second part of a int,int pair stored as long.
-   *
-   * @param p pair
-   * @return Second part
-   */
-  private static int second(long p) {
-    return (int) p; // truncate
-  }
-
-  /**
-   * x,y to triangle index.
-   *
-   * @param x Coordinate 1
-   * @param y Coordinate 2
-   * @return Offset
-   */
-  private static int offset(int x, int y) {
-    return x < y ? (MatrixParadigm.triangleSize(y) + x) : (MatrixParadigm.triangleSize(x) + y);
-  }
-  /**
-   * x,y to triangle index.
-  *
-  * @param x Coordinate 1
-  * @param y Coordinate 2
-  * @param possible shortcut for triangle size x
-  * @return Offset
-  */
- private static int offset(int x, int y, int trix) {
-   return x < y ? (MatrixParadigm.triangleSize(y) + x) : (trix + y);
- }
 
   /**
    * Calculates the maximal (k,r)-bonded sets of the database by removing
@@ -385,14 +212,15 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         // find close elements in in and proc
         for(int j = 0; j < in.size; j++) {
           final int y = in.data[j];
-          // FIXME: don't recompute triangleSize all the time. Makes it stable, but not necassarily faster
+          // FIXME: don't recompute triangleSize all the time. Makes it stable,
+          // but not necassarily faster
           if(rankmat[offset(x, y, trix)] <= r) {
             c++;
           }
         }
         for(int j = 0; j < proc.size; j++) {
           final int y = proc.data[j];
-          if(x != y && rankmat[offset(x, y,trix)] <= r) {
+          if(x != y && rankmat[offset(x, y, trix)] <= r) {
             c++;
           }
         }
@@ -459,6 +287,211 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       result.add(tres);
     }
     return result;
+  }
+
+  /**
+   * Filters the targetClusters list by removing elements from the filterList.
+   * In this application, it is used to find the new cluster in
+   * clusterCandidates, if there is one.
+   * targetClusters and filterList should be based on the same DataSet
+   * 
+   * @param targetClusters Cluster list to be filtered
+   * @param filterList Cluster list to be filtered by
+   * @param uf Unionfind containing the Clusters in filterList as Connected Sets
+   */
+  private void filterClusterList(List<ModifiableDBIDs> targetClusters, List<ModifiableDBIDs> filterList, UnionFind uf) {
+    // try to delete all clusters that didn't change (same size and sharing ids)
+    for(Iterator<ModifiableDBIDs> it = targetClusters.iterator(); it.hasNext();) {
+      ModifiableDBIDs cand = it.next();
+      DBIDRef c = cand.iter(); // some cluster representative
+      for(Iterator<ModifiableDBIDs> it2 = filterList.iterator(); it2.hasNext();) {
+        ModifiableDBIDs cluster = it2.next();
+        if(cand.size() == cluster.size() && uf.isConnected(c, cluster.iter())) {
+          it.remove();
+          it2.remove();
+          continue;
+        }
+      }
+    }
+  }
+
+  /**
+   * If there is only one toplevel cluster, it updates that entry (growth -> no
+   * new entry in dendogram)
+   * If there is more than one toplevel cluster, it merges those and updates the
+   * according data structures used for this algorithm
+   * 
+   * @param clusterCandidate the new cluster
+   * @param topLevelClusters the current clusters to be replaced
+   * @param uf unionfind containing connected sets of the current clusters
+   * @param oldclusters map of the current clusters to their child clusters
+   * @param clustering the clustering result object
+   * @param pointschildids map of toplevel clusters to their child. as the
+   *        childcluster objects only contain "their" points, we need this to
+   *        access all child points
+   * @param r current rank
+   */
+  private void addClusterToRepresentation(ModifiableDBIDs clusterCandidate, List<ModifiableDBIDs> topLevelClusters, UnionFind uf, Map<ModifiableDBIDs, List<Cluster<DendrogramModel>>> oldclusters, Clustering<DendrogramModel> clustering, Map<ModifiableDBIDs, ModifiableDBIDs> childids, int r) {
+    if(topLevelClusters.size() == 1) {
+      // child clusters
+      oldclusters.put(clusterCandidate, oldclusters.get(topLevelClusters.get(0)));
+      oldclusters.remove(topLevelClusters.get(0));
+      // child ids
+      childids.put(clusterCandidate, childids.get(topLevelClusters.get(0)));
+      childids.remove(topLevelClusters.get(0));
+    }
+    else {
+      LinkedList<Cluster<DendrogramModel>> clist = new LinkedList<Cluster<DendrogramModel>>();
+      ModifiableDBIDs idacc = DBIDUtil.newHashSet();
+      for(ModifiableDBIDs cluster : topLevelClusters) {
+        // create the cluster without child cluster points
+        ModifiableDBIDs clu = DBIDUtil.newHashSet(cluster);
+        // delete old points
+        clu.removeDBIDs(childids.get(cluster));
+        Cluster<DendrogramModel> cn = new Cluster<DendrogramModel>(clu, new DendrogramModel(r));
+        clist.add(cn);
+        idacc.addDBIDs(cluster);
+        for(Cluster<DendrogramModel> co : oldclusters.get(cluster)) {
+          clustering.addChildCluster(cn, co);
+        }
+        oldclusters.remove(cluster);
+        childids.remove(cluster);
+      }
+      oldclusters.put(clusterCandidate, clist);
+      childids.put(clusterCandidate, idacc);
+    }
+    // update unionfind
+    DBIDIter it = clusterCandidate.iter();
+    DBID pivot = DBIDUtil.deref(it);
+    for(it.advance(); it.valid(); it.advance()) {
+      if(!uf.isConnected(pivot, it)) {
+        uf.union(pivot, it);
+      }
+    }
+  }
+
+  /**
+   * Calculates the distance ranks and populates the rank matrix and the array
+   * of k-th occurrence. The k-th occurrence is the minimum rank where the id
+   * can be in a cluster.
+   * 
+   * @param adbids original DBID Data
+   * @param rankmat pairwise distance-rank-matrix
+   * @param relation original input relation
+   * @param kthOcc Array for storing necessary condition
+   */
+  private void calculateRanks(ArrayDBIDs adbids, int[] rankmat, Relation<O> relation, long[] kthOcc) {
+    DistanceQuery<O> dist = new QueryBuilder<>(relation, distanceFunction).distanceQuery();
+    // Get a modifiable, serialized triangle distance matrix:
+    double[] dists = new double[rankmat.length];
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", rankmat.length, LOG) : null;
+    int pos = 0;
+    DBIDArrayIter iter2 = adbids.iter();
+    for(DBIDArrayIter itx = adbids.iter(); itx.valid(); itx.advance()) {
+      final int x = itx.getOffset();
+      assert pos == MatrixParadigm.triangleSize(x);
+      for(DBIDArrayIter ity = iter2.seek(0); ity.getOffset() < x; ity.advance()) {
+        assert (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5) == x;
+        assert pos - MatrixParadigm.triangleSize((int) FastMath.floor(FastMath.sqrt(0.25 + 2 * pos) + 0.5)) == ity.getOffset();
+        dists[pos++] = dist.distance(itx, ity);
+      }
+      if(prog != null) {
+        prog.setProcessed(pos, LOG);
+      }
+    }
+    assert pos == dists.length;
+    if(LOG.isVerbose()) {
+      LOG.verbose("Converting to rank matrix");
+    }
+    int[] idx = MathUtil.sequence(0, rankmat.length);
+    DoubleIntegerArrayQuickSort.sort(dists, idx, dists.length);
+    int[] count = new int[adbids.size()];
+    for(int i = 0; i < pos; i++) {
+      int p = idx[i];
+      rankmat[p] = i;
+      final int x = (int) FastMath.floor(FastMath.sqrt(0.25 + 2 * p) + 0.5);
+      final int y = p - MatrixParadigm.triangleSize(x);
+      assert y < x;
+      if(++count[x] == 1) {
+        kthOcc[x] = pair(i, x);
+      }
+      if(++count[y] == 1) {
+        kthOcc[y] = pair(i, y);
+      }
+    }
+    Arrays.sort(kthOcc);
+  }
+
+  /**
+   * Adds all points that can be in a clustering with the given rank and returns
+   * the index of the first not added point.
+   * 
+   * @param r Rank
+   * @param toprocess Array to add the points to
+   * @param kthOcc the array containing the rank where the point occured the kth
+   *        time in a distance pair
+   * @param index index of the first not added point before invocation
+   * @return index of the first not added point after this method
+   */
+  private static int raiseIndexToRank(int r, IntegerArray toprocess, long[] kthOcc, int index) {
+    while(index < kthOcc.length && first(kthOcc[index]) <= r) {
+      toprocess.add(second(kthOcc[index++]));
+    }
+    return index;
+  }
+
+  /**
+   * Store an int,int pair as a long.
+   *
+   * @param p1 first part
+   * @param p2 second part
+   * @return Pair
+   */
+  private static long pair(int p1, int p2) {
+    return (((long) p1) << 32) | p2;
+  }
+
+  /**
+   * First part of a int,int pair stored as long.
+   *
+   * @param p pair
+   * @return First part
+   */
+  private static int first(long p) {
+    return (int) (p >>> 32);
+  }
+
+  /**
+   * Second part of a int,int pair stored as long.
+   *
+   * @param p pair
+   * @return Second part
+   */
+  private static int second(long p) {
+    return (int) p; // truncate
+  }
+
+  /**
+   * x,y to triangle index.
+   *
+   * @param x Coordinate 1
+   * @param y Coordinate 2
+   * @return Offset
+   */
+  private static int offset(int x, int y) {
+    return x < y ? (MatrixParadigm.triangleSize(y) + x) : (MatrixParadigm.triangleSize(x) + y);
+  }
+
+  /**
+   * x,y to triangle index.
+   *
+   * @param x Coordinate 1
+   * @param y Coordinate 2
+   * @param possible shortcut for triangle size x
+   * @return Offset
+   */
+  private static int offset(int x, int y, int trix) {
+    return x < y ? (MatrixParadigm.triangleSize(y) + x) : (trix + y);
   }
 
   @Override
