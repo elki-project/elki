@@ -129,7 +129,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
         notinclusters = new IntegerArray(adbids.size());
 
     // Starting value of r for finding k-bonded sets
-    int r = MatrixParadigm.triangleSize(k + 1);
+    int r = (int) MathUtil.binomialCoefficient(k+1, 2)-1;
     // note ranks in clusters to skip them
     boolean[] rsfound = new boolean[trisize];
 
@@ -333,6 +333,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
    */
   private void addClusterToRepresentation(ModifiableDBIDs clusterCandidate, List<ModifiableDBIDs> topLevelClusters, UnionFind uf, Map<ModifiableDBIDs, List<Cluster<DendrogramModel>>> oldclusters, Clustering<DendrogramModel> clustering, Map<ModifiableDBIDs, ModifiableDBIDs> childids, int r) {
     if(topLevelClusters.size() == 1) {
+      // cluster is growing
       // child clusters
       oldclusters.put(clusterCandidate, oldclusters.get(topLevelClusters.get(0)));
       oldclusters.remove(topLevelClusters.get(0));
@@ -341,6 +342,7 @@ public class LingKClustering<O> implements ClusteringAlgorithm<Clustering<Dendro
       childids.remove(topLevelClusters.get(0));
     }
     else {
+      // clusters are merged
       LinkedList<Cluster<DendrogramModel>> clist = new LinkedList<Cluster<DendrogramModel>>();
       ModifiableDBIDs idacc = DBIDUtil.newHashSet();
       for(ModifiableDBIDs cluster : topLevelClusters) {

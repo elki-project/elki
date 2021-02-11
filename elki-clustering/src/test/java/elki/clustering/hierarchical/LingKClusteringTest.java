@@ -22,9 +22,7 @@ package elki.clustering.hierarchical;
 
 import org.junit.Test;
 
-import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.distance.minkowski.EuclideanDistance;
