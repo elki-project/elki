@@ -48,6 +48,7 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(TextbookMultivariateGaussianModel.class);
+
   /**
    * Mean vector.
    */
@@ -240,11 +241,20 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
       // repeat the cheat but double s in every step
       while(!tmp.isSPD()) {
         c++;
+        if(c > 100) {
+          // arbitrary value, there was a case, where s got to infinity and no
+          // valid cov was achieved
+          break;
+        }
         for(int i = 0; i < cov.length; i++) {
           cov[i][i] += s;
         }
         tmp = new CholeskyDecomposition(cov);
         s += s;
+      }
+      if(c > 100) {
+        LOG.warning("A Cluster has degenerated. Singularity cheat failed 100 times, so no update has been made!");
+        return;
       }
       // this if keeps the original behavior of a silent level 1 sing. cheat
       if(c > 1) {

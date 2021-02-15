@@ -85,7 +85,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
    * Constructor.
    * 
    * @param weight Cluster weight
-   * @param mean   Initial mean
+   * @param mean Initial mean
    */
   public MultivariateGaussianModel(double weight, double[] mean) {
     this(weight, mean, null);
@@ -94,8 +94,8 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   /**
    * Constructor.
    * 
-   * @param weight     Cluster weight
-   * @param mean       Initial mean
+   * @param weight Cluster weight
+   * @param mean Initial mean
    * @param covariance Initial covariance matrix
    */
   public MultivariateGaussianModel(double weight, double[] mean, double[][] covariance) {
@@ -186,8 +186,8 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
    * Update the cholesky decomposition.
    * 
    * @param covariance Covariance matrix
-   * @param prev       Previous Cholesky decomposition (reused in case of
-   *                   instability)
+   * @param prev Previous Cholesky decomposition (reused in case of
+   *        instability)
    * @return New Cholesky decomposition
    */
   protected static CholeskyDecomposition updateCholesky(double[][] covariance, CholeskyDecomposition prev) {
@@ -293,16 +293,25 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
       // repeat the cheat but double s in every step
       while(!tmp.isSPD()) {
         c++;
+        if(c > 100) {
+          // arbitrary value, there was a case, where s got to infinity and no
+          // valid cov was achieved
+          break;
+        }
         for(int i = 0; i < cov.length; i++) {
           cov[i][i] += s;
         }
         tmp = new CholeskyDecomposition(cov);
         s += s;
       }
+      if(c > 100) {
+        LOG.warning("A Cluster has degenerated. Singularity cheat failed 100 times, so no update has been made!");
+        return;
+      }
       // this if keeps the original behavior of a silent level 1 sing. cheat
       if(c > 1) {
         LOG.warning("A Cluster has degenerated. For further operability, A Singualrity cheat was applied.\n"//
-            + "This drives the covariance matrix towards the unit matrix");
+            + "This drives the covariance matrix towards the unit matrix!");
         LOG.warning("singularity cheat used " + c + " times!");
       }
     }
