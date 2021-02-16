@@ -41,6 +41,18 @@ public class EMKDTest extends AbstractClusterAlgorithmTest {
     assertFMeasure(db, result, 0.8170718099);
     assertClusterSizes(result, new int[] { 5, 107, 290, 308 });
   }
+  
+  @Test
+  public void testInfinityCheatCase() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
+        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reaches an infinite value!
+        .with(EMKD.Par.K_ID, 4) //
+        .with(EMKD.Par.INIT_ID, MultivariateGaussianModelFactory.class) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.45888107612);
+    assertClusterSizes(result, new int[] { 0, 0, 0, 710 });
+  }
 
   @Test
   public void testSphericalGauss() {
