@@ -100,11 +100,6 @@ public class PointerHierarchyRepresentationBuilder {
 
   /**
    * Add an element to the pointer representation.
-   * <p>
-   * Important: If an algorithm does not produce links in an increasing fashion,
-   * a warning will be issued and the linking distance will be increased.
-   * Otherwise, the hierarchy would be misinterpreted when links are executed
-   * ordered by their distance.
    *
    * @param cur Current object
    * @param distance Link distance
@@ -121,11 +116,6 @@ public class PointerHierarchyRepresentationBuilder {
 
   /**
    * Add an element to the pointer representation.
-   * <p>
-   * Important: If an algorithm does not produce links in an increasing fashion,
-   * a warning will be issued and the linking distance will be increased.
-   * Otherwise, the hierarchy would be misinterpreted when links are executed
-   * ordered by their distance.
    *
    * @param cur Current object
    * @param distance Link distance
