@@ -14,7 +14,7 @@ if(project.hasProperty('jacoco')) {
       dependsOn it.tasks.test
       sourceSets it.sourceSets.main
     }
-    executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+    executionData.setFrom(project.fileTree(".") { include("**/build/jacoco/test.exec") })
 
     reports {
       html.enabled = true
