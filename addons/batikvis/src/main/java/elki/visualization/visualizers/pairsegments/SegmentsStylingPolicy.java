@@ -313,4 +313,10 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   public String getMenuName() {
     return "Pair segments styling policy";
   }
+
+  @Override
+  public double getIntensityForDBID(DBIDRef id) {
+    // TODO This is not supported, i dont know what this class does yet -rg
+    return 1.0;
+  }
 }

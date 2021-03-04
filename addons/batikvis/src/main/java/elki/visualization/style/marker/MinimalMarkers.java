@@ -85,4 +85,9 @@ public class MinimalMarkers implements MarkerLibrary {
     parent.appendChild(marker);
     return marker;
   }
+
+  @Override
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size, double intensity) {
+    return useMarker(plot, parent, x, y, style, size);
+  }
 }

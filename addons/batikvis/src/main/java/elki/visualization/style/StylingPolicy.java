@@ -43,4 +43,14 @@ public interface StylingPolicy extends VisualizationItem {
    * @return Color value
    */
   int getColorForDBID(DBIDRef id);
+  /**
+   * Get the Intensity for an individual object.
+   * TODO: maybe move to soft cluster policy
+   *
+   * Note: if possible, use a class styling policy which can optimize better.
+   *
+   * @param id Object ID
+   * @return Intensity value
+   */
+  double getIntensityForDBID(DBIDRef id);
 }

@@ -27,16 +27,24 @@ import java.util.List;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
+import elki.database.datastore.DoubleDataStore;
+import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.datastore.memory.ArrayDoubleStore;
+import elki.database.datastore.memory.MemoryDataStoreFactory;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
+import elki.database.relation.MaterializedRelation;
 import elki.logging.LoggingUtil;
 import elki.result.Metadata;
+import elki.utilities.datastructures.arraylike.DoubleArray;
+import elki.utilities.datastructures.iterator.It;
 import elki.visualization.colors.ColorLibrary;
 import elki.visualization.svg.SVGUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.jafama.FastMath;
 
 /**
  * Styling policy based on cluster membership.
@@ -67,6 +75,12 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   Clustering<?> clustering;
 
   /**
+   * Maps an ID to its best assignment value.
+   */
+  WritableDoubleDataStore maxInterpolation = null;
+
+  double maxass = 0, minass = 1;
+  /**
    * Constructor.
    *
    * @param clustering Clustering to use.
@@ -95,6 +109,36 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
       }
       if(!ci.hasNext()) {
         break;
+      }
+    }
+    // Try to find a soft clustering. (Maybe i can get a flag here, but i dont know how
+    It<MaterializedRelation> iter = Metadata.hierarchyOf(clustering).iterChildren()//
+        .filter(MaterializedRelation.class)//
+        .filter(mr -> mr.getLongName().contains("Cluster Probabilities"));
+    if(iter.valid()) {
+      MaterializedRelation<double[]> softAssignments = iter.get();
+      DBIDs data = softAssignments.getDBIDs();
+      maxInterpolation = new MemoryDataStoreFactory().makeDoubleStorage(data, data.size());
+      for(DBIDIter it = softAssignments.iterDBIDs(); it.valid(); it.advance()) {
+        double[] probs = softAssignments.get(it);
+        // values should be > 0, if not, 0 is still a valid value
+        double max = 0; 
+        for(double d : probs) {
+          max = d > max ? d : max;
+        }
+        maxass = max > maxass ? max : maxass;
+        minass = max < minass ? max : minass;
+        // following is a different interpolation
+        // for(double d : softAssignments.get(iter)) {
+        // if(d > max) {
+        // if(n > 1) max2 = max;
+        // max = d;
+        // }else if(n > 1 && d > max2) {
+        // max2 = d;
+        // }
+        // }
+        // if(n>1)max -=max2;
+        maxInterpolation.put(it, max);
       }
     }
   }
@@ -161,5 +205,10 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   @Override
   public String getMenuName() {
     return Metadata.of(clustering).getLongName();
+  }
+
+  @Override
+  public double getIntensityForDBID(DBIDRef id) {
+    return maxInterpolation != null ? /*(*/ maxInterpolation.doubleValue(id)/*-minass)/(maxass-minass)*/ : 0;
   }
 }

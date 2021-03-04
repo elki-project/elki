@@ -54,6 +54,7 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -439,6 +440,11 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     public static final OptionID PRIOR_ID = new OptionID("em.map.prior", "Regularization factor for MAP estimation.");
 
     /**
+     * Parameter to specify the saving of soft assignments
+     */
+    public static final OptionID SOFT_ID = new OptionID("em.soft", "Retain soft assignment of clusters.");
+
+    /**
      * Number of clusters.
      */
     protected int k;
@@ -467,7 +473,12 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
      * Prior to enable MAP estimation (use 0 for MLE)
      */
     double prior = 0.;
-
+    
+    /**
+     * Retain soft assignments?
+     */
+    boolean soft = false;
+    
     @Override
     public void configure(Parameterization config) {
       new IntParameter(K_ID) //
@@ -490,11 +501,13 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> prior = x);
+      new Flag(SOFT_ID) //
+          .grab(config, x -> soft = x);
     }
 
     @Override
     public EM<O, M> make() {
-      return new EM<>(k, delta, initializer, miniter, maxiter, prior, false);
+      return new EM<>(k, delta, initializer, miniter, maxiter, prior, soft);
     }
   }
 }

@@ -23,11 +23,20 @@ package elki.visualization.visualizers.scatterplot;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import elki.data.Clustering;
 import elki.data.NumberVector;
+import elki.data.model.Model;
 import elki.data.type.TypeUtil;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.ids.DBIDIter;
+import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
+import elki.result.Metadata;
+import elki.utilities.datastructures.iterator.It;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
 import elki.visualization.VisualizationTree;
@@ -36,6 +45,7 @@ import elki.visualization.gui.VisualizationPlot;
 import elki.visualization.projections.Projection;
 import elki.visualization.projector.ScatterPlotProjector;
 import elki.visualization.style.ClassStylingPolicy;
+import elki.visualization.style.ClusterStylingPolicy;
 import elki.visualization.style.StyleLibrary;
 import elki.visualization.style.StylingPolicy;
 import elki.visualization.style.marker.MarkerLibrary;
@@ -59,12 +69,16 @@ public class MarkerVisualization implements VisFactory {
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Markers";
-
+  /**
+   * Use soft markers if possible.
+   */
+  private boolean softMarkers;
   /**
    * Constructor.
    */
-  public MarkerVisualization() {
+  public MarkerVisualization(boolean soft) {
     super();
+    this.softMarkers = soft;
   }
 
   @Override
@@ -99,6 +113,8 @@ public class MarkerVisualization implements VisFactory {
      */
     public static final String DOTMARKER = "dot";
 
+    private MaterializedRelation<double[]> softAssignments;
+
     /**
      * Constructor.
      *
@@ -111,7 +127,18 @@ public class MarkerVisualization implements VisFactory {
      */
     public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(context, task, plot, width, height, proj);
-      addListeners();
+      final StylingPolicy spol = context.getStylingPolicy();
+      if(softMarkers && (spol instanceof ClusterStylingPolicy)) {
+        // this loop gives EM Cluster Probabilites as output, thats the long
+        // name of the soft results
+        @SuppressWarnings("unchecked")
+        Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) spol).getClustering();
+        for(It<MaterializedRelation<double[]>> it = Metadata.hierarchyOf(clustering).iterChildren().filter(MaterializedRelation.class); it.valid(); it.advance()) {
+          if(it.get().getLongName().equals("EM Cluster Probabilities")) {
+            this.softAssignments = it.get();
+          }
+        }
+      }
     }
 
     @Override
@@ -122,7 +149,24 @@ public class MarkerVisualization implements VisFactory {
       final double marker_size = style.getSize(StyleLibrary.MARKERPLOT);
       final StylingPolicy spol = context.getStylingPolicy();
 
-      if(spol instanceof ClassStylingPolicy) {
+      if(spol instanceof ClassStylingPolicy && softMarkers && softAssignments != null) {
+        ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
+        for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
+          try {
+            final NumberVector vec = rel.get(iter);
+            double[] v = proj.fastProjectDataToRenderSpace(vec);
+            if(v[0] != v[0] || v[1] != v[1]) {
+              continue; // NaN!
+            }
+            double in  = cspol.getIntensityForDBID(iter);
+            ml.useMarker(svgp, layer, v[0], v[1], cspol.getStyleForDBID(iter), marker_size, in);
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore.
+          }
+        }
+      }
+      else if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
         for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
           try {
@@ -155,6 +199,34 @@ public class MarkerVisualization implements VisFactory {
           }
         }
       }
+    }
+  }
+  
+
+  /**
+   * Parameterization class.
+   *
+   * @author Robert Gehde
+   */
+  public static class Par implements Parameterizer {
+    /**
+     * Option string to draw straight lines for hull.
+     */
+    public static final OptionID SOFT_ID = new OptionID("marker.soft", "Use soft markers for Visualization.");
+
+    /**
+     * Use bend curves
+     */
+    private boolean soft = false;
+
+    @Override
+    public void configure(Parameterization config) {
+      new Flag(SOFT_ID).grab(config, x -> soft = x);
+    }
+
+    @Override
+    public MarkerVisualization make() {
+      return new MarkerVisualization(soft);
     }
   }
 }

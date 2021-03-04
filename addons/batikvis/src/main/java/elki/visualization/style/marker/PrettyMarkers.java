@@ -28,6 +28,7 @@ import elki.visualization.css.CSSClass;
 import elki.visualization.style.StyleLibrary;
 import elki.visualization.svg.SVGPlot;
 import elki.visualization.svg.SVGUtil;
+import elki.visualization.visualizers.Interpolation;
 
 /**
  * Marker library achieving a larger number of styles by combining different
@@ -66,6 +67,8 @@ public class PrettyMarkers implements MarkerLibrary {
    */
   private String greycolor;
 
+  Interpolation interpol = Interpolation.RGB;
+
   /**
    * Constructor
    *
@@ -101,8 +104,9 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param style marker style (enumerated)
    * @param size size
    */
-  public void plotMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
+  public void plotMarker(SVGPlot plot, Element parent, double x, double y, int style, double size, double intensity) {
     assert (parent != null);
+    assert intensity >= 0 && intensity <= 1;
     if(style == -1) {
       plotUncolored(plot, parent, x, y, size);
       return;
@@ -113,7 +117,10 @@ public class PrettyMarkers implements MarkerLibrary {
     }
     // No dot allowed!
     String cssid = prefix + style + "_" + (int) (100 * size);
+    String igray = "#d3d3d3";
 
+    if(intensity < 1)
+      intensity = Math.pow(intensity, 2);
     switch(style & 0x7){
     case 0: {
       // + cross
@@ -130,6 +137,12 @@ public class PrettyMarkers implements MarkerLibrary {
       Element line2 = plot.svgLine(x - size / 2.2, y, x + size / 2.2, y);
       SVGUtil.setCSSClass(line2, cssid);
       parent.appendChild(line2);
+
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(line1, "stroke: " + icol + ";");
+        SVGUtil.setStyle(line2, "stroke: " + icol + ";");
+      }
       break;
     }
     case 1: {
@@ -147,6 +160,12 @@ public class PrettyMarkers implements MarkerLibrary {
       Element line2 = plot.svgLine(x - size / 2.828427, y + size / 2.828427, x + size / 2.828427, y - size / 2.828427);
       SVGUtil.setCSSClass(line2, cssid);
       parent.appendChild(line2);
+
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(line1, "stroke: " + icol + ";");
+        SVGUtil.setStyle(line2, "stroke: " + icol + ";");
+      }
       break;
     }
     case 2: {
@@ -162,6 +181,10 @@ public class PrettyMarkers implements MarkerLibrary {
       Element circ = plot.svgCircle(x, y, size / 2.2);
       SVGUtil.setCSSClass(circ, cssid);
       parent.appendChild(circ);
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(circ, "stroke: " + icol + ";");
+      }
       break;
     }
     case 3: {
@@ -177,6 +200,11 @@ public class PrettyMarkers implements MarkerLibrary {
       Element rect = plot.svgRect(x - size / 2.4, y - size / 2.4, size / 1.2, size / 1.2);
       SVGUtil.setCSSClass(rect, cssid);
       parent.appendChild(rect);
+      
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(rect, "stroke: " + icol + ";");
+      }
       break;
     }
     case 4: {
@@ -193,6 +221,11 @@ public class PrettyMarkers implements MarkerLibrary {
       SVGUtil.setCSSClass(rect, cssid);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
+      
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(rect, "stroke: " + icol + ";");
+      }
       break;
     }
     case 5: {
@@ -206,6 +239,10 @@ public class PrettyMarkers implements MarkerLibrary {
       Element circ = plot.svgCircle(x, y, size * .5);
       SVGUtil.setCSSClass(circ, cssid);
       parent.appendChild(circ);
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(circ, "stroke: " + icol + ";fill: " + icol + ";");
+      }
       break;
     }
     case 6: {
@@ -219,6 +256,11 @@ public class PrettyMarkers implements MarkerLibrary {
       Element rect = plot.svgRect(x - size / 2.2, y - size / 2.2, size / 1.1, size / 1.1);
       SVGUtil.setCSSClass(rect, cssid);
       parent.appendChild(rect);
+      
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(rect, "stroke: " + icol + ";fill: " + icol + ";");
+      }
       break;
     }
     case 7: {
@@ -233,6 +275,10 @@ public class PrettyMarkers implements MarkerLibrary {
       SVGUtil.setCSSClass(rect, cssid);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
+      if(intensity < 1) {
+        String icol = interpol.linearInterpolate(colors.getColor(style), igray, intensity);
+        SVGUtil.setStyle(rect, "stroke: " + icol + ";fill: " + icol + ";");
+      }
       break;
     }
     }
@@ -274,7 +320,19 @@ public class PrettyMarkers implements MarkerLibrary {
     // Note: we used to use <symbol> and <use>, but Batik performance was much
     // worse.
     Element use = plot.svgElement(SVGConstants.SVG_G_TAG);
-    plotMarker(plot, use, x, y, style, size);
+    plotMarker(plot, use, x, y, style, size, 1);
+    if(parent != null) {
+      parent.appendChild(use);
+    }
+    return use;
+  }
+
+  @Override
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size, double intensity) {
+    // Note: we used to use <symbol> and <use>, but Batik performance was much
+    // worse.
+    Element use = plot.svgElement(SVGConstants.SVG_G_TAG);
+    plotMarker(plot, use, x, y, style, size, intensity);
     if(parent != null) {
       parent.appendChild(use);
     }
