@@ -54,6 +54,12 @@ import net.jafama.FastMath;
  */
 // TODO: fast enough? Some other kind of mapping we can use?
 public class ClusterStylingPolicy implements ClassStylingPolicy {
+  public enum IntensityModification {
+    MAXLINEAR, MAXQUADRATIC, MAX2QUOTIENT, MAX2SUBTRACT, MINMAXSCALE
+  }
+
+  IntensityModification intmod = IntensityModification.MINMAXSCALE;
+
   /**
    * Object IDs
    */
@@ -80,6 +86,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   WritableDoubleDataStore maxInterpolation = null;
 
   double maxass = 0, minass = 1;
+
   /**
    * Constructor.
    *
@@ -111,7 +118,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         break;
       }
     }
-    // Try to find a soft clustering. (Maybe i can get a flag here, but i dont know how
+    // Try to find a soft clustering. (Maybe i can get a flag here, but i dont
+    // know how
     It<MaterializedRelation> iter = Metadata.hierarchyOf(clustering).iterChildren()//
         .filter(MaterializedRelation.class)//
         .filter(mr -> mr.getLongName().contains("Cluster Probabilities"));
@@ -122,12 +130,89 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
       for(DBIDIter it = softAssignments.iterDBIDs(); it.valid(); it.advance()) {
         double[] probs = softAssignments.get(it);
         // values should be > 0, if not, 0 is still a valid value
-        double max = 0; 
+        if(probs.length == 0) {
+          maxInterpolation.put(it, 1);
+        }
+        else {
+          double max, max2;
+          int n;
+          switch(intmod){
+          case MAXLINEAR:
+            max = 0;
+            for(double d : probs) {
+              max = d > max ? d : max;
+            }
+            maxInterpolation.put(it, max);
+            break;
+
+          case MINMAXSCALE:
+            max = 0;
+            for(double d : probs) {
+              max = d > max ? d : max;
+            }
+            maxass = max > maxass ? max : maxass;
+            minass = max < minass ? max : minass;
+            maxInterpolation.put(it, max);
+            break;
+
+          case MAXQUADRATIC:
+            max = 0;
+            for(double d : probs) {
+              max = d > max ? d : max;
+            }
+            maxInterpolation.put(it, max * max);
+            break;
+
+          case MAX2SUBTRACT:
+            n = probs.length;
+            max = 0;
+            max2 = 0;
+            for(double d : probs) {
+              if(d > max) {
+                if(n > 1)
+                  max2 = max;
+                max = d;
+              }
+              else if(n > 1 && d > max2) {
+                max2 = d;
+              }
+            }
+            if(n > 1)
+              max -= max2;
+            maxInterpolation.put(it, max);
+            break;
+
+          case MAX2QUOTIENT:
+            n = probs.length;
+            max = 0;
+            max2 = 0;
+            for(double d : probs) {
+              if(d > max) {
+                if(n > 1)
+                  max2 = max;
+                max = d;
+              }
+              else if(n > 1 && d > max2) {
+                max2 = d;
+              }
+            }
+            if(n > 1) {
+              maxInterpolation.put(it, 1 - (max2 / max));
+            }
+            else {
+              maxInterpolation.put(it, max);
+            }
+            break;
+
+          default:
+            maxInterpolation.put(it, 1);
+            break;
+          }
+        }
+        double max = 0;
         for(double d : probs) {
           max = d > max ? d : max;
         }
-        maxass = max > maxass ? max : maxass;
-        minass = max < minass ? max : minass;
         // following is a different interpolation
         // for(double d : softAssignments.get(iter)) {
         // if(d > max) {
@@ -138,7 +223,6 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         // }
         // }
         // if(n>1)max -=max2;
-        maxInterpolation.put(it, max);
       }
     }
   }
@@ -209,6 +293,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public double getIntensityForDBID(DBIDRef id) {
-    return maxInterpolation != null ? /*(*/ maxInterpolation.doubleValue(id)/*-minass)/(maxass-minass)*/ : 0;
+    return maxInterpolation == null ? 0 : //
+        intmod != IntensityModification.MINMAXSCALE ? maxInterpolation.doubleValue(id) : //
+            (maxInterpolation.doubleValue(id) - minass) / (maxass - minass);
   }
 }

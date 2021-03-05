@@ -119,8 +119,6 @@ public class PrettyMarkers implements MarkerLibrary {
     String cssid = prefix + style + "_" + (int) (100 * size);
     String igray = "#d3d3d3";
 
-    if(intensity < 1)
-      intensity = Math.pow(intensity, 2);
     switch(style & 0x7){
     case 0: {
       // + cross
