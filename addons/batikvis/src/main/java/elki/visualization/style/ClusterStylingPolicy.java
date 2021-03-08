@@ -27,9 +27,7 @@ import java.util.List;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.memory.ArrayDoubleStore;
 import elki.database.datastore.memory.MemoryDataStoreFactory;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
@@ -38,13 +36,11 @@ import elki.database.ids.DBIDs;
 import elki.database.relation.MaterializedRelation;
 import elki.logging.LoggingUtil;
 import elki.result.Metadata;
-import elki.utilities.datastructures.arraylike.DoubleArray;
 import elki.utilities.datastructures.iterator.It;
 import elki.visualization.colors.ColorLibrary;
 import elki.visualization.svg.SVGUtil;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.jafama.FastMath;
 
 /**
  * Styling policy based on cluster membership.
@@ -120,10 +116,12 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     }
     // Try to find a soft clustering. (Maybe i can get a flag here, but i dont
     // know how
+    @SuppressWarnings("rawtypes")
     It<MaterializedRelation> iter = Metadata.hierarchyOf(clustering).iterChildren()//
         .filter(MaterializedRelation.class)//
         .filter(mr -> mr.getLongName().contains("Cluster Probabilities"));
     if(iter.valid()) {
+      @SuppressWarnings("unchecked")
       MaterializedRelation<double[]> softAssignments = iter.get();
       DBIDs data = softAssignments.getDBIDs();
       maxInterpolation = new MemoryDataStoreFactory().makeDoubleStorage(data, data.size());
@@ -213,16 +211,6 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         for(double d : probs) {
           max = d > max ? d : max;
         }
-        // following is a different interpolation
-        // for(double d : softAssignments.get(iter)) {
-        // if(d > max) {
-        // if(n > 1) max2 = max;
-        // max = d;
-        // }else if(n > 1 && d > max2) {
-        // max2 = d;
-        // }
-        // }
-        // if(n>1)max -=max2;
       }
     }
   }

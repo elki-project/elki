@@ -27,6 +27,7 @@ import elki.visualization.colors.ColorLibrary;
 import elki.visualization.style.StyleLibrary;
 import elki.visualization.svg.SVGPlot;
 import elki.visualization.svg.SVGUtil;
+import elki.visualization.visualizers.Interpolation;
 
 /**
  * Simple marker library that just draws colored rectangles at the given
@@ -54,6 +55,11 @@ public class MinimalMarkers implements MarkerLibrary {
   private String greycolor = "gray";
 
   /**
+   * Color interpolation style
+   */
+  Interpolation interpol = Interpolation.RGB;
+
+  /**
    * Constructor
    * 
    * @param style Style library to use
@@ -70,6 +76,11 @@ public class MinimalMarkers implements MarkerLibrary {
    */
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
+    return useMarker(plot, parent, x, y, stylenr, size, 1);
+  }
+
+  @Override
+  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size, double intensity) {
     Element marker = plot.svgRect(x - size * .5, y - size * .5, size, size);
     final String col;
     if(stylenr == -1) {
@@ -81,13 +92,12 @@ public class MinimalMarkers implements MarkerLibrary {
     else {
       col = colors.getColor(stylenr);
     }
-    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + col);
+    String col2 = col;
+    if(intensity == 1) {
+      col2 = interpol.linearInterpolate(col, "#d3d3d3", intensity);
+    }
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + col2);
     parent.appendChild(marker);
     return marker;
-  }
-
-  @Override
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size, double intensity) {
-    return useMarker(plot, parent, x, y, style, size);
   }
 }

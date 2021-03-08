@@ -67,6 +67,9 @@ public class PrettyMarkers implements MarkerLibrary {
    */
   private String greycolor;
 
+  /**
+   * Color interpolation style
+   */
   Interpolation interpol = Interpolation.RGB;
 
   /**
