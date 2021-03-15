@@ -43,6 +43,7 @@ public class FuzzyCMeansTest extends AbstractClusterAlgorithmTest {
     assertFMeasure(db, result, 1.);
     assertClusterSizes(result, new int[] { 100, 100 });
   }
+
   @Test
   public void testFuzzyCMeans2() {
     Database db = makeSimpleDatabase(UNITTEST + "constant-attribute.csv.gz", 200);
@@ -52,7 +53,7 @@ public class FuzzyCMeansTest extends AbstractClusterAlgorithmTest {
         .with(FuzzyCMeans.Par.M_ID, 1.25) //
         .with(FuzzyCMeans.Par.SOFT_ID, true) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.858773181169);
-    assertClusterSizes(result, new int[] { 45,55, 100 });
+    assertFMeasure(db, result, 0.85740402193);
+    assertClusterSizes(result, new int[] { 48, 52, 100 });
   }
 }

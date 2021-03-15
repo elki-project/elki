@@ -62,7 +62,10 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Fuzzy Clustering developed by James Bezdek
+ * Fuzzy Clustering developed by Dunn and revisited by Bezdek
+ * 
+ * It minimizes the sum of squared distances times the weight of the assignment
+ * to the power m
  * 
  * @author Robert Gehde
  *
@@ -161,27 +164,28 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
 
     // build initial fuzzy partition
     double[][] means = initializer.chooseInitialMeans(relation, k, SquaredEuclideanDistance.STATIC);
-    double objfctvalue = assignProbabilitiesToInstances(relation, means, probClusterIGivenX);
-
-    DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".objectivevalue");
-    LOG.statistics(likestat.setDouble(objfctvalue));
+    double weightChange = assignProbabilitiesToInstances(relation, means, probClusterIGivenX, true);
+    double objectiveValue = 0;
+    DoubleStatistic changestat = new DoubleStatistic(this.getClass().getName() + ".weightChange");
+    DoubleStatistic objstat = new DoubleStatistic(this.getClass().getName() + ".objectiveValue");
 
     int it = 0, lastimprovement = 0;
-    double bestobjfctvalue = objfctvalue; // For detecting instabilities.
+    double bestWeightChange = 1; // For detecting instabilities.
+    // The first value cant be used, because it is 0
     for(++it; it < maxiter || maxiter < 0; it++) {
-      final double oldobjfctvalue = objfctvalue;
       // calculate centers
-      updateMeans(relation, probClusterIGivenX, means, d);
+      objectiveValue = updateMeans(relation, probClusterIGivenX, means, d);
       // assign
-      objfctvalue = assignProbabilitiesToInstances(relation, means, probClusterIGivenX);
+      weightChange = assignProbabilitiesToInstances(relation, means, probClusterIGivenX, false);
 
-      LOG.statistics(likestat.setDouble(objfctvalue));
-      // delta negative, because minimization and not maximization
-      if(bestobjfctvalue - objfctvalue > delta) {
+      LOG.statistics(changestat.setDouble(weightChange));
+      // statistic left out, output too cluttered
+      // LOG.statistics(objstat.setDouble(objectiveValue));
+      if(bestWeightChange - weightChange > delta) {
         lastimprovement = it;
-        bestobjfctvalue = objfctvalue;
+        bestWeightChange = weightChange;
       }
-      if(it >= miniter && (Math.abs(objfctvalue - oldobjfctvalue) <= delta || lastimprovement < it >> 1)) {
+      if(it >= miniter && (weightChange <= delta || lastimprovement < it >> 1)) {
         break;
       }
     }
@@ -215,47 +219,71 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
 
   /**
    * Updates the means according to the weighted means of all data points.
+   * Returns the objective function value
+   * 
+   * \sum_k \sum_ i (u_{ik}^m * d_{ik}^2)
    * 
    * @param relation data points
    * @param probClusterIGivenX weights of clusters
    * @param means destination array for means
    * @param d dimensionality of the data
+   * @return objective function value
    */
-  private void updateMeans(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, double[][] means, int d) {
+  private double updateMeans(Relation<V> relation, WritableDataStore<double[]> probClusterIGivenX, double[][] means, int d) {
     double[] weight = new double[k];
     double[][] tmeans = new double[k][d];
+    double objvalue = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] probs = probClusterIGivenX.get(iditer);
+      double objvalue2 = 0;
       for(int i = 0; i < k; i++) {
         double w = FastMath.pow(probs[i], m);
         weight[i] += w;
-        tmeans[i] = VMath.plusTimesEquals(tmeans[i], relation.get(iditer).toArray(), w);
+        double[] p = relation.get(iditer).toArray();
+        tmeans[i] = VMath.plusTimesEquals(tmeans[i], p, w);
+
+        // calculate squared distance for objective value
+        double dist = 0;
+        for(int j = 0; j < d; j++) {
+          dist += (p[j] - means[i][j]) * (p[j] - means[i][j]);
+        }
+        objvalue2 += w * dist;
       }
+      objvalue += objvalue2;
     }
     for(int i = 0; i < k; i++) {
       means[i] = VMath.times(tmeans[i], 1 / weight[i]);
     }
+    return objvalue;
   }
 
   /**
-   * calculates the weights of all points and clusters. As they add up to one
-   * for each point, they can be seen as cluster probabilities P(c_i|x_j)
+   * Calculates the weights of all points and clusters. As they add up to one
+   * for each point, they can be seen as cluster probabilities P(c_i|x_j).
+   * Then returns the difference of the weight matrix to the last weight matrix
+   * calculated with frobenius norm and normalized by the number of data points
+   * and cluster
+   * 
+   * (\sum_i \sum_j (weight_{ij} - weightprev_{ij})^2)/(N * k)
    * 
    * @param relation data points
    * @param centers current cluster centers
    * @param probClusterIGivenX destination datastore for probabilities/weights
-   * @return value of the objective function
+   * @return normalized frobenius norm between last and current weight matrix
    */
-  public double assignProbabilitiesToInstances(Relation<V> relation, double[][] centers, WritableDataStore<double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(Relation<V> relation, double[][] centers, WritableDataStore<double[]> probClusterIGivenX, boolean initial) {
     final int k = centers.length;
-    double objval = 0;
+    double weightChange = 0;
     int dirass = -1; // direct assignmend if dist == 0
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       V vec = relation.get(iditer);
+      double[] oldprobs = null;
+      if(!initial)
+        oldprobs = probClusterIGivenX.get(iditer);
       double[] probs = new double[k];
       double[] dists = new double[k];
       double sumprob = 0;
-      double objval2 = 0;
+      double weightChange2 = 0;
       for(int i = 0; i < k; i++) {
         double[] clustermean = centers[i];
         for(int d = 0; d < clustermean.length; d++) {
@@ -267,7 +295,7 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
           break;
         }
         probs[i] = FastMath.pow(FastMath.sqrt(dists[i]), 2 / (m - 1)); // d^(2/(m-1))
-        sumprob += 1 / probs[i]; // sum 1/d^(1/(m-1))
+        sumprob += 1 / probs[i]; // sum 1/d^(2/(m-1))
 
       }
       if(dirass != -1) {
@@ -275,21 +303,23 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
         for(int i = 0; i < probs.length; i++) {
           if(i != dirass)
             probs[i] = 0;
+          if(!initial)
+            weightChange2 += (probs[i] - oldprobs[i]) * (probs[i] - oldprobs[i]);
         }
+        weightChange += weightChange2;
         probClusterIGivenX.put(iditer, probs);
         continue;
       }
-      // conv sum to logspace
-      // sumprob = FastMath.log(sumprob);
       // calc actual probs
       for(int i = 0; i < k; i++) {
         probs[i] = 1 / (probs[i] * sumprob);
-        objval2 += Math.pow(probs[i], m) * dists[i];
+        if(!initial)
+          weightChange2 += (probs[i] - oldprobs[i]) * (probs[i] - oldprobs[i]);
       }
       probClusterIGivenX.put(iditer, probs);
-      objval += objval2;
+      weightChange += weightChange2;
     }
-    return objval;
+    return weightChange / (relation.size() * k);
   }
 
   @Override
@@ -309,7 +339,7 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
      * E(M) - E(M') &lt; fcm.delta, must be a double equal to or greater than 0.
      */
     public static final OptionID DELTA_ID = new OptionID("fcm.delta", //
-        "The termination criterion for maximization of E(M): E(M) - E(M') < fcm.delta");
+        "The termination criterion for maximization: Frob(u^{t-1} - u^{t})^2 / (N * k) <= fcm.delta");
 
     /**
      * Parameter to specify a minimum number of iterations
