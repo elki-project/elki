@@ -141,6 +141,6 @@ tasks.compileJava.dependsOn generateCodeHeaps
 dependencies {
   api project(':elki-logging')
   api group: 'net.jafama', name: 'jafama', version:'[2.3.0,3)'
-  api group: 'it.unimi.dsi', name: 'fastutil', version: '[8,9)'
+  api group: 'it.unimi.dsi', name: 'fastutil', version: '[8,8.5.2]'
   testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
 }
