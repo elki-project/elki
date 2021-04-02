@@ -105,7 +105,7 @@ public interface StyleLibrary {
   /**
    * Grayed out objects
    */
-  String PLOTGREY = "plot.grey";
+  String PLOTGRAY = "plot.gray";
 
   /**
    * Reference points color and size

@@ -25,7 +25,7 @@ import elki.visualization.VisualizationItem;
 
 /**
  * Styling policy.
- *
+ * <p>
  * Implementations <em>must</em> implement either {@link ClassStylingPolicy} or
  * {@link SingleObjectsStylingPolicy} interfaces, as most visualizers will only
  * support these known interfaces.
@@ -36,21 +36,23 @@ import elki.visualization.VisualizationItem;
 public interface StylingPolicy extends VisualizationItem {
   /**
    * Get the color for an individual object.
-   *
+   * <p>
    * Note: if possible, use a class styling policy which can optimize better.
    *
    * @param id Object ID
    * @return Color value
    */
   int getColorForDBID(DBIDRef id);
+
   /**
    * Get the Intensity for an individual object.
-   * TODO: maybe move to soft cluster policy
-   *
+   * <p>
    * Note: if possible, use a class styling policy which can optimize better.
    *
    * @param id Object ID
    * @return Intensity value
    */
-  double getIntensityForDBID(DBIDRef id);
+  default double getIntensityForDBID(DBIDRef id) {
+    return 1.0;
+  }
 }

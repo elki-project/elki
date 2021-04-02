@@ -36,32 +36,23 @@ import elki.visualization.svg.SVGPlot;
  */
 public interface MarkerLibrary {
   /**
-   * Insert a marker at the given coordinates. Markers will be defined in the
-   * defs part of the document, and then SVG-"use"d at the given coordinates.
-   * This supposedly is more efficient and significantly reduces file size.
-   * Symbols will be named "s0", "s1" etc.; these names must not be used by
-   * other elements in the SVG document!
+   * Insert a marker at the given coordinates.
    * 
    * @param plot Plot to draw on
-   * @param parent parent node
    * @param x coordinate
    * @param y coordinate
    * @param style style (enumerated)
    * @param size size
    * @return Element node generated.
    */
-  Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size);
+  default Element useMarker(SVGPlot plot, double x, double y, int style, double size) {
+    return useMarker(plot, x, y, style, size, 1.0);
+  }
 
   /**
-   * Insert a soft marker at the given coordinates. Markers will be defined in
-   * the defs part of the document, and then SVG-"use"d at the given
-   * coordinates. Then the Stroke and Fill is overwritten.
-   * Note that this method creates a larger file because of that.
-   * Symbols will be named "s0", "s1" etc.; these names must not be used by
-   * other elements in the SVG document!
+   * Insert a soft marker at the given coordinates.
    * 
    * @param plot Plot to draw on
-   * @param parent parent node
    * @param x coordinate
    * @param y coordinate
    * @param style style (enumerated)
@@ -69,5 +60,5 @@ public interface MarkerLibrary {
    * @param intensity intensity of the color
    * @return Element node generated.
    */
-  Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size, double intensity);
+  Element useMarker(SVGPlot plot, double x, double y, int style, double size, double intensity);
 }

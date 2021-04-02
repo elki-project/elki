@@ -213,7 +213,7 @@ public class UncertainSamplesVisualization implements VisFactory {
         if(v[0] != v[0] || v[1] != v[1]) {
           continue; // NaN!
         }
-        ml.useMarker(svgp, layer, v[0], v[1], cnum, uo.getWeight(i) * ssize);
+        layer.appendChild(ml.useMarker(svgp, v[0], v[1], cnum, uo.getWeight(i) * ssize));
       }
     }
 
@@ -232,7 +232,7 @@ public class UncertainSamplesVisualization implements VisFactory {
         if(v[0] != v[0] || v[1] != v[1]) {
           continue; // NaN!
         }
-        ml.useMarker(svgp, layer, v[0], v[1], cnum, size);
+        layer.appendChild(ml.useMarker(svgp, v[0], v[1], cnum, size));
       }
     }
 

@@ -29,14 +29,14 @@ import elki.visualization.svg.SVGUtil;
 
 /**
  * Line library using various dashed and dotted line styles.
- * 
+ * <p>
  * This library is particularly useful for black and white output.
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_STRONG} will result in thicker lines.
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and
  * semi-transparent lines.
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in shorter dashing
  * patterns.
  * 
@@ -54,20 +54,18 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
   /** Dash patterns to regularly use */
   private double[][] dashpatterns = {
       // solid, no dashing
-  {},
+      {},
       // half-half
-  { .5, .5 },
+      { .5, .5 },
       // quarters
-  { .25, .25, .25, .25 },
+      { .25, .25, .25, .25 },
       // alternating long-quart
-  { .75, .25 },
+      { .75, .25 },
       // dash-dot
-  { .7, .1, .1, .1 }, };
+      { .7, .1, .1, .1 }, };
 
   /** Replacement for the solid pattern in 'interpolated' mode */
   private double[] solidreplacement = { .1, .1 };
-
-  private int dashnum = dashpatterns.length;
 
   /**
    * Color of "uncolored" dots
@@ -75,9 +73,9 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
   private String dotcolor;
 
   /**
-   * Color of "greyed out" dots
+   * Color of "grayed out" dots
    */
-  private String greycolor;
+  private String graycolor;
 
   /**
    * Constructor
@@ -88,13 +86,13 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
     super();
     this.colors = style.getColorSet(StyleLibrary.PLOT);
     this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
-    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
+    this.graycolor = style.getColor(StyleLibrary.PLOTGRAY);
   }
 
   @Override
   public void formatCSSClass(CSSClass cls, int style, double width, Object... flags) {
     if(style == -2) {
-      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, greycolor);
+      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, graycolor);
     }
     else if(style == -1) {
       cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, dotcolor);
@@ -118,7 +116,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
     }
     cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     // handle dashing
-    int styleflav = (style > 0) ? (style % dashnum) : (-style % dashnum);
+    int styleflav = (style > 0) ? (style % dashpatterns.length) : (-style % dashpatterns.length);
     if(!interpolated) {
       double[] pat = dashpatterns[styleflav];
       assert (pat.length % 2 == 0);

@@ -174,7 +174,7 @@ public class UncertainInstancesVisualization implements VisFactory {
             if(v[0] != v[0] || v[1] != v[1]) {
               continue; // NaN!
             }
-            ml.useMarker(svgp, layer, v[0], v[1], cnum, size);
+            layer.appendChild(ml.useMarker(svgp, v[0], v[1], cnum, size));
           }
           catch(ObjectNotFoundException e) {
             // ignore.

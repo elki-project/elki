@@ -153,16 +153,10 @@ public class VisualizerContext implements DataStoreListener {
    * @param stylelib Style library
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
-    final Database db = ResultUtil.findDatabase(baseResult);
+    List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(ResultUtil.findDatabase(baseResult));
+    Clustering<?> c = clusterings.isEmpty() ? generateDefaultClustering() : clusterings.get(0);
     stylelibrary = stylelib;
-    List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
-    if(!clusterings.isEmpty()) {
-      stylepolicy = new ClusterStylingPolicy(clusterings.get(0), stylelib);
-    }
-    else {
-      Clustering<Model> c = generateDefaultClustering();
-      stylepolicy = new ClusterStylingPolicy(c, stylelib);
-    }
+    stylepolicy = new ClusterStylingPolicy(c, stylelib);
   }
 
   /**

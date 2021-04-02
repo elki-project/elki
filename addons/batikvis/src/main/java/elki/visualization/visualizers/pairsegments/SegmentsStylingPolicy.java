@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,8 +35,6 @@ import elki.visualization.svg.SVGUtil;
 
 /**
  * Styling policy to communicate the segment selection to other visualizers.
- *
- * TODO: Remove "implements Result"
  *
  * @author Sascha Goldhofer
  * @author Erich Schubert
@@ -93,8 +91,6 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   /**
    * Assign the style library, for compatibility color styling.
    *
-   * FIXME: handle this more generally
-   *
    * @param style Style library
    */
   public void setStyleLibrary(StyleLibrary style) {
@@ -126,14 +122,8 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getColorForDBID(DBIDRef id) {
-    int style = getStyleForDBID(id);
-    if(colorset != null) {
-      // FIXME: add caching
-      return SVGUtil.stringToColor(colorset.getColor(style)).getRGB();
-    }
-    else {
-      return 0;
-    }
+    // FIXME: add caching
+    return colorset != null ? SVGUtil.stringToColor(colorset.getColor(getStyleForDBID(id))).getRGB() : 0;
   }
 
   @Override
@@ -150,11 +140,8 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   @Override
   public DBIDIter iterateClass(int cnum) {
     // unselected
-    if(cnum == -2) {
-      return unselectedObjects.iter();
-    }
-    else if(cnum == -1) {
-      return DBIDUtil.EMPTYDBIDS.iter();
+    if(cnum == -2 || cnum == -1) {
+      return cnum == -2 ? unselectedObjects.iter() : DBIDUtil.EMPTYDBIDS.iter();
     }
     // colors
     DBIDs ids = selectedSegments.get(cnum).getDBIDs();
@@ -164,11 +151,8 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   @Override
   public int classSize(int cnum) {
     // unselected
-    if(cnum == -2) {
-      return unselectedObjects.size();
-    }
-    else if(cnum == -1) {
-      return 0;
+    if(cnum == -2 || cnum == -1) {
+      return cnum == -2 ? unselectedObjects.size() : 0;
     }
     // colors
     DBIDs ids = selectedSegments.get(cnum).getDBIDs();
@@ -180,7 +164,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
    * clustering and cluster selected and the addToSelection option given, the
    * current selection will be modified. This method is called by clicking on a
    * segment and ring and the CTRL-button status.
-   *
+   * <p>
    * Adding selections does only work on the same clustering and cluster, else a
    * new selection will be added.
    *
@@ -312,11 +296,5 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   @Override
   public String getMenuName() {
     return "Pair segments styling policy";
-  }
-
-  @Override
-  public double getIntensityForDBID(DBIDRef id) {
-    // TODO This is not supported, i dont know what this class does yet -rg
-    return 1.0;
   }
 }

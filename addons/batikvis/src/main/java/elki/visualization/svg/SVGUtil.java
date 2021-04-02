@@ -527,15 +527,12 @@ public final class SVGUtil {
    */
   public static Color stringToColor(String str) {
     int icol = SVG_COLOR_NAMES.getInt(str.toLowerCase());
-    if(icol != NO_VALUE) {
-      return new Color(icol, false);
-    }
-    return colorLookupStylesheet.stringToColor(str);
+    return icol != NO_VALUE ? new Color(icol, false) : colorLookupStylesheet.stringToColor(str);
   }
 
   /**
    * Convert a color name from an AWT color object to CSS syntax
-   *
+   * <p>
    * Note: currently only RGB (from ARGB order) are supported.
    *
    * @param col Color value
@@ -547,7 +544,7 @@ public final class SVGUtil {
 
   /**
    * Convert a color name from an integer RGB color to CSS syntax
-   *
+   * <p>
    * Note: currently only RGB (from ARGB order) are supported. The alpha channel
    * will be ignored.
    *

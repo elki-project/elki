@@ -473,12 +473,12 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
      * Prior to enable MAP estimation (use 0 for MLE)
      */
     double prior = 0.;
-    
+
     /**
      * Retain soft assignments?
      */
     boolean soft = false;
-    
+
     @Override
     public void configure(Parameterization config) {
       new IntParameter(K_ID) //

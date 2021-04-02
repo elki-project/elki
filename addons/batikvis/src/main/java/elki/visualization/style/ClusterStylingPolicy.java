@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import elki.clustering.em.EM;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -39,25 +40,144 @@ import elki.result.Metadata;
 import elki.utilities.datastructures.iterator.It;
 import elki.visualization.colors.ColorLibrary;
 import elki.visualization.svg.SVGUtil;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * Styling policy based on cluster membership.
+ * <p>
+ * TODO: allow cycling though the different intensity transformations.
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
-// TODO: fast enough? Some other kind of mapping we can use?
 public class ClusterStylingPolicy implements ClassStylingPolicy {
-  public enum IntensityModification {
-    MAXLINEAR, MAXQUADRATIC, MAX2QUOTIENT, MAX2SUBTRACT, MINMAXSCALE
+  /**
+   * Intensity transformation functions
+   * 
+   * @author Erich Schubert
+   */
+  public static enum IntensityTransform {
+    MAXLINEAR {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0];
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          max = d > max ? d : max;
+        }
+        return max;
+      }
+    },
+    SCALEDLINEAR {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0];
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          max = d > max ? d : max;
+        }
+        return max;
+      }
+
+      @Override
+      public double scale(double v, double min, double max) {
+        return min < max ? (v - min) / (max - min) : 1;
+      }
+    },
+    MAXQUADRATIC {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0];
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          max = d > max ? d : max;
+        }
+        return max * max;
+      }
+    },
+    MAX2QUOTIENT {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0], max2 = Double.NEGATIVE_INFINITY;
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          if(d > max) {
+            max2 = max;
+            max = d;
+          }
+          else if(d > max2) {
+            max2 = d;
+          }
+        }
+        return 1 - (max2 / max);
+      }
+    },
+    MAX2QUOTIENTQUAD {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0], max2 = Double.NEGATIVE_INFINITY;
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          if(d > max) {
+            max2 = max;
+            max = d;
+          }
+          else if(d > max2) {
+            max2 = d;
+          }
+        }
+        final double v = 1 - max2 / max;
+        return v * v;
+      }
+    },
+    MAX2SUBTRACT {
+      @Override
+      public double transform(double[] probs) {
+        double max = probs[0], max2 = Double.NEGATIVE_INFINITY;
+        for(int i = 1; i < probs.length; i++) {
+          double d = probs[i];
+          if(d > max) {
+            max2 = max;
+            max = d;
+          }
+          else if(d > max2) {
+            max2 = d;
+          }
+        }
+        return max - max2;
+      }
+    };
+
+    /**
+     * Transform the intensity values.
+     *
+     * @param probs Probabilities / weights
+     * @return transformed intensity value
+     */
+    public abstract double transform(double[] probs);
+
+    /**
+     * Additional scaling with minimum and maximum (default: none).
+     *
+     * @param v Value
+     * @param min Minimum input
+     * @param max Maximum input
+     * @return
+     */
+    public double scale(double v, double min, double max) {
+      return v;
+    }
   }
 
-  IntensityModification intmod = IntensityModification.MINMAXSCALE;
+  /**
+   * Intensity transformation
+   */
+  IntensityTransform inttrans = IntensityTransform.MAX2QUOTIENTQUAD;
 
   /**
-   * Object IDs
+   * Object IDs.
    */
   ArrayList<DBIDs> ids;
 
@@ -79,9 +199,12 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   /**
    * Maps an ID to its best assignment value.
    */
-  WritableDoubleDataStore maxInterpolation = null;
+  WritableDoubleDataStore intensities = null;
 
-  double maxass = 0, minass = 1;
+  /**
+   * Intensity scaling
+   */
+  double minint = Double.POSITIVE_INFINITY, maxint = Double.NEGATIVE_INFINITY;
 
   /**
    * Constructor.
@@ -104,113 +227,31 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
       cmap.put(c, i);
       Color col = SVGUtil.stringToColor(colorset.getColor(i));
-      if(col != null) {
-        colors.add(col.getRGB());
-      }
-      else {
+      if(col == null) {
         LoggingUtil.warning("Unrecognized color name: " + colorset.getColor(i));
+        continue;
       }
+      colors.add(col.getRGB());
       if(!ci.hasNext()) {
         break;
       }
     }
-    // Try to find a soft clustering. (Maybe i can get a flag here, but i dont
-    // know how
+    // Try to find a soft clustering, currently EM only.
     @SuppressWarnings("rawtypes")
     It<MaterializedRelation> iter = Metadata.hierarchyOf(clustering).iterChildren()//
         .filter(MaterializedRelation.class)//
-        .filter(mr -> mr.getLongName().contains("Cluster Probabilities"));
+        .filter(mr -> mr.getDataTypeInformation() == EM.SOFT_TYPE);
     if(iter.valid()) {
       @SuppressWarnings("unchecked")
       MaterializedRelation<double[]> softAssignments = iter.get();
       DBIDs data = softAssignments.getDBIDs();
-      maxInterpolation = new MemoryDataStoreFactory().makeDoubleStorage(data, data.size());
+      intensities = new MemoryDataStoreFactory().makeDoubleStorage(data, data.size());
       for(DBIDIter it = softAssignments.iterDBIDs(); it.valid(); it.advance()) {
         double[] probs = softAssignments.get(it);
-        // values should be > 0, if not, 0 is still a valid value
-        if(probs.length == 0) {
-          maxInterpolation.put(it, 1);
-        }
-        else {
-          double max, max2;
-          int n;
-          switch(intmod){
-          case MAXLINEAR:
-            max = 0;
-            for(double d : probs) {
-              max = d > max ? d : max;
-            }
-            maxInterpolation.put(it, max);
-            break;
-
-          case MINMAXSCALE:
-            max = 0;
-            for(double d : probs) {
-              max = d > max ? d : max;
-            }
-            maxass = max > maxass ? max : maxass;
-            minass = max < minass ? max : minass;
-            maxInterpolation.put(it, max);
-            break;
-
-          case MAXQUADRATIC:
-            max = 0;
-            for(double d : probs) {
-              max = d > max ? d : max;
-            }
-            maxInterpolation.put(it, max * max);
-            break;
-
-          case MAX2SUBTRACT:
-            n = probs.length;
-            max = 0;
-            max2 = 0;
-            for(double d : probs) {
-              if(d > max) {
-                if(n > 1)
-                  max2 = max;
-                max = d;
-              }
-              else if(n > 1 && d > max2) {
-                max2 = d;
-              }
-            }
-            if(n > 1)
-              max -= max2;
-            maxInterpolation.put(it, max);
-            break;
-
-          case MAX2QUOTIENT:
-            n = probs.length;
-            max = 0;
-            max2 = 0;
-            for(double d : probs) {
-              if(d > max) {
-                if(n > 1)
-                  max2 = max;
-                max = d;
-              }
-              else if(n > 1 && d > max2) {
-                max2 = d;
-              }
-            }
-            if(n > 1) {
-              maxInterpolation.put(it, 1 - (max2 / max));
-            }
-            else {
-              maxInterpolation.put(it, max);
-            }
-            break;
-
-          default:
-            maxInterpolation.put(it, 1);
-            break;
-          }
-        }
-        double max = 0;
-        for(double d : probs) {
-          max = d > max ? d : max;
-        }
+        double v = probs.length > 1 ? inttrans.transform(probs) : probs.length == 1 ? probs[0] : 0.;
+        intensities.put(it, v);
+        maxint = v > maxint ? v : maxint;
+        minint = v < minint ? v : minint;
       }
     }
   }
@@ -233,6 +274,11 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
       }
     }
     return 0;
+  }
+
+  @Override
+  public double getIntensityForDBID(DBIDRef id) {
+    return intensities == null ? 1 : inttrans.scale(intensities.doubleValue(id), minint, maxint);
   }
 
   @Override
@@ -277,12 +323,5 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   @Override
   public String getMenuName() {
     return Metadata.of(clustering).getLongName();
-  }
-
-  @Override
-  public double getIntensityForDBID(DBIDRef id) {
-    return maxInterpolation == null ? 0 : //
-        intmod != IntensityModification.MINMAXSCALE ? maxInterpolation.doubleValue(id) : //
-            (maxInterpolation.doubleValue(id) - minass) / (maxass - minass);
   }
 }

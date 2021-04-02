@@ -231,7 +231,7 @@ public class KeyVisualization implements VisFactory {
         for(Cluster<Model> c : allcs) {
           final int col = i / rows;
           final int row = i % rows;
-          ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.5);
+          layer.appendChild(ml.useMarker(svgp, 0.3 + maxwidth * col, row + 1.5, i, 0.5));
           Element label = svgp.svgText(0.7 + maxwidth * col, row + 1.7, c.getNameAutomatic());
           SVGUtil.setCSSClass(label, KEY_ENTRY);
           layer.appendChild(label);
@@ -289,7 +289,7 @@ public class KeyVisualization implements VisFactory {
         posy = pos.second + .5;
         pos.second += 1.;
       }
-      ml.useMarker(svgp, layer, 0.3 + pos.first, posy + 0.5, cnum.getInt(cluster), 0.3);
+      layer.appendChild(ml.useMarker(svgp, 0.3 + pos.first, posy + 0.5, cnum.getInt(cluster), 0.3));
       Element label = svgp.svgText(0.7 + pos.first, posy + 0.7, cluster.getNameAutomatic());
       SVGUtil.setCSSClass(label, KEY_ENTRY);
       layer.appendChild(label);

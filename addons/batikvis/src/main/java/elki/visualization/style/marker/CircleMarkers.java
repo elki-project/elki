@@ -24,10 +24,10 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.visualization.colors.ColorLibrary;
+import elki.visualization.style.ColorInterpolation;
 import elki.visualization.style.StyleLibrary;
 import elki.visualization.svg.SVGPlot;
 import elki.visualization.svg.SVGUtil;
-import elki.visualization.visualizers.Interpolation;
 
 /**
  * Simple marker library that just draws colored circles at the given
@@ -57,7 +57,7 @@ public class CircleMarkers implements MarkerLibrary {
   /**
    * Color interpolation style
    */
-  Interpolation interpol = Interpolation.RGB;
+  ColorInterpolation interpol = ColorInterpolation.RGB;
 
   /**
    * Constructor
@@ -68,37 +68,17 @@ public class CircleMarkers implements MarkerLibrary {
     super();
     this.colors = style.getColorSet(StyleLibrary.MARKERPLOT);
     this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
-    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
-  }
-
-  /**
-   * Use a given marker on the document.
-   */
-  @Override
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
-    return useMarker(plot, parent, x, y, stylenr, size, 1);
+    this.greycolor = style.getColor(StyleLibrary.PLOTGRAY);
   }
 
   @Override
-  public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size, double intensity) {
+  public Element useMarker(SVGPlot plot, double x, double y, int stylenr, double size, double intensity) {
+    String col = stylenr == -1 ? dotcolor : stylenr == -2 ? greycolor : colors.getColor(stylenr);
+    if(intensity < 1) {
+      col = interpol.interpolate(col, greycolor, intensity);
+    }
     Element marker = plot.svgCircle(x, y, size * .5);
-    final String col;
-    if(stylenr == -1) {
-      col = dotcolor;
-    }
-    else if(stylenr == -2) {
-      col = greycolor;
-    }
-    else {
-      col = colors.getColor(stylenr);
-      
-    }
-    String col2 = col;
-    if(intensity == 1) {
-      col2 = interpol.linearInterpolate(col, "#d3d3d3", intensity);
-    }
-    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + col2);
-    parent.appendChild(marker);
+    SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + col);
     return marker;
   }
 }

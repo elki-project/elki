@@ -30,12 +30,12 @@ import elki.visualization.svg.SVGUtil;
 /**
  * Line style library featuring solid lines for default styles only (combine
  * with a color library to obtain enough classes!)
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_STRONG} will result in thicker lines.
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_WEAK} will result in thinner and
  * semi-transparent lines.
- * 
+ * <p>
  * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in dashed lines.
  * 
  * @author Erich Schubert
@@ -55,9 +55,9 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
   private String dotcolor;
 
   /**
-   * Color of "greyed out" dots
+   * Color of "grayed out" dots
    */
-  private String greycolor;
+  private String graycolor;
 
   /**
    * Constructor.
@@ -68,13 +68,13 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
     super();
     this.colors = style.getColorSet(StyleLibrary.PLOT);
     this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
-    this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
+    this.graycolor = style.getColor(StyleLibrary.PLOTGRAY);
   }
 
   @Override
   public void formatCSSClass(CSSClass cls, int style, double width, Object... flags) {
     if(style == -2) {
-      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, greycolor);
+      cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, graycolor);
     }
     else if(style == -1) {
       cls.setStatement(CSSConstants.CSS_STROKE_PROPERTY, dotcolor);
