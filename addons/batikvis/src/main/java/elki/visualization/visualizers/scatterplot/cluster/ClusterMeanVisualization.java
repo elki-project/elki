@@ -173,7 +173,7 @@ public class ClusterMeanVisualization implements VisFactory {
 
         // add a greater Marker for the mean
         Element meanMarker = ml.useMarker(svgp, mean[0], mean[1], cnum, marker_size * 3);
-        SVGUtil.setAtt(meanMarker, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_MEAN);
+        SVGUtil.addCSSClass(meanMarker, CSS_MEAN);
 
         // Add a fine cross to mark the exact location of the mean.
         Element meanMarkerCenter = svgp.svgLine(mean[0] - .7, mean[1], mean[0] + .7, mean[1]);
