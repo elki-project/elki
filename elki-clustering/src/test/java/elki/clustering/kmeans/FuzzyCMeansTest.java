@@ -18,19 +18,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering;
+package elki.clustering.kmeans;
 
 import org.junit.Test;
 
-import elki.clustering.FuzzyCMeans;
-import elki.clustering.kmeans.KMeans;
+import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
+/**
+ * Unit test for FCM clustering.
+ *
+ * @author Robert Gehde
+ */
 public class FuzzyCMeansTest extends AbstractClusterAlgorithmTest {
-
   @Test
   public void testFuzzyCMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "constant-attribute.csv.gz", 200);

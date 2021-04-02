@@ -18,14 +18,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering;
+package elki.clustering.kmeans;
 
-import static elki.math.linearalgebra.VMath.argmax;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import elki.clustering.kmeans.KMeans;
+import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.Cluster;
@@ -47,12 +48,12 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
-import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -63,15 +64,31 @@ import net.jafama.FastMath;
 
 /**
  * Fuzzy Clustering developed by Dunn and revisited by Bezdek
- * 
+ * <p>
  * It minimizes the sum of squared distances times the weight of the assignment
- * to the power m
+ * to the power m.
+ * <p>
+ * Reference:
+ * <p>
+ * J. C. Dunn<br>
+ * A Fuzzy Relative of the ISODATA Process and Its Use in Detecting Compact
+ * Well-Separated Clusters<br>
+ * Journal of Cybernetics 3(3)
+ * <p>
+ * J. Bezdek<br>
+ * Pattern Recognition With Fuzzy Objective Function Algorithms<br>
+ * Springer, 1981
  * 
  * @author Robert Gehde
  *
  * @param <V> Vector Type of the data, must be subclass of {@link NumberVector}
  */
-@Reference(authors = "Bezdek, James", //
+@Reference(authors = "J. C. Dunn", //
+    title = "A Fuzzy Relative of the ISODATA Process and Its Use in Detecting Compact Well-Separated Clusters", //
+    booktitle = "Journal of Cybernetics 3(3)", //
+    url = "https://doi.org/10.1080/01969727308546046", //
+    bibkey = "doi:10.1080/01969727308546046")
+@Reference(authors = "J. Bezdek", //
     title = "Pattern Recognition With Fuzzy Objective Function Algorithms", //
     booktitle = "Pattern Recognition With Fuzzy Objective Function Algorithms", //
     url = "https://doi.org/10.1007/978-1-4757-0450-1", //
@@ -93,7 +110,7 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
   private int k;
 
   /**
-   * weight exponent
+   * Weight exponent
    */
   private double m;
 
@@ -128,7 +145,6 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
   KMeansInitialization initializer;
 
   /**
-   * 
    * Constructor.
    *
    * @param k number of clusters
@@ -159,41 +175,36 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
+    final int d = relation.get(relation.iterDBIDs()).getDimensionality();
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    int d = relation.get(relation.iterDBIDs()).getDimensionality();
-
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      probClusterIGivenX.put(iditer, new double[k]);
+    }
     // build initial fuzzy partition
     double[][] means = initializer.chooseInitialMeans(relation, k, SquaredEuclideanDistance.STATIC);
-    double weightChange = assignProbabilitiesToInstances(relation, means, probClusterIGivenX, true);
-    double objectiveValue = 0;
     DoubleStatistic changestat = new DoubleStatistic(this.getClass().getName() + ".weightChange");
     DoubleStatistic objstat = new DoubleStatistic(this.getClass().getName() + ".objectiveValue");
 
     int it = 0, lastimprovement = 0;
     double bestWeightChange = 1; // For detecting instabilities.
-    // The first value cant be used, because it is 0
-    for(++it; it < maxiter || maxiter < 0; it++) {
-      // calculate centers
-      objectiveValue = updateMeans(relation, probClusterIGivenX, means, d);
-      // assign
-      weightChange = assignProbabilitiesToInstances(relation, means, probClusterIGivenX, false);
-
+    for(++it; it < maxiter || maxiter < 0; ++it) {
+      double weightChange = assignProbabilitiesToInstances(relation, means, probClusterIGivenX);
       LOG.statistics(changestat.setDouble(weightChange));
-      // statistic left out, output too cluttered
-      // LOG.statistics(objstat.setDouble(objectiveValue));
       if(bestWeightChange - weightChange > delta) {
         lastimprovement = it;
         bestWeightChange = weightChange;
       }
-      if(it >= miniter && (weightChange <= delta || lastimprovement < it >> 1)) {
+      if(it >= miniter && (weightChange <= delta || lastimprovement < (it >> 1))) {
         break;
       }
+      double objectiveValue = updateMeans(relation, probClusterIGivenX, means, d);
+      LOG.statistics(objstat.setDouble(objectiveValue));
     }
     LOG.statistics(new LongStatistic(KEY + ".iterations", it));
-    // create result
+
+    // Create result structure:
     Clustering<MeanModel> result = new Clustering<>();
     Metadata.of(result).setLongName("FCM Clustering");
-
     List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       hardClusters.add(DBIDUtil.newArray());
@@ -220,8 +231,7 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
   /**
    * Updates the means according to the weighted means of all data points.
    * Returns the objective function value
-   * 
-   * \sum_k \sum_ i (u_{ik}^m * d_{ik}^2)
+   * \[ \sum_k \sum_i (u_{ik}^m \cdot d_{ik}^2) \]
    * 
    * @param relation data points
    * @param probClusterIGivenX weights of clusters
@@ -234,92 +244,103 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
     double[][] tmeans = new double[k][d];
     double objvalue = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      double[] p = relation.get(iditer).toArray();
       double[] probs = probClusterIGivenX.get(iditer);
-      double objvalue2 = 0;
       for(int i = 0; i < k; i++) {
         double w = FastMath.pow(probs[i], m);
         weight[i] += w;
-        double[] p = relation.get(iditer).toArray();
-        tmeans[i] = VMath.plusTimesEquals(tmeans[i], p, w);
-
-        // calculate squared distance for objective value
-        double dist = 0;
-        for(int j = 0; j < d; j++) {
-          dist += (p[j] - means[i][j]) * (p[j] - means[i][j]);
-        }
-        objvalue2 += w * dist;
+        plusTimesEquals(tmeans[i], p, w);
+        objvalue += w * distance(p, means[i]);
       }
-      objvalue += objvalue2;
     }
     for(int i = 0; i < k; i++) {
-      means[i] = VMath.times(tmeans[i], 1 / weight[i]);
+      means[i] = times(tmeans[i], 1 / weight[i]);
     }
     return objvalue;
   }
 
   /**
    * Calculates the weights of all points and clusters. As they add up to one
-   * for each point, they can be seen as cluster probabilities P(c_i|x_j).
+   * for each point, they can be seen as cluster probabilities \(P(c_i|x_j)\).
    * Then returns the difference of the weight matrix to the last weight matrix
-   * calculated with frobenius norm and normalized by the number of data points
+   * calculated with Frobenius norm and normalized by the number of data points
    * and cluster
-   * 
-   * (\sum_i \sum_j (weight_{ij} - weightprev_{ij})^2)/(N * k)
+   * \[ \frac{1}{Nk} \sum_i \sum_j (w_{ij} - w^\prime_{ij})^2 \]
    * 
    * @param relation data points
    * @param centers current cluster centers
    * @param probClusterIGivenX destination datastore for probabilities/weights
-   * @return normalized frobenius norm between last and current weight matrix
+   * @return normalized Frobenius norm between last and current weight matrix
    */
-  public double assignProbabilitiesToInstances(Relation<V> relation, double[][] centers, WritableDataStore<double[]> probClusterIGivenX, boolean initial) {
+  public double assignProbabilitiesToInstances(Relation<V> relation, double[][] centers, WritableDataStore<double[]> probClusterIGivenX) {
     final int k = centers.length;
+    final double exp = -1. / (m - 1);
+    double[] oldprobs = new double[k];
     double weightChange = 0;
-    int dirass = -1; // direct assignmend if dist == 0
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      V vec = relation.get(iditer);
-      double[] oldprobs = null;
-      if(!initial)
-        oldprobs = probClusterIGivenX.get(iditer);
-      double[] probs = new double[k];
-      double[] dists = new double[k];
+      final V vec = relation.get(iditer);
+      double[] probs = probClusterIGivenX.get(iditer);
+      System.arraycopy(probs, 0, oldprobs, 0, k); // Copy previous values
+      int dirass = -1; // direct assignment if dist == 0
       double sumprob = 0;
-      double weightChange2 = 0;
       for(int i = 0; i < k; i++) {
-        double[] clustermean = centers[i];
-        for(int d = 0; d < clustermean.length; d++) {
-          dists[i] += (vec.doubleValue(d) - clustermean[d]) * (vec.doubleValue(d) - clustermean[d]);
-        }
-        if(dists[i] == 0) {
-          dirass = i;
-          probs[i] = 1;
+        final double di = distance(vec, centers[i]);
+        if(di == 0) {
+          Arrays.fill(probs, 0);
+          probs[dirass = i] = 1;
           break;
         }
-        probs[i] = FastMath.pow(FastMath.sqrt(dists[i]), 2 / (m - 1)); // d^(2/(m-1))
-        sumprob += 1 / probs[i]; // sum 1/d^(2/(m-1))
-
+        double p = probs[i] = exp != 1 ? FastMath.pow(di, exp) : 1 / di; // 1/d^(2/(m-1))
+        sumprob += p;
       }
-      if(dirass != -1) {
-        // set all other values in probs = 0:
-        for(int i = 0; i < probs.length; i++) {
-          if(i != dirass)
-            probs[i] = 0;
-          if(!initial)
-            weightChange2 += (probs[i] - oldprobs[i]) * (probs[i] - oldprobs[i]);
-        }
-        weightChange += weightChange2;
-        probClusterIGivenX.put(iditer, probs);
-        continue;
+      // Workaround for m close to 1:
+      if(Double.isInfinite(sumprob)) {
+        dirass = argmax(probs);
+        Arrays.fill(probs, 0);
+        probs[dirass] = 1;
       }
-      // calc actual probs
+      if(dirass < 0) {
+        timesEquals(probs, 1 / sumprob);
+      }
+      // Frobenius norm of weight change:
       for(int i = 0; i < k; i++) {
-        probs[i] = 1 / (probs[i] * sumprob);
-        if(!initial)
-          weightChange2 += (probs[i] - oldprobs[i]) * (probs[i] - oldprobs[i]);
+        final double v = probs[i] - oldprobs[i];
+        weightChange += v * v;
       }
-      probClusterIGivenX.put(iditer, probs);
-      weightChange += weightChange2;
     }
     return weightChange / (relation.size() * k);
+  }
+
+  /**
+   * Distance computation.
+   *
+   * @param v1 Data vector
+   * @param v2 cluster mean
+   * @return Distance
+   */
+  private double distance(final V v1, double[] v2) {
+    double acc = 0;
+    for(int d = 0; d < v2.length; d++) {
+      final double v = v1.doubleValue(d) - v2[d];
+      acc += v * v;
+    }
+    return acc;
+  }
+
+  /**
+   * Distance computation.
+   *
+   * @param v1 Data vector
+   * @param v2 cluster mean
+   * @return Distance
+   */
+  private double distance(final double[] v1, double[] v2) {
+    double acc = 0;
+    for(int d = 0; d < v2.length; d++) {
+      final double v = v1[d] - v2[d];
+      acc += v * v;
+    }
+    return acc;
   }
 
   @Override
@@ -327,6 +348,11 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
+  /**
+   * Parameterization class.
+   *
+   * @author Robert Gehde
+   */
   public static class Par implements Parameterizer {
     /**
      * Parameter to specify the number of clusters to find, must be an integer
@@ -407,11 +433,11 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
       new DoubleParameter(M_ID, 2) //
-          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+          .addConstraint(new GreaterEqualConstraint(1.01)) //
           .grab(config, x -> m = x);
       new IntParameter(MINITER_ID)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
-          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setDefaultValue(1) //
           .grab(config, x -> miniter = x);
       new IntParameter(KMeans.MAXITER_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
@@ -425,6 +451,5 @@ public class FuzzyCMeans<V extends NumberVector> implements ClusteringAlgorithm<
     public FuzzyCMeans<NumberVector> make() {
       return new FuzzyCMeans<NumberVector>(k, miniter, maxiter, delta, m, soft, initializer);
     }
-
   }
 }

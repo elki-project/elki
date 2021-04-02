@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import elki.clustering.em.EM;
+import elki.clustering.kmeans.FuzzyCMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.datastore.WritableDoubleDataStore;
@@ -240,7 +241,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     @SuppressWarnings("rawtypes")
     It<MaterializedRelation> iter = Metadata.hierarchyOf(clustering).iterChildren()//
         .filter(MaterializedRelation.class)//
-        .filter(mr -> mr.getDataTypeInformation() == EM.SOFT_TYPE);
+        .filter(mr -> mr.getDataTypeInformation() == EM.SOFT_TYPE //
+            || mr.getDataTypeInformation() == FuzzyCMeans.SOFT_TYPE);
     if(iter.valid()) {
       @SuppressWarnings("unchecked")
       MaterializedRelation<double[]> softAssignments = iter.get();
