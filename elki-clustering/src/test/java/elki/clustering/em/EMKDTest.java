@@ -28,8 +28,12 @@ import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
+/**
+ * Test the kd-tree accelerated EM clustering.
+ *
+ * @author Robert Gehde
+ */
 public class EMKDTest extends AbstractClusterAlgorithmTest {
-
   @Test
   public void testMultivariateGauss() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
@@ -41,17 +45,18 @@ public class EMKDTest extends AbstractClusterAlgorithmTest {
     assertFMeasure(db, result, 0.83346);
     assertClusterSizes(result, new int[] { 5, 100, 290, 315 });
   }
-  
+
   @Test
   public void testInfinityCheatCase() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
-        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reaches an infinite value!
+        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reaches
+                                 // an infinite value!
         .with(EMKD.Par.K_ID, 4) //
         .with(EMKD.Par.INIT_ID, MultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.45888107612);
-    assertClusterSizes(result, new int[] { 0, 0, 0, 710 });
+    assertFMeasure(db, result, 0.782878);
+    assertClusterSizes(result, new int[] { 5, 91, 210, 404 });
   }
 
   @Test

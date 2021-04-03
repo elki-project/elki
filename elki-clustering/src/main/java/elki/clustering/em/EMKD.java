@@ -20,10 +20,7 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.times;
-import static elki.math.linearalgebra.VMath.minus;
-import static elki.math.linearalgebra.VMath.argmax;
-import static elki.math.linearalgebra.VMath.timesTranspose;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +49,7 @@ import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
-import elki.math.linearalgebra.VMath;
+import elki.math.MathUtil;
 import elki.result.Metadata;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
@@ -92,16 +89,14 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/nips/Moore98")
 public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering<M>> {
   /**
-   * Factory for producing the initial cluster model.
-   */
-  private EMClusterModelFactory<NumberVector, M> mfactory;
-
-  /**
    * Logging object
    */
   private static final Logging LOG = Logging.getLogger(EMKD.class);
 
-  private static final double MIN_LOGLIKELIHOOD = -100000;
+  /**
+   * Factory for producing the initial cluster model.
+   */
+  private EMClusterModelFactory<NumberVector, M> mfactory;
 
   /**
    * Retain soft assignments.
@@ -156,10 +151,12 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    */
   private int maxiter;
 
+  /**
+   * kd-tree object order
+   */
   protected ArrayModifiableDBIDs sorted;
 
   /**
-   * 
    * Constructor.
    *
    * @param k number of classes
@@ -190,56 +187,43 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * Calculates the EM Clustering with the given values by calling makeStats and
    * calculation the new models from the given results
    * 
-   * 
    * @param relation Data Relation
    * @return Clustering EMKD Clustering
    */
   public Clustering<M> run(Relation<? extends NumberVector> relation) {
-
-    if(relation.size() == 0) {
-      throw new IllegalArgumentException("database empty: must contain elements");
-    }
-    if(k == 0) {
-      throw new IllegalArgumentException("k is 0: no clusters to calculate");
-    }
-
     DBIDIter iter = relation.iterDBIDs();
-    int d = relation.get(iter).getDimensionality();
 
-    // Cache for the quadratic problem to reduce number of created arrays
-    ProblemData[] dataArrays = new ProblemData[d];
-    for(int i = 0; i < d; i++) {
-      dataArrays[i] = new ProblemData(i + 1);
-    }
-    // build kd-tree
+    // Build the kd-tree
     sorted = DBIDUtil.newArray(relation.getDBIDs());
     double[] dimWidth = analyseDimWidth(relation);
-    Duration buildtime = LOG.newDuration(this.getClass().getName() + ".Tree.buildtime").begin();
-    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimWidth, mbw, dataArrays);
+    Duration buildtime = LOG.newDuration(this.getClass().getName() + ".kdtree.buildtime").begin();
+    KDTree tree = new KDTree(relation, sorted, 0, sorted.size(), dimWidth, mbw);
     LOG.statistics(buildtime.end());
 
-    // initial models
-    ArrayList<? extends EMClusterModel<NumberVector, M>> models = new ArrayList<EMClusterModel<NumberVector, M>>(mfactory.buildInitialModels(relation, k));
-    WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    if(!KDTree.supportsStoppingCondition(models)) {
-      LOG.warning("Model list contains models that does not support the calculation of stopping conditions!");
-    }
     // assuming all models are the same
-    if(models.get(0) instanceof TwoPassMultivariateGaussianModel) {
+    if(mfactory instanceof TwoPassMultivariateGaussianModelFactory) {
       LOG.warning("TwoPassMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
     }
-    if(models.get(0) instanceof TextbookMultivariateGaussianModel) {
+    else if(mfactory instanceof TextbookMultivariateGaussianModelFactory) {
       LOG.warning("TextbookMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
     }
+    else if(!(mfactory instanceof MultivariateGaussianModelFactory)) {
+      LOG.warning("Model list contains models that does not support the calculation of stopping conditions!");
+    }
+    // Create initial models
+    List<? extends EMClusterModel<NumberVector, M>> models = mfactory.buildInitialModels(relation, k);
+    WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
-    DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
+    DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
+
+    // Cache for the quadratic problem to reduce number of created arrays
+    int d = relation.get(iter).getDimensionality();
+    ProblemData[] cache = ProblemData.newCache(d);
+    double piPow = FastMath.pow(MathUtil.SQRTPI, d);
 
     // iteration unless no change
     int it = 0, lastImprovement = 0;
-    double bestLogLikelihood = Double.NEGATIVE_INFINITY;
-    double logLikelihood = 0.0;
-
-    // double bestloglikelihood = loglikelihood; // For detecting instabilities.
+    double bestLogLikelihood = Double.NEGATIVE_INFINITY, logLikelihood = 0.0;
     for(; it < maxiter || maxiter < 0; it++) {
       // Array that contains indices used in makeStats
       // Necessary because we drop unlikely classes in the progress
@@ -255,7 +239,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       for(int i = 0; i < newstats.length; i++) {
         newstats[i] = new ClusterData(d);
       }
-      logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, !ignorePrune) / relation.size();
+      logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, !ignorePrune, cache, piPow) / relation.size();
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood
@@ -277,7 +261,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       hardClusters.add(DBIDUtil.newArray());
     }
 
-    logLikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    logLikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
     LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", logLikelihood));
 
@@ -302,13 +286,13 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   }
 
   /**
-   * update Cluster models according to the statistics calculated by makestats
+   * Update cluster models according to the statistics calculated by makestats
    * 
    * @param newstats new statistics
    * @param models models to update
    * @param size number of elements to cluster
    */
-  private void updateClusters(ClusterData[] newstats, ArrayList<? extends EMClusterModel<NumberVector, M>> models, int size) {
+  private void updateClusters(ClusterData[] newstats, List<? extends EMClusterModel<NumberVector, M>> models, int size) {
     for(int i = 0; i < k; i++) {
       if(newstats[i].summedLogWeights_apriori == Double.NEGATIVE_INFINITY) {
         LOG.warning("A model wasn't visited during tree traversion. The model has not been updated!");
@@ -318,9 +302,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       EMClusterModel<NumberVector, M> model = models.get(i);
 
       // calculate model statistics according to the paper
-      double weight = FastMath.exp(newstats[i].summedLogWeights_apriori - FastMath.log(size));
-      double[] center = times(newstats[i].summedPoints_mean, 1. / FastMath.exp(newstats[i].summedLogWeights_apriori));
-      double[][] covariance = minus(times(newstats[i].summedPointsSquared_cov, 1. / FastMath.exp(newstats[i].summedLogWeights_apriori)), timesTranspose(center, center));
+      double weight = FastMath.exp(newstats[i].summedLogWeights_apriori) / size;
+      double[] center = times(newstats[i].summedPoints_mean, FastMath.exp(-newstats[i].summedLogWeights_apriori));
+      double[][] covariance = minusEquals(times(newstats[i].summedPointsSquared_cov, FastMath.exp(-newstats[i].summedLogWeights_apriori)), timesTranspose(center, center));
 
       // set Values of the model
       model.setWeight(weight);
@@ -330,91 +314,26 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   }
 
   /**
-   * helper method to retrieve the widths of all data in all dimensions
+   * Helper method to retrieve the widths of all data in all dimensions.
    * 
    * @param relation Relation to analyze
    * @return width of each dimension
    */
   private double[] analyseDimWidth(Relation<? extends NumberVector> relation) {
     DBIDIter it = relation.iterDBIDs();
-    int d = relation.get(it).getDimensionality();
-    double[] lowerBounds = new double[d];
-    double[] upperBounds = new double[d];
-    for(int i = 0; i < d; i++) {
-      lowerBounds[i] = Double.MAX_VALUE;
-      upperBounds[i] = Double.MIN_VALUE;
-    }
+    NumberVector first = relation.get(it);
+    final int d = first.getDimensionality();
+    double[] lowerBounds = first.toArray(), upperBounds = lowerBounds.clone();
     // find upper and lower bound
-    for(; it.valid(); it.advance()) {
+    for(it.advance(); it.valid(); it.advance()) {
       NumberVector x = relation.get(it);
       for(int i = 0; i < d; i++) {
-        double t = x.doubleValue(i);
+        final double t = x.doubleValue(i);
         lowerBounds[i] = lowerBounds[i] < t ? lowerBounds[i] : t;
         upperBounds[i] = upperBounds[i] > t ? upperBounds[i] : t;
       }
     }
-    // calculate widths
-    return VMath.minus(upperBounds, lowerBounds);
-  }
-
-  /**
-   * Taken from EM, used for final model assignment.
-   * 
-   * 
-   * Assigns the current probability values to the instances in the database and
-   * compute the expectation value of the current mixture of distributions.
-   * <p>
-   * Computed as the sum of the logarithms of the prior probability of each
-   * instance.
-   * 
-   * @param relation the database used for assignment to instances
-   * @param models Cluster models
-   * @param probClusterIGivenX Output storage for cluster probabilities
-   * @param <O> Object type
-   * @return the expectation value of the current mixture of distributions
-   */
-  public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
-    final int k = models.size();
-    double emSum = 0.;
-
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      O vec = relation.get(iditer);
-      double[] probs = new double[k];
-      for(int i = 0; i < k; i++) {
-        double v = models.get(i).estimateLogDensity(vec);
-        probs[i] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
-      }
-      final double logP = logSumExp(probs);
-      for(int i = 0; i < k; i++) {
-        probs[i] = FastMath.exp(probs[i] - logP);
-      }
-      probClusterIGivenX.put(iditer, probs);
-      emSum += logP;
-    }
-    return emSum / relation.size();
-  }
-
-  /**
-   * Compute log(sum(exp(x_i)), with attention to numerical issues.
-   * 
-   * @param x Input
-   * @return Result
-   */
-  private static double logSumExp(double[] x) {
-    double max = x[0];
-    for(int i = 1; i < x.length; i++) {
-      final double v = x[i];
-      max = v > max ? v : max;
-    }
-    final double cutoff = max - 35.350506209; // log_e(2**51)
-    double acc = 0.;
-    for(int i = 0; i < x.length; i++) {
-      final double v = x[i];
-      if(v > cutoff) {
-        acc += v < max ? FastMath.exp(v - max) : 1.;
-      }
-    }
-    return acc > 1. ? (max + FastMath.log(acc)) : max;
+    return minusEquals(upperBounds, lowerBounds);
   }
 
   /**
@@ -439,9 +358,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         "Pruning criterion for the KD-Tree during construction. Stop splitting when leafwidth < mbw * width.");
 
     /**
-     * Parameter to specify the pruning criterium during the algorithm.
+     * Parameter to specify the pruning criterion during the algorithm.
      * Stop going down the kd-tree when possible weight error e < tau *
-     * totalweight. Musst be between 0 and 1. Low for precise, high for fast
+     * totalweight. Must be between 0 and 1. Low for precise, high for fast
      * results.
      */
     public static final OptionID TAU_ID = new OptionID("emkd.tau", //

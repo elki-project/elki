@@ -22,8 +22,9 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
+import elki.clustering.em.QuadraticProblem.ProblemData;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
@@ -32,9 +33,6 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.relation.Relation;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.pairs.DoubleDoublePair;
-
-import elki.clustering.em.QuadraticProblem.ProblemData;
 
 import net.jafama.FastMath;
 
@@ -93,11 +91,6 @@ class KDTree {
   Boundingbox boundingBox;
 
   /**
-   * Array cache object for quadratic problem calculation
-   */
-  ProblemData[] cache;
-
-  /**
    * 
    * Constructor for a KDTree with statistics needed for EMKD calculation. Uses
    * points between the indices left and right for calculation
@@ -110,53 +103,46 @@ class KDTree {
    *        complete dataset
    * @param mbw factor when to stop construction. Stop if splitdimwidth < mbw *
    *        dimwidth[splitdim]
-   * @param arrayCache ArrayCache object for Quadratic Problem calls
    */
-  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimWidth, double mbw, ProblemData[] arrayCache) {
-    this.cache = arrayCache;
-    /**
-     * other kdtrees seem to look at [left, right[
-     */
+  public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimWidth, double mbw) {
     DBIDArrayIter iter = sorted.iter();
     int dim = relation.get(iter).toArray().length;
 
     // point range
-    leftBorder = left;
-    rightBorder = right;
-    size = right - left;
+    this.leftBorder = left;
+    this.rightBorder = right;
+    this.size = right - left;
 
     // statistics of this node
-    summedPoints = new double[dim];
-    summedPointsXPointsT = new double[dim][dim];
-
-    // bounding box of this node
-    double[] lowerBounds = new double[dim];
-    double[] upperBounds = new double[dim];
+    this.summedPoints = new double[dim];
+    this.summedPointsXPointsT = new double[dim][dim];
 
     // calculate bounding box
-    iter.seek(left);
-    lowerBounds = relation.get(iter).toArray();
-    upperBounds = relation.get(iter).toArray();
+    double[] bounds1 = relation.get(iter.seek(left)).toArray();
+    double[] bounds2 = bounds1.clone();
 
-    for(int i = 0; i < size; i++) {
+    for(iter.advance(); iter.getOffset() < right; iter.advance()) {
       NumberVector vector = relation.get(iter);
       for(int d = 0; d < dim; d++) {
         double value = vector.doubleValue(d);
         // bounding box
-        lowerBounds[d] = value < lowerBounds[d] ? value : lowerBounds[d];
-        upperBounds[d] = value > upperBounds[d] ? value : upperBounds[d];
+        bounds1[d] = value < bounds1[d] ? value : bounds1[d];
+        bounds2[d] = value > bounds2[d] ? value : bounds2[d];
       }
-      if(iter.valid())
-        iter.advance();
     }
-    boundingBox = new Boundingbox(lowerBounds, upperBounds);
+    // Convert min/max to midpoint + halfwidth:
+    for(int d = 0; d < dim; d++) {
+      double l = bounds1[d], u = bounds2[d];
+      bounds1[d] = (l + u) * 0.5;
+      bounds2[d] = (u - l) * 0.5;
+    }
+    boundingBox = new Boundingbox(bounds1, bounds2);
 
-    iter.seek(left);
     // handle leaf -> calculate summedPoints and summedPointsXPointsT
     int splitDim = 0;
     double maxDiff = Double.NEGATIVE_INFINITY;
     for(int d = 0; d < dim; d++) {
-      double diff = boundingBox.hilim[d] - boundingBox.lolim[d];
+      double diff = 2 * boundingBox.halfwidth[d];
       if(diff > maxDiff) {
         splitDim = d;
         maxDiff = diff;
@@ -164,7 +150,7 @@ class KDTree {
     }
     if(maxDiff < mbw * dimWidth[splitDim]) {
       isLeaf = true;
-      for(int i = 0; i < size; i++) {
+      for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
         NumberVector vector = relation.get(iter);
         for(int d1 = 0; d1 < dim; d1++) {
           double value1 = vector.doubleValue(d1);
@@ -174,41 +160,38 @@ class KDTree {
             summedPointsXPointsT[d1][d2] += value1 * value2;
           }
         }
-        if(iter.valid()) {
-          iter.advance();
-        }
       }
+      return;
     }
-    else { // calculate nonleaf node
-      // split points at midpoint according to paper
-      double splitPoint = boundingBox.midpoint[splitDim];
-      int l = left, r = right - 1;
-      while(true) {
-        while(l <= r && relation.get(iter.seek(l)).doubleValue(splitDim) <= splitPoint) {
-          ++l;
-        }
-        while(l <= r && relation.get(iter.seek(r)).doubleValue(splitDim) >= splitPoint) {
-          --r;
-        }
-        if(l >= r) {
-          break;
-        }
-        sorted.swap(l++, r--);
+    // calculate nonleaf node
+    // split points at midpoint according to paper
+    double splitPoint = boundingBox.midpoint[splitDim];
+    int l = left, r = right - 1;
+    while(true) {
+      while(l <= r && relation.get(iter.seek(l)).doubleValue(splitDim) <= splitPoint) {
+        ++l;
       }
-
-      assert relation.get(iter.seek(r)).doubleValue(splitDim) <= splitPoint : relation.get(iter.seek(r)).doubleValue(splitDim) + " not less than " + splitPoint;
-      ++r;
-      if(r == right) { // Duplicate points!
-        isLeaf = true;
-        return;
+      while(l <= r && relation.get(iter.seek(r)).doubleValue(splitDim) >= splitPoint) {
+        --r;
       }
-      leftChild = new KDTree(relation, sorted, left, r, dimWidth, mbw, arrayCache);
-      rightChild = new KDTree(relation, sorted, r, right, dimWidth, mbw, arrayCache);
-
-      // fill up statistics from child nodes
-      summedPoints = plus(leftChild.summedPoints, rightChild.summedPoints);
-      summedPointsXPointsT = plus(leftChild.summedPointsXPointsT, rightChild.summedPointsXPointsT);
+      if(l >= r) {
+        break;
+      }
+      sorted.swap(l++, r--);
     }
+
+    assert relation.get(iter.seek(r)).doubleValue(splitDim) <= splitPoint : relation.get(iter.seek(r)).doubleValue(splitDim) + " not less than " + splitPoint;
+    if(++r == right) { // Duplicate points!
+      isLeaf = true;
+    }
+    else {
+      leftChild = new KDTree(relation, sorted, left, r, dimWidth, mbw);
+      rightChild = new KDTree(relation, sorted, r, right, dimWidth, mbw);
+    }
+
+    // fill up statistics from child nodes
+    summedPoints = plus(leftChild.summedPoints, rightChild.summedPoints);
+    summedPointsXPointsT = plus(leftChild.summedPointsXPointsT, rightChild.summedPointsXPointsT);
   }
 
   /**
@@ -227,26 +210,26 @@ class KDTree {
    * @param tau maximum error, stop if all models have w_max - w_min < tau *
    *        w_total
    * @param tauClass drop model if w_max < tauClass * max(W_min)
+   * @param cache Cache
+   * @param piPow Dimensionality scaling factor
    * @return indices that are not pruned
    */
-  public int[] checkStoppingCondition(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, ClusterData[] summedData, int[] indices, double tau, double tauClass) {
-    // Calculate Limits of the given Model inside the boundingbox
-    DoubleDoublePair[] limits = new DoubleDoublePair[models.size()];
+  public int[] checkStoppingCondition(List<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, ClusterData[] summedData, int[] indices, double tau, double tauClass, ProblemData[] cache, double piPow) {
+    if(!(models.get(0) instanceof MultivariateGaussianModel)) {
+      return indices;
+    }
+    // Calculate limits of the given Model inside the boundingbox
     double[][] maxPnts = new double[models.size()][summedPoints.length];
     double[][] minPnts = new double[models.size()][summedPoints.length];
-    if(models.get(0) instanceof MultivariateGaussianModel) {
-      for(int i : indices) {
-        limits[i] = calculateModelLimits((MultivariateGaussianModel) models.get(i), minPnts[i], maxPnts[i]);
-      }
-    }
-    else {
-      return indices;
+    double[][] limits = new double[models.size()][2];
+    for(int i : indices) {
+      calculateModelLimits((MultivariateGaussianModel) models.get(i), minPnts[i], maxPnts[i], limits[i], cache, piPow);
     }
     // calculate the complete sum of weighted limits for denominator calculation
     double maxDenomTotal = 0.0, minDenomTotal = 0.0;
     for(int i : indices) {
-      maxDenomTotal += models.get(i).getWeight() * limits[i].first;
-      minDenomTotal += models.get(i).getWeight() * limits[i].second;
+      maxDenomTotal += models.get(i).getWeight() * limits[i][0];
+      minDenomTotal += models.get(i).getWeight() * limits[i][1];
     }
     boolean prune = true;
     double maxMinWeight = Double.NEGATIVE_INFINITY;
@@ -254,113 +237,69 @@ class KDTree {
     for(int i : indices) {
       // calculate denominators for minimum/maximum weight estimation
       double weight = models.get(i).getWeight();
-      double wminDenom = minDenomTotal + weight * (limits[i].first - limits[i].second);
-      double wmaxDenom = maxDenomTotal + weight * (limits[i].second - limits[i].first);
+      double wminDenom = minDenomTotal + weight * (limits[i][0] - limits[i][1]);
+      double wmaxDenom = maxDenomTotal + weight * (limits[i][1] - limits[i][0]);
       // calculate minimum weight estimation
-      double wmin = bound((weight * limits[i].first) / wminDenom);
+      double wmin = bound((weight * limits[i][0]) / wminDenom);
       maxMinWeight = wmin > maxMinWeight ? wmin : maxMinWeight;
       // calculate maximum weight estimation
-      wmaxs[i] = bound((weight * limits[i].second) / wmaxDenom);
+      wmaxs[i] = bound((weight * limits[i][1]) / wmaxDenom);
       double minPossibleWeight = summedData[i].summedLogWeights_apriori + wmin * size;
       // calculate the maximum possible error in this node
       double maximumError = size * (wmaxs[i] - wmin);
       // pruning check, if error to big for this model, dont prune
-      if(maximumError > tau * minPossibleWeight)
+      if(maximumError > tau * minPossibleWeight) {
         prune = false;
+      }
     }
     // if no complete prune is possible, check dropping of classes
-    if(!prune) {
-      if(tauClass == 0.0) {
-        return indices;
-      }
-      IntegerArray result = new IntegerArray();
-      for(int i : indices) {
-        // drop one class if the maximum weight of a class in the bounding box
-        // is lower than tauClass * maxMinWeight, where maxMinWeight is the
-        // maximum minimal weight estimate of all classes
-        if(wmaxs[i] > tauClass * maxMinWeight) {
-          result.add(i);
-        }
-      }
-      // return updated list of indices
-      return result.toArray();
+    if(prune) {
+      // return empty array -> full prune
+      return new int[0];
     }
-    // return empty array -> full prune
-    return new int[0];
+    if(tauClass == 0.0) {
+      return indices;
+    }
+    IntegerArray result = new IntegerArray();
+    for(int i : indices) {
+      // drop one class if the maximum weight of a class in the bounding box
+      // is lower than tauClass * maxMinWeight, where maxMinWeight is the
+      // maximum minimal weight estimate of all classes
+      if(wmaxs[i] > tauClass * maxMinWeight) {
+        result.add(i);
+      }
+    }
+    // return updated list of indices
+    return result.toArray();
   }
 
   /**
-   * calculates the model limits inside this node by
-   * translating the gaussian model into a squared function
+   * Calculates the model limits inside this node by translating the Gaussian
+   * model into a squared function.
    * 
    * @param model model to calculate the limits for
    * @param minpnt result array for argmin
    * @param maxpnt result array for argmax
-   * @return pair containing min at index 0 and max at index 1
+   * @param cache Cache
+   * @param piPow Dimensionality scaling factor
+   * @param ret Return array
    */
-  public DoubleDoublePair calculateModelLimits(MultivariateGaussianModel model, double[] minpnt, double[] maxpnt) {
-    // translate problem by mean
-    double[] mean = model.mean;
-    double[] transmin = minus(boundingBox.lolim, mean);
-    double[] transmax = minus(boundingBox.hilim, mean);
-    Boundingbox bbTranslated = new Boundingbox(transmin, transmax);
+  public void calculateModelLimits(MultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret, ProblemData[] cache, double piPow) {
+    Boundingbox bbTranslated = new Boundingbox(minus(boundingBox.midpoint, model.mean), boundingBox.halfwidth.clone());
 
     // invert and ensure symmetric (array is cloned in inverse)
     double[][] covInv = inverse(model.covariance);
     double covdet = FastMath.exp(2 * MultivariateGaussianModel.getHalfLogDeterminant(model.chol));
-    for(int i = 0; i < covInv.length; i++) {
-      for(int j = i; j < covInv[i].length; j++) {
-        if(Math.abs(covInv[i][j] - covInv[j][i]) > 1e-10) {
-          covInv[j][i] = covInv[i][j] = (covInv[i][j] + covInv[j][i]) / 2;
-        }
-      }
-    }
 
-    // maximizes mahalanobis dist
-    QuadraticProblem quadmax = calcConstrainedSQDMahalMax(bbTranslated, covInv);
-    double mahalanobisSQDmax = quadmax.maximumValue;
-    System.arraycopy(quadmax.argmaxPoint, 0, maxpnt, 0, quadmax.argmaxPoint.length);
+    // maximizes Mahalanobis dist
+    final double[] b = new double[covInv.length];
+    double mahalanobisSQDmax = 2 * QuadraticProblem.solve(covInv, b, 0, bbTranslated, cache, maxpnt);
+    // minimizes Mahalanobis dist (invert covinv and result)
+    double mahalanobisSQDmin = -2 * QuadraticProblem.solve(timesEquals(covInv, -1.0), b, 0, bbTranslated, cache, minpnt);
 
-    // minimizes mahalanobis dist (invert covinv and result
-    QuadraticProblem quadmin = calcConstrainedSQDMahalMax(bbTranslated, times(covInv, -1.0));
-    double mahalanobisSQDmin = -1.0 * quadmin.maximumValue;
-    System.arraycopy(quadmax.argmaxPoint, 0, minpnt, 0, quadmax.argmaxPoint.length);
-
-    double amin = calculateGaussian(mahalanobisSQDmax, covdet, mean.length);
-    double amax = calculateGaussian(mahalanobisSQDmin, covdet, mean.length);
-
-    return new DoubleDoublePair(amin, amax);
-  }
-
-  /**
-   * Calculates gaussian density from covdet and squared mahalanobis distance
-   * 
-   * @param squaredMahalanobis squared mahalanobis distance
-   * @param covarianceDet covariance determinant of the model
-   * @param dim dimensions of the model
-   * @return density of the model at the given mahalanobis distance
-   */
-  private double calculateGaussian(double squaredMahalanobis, double covarianceDet, int dim) {
-    double num = FastMath.exp(-squaredMahalanobis / 2);
-    double den = cache[dim - 1].piPow * FastMath.sqrt(covarianceDet);
-    return num / den;
-  }
-
-  /**
-   * calculates the maximum squared mahalanobis distance for the given inverted
-   * covariance matrix and (translated) bounding box. The center of the model is
-   * considered to be at 0.
-   * 
-   * @param bbTranslated translated boundingbox of the node
-   * @param a inverted covariance matrix
-   * @return QuadraticProblem containing the solution
-   */
-  private QuadraticProblem calcConstrainedSQDMahalMax(Boundingbox bbTranslated, double[][] a) {
-    double c = 0.0;
-    double[] b = new double[a.length];
-    QuadraticProblem qp = new QuadraticProblem(a, b, c, bbTranslated, cache);
-    qp.maximumValue *= 2; // because we have a .5 factor in the calculation
-    return qp;
+    final double f = 1 / (piPow * FastMath.sqrt(covdet));
+    ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
+    ret[1] = FastMath.exp(mahalanobisSQDmin * -.5) * f;
   }
 
   /**
@@ -368,87 +307,58 @@ class KDTree {
    * new models
    * 
    * @param models list of all models
-   * @param indices list of indices to use in calculation, topmost call with all
-   *        indices
-   * @param resultData result target array for statistics, topmost call with
-   *        empty ClusterData array
+   * @param indices list of indices to use in calculation, initially all
+   * @param resultData result target array for statistics, initially empty
    * @param tau parameter for calculation pruning by weight error
-   * @param tauClass parameter for class dropping if class is not impactfull
+   * @param tauClass parameter for class dropping if class has no impact
    * @param pruneFlag flag if pruning should be done
+   * @param cache Cache
+   * @param piPow Dimensionality scaling factor
    * @return log likelihood of the model
    */
-  public double makeStats(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, int[] indices, ClusterData[] resultData, double tau, double tauClass, boolean pruneFlag) {
-    int k = models.size();
-    boolean prune = isLeaf;
-    int[] nextIndices = new int[indices.length];
+  public double makeStats(List<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models, int[] indices, ClusterData[] resultData, double tau, double tauClass, boolean pruneFlag, ProblemData[] cache, double piPow) {
     // check for pruning possibility
-    if(!prune && pruneFlag) {
-      nextIndices = checkStoppingCondition(models, resultData, indices, tau, tauClass);
-      if(nextIndices.length == 0) {
-        prune = true;
+    if(!isLeaf && pruneFlag) {
+      int[] nextIndices = checkStoppingCondition(models, resultData, indices, tau, tauClass, cache, piPow);
+      if(nextIndices.length > 0) {
+        // if this is not a leaf node, call child nodes
+        assert nextIndices != null;
+        return leftChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag, cache, piPow) //
+            + rightChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag, cache, piPow);
       }
     }
-    if(prune) {
-      // logarithmic probabilities of clusters in this node
-      double[] logProbr = new double[k];
-      DoubleVector midpoint = new DoubleVector(times(summedPoints, 1.0 / size));
-      for(int i = 0; i < k; i++) {
-        logProbr[i] = models.get(i).estimateLogDensity(midpoint);
-      }
-      double logDenSum = logSumExp(logProbr);
-      double[] logProb = minus(logProbr, logDenSum);
-      // calculate necessary statistics at this node
-      for(int c : indices) { // for(int c = 0; c < logProb.length; c++) {
-        double prob = FastMath.exp(logProb[c]);
-        double logAPrio = logProb[c] + FastMath.log(size);
-        double[] tCenter = times(summedPoints, prob);
-        double[][] tCovariance = times(summedPointsXPointsT, prob);
-
-        // combine with exisiting statistics
-        // objects should be created in caller
-        resultData[c].increment(logAPrio, tCenter, tCovariance);
-      }
-      return logDenSum * size;
+    // logarithmic probabilities of clusters in this node
+    int k = models.size();
+    DoubleVector midpoint = DoubleVector.wrap(times(summedPoints, 1.0 / size));
+    double[] logProb = new double[k];
+    for(int i = 0; i < k; i++) {
+      logProb[i] = models.get(i).estimateLogDensity(midpoint);
     }
-    else {
-      // if this is not a leaf node, call child nodes
-      assert nextIndices != null;
-      double l = leftChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag);
-      double r = rightChild.makeStats(models, nextIndices, resultData, tau, tauClass, pruneFlag);
-      return l + r;
+    double logDenSum = EM.logSumExp(logProb);
+    minusEquals(logProb, logDenSum);
+    // calculate necessary statistics at this node
+    for(int c : indices) {
+      resultData[c].increment(logProb[c] + FastMath.log(size), FastMath.exp(logProb[c]), //
+          summedPoints, summedPointsXPointsT);
     }
-  }
-
-  /**
-   * checks if any model in the list does not support checking condition
-   * 
-   * @param models list of models to check
-   * @return true, if all models support stopping conditions
-   */
-  public static boolean supportsStoppingCondition(ArrayList<? extends EMClusterModel<NumberVector, ? extends MeanModel>> models) {
-    boolean b = true;
-    for(EMClusterModel<NumberVector, ? extends MeanModel> emClusterModel : models) {
-      b = b && emClusterModel instanceof MultivariateGaussianModel;
-    }
-    return b;
+    return logDenSum * size;
   }
 
   /**
    * Bounding box of a KDTree node.
    */
   public static class Boundingbox {
-    private double[] hilim, lolim, midpoint;
+    private double[] midpoint, halfwidth;
 
     /**
-     * Constructs a bounding box from lower and upper bounds
+     * Constructs a bounding box.
      *
-     * @param lolim lower bounds
-     * @param hilim upper bounds
+     * @param midpoint Midpoint
+     * @param halfwidth Half width
      */
-    public Boundingbox(double[] lolim, double[] hilim) {
-      this.hilim = hilim;
-      this.lolim = lolim;
-      this.midpoint = timesPlusTimes(lolim, 0.5, hilim, 0.5);
+    public Boundingbox(double[] midpoint, double[] halfwidth) {
+      this.midpoint = midpoint;
+      this.halfwidth = halfwidth;
     }
 
     /**
@@ -458,7 +368,7 @@ class KDTree {
      * @return lower bound at dimension k
      */
     public double getLowerBound(int k) {
-      return lolim[k];
+      return midpoint[k] - halfwidth[k];
     }
 
     /**
@@ -468,7 +378,7 @@ class KDTree {
      * @return upper bound at dimension k
      */
     public double getUpperBound(int k) {
-      return hilim[k];
+      return midpoint[k] + halfwidth[k];
     }
 
     /**
@@ -477,8 +387,8 @@ class KDTree {
      * @param k dimension
      * @return difference at dimension k
      */
-    public double getDifference(int k) {
-      return hilim[k] - lolim[k];
+    public double getHalfwidth(int k) {
+      return halfwidth[k];
     }
 
     /**
@@ -500,15 +410,13 @@ class KDTree {
      */
     public void reduceBoundingboxTo(Boundingbox redBox, int reducedDim) {
       if(reducedDim > 0) {
-        System.arraycopy(lolim, 0, redBox.lolim, 0, reducedDim);
-        System.arraycopy(hilim, 0, redBox.hilim, 0, reducedDim);
+        System.arraycopy(halfwidth, 0, redBox.halfwidth, 0, reducedDim);
         System.arraycopy(midpoint, 0, redBox.midpoint, 0, reducedDim);
       }
 
       if(midpoint.length - (reducedDim) > 1) {
         int l = redBox.midpoint.length - reducedDim;
-        System.arraycopy(lolim, reducedDim + 1, redBox.lolim, reducedDim, l);
-        System.arraycopy(hilim, reducedDim + 1, redBox.hilim, reducedDim, l);
+        System.arraycopy(halfwidth, reducedDim + 1, redBox.halfwidth, reducedDim, l);
         System.arraycopy(midpoint, reducedDim + 1, redBox.midpoint, reducedDim, l);
       }
     }
@@ -520,8 +428,8 @@ class KDTree {
      * @return true if point is weakly inside bounds
      */
     public boolean weaklyInsideBounds(double[] point) {
-      for(int i = 0; i < lolim.length; i++) {
-        if(point[i] < lolim[i] || point[i] > hilim[i]) {
+      for(int i = 0; i < midpoint.length; i++) {
+        if(Math.abs(midpoint[i] - point[i]) > halfwidth[i]) {
           return false;
         }
       }
@@ -532,27 +440,26 @@ class KDTree {
   /**
    * This class holds information collected by makeStats
    */
-  static class ClusterData {
+  protected static class ClusterData {
     /**
-     * summed likelihoods
+     * Sum of likelihoods
      */
     double summedLogWeights_apriori;
 
     /**
-     * summed points, used for mean calculation
+     * Sum of points, used for mean calculation
      */
     double[] summedPoints_mean;
 
     /**
-     * summed squared points, used for covariance calculation
+     * Sum of squared points, used for covariance calculation.
      */
     double[][] summedPointsSquared_cov;
 
     /**
-     * Constructor for a clusterdata object with no data so far for d Dimensions
+     * Constructor for an empty clusterdata object for d dimensions
      * 
      * @param d Dimension
-     * 
      */
     public ClusterData(int d) {
       this.summedLogWeights_apriori = Double.NEGATIVE_INFINITY;
@@ -561,71 +468,40 @@ class KDTree {
     }
 
     /**
-     * 
-     * Creates this object with the given statistics and loglikelihood 0
-     * 
-     * @param logApriori logarithmic apriori probability of the node
-     * @param scaledSummedPoints scaled summed points of the node
-     * @param scaledSummedPointsSquared scaled summed points^t * points of the
-     *        node
-     */
-    public ClusterData(double logApriori, double[] scaledSummedPoints, double[][] scaledSummedPointsSquared) {
-      this.summedLogWeights_apriori = logApriori;
-      this.summedPoints_mean = scaledSummedPoints;
-      this.summedPointsSquared_cov = scaledSummedPointsSquared;
-    }
-
-    /**
      * increment the statistics in this object by the given values
      * 
      * @param logApriori logarithmic apriori probability of the node
-     * @param scaledSummedPoints scaled summed points of the node
-     * @param scaledSummedPointsSquared scaled summed points^t * points of the
-     *        node
+     * @param w Linear scaling factor for the
+     * @param linearSum summed points of the node
+     * @param squaredSum summed points^t * points of the node
      * @param loglike log likelihood in this node
      */
-    void increment(double logApriori, double[] scaledSummedPoints, double[][] scaledSummedPointsSquared) {
-      if(this.summedLogWeights_apriori == Double.NEGATIVE_INFINITY) {
-        this.summedLogWeights_apriori = logApriori;
-      }
-      else {
-        this.summedLogWeights_apriori = FastMath.log(FastMath.exp(logApriori) + FastMath.exp(this.summedLogWeights_apriori));
-      }
-      this.summedPoints_mean = plusEquals(this.summedPoints_mean, scaledSummedPoints);
-      this.summedPointsSquared_cov = plusEquals(this.summedPointsSquared_cov, scaledSummedPointsSquared);
+    void increment(double logApriori, double w, double[] linearSum, double[][] squaredSum) {
+      this.summedLogWeights_apriori = this.summedLogWeights_apriori == Double.NEGATIVE_INFINITY ? logApriori : //
+          logSumExp(logApriori, this.summedLogWeights_apriori);
+      plusTimesEquals(this.summedPoints_mean, linearSum, w);
+      plusTimesEquals(this.summedPointsSquared_cov, squaredSum, w);
+    }
+
+    /**
+     * Compute log(exp(a)+exp(b)), with attention to numerical issues.
+     * 
+     * @param a Input 1
+     * @param b Input 2
+     * @return Result
+     */
+    protected static double logSumExp(double a, double b) {
+      return (a > b ? a : b) + FastMath.log(a > b ? FastMath.exp(b - a) + 1 : FastMath.exp(a - b) + 1);
     }
   }
 
   /**
-   * ensures d to be in [0,1]
+   * Ensures d to be in [0,1].
    * 
    * @param d double to be bound to [0,1]
    * @return 0 if d < 0, 1 if d > 0, d else
    */
   private static double bound(double d) {
     return d < 0.0 ? 0.0 : d > 1.0 ? 1.0 : d;
-  }
-
-  /**
-   * Compute log(sum(exp(x_i)), with attention to numerical issues.
-   * 
-   * @param x Input
-   * @return Result
-   */
-  private static double logSumExp(double[] x) {
-    double max = x[0];
-    for(int i = 1; i < x.length; i++) {
-      final double v = x[i];
-      max = v > max ? v : max;
-    }
-    final double cutoff = max - 35.350506209; // log_e(2**51)
-    double acc = 0.;
-    for(int i = 0; i < x.length; i++) {
-      final double v = x[i];
-      if(v > cutoff) {
-        acc += v < max ? FastMath.exp(v - max) : 1.;
-      }
-    }
-    return acc > 1. ? (max + FastMath.log(acc)) : max;
   }
 }

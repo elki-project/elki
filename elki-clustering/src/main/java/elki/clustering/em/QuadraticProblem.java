@@ -25,7 +25,6 @@ import static elki.math.linearalgebra.VMath.*;
 import java.util.Arrays;
 
 import elki.clustering.em.KDTree.Boundingbox;
-import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
 import elki.utilities.documentation.Reference;
 
@@ -54,28 +53,18 @@ import net.jafama.FastMath;
     bibkey = "DBLP:conf/nips/Moore98")
 public class QuadraticProblem {
   /**
-   * maximum value
-   */
-  public double maximumValue;
-
-  /**
-   * point at maximum value
-   */
-  public double[] argmaxPoint;
-
-  /**
    * Cache object
    */
   private ProblemData[] cache;
 
   /**
-   * possibility to ignore point calculation, currently not supported in KDTree
+   * Private constructor.
    */
-  boolean calcPoint = true;
+  private QuadraticProblem() {
+    super(); // Internal use only!
+  }
 
   /**
-   * Constructor.
-   * <p>
    * Calculate \( 0.5 x^T A x + b + c \)
    * we use it in KDTrees with \( b = (0)^d \) and \( c = 0 \).
    * If you use it like this you can multiply the result with 2 to get
@@ -87,14 +76,12 @@ public class QuadraticProblem {
    * @param box The bounds in which the maximum is calculated
    * @param arrayCache ArrayCache object
    */
-  public QuadraticProblem(double[][] a, double[] b, double c, Boundingbox box, ProblemData[] arrayCache) {
-    maximumValue = Double.NEGATIVE_INFINITY;
-    argmaxPoint = null;
-    this.cache = arrayCache;
+  public static double solve(double[][] a, double[] b, double c, Boundingbox box, ProblemData[] cache, double[] argmaxPoint) {
+    QuadraticProblem p = new QuadraticProblem();
+    p.cache = cache;
     DimensionState[] dimStates = cache[b.length - 1].dimStates;
     Arrays.fill(dimStates, DimensionState.CONSTR);
-    argmaxPoint = new double[b.length];
-    maximumValue = evaluateConstrainedQuadraticFunction(a, b, c, box, dimStates, true, argmaxPoint, maximumValue);
+    return p.evaluateConstrainedQuadraticFunction(a, b, c, box, dimStates, true, argmaxPoint, Double.NEGATIVE_INFINITY);
   }
 
   /**
@@ -136,9 +123,8 @@ public class QuadraticProblem {
    * @param buf Return buffer
    */
   private void calculateLinearDerivativeLimits(double[][] a, double[] b, Boundingbox hyperboundingbox, int dim, double[] buf) {
-    double bk = b[dim];
     // initialize with value at 0^k
-    double min = bk, max = bk;
+    double min = b[dim], max = min;
     // then for each dimension add the y-difference to the bounds to the
     // according limits
     for(int i = 0; i < b.length; i++) {
@@ -169,14 +155,11 @@ public class QuadraticProblem {
    * @return The maximum Function value
    */
   private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, Boundingbox boundingbox) {
-    double[] middle = boundingbox.getMidPoint();
-    double fm = evalueateQuadraticFormula(a, b, c, middle);
-
+    double fm = evaluateQuadraticFormula(a, b, c, boundingbox.getMidPoint());
     double[] buf = new double[2];
-    for(int i = 0; i < middle.length; i++) {
+    for(int i = 0; i < b.length; i++) {
       calculateLinearDerivativeLimits(a, b, boundingbox, i, buf);
-      double halfdist = boundingbox.getDifference(i) * 0.5;
-      fm += halfdist * FastMath.max(-buf[0], buf[1]);
+      fm += boundingbox.getHalfwidth(i) * FastMath.max(-buf[0], buf[1]);
     }
     return fm;
   }
@@ -211,92 +194,84 @@ public class QuadraticProblem {
     // check if we have no constrained dimension -> we worked all dimension
     // then we just check if the maximum is inside the given bounds
     if(constrDim < 0) {
-      double[] opt = findMaximumWithfunctionValue(a, b);
+      double[] opt = findMaximumWithFunctionValue(a, b);
       if(opt == null) {
         return resultValue; // no optimum with constraints
       }
       if(bounds.weaklyInsideBounds(opt)) {
-        double optValue = evalueateQuadraticFormula(a, b, c, opt);
+        double optValue = evaluateQuadraticFormula(a, b, c, opt);
         if(optValue > resultValue) {
-          if(calcPoint) {
-            assert opt.length == result.length;
-            System.arraycopy(opt, 0, result, 0, opt.length);
-          }
+          System.arraycopy(opt, 0, result, 0, opt.length);
           return optValue; // better optimum with constraints
         }
       }
+      return resultValue; // we haven't found anything better, keep previous
     }
-    else { // we found a constrained dimension
-      if(cutoffCheck) {
-        double[] opt = findMaximumWithfunctionValue(a, b);
-        if(opt != null) {
-          double optValue = evalueateQuadraticFormula(a, b, c, opt);
-          if(bounds.weaklyInsideBounds(opt)) {
-            if(optValue > resultValue) {
-              // copy result and return
-              if(calcPoint) {
-                assert result.length == opt.length;
-                System.arraycopy(opt, 0, result, 0, opt.length);
-              }
-              resultValue = optValue;
-            }
-            return resultValue; // found value in cutoff check
-            // no point in checking children, because we found a value in bounds
-            // and will not get anything better
+    // we found a constrained dimension
+    if(cutoffCheck) {
+      double[] opt = findMaximumWithFunctionValue(a, b);
+      if(opt != null) {
+        double optValue = evaluateQuadraticFormula(a, b, c, opt);
+        if(bounds.weaklyInsideBounds(opt)) {
+          if(optValue > resultValue) {
+            System.arraycopy(opt, 0, result, 0, opt.length);
+            return optValue;
           }
-          else {
-            if(resultValue > optValue) {
-              return resultValue; // no better solution better in this
-                                  // sub-call-tree
-              // even though the value is outside of bounds, that value still
-              // will only drop in children, so its not worth checking any
-              // further
-            }
+          return resultValue; // found value in cutoff check
+          // no point in checking children, because we found a value in bounds
+          // and will not get anything better
+        }
+        else {
+          if(resultValue > optValue) {
+            return resultValue;
+            // no better solution better in this sub-call-tree
+            // even though the value is outside of bounds, that value still
+            // will only drop in children, so its not worth checking any
+            // further
           }
-        }
-        // At this point opt is either null or outside bounds and we can still
-        // get a good value
-        int drivenDimension = findLimitedDimensionWithDerivative(a, b, bounds);
-        if(drivenDimension != 0) {
-          // we found a value that can be driven to lower or upper limit
-          final int dim = Math.abs(drivenDimension) - 1;
-          DimensionState state = drivenDimension > 0 ? DimensionState.UPLIM : DimensionState.LOLIM;
-          double redVal = startReducedProblem(a, b, c, bounds, dimensionStates, dim, state, result, resultValue);
-          assert redVal >= resultValue;
-          return redVal;
-        }
-        // if we cannot find such a value, make sure we can still find a good
-        // value in the given bounds
-        double maxPossValue = computeMaximumPossibleFuncValue(a, b, c, bounds);
-        if(maxPossValue <= resultValue) {
-          return resultValue; // we cannot get any better in this sub-call-tree
         }
       }
-      // all cutoff checks done, if we reach this line, there is no cutoff and
-      // we proceed with calling all children
+      // At this point opt is either null or outside bounds and we can still
+      // get a good value
+      int drivenDimension = findLimitedDimensionWithDerivative(a, b, bounds);
+      if(drivenDimension != 0) {
+        // we found a value that can be driven to lower or upper limit
+        final int dim = Math.abs(drivenDimension) - 1;
+        DimensionState state = drivenDimension > 0 ? DimensionState.UPLIM : DimensionState.LOLIM;
+        double redVal = startReducedProblem(a, b, c, bounds, dimensionStates, dim, state, result, resultValue);
+        assert redVal >= resultValue;
+        return redVal;
+      }
+      // if we cannot find such a value, make sure we can still find a good
+      // value in the given bounds
+      double maxPossValue = computeMaximumPossibleFuncValue(a, b, c, bounds);
+      if(maxPossValue <= resultValue) {
+        return resultValue; // we cannot get any better in this sub-call-tree
+      }
+    }
+    // all cutoff checks done, if we reach this line, there is no cutoff and
+    // we proceed with calling all children
 
-      // only do unconstrained child if its not the last constrained
-      // count values in array
-      int acc = 0;
-      for(int i = 0; i < dimensionStates.length; i++) {
-        if(dimensionStates[i] == DimensionState.CONSTR) {
-          acc += 1;
-        }
+    // only do unconstrained child if its not the last constrained
+    // count values in array
+    int acc = 0;
+    for(int i = 0; i < dimensionStates.length; i++) {
+      if(dimensionStates[i] == DimensionState.CONSTR) {
+        acc += 1;
       }
-      double lastResult = resultValue;
-      if(acc > 1) {
-        lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.UNCONSTR, result, resultValue);
-        assert lastResult >= resultValue;
-        resultValue = lastResult;
-      }
-      lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.LOLIM, result, resultValue);
+    }
+    double lastResult = resultValue;
+    if(acc > 1) {
+      lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.UNCONSTR, result, resultValue);
       assert lastResult >= resultValue;
       resultValue = lastResult;
-      lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.UPLIM, result, resultValue);
-      assert lastResult >= resultValue;
-      return lastResult; // best of the children or old
     }
-    return resultValue; // we havent found anything better so return last result
+    lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.LOLIM, result, resultValue);
+    assert lastResult >= resultValue;
+    resultValue = lastResult;
+    lastResult = startReducedProblem(a, b, c, bounds, dimensionStates, constrDim, DimensionState.UPLIM, result, resultValue);
+    assert lastResult >= resultValue;
+    return lastResult; // best of the children or old
   }
 
   /**
@@ -314,7 +289,7 @@ public class QuadraticProblem {
    * @return the new max
    */
   private double evaluateConstrainedQuadraticFunction1D(double a, double b, double c, double lowerBound, double upperBound, double[] result, double resultValue) {
-    // has max if a <0
+    // has max if a < 0
     boolean hasMax = a < 0.0;
     double argmax = Double.NaN;
     double max = Double.NEGATIVE_INFINITY;
@@ -334,9 +309,7 @@ public class QuadraticProblem {
     }
 
     if(max > resultValue) {
-      if(calcPoint) {
-        result[0] = argmax;
-      }
+      result[0] = argmax;
       return max;
     }
     return resultValue;
@@ -355,12 +328,12 @@ public class QuadraticProblem {
    * @param dimStates Current calculation state of the dimensions
    * @param reducedDim the dimension to reduce
    * @param reducedTo the state the dimension is reduced to
-   * @param result the - so far - argmax
-   * @param resultValue the - so far - max
+   * @param result the current argmax
+   * @param resultValue the current max
    * @return the new max value
    */
   private double startReducedProblem(double[][] a, double[] b, double c, Boundingbox bounds, DimensionState[] dimStates, int reducedDim, DimensionState reducedTo, double[] result, double resultValue) {
-    assert dimStates[reducedDim] == DimensionState.CONSTR : "trying to reduce on allready reduced dimension";
+    assert dimStates[reducedDim] == DimensionState.CONSTR : "trying to reduce an already reduced dimension";
     assert reducedTo == DimensionState.UNCONSTR || reducedTo == DimensionState.LOLIM || reducedTo == DimensionState.UPLIM : "trying to reduce to constrained dim state";
 
     if(reducedTo == DimensionState.UNCONSTR) {
@@ -369,34 +342,28 @@ public class QuadraticProblem {
       // child call should only update result, if the new result is
       // better than the old
       double childResValue = evaluateConstrainedQuadraticFunction(a, b, c, bounds, dimStates, false, result, resultValue);
-      dimStates[reducedDim] = dimState;
       assert childResValue >= resultValue;
+      dimStates[reducedDim] = dimState; // Restore
       return childResValue;
     }
     double reduceToValue = reducedTo == DimensionState.LOLIM ? bounds.getLowerBound(reducedDim) : bounds.getUpperBound(reducedDim);
-    int redSize = b.length - 1;
-    double[][] redA = cache[redSize - 1].a;
-    double[] redB = cache[redSize - 1].b;
-    DimensionState[] redDimStates = cache[redSize - 1].dimStates;
-    Boundingbox redBounds = cache[redSize - 1].box;
+    final int redSizem1 = b.length - 2;
+    double[][] redA = cache[redSizem1].a;
+    double[] redB = cache[redSizem1].b;
+    DimensionState[] redDimStates = cache[redSizem1].dimStates;
+    Boundingbox redBounds = cache[redSizem1].box;
     double redC = reduceEquation(a, b, c, redA, redB, reducedDim, reduceToValue);
     reduceConstraints(bounds, redBounds, dimStates, redDimStates, reducedDim);
 
-    double[] redRes = null;
-    if(calcPoint) {
-      redRes = reduceSolution(result, reducedDim);
-    }
+    double[] redRes = reduceSolution(result, reducedDim);
     // reduce solution to make it temporarily usable
     double redResValue = evaluateConstrainedQuadraticFunction(redA, redB, redC, redBounds, redDimStates, true, redRes, resultValue);
-
     // if we found a better value than the one in result_value, update
-    if(redResValue > resultValue) {
-      if(calcPoint) {
-        expandNewSolution(result, redRes, reducedDim, reduceToValue);
-      }
-      resultValue = redResValue;
+    if(redResValue <= resultValue) {
+      return resultValue;
     }
-    return resultValue;
+    expandNewSolution(result, redRes, reducedDim, reduceToValue);
+    return redResValue;
   }
 
   /**
@@ -472,7 +439,7 @@ public class QuadraticProblem {
    * @param b coefficient vector b of the function
    * @return the argmax of the given function
    */
-  private double[] findMaximumWithfunctionValue(double[][] a, double[] b) {
+  private double[] findMaximumWithFunctionValue(double[][] a, double[] b) {
     CholeskyDecomposition chol = new CholeskyDecomposition(times(a, -1));
     return chol.isSPD() ? chol.solve(b) : null;
   }
@@ -486,7 +453,7 @@ public class QuadraticProblem {
    * @param point x to calculate the function at
    * @return function value
    */
-  public double evalueateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
+  public double evaluateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
     return 0.5 * transposeTimesTimes(point, a, point) + scalarProduct(point, b) + c;
   }
 
@@ -510,8 +477,6 @@ public class QuadraticProblem {
 
     double[] b, result;
 
-    double piPow;
-
     Boundingbox box;
 
     DimensionState[] dimStates;
@@ -520,9 +485,16 @@ public class QuadraticProblem {
       a = new double[size][size];
       b = new double[size];
       result = new double[size];
-      piPow = FastMath.pow(MathUtil.SQRTPI, size);
       dimStates = new DimensionState[size];
       box = new Boundingbox(new double[size], new double[size]);
+    }
+
+    public static ProblemData[] newCache(int d) {
+      ProblemData[] cache = new ProblemData[d];
+      for(int i = 0; i < d; i++) {
+        cache[i] = new ProblemData(i + 1);
+      }
+      return cache;
     }
   }
 }
