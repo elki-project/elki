@@ -40,23 +40,23 @@ public class EMKDTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, MultivariateGaussianModelFactory.class) //
+        .with(EMKD.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.83346);
-    assertClusterSizes(result, new int[] { 5, 100, 290, 315 });
+    assertFMeasure(db, result, 0.82040);
+    assertClusterSizes(result, new int[] { 5, 102, 282, 321 });
   }
 
   @Test
   public void testInfinityCheatCase() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
-        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reaches
+        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reached
                                  // an infinite value!
         .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, MultivariateGaussianModelFactory.class) //
+        .with(EMKD.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.782878);
-    assertClusterSizes(result, new int[] { 5, 91, 210, 404 });
+    assertFMeasure(db, result, 0.64239);
+    assertClusterSizes(result, new int[] { 5, 85, 205, 415 });
   }
 
   @Test

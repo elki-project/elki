@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MeanModel;
@@ -113,42 +112,42 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   /**
    * Number of clusters
    */
-  private int k;
+  protected int k;
 
   /**
    * Delta parameter
    */
-  private double delta;
+  protected double delta;
 
   /**
    * Factory for producing the initial cluster model.
    */
-  private EMClusterModelFactory<O, M> mfactory;
+  protected EMClusterModelFactory<? super O, M> mfactory;
 
   /**
    * Minimum number of iterations to do
    */
-  private int miniter;
+  protected int miniter;
 
   /**
    * Maximum number of iterations to allow
    */
-  private int maxiter;
+  protected int maxiter;
 
   /**
    * Prior to enable MAP estimation (use 0 for MLE)
    */
-  private double prior = 0.;
+  protected double prior = 0.;
 
   /**
    * Retain soft assignments.
    */
-  private boolean soft;
+  protected boolean soft;
 
   /**
    * Minimum loglikelihood to avoid -infinity.
    */
-  private static final double MIN_LOGLIKELIHOOD = -100000;
+  protected static final double MIN_LOGLIKELIHOOD = -100000;
 
   /**
    * Soft assignment result type.
@@ -162,7 +161,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param delta delta parameter
    * @param mfactory EM cluster model factory
    */
-  public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory) {
+  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory) {
     this(k, delta, mfactory, -1, 0., false);
   }
 
@@ -175,7 +174,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param maxiter Maximum number of iterations
    * @param soft Include soft assignments
    */
-  public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory, int maxiter, boolean soft) {
+  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int maxiter, boolean soft) {
     this(k, delta, mfactory, maxiter, 0., soft);
   }
 
@@ -189,7 +188,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param prior MAP prior
    * @param soft Include soft assignments
    */
-  public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory, int maxiter, double prior, boolean soft) {
+  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int maxiter, double prior, boolean soft) {
     this(k, delta, mfactory, 1, maxiter, prior, soft);
   }
 
@@ -204,7 +203,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param prior MAP prior
    * @param soft Include soft assignments
    */
-  public EM(int k, double delta, EMClusterModelFactory<O, M> mfactory, int miniter, int maxiter, double prior, boolean soft) {
+  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int miniter, int maxiter, double prior, boolean soft) {
     super();
     this.k = k;
     this.delta = delta;
@@ -236,7 +235,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
-    List<? extends EMClusterModel<O, M>> models = mfactory.buildInitialModels(relation, k);
+    List<? extends EMClusterModel<? super O, M>> models = mfactory.buildInitialModels(relation, k);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
@@ -296,7 +295,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param prior MAP prior (use 0 for MLE)
    * @param <O> Object type
    */
-  public static <O> void recomputeCovarianceMatrices(Relation<? extends O> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<O, ?>> models, double prior) {
+  public static <O> void recomputeCovarianceMatrices(Relation<? extends O> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<? super O, ?>> models, double prior) {
     final int k = models.size();
     boolean needsTwoPass = false;
     for(EMClusterModel<?, ?> m : models) {
@@ -351,7 +350,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param <O> Object type
    * @return the expectation value of the current mixture of distributions
    */
-  public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
+  public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<? super O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
 
@@ -396,6 +395,17 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   }
 
   /**
+   * Compute log(exp(a)+exp(b)), with attention to numerical issues.
+   *
+   * @param a Input 1
+   * @param b Input 2
+   * @return Result
+   */
+  protected static double logSumExp(double a, double b) {
+    return (a > b ? a : b) + FastMath.log(a > b ? FastMath.exp(b - a) + 1 : FastMath.exp(a - b) + 1);
+  }
+
+  /**
    * Set whether the clustering is supposed to preserve cluster assignment
    * probabilities. Used by {@link elki.outlier.clustering.EMOutlier}.
    *
@@ -412,8 +422,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    */
   public static class Par<O, M extends MeanModel> implements Parameterizer {
     /**
-     * Parameter to specify the number of clusters to find, must be an integer
-     * greater than 0.
+     * Parameter to specify the number of clusters to find.
      */
     public static final OptionID K_ID = new OptionID("em.k", "The number of clusters to find.");
 
@@ -430,9 +439,14 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     public static final OptionID INIT_ID = new OptionID("em.model", "Model factory.");
 
     /**
-     * Parameter to specify a minimum number of iterations
+     * Parameter to specify a minimum number of iterations.
      */
     public static final OptionID MINITER_ID = new OptionID("em.miniter", "Minimum number of iterations.");
+
+    /**
+     * Parameter to specify the maximum number of iterations.
+     */
+    public static final OptionID MAXITER_ID = new OptionID("em.maxiter", "Maximum number of iterations.");
 
     /**
      * Parameter to specify the MAP prior
@@ -493,7 +507,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> miniter = x);
-      new IntParameter(KMeans.MAXITER_ID)//
+      new IntParameter(MAXITER_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> maxiter = x);

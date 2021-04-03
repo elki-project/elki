@@ -28,7 +28,6 @@ import java.util.List;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.em.KDTree.ClusterData;
 import elki.clustering.em.QuadraticProblem.ProblemData;
-import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -76,9 +75,9 @@ import net.jafama.FastMath;
  * Very Fast EM-based Mixture Model Clustering using Multiresolution
  * kd-trees.<br>
  * Neural Information Processing Systems (NIPS 1998)
- * <p>
- * 
+ *
  * @author Robert Gehde
+ *
  * @param <M> model type to produce
  */
 @Title("EMKD-Clustering: Clustering by Expectation Maximization on a KD-Tree")
@@ -96,7 +95,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   /**
    * Factory for producing the initial cluster model.
    */
-  private EMClusterModelFactory<NumberVector, M> mfactory;
+  private EMClusterModelFactory<? super NumberVector, M> mfactory;
 
   /**
    * Retain soft assignments.
@@ -129,17 +128,11 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
   private double tau;
 
   /**
-   * drop one class if the maximum weight of a class in the bounding box is
+   * Drop one class if the maximum weight of a class in the bounding box is
    * lower than tauClass * wmin_max, where wmin_max is the maximum minimum
    * weight of all classes
    */
   private double tauClass;
-
-  /**
-   * if true, will check the difference of upper and lower limits of the models
-   * to check for pruning opportunities
-   */
-  private boolean ignorePrune;
 
   /**
    * minimum amount of iterations
@@ -167,10 +160,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * @param mfactory EM cluster model factory
    * @param miniter Minimum number of iterations
    * @param maxiter Maximum number of iterations
-   * @param ignorePrune dont prune during calculation
    * @param soft Include soft assignments
    */
-  public EMKD(int k, double mbw, double tau, double tauclass, double delta, EMClusterModelFactory<NumberVector, M> mfactory, int miniter, int maxiter, boolean ignorePrune, boolean soft) {
+  public EMKD(int k, double mbw, double tau, double tauclass, double delta, EMClusterModelFactory<? super NumberVector, M> mfactory, int miniter, int maxiter, boolean soft) {
     this.k = k;
     this.mbw = mbw;
     this.tau = tau;
@@ -179,7 +171,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     this.mfactory = mfactory;
     this.miniter = miniter;
     this.maxiter = maxiter;
-    this.ignorePrune = ignorePrune;
     this.soft = soft;
   }
 
@@ -202,16 +193,16 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
 
     // assuming all models are the same
     if(mfactory instanceof TwoPassMultivariateGaussianModelFactory) {
-      LOG.warning("TwoPassMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
+      LOG.warning("TwoPassMultivariateGaussianModel has the same behaviour as TextbookMultivariateGaussianModel in EMKD.");
     }
-    else if(mfactory instanceof TextbookMultivariateGaussianModelFactory) {
-      LOG.warning("TextbookMultivariateGaussianModel has the same behaviour as MultivariateGaussianModel in EMKD\nbut doesn't support the calculation of stopping condition.\nBetter use MultivariateGaussianModel instead");
+    else if(mfactory instanceof MultivariateGaussianModelFactory) {
+      LOG.warning("MultivariateGaussianModel has the same behaviour as TextbookMultivariateGaussianModel in EMKD.");
     }
-    else if(!(mfactory instanceof MultivariateGaussianModelFactory)) {
-      LOG.warning("Model list contains models that does not support the calculation of stopping conditions!");
+    else if(!(mfactory instanceof TextbookMultivariateGaussianModelFactory)) {
+      LOG.warning("Model does not support the calculation of stopping conditions.");
     }
     // Create initial models
-    List<? extends EMClusterModel<NumberVector, M>> models = mfactory.buildInitialModels(relation, k);
+    List<? extends EMClusterModel<? super NumberVector, M>> models = mfactory.buildInitialModels(relation, k);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     DoubleStatistic likeStat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
@@ -239,7 +230,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
       for(int i = 0; i < newstats.length; i++) {
         newstats[i] = new ClusterData(d);
       }
-      logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, !ignorePrune, cache, piPow) / relation.size();
+      logLikelihood = tree.makeStats(models, indices, newstats, tau, tauClass, cache, piPow) / relation.size();
       // newstats now contains necessary info for updatecluster
       updateClusters(newstats, models, relation.size());
       // log new likelihood
@@ -292,14 +283,14 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * @param models models to update
    * @param size number of elements to cluster
    */
-  private void updateClusters(ClusterData[] newstats, List<? extends EMClusterModel<NumberVector, M>> models, int size) {
+  private void updateClusters(ClusterData[] newstats, List<? extends EMClusterModel<? super NumberVector, M>> models, int size) {
     for(int i = 0; i < k; i++) {
       if(newstats[i].summedLogWeights_apriori == Double.NEGATIVE_INFINITY) {
         LOG.warning("A model wasn't visited during tree traversion. The model has not been updated!");
         continue;
       }
       // for this model
-      EMClusterModel<NumberVector, M> model = models.get(i);
+      EMClusterModel<? super NumberVector, M> model = models.get(i);
 
       // calculate model statistics according to the paper
       double weight = FastMath.exp(newstats[i].summedLogWeights_apriori) / size;
@@ -341,13 +332,25 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
    * 
    * @author Erich Schubert
    * @author Robert Gehde
+   * 
+   * @param <M> model type to produce
    */
   public static class Par<M extends MeanModel> implements Parameterizer {
     /**
-     * Parameter to specify the number of clusters to find, must be an integer
-     * greater than 0.
+     * Parameter to specify the number of clusters to find.
      */
-    public static final OptionID K_ID = new OptionID("emkd.k", "The number of clusters to find.");
+    public static final OptionID K_ID = EM.Par.K_ID;
+
+    /**
+     * Parameter to specify the termination criterion for maximization of E(M):
+     * E(M) - E(M') &lt; em.delta, must be a double equal to or greater than 0.
+     */
+    public static final OptionID DELTA_ID = EM.Par.DELTA_ID;
+
+    /**
+     * Parameter to specify the EM cluster models to use.
+     */
+    public static final OptionID INIT_ID = EM.Par.INIT_ID;
 
     /**
      * Parameter to specify the termination criterion for kd-tree construction.
@@ -375,26 +378,19 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
         "Parameter for pruning. Drop a class if w[c] < tauclass * max(wmins). Set to 0 to disable dropping of classes.");
 
     /**
-     * Parameter to specify the termination criterion for maximization of E(M):
-     * E(M) - E(M') &lt; em.delta, must be a double equal to or greater than 0.
-     */
-    public static final OptionID DELTA_ID = new OptionID("emkd.delta", //
-        "The termination criterion for maximization of E(M): E(M) - E(M') < em.delta.");
-
-    /**
-     * Parameter to specify the EM cluster models to use.
-     */
-    public static final OptionID INIT_ID = new OptionID("emkd.model", "Model factory.");
-
-    /**
      * Parameter to specify a minimum number of iterations
      */
-    public static final OptionID MINITER_ID = new OptionID("emkd.miniter", "Minimum number of iterations.");
+    public static final OptionID MINITER_ID = EM.Par.MINITER_ID;
 
     /**
-     * Parameter to specify if pruning should be ignored
+     * Parameter to specify a maximum number of iterations
      */
-    public static final OptionID IGNORE_PRUNE_ID = new OptionID("emkd.ignorePrune", "Set to ignore pruning checks during calculation.");
+    public static final OptionID MAXITER_ID = EM.Par.MAXITER_ID;
+
+    /**
+     * Parameter to specify the saving of soft assignments
+     */
+    public static final OptionID SOFT_ID = EM.Par.SOFT_ID;
 
     /**
      * Number of clusters.
@@ -437,9 +433,9 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
     protected int maxiter = -1;
 
     /**
-     * Pruning on or off
+     * Retain soft assignments?
      */
-    protected boolean ignorePrune = true;
+    boolean soft = false;
 
     @Override
     public void configure(Parameterization config) {
@@ -450,8 +446,6 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .grab(config, x -> mbw = x);
-      new Flag(IGNORE_PRUNE_ID) //
-          .grab(config, x -> ignorePrune = x);
       new DoubleParameter(TAU_ID, 0.01)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
@@ -460,7 +454,7 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
           .grab(config, x -> tauclass = x);
-      new ObjectParameter<EMClusterModelFactory<NumberVector, M>>(INIT_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
+      new ObjectParameter<EMClusterModelFactory<NumberVector, M>>(INIT_ID, EMClusterModelFactory.class, TextbookMultivariateGaussianModelFactory.class) //
           .grab(config, x -> initializer = x);
       new DoubleParameter(DELTA_ID, 1e-7)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
@@ -469,15 +463,17 @@ public class EMKD<M extends MeanModel> implements ClusteringAlgorithm<Clustering
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> miniter = x);
-      new IntParameter(KMeans.MAXITER_ID)//
+      new IntParameter(MAXITER_ID)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> maxiter = x);
+      new Flag(SOFT_ID) //
+          .grab(config, x -> soft = x);
     }
 
     @Override
     public EMKD<M> make() {
-      return new EMKD<>(k, mbw, tau, tauclass, delta, initializer, miniter, maxiter, ignorePrune, false);
+      return new EMKD<>(k, mbw, tau, tauclass, delta, initializer, miniter, maxiter, soft);
     }
   }
 
