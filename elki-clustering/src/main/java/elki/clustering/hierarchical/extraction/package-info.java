@@ -5,7 +5,7 @@
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.hierarchical.HierarchicalClusteringAlgorithm
- * @opt include .*elki.clustering.hierarchical.PointerHierarchyRepresentationResult
+ * @opt include .*elki.clustering.hierarchical.PointerHierarchyResult
  */
 /*
  * This file is part of ELKI:

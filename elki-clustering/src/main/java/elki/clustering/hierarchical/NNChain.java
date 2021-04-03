@@ -77,7 +77,7 @@ public class NNChain<O> extends AGNES<O> {
   }
 
   @Override
-  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerHierarchyResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
@@ -89,7 +89,7 @@ public class NNChain<O> extends AGNES<O> {
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
+    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
 
     nnChainCore(mat, builder);
     return builder.complete();
@@ -102,7 +102,7 @@ public class NNChain<O> extends AGNES<O> {
    * @param mat Matrix view
    * @param builder Result builder
    */
-  private void nnChainCore(MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {
+  private void nnChainCore(MatrixParadigm mat, PointerHierarchyBuilder builder) {
     final DBIDArrayIter ix = mat.ix;
     final double[] distances = mat.matrix;
     final int size = mat.size;
@@ -190,7 +190,7 @@ public class NNChain<O> extends AGNES<O> {
    * @param builder Linkage information
    * @return Position
    */
-  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyRepresentationBuilder builder) {
+  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyBuilder builder) {
     while(pos < end) {
       if(!builder.isLinked(ix.seek(pos))) {
         return pos;

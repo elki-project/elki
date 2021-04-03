@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import elki.Algorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.clustering.hierarchical.extraction.CutDendrogramByHeight;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -65,8 +65,8 @@ public class CutDendrogramByHeightExtractor implements Evaluator {
 
   @Override
   public void processNewResult(Object newResult) {
-    ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyRepresentationResult.class);
-    for(PointerHierarchyRepresentationResult pointerresult : hrs) {
+    ArrayList<PointerHierarchyResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyResult.class);
+    for(PointerHierarchyResult pointerresult : hrs) {
       Metadata.hierarchyOf(pointerresult).addChild(inner.run(pointerresult));
     }
   }
@@ -92,7 +92,7 @@ public class CutDendrogramByHeightExtractor implements Evaluator {
     }
 
     @Override
-    public PointerHierarchyRepresentationResult autorun(Database db) {
+    public PointerHierarchyResult autorun(Database db) {
       throw new AbortException("This must not be called");
     }
   }

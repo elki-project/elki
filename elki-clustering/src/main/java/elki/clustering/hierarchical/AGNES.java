@@ -87,7 +87,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.6.0
  *
  * @composed - - - LinkageMethod
- * @composed - - - PointerHierarchyRepresentationBuilder
+ * @composed - - - PointerHierarchyBuilder
  *
  * @param <O> Object type
  */
@@ -141,7 +141,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerHierarchyResult run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
@@ -154,7 +154,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
+    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -180,7 +180,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param x Last merged object
    * @return New active set size
    */
-  protected static int shrinkActiveSet(DBIDArrayIter ix, PointerHierarchyRepresentationBuilder builder, int end, int x) {
+  protected static int shrinkActiveSet(DBIDArrayIter ix, PointerHierarchyBuilder builder, int end, int x) {
     if(x == end - 1) { // Can truncate active set.
       while(builder.isLinked(ix.seek(--end - 1))) {
         // Everything happens in while condition already.
@@ -227,7 +227,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param builder Pointer representation builder
    * @return the index that has disappeared, for shrinking the working set
    */
-  protected int findMerge(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder) {
+  protected int findMerge(int end, MatrixParadigm mat, PointerHierarchyBuilder builder) {
     assert (end > 0);
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] matrix = mat.matrix;
@@ -269,7 +269,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y) {
+  protected void merge(int end, MatrixParadigm mat, PointerHierarchyBuilder builder, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     if(LOG.isDebuggingFine()) {
@@ -278,7 +278,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, linkage.restore(mindist, distance.isSquared()), iy);
+    builder.strictAdd(ix, linkage.restore(mindist, distance.isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
@@ -297,7 +297,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param sizex Old size of first cluster
    * @param sizey Old size of second cluster
    */
-  protected void updateMatrix(int end, MatrixParadigm mat, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
+  protected void updateMatrix(int end, MatrixParadigm mat, PointerHierarchyBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: y < x
     final int xbase = MatrixParadigm.triangleSize(x);
     final int ybase = MatrixParadigm.triangleSize(y);

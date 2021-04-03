@@ -21,9 +21,7 @@
 package elki.clustering.hierarchical;
 
 import elki.database.datastore.*;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.logging.Logging;
 
 /**
@@ -32,13 +30,13 @@ import elki.logging.Logging;
  * @author Erich Schubert
  * @since 0.7.1
  *
- * @has - - - PointerHierarchyRepresentationResult
+ * @has - - - PointerHierarchyResult
  */
-public class PointerHierarchyRepresentationBuilder {
+public class PointerHierarchyBuilder {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(PointerHierarchyRepresentationBuilder.class);
+  private static final Logging LOG = Logging.getLogger(PointerHierarchyBuilder.class);
 
   /**
    * The DBIDs in this result.
@@ -86,7 +84,7 @@ public class PointerHierarchyRepresentationBuilder {
    * @param ids IDs
    * @param isSquared Flag to indicate squared distances
    */
-  public PointerHierarchyRepresentationBuilder(DBIDs ids, boolean isSquared) {
+  public PointerHierarchyBuilder(DBIDs ids, boolean isSquared) {
     super();
     this.ids = ids;
     this.parent = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -99,18 +97,60 @@ public class PointerHierarchyRepresentationBuilder {
   }
 
   /**
-   * Add an element to the pointer representation.
-   *
-   * @param cur Current object
-   * @param distance Link distance
-   * @param par Parent
+   * Helper variables used for union-find.
+   * <p>
+   * TODO: once Java has value types, this likely is no longer beneficial.
    */
-  public void add(DBIDRef cur, double distance, DBIDRef par) {
+  private DBIDVar p = DBIDUtil.newVar(), q = DBIDUtil.newVar(),
+      n = DBIDUtil.newVar();
+
+  /**
+   * A more robust "add" operation (involving a union-find) where we may use
+   * arbitrary objects i and j to refer to clusters, not only the largest ID
+   * in each cluster.
+   * <p>
+   * TODO: worth implementing a union-find halving optimization?
+   * 
+   * @param i First cluster
+   * @param dist Link distance
+   * @param j Second cluster
+   */
+  public void add(DBIDRef i, double dist, DBIDRef j) {
+    p.set(i);
+    // Follow p to its parent.
+    while(!DBIDUtil.equal(p, parent.assignVar(p, n))) {
+      p.set(n);
+    }
+    // Follow q to its parent.
+    q.set(j);
+    while(!DBIDUtil.equal(q, parent.assignVar(q, n))) {
+      q.set(n);
+    }
+    // By definition of the pointer representation, the largest element in
+    // each cluster is the cluster lead.
+    // The extraction methods currently rely on this!
+    final int c = DBIDUtil.compare(p, q);
+    if(c == 0) {
+      throw new IllegalStateException("Merging cluster to itself!");
+    }
+    strictAdd(c < 0 ? p : q, dist, c < 0 ? q : p);
+  }
+
+  /**
+   * Add a merge to the pointer representation. This API requires that the
+   * source object is <em>not</em> linked yet, and has a smaller ID than the
+   * target, because of the pointer structure representation used by SLINK.
+   *
+   * @param source Current object
+   * @param distance Link distance
+   * @param target Parent
+   */
+  public void strictAdd(DBIDRef source, double distance, DBIDRef target) {
     assert prototypes == null;
-    parent.putDBID(cur, par);
-    double olddist = parentDistance.putDouble(cur, distance);
+    parent.putDBID(source, target);
+    double olddist = parentDistance.putDouble(source, distance);
     assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
-    order.putInt(cur, mergecount);
+    order.putInt(source, mergecount);
     ++mergecount;
   }
 
@@ -140,7 +180,7 @@ public class PointerHierarchyRepresentationBuilder {
    *
    * @return Completed result
    */
-  public PointerHierarchyRepresentationResult complete() {
+  public PointerHierarchyResult complete() {
     if(csize != null) {
       csize.destroy();
       csize = null;
@@ -148,10 +188,26 @@ public class PointerHierarchyRepresentationBuilder {
     if(mergecount != ids.size() - 1) {
       LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
     }
-    if(prototypes != null) {
-      return new PointerPrototypeHierarchyRepresentationResult(ids, parent, parentDistance, isSquared, order, prototypes);
+    return prototypes != null ? //
+        new PointerPrototypeHierarchyResult(ids, parent, parentDistance, isSquared, order, prototypes) : //
+        new PointerHierarchyResult(ids, parent, parentDistance, isSquared, order);
+  }
+
+  /**
+   * Build a result with additional density information.
+   * 
+   * @param coredists Core distances (density)
+   * @return Completed result.
+   */
+  public PointerDensityHierarchyResult complete(WritableDoubleDataStore coredists) {
+    if(csize != null) {
+      csize.destroy();
+      csize = null;
     }
-    return new PointerHierarchyRepresentationResult(ids, parent, parentDistance, isSquared, order);
+    if(mergecount != ids.size() - 1) {
+      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
+    }
+    return new PointerDensityHierarchyResult(ids, parent, parentDistance, isSquared, coredists);
   }
 
   /**

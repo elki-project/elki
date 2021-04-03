@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import elki.clustering.hierarchical.PointerPrototypeHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
@@ -64,7 +64,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.6.0
  *
  * @composed - runs - HierarchicalClusteringAlgorithm
- * @assoc - processes - PointerHierarchyRepresentationResult
+ * @assoc - processes - PointerHierarchyResult
  * @navassoc - produces - Clustering
  * @navassoc - produces - DendrogramModel
  */
@@ -108,7 +108,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    * @param pointerresult Hierarchical result in pointer representation.
    * @return Clustering
    */
-  public abstract Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult);
+  public abstract Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult);
 
   /**
    * Instance for a single data set.
@@ -134,7 +134,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyRepresentationResult pointerresult;
+    protected PointerHierarchyResult pointerresult;
 
     /**
      * Map clusters to integer cluster numbers.
@@ -161,7 +161,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      *
      * @param pointerresult Hierarchical result
      */
-    public Instance(PointerHierarchyRepresentationResult pointerresult) {
+    public Instance(PointerHierarchyResult pointerresult) {
       this.ids = pointerresult.topologicalSort();
       this.pi = pointerresult.getParentStore();
       this.lambda = pointerresult.getParentDistanceStore();
@@ -406,8 +406,8 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
       }
 
       DendrogramModel model;
-      if(members != null && !members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
-        model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyRepresentationResult) pointerresult).findPrototype(members));
+      if(members != null && !members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyResult) {
+        model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyResult) pointerresult).findPrototype(members));
       }
       else {
         model = new DendrogramModel(depth);

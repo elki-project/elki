@@ -67,8 +67,8 @@ public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build();
-    assertFMeasure(db, slink.autorun(db), 0.97218);
-    assertClusterSizes(slink.autorun(db), new int[] { 21, 54, 103, 152 });
+    assertFMeasure(db, slink.autorun(db), 0.9703989);
+    assertClusterSizes(slink.autorun(db), new int[] { 20, 55, 103, 152 });
   }
 
   @Test

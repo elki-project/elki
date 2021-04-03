@@ -71,8 +71,8 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.96941);
-    assertClusterSizes(clustering, new int[] { 7, 14, 54, 103, 152 });
+    assertFMeasure(db, clustering, 0.96782);
+    assertClusterSizes(clustering, new int[] { 7, 13, 55, 103, 152 });
   }
 
   @Test

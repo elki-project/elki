@@ -23,7 +23,7 @@ package elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.database.datastore.DBIDDataStore;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
@@ -128,7 +128,7 @@ public class DendrogramVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    VisualizationTree.findNewResults(context, start).filter(PointerHierarchyRepresentationResult.class).forEach(pi -> {
+    VisualizationTree.findNewResults(context, start).filter(PointerHierarchyResult.class).forEach(pi -> {
       final VisualizationTask task = new VisualizationTask(this, NAME, pi, null) //
           .level(VisualizationTask.LEVEL_STATIC) //
           .with(UpdateFlag.ON_STYLEPOLICY);
@@ -231,7 +231,7 @@ public class DendrogramVisualization implements VisFactory {
       StyleLibrary style = context.getStyleLibrary();
       StylingPolicy spol = context.getStylingPolicy();
 
-      PointerHierarchyRepresentationResult p = task.getResult();
+      PointerHierarchyResult p = task.getResult();
       final boolean squared = p.isSquared();
 
       DBIDs ids = p.getDBIDs();

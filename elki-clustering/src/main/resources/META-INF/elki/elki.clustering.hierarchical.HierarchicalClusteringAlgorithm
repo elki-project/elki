@@ -8,3 +8,4 @@ elki.clustering.hierarchical.SLINKHDBSCANLinearMemory
 elki.clustering.hierarchical.MiniMaxAnderberg
 elki.clustering.hierarchical.MiniMaxNNChain
 elki.clustering.hierarchical.MiniMax
+elki.clustering.hierarchical.OPTICSToHierarchical

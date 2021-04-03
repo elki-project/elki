@@ -26,9 +26,9 @@ import java.util.Collection;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import elki.clustering.hierarchical.PointerPrototypeHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerDensityHierarchyResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
@@ -72,7 +72,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.0
  *
  * @assoc - - - HierarchicalClusteringAlgorithm
- * @assoc - - - PointerHierarchyRepresentationResult
+ * @assoc - - - PointerHierarchyResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
@@ -125,7 +125,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * @param pointerresult Existing result in pointer representation.
    * @return Clustering
    */
-  public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
+  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).run();
     Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
@@ -160,20 +160,20 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyRepresentationResult pointerresult;
+    protected PointerHierarchyResult pointerresult;
 
     /**
      * Constructor.
      *
      * @param pointerresult Hierarchical result
      */
-    public Instance(PointerHierarchyRepresentationResult pointerresult) {
+    public Instance(PointerHierarchyResult pointerresult) {
       this.ids = pointerresult.topologicalSort();
       this.pi = pointerresult.getParentStore();
       this.lambda = pointerresult.getParentDistanceStore();
       this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
-        this.coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
+      if(pointerresult instanceof PointerDensityHierarchyResult) {
+        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
       }
     }
 
@@ -300,8 +300,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten) {
       final String name = "C_" + FormatUtil.NF6.format(temp.dist);
       DendrogramModel model;
-      if(temp.members != null && !temp.members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
-        model = new PrototypeDendrogramModel(temp.dist, ((PointerPrototypeHierarchyRepresentationResult) pointerresult).findPrototype(temp.members));
+      if(temp.members != null && !temp.members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyResult) {
+        model = new PrototypeDendrogramModel(temp.dist, ((PointerPrototypeHierarchyResult) pointerresult).findPrototype(temp.members));
       }
       else {
         model = new DendrogramModel(temp.dist);

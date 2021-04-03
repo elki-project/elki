@@ -23,7 +23,7 @@ package elki.evaluation.clustering.extractor;
 import java.util.ArrayList;
 
 import elki.Algorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
@@ -64,8 +64,8 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
 
   @Override
   public void processNewResult(Object newResult) {
-    ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyRepresentationResult.class);
-    for(PointerHierarchyRepresentationResult pointerresult : hrs) {
+    ArrayList<PointerHierarchyResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyResult.class);
+    for(PointerHierarchyResult pointerresult : hrs) {
       Clustering<DendrogramModel> result = inner.run(pointerresult);
       Metadata.hierarchyOf(pointerresult).addChild(result);
     }

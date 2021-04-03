@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.6.0
  *
  * @composed - implicitly - SingleLinkageMethod
- * @navassoc - generates - PointerHierarchyRepresentationResult
+ * @navassoc - generates - PointerHierarchyResult
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -106,7 +106,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
    *
    * @param relation Data relation to use
    */
-  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerHierarchyResult run(Relation<O> relation) {
     final Logging log = getLogger(); // To allow CLINK logger override
     DBIDs ids = relation.getDBIDs();
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -149,7 +149,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
 
     log.ensureCompleted(progress);
     m.destroy();
-    return new PointerHierarchyRepresentationResult(ids, pi, lambda, distance.isSquared());
+    return new PointerHierarchyResult(ids, pi, lambda, distance.isSquared());
   }
 
   /**

@@ -43,7 +43,7 @@ import elki.result.Metadata;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class PointerHierarchyRepresentationResult {
+public class PointerHierarchyResult {
   /**
    * The DBIDs in this result.
    */
@@ -82,7 +82,7 @@ public class PointerHierarchyRepresentationResult {
    * @param parentDistance Distance to parent.
    * @param isSquared Flag to indicate squared distances
    */
-  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared) {
+  public PointerHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared) {
     this(ids, parent, parentDistance, isSquared, null);
   }
 
@@ -95,7 +95,7 @@ public class PointerHierarchyRepresentationResult {
    * @param isSquared Flag to indicate squared distances
    * @param mergeOrder Order in which to execute merges
    */
-  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder) {
+  public PointerHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder) {
     super();
     Metadata.of(this).setLongName("Pointer Representation");
     this.ids = ids;

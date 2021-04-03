@@ -22,7 +22,7 @@ package tutorial.clustering;
 
 import elki.Algorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.clustering.hierarchical.SLINK;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -176,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerHierarchyResult run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
@@ -281,7 +281,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
     }
     LOG.ensureCompleted(prog);
 
-    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistance().isSquared());
+    return new PointerHierarchyResult(ids, parent, height, dq.getDistance().isSquared());
   }
 
   /**

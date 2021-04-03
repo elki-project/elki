@@ -55,7 +55,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @has - - - PointerPrototypeHierarchyRepresentationResult
+ * @has - - - PointerPrototypeHierarchyResult
  *
  * @param <O> Object type
  */
@@ -101,13 +101,13 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Relation to process.
    * @return Hierarchical result
    */
-  public PointerPrototypeHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
+    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
 
     // Allocate working space:
@@ -124,7 +124,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
-    return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
+    return (PointerPrototypeHierarchyResult) builder.complete();
   }
 
   /**
@@ -156,7 +156,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
    * @param dq Distance query
    * @return x, for shrinking the working set.
    */
-  protected static int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
+  protected static int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] distances = mat.matrix;
     double mindist = Double.POSITIVE_INFINITY;
@@ -202,7 +202,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
    * @param x first cluster to merge
    * @param y second cluster to merge
    */
-  protected static void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
@@ -246,7 +246,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
    * @param dq distance query of the data set
    * @param c the cluster to update distances to
    */
-  protected static <O> void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
+  protected static <O> void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     // c is the new cluster.
     // Update entries (at (x,y) with x > y) in the matrix where x = c or y = c

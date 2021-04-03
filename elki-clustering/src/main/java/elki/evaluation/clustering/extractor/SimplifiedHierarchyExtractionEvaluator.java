@@ -23,7 +23,7 @@ package elki.evaluation.clustering.extractor;
 import java.util.ArrayList;
 
 import elki.Algorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction;
 import elki.evaluation.Evaluator;
 import elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm;
@@ -62,8 +62,8 @@ public class SimplifiedHierarchyExtractionEvaluator implements Evaluator {
 
   @Override
   public void processNewResult(Object newResult) {
-    ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyRepresentationResult.class);
-    for(PointerHierarchyRepresentationResult pointerresult : hrs) {
+    ArrayList<PointerHierarchyResult> hrs = ResultUtil.filterResults(newResult, PointerHierarchyResult.class);
+    for(PointerHierarchyResult pointerresult : hrs) {
       Metadata.hierarchyOf(pointerresult).addChild(inner.run(pointerresult));
     }
   }

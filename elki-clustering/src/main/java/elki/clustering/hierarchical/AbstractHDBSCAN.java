@@ -26,7 +26,6 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
-import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
@@ -214,75 +213,27 @@ public abstract class AbstractHDBSCAN<O> implements Algorithm {
 
   /**
    * Convert spanning tree to a pointer representation.
-   *
+   * <p>
    * Note: the heap must use the correct encoding of indexes.
    *
    * @param ids IDs indexed
    * @param heap Heap
-   * @param pi Parent array
-   * @param lambda Distance array
+   * @param builder Hierarchy builder
+   * @return builder, for method chaining
    */
-  protected void convertToPointerRepresentation(ArrayDBIDs ids, DoubleLongHeap heap, WritableDBIDDataStore pi, WritableDoubleDataStore lambda) {
+  protected PointerHierarchyBuilder convertToPointerRepresentation(ArrayDBIDs ids, DoubleLongHeap heap, PointerHierarchyBuilder builder) {
     final Logging LOG = getLogger();
-    // Initialize parent array:
-    for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      pi.put(iter, iter); // Initialize
-    }
-    DBIDVar p = DBIDUtil.newVar(), q = DBIDUtil.newVar(), n = DBIDUtil.newVar();
+    DBIDVar p = DBIDUtil.newVar(), q = DBIDUtil.newVar();
     FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Converting MST to pointer representation", heap.size(), LOG) : null;
     while(!heap.isEmpty()) {
-      final double dist = heap.peekKey();
       final long pair = heap.peekValue();
       final int i = (int) (pair >>> 31), j = (int) (pair & 0x7FFFFFFFL);
-      ids.assignVar(i, p);
-      // Follow p to its parent.
-      while(!DBIDUtil.equal(p, pi.assignVar(p, n))) {
-        p.set(n);
-      }
-      // Follow q to its parent.
-      ids.assignVar(j, q);
-      while(!DBIDUtil.equal(q, pi.assignVar(q, n))) {
-        q.set(n);
-      }
-      // By definition of the pointer representation, the largest element in
-      // each cluster is the cluster lead.
-      // The extraction methods currently rely on this!
-      int c = DBIDUtil.compare(p, q);
-      if(c < 0) {
-        // p joins q:
-        pi.put(p, q);
-        lambda.put(p, dist);
-      }
-      else {
-        assert (c != 0) : "This should never happen!";
-        // q joins p:
-        pi.put(q, p);
-        lambda.put(q, dist);
-      }
-
+      builder.add(ids.assignVar(i, p), heap.peekKey(), ids.assignVar(j, q));
       heap.poll();
       LOG.incrementProcessed(pprog);
     }
     LOG.ensureCompleted(pprog);
-    // Hack to ensure a valid pointer representation:
-    // If distances are tied, the heap may return edges such that the n-way join
-    // does not fulfill the property that the last element has the largest id.
-    for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double d = lambda.doubleValue(iter);
-      // Parent:
-      pi.assignVar(iter, p);
-      q.set(p);
-      // Follow parent while tied.
-      while(d >= lambda.doubleValue(q) && !DBIDUtil.equal(q, pi.assignVar(q, n))) {
-        q.set(n);
-      }
-      if(!DBIDUtil.equal(p, q)) {
-        if(LOG.isDebuggingFinest()) {
-          LOG.finest("Correcting parent: " + p + " -> " + q);
-        }
-        pi.put(iter, q);
-      }
-    }
+    return builder;
   }
 
   @Override

@@ -56,7 +56,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @has - - - PointerPrototypeHierarchyRepresentationResult
+ * @has - - - PointerPrototypeHierarchyResult
  *
  * @param <O> Object type
  */
@@ -102,12 +102,12 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Data relation
    * @return Clustering result
    */
-  public PointerPrototypeHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final DBIDs ids = relation.getDBIDs();
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistance().isSquared());
+    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(ids.size());
 
     MatrixParadigm mat = new MatrixParadigm(ids);
@@ -117,7 +117,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
 
     nnChainCore(mat, prots.iter(), dq, builder, clusters);
 
-    return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
+    return (PointerPrototypeHierarchyResult) builder.complete();
   }
 
   /**
@@ -130,7 +130,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param builder Result builder
    * @param clusters current clusters
    */
-  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
     final DBIDArrayIter ix = mat.ix;
     final double[] distances = mat.matrix;
     final int size = mat.size;

@@ -35,7 +35,7 @@ import elki.database.ids.DBIDs;
  * @author Julian Erhard
  * @since 0.7.5
  */
-public class PointerPrototypeHierarchyRepresentationResult extends PointerHierarchyRepresentationResult {
+public class PointerPrototypeHierarchyResult extends PointerHierarchyResult {
   /**
    * Prototypes
    */
@@ -51,7 +51,7 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * @param mergeOrder Merging order
    * @param prototypes Cluster prototypes
    */
-  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder, DBIDDataStore prototypes) {
+  public PointerPrototypeHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, IntegerDataStore mergeOrder, DBIDDataStore prototypes) {
     super(ids, parent, parentDistance, isSquared, mergeOrder);
     this.prototypes = prototypes;
   }
@@ -65,7 +65,7 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * @param isSquared Flag to indicate squared distances
    * @param prototypes Cluster prototypes
    */
-  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DBIDDataStore prototypes) {
+  public PointerPrototypeHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DBIDDataStore prototypes) {
     this(ids, parent, parentDistance, isSquared, null, prototypes);
   }
 

@@ -22,7 +22,7 @@ package elki.clustering.hierarchical.extraction;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.database.ids.DBIDArrayIter;
@@ -39,7 +39,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * @since 0.7.5
  *
  * @assoc - - - HierarchicalClusteringAlgorithm
- * @assoc - - - PointerHierarchyRepresentationResult
+ * @assoc - - - PointerHierarchyResult
  */
 public class CutDendrogramByHeight extends AbstractCutDendrogram implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
@@ -65,7 +65,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
   }
 
   @Override
-  public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
+  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
     Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
@@ -82,7 +82,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
      *
      * @param pointerresult Pointer result
      */
-    public Instance(PointerHierarchyRepresentationResult pointerresult) {
+    public Instance(PointerHierarchyResult pointerresult) {
       super(pointerresult);
     }
 

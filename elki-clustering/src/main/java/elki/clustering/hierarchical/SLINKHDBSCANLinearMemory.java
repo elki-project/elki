@@ -61,7 +61,7 @@ import elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - PointerDensityHierarchyRepresentationResult
+ * @has - - - PointerDensityHierarchyResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
@@ -95,7 +95,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerDensityHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerDensityHierarchyResult run(Relation<O> relation) {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     final DistanceQuery<O> distQ = qb.distanceQuery();
     final KNNSearcher<DBIDRef> knnQ = qb.kNNByDBID(minPts);
@@ -129,7 +129,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
     }
     LOG.ensureCompleted(progress);
 
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
+    return new PointerDensityHierarchyResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
   }
 
   /**

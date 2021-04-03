@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
-import elki.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import elki.clustering.hierarchical.PointerDensityHierarchyResult;
+import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;
@@ -70,7 +70,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.5
  *
  * @assoc - - - HierarchicalClusteringAlgorithm
- * @assoc - - - PointerHierarchyRepresentationResult
+ * @assoc - - - PointerHierarchyResult
  */
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Semantic Word Clouds with Background Corpus Normalization and t-distributed Stochastic Neighbor Embedding", //
@@ -124,7 +124,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    * @param pointerresult Existing result in pointer representation.
    * @return Clustering
    */
-  public Clustering<Model> run(PointerHierarchyRepresentationResult pointerresult) {
+  public Clustering<Model> run(PointerHierarchyResult pointerresult) {
     Clustering<Model> result = new Instance(pointerresult).run();
     Metadata.hierarchyOf(result).addChild(pointerresult);
     return result;
@@ -159,20 +159,20 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
     /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyRepresentationResult pointerresult;
+    protected PointerHierarchyResult pointerresult;
 
     /**
      * Constructor.
      *
      * @param pointerresult Hierarchical result
      */
-    public Instance(PointerHierarchyRepresentationResult pointerresult) {
+    public Instance(PointerHierarchyResult pointerresult) {
       this.ids = pointerresult.topologicalSort();
       this.pi = pointerresult.getParentStore();
       this.lambda = pointerresult.getParentDistanceStore();
       this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
-        this.coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
+      if(pointerresult instanceof PointerDensityHierarchyResult) {
+        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
       }
     }
 

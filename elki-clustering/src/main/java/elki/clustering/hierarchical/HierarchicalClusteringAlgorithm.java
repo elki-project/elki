@@ -33,11 +33,11 @@ import elki.database.Database;
  * @author Erich Schubert
  * @since 0.6.0
  *
- * @has - - - PointerHierarchyRepresentationResult
+ * @has - - - PointerHierarchyResult
  */
 public interface HierarchicalClusteringAlgorithm extends Algorithm {
   @Override
-  default PointerHierarchyRepresentationResult autorun(Database database) {
-    return (PointerHierarchyRepresentationResult) Algorithm.Utils.autorun(this, database);
+  default PointerHierarchyResult autorun(Database database) {
+    return (PointerHierarchyResult) Algorithm.Utils.autorun(this, database);
   }
 }

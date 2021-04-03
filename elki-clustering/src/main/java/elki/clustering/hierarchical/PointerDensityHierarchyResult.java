@@ -32,7 +32,7 @@ import elki.database.ids.DBIDs;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class PointerDensityHierarchyRepresentationResult extends PointerHierarchyRepresentationResult {
+public class PointerDensityHierarchyResult extends PointerHierarchyResult {
   /**
    * Core distance.
    */
@@ -47,7 +47,7 @@ public class PointerDensityHierarchyRepresentationResult extends PointerHierarch
    * @param isSquared Flag to indicate squared distances
    * @param coreDistance Core distances.
    */
-  public PointerDensityHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DoubleDataStore coreDistance) {
+  public PointerDensityHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DoubleDataStore coreDistance) {
     super(ids, parent, parentDistance, isSquared);
     this.coreDistance = coreDistance;
   }

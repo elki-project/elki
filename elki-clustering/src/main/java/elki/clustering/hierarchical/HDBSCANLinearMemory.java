@@ -22,9 +22,6 @@ package elki.clustering.hierarchical;
 
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDBIDDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDRef;
@@ -71,7 +68,7 @@ import elki.utilities.documentation.Title;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - PointerDensityHierarchyRepresentationResult
+ * @has - - - PointerDensityHierarchyResult
  *
  * @param <O> Object type
  */
@@ -109,7 +106,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements Hierar
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerDensityHierarchyRepresentationResult run(Relation<O> relation) {
+  public PointerDensityHierarchyResult run(Relation<O> relation) {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     final KNNSearcher<DBIDRef> knnQ = qb.kNNByDBID(minPts);
     final DistanceQuery<O> distQ = qb.distanceQuery();
@@ -128,12 +125,9 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements Hierar
         new HDBSCANAdapter(ids, coredists, distQ), //
         new HeapMSTCollector(heap, mprog, LOG));
     LOG.ensureCompleted(mprog);
-    // Storage for pointer representation:
-    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
-    convertToPointerRepresentation(ids, heap, pi, lambda);
-
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
+    return convertToPointerRepresentation(ids, heap, //
+        new PointerHierarchyBuilder(ids, distQ.getDistance().isSquared())) //
+            .complete(coredists);
   }
 
   @Override
