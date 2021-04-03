@@ -20,17 +20,9 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.argmax;
-import static elki.math.linearalgebra.VMath.inverse;
-
-import static elki.math.linearalgebra.VMath.plus;
-import static elki.math.linearalgebra.VMath.plusEquals;
-import static elki.math.linearalgebra.VMath.minus;
-import static elki.math.linearalgebra.VMath.times;
-import static elki.math.linearalgebra.VMath.timesPlusTimes;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
@@ -42,7 +34,6 @@ import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.pairs.DoubleDoublePair;
 
-import elki.clustering.em.QuadraticProblem;
 import elki.clustering.em.QuadraticProblem.ProblemData;
 
 import net.jafama.FastMath;
@@ -50,24 +41,21 @@ import net.jafama.FastMath;
 /**
  * KDTree class with the statistics needed for the calculation of EMKD
  * clustering as given in the following paper
- * 
- *
+ * <p>
  * Reference:
  * <p>
- * A. W. Moore:<br>
+ * A. W. Moore<br>
  * Very Fast EM-based Mixture Model Clustering using Multiresolution
- * kd-trees.<br>
+ * kd-trees<br>
  * Neural Information Processing Systems (NIPS 1998)
- * <p>
  * 
  * @author Robert Gehde
  */
-@Reference(authors = "Andrew W. Moore", //
+@Reference(authors = "A. W. Moore", //
+    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution kd-Trees", //
     booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
-    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
     bibkey = "DBLP:conf/nips/Moore98")
 class KDTree {
-
   /**
    * child-trees
    */
@@ -165,8 +153,16 @@ class KDTree {
 
     iter.seek(left);
     // handle leaf -> calculate summedPoints and summedPointsXPointsT
-    final int splitDim = argmax(boundingBox.getDifferences());
-    if(boundingBox.getDifference(splitDim) < mbw * dimWidth[splitDim]) {
+    int splitDim = 0;
+    double maxDiff = Double.NEGATIVE_INFINITY;
+    for(int d = 0; d < dim; d++) {
+      double diff = boundingBox.hilim[d] - boundingBox.lolim[d];
+      if(diff > maxDiff) {
+        splitDim = d;
+        maxDiff = diff;
+      }
+    }
+    if(maxDiff < mbw * dimWidth[splitDim]) {
       isLeaf = true;
       for(int i = 0; i < size; i++) {
         NumberVector vector = relation.get(iter);
@@ -175,16 +171,17 @@ class KDTree {
           summedPoints[d1] += value1;
           for(int d2 = 0; d2 < dim; d2++) {
             double value2 = vector.doubleValue(d2);
-            summedPointsXPointsT[d1][d2] += (value1) * (value2);
+            summedPointsXPointsT[d1][d2] += value1 * value2;
           }
         }
-        if(iter.valid())
+        if(iter.valid()) {
           iter.advance();
+        }
       }
     }
     else { // calculate nonleaf node
       // split points at midpoint according to paper
-      double splitPoint = boundingBox.getMidPoint()[splitDim];
+      double splitPoint = boundingBox.midpoint[splitDim];
       int l = left, r = right - 1;
       while(true) {
         while(l <= r && relation.get(iter.seek(l)).doubleValue(splitDim) <= splitPoint) {
@@ -208,7 +205,7 @@ class KDTree {
       leftChild = new KDTree(relation, sorted, left, r, dimWidth, mbw, arrayCache);
       rightChild = new KDTree(relation, sorted, r, right, dimWidth, mbw, arrayCache);
 
-      // fill up statistics from childnodes
+      // fill up statistics from child nodes
       summedPoints = plus(leftChild.summedPoints, rightChild.summedPoints);
       summedPointsXPointsT = plus(leftChild.summedPointsXPointsT, rightChild.summedPointsXPointsT);
     }
@@ -246,8 +243,7 @@ class KDTree {
       return indices;
     }
     // calculate the complete sum of weighted limits for denominator calculation
-    double maxDenomTotal = 0.0;
-    double minDenomTotal = 0.0;
+    double maxDenomTotal = 0.0, minDenomTotal = 0.0;
     for(int i : indices) {
       maxDenomTotal += models.get(i).getWeight() * limits[i].first;
       minDenomTotal += models.get(i).getWeight() * limits[i].second;
@@ -305,8 +301,8 @@ class KDTree {
   public DoubleDoublePair calculateModelLimits(MultivariateGaussianModel model, double[] minpnt, double[] maxpnt) {
     // translate problem by mean
     double[] mean = model.mean;
-    double[] transmin = minus(boundingBox.getLowerBounds(), mean);
-    double[] transmax = minus(boundingBox.getUpperBounds(), mean);
+    double[] transmin = minus(boundingBox.lolim, mean);
+    double[] transmax = minus(boundingBox.hilim, mean);
     Boundingbox bbTranslated = new Boundingbox(transmin, transmax);
 
     // invert and ensure symmetric (array is cloned in inverse)
@@ -438,12 +434,10 @@ class KDTree {
   }
 
   /**
-   * Bounding box of a KDTree Node
-   * 
+   * Bounding box of a KDTree node.
    */
-  static public class Boundingbox {
-
-    private double[] hilim, lolim, midpoint, dist;
+  public static class Boundingbox {
+    private double[] hilim, lolim, midpoint;
 
     /**
      * Constructs a bounding box from lower and upper bounds
@@ -455,16 +449,6 @@ class KDTree {
       this.hilim = hilim;
       this.lolim = lolim;
       this.midpoint = timesPlusTimes(lolim, 0.5, hilim, 0.5);
-      this.dist = minus(hilim, lolim);
-    }
-
-    /**
-     * print lower and upper bounds
-     */
-    public void printHiLo() {
-      System.out.println("Boundingbox");
-      System.out.println(Arrays.toString(getLowerBounds()));
-      System.out.println(Arrays.toString(getUpperBounds()));
     }
 
     /**
@@ -494,37 +478,7 @@ class KDTree {
      * @return difference at dimension k
      */
     public double getDifference(int k) {
-      return dist[k];
-    }
-
-    /**
-     * get all lower bounds. returns the backend object, so changes will change
-     * the bounding box
-     * 
-     * @return array containing lower bounds
-     */
-    public double[] getLowerBounds() {
-      return lolim;
-    }
-
-    /**
-     * get all upper bounds. returns the backend object, so changes will change
-     * the bounding box
-     * 
-     * @return array containing upper bounds
-     */
-    public double[] getUpperBounds() {
-      return hilim;
-    }
-
-    /**
-     * get all differences. returns the backend object, so changes will change
-     * the bounding box
-     * 
-     * @return array containing differences
-     */
-    public double[] getDifferences() {
-      return dist;
+      return hilim[k] - lolim[k];
     }
 
     /**
@@ -538,38 +492,36 @@ class KDTree {
     }
 
     /**
-     * reduces this bounding box by omitting reducedDim and saving the result to
-     * redBox
+     * Reduces this bounding box by omitting reducedDim and saving the result to
+     * redBox.
      * 
      * @param redBox target bounding box
      * @param reducedDim dimension to omit
      */
     public void reduceBoundingboxTo(Boundingbox redBox, int reducedDim) {
       if(reducedDim > 0) {
-        System.arraycopy(lolim, 0, redBox.getLowerBounds(), 0, reducedDim);
-        System.arraycopy(hilim, 0, redBox.getUpperBounds(), 0, reducedDim);
-        System.arraycopy(midpoint, 0, redBox.getMidPoint(), 0, reducedDim);
-        System.arraycopy(dist, 0, redBox.getDifferences(), 0, reducedDim);
+        System.arraycopy(lolim, 0, redBox.lolim, 0, reducedDim);
+        System.arraycopy(hilim, 0, redBox.hilim, 0, reducedDim);
+        System.arraycopy(midpoint, 0, redBox.midpoint, 0, reducedDim);
       }
 
       if(midpoint.length - (reducedDim) > 1) {
         int l = redBox.midpoint.length - reducedDim;
-        System.arraycopy(lolim, reducedDim + 1, redBox.getLowerBounds(), reducedDim, l);
-        System.arraycopy(hilim, reducedDim + 1, redBox.getUpperBounds(), reducedDim, l);
-        System.arraycopy(midpoint, reducedDim + 1, redBox.getMidPoint(), reducedDim, l);
-        System.arraycopy(dist, reducedDim + 1, redBox.getDifferences(), reducedDim, l);
+        System.arraycopy(lolim, reducedDim + 1, redBox.lolim, reducedDim, l);
+        System.arraycopy(hilim, reducedDim + 1, redBox.hilim, reducedDim, l);
+        System.arraycopy(midpoint, reducedDim + 1, redBox.midpoint, reducedDim, l);
       }
     }
 
     /**
-     * checks if the point is inside or on the bounds of this bounding box
+     * Checks if the point is inside or on the bounds of this bounding box
      * 
      * @param point point to check
      * @return true if point is weakly inside bounds
      */
     public boolean weaklyInsideBounds(double[] point) {
-      for(int i = 0; i < point.length; i++) {
-        if(point[i] < getLowerBound(i) || point[i] > getUpperBound(i)) {
+      for(int i = 0; i < lolim.length; i++) {
+        if(point[i] < lolim[i] || point[i] > hilim[i]) {
           return false;
         }
       }
@@ -579,7 +531,6 @@ class KDTree {
 
   /**
    * This class holds information collected by makeStats
-   *
    */
   static class ClusterData {
     /**

@@ -38,8 +38,8 @@ public class EMKDTest extends AbstractClusterAlgorithmTest {
         .with(EMKD.Par.K_ID, 4) //
         .with(EMKD.Par.INIT_ID, MultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.8170718099);
-    assertClusterSizes(result, new int[] { 5, 107, 290, 308 });
+    assertFMeasure(db, result, 0.83346);
+    assertClusterSizes(result, new int[] { 5, 100, 290, 315 });
   }
   
   @Test
