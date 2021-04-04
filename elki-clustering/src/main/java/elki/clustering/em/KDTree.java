@@ -24,7 +24,6 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.List;
 
-import elki.clustering.em.QuadraticProblem.ProblemData;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.MeanModel;
@@ -38,7 +37,7 @@ import elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
 
 /**
- * KDTree class with the statistics needed for the calculation of EMKD
+ * KDTree class with the statistics needed for the calculation of KDTreeEM
  * clustering as given in the following paper
  * <p>
  * Reference:
@@ -82,7 +81,8 @@ class KDTree {
   Boundingbox boundingBox;
 
   /**
-   * Constructor for a KDTree with statistics needed for EMKD calculation. Uses
+   * Constructor for a KDTree with statistics needed for KDTreeEM calculation.
+   * Uses
    * points between the indices left and right for calculation
    *
    * @param relation datapoints for the construction
@@ -194,7 +194,7 @@ class KDTree {
    * node.
    * 
    * @param models list of all models
-   * @param summedData accumulator object for statistics needed for EMKD
+   * @param summedData accumulator object for statistics needed for KDTreeEM
    *        clustering
    * @param indices list of indices to check
    * @param tau maximum error, stop if all models have w_max - w_min < tau *
@@ -204,7 +204,7 @@ class KDTree {
    * @param piPow Dimensionality scaling factor
    * @return indices that are not pruned
    */
-  public int[] checkStoppingCondition(List<? extends EMClusterModel<? super NumberVector, ? extends MeanModel>> models, ClusterData[] summedData, int[] indices, double tau, double tauClass, ProblemData[] cache, double piPow) {
+  public int[] checkStoppingCondition(List<? extends EMClusterModel<? super NumberVector, ? extends MeanModel>> models, ClusterData[] summedData, int[] indices, double tau, double tauClass, ConstrainedQuadraticProblemSolver solver, double piPow) {
     if(!(models.get(0) instanceof TextbookMultivariateGaussianModel)) {
       return indices;
     }
@@ -213,7 +213,7 @@ class KDTree {
     double[][] minPnts = new double[models.size()][sum.length];
     double[][] limits = new double[models.size()][2];
     for(int i : indices) {
-      calculateModelLimits((TextbookMultivariateGaussianModel) models.get(i), minPnts[i], maxPnts[i], limits[i], cache, piPow);
+      calculateModelLimits((TextbookMultivariateGaussianModel) models.get(i), minPnts[i], maxPnts[i], limits[i], solver, piPow);
     }
     // calculate the complete sum of weighted limits for denominator calculation
     double maxDenomTotal = 0.0, minDenomTotal = 0.0;
@@ -272,7 +272,7 @@ class KDTree {
    * @param piPow Dimensionality scaling factor
    * @param ret Return array
    */
-  public void calculateModelLimits(TextbookMultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret, ProblemData[] cache, double piPow) {
+  public void calculateModelLimits(TextbookMultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret, ConstrainedQuadraticProblemSolver solver, double piPow) {
     Boundingbox bbTranslated = new Boundingbox(minus(boundingBox.midpoint, model.mean), boundingBox.halfwidth.clone());
 
     // invert and ensure symmetric (array is cloned in inverse)
@@ -281,9 +281,9 @@ class KDTree {
 
     // maximizes Mahalanobis dist
     final double[] b = new double[covInv.length];
-    double mahalanobisSQDmax = 2 * QuadraticProblem.solve(covInv, b, 0, bbTranslated, cache, maxpnt);
+    double mahalanobisSQDmax = 2 * solver.solve(covInv, b, 0, bbTranslated, maxpnt);
     // minimizes Mahalanobis dist (invert covinv and result)
-    double mahalanobisSQDmin = -2 * QuadraticProblem.solve(timesEquals(covInv, -1.0), b, 0, bbTranslated, cache, minpnt);
+    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), b, 0, bbTranslated, minpnt);
 
     final double f = 1 / (piPow * FastMath.sqrt(covdet));
     ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
@@ -303,7 +303,7 @@ class KDTree {
    * @param piPow Dimensionality scaling factor
    * @return log likelihood of the model
    */
-  public double makeStats(List<? extends EMClusterModel<? super NumberVector, ? extends MeanModel>> models, int[] indices, ClusterData[] resultData, double tau, double tauClass, ProblemData[] cache, double piPow) {
+  public double makeStats(List<? extends EMClusterModel<? super NumberVector, ? extends MeanModel>> models, int[] indices, ClusterData[] resultData, double tau, double tauClass, ConstrainedQuadraticProblemSolver solver, double piPow) {
     // Only one possible cluster remaining.
     if(indices.length == 1) {
       DoubleVector midpoint = DoubleVector.wrap(times(sum, 1.0 / (right - left)));
@@ -313,10 +313,10 @@ class KDTree {
     }
     // check for pruning possibility
     if(leftChild != null) {
-      int[] nextIndices = checkStoppingCondition(models, resultData, indices, tau, tauClass, cache, piPow);
+      int[] nextIndices = checkStoppingCondition(models, resultData, indices, tau, tauClass, solver, piPow);
       if(nextIndices != null) {
-        return leftChild.makeStats(models, nextIndices, resultData, tau, tauClass, cache, piPow) //
-            + rightChild.makeStats(models, nextIndices, resultData, tau, tauClass, cache, piPow);
+        return leftChild.makeStats(models, nextIndices, resultData, tau, tauClass, solver, piPow) //
+            + rightChild.makeStats(models, nextIndices, resultData, tau, tauClass, solver, piPow);
       }
     }
     DoubleVector midpoint = DoubleVector.wrap(times(sum, 1.0 / (right - left)));
@@ -338,7 +338,7 @@ class KDTree {
    * Bounding box of a KDTree node.
    */
   public static class Boundingbox {
-    private double[] midpoint, halfwidth;
+    protected double[] midpoint, halfwidth;
 
     /**
      * Constructs a bounding box.
@@ -357,7 +357,7 @@ class KDTree {
      * @param k dimension
      * @return lower bound at dimension k
      */
-    public double getLowerBound(int k) {
+    public double getMin(int k) {
       return midpoint[k] - halfwidth[k];
     }
 
@@ -367,7 +367,7 @@ class KDTree {
      * @param k dimension
      * @return upper bound at dimension k
      */
-    public double getUpperBound(int k) {
+    public double getMax(int k) {
       return midpoint[k] + halfwidth[k];
     }
 
@@ -417,7 +417,7 @@ class KDTree {
      * @param point point to check
      * @return true if point is weakly inside bounds
      */
-    public boolean weaklyInsideBounds(double[] point) {
+    public boolean contains(double[] point) {
       for(int i = 0; i < midpoint.length; i++) {
         if(Math.abs(midpoint[i] - point[i]) > halfwidth[i]) {
           return false;

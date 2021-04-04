@@ -56,7 +56,7 @@ public class SphericalGaussianModelFactory implements EMClusterModelFactory<Numb
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
   public SphericalGaussianModelFactory(KMeansInitialization initializer) {
     super();

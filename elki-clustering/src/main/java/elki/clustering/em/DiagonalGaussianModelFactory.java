@@ -56,7 +56,7 @@ public class DiagonalGaussianModelFactory implements EMClusterModelFactory<Numbe
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
   public DiagonalGaussianModelFactory(KMeansInitialization initializer) {
     super();

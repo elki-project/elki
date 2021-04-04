@@ -33,14 +33,13 @@ import elki.utilities.ELKIBuilder;
  *
  * @author Robert Gehde
  */
-public class EMKDTest extends AbstractClusterAlgorithmTest {
+public class KDTreeEMTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testMultivariateGauss() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-    Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
+    Clustering<?> result = new ELKIBuilder<KDTreeEM>(KDTreeEM.class) //
         .with(KMeans.SEED_ID, 1) //
-        .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .with(KDTreeEM.Par.K_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.82040);
     assertClusterSizes(result, new int[] { 5, 102, 282, 321 });
@@ -49,38 +48,12 @@ public class EMKDTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testInfinityCheatCase() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-    Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
+    Clustering<?> result = new ELKIBuilder<KDTreeEM>(KDTreeEM.class) //
         .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reached
                                  // an infinite value!
-        .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, TextbookMultivariateGaussianModelFactory.class) //
+        .with(KDTreeEM.Par.K_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.64239);
     assertClusterSizes(result, new int[] { 5, 85, 205, 415 });
   }
-
-  @Test
-  public void testSphericalGauss() {
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-    Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
-        .with(KMeans.SEED_ID, 1) //
-        .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, SphericalGaussianModelFactory.class) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8136354671);
-    assertClusterSizes(result, new int[] { 8, 96, 198, 408 });
-  }
-
-  @Test
-  public void testDiagonalGauss() {
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
-    Clustering<?> result = new ELKIBuilder<EMKD<?>>(EMKD.class) //
-        .with(KMeans.SEED_ID, 1) //
-        .with(EMKD.Par.K_ID, 4) //
-        .with(EMKD.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8334267105);
-    assertClusterSizes(result, new int[] { 7, 99, 289, 315 });
-  }
-
 }

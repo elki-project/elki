@@ -32,8 +32,8 @@ import net.jafama.FastMath;
 
 /**
  * Solve a constrained quadratic equation in the form
- * \( 0.5 \cdot x^T A x + b^T x + c \)
- * constrained by the given bounding box.
+ * \( \tfrac12 x^T A x + b^T x + c \)
+ * constrained by a bounding box.
  * <p>
  * Works by recursion over the dimensions, searches the different possible
  * outcomes until it finds the best solution.
@@ -51,17 +51,23 @@ import net.jafama.FastMath;
     title = "Very Fast EM-based Mixture Model Clustering using Multiresolution kd-Trees", //
     booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
     bibkey = "DBLP:conf/nips/Moore98")
-public class QuadraticProblem {
+public class ConstrainedQuadraticProblemSolver {
   /**
    * Cache object
    */
   private ProblemData[] cache;
 
   /**
-   * Private constructor.
+   * Constructor.
+   * 
+   * @param dim Maximum dimensionality (for the cache).
    */
-  private QuadraticProblem() {
+  public ConstrainedQuadraticProblemSolver(int dim) {
     super(); // Internal use only!
+    cache = new ProblemData[dim];
+    for(int i = 0; i < dim; i++) {
+      cache[i] = new ProblemData(i + 1);
+    }
   }
 
   /**
@@ -76,12 +82,10 @@ public class QuadraticProblem {
    * @param box The bounds in which the maximum is calculated
    * @param arrayCache ArrayCache object
    */
-  public static double solve(double[][] a, double[] b, double c, Boundingbox box, ProblemData[] cache, double[] argmaxPoint) {
-    QuadraticProblem p = new QuadraticProblem();
-    p.cache = cache;
+  public double solve(double[][] a, double[] b, double c, Boundingbox box, double[] argmaxPoint) {
     DimensionState[] dimStates = cache[b.length - 1].dimStates;
     Arrays.fill(dimStates, DimensionState.CONSTR);
-    return p.evaluateConstrainedQuadraticFunction(a, b, c, box, dimStates, true, argmaxPoint, Double.NEGATIVE_INFINITY);
+    return evaluateConstrainedQuadraticFunction(a, b, c, box, dimStates, true, argmaxPoint, Double.NEGATIVE_INFINITY);
   }
 
   /**
@@ -94,13 +98,13 @@ public class QuadraticProblem {
    * 
    * @param a a coefficient matrix of the function
    * @param b b coefficient vector of the function
-   * @param hyperboundingbox bounds in which to check derivative
+   * @param box bounds in which to check derivative
    * @return 0 if none, dim + 1 if lo, -dim-1 if hi
    */
-  private int findLimitedDimensionWithDerivative(double[][] a, double[] b, Boundingbox hyperboundingbox) {
+  private int findLimitedDimensionWithDerivative(double[][] a, double[] b, Boundingbox box) {
     double[] buf = new double[2];
     for(int i = 0; i < b.length; i++) {
-      calculateLinearDerivativeLimits(a, b, hyperboundingbox, i, buf);
+      calculateLinearDerivativeLimits(a, b, box, i, buf);
       // if hi < 0 or lo > 0 -> hit
       if(buf[0] >= 0.0) {
         return i + 1;
@@ -119,10 +123,10 @@ public class QuadraticProblem {
    * 
    * @param ak gradient/slope
    * @param bk y axis crossing
-   * @param hyperboundingbox limitation of min max search
+   * @param box limitation of min max search
    * @param buf Return buffer
    */
-  private void calculateLinearDerivativeLimits(double[][] a, double[] b, Boundingbox hyperboundingbox, int dim, double[] buf) {
+  private void calculateLinearDerivativeLimits(double[][] a, double[] b, Boundingbox box, int dim, double[] buf) {
     // initialize with value at 0^k
     double min = b[dim], max = min;
     // then for each dimension add the y-difference to the bounds to the
@@ -131,12 +135,12 @@ public class QuadraticProblem {
       // get slope of the derivative, is a[dim][i]
       double slope = a[dim][i];
       if(slope < 0) {
-        min += hyperboundingbox.getUpperBound(i) * slope;
-        max += hyperboundingbox.getLowerBound(i) * slope;
+        min += box.getMax(i) * slope;
+        max += box.getMin(i) * slope;
       }
       else {
-        max += hyperboundingbox.getUpperBound(i) * slope;
-        min += hyperboundingbox.getLowerBound(i) * slope;
+        max += box.getMax(i) * slope;
+        min += box.getMin(i) * slope;
       }
     }
     buf[0] = min; // return values
@@ -151,21 +155,21 @@ public class QuadraticProblem {
    * @param a a coefficient matrix of the function
    * @param b b coefficient vector of the function
    * @param c c coefficient of the function
-   * @param boundingbox The bounds in which the maximum is calculated
+   * @param bounds The bounds in which the maximum is calculated
    * @return The maximum Function value
    */
-  private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, Boundingbox boundingbox) {
-    double fm = evaluateQuadraticFormula(a, b, c, boundingbox.getMidPoint());
+  private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, Boundingbox bounds) {
+    double fm = evaluateQuadraticFormula(a, b, c, bounds.getMidPoint());
     double[] buf = new double[2];
     for(int i = 0; i < b.length; i++) {
-      calculateLinearDerivativeLimits(a, b, boundingbox, i, buf);
-      fm += boundingbox.getHalfwidth(i) * FastMath.max(-buf[0], buf[1]);
+      calculateLinearDerivativeLimits(a, b, bounds, i, buf);
+      fm += bounds.getHalfwidth(i) * FastMath.max(-buf[0], buf[1]);
     }
     return fm;
   }
 
   /**
-   * Main recursive function. We calculate 0.5 x^tax + bx +c
+   * Main recursive function. We calculate \( \frac12 x^T A x + bx + c \)
    * and only update the result array if we have a better result
    * 
    * @param a a coefficient matrix of the function
@@ -178,7 +182,7 @@ public class QuadraticProblem {
   private double evaluateConstrainedQuadraticFunction(double[][] a, double[] b, double c, Boundingbox bounds, DimensionState[] dimensionStates, boolean cutoffCheck, double[] result, double resultValue) {
     // case for one dimension
     if(dimensionStates.length == 1) {
-      double res1d = evaluateConstrainedQuadraticFunction1D(a[0][0], b[0], c, bounds.getLowerBound(0), bounds.getUpperBound(0), result, resultValue);
+      double res1d = evaluateConstrainedQuadraticFunction1D(a[0][0], b[0], c, bounds.getMin(0), bounds.getMax(0), result, resultValue);
       assert res1d >= resultValue;
       return res1d; // 1 dimensional solution
     }
@@ -198,7 +202,7 @@ public class QuadraticProblem {
       if(opt == null) {
         return resultValue; // no optimum with constraints
       }
-      if(bounds.weaklyInsideBounds(opt)) {
+      if(bounds.contains(opt)) {
         double optValue = evaluateQuadraticFormula(a, b, c, opt);
         if(optValue > resultValue) {
           System.arraycopy(opt, 0, result, 0, opt.length);
@@ -212,7 +216,7 @@ public class QuadraticProblem {
       double[] opt = findMaximumWithFunctionValue(a, b);
       if(opt != null) {
         double optValue = evaluateQuadraticFormula(a, b, c, opt);
-        if(bounds.weaklyInsideBounds(opt)) {
+        if(bounds.contains(opt)) {
           if(optValue > resultValue) {
             System.arraycopy(opt, 0, result, 0, opt.length);
             return optValue;
@@ -346,7 +350,7 @@ public class QuadraticProblem {
       dimStates[reducedDim] = dimState; // Restore
       return childResValue;
     }
-    double reduceToValue = reducedTo == DimensionState.LOLIM ? bounds.getLowerBound(reducedDim) : bounds.getUpperBound(reducedDim);
+    double reduceToValue = reducedTo == DimensionState.LOLIM ? bounds.getMin(reducedDim) : bounds.getMax(reducedDim);
     final int redSizem1 = b.length - 2;
     double[][] redA = cache[redSizem1].a;
     double[] redB = cache[redSizem1].b;
@@ -369,44 +373,64 @@ public class QuadraticProblem {
   /**
    * Expands the redRes to a problem with dim+1 and saves it into result
    * 
-   * @param result the result
-   * @param redRes the the reduced result
-   * @param reducedDim the dimension that was reduced to gain redRes
-   * @param reduceToValue the value the dimension was reduced to to gain redRes
+   * @param outbox the result
+   * @param inbox the the reduced result
+   * @param insert the dimension that was reduced to gain redRes
+   * @param insertValue the value the dimension was reduced to to gain redRes
    */
-  private void expandNewSolution(double[] result, double[] redRes, int reducedDim, double reduceToValue) {
-    System.arraycopy(redRes, 0, result, 0, reducedDim);
-    result[reducedDim] = reduceToValue;
-    System.arraycopy(redRes, reducedDim, result, reducedDim + 1, redRes.length - reducedDim);
+  private void expandNewSolution(double[] outbox, double[] inbox, int insert, double insertValue) {
+    System.arraycopy(inbox, 0, outbox, 0, insert);
+    outbox[insert] = insertValue;
+    System.arraycopy(inbox, insert, outbox, insert + 1, inbox.length - insert);
   }
 
   /**
    * Reduce the solution to a problem with dim-1
    * 
    * @param result result of the array
-   * @param reducedDim dimension to reduce
+   * @param omit dimension to omit
    * @return reduced result
    */
-  private double[] reduceSolution(double[] result, int reducedDim) {
+  private double[] reduceSolution(double[] result, int omit) {
     double[] redRes = cache[result.length - 2].result;
-    System.arraycopy(result, 0, redRes, 0, reducedDim);
-    System.arraycopy(result, reducedDim + 1, redRes, reducedDim, redRes.length - reducedDim);
+    System.arraycopy(result, 0, redRes, 0, omit);
+    System.arraycopy(result, omit + 1, redRes, omit, redRes.length - omit);
     return redRes;
   }
 
   /**
    * Reduces the constrains to a problem with dim-1
    * 
-   * @param bounds boundingbox of the problem
-   * @param redBounds result boundingbox
-   * @param dimStates dimension states of the problem
-   * @param redDimStates result array for dimension states
-   * @param reducedDim dimension to reduce
+   * @param inbox Boundingbox of the problem
+   * @param outbox result Boundingbox
+   * @param instates dimension states of the problem
+   * @param outstates result array for dimension states
+   * @param omit dimension to omit
    */
-  private void reduceConstraints(Boundingbox bounds, Boundingbox redBounds, DimensionState[] dimStates, DimensionState[] redDimStates, int reducedDim) {
-    System.arraycopy(dimStates, 0, redDimStates, 0, reducedDim);
-    System.arraycopy(dimStates, reducedDim + 1, redDimStates, reducedDim, redDimStates.length - reducedDim);
-    bounds.reduceBoundingboxTo(redBounds, reducedDim);
+  private static void reduceConstraints(Boundingbox inbox, Boundingbox outbox, DimensionState[] instates, DimensionState[] outstates, int omit) {
+    System.arraycopy(instates, 0, outstates, 0, omit);
+    System.arraycopy(instates, omit + 1, outstates, omit, outstates.length - omit);
+    final double[] inmin = inbox.midpoint, outmin = outbox.midpoint;
+    System.arraycopy(inmin, 0, outmin, 0, omit);
+    System.arraycopy(inmin, omit + 1, outmin, omit, outstates.length - omit);
+    final double[] inmax = inbox.halfwidth, outmax = outbox.halfwidth;
+    System.arraycopy(inmax, 0, outmax, 0, omit);
+    System.arraycopy(inmax, omit + 1, outmax, omit, outstates.length - omit);
+  }
+
+  /**
+   * Reduces this bounding box by omitting reducedDim and saving the result to
+   * redBox.
+   * 
+   * @param in Input bounding box
+   * @param redBox target bounding box
+   * @param reducedDim dimension to omit
+   */
+  public static void reduceBoundingBox(Boundingbox in, Boundingbox redBox, int reducedDim) {
+    System.arraycopy(in.midpoint, 0, redBox.midpoint, 0, reducedDim);
+    System.arraycopy(in.midpoint, reducedDim + 1, redBox.midpoint, reducedDim, redBox.midpoint.length - reducedDim);
+    System.arraycopy(in.halfwidth, 0, redBox.halfwidth, 0, reducedDim);
+    System.arraycopy(in.halfwidth, reducedDim + 1, redBox.halfwidth, reducedDim, redBox.halfwidth.length - reducedDim);
   }
 
   /**
@@ -421,7 +445,7 @@ public class QuadraticProblem {
    * @param reduceToValue state to reduce the dimension to
    * @return reduced c
    */
-  private double reduceEquation(double[][] a, double[] b, double c, double[][] redA, double[] redB, int reducedDim, double reduceToValue) {
+  private static double reduceEquation(double[][] a, double[] b, double c, double[][] redA, double[] redB, int reducedDim, double reduceToValue) {
     int redSize = b.length - 1;
     for(int i = 0; i < redSize; i++) {
       int oRefi = i < reducedDim ? i : i + 1;
@@ -445,7 +469,7 @@ public class QuadraticProblem {
   }
 
   /**
-   * calculate \( 0.5 x^T A x + x^t b + c \) for the given values
+   * calculate \( \tfrac12 x^T A x + x^t b + c \) for the given values
    * 
    * @param a coefficient matrix A of the function
    * @param b coefficient vector b of the function
@@ -453,14 +477,14 @@ public class QuadraticProblem {
    * @param point x to calculate the function at
    * @return function value
    */
-  public double evaluateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
+  public static double evaluateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
     return 0.5 * transposeTimesTimes(point, a, point) + scalarProduct(point, b) + c;
   }
 
   /**
    * Describes the calculation state of a Dimension
    */
-  private enum DimensionState {
+  private static enum DimensionState {
     LOLIM, // driven to lower bounding box limit
     UPLIM, // driven to upper bounding box limit
     UNCONSTR, // constrains lifted (results are ignored if outside of bounds)
@@ -468,11 +492,11 @@ public class QuadraticProblem {
   }
 
   /**
-   * contains arrays for a specific size needed for the problem calculation
+   * Contains arrays for a specific size needed for the problem calculation
    * using this object saves the creation of all those arrays, because we can
-   * just reuse them
+   * just reuse them.
    */
-  public static class ProblemData {
+  private static class ProblemData {
     double[][] a;
 
     double[] b, result;
@@ -487,14 +511,6 @@ public class QuadraticProblem {
       result = new double[size];
       dimStates = new DimensionState[size];
       box = new Boundingbox(new double[size], new double[size]);
-    }
-
-    public static ProblemData[] newCache(int d) {
-      ProblemData[] cache = new ProblemData[d];
-      for(int i = 0; i < d; i++) {
-        cache[i] = new ProblemData(i + 1);
-      }
-      return cache;
     }
   }
 }

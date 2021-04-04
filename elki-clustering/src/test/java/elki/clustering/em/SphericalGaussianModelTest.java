@@ -41,7 +41,7 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Par.K_ID, 4) //
-        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, SphericalGaussianModelFactory.class) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.811247176);
     assertClusterSizes(result, new int[] { 8, 95, 198, 409 });
@@ -53,7 +53,7 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 1) //
         .with(EM.Par.K_ID, 4) //
-        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, SphericalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.97137);
@@ -65,7 +65,7 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Par.K_ID, 2) //
-        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, SphericalGaussianModelFactory.class) //
         .build().autorun(db);
     assertFMeasure(db, result, 1.);
     assertClusterSizes(result, new int[] { 100, 100 });
@@ -77,7 +77,7 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Par.K_ID, 2) //
-        .with(EM.Par.INIT_ID, SphericalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, SphericalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, .1) //
         .build().autorun(db);
     assertFMeasure(db, result, 1.);

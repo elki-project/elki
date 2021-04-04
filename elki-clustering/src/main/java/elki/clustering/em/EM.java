@@ -436,7 +436,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     /**
      * Parameter to specify the EM cluster models to use.
      */
-    public static final OptionID INIT_ID = new OptionID("em.model", "Model factory.");
+    public static final OptionID MODEL_ID = new OptionID("em.model", "Model factory.");
 
     /**
      * Parameter to specify a minimum number of iterations.
@@ -469,9 +469,9 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     protected double delta;
 
     /**
-     * Initialization method
+     * Cluster model factory.
      */
-    protected EMClusterModelFactory<O, M> initializer;
+    protected EMClusterModelFactory<O, M> mfactory;
 
     /**
      * Minimum number of iterations.
@@ -498,8 +498,8 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<EMClusterModelFactory<O, M>>(INIT_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
-          .grab(config, x -> initializer = x);
+      new ObjectParameter<EMClusterModelFactory<O, M>>(MODEL_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
+          .grab(config, x -> mfactory = x);
       new DoubleParameter(DELTA_ID, 1e-7)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
@@ -521,7 +521,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
     @Override
     public EM<O, M> make() {
-      return new EM<>(k, delta, initializer, miniter, maxiter, prior, soft);
+      return new EM<>(k, delta, mfactory, miniter, maxiter, prior, soft);
     }
   }
 }

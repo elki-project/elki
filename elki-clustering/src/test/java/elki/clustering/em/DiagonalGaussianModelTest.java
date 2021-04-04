@@ -41,7 +41,7 @@ public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 3) //
         .with(EM.Par.K_ID, 5) //
-        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, DiagonalGaussianModelFactory.class) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.9681384);
     assertClusterSizes(result, new int[] { 7, 91, 99, 200, 313 });
@@ -53,7 +53,7 @@ public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 3) //
         .with(EM.Par.K_ID, 5) //
-        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, DiagonalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.949566);
@@ -66,7 +66,7 @@ public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Par.K_ID, 2) //
-        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, DiagonalGaussianModelFactory.class) //
         .build().autorun(db);
     assertFMeasure(db, result, 1.);
     assertClusterSizes(result, new int[] { 100, 100 });
@@ -78,7 +78,7 @@ public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
         .with(KMeans.SEED_ID, 0) //
         .with(EM.Par.K_ID, 2) //
-        .with(EM.Par.INIT_ID, DiagonalGaussianModelFactory.class) //
+        .with(EM.Par.MODEL_ID, DiagonalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, .1) //
         .build().autorun(db);
     assertFMeasure(db, result, 1.);
