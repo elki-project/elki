@@ -216,23 +216,4 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
   public EMModel finalizeCluster() {
     return new EMModel(mean, diagonal(variances));
   }
-
-  @Override
-  public void setCenter(double[] center) {
-    this.mean = center;
-  }
-
-  @Override
-  public void updateCovariance(double[][] cov) {
-    for(int i = 0; i < variances.length; i++) {
-      variances[i] = MathUtil.max(cov[i][i], SINGULARITY_CHEAT);
-
-    }
-    priordiag = copy(variances);
-    double logDet = 0;
-    for(double d : variances) {
-      logDet += FastMath.log(d);
-    }
-    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
-  }
 }

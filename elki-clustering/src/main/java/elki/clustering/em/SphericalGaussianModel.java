@@ -200,24 +200,4 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   public EMModel finalizeCluster() {
     return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
   }
-
-  @Override
-  public void setCenter(double[] center) {
-    this.mean = center;
-  }
-
-  @Override
-  public void updateCovariance(double[][] cov) {
-    double var = 0.0;
-    for(int i = 0; i < cov.length; i++) {
-      var += cov[i][i];
-    }
-    this.variance = var / cov.length;
-    // So far, the variance is not adjusted if Singularity_Cheat comes into
-    // play. This matches the behavior of finalizeE.
-    // if you need to use the variance value directly, this must be adjusted!
-    double logDet = cov.length * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
-    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
-
-  }
 }
