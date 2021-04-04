@@ -76,9 +76,14 @@ class KDTree {
   double[][] sumSq;
 
   /**
-   * Bounding box of elements in this node
+   * Middle point of bounding box
    */
-  Boundingbox boundingBox;
+  double[] midpoint;
+
+  /**
+   * Half width of the rectangle.
+   */
+  double[] halfwidth;
 
   /**
    * Constructor for a KDTree with statistics needed for KDTreeEM calculation.
@@ -104,15 +109,15 @@ class KDTree {
     computeBoundingBox(relation, iter);
 
     // Decide if we need to split:
-    int splitDim = argmax(boundingBox.halfwidth);
-    double maxDiff = 2 * boundingBox.halfwidth[splitDim];
+    int splitDim = argmax(halfwidth);
+    double maxDiff = 2 * halfwidth[splitDim];
     if(maxDiff < mbw * dimWidth[splitDim]) {
       // Aggregate data for leaf directly:
       aggregateStats(relation, iter, dim);
       return;
     }
     // Split points at midpoint according to paper
-    double splitPoint = boundingBox.midpoint[splitDim];
+    double splitPoint = midpoint[splitDim];
     int l = left, r = right - 1;
     while(true) {
       while(l <= r && relation.get(iter.seek(l)).doubleValue(splitDim) <= splitPoint) {
@@ -164,7 +169,8 @@ class KDTree {
       b1[d] = (l + u) * 0.5;
       b2[d] = (u - l) * 0.5;
     }
-    boundingBox = new Boundingbox(b1, b2);
+    midpoint = b1;
+    halfwidth = b2;
   }
 
   private void aggregateStats(Relation<? extends NumberVector> relation, DBIDArrayIter iter, int dim) {
@@ -273,19 +279,20 @@ class KDTree {
    * @param ret Return array
    */
   public void calculateModelLimits(TextbookMultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret, ConstrainedQuadraticProblemSolver solver, double piPow) {
-    Boundingbox bbTranslated = new Boundingbox(minus(boundingBox.midpoint, model.mean), boundingBox.halfwidth.clone());
+    double[] min = minusEquals(minus(midpoint, model.mean), halfwidth);
+    double[] max = plusTimes(min, halfwidth, 2);
 
     // invert and ensure symmetric (array is cloned in inverse)
     double[][] covInv = inverse(model.covariance);
-    double covdet = FastMath.exp(2 * MultivariateGaussianModel.getHalfLogDeterminant(model.chol));
+    double covdetsqrt = FastMath.exp(MultivariateGaussianModel.getHalfLogDeterminant(model.chol));
 
     // maximizes Mahalanobis dist
     final double[] b = new double[covInv.length];
-    double mahalanobisSQDmax = 2 * solver.solve(covInv, b, 0, bbTranslated, maxpnt);
+    double mahalanobisSQDmax = 2 * solver.solve(covInv, b, 0, min, max, maxpnt);
     // minimizes Mahalanobis dist (invert covinv and result)
-    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), b, 0, bbTranslated, minpnt);
+    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), b, 0, min, max, minpnt);
 
-    final double f = 1 / (piPow * FastMath.sqrt(covdet));
+    final double f = 1 / (piPow * covdetsqrt);
     ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
     ret[1] = FastMath.exp(mahalanobisSQDmin * -.5) * f;
   }
@@ -332,99 +339,6 @@ class KDTree {
       resultData[indices[i]].increment(logProb[i] + FastMath.log(right - left), FastMath.exp(logProb[i]), sum, sumSq);
     }
     return logDenSum * (right - left);
-  }
-
-  /**
-   * Bounding box of a KDTree node.
-   */
-  public static class Boundingbox {
-    protected double[] midpoint, halfwidth;
-
-    /**
-     * Constructs a bounding box.
-     *
-     * @param midpoint Midpoint
-     * @param halfwidth Half width
-     */
-    public Boundingbox(double[] midpoint, double[] halfwidth) {
-      this.midpoint = midpoint;
-      this.halfwidth = halfwidth;
-    }
-
-    /**
-     * get lower bound at dimension k
-     * 
-     * @param k dimension
-     * @return lower bound at dimension k
-     */
-    public double getMin(int k) {
-      return midpoint[k] - halfwidth[k];
-    }
-
-    /**
-     * get upper bound at dimension k
-     * 
-     * @param k dimension
-     * @return upper bound at dimension k
-     */
-    public double getMax(int k) {
-      return midpoint[k] + halfwidth[k];
-    }
-
-    /**
-     * get difference between lower and upper bounds at dimension k
-     * 
-     * @param k dimension
-     * @return difference at dimension k
-     */
-    public double getHalfwidth(int k) {
-      return halfwidth[k];
-    }
-
-    /**
-     * get the middle point of the bounding box. returns the backend object, so
-     * changes will change the bounding box
-     * 
-     * @return array containing midpoint
-     */
-    public double[] getMidPoint() {
-      return midpoint;
-    }
-
-    /**
-     * Reduces this bounding box by omitting reducedDim and saving the result to
-     * redBox.
-     * 
-     * @param redBox target bounding box
-     * @param reducedDim dimension to omit
-     */
-    public void reduceBoundingboxTo(Boundingbox redBox, int reducedDim) {
-      if(reducedDim > 0) {
-        System.arraycopy(halfwidth, 0, redBox.halfwidth, 0, reducedDim);
-        System.arraycopy(midpoint, 0, redBox.midpoint, 0, reducedDim);
-      }
-
-      if(midpoint.length - (reducedDim) > 1) {
-        int l = redBox.midpoint.length - reducedDim;
-        System.arraycopy(halfwidth, reducedDim + 1, redBox.halfwidth, reducedDim, l);
-        System.arraycopy(midpoint, reducedDim + 1, redBox.midpoint, reducedDim, l);
-      }
-    }
-
-    /**
-     * Checks if the point is inside or on the bounds of this bounding box
-     * 
-     * @param point point to check
-     * @return true if point is weakly inside bounds
-     */
-    public boolean contains(double[] point) {
-      for(int i = 0; i < midpoint.length; i++) {
-        if(Math.abs(midpoint[i] - point[i]) > halfwidth[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
   }
 
   /**
