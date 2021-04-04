@@ -148,6 +148,25 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
     wsum += wei;
   }
 
+  /**
+   * Add a set of points with covariance information, for {@link KDTreeEM}.
+   *
+   * @param vec sum of new points
+   * @param covm sum of codeviates
+   * @param sca scaling factor applied to vec and covm instead of wei
+   * @param wei weight sum contribution
+   */
+  public void updateE(double[] vec, double[][] covm, double sca, double wei) {
+    assert vec.length == mean.length;
+    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
+    if(wei < Double.MIN_NORMAL) {
+      return;
+    }
+    plusTimesEquals(mean, vec, sca);
+    plusTimesEquals(covariance, covm, sca);
+    wsum += wei;
+  }
+
   @Override
   public void finalizeEStep(double weight, double prior) {
     final int dim = covariance.length;
@@ -266,5 +285,22 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
     this.covariance = cov;
     this.chol = tmp;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
+  }
+
+  /**
+   * Copy the parameters of another model.
+   *
+   * @param other Other
+   */
+  public void clone(TextbookMultivariateGaussianModel other) {
+    System.arraycopy(other.mean, 0, mean, 0, mean.length);
+    for(int d = 0; d < covariance.length; d++) {
+      System.arraycopy(other.covariance[d], 0, covariance[d], 0, covariance[d].length);
+    }
+    logNorm = other.logNorm;
+    logNormDet = other.logNormDet;
+    chol = other.chol;
+    weight = other.weight;
+    wsum = other.wsum;
   }
 }
