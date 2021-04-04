@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2020
+ * Copyright (C) 2021
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.math.linearalgebra;
 
 import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
-
-import elki.math.linearalgebra.CholeskyDecomposition;
-import elki.utilities.documentation.Reference;
 
 import net.jafama.FastMath;
 
@@ -36,20 +33,9 @@ import net.jafama.FastMath;
  * <p>
  * Works by recursion over the dimensions, searches the different possible
  * outcomes until it finds the best solution.
- * <p>
- * Reference:
- * <p>
- * A. W. Moore<br>
- * Very Fast EM-based Mixture Model Clustering using Multiresolution
- * kd-trees<br>
- * Neural Information Processing Systems (NIPS 1998)
  * 
  * @author Robert Gehde
  */
-@Reference(authors = "A. W. Moore", //
-    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution kd-Trees", //
-    booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
-    bibkey = "DBLP:conf/nips/Moore98")
 public class ConstrainedQuadraticProblemSolver {
   /**
    * Cache object
@@ -83,7 +69,7 @@ public class ConstrainedQuadraticProblemSolver {
    * @param arrayCache ArrayCache object
    */
   public double solve(double[][] a, double[] b, double c, double[] min, double[] max, double[] argmaxPoint) {
-    DimensionState[] dimStates = cache[b.length - 1].dimStates;
+    DimensionState[] dimStates = cache[min.length - 1].dimStates;
     Arrays.fill(dimStates, DimensionState.CONSTR);
     return evaluateConstrainedQuadraticFunction(a, b, c, min, max, dimStates, true, argmaxPoint, Double.NEGATIVE_INFINITY);
   }
@@ -104,7 +90,7 @@ public class ConstrainedQuadraticProblemSolver {
    */
   private int findLimitedDimensionWithDerivative(double[][] a, double[] b, double[] min, double[] max) {
     double[] buf = new double[2];
-    for(int i = 0; i < b.length; i++) {
+    for(int i = 0; i < min.length; i++) {
       calculateLinearDerivativeLimits(a, b, min, max, i, buf);
       // if hi < 0 or lo > 0 -> hit
       if(buf[0] >= 0.0) {
@@ -130,10 +116,10 @@ public class ConstrainedQuadraticProblemSolver {
    */
   private void calculateLinearDerivativeLimits(double[][] a, double[] b, double[] min, double[] max, int dim, double[] buf) {
     // initialize with value at 0^k
-    double mi = b[dim], ma = mi;
+    double mi = b != null ? b[dim] : 0, ma = mi;
     // then for each dimension add the y-difference to the bounds to the
     // according limits
-    for(int i = 0; i < b.length; i++) {
+    for(int i = 0; i < min.length; i++) {
       // get slope of the derivative, is a[dim][i]
       double slope = a[dim][i];
       if(slope < 0) {
@@ -164,7 +150,7 @@ public class ConstrainedQuadraticProblemSolver {
   private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, double[] min, double[] max) {
     double fm = evaluateQuadraticFormula(a, b, c, timesEquals(plus(min, max), 0.5));
     double[] buf = new double[2];
-    for(int i = 0; i < b.length; i++) {
+    for(int i = 0; i < min.length; i++) {
       calculateLinearDerivativeLimits(a, b, min, max, i, buf);
       fm += (max[i] - min[i]) * 0.5 * FastMath.max(-buf[0], buf[1]);
     }
@@ -356,7 +342,7 @@ public class ConstrainedQuadraticProblemSolver {
       return childResValue;
     }
     double reduceToValue = reducedTo == DimensionState.LOLIM ? min[reducedDim] : max[reducedDim];
-    final int redSizem1 = b.length - 2;
+    final int redSizem1 = min.length - 2;
     double[][] redA = cache[redSizem1].a;
     double[] redB = cache[redSizem1].b;
     DimensionState[] redDimStates = cache[redSizem1].dimStates;
@@ -436,18 +422,18 @@ public class ConstrainedQuadraticProblemSolver {
    * @return reduced c
    */
   private static double reduceEquation(double[][] a, double[] b, double c, double[][] redA, double[] redB, int reducedDim, double reduceToValue) {
-    int redSize = b.length - 1;
+    int redSize = a.length - 1;
     for(int i = 0; i < redSize; i++) {
       int oRefi = i < reducedDim ? i : i + 1;
-      redB[i] = b[oRefi] + reduceToValue * a[oRefi][reducedDim];
+      redB[i] = (b != null ? b[oRefi] : 0) + reduceToValue * a[oRefi][reducedDim];
       System.arraycopy(a[oRefi], 0, redA[i], 0, reducedDim);
       System.arraycopy(a[oRefi], reducedDim + 1, redA[i], reducedDim, redSize - reducedDim);
     }
-    return 0.5 * reduceToValue * reduceToValue * a[reducedDim][reducedDim] + reduceToValue * b[reducedDim];
+    return 0.5 * reduceToValue * reduceToValue * a[reducedDim][reducedDim] + (b != null ? reduceToValue * b[reducedDim] : 0);
   }
 
   /**
-   * Finds the argmax for \( \tfrac12 A x^2 + b x \)
+   * Finds the argmax for \( \tfrac12 A x^2 + b x \).
    * 
    * @param a coefficient matrix A of the function
    * @param b coefficient vector b of the function
@@ -455,11 +441,11 @@ public class ConstrainedQuadraticProblemSolver {
    */
   private double[] findMaximumWithFunctionValue(double[][] a, double[] b) {
     CholeskyDecomposition chol = new CholeskyDecomposition(times(a, -1));
-    return chol.isSPD() ? chol.solve(b) : null;
+    return chol.isSPD() ? chol.solveLtransposed(chol.solveLInplace(b != null ? copy(b) : new double[a.length])) : null;
   }
 
   /**
-   * calculate \( \tfrac12 x^T A x + x^t b + c \) for the given values
+   * calculate \( \tfrac12 x^T A x + x^t b + c \) for the given values.
    * 
    * @param a coefficient matrix A of the function
    * @param b coefficient vector b of the function
@@ -468,7 +454,7 @@ public class ConstrainedQuadraticProblemSolver {
    * @return function value
    */
   private static double evaluateQuadraticFormula(double[][] a, double[] b, double c, double[] point) {
-    return 0.5 * transposeTimesTimes(point, a, point) + scalarProduct(point, b) + c;
+    return 0.5 * transposeTimesTimes(point, a, point) + (b != null ? scalarProduct(point, b) + c : c);
   }
 
   /**

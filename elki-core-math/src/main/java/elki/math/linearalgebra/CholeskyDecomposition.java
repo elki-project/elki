@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,10 +28,10 @@ import net.jafama.FastMath;
 
 /**
  * Cholesky Decomposition.
- *
+ * <p>
  * For a symmetric, positive definite matrix A, the Cholesky decomposition is an
- * lower triangular matrix L so that A = L*L^T.
- *
+ * lower triangular matrix L so that \( A = L L^T \).
+ * <p>
  * If the matrix is not symmetric or positive definite, the constructor returns
  * a partial decomposition and sets an internal flag that may be queried by the
  * isSPD() method.
@@ -214,7 +214,7 @@ public class CholeskyDecomposition {
    * @param X Solution of L*Y=b
    * @return X
    */
-  private double[] solveLtransposed(double[] X) {
+  public double[] solveLtransposed(double[] X) {
     for(int k = L.length - 1; k >= 0; k--) {
       final double[] Lk = L[k];
       X[k] /= Lk[k];

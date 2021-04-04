@@ -41,19 +41,32 @@ public class KDTreeEMTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 1) //
         .with(KDTreeEM.Par.K_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.82040);
-    assertClusterSizes(result, new int[] { 5, 102, 282, 321 });
+    assertFMeasure(db, result, 0.82415);
+    assertClusterSizes(result, new int[] { 5, 98, 289, 318 });
+  }
+
+  @Test
+  public void testMultivariateGaussExact() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<KDTreeEM>(KDTreeEM.class) //
+        .with(KMeans.SEED_ID, 1) //
+        .with(KDTreeEM.Par.K_ID, 4) //
+        .with(KDTreeEM.Par.SOFT_ID) //
+        .with(KDTreeEM.Par.EXACT_ASSIGN_ID) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.82908);
+    assertClusterSizes(result, new int[] { 5, 98, 290, 317 });
   }
 
   @Test
   public void testInfinityCheatCase() {
+    // This caused singularity issues before & cluster degeneration
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<KDTreeEM>(KDTreeEM.class) //
-        .with(KMeans.SEED_ID, 2) // on this seed, the singularity cheat reached
-                                 // an infinite value!
+        .with(KMeans.SEED_ID, 2) //
         .with(KDTreeEM.Par.K_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.64239);
-    assertClusterSizes(result, new int[] { 5, 85, 205, 415 });
+    assertFMeasure(db, result, 0.80187);
+    assertClusterSizes(result, new int[] { 5, 92, 199, 414 });
   }
 }

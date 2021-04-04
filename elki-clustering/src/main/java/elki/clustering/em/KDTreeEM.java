@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2020
+ * Copyright (C) 2021
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -46,11 +46,11 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
+import elki.math.linearalgebra.ConstrainedQuadraticProblemSolver;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
-import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -75,11 +75,10 @@ import net.jafama.FastMath;
  *
  * @author Robert Gehde
  */
-@Title("Clustering by Expectation Maximization on a KD-Tree")
-@Description("Cluster data via Gaussian mixture modeling and the KDTreeEM algorithm")
+@Description("Gaussian mixture modeling accelerated using a kd-tree")
 @Reference(authors = "Andrew W. Moore", //
     booktitle = "Advances in Neural Information Processing Systems 11 (NIPS 1998)", //
-    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution", //
+    title = "Very Fast EM-based Mixture Model Clustering using Multiresolution kd-trees", //
     bibkey = "DBLP:conf/nips/Moore98")
 public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
   /**
@@ -156,8 +155,9 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * @param miniter Minimum number of iterations
    * @param maxiter Maximum number of iterations
    * @param soft Include soft assignments
+   * @param exactAssign Perform exact assignments at the end
    */
-  public KDTreeEM(int k, double mbw, double tau, double tauclass, double delta, TextbookMultivariateGaussianModelFactory mfactory, int miniter, int maxiter, boolean soft) {
+  public KDTreeEM(int k, double mbw, double tau, double tauclass, double delta, TextbookMultivariateGaussianModelFactory mfactory, int miniter, int maxiter, boolean soft, boolean exactAssign) {
     this.k = k;
     this.mbw = mbw;
     this.tau = tau;
@@ -167,6 +167,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     this.miniter = miniter;
     this.maxiter = maxiter;
     this.soft = soft;
+    this.exactAssign = exactAssign;
   }
 
   /**
@@ -189,7 +190,15 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    */
   private double ipiPow;
 
+  /**
+   * Cluster weights
+   */
   private double[] wsum;
+
+  /**
+   * Perform exact cluster assignments
+   */
+  protected boolean exactAssign = false;
 
   /**
    * Calculates the EM Clustering with the given values by calling makeStats and
@@ -235,7 +244,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
         c.beginEStep();
       }
       Arrays.fill(wsum, 0.);
-      logLikelihood = makeStats(tree, MathUtil.sequence(0, k)) / relation.size();
+      logLikelihood = makeStats(tree, MathUtil.sequence(0, k), null) / relation.size();
       for(int i = 0; i < k; i++) {
         final double weight = wsum[i] / relation.size();
         if(weight <= Double.MIN_NORMAL) {
@@ -268,7 +277,12 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
 
     // TODO: use approximate values from the kd-tree here, too!
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    logLikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    if(exactAssign) {
+      logLikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    }
+    else {
+      logLikelihood = makeStats(tree, MathUtil.sequence(0, k), probClusterIGivenX) / relation.size();
+    }
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
     LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", logLikelihood));
 
@@ -353,14 +367,14 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     for(int i : indices) {
       // calculate denominators for minimum/maximum weight estimation
       double weight = models.get(i).getWeight();
-      double wminDenom = minDenomTotal + weight * (limits[i][0] - limits[i][1]);
-      double wmaxDenom = maxDenomTotal + weight * (limits[i][1] - limits[i][0]);
+      double wminDenom = maxDenomTotal + weight * (limits[i][0] - limits[i][1]);
+      double wmaxDenom = minDenomTotal + weight * (limits[i][1] - limits[i][0]);
       // calculate minimum weight estimation
       double wmin = MathUtil.clamp((weight * limits[i][0]) / wminDenom, 0, 1);
       maxMinWeight = wmin > maxMinWeight ? wmin : maxMinWeight;
       // calculate maximum weight estimation
       wmaxs[i] = MathUtil.clamp((weight * limits[i][1]) / wmaxDenom, 0, 1);
-      double minPossibleWeight = newmodels.get(i).weight + wmin * size; // FIXME
+      double minPossibleWeight = newmodels.get(i).weight + wmin * size;
       // calculate the maximum possible error in this node
       double maximumError = size * (wmaxs[i] - wmin);
       // pruning check, if error to big for this model, don't prune
@@ -405,10 +419,9 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     double icovdetsqrt = FastMath.exp(-1 * MultivariateGaussianModel.getHalfLogDeterminant(model.chol));
 
     // maximizes Mahalanobis dist
-    final double[] b = new double[covInv.length];
-    double mahalanobisSQDmax = 2 * solver.solve(covInv, b, 0, min, max, maxpnt);
+    double mahalanobisSQDmax = 2 * solver.solve(covInv, null, 0, min, max, maxpnt);
     // minimizes Mahalanobis dist (invert covinv and result)
-    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), b, 0, min, max, minpnt);
+    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), null, 0, min, max, minpnt);
 
     final double f = ipiPow * icovdetsqrt;
     ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
@@ -421,9 +434,10 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * 
    * @param node next node
    * @param indices list of indices to use in calculation, initially all
+   * @param probs cluster assignment
    * @return log likelihood of the model
    */
-  private double makeStats(KDTree node, int[] indices) {
+  private double makeStats(KDTree node, int[] indices, WritableDataStore<double[]> probs) {
     // Only one possible cluster remaining.
     final int size = node.right - node.left;
     if(indices.length == 1) {
@@ -431,13 +445,20 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
       double logDenSum = models.get(indices[0]).estimateLogDensity(midpoint);
       wsum[indices[0]] += size;
       newmodels.get(indices[0]).updateE(node.sum, node.sumSq, 1., size);
+      if(probs != null) {
+        double[] p = new double[k];
+        p[indices[0]] = 1;
+        for(DBIDArrayIter it = sorted.iter().seek(node.left); it.getOffset() < node.right; it.advance()) {
+          probs.put(it, p);
+        }
+      }
       return logDenSum * size;
     }
     // check for pruning possibility
     if(node.leftChild != null) {
       int[] nextIndices = checkStoppingCondition(node, indices);
       if(nextIndices != null) {
-        return makeStats(node.leftChild, nextIndices) + makeStats(node.rightChild, nextIndices);
+        return makeStats(node.leftChild, nextIndices, probs) + makeStats(node.rightChild, nextIndices, probs);
       }
     }
     DoubleVector midpoint = DoubleVector.wrap(times(node.sum, 1. / size));
@@ -449,10 +470,19 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     double logDenSum = EM.logSumExp(logProb);
     minusEquals(logProb, logDenSum); // total probability 1
     // calculate necessary statistics at this node
+    double[] ps = probs != null ? new double[k] : null;
     for(int i = 0; i < indices.length; i++) {
       final double p = FastMath.exp(logProb[i]);
       wsum[indices[i]] += p * size;
       newmodels.get(indices[i]).updateE(node.sum, node.sumSq, p, p * size);
+      if(ps != null) {
+        ps[indices[i]] = p;
+      }
+    }
+    if(probs != null) {
+      for(DBIDArrayIter it = sorted.iter().seek(node.left); it.getOffset() < node.right; it.advance()) {
+        probs.put(it, ps);
+      }
     }
     return logDenSum * size;
   }
@@ -670,6 +700,11 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     public static final OptionID SOFT_ID = EM.Par.SOFT_ID;
 
     /**
+     * Parameter to produce more precise final assignments
+     */
+    public static final OptionID EXACT_ASSIGN_ID = new OptionID("emkd.exactassign", "Assign each point individually, not using the kd-tree in the final step.");
+
+    /**
      * Number of clusters.
      */
     protected int k;
@@ -714,6 +749,11 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
      */
     boolean soft = false;
 
+    /**
+     * Perform the slower exact assignment step.
+     */
+    boolean exactAssign = false;
+
     @Override
     public void configure(Parameterization config) {
       new IntParameter(K_ID) //
@@ -745,11 +785,13 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
           .grab(config, x -> maxiter = x);
       new Flag(SOFT_ID) //
           .grab(config, x -> soft = x);
+      new Flag(EXACT_ASSIGN_ID) //
+          .grab(config, x -> exactAssign = x);
     }
 
     @Override
     public KDTreeEM make() {
-      return new KDTreeEM(k, mbw, tau, tauclass, delta, mfactory, miniter, maxiter, soft);
+      return new KDTreeEM(k, mbw, tau, tauclass, delta, mfactory, miniter, maxiter, soft, exactAssign);
     }
   }
 }
