@@ -178,6 +178,12 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
     DoubleIntegerArrayQuickSort.sort(dists, ids, 0, size);
     return this;
   }
+  
+  @Override
+  public ModifiableDoubleDBIDList sortDescending() {
+    DoubleIntegerArrayQuickSort.sortReverse(dists, ids, 0, size);
+    return this;
+  }
 
   /**
    * Reverse the list.

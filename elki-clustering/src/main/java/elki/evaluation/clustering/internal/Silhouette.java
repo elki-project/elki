@@ -25,6 +25,8 @@ import java.util.List;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -138,6 +140,8 @@ public class Silhouette<O> implements Evaluator {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
+    // for silhouetteplot
+    WritableDoubleDataStore perIDStore = DataStoreUtil.makeDoubleStorage(rel.getDBIDs(), rel.size());
     for(Cluster<?> cluster : clusters) {
       // Note: we treat 1-element clusters the same as noise.
       if(cluster.size() <= 1 || cluster.isNoise()) {
@@ -197,6 +201,7 @@ public class Silhouette<O> implements Evaluator {
         // One cluster only?
         b = b < Double.POSITIVE_INFINITY ? b : a;
         msil.put((b - a) / (b > a ? b : a));
+        perIDStore.putDouble(it1, (b - a) / (b > a ? b : a));
       }
     }
     double penalty = 1.;
@@ -221,6 +226,7 @@ public class Silhouette<O> implements Evaluator {
     if(!Metadata.hierarchyOf(c).addChild(ev)) {
       Metadata.of(ev).notifyChanged();
     }
+    Metadata.hierarchyOf(c).addChild(perIDStore);
     return meansil;
   }
 
