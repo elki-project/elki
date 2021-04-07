@@ -177,6 +177,7 @@ public class SilhouettePlot {
   protected LinearScale computeScale(ModifiableDoubleDBIDList[] silhouettes) {
     DoubleMinMax range = new DoubleMinMax();
     // calculate range
+    range.put(0);
     for(ModifiableDoubleDBIDList list : silhouettes) {
       for(DoubleDBIDListMIter it = list.iter(); it.valid(); it.advance()) {
         final double silhouette = it.doubleValue();

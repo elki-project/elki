@@ -53,7 +53,7 @@ public class SilhouettePlotFactory implements ProjectorFactory {
     VisualizationTree.findNewResults(context, start).filter(WritableDoubleDataStore.class).forEach(wdds -> {
       ModifiableDoubleDBIDList[] silhouettes = new ModifiableDoubleDBIDList[c.getAllClusters().size()];
       int i = 0;
-      for(Cluster<?> cluster : c.getToplevelClusters()) {
+      for(Cluster<?> cluster : c.getAllClusters()) {
         ModifiableDoubleDBIDList dbidlist = DBIDUtil.newDistanceDBIDList(cluster.size());
         for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
           dbidlist.add(wdds.doubleValue(iter), iter);
