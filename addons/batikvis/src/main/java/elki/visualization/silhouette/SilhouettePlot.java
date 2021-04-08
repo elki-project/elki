@@ -33,7 +33,7 @@ import elki.visualization.batikutil.ThumbnailRegistryEntry;
 import elki.visualization.style.StylingPolicy;
 
 /**
- * Class to produce an OPTICS plot image.
+ * Class to produce an Silhouette plot image.
  *
  * @author Robert Gehde
  *
@@ -285,7 +285,7 @@ public class SilhouettePlot {
    * @param silhouettes silhouette values
    * @param context Context (for colors and reference clustering)
    *
-   * @return New or existing optics plot
+   * @return New or existing silhouette plot
    */
   public static SilhouettePlot plotForSilhouetteValues(ModifiableDoubleDBIDList[] silhouettes, VisualizerContext context) {
     final StylingPolicy policy = context.getStylingPolicy();
