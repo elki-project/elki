@@ -65,7 +65,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Cabral, Eugênio F. (Original Code)
  * @author Braulio V.S. Vinces (ELKIfication)
- * @since 0.1
+ * @since 0.7.5
  *
  * @param <V> Vector type
  */
