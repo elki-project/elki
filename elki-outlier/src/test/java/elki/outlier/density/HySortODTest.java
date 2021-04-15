@@ -32,11 +32,10 @@ import elki.utilities.ELKIBuilder;
  * Tests the HySortOD algorithm.
  * 
  * @author Braulio V.S. Vinces
- * @since 0.7.5
  */
 public class HySortODTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testKNNOutlier() {
+  public void testHySortOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
     OutlierResult result = new ELKIBuilder<HySortOD<DoubleVector>>(HySortOD.class) //
         .with(HySortOD.Par.B_ID, 5).with(HySortOD.Par.MIN_SPLIT_ID, 100).build().autorun(db);
