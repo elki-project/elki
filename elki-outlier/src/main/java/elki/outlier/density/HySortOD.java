@@ -29,18 +29,20 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDArrayIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.progress.StepProgress;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.Alias;
+import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -48,6 +50,8 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+
+import net.jafama.FastMath;
 
 /**
  * Hypercube-Based Outlier Detection.
@@ -65,7 +69,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Cabral, Eugênio F. (Original Code)
  * @author Braulio V.S. Vinces (ELKIfication)
- * @since 0.7.5
  *
  * @param <V> Vector type
  */
@@ -84,68 +87,78 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
   private static final Logging LOG = Logging.getLogger(HySortOD.class);
 
   /**
-   * Number of bins
+   * Number of bins.
    */
   protected int b;
 
   /**
-   * Threshold to balance the trade-off between the number of hyper-cubes to
-   * scan
-   * during the search and the granularity of mapping
+   * Threshold to balance the trade-off between the number of hypercubes to
+   * scan during the search and the granularity of mapping.
    */
   protected int minSplit;
 
-  // hypercube's length
+  /**
+   * Hypercube's length.
+   */
   private final double l;
 
-  // to match each object with its hyper-cube
-  // it's a little trick to deal with hypercube rearrangement
-  private int[] invertedIndex;
-
-  // strategy for hyper-cubes density search
+  /**
+   * Strategy for hypercubes density search.
+   */
   private DensityStrategy strategy;
 
   /**
-   * Constructor
+   * Constructor with parameters.
    * 
-   * @param k
    * @param b Number of bins
+   * @param minSplit Threshold to balance the tree strategy
    */
   public HySortOD(int b, int minSplit) {
     super();
     this.b = b;
     this.l = 1 / (double) this.b;
     this.minSplit = minSplit;
-    if(this.minSplit > 0) 
+    if(this.minSplit > 0) {
       this.strategy = new TreeStrategy(this.minSplit);
-     else 
+    }
+    else {
       this.strategy = new NaiveStrategy();
+    }
   }
 
   public OutlierResult run(Database db, Relation<V> relation) {
 
     // Output data storage
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("HySortOD scores", relation.size(), LOG) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
+
+    LOG.beginStep(stepprog, 1, "Ordering of hypercubes lexicographically according to their coordinates.");
+    final List<Hypercube> H = getSortedHypercubes(relation);
+
+    LOG.beginStep(stepprog, 2, "Obtaining densities per hypercube.");
+    final int[] W = this.strategy.buildIndex(H).getDensities();
+
     // Track minimum and maximum scores
     DoubleMinMax minmax = new DoubleMinMax();
-
-    int[] W;
-    List<Hypercube> H;
-
     {
-      H = getSortedHypercubes(relation);
-      W = this.strategy.buildIndex(H).getDensities();
+      // compute score by hypercube
+      LOG.beginStep(stepprog, 3, "Computing hypercube scores");
 
-      // Iterate over all objects
-      int objectPosition = 0;
-      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance())
-        scores.putDouble(iter, score(W[this.invertedIndex[objectPosition++]]));
-
-      LOG.incrementProcessed(prog);
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("HySortOD scores", relation.size(), LOG) : null;
+      DBIDArrayIter iter = (DBIDArrayIter) relation.iterDBIDs();
+      for(int hypercube = 0; hypercube < H.size(); hypercube++) {
+        final IntegerArray instances = H.get(hypercube).getInstances();
+        final double hypercubeScore = score(W[hypercube]);
+        minmax.put(hypercubeScore);
+        for(int instance = 0; instance < instances.size; instance++) {
+          final int index = instances.get(instance);
+          scores.putDouble(iter.seek(index), hypercubeScore);
+          LOG.incrementProcessed(prog);
+        }
+      }
+      LOG.ensureCompleted(prog);
     }
 
-    LOG.ensureCompleted(prog);
     // Wrap the result in the standard containers
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(
         // Actually observed minimum and maximum values
@@ -156,43 +169,43 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
     return new OutlierResult(meta, rel);
   }
 
+  /**
+   * Create and sort hypercubes considering their coordinates.
+   * 
+   * @param relation Data to process
+   * @return Hypercubes sorted
+   */
   private List<Hypercube> getSortedHypercubes(Relation<V> relation) {
-    BinaryTree<Hypercube> sorted = new BinaryTree<>();
+    TreeSet<Hypercube> sorted = new TreeSet<HySortOD<V>.Hypercube>();
 
-    int objectPosition = 0;
     // Iterate over all objects
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      Hypercube h = new Hypercube(relation.get(iter), this.l);
-      Hypercube obj = sorted.get(h);
-
-      if(Objects.isNull(obj)) {
-        h.add(objectPosition);
+    for(DBIDArrayIter iter = (DBIDArrayIter) relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      Hypercube h = new Hypercube(relation.get(iter).toArray(), this.l);
+      if(!sorted.contains(h)) {
+        h.add(iter.getOffset());
         sorted.add(h);
       }
       else {
-        obj.add(objectPosition);
+        sorted.ceiling(h).add(iter.getOffset());
       }
-
-      objectPosition++;
     }
 
     int n = sorted.size();
     List<Hypercube> H = new ArrayList<Hypercube>(n);
 
-    this.invertedIndex = new int[relation.size()];
-    int hypercybePosition = 0;
     for(Hypercube h : sorted) {
       H.add(h);
-
-      for(Integer _objectPosition : h.getInstances())
-        this.invertedIndex[_objectPosition] = hypercybePosition;
-
-      hypercybePosition++;
     }
 
     return H;
   }
 
+  /**
+   * Compute score according to hypercube neighborhood density.
+   * 
+   * @param density Hypercube density
+   * @return score
+   */
   private double score(int density) {
     return 1 - (density / this.strategy.getMaxDensity());
   }
@@ -202,59 +215,72 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
-  class Hypercube implements Comparable<Hypercube>, Comparator<Hypercube> {
+  /**
+   * Bounded regions of the space where at least one instance exists.
+   * 
+   * @author Cabral, Eugênio F.
+   */
+  class Hypercube implements Comparable<Hypercube> {
 
-    int[] coords;
+    /**
+     * Hypercube coordinates.
+     */
+    final int[] coords;
 
-    ArrayList<Integer> instances;
+    /**
+     * Holds a set of instances within the hypercube.
+     */
+    final IntegerArray instances;
 
-    public Hypercube(V instance, double lenght) {
+    /**
+     * Hypercube constructor.
+     *
+     * @param values Vector representation of an instance
+     * @param lenght Hypercube's length
+     */
+    public Hypercube(double[] values, double lenght) {
       super();
-      this.coords = new int[instance.getDimensionality()];
-      this.instances = new ArrayList<Integer>();
+      this.coords = new int[values.length];
+      this.instances = new IntegerArray();
 
-      for(int d = 0; d < instance.getDimensionality(); d++) {
-        this.coords[d] = (int) Math.floor(instance.doubleValue(d) / lenght);
+      for(int d = 0; d < values.length; d++) {
+        this.coords[d] = (int) FastMath.floor(values[d] / lenght);
       }
-    }
-
-    @Override
-    public int compare(Hypercube o1, Hypercube o2) {
-      for(int i = 0; i < o1.coords.length; i++) {
-        int d = o1.coords[i] - o2.coords[i];
-        if(d != 0)
-          return d;
-      }
-      return 0;
     }
 
     @Override
     public int compareTo(Hypercube o) {
       for(int i = 0; i < coords.length; i++) {
         int d = this.coords[i] - o.coords[i];
-        if(d != 0)
+        if(d != 0) {
           return d;
+        }
       }
       return 0;
     }
 
     @Override
     public boolean equals(Object obj) {
-      if(Objects.isNull(obj))
+      if(Objects.isNull(obj)) {
         return false;
+      }
 
-      if(getClass() != obj.getClass())
+      if(getClass() != obj.getClass()) {
         return false;
+      }
 
       @SuppressWarnings("unchecked")
       final Hypercube other = (Hypercube) obj;
 
-      if(coords.length != other.coords.length)
+      if(coords.length != other.coords.length) {
         return false;
+      }
 
-      for(int i = 0; i < coords.length; i++)
-        if(coords[i] != other.coords[i])
+      for(int i = 0; i < coords.length; i++) {
+        if(coords[i] != other.coords[i]) {
           return false;
+        }
+      }
 
       return true;
     }
@@ -263,8 +289,9 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
     public String toString() {
       StringBuilder str = new StringBuilder();
       str.append("(" + coords[0]);
-      for(int i = 1; i < coords.length; i++)
+      for(int i = 1; i < coords.length; i++) {
         str.append(", " + coords[i]);
+      }
       str.append(")");
       return str.toString();
     }
@@ -281,11 +308,11 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
       return coords.length;
     }
 
-    public List<Integer> getInstances() {
+    public IntegerArray getInstances() {
       return instances;
     }
 
-    public void add(Integer instance) {
+    public void add(int instance) {
       instances.add(instance);
     }
 
@@ -296,218 +323,81 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
   }
 
   /**
+   * Strategy for compute density.
    * 
-   * @source https://www.baeldung.com/java-binary-tree
+   * @author Cabral, Eugênio F.
+   *
    */
-  class BinaryTree<T extends Comparable<T>> implements Iterable<T> {
-
-    private Node<T> root;
-
-    public void add(T value) {
-      root = addRecursive(null, root, value);
-    }
-
-    private Node<T> addRecursive(Node<T> parent, Node<T> current, T value) {
-
-      if(Objects.isNull(current)) {
-        return new Node<T>(parent, value);
-      }
-
-      if(value.compareTo(current.value) < 0) {
-        current.left = addRecursive(current, current.left, value);
-      }
-      else if(value.compareTo(current.value) > 0) {
-        current.right = addRecursive(current, current.right, value);
-      }
-
-      return current;
-    }
-
-    public boolean isEmpty() {
-      return Objects.isNull(root);
-    }
-
-    public int size() {
-      return getSizeRecursive(root);
-    }
-
-    private int getSizeRecursive(Node<T> current) {
-      return Objects.isNull(current) ? 0 : getSizeRecursive(current.left) + 1 + getSizeRecursive(current.right);
-    }
-
-    public boolean contains(T value) {
-      return containsRecursive(root, value);
-    }
-
-    private boolean containsRecursive(Node<T> current, T value) {
-      if(Objects.isNull(current)) {
-        return false;
-      }
-
-      if(value.compareTo(current.value) == 0) {
-        return true;
-      }
-
-      return value.compareTo(current.value) < 0 ? containsRecursive(current.left, value) : containsRecursive(current.right, value);
-    }
-
-    public T get(T value) {
-      return getRecursive(root, value);
-    }
-
-    private T getRecursive(Node<T> current, T value) {
-      if(Objects.isNull(current))
-        return null;
-
-      if(value.compareTo(current.value) == 0)
-        return current.value;
-
-      return value.compareTo(current.value) < 0 ? getRecursive(current.left, value) : getRecursive(current.right, value);
-    }
-
-    public void delete(T value) {
-      root = deleteRecursive(root, value);
-    }
-
-    private Node<T> deleteRecursive(Node<T> current, T value) {
-      if(Objects.isNull(current)) {
-        return null;
-      }
-
-      if(value.compareTo(current.value) == 0) {
-        // Case 1: no children
-        if(current.left == null && current.right == null) {
-          return null;
-        }
-
-        // Case 2: only 1 child
-        if(current.right == null) {
-          return current.left;
-        }
-
-        if(current.left == null) {
-          return current.right;
-        }
-
-        // Case 3: 2 children
-        T smallestValue = findSmallestValue(current.right);
-        current.value = smallestValue;
-        current.right = deleteRecursive(current.right, smallestValue);
-        return current;
-      }
-      if(value.compareTo(current.value) < 0) {
-        current.left = deleteRecursive(current.left, value);
-        return current;
-      }
-
-      current.right = deleteRecursive(current.right, value);
-      return current;
-    }
-
-    private T findSmallestValue(Node<T> root) {
-      return root.left == null ? root.value : findSmallestValue(root.left);
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-      return new TreeIterator(root);
-    }
-
-    /**
-     * @source https://stackoverflow.com/a/12851421
-     */
-    private class TreeIterator implements Iterator<T> {
-      private Node<T> next;
-
-      public TreeIterator(Node<T> root) {
-        next = root;
-        if(next == null)
-          return;
-
-        while(next.left != null)
-          next = next.left;
-      }
-
-      public boolean hasNext() {
-        return Objects.nonNull(next);
-      }
-
-      public T next() {
-        if(!hasNext())
-          throw new NoSuchElementException();
-        Node<T> r = next;
-
-        // If you can walk right, walk right, then fully left.
-        // otherwise, walk up until you come from left.
-        if(Objects.nonNull(next.right)) {
-          next = next.right;
-          while(Objects.nonNull(next.left))
-            next = next.left;
-          return r.value;
-        }
-
-        while(true) {
-          if(Objects.isNull(next.parent)) {
-            next = null;
-            return r.value;
-          }
-          if(next.parent.left == next) {
-            next = next.parent;
-            return r.value;
-          }
-          next = next.parent;
-        }
-      }
-    }
-
-    @SuppressWarnings("hiding")
-    private class Node<T> {
-      public T value;
-
-      public Node<T> left;
-
-      public Node<T> right;
-
-      public Node<T> parent;
-
-      public Node(Node<T> parent, T value) {
-        this.right = null;
-        this.left = null;
-        this.parent = parent;
-        this.value = value;
-      }
-    }
-  }
-
   abstract class DensityStrategy {
-    // Max hypercube neighborhood density
+    /**
+     * Max hypercube neighborhood density
+     */
     int Wmax;
 
-    // Local reference for search
+    /**
+     * Local reference for search
+     */
     List<Hypercube> H;
 
+    /**
+     * Construct the index for compute hypercube density according to a
+     * strategy.
+     * 
+     * @param H List of hypercubes
+     * @return DensityStrategy Strategy instance
+     */
     abstract DensityStrategy buildIndex(List<Hypercube> H);
 
+    /**
+     * @return Densities of all hypercubes
+     */
     abstract int[] getDensities();
 
+    /**
+     * @return Maximum density
+     */
     double getMaxDensity() {
       return (double) this.Wmax;
     }
 
+    /**
+     * Validate if Hypercube hk is immediate neighbor of Hypercube hi.
+     * 
+     * @param hi Hypercube hi
+     * @param hk Hypercube hk
+     * @return
+     */
     protected boolean isImmediate(Hypercube hi, Hypercube hk) {
       final int[] p = hi.getCoords();
       final int[] q = hk.getCoords();
-      for(int j = p.length - 1; j >= 0; j--)
-        if(Math.abs(p[j] - q[j]) > 1)
+      for(int j = p.length - 1; j >= 0; j--) {
+        if(FastMath.abs(p[j] - q[j]) > 1) {
           return false;
+        }
+      }
       return true;
     }
 
+    /**
+     * Validate if Hypercube hk is immediate neighbor of Hypercube hi using a
+     * the same coordinate.
+     * 
+     * @param hi Hypercube hi
+     * @param hk Hypercube hk
+     * @param col Hypercube coordinate
+     * @return
+     */
     protected boolean isProspective(Hypercube hi, Hypercube hk, int col) {
-      return Math.abs(hi.getCoordAt(col) - hk.getCoordAt(col)) <= 1;
+      return FastMath.abs(hi.getCoordAt(col) - hk.getCoordAt(col)) <= 1;
     }
   }
-  
+
+  /**
+   * Naive strategy for computing density.
+   * 
+   * @author Cabral, Eugênio F.
+   *
+   */
   class NaiveStrategy extends DensityStrategy {
 
     @Override
@@ -516,51 +406,76 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
       this.Wmax = 0;
       return this;
     }
-    
+
     @Override
     public int[] getDensities() {
       int n = H.size();
       int[] W = new int[n];
 
-      for (int i = 0; i < n; i++) {
-        
+      for(int i = 0; i < n; i++) {
+
         W[i] = H.get(i).getDensity();
-        
-        for (int k = i - 1; k >= 0; k--) {
-          if (!isProspective(H.get(i), H.get(k), 0))
+
+        for(int k = i - 1; k >= 0; k--) {
+          if(!isProspective(H.get(i), H.get(k), 0)) {
             break;
-          if (isImmediate(H.get(i), H.get(k)))
+          }
+          if(isImmediate(H.get(i), H.get(k))) {
             W[i] += H.get(k).getDensity();
+          }
         }
-        
-        for (int k = i + 1; k < n; k++) {
-          if (!isProspective(H.get(i), H.get(k), 0))
+
+        for(int k = i + 1; k < n; k++) {
+          if(!isProspective(H.get(i), H.get(k), 0)) {
             break;
-          if (isImmediate(H.get(i), H.get(k)))
+          }
+          if(isImmediate(H.get(i), H.get(k))) {
             W[i] += H.get(k).getDensity();
+          }
         }
-        
-        Wmax = Math.max(Wmax, W[i]);
+
+        Wmax = FastMath.max(Wmax, W[i]);
       }
-      
+
       return W;
     }
-    
+
   }
 
+  /**
+   * Tree strategy for computing density.
+   * 
+   * @author Cabral, Eugênio F.
+   *
+   */
   class TreeStrategy extends DensityStrategy {
+    /**
+     * Tree root.
+     */
     Node root;
 
-    // Minimum number of rows to allow sub-mapping
+    /**
+     * Minimum number of rows to allow sub-mapping.
+     */
     final int minSplit;
 
-    // Maximum number of dimensions to map
+    /**
+     * Maximum number of dimensions to map.
+     */
     int numMappedDimensions;
 
+    /**
+     * Default constructor of the tree strategy.
+     */
     public TreeStrategy() {
       this(100);
     }
 
+    /**
+     * Constructor of the tree strategy.
+     *
+     * @param minSplit
+     */
     public TreeStrategy(int minSplit) {
       // Set the minimum number of rows to allow sub-mapping
       // When the value is 0 this parameter has no effect
@@ -581,6 +496,12 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
       return this;
     }
 
+    /**
+     * Recursive build index.
+     * 
+     * @param parent Node of the tree strategy
+     * @param col
+     */
     private void buildIndex(Node parent, int col) {
 
       // Stop sub-mapping when the parent node map less than minSplit hypercubes
@@ -640,6 +561,14 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
       return W;
     }
 
+    /**
+     * Recursive computing of density.
+     * 
+     * @param i Index of the hypercube
+     * @param parent Node of the tree
+     * @param col Coordinate of the hypercube
+     * @return Density
+     */
     private int density(int i, Node parent, int col) {
       int density = 0;
 
@@ -676,13 +605,31 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
       return density;
     }
 
-    final class Node {
+    /**
+     * Tree node.
+     * 
+     * @author Cabral, Eugênio F.
+     *
+     */
+    private class Node {
 
-      // Index information
+      /**
+       * Index information.
+       */
       public final int value, begin, end;
 
+      /**
+       * Childs of the node.
+       */
       public final HashMap<Integer, Node> childs;
 
+      /**
+       * Constructor.
+       *
+       * @param value
+       * @param begin
+       * @param end
+       */
       public Node(int value, int begin, int end) {
         this.childs = new HashMap<>();
         this.value = value;
@@ -695,6 +642,11 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
         return "(" + begin + "," + end + ")";
       }
 
+      /**
+       * Add a child.
+       * 
+       * @param node Child
+       */
       public void add(Node node) {
         if(Objects.nonNull(node)) {
           childs.put(node.value, node);
@@ -740,4 +692,3 @@ public class HySortOD<V extends NumberVector> implements OutlierAlgorithm {
   }
 
 }
-

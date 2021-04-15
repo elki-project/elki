@@ -32,7 +32,6 @@ import elki.utilities.ELKIBuilder;
  * Tests the HySortOD algorithm.
  * 
  * @author Braulio V.S. Vinces
- * @since 0.7.5
  */
 public class HySortODTest extends AbstractOutlierAlgorithmTest {
   @Test
