@@ -1,8 +1,9 @@
 configurations {
   // For bundle
   enabledModules {
+    canBeResolved true
     transitive false
-    extendsFrom runtime
+    extendsFrom runtimeOnly
   }
 }
 dependencies {

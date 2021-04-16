@@ -42,10 +42,12 @@ subprojects {
     from("$rootDir/elki/src/main/resources/META-INF") {
       include "NOTICE"
       into "META-INF"
+      duplicatesStrategy DuplicatesStrategy.INCLUDE
     }
     from("$rootDir/elki/src/main/resources/elki/LICENSE.txt") {
       rename "\\.txt\$", ""
       into "license"
+      duplicatesStrategy DuplicatesStrategy.INCLUDE
     }
   }
   // Build source jars:
@@ -60,8 +62,8 @@ subprojects {
     from javadoc.destinationDir
   }
   artifacts.archives javadocJar
-  // Collect dependencies
-  task collectDependencies(type: Sync) {
+  // Collect dependencies -- FIXME: does not work in Gradle 7 anymore
+  tasks.register('collectDependencies', Sync) {
     description = "Collect dependencies"
     group = "Build"
     from configurations.runtime

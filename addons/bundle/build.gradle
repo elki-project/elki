@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.johnrengelman.shadow" version "4.0.4"
+  id "com.github.johnrengelman.shadow" version "6.1.0"
 }
 
 description = 'ELKI - Single-jar Bundle'
@@ -43,6 +43,7 @@ jar {
       include("META-INF/LICENSE*")
       include("META-INF/README*")
       include("license/*")
+      duplicatesStrategy DuplicatesStrategy.INCLUDE
       eachFile { FileCopyDetails fcp ->
         fcp.path = "license/"  + fcp.name.replaceAll(".txt\$", "")
         fcp.path += "-" + dep.name.replaceAll("batik-.*", "batik")
@@ -71,7 +72,7 @@ javadoc.dependsOn documentReferences
 shadowJar {
   dependsOn jar
   from jar.outputs.files // To include the bundle jar with above notices!
-  configurations = [ project.configurations.runtime ]
+  //configurations = [ project.configurations.implementation ]
   destinationDirectory = project.parent.rootDir
   classifier = null
   manifest {
