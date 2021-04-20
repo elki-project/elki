@@ -21,16 +21,20 @@
 package elki.index.tree.metrical.vptree;
 
 import elki.database.ids.*;
+import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.query.knn.KNNSearcher;
+import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.index.Index;
+import elki.index.DistancePriorityIndex;
+import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 
 /**
  * Vantage Point Tree with no further information
- *  
- *  WIP
+ * 
+ * WIP
  * 
  * @author Robert Gehde
  *
@@ -42,16 +46,16 @@ import elki.utilities.documentation.Reference;
     title = "Data Structures and Algorithms for Nearest Neighbor Search in General Metric Spaces", //
     url = "http://dl.acm.org/citation.cfm?id=313559.313789", //
     bibkey = "DBLP:conf/soda/Yianilos93")
-public class VPTree<O> implements Index {
+public class VPTree<O> implements DistancePriorityIndex<O> {
 
   /**
    * The representation we are bound to.
    */
   protected final Relation<O> relation;
 
-  Distance<? super O> distFunc;
+  Distance<O> distFunc;
 
-  DistanceQuery<? super O> distQuery;
+  DistanceQuery<O> distQuery;
 
   ModifiableDoubleDBIDList sorted;
 
@@ -76,7 +80,7 @@ public class VPTree<O> implements Index {
     }
   }
 
-  public VPTree(Relation<O> relation, Distance<? super O> distance) {
+  public VPTree(Relation<O> relation, Distance<O> distance) {
     this.relation = relation;
     this.distFunc = distance;
     this.distQuery = distance.instantiate(relation);
@@ -146,47 +150,6 @@ public class VPTree<O> implements Index {
     }
   }
 
-  // this is not nice
-  DBID result = null;
-
-  double tau = 1;
-
-  public DBID FindnearestNeighbor(DBID target) {
-    result = null;
-    tau = 1;
-    searchTree(target, root);
-    return DBIDUtil.deref(result);
-  }
-
-  private void searchTree(DBID target, Node tree) {
-    if(tree == null) {
-      return;
-    }
-    double x = distQuery.distance(tree.vp, target);
-    if(x < tau) {
-      result = tree.vp;
-      tau = x;
-    }
-    double middle = (tree.leftHighBound + tree.rightLowBound) / 2;
-
-    if(x < middle) {
-      if(x > tree.leftLowBound - tau && x < tree.leftHighBound + tau) {
-        searchTree(target, tree.leftChild);
-      }
-      if(x > tree.rightLowBound - tau && x < tree.rightHighBound + tau) {
-        searchTree(target, tree.leftChild);
-      }
-    }
-    else {
-      if(x > tree.rightLowBound - tau && x < tree.rightHighBound + tau) {
-        searchTree(target, tree.leftChild);
-      }
-      if(x > tree.leftLowBound - tau && x < tree.leftHighBound + tau) {
-        searchTree(target, tree.leftChild);
-      }
-    }
-  }
-
   /**
    * TODO size of random sample
    * TODO random seed
@@ -233,5 +196,245 @@ public class VPTree<O> implements Index {
       moment += Math.pow(iter.doubleValue() - median, 2);
     }
     return moment / s;
+  }
+
+  @Override
+  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    Distance<? super O> df = distanceQuery.getDistance();
+    // TODO: if we know this works for other distance functions, add them, too!
+    if(df.getClass().equals(distFunc.getClass())) {
+      return new VPTreeKNNSearcher();
+    }
+    return null;
+  }
+
+  @Override
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    Distance<? super O> df = distanceQuery.getDistance();
+    // TODO: if we know this works for other distance functions, add them, too!
+    if(df.getClass().equals(distFunc.getClass())) {
+      return new VPTreeRangeSearcher();
+    }
+    return null;
+  }
+
+  @Override
+  public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    Distance<? super O> df = distanceQuery.getDistance();
+    // TODO: if we know this works for other distance functions, add them, too!
+    if(df.getClass().equals(distFunc.getClass())) {
+      return new VPTreePrioritySearcher();
+    }
+    return null;
+  }
+
+  /**
+   * kNN query for the vp-tree.
+   *
+   * @author Robert Gehde
+   */
+  public class VPTreeKNNSearcher implements KNNSearcher<O> {
+
+    @Override
+    public KNNList getKNN(O obj, int k) {
+      final KNNHeap knns = DBIDUtil.newHeap(k);
+      vpKNNSearch(obj, knns, root, 1);
+      return knns.toKNNList();
+    }
+
+    private double vpKNNSearch(O obj, KNNHeap knns, Node node, double tau) {
+      if(node == null) {
+        return tau;
+      }
+      double x = distQuery.distance(node.vp, obj);
+      if(x < tau) {
+        knns.insert(x, node.vp);
+        tau = knns.getKNNDistance();
+      }
+      double middle = (node.leftHighBound + node.rightLowBound) / 2;
+
+      if(x < middle) {
+        if(x > node.leftLowBound - tau && x < node.leftHighBound + tau) {
+          tau = vpKNNSearch(obj, knns, node.leftChild, tau);
+        }
+        if(x > node.rightLowBound - tau && x < node.rightHighBound + tau) {
+          tau = vpKNNSearch(obj, knns, node.rightChild, tau);
+        }
+      }
+      else {
+        if(x > node.rightLowBound - tau && x < node.rightHighBound + tau) {
+          tau = vpKNNSearch(obj, knns, node.rightChild, tau);
+        }
+        if(x > node.leftLowBound - tau && x < node.leftHighBound + tau) {
+          tau = vpKNNSearch(obj, knns, node.leftChild, tau);
+        }
+      }
+      return tau;
+    }
+  }
+
+  public class VPTreeRangeSearcher implements RangeSearcher<O> {
+
+    @Override
+    public ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result) {
+      vpRangeSearch(query, result, root, range);
+      return result;
+    }
+
+    private void vpRangeSearch(O query, ModifiableDoubleDBIDList result, Node node, double range) {
+      if(node == null) {
+        return;
+      }
+      double x = distQuery.distance(node.vp, query);
+      if(x < range) {
+        result.add(x, node.vp);
+      }
+      double middle = (node.leftHighBound + node.rightLowBound) / 2;
+
+      if(x < middle) {
+        if(x > node.leftLowBound - range && x < node.leftHighBound + range) {
+          vpRangeSearch(query, result, node.leftChild, range);
+        }
+        if(x > node.rightLowBound - range && x < node.rightHighBound + range) {
+          vpRangeSearch(query, result, node.rightChild, range);
+        }
+      }
+      else {
+        if(x > node.rightLowBound - range && x < node.rightHighBound + range) {
+          vpRangeSearch(query, result, node.rightChild, range);
+        }
+        if(x > node.leftLowBound - range && x < node.leftHighBound + range) {
+          vpRangeSearch(query, result, node.leftChild, range);
+        }
+      }
+    }
+  }
+
+  /**
+   * Search position for priority search.
+   *
+   * @author Erich Schubert
+   */
+  private class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
+    /**
+     * Minimum distance
+     */
+    double mindist;
+
+    /**
+     * Node
+     */
+    Node node;
+
+    /**
+     * Constructor.
+     *
+     * @param mindist Minimum distance
+     * @param left Interval begin
+     * @param right Interval end (exclusive)
+     * @param axis Next axis
+     */
+    public PrioritySearchBranch(double mindist, Node node) {
+      this.mindist = mindist;
+      this.node = node;
+    }
+
+    @Override
+    public int compareTo(PrioritySearchBranch o) {
+      return Double.compare(this.mindist, o.mindist);
+    }
+  }
+
+  public class VPTreePrioritySearcher implements PrioritySearcher<O> {
+
+    /**
+     * Min heap for searching.
+     */
+    private ComparableMinHeap<PrioritySearchBranch> heap = new ComparableMinHeap<>();
+
+    /**
+     * Current query object.
+     */
+    private O query;
+
+    /**
+     * Stopping threshold.
+     */
+    private double threshold;
+
+    /**
+     * Current search position.
+     */
+    private PrioritySearchBranch cur;
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      this.query = query;
+      this.threshold = Double.POSITIVE_INFINITY;
+      this.heap.clear();
+      this.heap.add(new PrioritySearchBranch(0, root));
+      return advance();
+    }
+
+    @Override
+    public PrioritySearcher<O> advance() {
+      if(heap.isEmpty()) {
+        cur = null;
+        return this;
+      }
+      // Get next
+      cur = heap.poll();
+      if(cur.mindist > threshold) {
+        cur = null;
+        return this;
+      }
+
+      double middist = (cur.node.leftHighBound + cur.node.rightLowBound) / 2; // middle element
+      // Distance to axis:
+      final double delta = middist - distQuery.distance(query, cur.node.vp);
+      final double mindist = distFunc.isSquared()? delta * delta : Math.abs(delta);
+
+      // Next axis:
+      final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+      if(cur.node.leftChild != null && ldist <= threshold) { 
+        heap.add(new PrioritySearchBranch(ldist, cur.node.leftChild));
+      }
+      final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+      if(cur.node.rightChild != null && rdist <= threshold) {
+        heap.add(new PrioritySearchBranch(rdist, cur.node.rightChild));
+      }
+      return this;
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return cur.node.vp.internalGetIndex();
+    }
+
+    @Override
+    public boolean valid() {
+      return cur != null;
+    }
+
+    @Override
+    public PrioritySearcher<O> decreaseCutoff(double threshold) {
+      assert threshold <= this.threshold : "Thresholds must only decreasee.";
+      this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public double computeExactDistance() {
+      return distQuery.distance(query, relation.get(cur.node.vp));
+    }
+
+    @Override
+    public double allLowerBound() {
+      return cur.mindist;
+    }
+    @Override
+    public double getLowerBound() {
+      return cur.mindist;
+    }
   }
 }
