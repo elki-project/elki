@@ -37,7 +37,9 @@ public class VPTreeTest extends AbstractIndexStructureTest {
   @Test
   public void testVPTree() {
     VPTree.Factory<?> factory = new ELKIBuilder<>(VPTree.Factory.class) //
-        .with(VPTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
+        .with(VPTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class)//
+        .with(VPTree.Factory.Par.SAMPLE_SIZE_ID, 10)//
+        .with(VPTree.Factory.Par.SEED_ID, 1234).build();
     assertExactEuclidean(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, VPTree.VPTreePrioritySearcher.class);
     assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);

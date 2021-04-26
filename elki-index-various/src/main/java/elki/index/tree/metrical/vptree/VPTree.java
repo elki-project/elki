@@ -32,13 +32,20 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
+import elki.index.tree.metrical.covertree.CoverTree;
+import elki.logging.Logging;
+import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.RandomParameter;
+import elki.utilities.random.RandomFactory;
 
 /**
  * Vantage Point Tree with no further information
@@ -63,16 +70,53 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 public class VPTree<O> implements DistancePriorityIndex<O> {
 
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(CoverTree.class);
+
+  /**
+   * Counter for comparisons.
+   */
+  protected final Counter objaccess;
+
+  /**
+   * Counter for distance computations.
+   */
+  protected final Counter distcalc;
+
+  /**
    * The representation we are bound to.
    */
   protected final Relation<O> relation;
 
+  /**
+   * Distance Function to use
+   */
   Distance<O> distFunc;
 
+  /**
+   * Actual distance query on the Data
+   */
   DistanceQuery<O> distQuery;
 
+  /**
+   * Distance storage for building
+   */
   ModifiableDoubleDBIDList sorted;
 
+  /**
+   * Random factory for selecting vantage points
+   */
+  RandomFactory random;
+  
+  /**
+   * Sample size for selecting vantage points
+   */
+  int sampleSize;
+
+  /**
+   * Root node from the tree
+   */
   Node root;
 
   /**
@@ -119,10 +163,21 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @param relation data for tree construction
    * @param distance distance function for tree construction
    */
-  public VPTree(Relation<O> relation, Distance<O> distance) {
+  public VPTree(Relation<O> relation, Distance<O> distance, RandomFactory random, int sampleSize) {
     this.relation = relation;
     this.distFunc = distance;
+    this.random = random;
     this.distQuery = distance.instantiate(relation);
+    this.sampleSize = sampleSize;
+    if(LOG.isStatistics()) {
+      String prefix = this.getClass().getName();
+      this.objaccess = LOG.newCounter(prefix + ".objaccess");
+      this.distcalc = LOG.newCounter(prefix + ".distancecalcs");
+    }
+    else {
+      this.objaccess = null;
+      this.distcalc = null;
+    }
   }
 
   @Override
@@ -151,7 +206,9 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     int vantagePointOffset = 0;
     for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
       double d = distQuery.distance(iter, vantagePoint);
+      countDistanceComputation();
       iter.setDouble(d);
+      countObjectAccess();
       if(DBIDUtil.compare(iter, vantagePoint) == 0) {
         vantagePointOffset = iter.getOffset();
       }
@@ -161,14 +218,17 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     // quickselect only assures that the median is correct
     // exclude current vantage point
     sorted.swap(left, vantagePointOffset);
+    countObjectAccess();
     QuickSelectDBIDs.quickSelect(sorted, left + 1, right, middle);
 
     // offset for values == median, such that correct sorting is given
     double median = iter.seek(middle).doubleValue();
+    countObjectAccess();
     for(iter.seek(left + 1); iter.getOffset() < middle; iter.advance()) {
       double d = iter.doubleValue();
       if(d == median) {
         sorted.swap(iter.getOffset(), --middle);
+        countObjectAccess();
       }
       else {
         if(d < current.leftLowBound) {
@@ -212,17 +272,19 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    */
   private DBID findVantagePoint(int left, int right, DoubleDBIDListMIter iter) {
     // init, construct workset
-    int s = Math.min(10, right - left);
+    int s = Math.min(sampleSize, right - left);
     ArrayModifiableDBIDs workset = DBIDUtil.newArray(right - left);
     for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
       workset.add(iter);
+      countObjectAccess();
     }
-    // find vantage point (TODO random values will be replaced)
-    ModifiableDBIDs candidates = DBIDUtil.randomSample(workset, s, 1337);
+    // find vantage point (TODO maybe add s to objaccess)
+    ModifiableDBIDs candidates = DBIDUtil.randomSample(workset, s, random);
     DBID best = null;
     double bestSpread = Double.NEGATIVE_INFINITY;
     for(DBIDMIter it = candidates.iter(); it.valid(); it.advance()) {
-      DBIDs check = DBIDUtil.randomSample(workset, s, 72 + it.internalGetIndex());
+      countObjectAccess();
+      DBIDs check = DBIDUtil.randomSample(workset, s, random);
       // calculate moment
       double spread = calcMoment(check, it, s);
       if(spread > bestSpread) {
@@ -247,6 +309,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     ModifiableDoubleDBIDList vals = DBIDUtil.newDistanceDBIDList(s);
     for(DBIDIter iter = check.iter(); iter.valid(); iter.advance()) {
       double d = distQuery.distance(it, iter);
+      countDistanceComputation();
       // d = d / (d + 1);
       vals.add(d, iter);
     }
@@ -310,6 +373,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         return tau;
       }
       double x = distQuery.distance(node.vp, obj);
+      countDistanceComputation();
       if(x < tau) {
         knns.insert(x, node.vp);
         tau = knns.getKNNDistance();
@@ -349,6 +413,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         return;
       }
       double x = distQuery.distance(node.vp, query);
+      countDistanceComputation();
       if(x <= range) {
         result.add(x, node.vp);
       }
@@ -456,6 +521,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
       // Distance to axis:
       final double delta = middist - distQuery.distance(query, cur.node.vp);
+      countDistanceComputation();
       final double mindist = distFunc.isSquared() ? delta * delta : Math.abs(delta);
 
       // Next axis:
@@ -503,6 +569,34 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     }
   }
 
+  /**
+   * Count a single object access.
+   */
+  protected void countObjectAccess() {
+    if(objaccess != null) {
+      objaccess.increment();
+    }
+  }
+
+  /**
+   * Count a distance computation.
+   */
+  protected void countDistanceComputation() {
+    if(distcalc != null) {
+      distcalc.increment();
+    }
+  }
+
+  @Override
+  public void logStatistics() {
+    if(objaccess != null) {
+      LOG.statistics(objaccess);
+    }
+    if(distcalc != null) {
+      LOG.statistics(distcalc);
+    }
+  }
+
   @Alias({ "vp" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O> {
 
@@ -512,27 +606,38 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     Distance<O> distance;
 
     /**
+     * Random factory
+     */
+    RandomFactory random;
+
+    /**
+     * Sample size
+     */
+    int sampleSize;
+    /**
      * 
      * Constructor.
      *
      */
     @SuppressWarnings("unchecked")
     public Factory() {
-      this((Distance<O>) EuclideanDistance.STATIC);
+      this((Distance<O>) EuclideanDistance.STATIC, RandomFactory.DEFAULT,10);
     }
 
     /**
      * Constructor.
      *
      */
-    public Factory(Distance<O> distFunc) {
+    public Factory(Distance<O> distFunc, RandomFactory random, int sampleSize) {
       super();
       this.distance = distFunc;
+      this.random = random;
+      this.sampleSize = sampleSize;
     }
 
     @Override
     public VPTree<O> instantiate(Relation<O> relation) {
-      return new VPTree<>(relation, distance);
+      return new VPTree<>(relation, distance, random, sampleSize);
     }
 
     @Override
@@ -551,9 +656,31 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
        * between database objects, must extend
        * {@link elki.distance.Distance}.
        */
-      public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("vptree.distancefunction", "Distance function to determine the distance between objects.");
+      public final static OptionID DISTANCE_FUNCTION_ID = new OptionID("vptree.distanceFunction", "Distance function to determine the distance between objects.");
 
-      Distance<O> distance;
+      /**
+       * Parameter to specify the sample size for choosing vantage point
+       */
+      public final static OptionID SAMPLE_SIZE_ID = new OptionID("vptree.sampleSize", "Size of sample to select vantage point from.");
+
+      /**
+       * Parameter to specify the random generator seed
+       */
+      public final static OptionID SEED_ID = new OptionID("vptree.seed", "The random number generator seed.");
+
+      /**
+       * Distance function
+       */
+      protected Distance<O> distance;
+
+      /**
+       * Random generator
+       */
+      protected RandomFactory random;
+      /**
+       * Sample size
+       */
+      protected int sampleSize;
 
       @Override
       public void configure(Parameterization config) {
@@ -561,11 +688,17 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
             .grab(config, x -> {
               this.distance = x;
             });
+        new IntParameter(SAMPLE_SIZE_ID, 10) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
+        .grab(config, x ->{
+          this.sampleSize = x;
+        });
+        new RandomParameter(SEED_ID).grab(config, x -> random = x);
       }
 
       @Override
       public Factory<O> make() {
-        return new Factory<>(distance);
+        return new Factory<>(distance, random, sampleSize);
       }
     }
   }
