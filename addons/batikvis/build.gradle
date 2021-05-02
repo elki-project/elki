@@ -2,11 +2,14 @@ description = 'ELKI - Batik Visualization'
 dependencies {
   api project(':elki-gui-minigui') // For GUIUtil, otherwise elki would be enough
   api project(':elki-uncertain')
-  api group: 'org.apache.xmlgraphics', name: 'batik-swing', version:'1.13+'
-  api group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version:'1.13+'
-  api group: 'org.apache.xmlgraphics', name: 'batik-ext', version:'1.13+'
-  api group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'1.13+'
-  api group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'2.4+'
+  api group: 'org.apache.xmlgraphics', name: 'batik-swing', version:'1.14+'
+  api group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version:'1.14+'
+  api group: 'org.apache.xmlgraphics', name: 'batik-ext', version:'1.14+'
+  api group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'1.14+'
+  api group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'2.6+'
   implementation group: 'xalan', name: 'xalan', version:'[2.7.2,3)'
   testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+}
+configurations.all {
+  exclude group: 'xml-apis', module: 'xml-apis'
 }
