@@ -57,6 +57,7 @@ import elki.utilities.random.RandomFactory;
  * size. In this class the function is not bounded, as we can just limit tau to
  * Double.MAX_VALUE
  * 
+ * TODO: Ref in Doc
  * @author Robert Gehde
  *
  * @param <O>
@@ -441,7 +442,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
   /**
    * Search position for priority search.
    *
-   * @author Erich Schubert
+   * @author Robert Gehde
    */
   private class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
     /**
@@ -472,7 +473,11 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       return Double.compare(this.mindist, o.mindist);
     }
   }
-
+  /**
+   * 
+   * @author Robert Gehde
+   *
+   */
   public class VPTreePrioritySearcher implements PrioritySearcher<O> {
 
     /**
