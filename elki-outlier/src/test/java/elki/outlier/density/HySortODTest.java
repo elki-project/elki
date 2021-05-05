@@ -22,9 +22,8 @@ package elki.outlier.density;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
-import elki.data.DoubleVector;
 import elki.database.Database;
+import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -37,8 +36,21 @@ public class HySortODTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testHySortOD() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
-    OutlierResult result = new ELKIBuilder<HySortOD<DoubleVector>>(HySortOD.class) //
-        .with(HySortOD.Par.B_ID, 5).with(HySortOD.Par.MIN_SPLIT_ID, 100).build().autorun(db);
+    OutlierResult result = new ELKIBuilder<HySortOD>(HySortOD.class) //
+        .with(HySortOD.Par.B_ID, 5) //
+        .with(HySortOD.Par.MIN_SPLIT_ID, 100) //
+        .build().autorun(db);
+    assertSingleScore(result, 945, 0.9545454545454546);
+    assertAUC(db, "Noise", result, 0.922537037037037);
+  }
+
+  @Test
+  public void testHySortODNaive() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+    OutlierResult result = new ELKIBuilder<HySortOD>(HySortOD.class) //
+        .with(HySortOD.Par.B_ID, 5) //
+        .with(HySortOD.Par.MIN_SPLIT_ID, 0) //
+        .build().autorun(db);
     assertSingleScore(result, 945, 0.9545454545454546);
     assertAUC(db, "Noise", result, 0.922537037037037);
   }

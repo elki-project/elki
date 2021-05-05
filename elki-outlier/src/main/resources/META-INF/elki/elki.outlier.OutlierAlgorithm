@@ -2,6 +2,7 @@ elki.outlier.anglebased.ABOD
 elki.outlier.anglebased.FastABOD
 elki.outlier.anglebased.LBABOD lb-abod
 elki.outlier.COP
+elki.outlier.density.HySortOD
 elki.outlier.distance.DBOutlierDetection
 elki.outlier.distance.DBOutlierScore
 elki.outlier.distance.HilOut
