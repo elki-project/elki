@@ -20,12 +20,8 @@
  */
 package elki.visualization.projector;
 
-import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.datastore.DoubleDataStore;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
 
@@ -48,20 +44,12 @@ public class SilhouettePlotFactory implements ProjectorFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     Clustering<?> c = VisualizationTree.findNewResults(context, start).filter(Clustering.class).get();
     // compute the plot only if you find the clustering
-    if(c == null)
+    if(c == null) {
       return;
-    VisualizationTree.findNewResults(context, start).filter(WritableDoubleDataStore.class).forEach(wdds -> {
-      ModifiableDoubleDBIDList[] silhouettes = new ModifiableDoubleDBIDList[c.getAllClusters().size()];
-      int i = 0;
-      for(Cluster<?> cluster : c.getAllClusters()) {
-        ModifiableDoubleDBIDList dbidlist = DBIDUtil.newDistanceDBIDList(cluster.size());
-        for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-          dbidlist.add(wdds.doubleValue(iter), iter);
-        }
-        dbidlist.sortDescending();
-        silhouettes[i++] = dbidlist;
-      }
-      context.addVis(c, new SilhouettePlotProjector(c, silhouettes));
+    }
+    VisualizationTree.findNewResults(context, start).filter(DoubleDataStore.class).forEach(dds -> {
+      // FIXME: ensure that the DoubleDataStore *is* Silhouette scores!
+      context.addVis(c, new SilhouettePlotProjector(c, dds));
     });
   }
 }

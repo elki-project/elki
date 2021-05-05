@@ -23,8 +23,8 @@ package elki.visualization.silhouette;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 
-import elki.database.ids.DoubleDBIDListMIter;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.DoubleDBIDList;
+import elki.database.ids.DoubleDBIDListIter;
 import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.math.scales.LinearScale;
@@ -73,7 +73,7 @@ public class SilhouettePlot {
   /**
    * The silhouette values.
    */
-  final ModifiableDoubleDBIDList[] silhouettes;
+  final DoubleDBIDList[] silhouettes;
 
   /**
    * Color adapter to use
@@ -96,7 +96,7 @@ public class SilhouettePlot {
    * @param silhouettes silhouette values to plot.
    * @param colors Coloring strategy
    */
-  public SilhouettePlot(ModifiableDoubleDBIDList[] silhouettes, StylingPolicy colors) {
+  public SilhouettePlot(DoubleDBIDList[] silhouettes, StylingPolicy colors) {
     super();
     this.silhouettes = silhouettes;
     this.colors = colors;
@@ -108,30 +108,29 @@ public class SilhouettePlot {
   public void replot() {
     // calc width
     width = 0;
-    for(ModifiableDoubleDBIDList modifiableDoubleDBIDList : silhouettes) {
-      width += modifiableDoubleDBIDList.size();
+    for(DoubleDBIDList doubleDBIDList : silhouettes) {
+      width += doubleDBIDList.size();
     }
-    // here i need to add some pixels between each cluster so + 3 * (clus.size-1)
-    width += 3 * (silhouettes.length - 1); 
+    // here i need to add some pixels between each cluster so + 3 *
+    // (clus.size-1)
+    width += 3 * (silhouettes.length - 1);
     height = (int) Math.ceil(width * .2);
     ratio = width / (double) height;
     height = height < MIN_HEIGHT ? MIN_HEIGHT : height > MAX_HEIGHT ? MAX_HEIGHT : height;
-    if(scale == null) {
-      scale = computeScale(silhouettes);
-    }
+    scale = scale != null ? scale : computeScale(silhouettes);
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
     int x = 0;
     final int start = scaleToPixel(0);
-    for(ModifiableDoubleDBIDList list : silhouettes) {
-      for(DoubleDBIDListMIter it = list.iter(); it.valid(); it.advance()) {
+    for(DoubleDBIDList list : silhouettes) {
+      for(DoubleDBIDListIter it = list.iter(); it.valid(); it.advance()) {
         double silhouette = it.doubleValue();
         final int y = scaleToPixel(silhouette);
         try {
           int col = colors.getColorForDBID(it);
           int dir = silhouette < 0 ? 1 : -1;
-          for(int y2 = start; y2 != y + dir; y2 += dir) { 
+          for(int y2 = start; y2 != y + dir; y2 += dir) {
             // y + dir means that we include y itself and then stop
             img.setRGB(x, y2, col);
           }
@@ -174,14 +173,12 @@ public class SilhouettePlot {
    * @param silhouettes Silhouette values to process
    * @return Scale for value range of silhouette values
    */
-  protected LinearScale computeScale(ModifiableDoubleDBIDList[] silhouettes) {
-    DoubleMinMax range = new DoubleMinMax();
-    // calculate range
-    range.put(0);
-    for(ModifiableDoubleDBIDList list : silhouettes) {
-      for(DoubleDBIDListMIter it = list.iter(); it.valid(); it.advance()) {
+  protected LinearScale computeScale(DoubleDBIDList[] silhouettes) {
+    DoubleMinMax range = new DoubleMinMax(0, 0); // Always include 0
+    for(DoubleDBIDList list : silhouettes) {
+      for(DoubleDBIDListIter it = list.iter(); it.valid(); it.advance()) {
         final double silhouette = it.doubleValue();
-        if(silhouette < Double.POSITIVE_INFINITY) {
+        if(Double.isFinite(silhouette)) {
           range.put(silhouette);
         }
       }
@@ -279,17 +276,14 @@ public class SilhouettePlot {
   }
 
   /**
-   * Static method to find a silhouette plot for a result, or to create a new one
-   * using the given context.
+   * Static method to find a silhouette plot for a result, or to create a new
+   * one using the given context.
    *
    * @param silhouettes silhouette values
    * @param context Context (for colors and reference clustering)
-   *
    * @return New or existing silhouette plot
    */
-  public static SilhouettePlot plotForSilhouetteValues(ModifiableDoubleDBIDList[] silhouettes, VisualizerContext context) {
-    final StylingPolicy policy = context.getStylingPolicy();
-    SilhouettePlot silhouetteplot = new SilhouettePlot(silhouettes, policy);
-    return silhouetteplot;
+  public static SilhouettePlot plotForSilhouetteValues(DoubleDBIDList[] silhouettes, VisualizerContext context) {
+    return new SilhouettePlot(silhouettes, context.getStylingPolicy());
   }
 }

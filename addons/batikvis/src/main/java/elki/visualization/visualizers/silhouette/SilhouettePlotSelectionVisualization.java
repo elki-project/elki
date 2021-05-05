@@ -81,8 +81,10 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(SilhouettePlotProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(this, NAME, p.getResult(), null) //
-          .level(VisualizationTask.LEVEL_INTERACTIVE).with(UpdateFlag.ON_SELECTION));
+      VisualizationTask task = new VisualizationTask(this, NAME, p.getResult(), null) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE).with(UpdateFlag.ON_SELECTION);
+      context.addVis(p, task);
+      context.addVis(context.getSelectionResult(), task);
     });
   }
 
@@ -138,10 +140,10 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
     public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(context, task, plot, width, height, proj);
       // calculate size
-      ModifiableDoubleDBIDList[] values = getSilhouetteValues();
+      DoubleDBIDList[] values = silhouette.getSilhouetteValues();
 
       plotSize = (values.length - 1) * 3; // spaces
-      for(ModifiableDoubleDBIDList clusterValues : values) {
+      for(DoubleDBIDList clusterValues : values) {
         plotSize += clusterValues.size();
       }
       addListeners();
@@ -162,7 +164,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
      * Add marker for the selected IDs to mtag
      */
     public void addMarker() {
-      ModifiableDoubleDBIDList[] values = getSilhouetteValues();
+      DoubleDBIDList[] values = silhouette.getSilhouetteValues();
       // TODO: replace mtag!
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
@@ -172,7 +174,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
         int j = 0;
         for(int i = 0; i < values.length; i++) {
           int begin = -1;
-          ModifiableDoubleDBIDList currentList = values[i];
+          DoubleDBIDList currentList = values[i];
           for(DBIDIter it = currentList.iter(); it.valid(); it.advance(), j++) {
             if(selection.contains(it)) {
               if(begin == -1) {
@@ -286,7 +288,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
      * @param end last index to select
      */
     protected void updateSelection(Mode mode, int begin, int end) {
-      ModifiableDoubleDBIDList[] values = getSilhouetteValues();
+      DoubleDBIDList[] values = silhouette.getSilhouetteValues();
       if(begin < 0 || begin > end || end >= plotSize) {
         LOG.warning("Invalid range in updateSelection: " + begin + " .. " + end);
         return;
@@ -298,7 +300,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
 
       int clusbegin = 0;
       for(int i = 0; i < values.length; i++) {
-        ModifiableDoubleDBIDList cluster = values[i];
+        DoubleDBIDList cluster = values[i];
         int tbegin = begin, tend = end;
         if(begin < clusbegin) {
           tbegin = 0;

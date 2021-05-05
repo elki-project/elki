@@ -24,7 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import elki.data.Cluster;
 import elki.data.Clustering;
+import elki.database.datastore.DoubleDataStore;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizerContext;
@@ -39,7 +44,7 @@ import elki.visualization.silhouette.SilhouettePlot;
  */
 public class SilhouettePlotProjector implements Projector {
   /**
-   * underlying clustering
+   * Underlying clustering
    */
   private Clustering<?> clustering;
 
@@ -49,21 +54,41 @@ public class SilhouettePlotProjector implements Projector {
   private SilhouettePlot plot = null;
 
   /**
-   * silhouette values
+   * Silhouette values
    */
-  private ModifiableDoubleDBIDList[] values = null;
+  private DoubleDBIDList[] values = null;
 
   /**
    * Constructor.
    *
-   * @param clustering underlying clustering on which the silhouette values are
-   *        calculated
-   * @param silhouettes silhouette values sorted by clusters
+   * @param clustering clustering on which the silhouette values are calculated
+   * @param dds silhouette values sorted by clusters
    */
-  public SilhouettePlotProjector(Clustering<?> clustering, ModifiableDoubleDBIDList[] silhouettes) {
+  public SilhouettePlotProjector(Clustering<?> clustering, DoubleDataStore dds) {
     super();
     this.clustering = clustering;
-    this.values = silhouettes;
+    this.values = sortSilhouette(clustering, dds);
+  }
+
+  /**
+   * Sort the silhouettes for visualization.
+   * 
+   * @param c Clustering
+   * @param dds Silhouette values
+   * @return Sorted silhouette per cluster
+   */
+  private static DoubleDBIDList[] sortSilhouette(Clustering<?> c, DoubleDataStore dds) {
+    DoubleDBIDList[] silhouettes = new DoubleDBIDList[c.getAllClusters().size()];
+    int i = 0;
+    for(Cluster<?> cluster : c.getAllClusters()) {
+      ModifiableDoubleDBIDList dbidlist = DBIDUtil.newDistanceDBIDList(cluster.size());
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+        dbidlist.add(dds.doubleValue(iter), iter);
+      }
+      dbidlist.sortDescending();
+      silhouettes[i++] = dbidlist;
+    }
+    return silhouettes;
   }
 
   @Override
@@ -110,7 +135,7 @@ public class SilhouettePlotProjector implements Projector {
    *
    * @return the silhouette values
    */
-  public ModifiableDoubleDBIDList[] getValues() {
+  public DoubleDBIDList[] getValues() {
     return values;
   }
 }

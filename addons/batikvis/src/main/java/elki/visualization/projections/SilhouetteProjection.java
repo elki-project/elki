@@ -21,7 +21,7 @@
 package elki.visualization.projections;
 
 import elki.data.Clustering;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.DoubleDBIDList;
 import elki.math.scales.LinearScale;
 import elki.visualization.VisualizerContext;
 import elki.visualization.projector.Projector;
@@ -83,13 +83,13 @@ public class SilhouetteProjection implements Projection {
   public Clustering<?> getResult() {
     return projector.getResult();
   }
-  
+
   /**
    * Get the silhouette values
    * 
    * @return silhouette values
    */
-  public ModifiableDoubleDBIDList[] getSilhouetteValues() {
+  public DoubleDBIDList[] getSilhouetteValues() {
     return projector.getValues();
   }
 

@@ -123,7 +123,7 @@ public class SilhouettePlotVisualizer implements VisFactory {
       LinearScale scale = silhouettesplot.getScale();
       double y1 = plotheight * silhouettesplot.scaleToPixel(scale.getMin()) / silhouettesplot.getHeight();
       double y2 = plotheight * silhouettesplot.scaleToPixel(scale.getMax()) / silhouettesplot.getHeight();
-      double y3 = plotheight * silhouettesplot.scaleToPixel(0) / (silhouettesplot.getHeight()-1);
+      double y3 = plotheight * silhouettesplot.scaleToPixel(0) / (silhouettesplot.getHeight() - 1);
       // -1 because in testing the line was a bit off in the thumbnail.
       try {
         final StyleLibrary style = context.getStyleLibrary();

@@ -96,12 +96,12 @@ public class Silhouette<O> implements Evaluator {
   /**
    * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  private boolean penalize = true;
+  private boolean penalize;
 
   /**
    * Key for logging statistics.
    */
-  private String key = Silhouette.class.getName();
+  private static final String key = Silhouette.class.getName();
 
   /**
    * Constructor.
@@ -140,7 +140,7 @@ public class Silhouette<O> implements Evaluator {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
-    // for silhouetteplot
+    // Store values for the Silhouette plot
     WritableDoubleDataStore perIDStore = DataStoreUtil.makeDoubleStorage(rel.getDBIDs(), rel.size());
     for(Cluster<?> cluster : clusters) {
       // Note: we treat 1-element clusters the same as noise.
@@ -198,10 +198,10 @@ public class Silhouette<O> implements Evaluator {
           btmp /= oids.size(); // Average
           b = btmp < b ? btmp : b; // Minimum average
         }
-        // One cluster only?
-        b = b < Double.POSITIVE_INFINITY ? b : a;
-        msil.put((b - a) / (b > a ? b : a));
-        perIDStore.putDouble(it1, (b - a) / (b > a ? b : a));
+        // One cluster only? Then use 0.
+        final double s = b < Double.POSITIVE_INFINITY ? (b - a) / (b > a ? b : a) : 0;
+        msil.put(s);
+        perIDStore.putDouble(it1, s);
       }
     }
     double penalty = 1.;
@@ -226,6 +226,7 @@ public class Silhouette<O> implements Evaluator {
     if(!Metadata.hierarchyOf(c).addChild(ev)) {
       Metadata.of(ev).notifyChanged();
     }
+    Metadata.of(perIDStore).setLongName("Silhouette scores");
     Metadata.hierarchyOf(c).addChild(perIDStore);
     return meansil;
   }

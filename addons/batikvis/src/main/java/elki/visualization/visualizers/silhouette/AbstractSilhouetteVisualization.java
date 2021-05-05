@@ -22,8 +22,6 @@ package elki.visualization.visualizers.silhouette;
 
 import org.apache.batik.util.SVGConstants;
 
-import elki.data.Clustering;
-import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizerContext;
 import elki.visualization.gui.VisualizationPlot;
@@ -81,23 +79,5 @@ public abstract class AbstractSilhouetteVisualization extends AbstractVisualizat
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), plotwidth, plotheight, margin * .5, margin * .5, margin * 1.5, margin * .5);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-  }
-
-  /**
-   * Access the raw cluster order
-   *
-   * @return Silhouette Values
-   */
-  protected ModifiableDoubleDBIDList[] getSilhouetteValues() {
-    return silhouette.getSilhouetteValues();
-  }
-
-  /**
-   * Access the raw cluster order
-   *
-   * @return Silhouette Values
-   */
-  protected Clustering<?> getResult() {
-    return silhouette.getResult();
   }
 }
