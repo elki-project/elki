@@ -138,6 +138,11 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   boolean warnedPrecision = false;
 
   /**
+   * Emit a dimensionality change warning once.
+   */
+  boolean warnedDim = false;
+
+  /**
    * Constructor.
    *
    * @param format Input format
@@ -211,8 +216,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
           if(curdim > maxdim || mindim > curdim) {
             mindim = (curdim < mindim) ? curdim : mindim;
             maxdim = (curdim > maxdim) ? curdim : maxdim;
-            if(mindim != maxdim && LOG.isVerbose()) {
+            if(!warnedDim && mindim != maxdim && LOG.isVerbose()) {
               LOG.verbose("Non-uniform column width detected in input line " + reader.getLineNumber() + ", widening data type to " + mindim + "-" + maxdim + " dimensions.");
+              warnedDim = true;
             }
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
