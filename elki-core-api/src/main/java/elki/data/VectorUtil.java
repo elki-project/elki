@@ -358,6 +358,23 @@ public final class VectorUtil {
   }
 
   /**
+   * Compute the dot product of two dense vectors.
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return dot product
+   */
+  public static double dotDense(NumberVector v1, double[] v2) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.length;
+    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
+    double dot = 0;
+    for(int k = 0; k < mindim; k++) {
+      dot += v1.doubleValue(k) * v2[k];
+    }
+    return dot;
+  }
+
+  /**
    * Compute the dot product for two sparse vectors.
    *
    * @param v1 First vector
@@ -405,6 +422,26 @@ public final class VectorUtil {
   }
 
   /**
+   * Compute the dot product for a sparse and a dense vector.
+   *
+   * @param v1 Sparse first vector
+   * @param v2 Dense second vector
+   * @return dot product
+   */
+  public static double dotSparseDense(SparseNumberVector v1, double[] v2) {
+    final int dim2 = v2.length;
+    double dot = 0.;
+    for(int i1 = v1.iter(); v1.iterValid(i1); i1 = v1.iterAdvance(i1)) {
+      final int d1 = v1.iterDim(i1);
+      if(d1 >= dim2) {
+        break;
+      }
+      dot += v1.iterDoubleValue(i1) * v2[d1];
+    }
+    return dot;
+  }
+
+  /**
    * Compute the dot product of the angle between two vectors.
    *
    * @param v1 first vector
@@ -420,6 +457,20 @@ public final class VectorUtil {
         v2 instanceof SparseNumberVector ? //
             dotSparseDense((SparseNumberVector) v2, v1) : //
             dotDense(v1, v2);
+  }
+
+  /**
+   * Compute the dot product of the angle between two vectors.
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Dot product
+   */
+  public static double dot(NumberVector v1, double[] v2) {
+    // Java Hotspot appears to optimize these better than if-then-else:
+    return v1 instanceof SparseNumberVector ? //
+        dotSparseDense((SparseNumberVector) v1, v2) : //
+        dotDense(v1, v2);
   }
 
   /**
