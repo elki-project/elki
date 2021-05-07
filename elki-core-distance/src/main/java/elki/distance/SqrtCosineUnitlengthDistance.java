@@ -23,37 +23,39 @@ package elki.distance;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.spatial.SpatialComparable;
-import elki.data.type.SimpleTypeInformation;
 import elki.utilities.optionhandling.Parameterizer;
 
+import net.jafama.FastMath;
+
 /**
- * Cosine distance function for <em>unit length</em> feature vectors.
+ * Cosine distance function for <em>unit length</em> feature vectors using the
+ * square root.
  * <p>
  * The cosine distance is computed from the cosine similarity by
- * <code>1-(cosine similarity)</code>.
+ * <code>sqrt(1-cosine similarity)</code>.
  * <p>
  * Cosine similarity is defined as
  * \[ \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||}
  * =_{||a||=||b||=1} \vec{x}\cdot\vec{y}
  * \]
  * Cosine distance then is defined as
- * \[ 1 - \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||}
- * =_{||a||=||b||=1} 1-\vec{x}\cdot\vec{y} \in [0;2] \]
+ * \[ \sqrt{2 - 2 \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||}}
+ * =_{||a||=||b||=1} \sqrt{2 - 2\vec{x}\cdot\vec{y}} \in [0;2] \]
  * <p>
  * This implementation <em>assumes</em> that \(||a||=||b||=1\). If this does not
- * hold for your data, use {@link CosineDistance} instead!
+ * hold for your data, use {@link SqrtCosineDistance} instead!
  * <p>
- * {@link ArcCosineUnitlengthDistance} or {@link SqrtCosineUnitlengthDistance}
- * can be used if you need a metric, but are more expensive to computate.
+ * Because of the square root, this is more expensive than regular cosine,
+ * but because this corresponds to Euclidean distance on normalized vectors,
+ * it is a metric on normalized vectors.
  * 
  * @author Erich Schubert
- * @since 0.7.5
  */
-public class CosineUnitlengthDistance implements SpatialPrimitiveDistance<NumberVector>, NumberVectorDistance<NumberVector> {
+public class SqrtCosineUnitlengthDistance extends CosineUnitlengthDistance {
   /**
    * Static instance
    */
-  public static final CosineUnitlengthDistance STATIC = new CosineUnitlengthDistance();
+  public static final SqrtCosineUnitlengthDistance STATIC = new SqrtCosineUnitlengthDistance();
 
   /**
    * Constructor - use {@link #STATIC} instead.
@@ -61,45 +63,35 @@ public class CosineUnitlengthDistance implements SpatialPrimitiveDistance<Number
    * @deprecated Use static instance
    */
   @Deprecated
-  public CosineUnitlengthDistance() {
+  public SqrtCosineUnitlengthDistance() {
     super();
   }
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = VectorUtil.dot(v1, v2);
-    return (d <= 1) ? 1 - d : 0;
+    return (d <= 1) ? FastMath.sqrt(2 - 2 * d) : 0;
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = VectorUtil.minDot(mbr1, mbr2);
-    return (d <= 1) ? 1 - d : 0;
-  }
-  
-  @Override
-  public boolean isSquared() {
-    return true;
+    return (d <= 1) ? FastMath.sqrt(2 - 2 * d) : 0;
   }
 
   @Override
   public String toString() {
-    return "CosineUnitlengthDistance";
+    return "SqrtCosineUnitlengthDistance";
   }
 
   @Override
-  public boolean equals(Object obj) {
-    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  public boolean isSquared() {
+    return false;
   }
 
   @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
-
-  @Override
-  public SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return NumberVector.VARIABLE_LENGTH;
+  public boolean isMetric() {
+    return true;
   }
 
   /**
@@ -109,8 +101,8 @@ public class CosineUnitlengthDistance implements SpatialPrimitiveDistance<Number
    */
   public static class Par implements Parameterizer {
     @Override
-    public CosineUnitlengthDistance make() {
-      return CosineUnitlengthDistance.STATIC;
+    public SqrtCosineUnitlengthDistance make() {
+      return SqrtCosineUnitlengthDistance.STATIC;
     }
   }
 }

@@ -42,8 +42,9 @@ import elki.utilities.optionhandling.Parameterizer;
  * This implementation <em>assumes</em> that \(||a||=||b||=1\). If this does not
  * hold for your data, use {@link ArcCosineDistance} instead!
  * <p>
- * {@link CosineUnitlengthDistance} is a bit less expensive, and will
- * yield the same ranking of neighbors.
+ * {@link CosineUnitlengthDistance} and {@link SqrtCosineUnitlengthDistance} are
+ * a bit less expensive to compute, and will yield the same ranking of
+ * neighbors.
  * 
  * @author Erich Schubert
  * @since 0.7.5
@@ -64,16 +65,6 @@ public class ArcCosineUnitlengthDistance implements SpatialPrimitiveDistance<Num
     super();
   }
 
-  /**
-   * Computes the cosine distance for two given feature vectors.
-   * <p>
-   * The cosine distance is computed as the arcus from the cosine similarity
-   * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
-   * 
-   * @param v1 first feature vector
-   * @param v2 second feature vector
-   * @return the cosine distance for two given feature vectors v1 and v2
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final double v = VectorUtil.dot(v1, v2);

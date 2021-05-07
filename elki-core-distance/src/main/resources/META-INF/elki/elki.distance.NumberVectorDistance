@@ -8,6 +8,8 @@ elki.distance.ArcCosineDistance arccos
 elki.distance.ArcCosineUnitlengthDistance
 elki.distance.CosineDistance cosine
 elki.distance.CosineUnitlengthDistance
+elki.distance.SqrtCosineDistance
+elki.distance.SqrtCosineUnitlengthDistance
 elki.distance.minkowski.SquaredEuclideanDistance squaredeuclidean
 elki.distance.BrayCurtisDistance bray-curtis braycurtis sorensen dice sorensen-dice
 elki.distance.CanberraDistance canberra
