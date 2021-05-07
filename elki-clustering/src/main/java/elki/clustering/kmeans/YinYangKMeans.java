@@ -498,7 +498,7 @@ public class YinYangKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      int deft = k > 10 ? k / 10 : k / 2;
+      int deft = k > 10 ? k / 10 : k > 1 ? k / 2 : 1;
       new IntParameter(T_ID) //
           .setDefaultValue(deft) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//

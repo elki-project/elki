@@ -111,7 +111,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers:
-        double best = distance(fv, means[0]), bes2 = distance(fv, means[1]);
+        double best = distance(fv, means[0]), bes2 = k > 1 ? distance(fv, means[1]) : best;
         int minIdx = 0, minId2 = 1;
         if(bes2 < best) {
           double tmp = best;

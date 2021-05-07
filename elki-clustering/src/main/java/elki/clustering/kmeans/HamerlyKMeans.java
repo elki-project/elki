@@ -161,7 +161,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers
-        double min1 = distance(fv, means[0]), min2 = distance(fv, means[1]);
+        double min1 = distance(fv, means[0]), min2 = k > 1 ? distance(fv, means[1]) : min1;
         int minIndex = 0;
         if(min2 < min1) {
           double tmp = min1;
