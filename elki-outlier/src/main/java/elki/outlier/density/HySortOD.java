@@ -44,7 +44,6 @@ import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
-import elki.utilities.Alias;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -80,7 +79,6 @@ import net.jafama.FastMath;
     title = "Fast and Scalable Outlier Detection with Sorted Hypercubes", //
     booktitle = "Proc. 29th ACM Int. Conf. on Information & Knowledge Management (CIKM'20)", //
     url = "https://doi.org/10.1145/3340531.3412033")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HySortOD", "hysort" })
 public class HySortOD implements OutlierAlgorithm {
   /**
    * The logger for this class.
