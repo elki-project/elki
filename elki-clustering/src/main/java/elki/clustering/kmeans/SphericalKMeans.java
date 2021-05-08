@@ -28,17 +28,22 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.model.KMeansModel;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.CosineUnitlengthDistance;
+import elki.database.relation.RelationUtil;
+import elki.distance.CosineDistance;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+
+import net.jafama.FastMath;
 
 /**
  * The standard spherical k-means algorithm.
@@ -74,7 +79,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
    * @param initializer Initialization class
    */
   public SphericalKMeans(int k, int maxiter, KMeansInitialization initializer) {
-    super(CosineUnitlengthDistance.STATIC, k, maxiter, initializer);
+    super(CosineDistance.STATIC, k, maxiter, initializer);
   }
 
   @Override
@@ -82,6 +87,11 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
     Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildResult(true, relation);
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   @Override
@@ -104,6 +114,13 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
+      // ensure the initial means have the full dimensionality:
+      final int dim = RelationUtil.maxDimensionality(relation);
+      for(int i = 0; i < means.length; i++) {
+        if(means[i].length < dim) {
+          means[i] = Arrays.copyOf(means[i], dim);
+        }
+      }
     }
 
     @Override
@@ -123,12 +140,10 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector fv = relation.get(iditer);
-        diststat++;
-        double maxSim = VectorUtil.dot(fv, means[0]);
+        double maxSim = similarity(fv, means[0]);
         int maxIndex = 0;
         for(int i = 1; i < k; i++) {
-          diststat++;
-          double sim = VectorUtil.dot(fv, means[i]);
+          double sim = similarity(fv, means[i]);
           if(sim > maxSim) {
             maxIndex = i;
             maxSim = sim;
@@ -142,6 +157,44 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       }
       VMath.timesEquals(varsum, MathUtil.SQRT2);
       return changed;
+    }
+
+    /**
+     * Compute the similarity of two objects (and count this operation).
+     *
+     * @param vec1 First vector
+     * @param vec2 Second vector
+     * @return Similarity (dot product)
+     */
+    protected double similarity(NumberVector vec1, double[] vec2) {
+      diststat++;
+      return VectorUtil.dot(vec1, vec2);
+    }
+
+    @Override
+    protected double distance(NumberVector x, double[] y) {
+      ++diststat;
+      return 2 - 2 * VectorUtil.dot(x, y);
+    }
+
+    @Override
+    protected double distance(NumberVector x, NumberVector y) {
+      ++diststat;
+      return 2 - 2 * VectorUtil.dot(x, y);
+    }
+
+    @Override
+    protected double sqrtdistance(NumberVector x, double[] y) {
+      ++diststat;
+      final double s = VectorUtil.dot(x, y);
+      return s > 0 ? FastMath.sqrt(2 - 2 * s) : 0;
+    }
+
+    @Override
+    protected double sqrtdistance(NumberVector x, NumberVector y) {
+      ++diststat;
+      final double s = VectorUtil.dot(x, y);
+      return s > 0 ? FastMath.sqrt(2 - 2 * s) : 0;
     }
 
     @Override
@@ -158,7 +211,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      * @return the mean vectors of the given clusters in the given database
      */
     protected static double[][] means(List<? extends DBIDs> clusters, double[][] means, Relation<? extends NumberVector> relation) {
-      final int k = means.length;
+      final int k = means.length, dim = means[0].length;
       double[][] newMeans = new double[k][];
       for(int i = 0; i < k; i++) {
         DBIDs list = clusters.get(i);
@@ -167,10 +220,8 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
           newMeans[i] = means[i];
           continue;
         }
-        DBIDIter iter = list.iter();
-        double[] sum = relation.get(iter).toArray();
-        // Add remaining vectors (sparse):
-        for(iter.advance(); iter.valid(); iter.advance()) {
+        double[] sum = new double[dim];
+        for(DBIDIter iter = list.iter(); iter.valid(); iter.advance()) {
           plusEquals(sum, relation.get(iter));
         }
         // normalize to unit length

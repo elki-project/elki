@@ -199,6 +199,21 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
    * @param vec Vector to add
    */
   public static void plusEquals(double[] sum, NumberVector vec) {
+    if(vec instanceof SparseNumberVector) {
+      sparsePlusEquals(sum, (SparseNumberVector) vec);
+    }
+    else {
+      densePlusEquals(sum, vec);
+    }
+  }
+
+  /**
+   * Similar to VMath.plusEquals, but accepts a number vector.
+   *
+   * @param sum Aggregation array
+   * @param vec Vector to add
+   */
+  private static void densePlusEquals(double[] sum, NumberVector vec) {
     for(int d = 0; d < sum.length; d++) {
       sum[d] += vec.doubleValue(d);
     }
@@ -210,7 +225,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
    * @param sum Aggregation array
    * @param vec Vector to add
    */
-  public static void sparsePlusEquals(double[] sum, SparseNumberVector vec) {
+  private static void sparsePlusEquals(double[] sum, SparseNumberVector vec) {
     for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
       sum[vec.iterDim(j)] += vec.iterDoubleValue(j);
     }
@@ -236,8 +251,40 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
    * @param vec Vector to subtract
    */
   public static void plusMinusEquals(double[] add, double[] sub, NumberVector vec) {
+    if(vec instanceof SparseNumberVector) {
+      sparsePlusMinusEquals(add, sub, (SparseNumberVector) vec);
+    }
+    else {
+      densePlusMinusEquals(add, sub, vec);
+    }
+  }
+
+  /**
+   * Add to one, remove from another.
+   *
+   * @param add Array to add to
+   * @param sub Array to remove from
+   * @param vec Vector to subtract
+   */
+  private static void densePlusMinusEquals(double[] add, double[] sub, NumberVector vec) {
     for(int d = 0; d < add.length; d++) {
       final double v = vec.doubleValue(d);
+      add[d] += v;
+      sub[d] -= v;
+    }
+  }
+
+  /**
+   * Add to one, remove from another.
+   *
+   * @param add Array to add to
+   * @param sub Array to remove from
+   * @param vec Vector to subtract
+   */
+  private static void sparsePlusMinusEquals(double[] add, double[] sub, SparseNumberVector vec) {
+    for(int j = vec.iter(); vec.iterValid(j); j = vec.iterAdvance(j)) {
+      final double v = vec.iterDoubleValue(j);
+      final int d = vec.iterDim(j);
       add[d] += v;
       sub[d] -= v;
     }
@@ -572,7 +619,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     protected void copyMeans(double[][] src, double[][] dst) {
       for(int i = 0; i < k; i++) {
-        System.arraycopy(src[i], 0, dst[i], 0, src[i].length);
+        final double[] srci = src[i], dsti = dst[i];
+        System.arraycopy(srci, 0, dsti, 0, srci.length);
+        // For sparse versions
+        if(srci.length < dsti.length) {
+          Arrays.fill(dsti, srci.length, dsti.length, 0.);
+        }
       }
     }
 
