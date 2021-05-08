@@ -36,7 +36,6 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.CosineDistance;
-import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
@@ -84,7 +83,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
 
   @Override
   public Clustering<KMeansModel> run(Relation<V> relation) {
-    Instance instance = new Instance(relation, distance, initialMeans(relation));
+    Instance instance = new Instance(relation, initialMeans(relation));
     instance.run(maxiter);
     return instance.buildResult(true, relation);
   }
@@ -109,11 +108,10 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      * Constructor.
      *
      * @param relation Data relation
-     * @param df Distance function
      * @param means Initial cluster means
      */
-    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
-      super(relation, df, means);
+    public Instance(Relation<? extends NumberVector> relation, double[][] means) {
+      super(relation, CosineDistance.STATIC, means);
       // ensure the initial means have the full dimensionality:
       final int dim = RelationUtil.maxDimensionality(relation);
       for(int i = 0; i < means.length; i++) {
@@ -172,29 +170,42 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
     }
 
     @Override
+    protected double distance(double[] x, double[] y) {
+      ++diststat;
+      double d = 0;
+      for(int i = 0; i < x.length; i++) {
+        double v = x[i] - y[i];
+        d += v * v;
+      }
+      return d;
+    }
+
+    @Override
     protected double distance(NumberVector x, double[] y) {
       ++diststat;
-      return 2 - 2 * VectorUtil.dot(x, y);
+      final double s = VectorUtil.dot(x, y);
+      return s < 1 ? 2 - 2 * s : 0;
     }
 
     @Override
     protected double distance(NumberVector x, NumberVector y) {
       ++diststat;
-      return 2 - 2 * VectorUtil.dot(x, y);
+      final double s = VectorUtil.dot(x, y);
+      return s < 1 ? 2 - 2 * s : 0;
     }
 
     @Override
     protected double sqrtdistance(NumberVector x, double[] y) {
       ++diststat;
       final double s = VectorUtil.dot(x, y);
-      return s > 0 ? FastMath.sqrt(2 - 2 * s) : 0;
+      return s < 1 ? FastMath.sqrt(2 - 2 * s) : 0;
     }
 
     @Override
     protected double sqrtdistance(NumberVector x, NumberVector y) {
       ++diststat;
       final double s = VectorUtil.dot(x, y);
-      return s > 0 ? FastMath.sqrt(2 - 2 * s) : 0;
+      return s < 1 ? FastMath.sqrt(2 - 2 * s) : 0;
     }
 
     @Override
@@ -239,7 +250,9 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
   public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
     public void configure(Parameterization config) {
-      super.configure(config);
+      getParameterK(config);
+      getParameterInitialization(config);
+      getParameterMaxIter(config);
     }
 
     @Override
