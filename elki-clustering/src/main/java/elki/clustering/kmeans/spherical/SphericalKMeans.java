@@ -168,6 +168,18 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       return VectorUtil.dot(vec1, vec2);
     }
 
+    /**
+     * Compute the similarity of two objects (and count this operation).
+     *
+     * @param vec1 First vector
+     * @param vec2 Second vector
+     * @return Similarity (dot product)
+     */
+    protected double similarity(double[] vec1, double[] vec2) {
+      diststat++;
+      return VMath.dot(vec1, vec2);
+    }
+
     @Override
     protected double distance(double[] x, double[] y) {
       ++diststat;
