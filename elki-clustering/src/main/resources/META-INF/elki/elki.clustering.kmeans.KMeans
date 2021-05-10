@@ -22,4 +22,6 @@ elki.clustering.kmeans.YinYangKMeans
 elki.clustering.kmeans.XMeans
 elki.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.clustering.kmeans.spherical.SphericalKMeans
+elki.clustering.kmeans.spherical.SphericalElkanKMeans
 elki.clustering.kmeans.spherical.SphericalHamerlyKMeans
+elki.clustering.kmeans.spherical.SphericalSimplifiedElkanKMeans
