@@ -18,11 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.kmeans;
+package elki.clustering.kmeans.spherical;
 
 import java.util.Arrays;
 import java.util.List;
 
+import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -103,7 +104,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
    * 
    * @author Alexander Voß
    */
-  protected static class Instance extends AbstractKMeans.Instance {
+  public static class Instance extends AbstractKMeans.Instance {
     /**
      * Constructor.
      *
@@ -122,7 +123,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
     }
 
     @Override
-    protected int iterate(int iteration) {
+    public int iterate(int iteration) {
       means = iteration == 1 ? means : means(clusters, means, relation);
       return assignToNearestCluster();
     }

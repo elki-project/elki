@@ -18,11 +18,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.kmeans;
+package elki.clustering.kmeans.spherical;
 
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.kmeans.KMeans;
+import elki.clustering.kmeans.LloydKMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;

@@ -388,11 +388,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
    *
    * @author Erich Schubert
    */
-  protected abstract static class Instance {
+  public abstract static class Instance {
     /**
      * Cluster means.
      */
-    double[][] means;
+    protected double[][] means;
 
     /**
      * Store the elements per cluster.
@@ -563,7 +563,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      *
      * @param maxiter Maximum number of iterations
      */
-    protected void run(int maxiter) {
+    public void run(int maxiter) {
       final Logging log = getLogger();
       IndefiniteProgress prog = log.isVerbose() ? new IndefiniteProgress("Iteration") : null;
       int iteration = 0;
@@ -759,7 +759,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      * @param relation Data relation (only needed if varstat is set)
      * @return Clustering result
      */
-    protected Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
+    public Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
       Logging log = getLogger();
       Clustering<KMeansModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Means Clustering");
@@ -807,7 +807,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      *
      * @return Logger
      */
-    abstract Logging getLogger();
+    protected abstract Logging getLogger();
   }
 
   /**

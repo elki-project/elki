@@ -165,7 +165,7 @@ public class YinYangKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
 
     @Override
-    protected void run(int maxiter) {
+    public void run(int maxiter) {
       this.groups = groupKMeans(gdrift.length /* = t */);
       super.run(maxiter);
     }
@@ -464,7 +464,7 @@ public class YinYangKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
 
     @Override
-    Logging getLogger() {
+    protected Logging getLogger() {
       return LOG;
     }
   }
