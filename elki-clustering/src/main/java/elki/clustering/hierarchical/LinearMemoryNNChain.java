@@ -21,8 +21,9 @@
 package elki.clustering.hierarchical;
 
 import elki.clustering.hierarchical.linkage.Linkage;
-import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
+import elki.clustering.hierarchical.linkage.MedianLinkage;
+import elki.clustering.hierarchical.linkage.CentroidLinkage;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.database.ids.*;
@@ -33,8 +34,9 @@ import elki.logging.progress.FiniteProgress;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * NNchain clustering algorithm with linear Memory.
@@ -50,30 +52,30 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-  @Reference(authors = "F. Murtagh", //
-      booktitle = "Multidimensional Clustering Algorithms", //
-      title = "Multidimensional Clustering Algorithms", //
-      url = "http://www.multiresolutions.com/strule/MClA/")
+@Reference(authors = "F. Murtagh", //
+    booktitle = "Multidimensional Clustering Algorithms", //
+    title = "Multidimensional Clustering Algorithms", //
+    url = "http://www.multiresolutions.com/strule/MClA/")
 public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(LinearMemoryNNChain.class);
 
+  private GeometricLinkage geometricLinkage;
+
   /**
    * Constructor.
    *
    * @param linkage Linkage option; currently unused, only ward
    */
-  public LinearMemoryNNChain(Linkage linkage) {
+  public LinearMemoryNNChain(GeometricLinkage geomlinkage, Linkage linkage) {
     super(SquaredEuclideanDistance.STATIC, linkage);
+    this.geometricLinkage = geomlinkage;
   }
 
   @Override
   public PointerHierarchyResult run(Relation<O> relation) {
-    if(SingleLinkage.class.isInstance(linkage)) {
-      LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
-    }
     final DBIDs ids = relation.getDBIDs();
 
     // create Array Iter for PointerHirarchyBuilder
@@ -130,13 +132,13 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
       }
       // For ties, always prefer the second-last element b:
       final int bSize = builder.getSize(aIt.seek(b));
-      double minDist = wardDist(builder.getSize(aIt.seek(a)), clusters[a], bSize, clusters[b]);
+      double minDist = geometricLinkage.distance(builder.getSize(aIt.seek(a)), bSize, clusters[a], clusters[b]);
       do {
         final int aSize = builder.getSize(aIt.seek(a));
         int c = b;
         for(int i = 0; i < a; i++) {
           if(i != b && !builder.isLinked(aIt.seek(i))) {
-            double dist = wardDist(aSize, clusters[a], builder.getSize(aIt2.seek(i)), clusters[i]);
+            double dist = geometricLinkage.distance(aSize, builder.getSize(aIt2.seek(i)), clusters[a], clusters[i]);
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -145,7 +147,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
         }
         for(int i = a + 1; i < size; i++) {
           if(i != b && !builder.isLinked(aIt.seek(i))) {
-            double dist = wardDist(aSize, clusters[a], builder.getSize(aIt2.seek(i)), clusters[i]);
+            double dist = geometricLinkage.distance(aSize, builder.getSize(aIt2.seek(i)), clusters[a], clusters[i]);
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -165,17 +167,13 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
         a = b;
         b = tmp;
       }
-      assert (minDist == wardDist(builder.getSize(aIt.seek(a)), clusters[a], builder.getSize(aIt2.seek(b)), clusters[b]));
+      assert (minDist == geometricLinkage.distance(builder.getSize(aIt.seek(a)), builder.getSize(aIt2.seek(b)), clusters[a], clusters[b]));
       assert (b < a);
-      wardMerge(size, clusters, aIt.seek(a), aIt2.seek(b), builder, minDist, a, b);
+      merge(size, clusters, aIt.seek(a), aIt2.seek(b), builder, minDist, a, b);
       end = AGNES.shrinkActiveSet(aIt, builder, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
-  }
-
-  private double wardDist(int aSize, NumberVector a, int bSize, NumberVector b) {
-    return ((aSize * bSize) / (double)(aSize + bSize)) * SquaredEuclideanDistance.STATIC.distance(a, b);
   }
 
   /**
@@ -188,7 +186,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void wardMerge(int end, NumberVector[] clusters, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyBuilder builder, double mindist, int x, int y) {
+  protected void merge(int end, NumberVector[] clusters, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyBuilder builder, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
@@ -201,36 +199,8 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);
-    updateArrays(clusters, x, y, sizex, sizey);
-  }
-
-  /**
-   * Update the cluster center
-   * 
-   * @param clusters Array of Clustervectors
-   * @param x cluster index to merge
-   * @param y cluster index to merge to
-   * @param sizex cluster size
-   * @param sizey cluster size
-   */
-  protected void updateArrays(NumberVector[] clusters, int x, int y, final int sizex, final int sizey) {
-    // Update distance matrix. Note: y < x
-    clusters[y] = calcWardCenter(clusters[y], clusters[x], sizey, sizex);
-  }
-
-  /**
-   * calculate new center according to ward clustering
-   * ward clustering calculates the weighted average
-   * 
-   * @param y Cluster center y
-   * @param x Cluster center x
-   * @param sizey Cluster size y
-   * @param sizex Cluster size x
-   * @return new Cluster center
-   */
-  private NumberVector calcWardCenter(NumberVector y, NumberVector x, int sizey, int sizex) {
-    double[] c =VMath.timesPlusTimes(y.toArray(),sizey/(double)(sizex+sizey) , x.toArray(), sizex/(double)(sizex+sizey));
-    return new DoubleVector(c);
+    // update the cluster center for y
+    clusters[y] = geometricLinkage.merge(sizex, sizey, clusters[x], clusters[y]);
   }
 
   /**
@@ -252,6 +222,67 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
     return -1;
   }
 
+  public static enum GeometricLinkage {
+    WARD {
+      @Override
+      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
+        double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
+        return new DoubleVector(c);
+      }
+
+      @Override
+      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
+        return ((sizex * sizey) / (double) (sizex + sizey)) * SquaredEuclideanDistance.STATIC.distance(x, y);
+      }
+
+      @Override
+      public Linkage getAssociatedLinkage() {
+        return WardLinkage.STATIC;
+      }
+
+    },
+    MEDIAN_WPGMC {
+      @Override
+      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
+        double[] c = VMath.timesPlusTimes(y.toArray(), .5, x.toArray(), .5);
+        return new DoubleVector(c);
+      }
+
+      @Override
+      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
+        return SquaredEuclideanDistance.STATIC.distance(x, y);
+      }
+
+      @Override
+      public Linkage getAssociatedLinkage() {
+        return MedianLinkage.STATIC;
+      }
+    },
+    CENTROID_UPGMC {
+      @Override
+      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
+        double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
+        return new DoubleVector(c);
+      }
+
+      @Override
+      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
+        return SquaredEuclideanDistance.STATIC.distance(x, y);
+      }
+
+      @Override
+      public Linkage getAssociatedLinkage() {
+        return CentroidLinkage.STATIC;
+      }
+    };
+
+    public abstract NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y);
+
+    public abstract double distance(int sizex, int sizey, NumberVector x, NumberVector y);
+
+    public abstract Linkage getAssociatedLinkage();
+  }
+
   /**
    * Parameterization class.
    * 
@@ -262,15 +293,29 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    * @param <O> Object type
    */
   public static class Par<O extends NumberVector> extends AGNES.Par<O> {
+    /**
+     * Option ID for geometric linkage parameter.
+     */
+    public static final OptionID GEOM_LINKAGE_ID = new OptionID("linearMemoryNNChain.geom_linkage", "Linkage method to use (can be WARD, UPGMC,WPGMC)");
+
+    /**
+     * geometric linkage parameter.
+     */
+    public static GeometricLinkage geomLinkage = GeometricLinkage.WARD;
+
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<Linkage>(LINKAGE_ID, WardLinkage.class) //
-          .setDefaultValue(WardLinkage.class) //
-          .grab(config, x -> linkage = x);
+      new EnumParameter<GeometricLinkage>(GEOM_LINKAGE_ID, GeometricLinkage.class) //
+          .setDefaultValue(GeometricLinkage.WARD) //
+          .grab(config, x -> {
+            geomLinkage = x;
+            linkage = x.getAssociatedLinkage();
+          });
     }
+
     @Override
     public LinearMemoryNNChain<O> make() {
-      return new LinearMemoryNNChain<>(linkage);
+      return new LinearMemoryNNChain<>(geomLinkage, linkage);
     }
   }
 }
