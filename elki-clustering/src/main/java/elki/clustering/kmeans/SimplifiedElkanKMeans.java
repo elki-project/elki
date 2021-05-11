@@ -127,6 +127,7 @@ public class SimplifiedElkanKMeans<V extends NumberVector> extends AbstractKMean
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

@@ -118,6 +118,13 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
      */
     int[] cnum;
 
+    /**
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param df Distance function
+     * @param means Initial means
+     */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
       second = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
