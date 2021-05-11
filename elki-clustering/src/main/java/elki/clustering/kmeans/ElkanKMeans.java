@@ -91,7 +91,7 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
     /**
      * Cluster center distances
      */
-    double[][] cdist = new double[k][k];
+    double[][] cdist;
 
     /**
      * Constructor.
