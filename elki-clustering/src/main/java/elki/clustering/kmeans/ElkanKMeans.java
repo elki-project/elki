@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -131,15 +131,14 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
         // Assign to nearest cluster.
         clusters.get(minIndex).add(it);
         assignment.putInt(it, minIndex);
-        upper.putDouble(it, best);
         plusEquals(sums[minIndex], fv);
+        upper.putDouble(it, best);
       }
       return relation.size();
     }
 
     @Override
     protected int assignToNearestCluster() {
-      assert (k == means.length);
       recomputeSeperation(sep, cdist); // #1
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
@@ -159,28 +158,26 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
             continue; // Condition #3 i-iii not satisfied
           }
           if(recompute_u) { // Need to update bound? #3a
-            u = sqrtdistance(fv, means[cur]);
-            upper.putDouble(it, u);
+            upper.putDouble(it, u = sqrtdistance(fv, means[cur]));
             recompute_u = false; // Once only
             if(u <= l[j] || u <= cdist[cur][j]) { // #3b
               continue;
             }
           }
-          double dist = sqrtdistance(fv, means[j]);
-          l[j] = dist;
+          double dist = l[j] = sqrtdistance(fv, means[j]);
           if(dist < u) {
             cur = j;
             u = dist;
           }
         }
-        // Object is to be reassigned.
+        // Object has to be reassigned.
         if(cur != orig) {
-          upper.putDouble(it, u); // Remember bound.
           clusters.get(cur).add(it);
           clusters.get(orig).remove(it);
           assignment.putInt(it, cur);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
+          upper.putDouble(it, u); // Remember bound.
         }
       }
       return changed;

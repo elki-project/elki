@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -196,19 +196,18 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
       orderMeans();
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final int cur = assignment.intValue(it);
+        final int orig = assignment.intValue(it);
         // Compute the current bound:
         final double z = lower.doubleValue(it);
-        final double sa = sep[cur];
+        final double sa = sep[orig];
         double u = upper.doubleValue(it);
         if(u <= z || u <= sa) {
           continue;
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, means[cur]);
-        u = isSquared ? FastMath.sqrt(curd2) : curd2;
-        upper.putDouble(it, u);
+        double curd2 = distance(fv, means[orig]);
+        upper.putDouble(it, u = isSquared ? FastMath.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
@@ -219,16 +218,16 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         final double norm = EuclideanDistance.STATIC.norm(fv);
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = secd2;
-        int minIndex = cur, secIndex = sec;
+        int cur = orig, secIndex = sec;
         if(curd2 > secd2) {
           min1 = secd2;
           min2 = curd2;
-          minIndex = sec;
-          secIndex = cur;
+          cur = sec;
+          secIndex = orig;
         }
         for(int i = 0; i < k; i++) {
-          int c = cnum[i];
-          if(c == cur || c == sec) {
+          final int c = cnum[i]; // Optimized ordering
+          if(c == orig || c == sec) {
             continue;
           }
           double d = cdist[i] - norm;
@@ -240,8 +239,8 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
           }
           double dist = distance(fv, means[c]);
           if(dist < min1) {
-            secIndex = minIndex;
-            minIndex = c;
+            secIndex = cur;
+            cur = c;
             min2 = min1;
             min1 = dist;
           }
@@ -250,12 +249,13 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
             min2 = dist;
           }
         }
-        if(minIndex != cur) {
-          clusters.get(minIndex).add(it);
-          clusters.get(cur).remove(it);
-          assignment.putInt(it, minIndex);
+        // Object has to be reassigned.
+        if(cur != orig) {
+          clusters.get(cur).add(it);
+          clusters.get(orig).remove(it);
+          assignment.putInt(it, cur);
           second.putInt(it, secIndex);
-          plusMinusEquals(sums[minIndex], sums[cur], fv);
+          plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
           upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
         }
