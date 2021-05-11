@@ -37,7 +37,7 @@ import elki.utilities.io.ParseUtil;
 
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
- * per line, points separated by whitespace, numbers separated by colons.
+ * per line, points separated by whitespace, numbers separated by commas.
  * Multiple polygons components can be separated using {@code --}.
  * <p>
  * Unparseable parts will be treated as labels.
