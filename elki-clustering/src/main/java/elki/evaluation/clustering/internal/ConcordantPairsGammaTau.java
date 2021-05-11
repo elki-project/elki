@@ -43,13 +43,11 @@ import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Compute the Gamma Criterion of a data set.
@@ -285,7 +283,7 @@ public class ConcordantPairsGammaTau implements Evaluator {
       bibkey = "doi:10.1146/annurev.es.05.110174.000533")
   public double computeTau(long c, long d, double m, long wd, long bd) {
     double tie = (wd * (wd - 1) + bd * (bd - 1)) >>> 1;
-    return (c - d) / FastMath.sqrt((m - tie) * m);
+    return (c - d) / Math.sqrt((m - tie) * m);
     // return (4. * c - m) / m;
   }
 

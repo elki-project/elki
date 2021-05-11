@@ -218,7 +218,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
       if(off < factor) { // Blend with black:
         factor = (off / factor);
         int a = (col >> 24) & 0xFF;
-        a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
+        a = (int) (a * Math.sqrt(reldist)) & 0xFF;
         a = (int) ((1 - factor) * 0xFF + factor * a);
         int r = (int) (factor * ((col >> 16) & 0xFF));
         int g = (int) (factor * ((col >> 8) & 0xFF));
@@ -228,7 +228,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     }
     int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF,
         b = (col) & 0xFF;
-    a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
+    a = (int) (a * Math.sqrt(reldist)) & 0xFF;
     return a << 24 | r << 16 | g << 8 | b;
   }
 

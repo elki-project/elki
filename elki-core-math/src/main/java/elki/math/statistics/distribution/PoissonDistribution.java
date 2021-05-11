@@ -187,7 +187,7 @@ public class PoissonDistribution implements Distribution {
     }
     final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
     final double f = (MathUtil.TWOPI * x * (n - x)) / n;
-    return FastMath.exp(lc) / FastMath.sqrt(f);
+    return FastMath.exp(lc) / Math.sqrt(f);
   }
 
   /**
@@ -424,7 +424,7 @@ public class PoissonDistribution implements Distribution {
     }
     final double f = MathUtil.TWOPI * x;
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
-    return FastMath.exp(y) / FastMath.sqrt(f);
+    return FastMath.exp(y) / Math.sqrt(f);
   }
 
   /**

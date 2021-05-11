@@ -65,8 +65,6 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Abstract base class for k-means implementations.
  *
@@ -529,7 +527,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     protected double sqrtdistance(NumberVector x, NumberVector y) {
       final double d = distance(x, y);
-      return isSquared ? FastMath.sqrt(d) : d;
+      return isSquared ? Math.sqrt(d) : d;
     }
 
     /**
@@ -542,7 +540,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     protected double sqrtdistance(NumberVector x, double[] y) {
       final double d = distance(x, y);
-      return isSquared ? FastMath.sqrt(d) : d;
+      return isSquared ? Math.sqrt(d) : d;
     }
 
     /**
@@ -555,7 +553,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     protected double sqrtdistance(double[] x, double[] y) {
       final double d = distance(x, y);
-      return isSquared ? FastMath.sqrt(d) : d;
+      return isSquared ? Math.sqrt(d) : d;
     }
 
     /**

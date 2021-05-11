@@ -20,21 +20,12 @@
  */
 package elki.math.geodesy;
 
-import static elki.math.MathUtil.HALFPI;
-import static elki.math.MathUtil.TWOPI;
-import static elki.math.MathUtil.deg2rad;
-import static elki.math.MathUtil.rad2deg;
-import static net.jafama.FastMath.acos;
-import static net.jafama.FastMath.asin;
-import static net.jafama.FastMath.atan;
-import static net.jafama.FastMath.atan2;
-import static net.jafama.FastMath.cos;
-import static net.jafama.FastMath.sin;
-import static net.jafama.FastMath.sinAndCos;
-import static net.jafama.FastMath.sqrt;
-import static net.jafama.FastMath.tan;
+import static elki.math.MathUtil.*;
+import static java.lang.Math.sqrt;
+import static net.jafama.FastMath.*;
 
 import elki.utilities.documentation.Reference;
+
 import net.jafama.DoubleWrapper;
 
 /**

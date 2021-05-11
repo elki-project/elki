@@ -26,7 +26,6 @@ import elki.data.type.SimpleTypeInformation;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Clark distance function for vector spaces.
@@ -88,7 +87,7 @@ public class ClarkDistance implements SpatialPrimitiveDistance<NumberVector>, Nu
         agg += 1;
       }
     }
-    return FastMath.sqrt(agg / Math.max(dim1, dim2));
+    return Math.sqrt(agg / Math.max(dim1, dim2));
   }
 
   @Override
@@ -126,7 +125,7 @@ public class ClarkDistance implements SpatialPrimitiveDistance<NumberVector>, Nu
         agg += 1;
       }
     }
-    return FastMath.sqrt(agg / Math.max(dim1, dim2));
+    return Math.sqrt(agg / Math.max(dim1, dim2));
   }
 
   @Override

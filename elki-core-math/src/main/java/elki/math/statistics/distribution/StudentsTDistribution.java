@@ -89,7 +89,7 @@ public class StudentsTDistribution implements Distribution {
   public static double pdf(double val, int v) {
     // TODO: improve precision by computing "exp" last?
     return FastMath.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) //
-        * (1 / FastMath.sqrt(v * Math.PI)) * FastMath.pow(1 + (val * val) / v, -((v + 1) * .5));
+        * (1 / Math.sqrt(v * Math.PI)) * FastMath.pow(1 + (val * val) / v, -((v + 1) * .5));
   }
 
   /**

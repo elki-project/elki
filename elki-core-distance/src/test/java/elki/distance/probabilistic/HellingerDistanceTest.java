@@ -20,8 +20,8 @@
  */
 package elki.distance.probabilistic;
 
+import static java.lang.Math.sqrt;
 import static net.jafama.FastMath.pow;
-import static net.jafama.FastMath.sqrt;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

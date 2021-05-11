@@ -24,8 +24,6 @@ import elki.logging.LoggingUtil;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Pair-counting measures, with support for "noise" clusters and self-pairing
  * support.
@@ -173,7 +171,7 @@ public class PairCounting {
       url = "https://doi.org/10.2307/2288117", //
       bibkey = "doi:10.2307/2288117")
   public double fowlkesMallows() {
-    return FastMath.sqrt(precision() * recall());
+    return Math.sqrt(precision() * recall());
   }
 
   /**
@@ -209,7 +207,7 @@ public class PairCounting {
       url = "https://doi.org/10.1007/BF01908075", //
       bibkey = "doi:10.1007/BF01908075")
   public double adjustedRandIndex() {
-    double d = FastMath.sqrt((double) inBoth + inFirst + inSecond + inNone);
+    double d = Math.sqrt((double) inBoth + inFirst + inSecond + inNone);
     // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
     // Because we have O(N^2) pairs, and thus this value is temporarily O(N^4)
     double exp = (inBoth + inFirst) / d * (inBoth + inSecond) / d;

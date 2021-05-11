@@ -24,8 +24,6 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import net.jafama.FastMath;
-
 /**
  * Cholesky Decomposition.
  * <p>
@@ -64,7 +62,7 @@ public class CholeskyDecomposition {
     { // First iteration
       double d = A[0][0];
       isspd &= d > 0.0;
-      L[0][0] = d > 0 ? FastMath.sqrt(d) : 0;
+      L[0][0] = d > 0 ? Math.sqrt(d) : 0;
       Arrays.fill(L[0], 1, n, 0.0);
     }
     // Main loop.
@@ -83,7 +81,7 @@ public class CholeskyDecomposition {
       }
       d = Aj[j] - d;
       isspd &= d > 0.0;
-      Lj[j] = d > 0 ? FastMath.sqrt(d) : 0;
+      Lj[j] = d > 0 ? Math.sqrt(d) : 0;
       Arrays.fill(Lj, j + 1, n, 0.0);
     }
   }

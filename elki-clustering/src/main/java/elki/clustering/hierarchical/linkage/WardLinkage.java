@@ -25,8 +25,6 @@ import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Ward's method clustering method.
  * <p>
@@ -112,7 +110,7 @@ public class WardLinkage implements Linkage {
 
   @Override
   public double restore(double d, boolean issquare) {
-    return issquare ? 2. * d : FastMath.sqrt(2. * d);
+    return issquare ? 2. * d : Math.sqrt(2. * d);
   }
 
   @Override

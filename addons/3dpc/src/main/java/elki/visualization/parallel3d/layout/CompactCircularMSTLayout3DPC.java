@@ -25,6 +25,7 @@ import java.util.List;
 import elki.math.MathUtil;
 import elki.math.statistics.dependence.Dependence;
 import elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -123,7 +124,7 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
     if(node.weight > 1) {
       double s = FastMath.sin(awid * .5), c = FastMath.cos(awid * .5);
       double dx = s * (depth + 1), dy = c * (depth + 1) - depth;
-      double d = FastMath.sqrt(dx * dx + dy * dy) / MathUtil.SQRT2;
+      double d = Math.sqrt(dx * dx + dy * dy) / MathUtil.SQRT2;
       div = Math.max(div, d);
     }
     // Angular position of current child:

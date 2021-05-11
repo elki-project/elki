@@ -43,8 +43,6 @@ import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
-import net.jafama.FastMath;
-
 /**
  * The standard spherical k-means algorithm.
  * <p>
@@ -199,14 +197,14 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
     protected double sqrtdistance(NumberVector x, double[] y) {
       ++diststat;
       final double s = VectorUtil.dot(x, y);
-      return s < 1 ? FastMath.sqrt(2 - 2 * s) : 0;
+      return s < 1 ? Math.sqrt(2 - 2 * s) : 0;
     }
 
     @Override
     protected double sqrtdistance(NumberVector x, NumberVector y) {
       ++diststat;
       final double s = VectorUtil.dot(x, y);
-      return s < 1 ? FastMath.sqrt(2 - 2 * s) : 0;
+      return s < 1 ? Math.sqrt(2 - 2 * s) : 0;
     }
 
     @Override

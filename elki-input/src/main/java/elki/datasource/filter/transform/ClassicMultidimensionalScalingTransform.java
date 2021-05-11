@@ -35,12 +35,11 @@ import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.linearalgebra.SingularValueDecomposition;
 import elki.utilities.Alias;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import net.jafama.FastMath;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
@@ -130,7 +129,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
         // Undo squared, unless we were given a squared distance function:
         if(!dist.isSquared()) {
           for(int i = 0; i < tdim; i++) {
-            lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
+            lambda[i] = Math.sqrt(Math.abs(lambda[i]));
           }
         }
 

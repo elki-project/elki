@@ -282,7 +282,7 @@ public class ALOCI<V extends NumberVector> implements OutlierAlgorithm {
     // LOCI
     long cb = sn.getCubicSum(cg.getLevel() - sn.getLevel());
     double n_hat = (double) sq / sn.getCount();
-    double sig_n_hat = FastMath.sqrt(cb * sn.getCount() - (sq * sq)) / sn.getCount();
+    double sig_n_hat = Math.sqrt(cb * sn.getCount() - (sq * sq)) / sn.getCount();
     // Avoid NaN - correct result 0.0?
     if(sig_n_hat < Double.MIN_NORMAL) {
       return 0.0;

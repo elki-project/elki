@@ -37,8 +37,6 @@
  */
 package elki.svm.solver;
 
-import net.jafama.FastMath;
-
 //
 // Solver for nu-svm classification and regression
 //
@@ -128,7 +126,7 @@ public class NuSolver extends Solver {
         }
       }
     }
-    if(FastMath.max(Gmaxp + Gmaxp2, Gmaxn + Gmaxn2) < eps || Gmin_idx < 0) {
+    if(Math.max(Gmaxp + Gmaxp2, Gmaxn + Gmaxn2) < eps || Gmin_idx < 0) {
       return true;
     }
 
@@ -174,7 +172,7 @@ public class NuSolver extends Solver {
       }
     }
 
-    if(unshrink == false && FastMath.max(Gmax1 + Gmax2, Gmax3 + Gmax4) <= eps * 10) {
+    if(unshrink == false && Math.max(Gmax1 + Gmax2, Gmax3 + Gmax4) <= eps * 10) {
       unshrink = true;
       reconstruct_gradient();
       active_size = l;

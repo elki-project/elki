@@ -28,8 +28,6 @@ import elki.datasource.filter.normalization.Normalization;
 import elki.math.MathUtil;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Normalize histograms by scaling them to unit absolute sum, then taking the
  * square root of the absolute value in each attribute, times the normalization
@@ -72,7 +70,7 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
     if(sum > 0.) {
       for(int d = 0; d < data.length; ++d) {
         double v = data[d];
-        data[d] = v > 0 ? FastMath.sqrt(v / sum) * MathUtil.SQRTHALF : 0.;
+        data[d] = v > 0 ? Math.sqrt(v / sum) * MathUtil.SQRTHALF : 0.;
       }
     }
     return factory.newNumberVector(data);

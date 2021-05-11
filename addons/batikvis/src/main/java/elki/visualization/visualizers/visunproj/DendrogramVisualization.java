@@ -28,15 +28,11 @@ import elki.database.datastore.DBIDDataStore;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.IntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.logging.LoggingUtil;
 import elki.math.scales.LinearScale;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.visualization.VisualizationMenuAction;
@@ -60,6 +56,7 @@ import elki.visualization.visualizers.AbstractVisualization;
 import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.Visualization;
 import elki.visualization.visualizers.scatterplot.AxisVisualization;
+
 import it.unimi.dsi.fastutil.doubles.Double2DoubleFunction;
 import net.jafama.FastMath;
 
@@ -256,10 +253,10 @@ public class DendrogramVisualization implements VisFactory {
         }
         maxh = v > maxh ? v : maxh;
       }
-      LinearScale yscale = new LinearScale(0, squared ? FastMath.sqrt(maxh) : maxh);
+      LinearScale yscale = new LinearScale(0, squared ? Math.sqrt(maxh) : maxh);
       // Y projection function
       Double2DoubleFunction proy = squared ? //
-          (h -> height * (1 - yscale.getScaled(FastMath.sqrt(h)))) : //
+          (h -> height * (1 - yscale.getScaled(Math.sqrt(h)))) : //
           (h -> height * (1 - yscale.getScaled(h)));
       // Draw axes
       try {

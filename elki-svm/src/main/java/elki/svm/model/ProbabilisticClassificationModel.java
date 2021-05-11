@@ -24,7 +24,7 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
 
     for(int i = 0, k = 0; i < nr_class; i++) {
       for(int j = i + 1; j < nr_class; j++, k++) {
-        pairwise_prob[i][j] = FastMath.min(FastMath.max(sigmoid_predict(dec_values[k], probA[k], probB[k]), min_prob), 1 - min_prob);
+        pairwise_prob[i][j] = Math.min(Math.max(sigmoid_predict(dec_values[k], probA[k], probB[k]), min_prob), 1 - min_prob);
         pairwise_prob[j][i] = 1 - pairwise_prob[i][j];
       }
     }
@@ -58,7 +58,7 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
 
   // Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
   private static void multiclass_probability(int k, double[][] r, double[] p) {
-    final int max_iter = FastMath.max(100, k);
+    final int max_iter = Math.max(100, k);
     double[][] Q = new double[k][k];
     double[] Qp = new double[k];
     double pQp, eps = 0.005 / k;
@@ -87,7 +87,7 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
       }
       double max_error = 0.;
       for(int t = 0; t < k; t++) {
-        double error = FastMath.abs(Qp[t] - pQp);
+        double error = Math.abs(Qp[t] - pQp);
         if(error > max_error) {
           max_error = error;
         }

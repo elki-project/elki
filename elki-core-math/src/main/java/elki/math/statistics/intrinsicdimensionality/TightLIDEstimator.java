@@ -84,14 +84,14 @@ public class TightLIDEstimator implements IntrinsicDimensionalityEstimator<Objec
         double Dj2 = issquared ? kdj : kdj * kdj, V2 = issquared ? d : d * d;
         // Real point:
         double S = Di2 + V2 - Dj2;
-        S = (FastMath.sqrt(S * S + 2 * V2 * r2mDi2) - S) * ir2mDi2;
+        S = (Math.sqrt(S * S + 2 * V2 * r2mDi2) - S) * ir2mDi2;
         if(S <= 0) {
           continue;
         }
         // Virtual point:
         double Z2 = 2 * Di2 + 2 * Dj2 - V2;
         double T = Di2 + Z2 - Dj2;
-        T = (FastMath.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
+        T = (Math.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
         if(T > 0) {
           sum += 2 * (FastMath.log(T) + FastMath.log(S));
           valid += 2;
@@ -132,14 +132,14 @@ public class TightLIDEstimator implements IntrinsicDimensionalityEstimator<Objec
         double Dj2 = issquared ? kdj : kdj * kdj, V2 = issquared ? d : d * d;
         // Real point:
         double S = Di2 + V2 - Dj2;
-        S = (FastMath.sqrt(S * S + 2 * V2 * r2mDi2) - S) * ir2mDi2;
+        S = (Math.sqrt(S * S + 2 * V2 * r2mDi2) - S) * ir2mDi2;
         if(S <= 0) {
           continue;
         }
         // Virtual point:
         double Z2 = 2 * Di2 + 2 * Dj2 - V2;
         double T = Di2 + Z2 - Dj2;
-        T = (FastMath.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
+        T = (Math.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
         if(T > 0) {
           sum += 2 * (FastMath.log(T) + FastMath.log(S));
           valid += 2;

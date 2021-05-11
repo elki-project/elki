@@ -248,7 +248,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
   private double deviation(double[] delta, double[][] beta) {
     final double a = squareSum(delta);
     final double b = squareSum(transposeTimes(beta, delta));
-    return (a > b) ? FastMath.sqrt(a - b) : 0.;
+    return (a > b) ? Math.sqrt(a - b) : 0.;
   }
 
   /**

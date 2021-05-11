@@ -122,7 +122,7 @@ public final class MathUtil {
   /**
    * Square root of one third.
    */
-  public static final double SQRTTHIRD = FastMath.sqrt(1 / 3.);
+  public static final double SQRTTHIRD = Math.sqrt(1 / 3.);
 
   /**
    * Logarithm of 2 to the basis e, for logarithm conversion.

@@ -61,7 +61,7 @@ public class ChiDistribution implements Distribution {
 
   @Override
   public double nextRandom(Random random) {
-    return FastMath.sqrt(chisq.nextRandom(random));
+    return Math.sqrt(chisq.nextRandom(random));
   }
 
   @Override

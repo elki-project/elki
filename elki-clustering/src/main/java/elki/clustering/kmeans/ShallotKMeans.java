@@ -33,8 +33,6 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Borgelt's Shallot k-means algorithm, exploiting the triangle inequality.
  * <p>
@@ -140,8 +138,8 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
         clusters.get(minIdx).add(it);
         assignment.putInt(it, minIdx);
         plusEquals(sums[minIdx], fv);
-        upper.putDouble(it, isSquared ? FastMath.sqrt(min1) : min1);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(min2) : min2);
+        upper.putDouble(it, isSquared ? Math.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? Math.sqrt(min2) : min2);
         // Overall like Exponion, but also store second closest
         second.putInt(it, minId2);
       }
@@ -165,7 +163,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
         // Update the upper bound
         NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
-        upper.putDouble(it, u = isSquared ? FastMath.sqrt(curd2) : curd2);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
@@ -186,7 +184,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           ref = secn;
           secn = orig;
           // Update u
-          u = isSquared ? FastMath.sqrt(curd2) : curd2;
+          u = isSquared ? Math.sqrt(curd2) : curd2;
         }
         // Second Shallot improvement: r
         double l = Math.min(u + sa, 2 * u + cdist[orig][cnum[orig][0]]);
@@ -225,9 +223,9 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           second.putInt(it, minId2);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
       }
       return changed;
     }

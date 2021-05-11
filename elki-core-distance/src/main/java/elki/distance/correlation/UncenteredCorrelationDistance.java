@@ -23,7 +23,6 @@ package elki.distance.correlation;
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Uncentered correlation distance.
@@ -73,7 +72,7 @@ public class UncenteredCorrelationDistance extends AbstractNumberVectorDistance 
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -99,7 +98,7 @@ public class UncenteredCorrelationDistance extends AbstractNumberVectorDistance 
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**

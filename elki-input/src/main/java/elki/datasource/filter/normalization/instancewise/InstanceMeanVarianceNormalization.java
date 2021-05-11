@@ -28,8 +28,6 @@ import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Normalize vectors such that they have zero mean and unit variance.
  * 
@@ -90,7 +88,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
       ssum += v * v;
     }
     // Compute the inverse standard deviation:
-    final double istd = ssum > 0. ? FastMath.sqrt(raw.length / ssum) : Double.POSITIVE_INFINITY;
+    final double istd = ssum > 0. ? Math.sqrt(raw.length / ssum) : Double.POSITIVE_INFINITY;
     if(istd < Double.POSITIVE_INFINITY) {
       for(int i = 0; i < raw.length; ++i) {
         raw[i] = (raw[i] - mean) * istd;
@@ -128,7 +126,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
     }
     // Compute the INVERSE standard deviation from ssq.
     for(int j = 0; j < multiplicity; ++j) {
-      istd[j] = istd[j] > 0. ? FastMath.sqrt(len / istd[j]) : 1;
+      istd[j] = istd[j] > 0. ? Math.sqrt(len / istd[j]) : 1;
     }
     for(int i = 0, j = 0; i < raw.length; ++i, j = ++j == multiplicity ? 0 : j) {
       raw[i] = (raw[i] - mean[j]) * istd[j];

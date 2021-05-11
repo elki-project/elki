@@ -20,7 +20,6 @@
  */
 package elki.distance.probabilistic;
 
-import static net.jafama.FastMath.sqrt;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -58,7 +57,7 @@ public class ChiDistanceTest extends AbstractDistanceTest {
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j, sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, Math.sqrt(distances[i][j]), df.distance(vi, vj), 1e-15);
         assertEquals("Distance " + i + "," + j, distances[i][j], df2.distance(vi, vj), 1e-15);
         assertMBRDistances(vj, vi, mbri, df);
       }

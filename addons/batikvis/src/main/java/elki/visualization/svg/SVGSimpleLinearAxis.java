@@ -28,6 +28,7 @@ import elki.visualization.css.CSSClass;
 import elki.visualization.css.CSSClassManager;
 import elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import elki.visualization.style.StyleLibrary;
+
 import net.jafama.FastMath;
 
 /**
@@ -184,7 +185,7 @@ public final class SVGSimpleLinearAxis {
       int sw = 1;
       { // Compute how many ticks to draw
         int numticks = (int) ((scale.getMax() - scale.getMin()) / scale.getRes());
-        double tlen = FastMath.sqrt(tx * tx + ty * ty);
+        double tlen = Math.sqrt(tx * tx + ty * ty);
         double minl = 10 * style.getLineWidth(StyleLibrary.AXIS_TICK);
         // Try proper divisors first.
         if(sw * tlen / numticks < minl) {

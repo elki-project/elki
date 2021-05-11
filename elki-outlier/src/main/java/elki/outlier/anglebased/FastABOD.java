@@ -52,8 +52,6 @@ import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Fast-ABOD (approximateABOF) version of
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
@@ -173,7 +171,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           double numerator = simBC - simAB - simAC + simAA;
           if(squared) {
             double div = 1. / (dAB * dAC);
-            s.put(numerator * div, FastMath.sqrt(div));
+            s.put(numerator * div, Math.sqrt(div));
           }
           else {
             double sqrtdiv = 1. / (dAB * dAC);
@@ -242,7 +240,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           double simBC = kernelMatrix.getSimilarity(iB, iC);
           double numerator = simBC - simAB - simAC + simAA;
           double div = 1. / (sqdAB * sqdAC);
-          s.put(numerator * div, FastMath.sqrt(div));
+          s.put(numerator * div, Math.sqrt(div));
         }
       }
       final double abof = s.getCount() > 0 ? s.getPopulationVariance() : Double.POSITIVE_INFINITY;

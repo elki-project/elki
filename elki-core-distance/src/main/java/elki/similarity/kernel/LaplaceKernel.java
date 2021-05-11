@@ -23,11 +23,12 @@ package elki.similarity.kernel;
 import elki.data.NumberVector;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.similarity.AbstractVectorSimilarity;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -60,7 +61,7 @@ public class LaplaceKernel extends AbstractVectorSimilarity {
       final double v = o1.doubleValue(i) - o2.doubleValue(i);
       sim += v * v;
     }
-    return FastMath.exp(mgamma * FastMath.sqrt(sim));
+    return FastMath.exp(mgamma * Math.sqrt(sim));
   }
 
   /**

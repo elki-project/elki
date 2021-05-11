@@ -25,8 +25,6 @@ import java.util.Arrays;
 import elki.utilities.datastructures.KuhnMunkresStern;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * The Pair Sets Index calculates an index based on the maximum matching of
  * relative cluster sizes by the Hungarian algorithm.
@@ -97,7 +95,7 @@ public class PairSetsIndex {
     Arrays.sort(secondlevelOrder);
 
     double e = 0;
-    int minlength = FastMath.min(rowlen, collen);
+    int minlength = Math.min(rowlen, collen);
     for(int i = 0; i < minlength; i++) {
       e += (firstlevelOrder[i] * secondlevelOrder[i] / (double) cont[rowlen][collen]) / Math.max(firstlevelOrder[i], secondlevelOrder[i]);
     }

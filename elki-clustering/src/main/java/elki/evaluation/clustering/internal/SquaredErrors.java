@@ -38,13 +38,11 @@ import elki.result.EvaluationResult;
 import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Evaluate a clustering by reporting the squared errors (SSE, SSQ), as used by
@@ -138,14 +136,14 @@ public class SquaredErrors implements Evaluator {
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".mean", sum / div));
       LOG.statistics(new DoubleStatistic(key + ".ssq", ssq));
-      LOG.statistics(new DoubleStatistic(key + ".rmsd", FastMath.sqrt(ssq / div)));
+      LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / div)));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
-    g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("RMSD", Math.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
     if(!Metadata.hierarchyOf(c).addChild(ev)) {
       Metadata.of(ev).notifyChanged();
     }

@@ -26,7 +26,10 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.datastore.*;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDataStore;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
@@ -39,8 +42,6 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Yin-Yang k-Means Clustering. This approach has one bound for each group of
@@ -439,8 +440,8 @@ public class YinYangKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
             }
           }
           // For the triangle inequality, we need Euclidean not squared
-          min1 = isSquared ? FastMath.sqrt(min1) : min1;
-          min2 = min2 < Double.POSITIVE_INFINITY ? (isSquared ? FastMath.sqrt(min2) : min2) : min1;
+          min1 = isSquared ? Math.sqrt(min1) : min1;
+          min2 = min2 < Double.POSITIVE_INFINITY ? (isSquared ? Math.sqrt(min2) : min2) : min1;
 
           if(min1 < min) {
             if(globalindex != -1) {

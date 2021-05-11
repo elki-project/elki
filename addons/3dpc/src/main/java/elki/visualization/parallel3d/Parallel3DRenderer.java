@@ -48,6 +48,7 @@ import elki.visualization.style.ClassStylingPolicy;
 import elki.visualization.style.StyleLibrary;
 import elki.visualization.style.StylingPolicy;
 import elki.visualization.svg.SVGUtil;
+
 import net.jafama.FastMath;
 
 /**
@@ -493,7 +494,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
         sin = FastMath.sin(shared.camera.getRotationZ());
 
     shared.textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    float defaultscale = .01f / (float) FastMath.sqrt(shared.dim);
+    float defaultscale = .01f / (float) Math.sqrt(shared.dim);
     final float targetwidth = .2f; // TODO: div depth?
     final float minratio = 8.f; // Assume all text is at least this width
     for(int i = 0; i < shared.dim; i++) {

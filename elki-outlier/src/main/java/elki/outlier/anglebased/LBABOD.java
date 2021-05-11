@@ -53,8 +53,6 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-import net.jafama.FastMath;
-
 /**
  * LB-ABOD (lower-bound) version of
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
@@ -148,7 +146,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
         double sqdAB = simAA + simBB - simAB - simAB;
         sqDists.putDouble(pB, sqdAB);
         final double isqdAB = 1. / sqdAB;
-        sumid += FastMath.sqrt(isqdAB);
+        sumid += Math.sqrt(isqdAB);
         sumisqd += isqdAB;
         // Update heap
         nn.insert(sqdAB, pB);
@@ -179,7 +177,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
           double simBC = kernelMatrix.getSimilarity(iB, iC);
           double numerator = simBC - simAB - simAC + simAA;
           double sqweight = 1. / (sqdAB * sqdAC);
-          double weight = FastMath.sqrt(sqweight);
+          double weight = Math.sqrt(sqweight);
           double val = numerator * sqweight;
           nnsum += val * weight;
           nnsumsq += val * val * weight;

@@ -26,8 +26,6 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleListParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Weighted Euclidean distance for {@link NumberVector}s.
  * <p>
@@ -115,12 +113,12 @@ public class WeightedEuclideanDistance extends WeightedLPNormDistance {
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return FastMath.sqrt(agg);
+    return Math.sqrt(agg);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return FastMath.sqrt(preNorm(v, 0, v.getDimensionality()));
+    return Math.sqrt(preNorm(v, 0, v.getDimensionality()));
   }
 
   @Override
@@ -142,7 +140,7 @@ public class WeightedEuclideanDistance extends WeightedLPNormDistance {
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return FastMath.sqrt(agg);
+    return Math.sqrt(agg);
   }
 
   /**

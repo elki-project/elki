@@ -250,7 +250,7 @@ public class OUTRES implements OutlierAlgorithm {
    * @return relevance test result
    */
   protected boolean relevantSubspace(long[] subspace, DoubleDBIDList neigh, KernelDensityEstimator kernel) {
-    final double crit = K_S_CRITICAL001 / FastMath.sqrt(neigh.size() - 2);
+    final double crit = K_S_CRITICAL001 / Math.sqrt(neigh.size() - 2);
 
     double[] data = new double[neigh.size()];
     Relation<? extends NumberVector> relation = kernel.relation;

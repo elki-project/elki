@@ -27,12 +27,11 @@ import elki.database.query.distance.SpatialPrimitiveDistanceSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.distance.AbstractNumberVectorDistance;
 import elki.distance.SpatialPrimitiveDistance;
-import elki.similarity.NormalizedPrimitiveSimilarity;
 import elki.math.MathUtil;
+import elki.similarity.NormalizedPrimitiveSimilarity;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Hellinger metric / affinity / kernel, Bhattacharyya coefficient, fidelity
@@ -135,7 +134,7 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
       final double v1 = fv1.doubleValue(d), v2 = fv2.doubleValue(d);
       assert (v1 >= 0 && v2 >= 0) : NON_NEGATIVE;
       if(v1 != v2) {
-        final double v = FastMath.sqrt(v1) - FastMath.sqrt(v2);
+        final double v = Math.sqrt(v1) - Math.sqrt(v2);
         agg += v * v;
       }
     }
@@ -149,7 +148,7 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
       assert (v2 >= 0) : NON_NEGATIVE;
       agg += v2;
     }
-    return MathUtil.SQRTHALF * FastMath.sqrt(agg);
+    return MathUtil.SQRTHALF * Math.sqrt(agg);
   }
 
   @Override
@@ -162,11 +161,11 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       assert (min1 >= 0 && min2 >= 0) : NON_NEGATIVE;
       if(max1 < min2) {
-        final double v = FastMath.sqrt(max1) - FastMath.sqrt(min2);
+        final double v = Math.sqrt(max1) - Math.sqrt(min2);
         agg += v * v;
       }
       else if(max2 < min1) {
-        final double v = FastMath.sqrt(max2) - FastMath.sqrt(min1);
+        final double v = Math.sqrt(max2) - Math.sqrt(min1);
         agg += v * v;
       }
     }
@@ -180,7 +179,7 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
       assert (min2 >= 0) : NON_NEGATIVE;
       agg += min2;
     }
-    return MathUtil.SQRTHALF * FastMath.sqrt(agg);
+    return MathUtil.SQRTHALF * Math.sqrt(agg);
   }
 
   @Override
@@ -191,7 +190,7 @@ public class HellingerDistance extends AbstractNumberVectorDistance implements S
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
       final double v1 = o1.doubleValue(d), v2 = o2.doubleValue(d);
-      agg += v1 == v2 ? (v1 > 0 ? v1 : -v1) : (v1 == 0 || v2 == 0) ? 0. : FastMath.sqrt(v1 * v2);
+      agg += v1 == v2 ? (v1 > 0 ? v1 : -v1) : (v1 == 0 || v2 == 0) ? 0. : Math.sqrt(v1 * v2);
     }
     return agg;
   }

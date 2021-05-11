@@ -24,8 +24,6 @@ import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Minimum increase in variance (MIVAR) linkage.
  * <p>
@@ -86,7 +84,7 @@ public class MinimumVarianceLinkage implements Linkage {
 
   @Override
   public double restore(double d, boolean issquare) {
-    return issquare ? 4. * d : FastMath.sqrt(4. * d);
+    return issquare ? 4. * d : Math.sqrt(4. * d);
   }
 
   @Override

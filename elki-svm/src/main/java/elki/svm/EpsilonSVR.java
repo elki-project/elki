@@ -8,8 +8,6 @@ import elki.svm.qmatrix.QMatrix;
 import elki.svm.qmatrix.SVR_Q;
 import elki.svm.solver.Solver;
 
-import net.jafama.FastMath;
-
 public class EpsilonSVR extends AbstractSVR {
   private static final Logging LOG = Logging.getLogger(EpsilonSVR.class);
 
@@ -42,7 +40,7 @@ public class EpsilonSVR extends AbstractSVR {
     double sum_alpha = 0;
     for(int i = 0; i < l; i++) {
       si.alpha[i] = alpha2[i] - alpha2[i + l];
-      sum_alpha += FastMath.abs(si.alpha[i]);
+      sum_alpha += Math.abs(si.alpha[i]);
     }
     LOG.verbose("nu = " + (sum_alpha / (C * l)));
     return si;

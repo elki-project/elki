@@ -38,8 +38,6 @@ import elki.math.linearalgebra.VMath;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Annulus k-means algorithm. A variant of Hamerly with an additional bound,
  * based on comparing the norm of the mean and the norm of the points.
@@ -164,8 +162,8 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         assignment.putInt(it, minIndex);
         second.putInt(it, secIndex);
         plusEquals(sums[minIndex], fv);
-        upper.putDouble(it, isSquared ? FastMath.sqrt(min1) : min1);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(min2) : min2);
+        upper.putDouble(it, isSquared ? Math.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? Math.sqrt(min2) : min2);
       }
       return relation.size();
     }
@@ -207,13 +205,13 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         // Update the upper bound
         NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
-        upper.putDouble(it, u = isSquared ? FastMath.sqrt(curd2) : curd2);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
         final int sec = second.intValue(it);
         double secd2 = distance(fv, means[sec]);
-        double secd = isSquared ? FastMath.sqrt(secd2) : secd2;
+        double secd = isSquared ? Math.sqrt(secd2) : secd2;
         double r = u > secd ? u : secd;
         final double norm = EuclideanDistance.STATIC.norm(fv);
         // Find closest center, and distance to two closest centers
@@ -257,9 +255,9 @@ public class AnnulusKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
           second.putInt(it, secIndex);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
       }
       return changed;
     }

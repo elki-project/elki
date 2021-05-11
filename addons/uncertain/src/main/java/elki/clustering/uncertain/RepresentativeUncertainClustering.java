@@ -66,8 +66,6 @@ import elki.utilities.optionhandling.parameters.*;
 import elki.utilities.pairs.DoubleObjPair;
 import elki.utilities.random.RandomFactory;
 
-import net.jafama.FastMath;
-
 /**
  * Representative clustering of uncertain data.
  * <p>
@@ -208,7 +206,9 @@ public class RepresentativeUncertainClustering implements ClusteringAlgorithm<Cl
     mat.initialize();
     Metadata.hierarchyOf(crel).addChild(mat);
     Clustering<?> c = metaAlgorithm.autorun(new ProxyDatabase(rids, crel));
-    Metadata.hierarchyOf(new ProxyDatabase(rids, crel)).removeChild(c); // Detach from database
+    Metadata.hierarchyOf(new ProxyDatabase(rids, crel)).removeChild(c); // Detach
+                                                                        // from
+                                                                        // database
 
     // "Result" to group or representative results
     Object reps = new Object();
@@ -281,7 +281,7 @@ public class RepresentativeUncertainClustering implements ClusteringAlgorithm<Cl
   private double computeConfidence(int support, int samples) {
     final double z = NormalDistribution.standardNormalQuantile(alpha);
     final double eprob = support / (double) samples;
-    return Math.max(0., eprob - z * FastMath.sqrt((eprob * (1 - eprob)) / samples));
+    return Math.max(0., eprob - z * Math.sqrt((eprob * (1 - eprob)) / samples));
   }
 
   /**

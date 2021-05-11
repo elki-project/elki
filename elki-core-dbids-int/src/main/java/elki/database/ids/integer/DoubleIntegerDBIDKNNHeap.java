@@ -27,8 +27,6 @@ import elki.database.ids.DoubleDBIDIter;
 import elki.database.ids.KNNHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 
-import net.jafama.FastMath;
-
 /**
  * Class to efficiently manage a kNN heap.
  *
@@ -183,13 +181,13 @@ class DoubleIntegerDBIDKNNHeap extends DoubleIntegerDBIDHeap implements KNNHeap 
     final int hsize = super.size();
     DoubleIntegerDBIDKNNList ret = new DoubleIntegerDBIDKNNList(k, hsize + numties);
     // Add ties:
-    double kdist = numties > 0 ? FastMath.sqrt(this.kdist) : 0.;
+    double kdist = numties > 0 ? Math.sqrt(this.kdist) : 0.;
     for(int i = 0; i < numties; i++) {
       ret.dists[hsize + i] = kdist;
       ret.ids[hsize + i] = ties[i];
     }
     for(int j = hsize - 1; j >= 0; j--) {
-      ret.dists[j] = FastMath.sqrt(super.peekKey());
+      ret.dists[j] = Math.sqrt(super.peekKey());
       ret.ids[j] = super.internalGetIndex();
       super.poll();
     }

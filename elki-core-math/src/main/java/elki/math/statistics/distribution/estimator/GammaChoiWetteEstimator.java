@@ -24,6 +24,7 @@ import elki.math.statistics.distribution.GammaDistribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -77,7 +78,7 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
     // Initial approximation
     final double logmeanx = (meanx > 0) ? FastMath.log(meanx) : meanlogx;
     final double diff = logmeanx - meanlogx;
-    double k = (3 - diff + FastMath.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
+    double k = (3 - diff + Math.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
 
     // Refine via newton iteration, based on Choi and Wette equation
     while(true) {

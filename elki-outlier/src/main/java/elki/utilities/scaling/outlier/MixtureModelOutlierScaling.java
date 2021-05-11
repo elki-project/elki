@@ -176,7 +176,7 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
         break;
       }
       double newMu = owsum / otisum;
-      double newSigma = Math.max(FastMath.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
       double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
       double newAlpha = otisum / ids.size();
       // converged?
@@ -252,7 +252,7 @@ public class MixtureModelOutlierScaling implements OutlierScaling {
         break;
       }
       double newMu = owsum / otisum;
-      double newSigma = Math.max(FastMath.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
       double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
       double newAlpha = otisum / size;
       // converged?

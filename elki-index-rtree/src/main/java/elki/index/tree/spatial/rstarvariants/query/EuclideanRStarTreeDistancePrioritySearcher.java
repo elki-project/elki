@@ -30,8 +30,6 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 
-import net.jafama.FastMath;
-
 /**
  * Instance of priority search for a particular spatial index.
  *
@@ -179,19 +177,19 @@ public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialCompara
 
   @Override
   public double getLowerBound() {
-    return mindist < 0 ? (mindist = FastMath.sqrt(mindist)) : mindist;
+    return mindist < 0 ? (mindist = Math.sqrt(mindist)) : mindist;
   }
 
   @Override
   public double allLowerBound() {
-    return mindist < 0 ? (mindist = FastMath.sqrt(mindist)) : mindist;
+    return mindist < 0 ? (mindist = Math.sqrt(mindist)) : mindist;
   }
 
   @Override
   public double computeExactDistance() {
     assert valid();
     tree.statistics.countDistanceCalculation();
-    return FastMath.sqrt(SQUARED.minDist(query, node.getEntry(childnr)));
+    return Math.sqrt(SQUARED.minDist(query, node.getEntry(childnr)));
   }
 
   @Override

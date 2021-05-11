@@ -28,12 +28,10 @@ import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -92,7 +90,7 @@ public class SqrtStandardDeviationScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    return value <= mean ? 0 : Math.max(0, NormalDistribution.erf((FastMath.sqrt(value - min) - mean) / factor));
+    return value <= mean ? 0 : Math.max(0, NormalDistribution.erf((Math.sqrt(value - min) - mean) / factor));
   }
 
   @Override
@@ -102,7 +100,7 @@ public class SqrtStandardDeviationScaling implements OutlierScaling {
       MeanVarianceMinMax mv = new MeanVarianceMinMax();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         final double val = scores.doubleValue(id);
-        mv.put(val <= min ? 0 : FastMath.sqrt(val - min));
+        mv.put(val <= min ? 0 : Math.sqrt(val - min));
       }
       min = Double.isNaN(pmin) ? mv.getMin() : pmin;
       mean = mv.getMean();
@@ -114,11 +112,11 @@ public class SqrtStandardDeviationScaling implements OutlierScaling {
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.doubleValue(id);
         mm = Math.min(mm, val);
-        val = (val <= min ? 0 : FastMath.sqrt(val - min)) - mean;
+        val = (val <= min ? 0 : Math.sqrt(val - min)) - mean;
         sqsum += val * val;
       }
       min = Double.isNaN(pmin) ? mm : pmin;
-      factor = plambda * FastMath.sqrt(sqsum / scores.size()) * MathUtil.SQRT2;
+      factor = plambda * Math.sqrt(sqsum / scores.size()) * MathUtil.SQRT2;
     }
   }
 
@@ -129,7 +127,7 @@ public class SqrtStandardDeviationScaling implements OutlierScaling {
       final int size = adapter.size(array);
       for(int i = 0; i < size; i++) {
         final double val = adapter.getDouble(array, i);
-        mv.put(val <= min ? 0 : FastMath.sqrt(val - min));
+        mv.put(val <= min ? 0 : Math.sqrt(val - min));
       }
       min = Double.isNaN(pmin) ? mv.getMin() : pmin;
       mean = mv.getMean();
@@ -142,11 +140,11 @@ public class SqrtStandardDeviationScaling implements OutlierScaling {
       for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
         mm = Math.min(mm, val);
-        val = (val <= min ? 0 : FastMath.sqrt(val - min)) - mean;
+        val = (val <= min ? 0 : Math.sqrt(val - min)) - mean;
         sqsum += val * val;
       }
       min = Double.isNaN(pmin) ? mm : pmin;
-      factor = plambda * FastMath.sqrt(sqsum / size) * MathUtil.SQRT2;
+      factor = plambda * Math.sqrt(sqsum / size) * MathUtil.SQRT2;
     }
   }
 

@@ -24,8 +24,6 @@ import elki.math.MeanVariance;
 import elki.math.statistics.distribution.BetaDistribution;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Calculates a test statistic according to Welch's t test for two samples
  * Supplies methods for calculating the degrees of freedom according to the
@@ -62,7 +60,7 @@ public class WelchTTest implements GoodnessOfFitTest {
     double mean2 = mv.reset().put(sample2).getMean();
     double avgvar2 = mv.getSampleVariance() / sample2.length;
     // Welch t-statistic:
-    double t = (mean1 - mean2) / FastMath.sqrt(avgvar1 + avgvar2);
+    double t = (mean1 - mean2) / Math.sqrt(avgvar1 + avgvar2);
     // Degrees of freedom using Welch-Satterthwaite:
     double wvariance = avgvar1 + avgvar2;
     double v = Math.round(wvariance * wvariance / //

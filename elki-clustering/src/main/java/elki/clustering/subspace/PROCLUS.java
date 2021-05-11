@@ -57,8 +57,6 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.pairs.Pair;
 import elki.utilities.random.RandomFactory;
 
-import net.jafama.FastMath;
-
 /**
  * The PROCLUS algorithm, an algorithm to find subspace clusters in high
  * dimensional spaces.
@@ -457,7 +455,7 @@ public class PROCLUS extends AbstractProjectedClustering<Clustering<SubspaceMode
         sigma_i += diff * diff;
       }
       sigma_i /= (dim - 1);
-      sigma_i = FastMath.sqrt(sigma_i);
+      sigma_i = Math.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
         z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));

@@ -20,15 +20,7 @@
  */
 package elki.visualization.visualizers.scatterplot.cluster;
 
-import static elki.math.linearalgebra.VMath.minus;
-import static elki.math.linearalgebra.VMath.minusTimes;
-import static elki.math.linearalgebra.VMath.normalize;
-import static elki.math.linearalgebra.VMath.plus;
-import static elki.math.linearalgebra.VMath.plusEquals;
-import static elki.math.linearalgebra.VMath.plusTimes;
-import static elki.math.linearalgebra.VMath.times;
-import static elki.math.linearalgebra.VMath.timesEquals;
-import static elki.math.linearalgebra.VMath.transpose;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -66,7 +58,6 @@ import elki.visualization.svg.SVGPath;
 import elki.visualization.svg.SVGUtil;
 import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import net.jafama.FastMath;
 
 /**
  * Visualizer for generating SVG-Elements containing ellipses for first, second
@@ -234,7 +225,7 @@ public class EMClusterVisualization implements VisFactory {
         // Projected eigenvectors:
         double[][] pc = new double[eigenvalues.length][];
         for(int i = 0; i < eigenvalues.length; i++) {
-          pc[i] = proj.fastProjectRelativeDataToRenderSpace(times(eigenvectors[i], FastMath.sqrt(eigenvalues[i])));
+          pc[i] = proj.fastProjectRelativeDataToRenderSpace(times(eigenvectors[i], Math.sqrt(eigenvalues[i])));
         }
         if(drawStyle != 0 || eigenvalues.length == 2) {
           drawSphere2D(sname, cent, pc);
@@ -361,7 +352,7 @@ public class EMClusterVisualization implements VisFactory {
         }
         plusEquals(diag, pc[j]);
       }
-      timesEquals(diag, 1.0 / FastMath.sqrt(pc.length));
+      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
       hull.add(diag);
       hull.add(times(diag, -1));
 
@@ -407,7 +398,7 @@ public class EMClusterVisualization implements VisFactory {
         }
         plusEquals(diag, pc[j]);
       }
-      timesEquals(diag, 1.0 / FastMath.sqrt(pc.length));
+      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
       hull.add(diag);
       hull.add(times(diag, -1));
       return hull.getHull();

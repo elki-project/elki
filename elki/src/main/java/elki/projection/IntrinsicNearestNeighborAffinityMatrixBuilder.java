@@ -148,7 +148,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
       double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
           pij[ix.getOffset()] = new double[dists.size()]);
       if(mv != null) {
-        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
+        mv.put(beta > 0 ? Math.sqrt(.5 / beta) : 0.); // Sigma
       }
       indices[ix.getOffset()] = inds.toArray();
       LOG.incrementProcessed(prog);
@@ -169,7 +169,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
         assert (i != j);
         int offj = containsIndex(indices[j], i);
         if(offj >= 0) { // Found
-          sum += FastMath.sqrt(pij_i[offi] * pij[j][offj]);
+          sum += Math.sqrt(pij_i[offi] * pij[j][offj]);
         }
       }
     }
@@ -184,7 +184,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
           assert (indices[j][offj] == i);
           // Exploit symmetry:
           if(i < j) {
-            final double val = FastMath.sqrt(pij_i[offi] * pij[j][offj]); // Symmetrize
+            final double val = Math.sqrt(pij_i[offi] * pij[j][offj]); // Symmetrize
             pij_i[offi] = pij[j][offj] = MathUtil.max(val * scale, MIN_PIJ);
           }
         }

@@ -25,8 +25,6 @@ import elki.data.VectorUtil;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Cosine distance function for <em>unit length</em> feature vectors using the
  * square root.
@@ -70,13 +68,13 @@ public class SqrtCosineUnitlengthDistance extends CosineUnitlengthDistance {
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = VectorUtil.dot(v1, v2);
-    return (d <= 1) ? FastMath.sqrt(2 - 2 * d) : 0;
+    return (d <= 1) ? Math.sqrt(2 - 2 * d) : 0;
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = VectorUtil.minDot(mbr1, mbr2);
-    return (d <= 1) ? FastMath.sqrt(2 - 2 * d) : 0;
+    return (d <= 1) ? Math.sqrt(2 - 2 * d) : 0;
   }
 
   @Override

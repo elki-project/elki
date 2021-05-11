@@ -243,7 +243,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
           sqsum += v * v;
         }
         sqsum /= data.length;
-        return new double[] { avg, FastMath.sqrt(sqsum) };
+        return new double[] { avg, Math.sqrt(sqsum) };
       }
 
       @Override
@@ -271,7 +271,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
           sqsum += v * v;
         }
         sqsum /= data.length;
-        return new double[] { avg, FastMath.sqrt(sqsum), min, max };
+        return new double[] { avg, Math.sqrt(sqsum), min, max };
       }
 
       @Override

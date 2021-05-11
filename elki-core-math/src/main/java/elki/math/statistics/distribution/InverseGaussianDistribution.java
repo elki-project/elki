@@ -113,7 +113,7 @@ public class InverseGaussianDistribution implements Distribution {
   public double nextRandom(Random random) {
     double v = random.nextGaussian();
     v *= v;
-    double x = mean + mean * .5 / shape * (mean * v - FastMath.sqrt(4. * mean * shape * v + mean * mean * v * v));
+    double x = mean + mean * .5 / shape * (mean * v - Math.sqrt(4. * mean * shape * v + mean * mean * v * v));
     double u = random.nextDouble();
     if(u * (mean + x) <= mean) {
       return x;
@@ -141,7 +141,7 @@ public class InverseGaussianDistribution implements Distribution {
       return x == x ? 0 : Double.NaN;
     }
     final double v = (x - mu) / mu;
-    double t1 = FastMath.sqrt(shape / (MathUtil.TWOPI * x * x * x));
+    double t1 = Math.sqrt(shape / (MathUtil.TWOPI * x * x * x));
     return t1 > 0 ? t1 * FastMath.exp(-shape * v * v * .5 / x) : 0;
   }
 
@@ -175,7 +175,7 @@ public class InverseGaussianDistribution implements Distribution {
     }
     // TODO: accelerate by caching exp(2 * shape / mu).
     final double v0 = x / mu;
-    final double v1 = FastMath.sqrt(shape / x);
+    final double v1 = Math.sqrt(shape / x);
     if(v1 == 0.) {
       return v0 > 0. ? 1 : 0.;
     }

@@ -67,8 +67,6 @@ import elki.utilities.scaling.outlier.OutlierLinearScaling;
 import elki.utilities.scaling.outlier.OutlierScaling;
 import elki.workflow.OutputStep;
 
-import net.jafama.FastMath;
-
 /**
  * Class to handle KML output.
  * <p>
@@ -393,7 +391,7 @@ public class KMLOutputHandler implements ResultHandler {
         double hullarea = SpatialUtil.volume(pair.second);
         final double relativeArea = Math.max(1. - (hullarea / projarea), 0.);
         // final double relativeSize = pair.first / coords.size();
-        final double opacity = .65 * FastMath.sqrt(relativeArea) + .1;
+        final double opacity = .65 * Math.sqrt(relativeArea) + .1;
         xmlw.writeStartElement("Style");
         xmlw.writeAttribute("id", "s" + i);
         writeNewlineOnDebug(xmlw);

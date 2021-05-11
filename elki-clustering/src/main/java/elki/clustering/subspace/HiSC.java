@@ -52,8 +52,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Implementation of the HiSC algorithm, an algorithm for detecting hierarchies
  * of subspace clusters.
@@ -319,7 +317,7 @@ public class HiSC implements GeneralizedOPTICS {
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   @Override

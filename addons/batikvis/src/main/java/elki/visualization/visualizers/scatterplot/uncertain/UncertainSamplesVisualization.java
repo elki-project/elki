@@ -49,8 +49,6 @@ import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.Visualization;
 import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
-import net.jafama.FastMath;
-
 /**
  * Visualize uncertain objects by multiple samples.
  *
@@ -146,7 +144,7 @@ public class UncertainSamplesVisualization implements VisFactory {
       final StyleLibrary style = context.getStyleLibrary();
       final StylingPolicy spol = context.getStylingPolicy();
       final double size = style.getSize(StyleLibrary.MARKERPLOT);
-      final double ssize = size / FastMath.sqrt(samples);
+      final double ssize = size / Math.sqrt(samples);
       final MarkerLibrary ml = style.markers();
 
       Random rand = random.getSingleThreadedRandom();
@@ -203,7 +201,7 @@ public class UncertainSamplesVisualization implements VisFactory {
      */
     private void drawDiscete(DiscreteUncertainObject uo, MarkerLibrary ml, int cnum, double size) {
       final int e = uo.getNumberSamples();
-      final double ssize = size * FastMath.sqrt(e);
+      final double ssize = size * Math.sqrt(e);
       for(int i = 0; i < e; i++) {
         final NumberVector s = uo.getSample(i);
         if(s == null) {
@@ -250,7 +248,7 @@ public class UncertainSamplesVisualization implements VisFactory {
      */
     private void drawDiscreteDefault(DiscreteUncertainObject uo, int col, double size) {
       final int e = uo.getNumberSamples();
-      final double ssize = size * FastMath.sqrt(e);
+      final double ssize = size * Math.sqrt(e);
       for(int i = 0; i < e; i++) {
         final NumberVector s = uo.getSample(i);
         if(s == null) {

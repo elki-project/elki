@@ -24,7 +24,6 @@ import java.util.Arrays;
 
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import net.jafama.FastMath;
 
 /**
  * Class providing basic vector mathematics, for low-level vectors stored as
@@ -680,7 +679,7 @@ public final class VMath {
    * @return Euclidean length of this vector
    */
   public static double euclideanLength(final double[] v1) {
-    return FastMath.sqrt(squareSum(v1));
+    return Math.sqrt(squareSum(v1));
   }
 
   /**
@@ -1577,7 +1576,7 @@ public final class VMath {
         norm += v * v;
       }
       if(norm > 0) {
-        norm = FastMath.sqrt(norm);
+        norm = Math.sqrt(norm);
         for(int row = 0; row < m1.length; row++) {
           m1[row][col] /= norm;
         }
@@ -1693,7 +1692,7 @@ public final class VMath {
       }
     }
     // TODO: detect overflow, fall back to slower hypot()
-    return FastMath.sqrt(f);
+    return Math.sqrt(f);
   }
 
   /**
@@ -1847,7 +1846,7 @@ public final class VMath {
       final double r2 = v2[k];
       e2 += r2 * r2;
     }
-    double a = FastMath.sqrt((s / e1) * (s / e2));
+    double a = Math.sqrt((s / e1) * (s / e2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -1884,7 +1883,7 @@ public final class VMath {
       final double r2 = v2[k] - ok;
       e2 += r2 * r2;
     }
-    double a = FastMath.sqrt((s / e1) * (s / e2));
+    double a = Math.sqrt((s / e1) * (s / e2));
     return (a < 1.) ? a : 1.;
   }
 }

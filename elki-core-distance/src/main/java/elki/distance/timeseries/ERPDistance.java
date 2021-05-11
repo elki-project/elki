@@ -28,7 +28,6 @@ import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import net.jafama.FastMath;
 
 /**
  * Edit Distance With Real Penalty distance for numerical vectors.
@@ -120,7 +119,7 @@ public class ERPDistance extends DTWDistance {
     }
 
     // TODO: support Euclidean, Manhattan here:
-    return FastMath.sqrt(buf[cur + dim2 - 1]);
+    return Math.sqrt(buf[cur + dim2 - 1]);
   }
 
   @Override

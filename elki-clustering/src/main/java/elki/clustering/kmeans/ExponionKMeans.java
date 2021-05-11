@@ -30,8 +30,6 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Newlings's Exponion k-means algorithm, exploiting the triangle inequality.
  * <p>
@@ -144,8 +142,8 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         clusters.get(minIndex).add(it);
         assignment.putInt(it, minIndex);
         plusEquals(sums[minIndex], fv);
-        upper.putDouble(it, isSquared ? FastMath.sqrt(min1) : min1);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(min2) : min2);
+        upper.putDouble(it, isSquared ? Math.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? Math.sqrt(min2) : min2);
       }
       return relation.size();
     }
@@ -167,7 +165,7 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         // Update the upper bound
         NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
-        upper.putDouble(it, u = isSquared ? FastMath.sqrt(curd2) : curd2);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
@@ -197,9 +195,9 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
           assignment.putInt(it, cur);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
       }
       return changed;
     }

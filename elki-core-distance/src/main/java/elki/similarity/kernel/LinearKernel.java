@@ -24,7 +24,6 @@ import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.utilities.Priority;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Linear Kernel function that computes a similarity between the two feature
@@ -58,7 +57,7 @@ public class LinearKernel extends PolynomialKernel {
 
   @Override
   public double distance(final NumberVector fv1, final NumberVector fv2) {
-    return FastMath.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
+    return Math.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
   }
 
   /**

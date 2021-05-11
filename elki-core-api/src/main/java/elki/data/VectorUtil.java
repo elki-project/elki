@@ -27,8 +27,8 @@ import elki.data.spatial.SpatialComparable;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
 import elki.utilities.datastructures.BitsUtil;
+
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
-import net.jafama.FastMath;
 
 /**
  * Utility functions for use with vectors.
@@ -118,7 +118,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            FastMath.sqrt((cross / l1) * (cross / l2));
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -167,7 +167,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            FastMath.sqrt((cross / l1) * (cross / l2));
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -213,7 +213,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            FastMath.sqrt((cross / l1) * (cross / l2));
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -295,7 +295,7 @@ public final class VectorUtil {
     final double cross = Math.max(Math.abs(s1), Math.abs(s2));
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            FastMath.sqrt((cross / l1) * (cross / l2));
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -336,7 +336,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            FastMath.sqrt((cross / l1) * (cross / l2));
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 

@@ -50,7 +50,6 @@ import elki.utilities.exceptions.InconsistentDataException;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.jafama.FastMath;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
@@ -267,7 +266,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
       }
     }
     // Generate candidates of length 2.
-    List<SparseItemset> frequent = new ArrayList<>(f1 * (int) FastMath.sqrt(f1));
+    List<SparseItemset> frequent = new ArrayList<>(f1 * (int) Math.sqrt(f1));
     for(ObjectIterator<Long2IntMap.Entry> iter = map.long2IntEntrySet().fastIterator(); iter.hasNext();) {
       Long2IntMap.Entry entry = iter.next();
       if(entry.getIntValue() >= needed) {

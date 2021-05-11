@@ -52,8 +52,6 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
  * <p>
@@ -164,7 +162,7 @@ public class ABOD<V extends NumberVector> implements OutlierAlgorithm {
         double simBC = kernelMatrix.getSimilarity(pB, pC);
         double numerator = simBC - simAB - simAC + simAA;
         double div = 1. / (sqdAB * sqdAC);
-        s.put(numerator * div, FastMath.sqrt(div));
+        s.put(numerator * div, Math.sqrt(div));
       }
     }
     // Sample variance probably would be better here, but the ABOD publication

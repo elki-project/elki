@@ -71,7 +71,7 @@ public abstract class AbstractEarthModel implements EarthModel {
     this.f = f;
     this.invf = invf;
     this.esq = f * (2 - f);
-    this.e = FastMath.sqrt(esq);
+    this.e = Math.sqrt(esq);
   }
 
   @Override
@@ -101,7 +101,7 @@ public abstract class AbstractEarthModel implements EarthModel {
     final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
     final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
-    final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+    final double v = a / Math.sqrt(1 - esq * slat * slat);
     return new double[] { v * clat * clng, v * clat * slng, (1 - esq) * v * slat };
   }
 
@@ -112,7 +112,7 @@ public abstract class AbstractEarthModel implements EarthModel {
     final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
     final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
-    final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+    final double v = a / Math.sqrt(1 - esq * slat * slat);
     return new double[] { (v + h) * clat * clng, (v + h) * clat * slng, ((1 - esq) * v + h) * slat };
   }
 
@@ -123,14 +123,14 @@ public abstract class AbstractEarthModel implements EarthModel {
 
   @Override
   public double ecefToLatRad(double x, double y, double z) {
-    final double p = FastMath.sqrt(x * x + y * y);
+    final double p = Math.sqrt(x * x + y * y);
     double plat = FastMath.atan2(z, p * (1 - esq));
 
     // Iteratively improving the lat value
     // TODO: instead of a fixed number of iterations, check for convergence?
     for (int i = 0;; i++) {
       final double slat = FastMath.sin(plat);
-      final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+      final double v = a / Math.sqrt(1 - esq * slat * slat);
       final double lat = FastMath.atan2(z + esq * v * slat, p);
       if (Math.abs(lat - plat) < PRECISION || i > MAX_ITER) {
         return lat;
@@ -160,7 +160,7 @@ public abstract class AbstractEarthModel implements EarthModel {
   @Override
   public double[] ecefToLatLngRadHeight(double x, double y, double z) {
     double lng = FastMath.atan2(y, x);
-    final double p = FastMath.sqrt(x * x + y * y);
+    final double p = Math.sqrt(x * x + y * y);
     double plat = FastMath.atan2(z, p * (1 - esq));
     double h = 0;
 
@@ -168,7 +168,7 @@ public abstract class AbstractEarthModel implements EarthModel {
     // TODO: instead of a fixed number of iterations, check for convergence?
     for (int i = 0;; i++) {
       final double slat = FastMath.sin(plat);
-      final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+      final double v = a / Math.sqrt(1 - esq * slat * slat);
       double lat = FastMath.atan2(z + esq * v * slat, p);
       if (Math.abs(lat - plat) < PRECISION || i > MAX_ITER) {
         h = p / FastMath.cos(lat) - v;

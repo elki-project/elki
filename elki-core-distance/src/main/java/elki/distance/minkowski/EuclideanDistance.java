@@ -25,7 +25,6 @@ import elki.data.spatial.SpatialComparable;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Euclidean distance for {@link NumberVector}s.
@@ -120,12 +119,12 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return FastMath.sqrt(agg);
+    return Math.sqrt(agg);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return FastMath.sqrt(preNorm(v, 0, v.getDimensionality()));
+    return Math.sqrt(preNorm(v, 0, v.getDimensionality()));
   }
 
   @Override
@@ -147,7 +146,7 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return FastMath.sqrt(agg);
+    return Math.sqrt(agg);
   }
 
   /**
@@ -177,7 +176,7 @@ public class EuclideanDistance extends LPIntegerNormDistance {
       double delta = d1 > d2 ? d1 : d2;
       agg += delta * delta;
     }
-    return FastMath.sqrt(agg);
+    return Math.sqrt(agg);
   }
 
   @Override
