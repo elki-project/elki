@@ -20,23 +20,23 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.clustering.hierarchical.linkage.Linkage;
+import elki.clustering.hierarchical.linkage.GeometricLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
-import elki.clustering.hierarchical.linkage.MedianLinkage;
-import elki.clustering.hierarchical.linkage.CentroidLinkage;
-import elki.data.DoubleVector;
 import elki.data.NumberVector;
-import elki.database.ids.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.math.linearalgebra.VMath;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.EnumParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * NNchain clustering algorithm with linear Memory.
@@ -69,8 +69,8 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    *
    * @param linkage Linkage option; currently unused, only ward
    */
-  public LinearMemoryNNChain(GeometricLinkage geomlinkage, Linkage linkage) {
-    super(SquaredEuclideanDistance.STATIC, linkage);
+  public LinearMemoryNNChain(GeometricLinkage geomlinkage) {
+    super(SquaredEuclideanDistance.STATIC, geomlinkage);
     this.geometricLinkage = geomlinkage;
   }
 
@@ -222,67 +222,6 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
     return -1;
   }
 
-  public static enum GeometricLinkage {
-    WARD {
-      @Override
-      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
-        double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
-        return new DoubleVector(c);
-      }
-
-      @Override
-      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
-        return ((sizex * sizey) / (double) (sizex + sizey)) * SquaredEuclideanDistance.STATIC.distance(x, y);
-      }
-
-      @Override
-      public Linkage getAssociatedLinkage() {
-        return WardLinkage.STATIC;
-      }
-
-    },
-    MEDIAN_WPGMC {
-      @Override
-      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
-        double[] c = VMath.timesPlusTimes(y.toArray(), .5, x.toArray(), .5);
-        return new DoubleVector(c);
-      }
-
-      @Override
-      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
-        return SquaredEuclideanDistance.STATIC.distance(x, y);
-      }
-
-      @Override
-      public Linkage getAssociatedLinkage() {
-        return MedianLinkage.STATIC;
-      }
-    },
-    CENTROID_UPGMC {
-      @Override
-      public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
-        double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
-        return new DoubleVector(c);
-      }
-
-      @Override
-      public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
-        return SquaredEuclideanDistance.STATIC.distance(x, y);
-      }
-
-      @Override
-      public Linkage getAssociatedLinkage() {
-        return CentroidLinkage.STATIC;
-      }
-    };
-
-    public abstract NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y);
-
-    public abstract double distance(int sizex, int sizey, NumberVector x, NumberVector y);
-
-    public abstract Linkage getAssociatedLinkage();
-  }
-
   /**
    * Parameterization class.
    * 
@@ -292,7 +231,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    *
    * @param <O> Object type
    */
-  public static class Par<O extends NumberVector> extends AGNES.Par<O> {
+  public static class Par<O extends NumberVector> implements Parameterizer {
     /**
      * Option ID for geometric linkage parameter.
      */
@@ -301,21 +240,20 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
     /**
      * geometric linkage parameter.
      */
-    public static GeometricLinkage geomLinkage = GeometricLinkage.WARD;
+    public static GeometricLinkage geomLinkage = WardLinkage.STATIC;
 
     @Override
     public void configure(Parameterization config) {
-      new EnumParameter<GeometricLinkage>(GEOM_LINKAGE_ID, GeometricLinkage.class) //
-          .setDefaultValue(GeometricLinkage.WARD) //
+      new ObjectParameter<GeometricLinkage>(GEOM_LINKAGE_ID, GeometricLinkage.class) //
+          .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> {
             geomLinkage = x;
-            linkage = x.getAssociatedLinkage();
           });
     }
 
     @Override
     public LinearMemoryNNChain<O> make() {
-      return new LinearMemoryNNChain<>(geomLinkage, linkage);
+      return new LinearMemoryNNChain<>(geomLinkage);
     }
   }
 }

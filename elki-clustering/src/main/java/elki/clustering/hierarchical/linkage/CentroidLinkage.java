@@ -20,6 +20,10 @@
  */
 package elki.clustering.hierarchical.linkage;
 
+import elki.data.DoubleVector;
+import elki.data.NumberVector;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -69,7 +73,7 @@ import elki.utilities.optionhandling.Parameterizer;
     url = "https://doi.org/10.2307/2528417", //
     bibkey = "doi:10.2307/2528417")
 @Alias({ "centroid", "upgmc" })
-public class CentroidLinkage implements Linkage {
+public class CentroidLinkage implements Linkage, GeometricLinkage {
   /**
    * Static instance of class.
    */
@@ -91,6 +95,17 @@ public class CentroidLinkage implements Linkage {
     return (sizex * dx + sizey * dy - (sizex * sizey) * f * dxy) * f;
   }
 
+  @Override
+  public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
+    double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
+    return new DoubleVector(c);
+  }
+
+  @Override
+  public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
+    return SquaredEuclideanDistance.STATIC.distance(x, y);
+  }
+
   /**
    * Class parameterizer.
    * <p>
@@ -104,4 +119,5 @@ public class CentroidLinkage implements Linkage {
       return STATIC;
     }
   }
+
 }

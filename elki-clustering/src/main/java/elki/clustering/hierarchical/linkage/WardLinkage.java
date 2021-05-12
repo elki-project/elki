@@ -20,6 +20,10 @@
  */
 package elki.clustering.hierarchical.linkage;
 
+import elki.data.DoubleVector;
+import elki.data.NumberVector;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -87,7 +91,7 @@ import elki.utilities.optionhandling.Parameterizer;
     bibkey = "doi:10.2307/2528688")
 @Alias({ "ward", "MISSQ" })
 @Priority(Priority.IMPORTANT + 1)
-public class WardLinkage implements Linkage {
+public class WardLinkage implements Linkage, GeometricLinkage {
   /**
    * Static instance of class.
    */
@@ -116,6 +120,17 @@ public class WardLinkage implements Linkage {
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
     return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
+  }
+
+  @Override
+  public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y) {
+    double[] c = VMath.timesPlusTimes(y.toArray(), sizey / (double) (sizex + sizey), x.toArray(), sizex / (double) (sizex + sizey));
+    return new DoubleVector(c);
+  }
+
+  @Override
+  public double distance(int sizex, int sizey, NumberVector x, NumberVector y) {
+    return ((sizex * sizey) / (double) (sizex + sizey)) * SquaredEuclideanDistance.STATIC.distance(x, y);
   }
 
   /**
