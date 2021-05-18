@@ -541,6 +541,7 @@ public class HySortOD implements OutlierAlgorithm {
         this.value = value;
         this.begin = begin;
         this.end = end;
+        this.children = new Int2ObjectOpenHashMap<>();
       }
 
       @Override
@@ -555,9 +556,6 @@ public class HySortOD implements OutlierAlgorithm {
        */
       public void add(Node node) {
         if(node != null) {
-          if(children == null) {
-            children = new Int2ObjectOpenHashMap<>();
-          }
           children.put(node.value, node);
         }
       }
