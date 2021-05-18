@@ -361,7 +361,7 @@ public class SingularValueDecomposition {
     double c = (sp * epm1) * (sp * epm1);
     double shift = 0.0;
     if((b != 0.0) || (c != 0.0)) {
-      shift = FastMath.sqrt(b * b + c);
+      shift = Math.sqrt(b * b + c);
       shift = c / (b < 0. ? b - shift : b + shift);
     }
     double f = (sk + sp) * (sk - sp) + shift;

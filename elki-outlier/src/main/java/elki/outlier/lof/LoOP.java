@@ -57,8 +57,6 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * LoOP: Local Outlier Probabilities
  * <p>
@@ -236,7 +234,7 @@ public class LoOP<O> implements OutlierAlgorithm {
         ssum += d * d;
         ks++;
       }
-      double pdist = ks > 0 ? FastMath.sqrt(ssum / ks) : 0.;
+      double pdist = ks > 0 ? Math.sqrt(ssum / ks) : 0.;
       pdists.putDouble(iditer, pdist);
       LOG.incrementProcessed(prdsProgress);
     }
@@ -279,7 +277,7 @@ public class LoOP<O> implements OutlierAlgorithm {
     }
     LOG.ensureCompleted(progressPLOFs);
 
-    nplof = lambda * FastMath.sqrt(nplof / relation.size());
+    nplof = lambda * Math.sqrt(nplof / relation.size());
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("nplof normalization factor is " + nplof);
     }

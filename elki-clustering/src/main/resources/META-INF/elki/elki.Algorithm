@@ -44,10 +44,11 @@ elki.clustering.kmeans.ShallotKMeans
 elki.clustering.kmeans.SingleAssignmentKMeans
 elki.clustering.kmeans.SimplifiedElkanKMeans
 elki.clustering.kmeans.SortMeans
-elki.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.clustering.kmeans.YinYangKMeans
 elki.clustering.kmeans.XMeans
 elki.clustering.kmeans.FuzzyCMeans
+elki.clustering.kmeans.parallel.ParallelLloydKMeans
+elki.clustering.kmeans.spherical.SphericalKMeans
 elki.clustering.kmedoids.FasterPAM
 elki.clustering.kmedoids.FastPAM
 elki.clustering.kmedoids.FastPAM1

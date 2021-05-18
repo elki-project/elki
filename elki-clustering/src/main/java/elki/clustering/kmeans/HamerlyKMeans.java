@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,8 +35,6 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-
-import net.jafama.FastMath;
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
@@ -103,24 +101,24 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
     double[][] sums;
 
     /**
-     * Temporary storage for the new means.
+     * Scratch space for new means.
      */
     double[][] newmeans;
+
+    /**
+     * Upper bounds
+     */
+    WritableDoubleDataStore upper;
+
+    /**
+     * Lower bounds
+     */
+    WritableDoubleDataStore lower;
 
     /**
      * Separation of means / distance moved.
      */
     double[] sep;
-
-    /**
-     * Upper bounding distance
-     */
-    WritableDoubleDataStore upper;
-
-    /**
-     * Lower bounding distance
-     */
-    WritableDoubleDataStore lower;
 
     /**
      * Constructor.
@@ -152,7 +150,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
     /**
      * Perform initial cluster assignment.
      *
-     * @return Number of changes (i.e. relation size)
+     * @return Number of changes (i.e., relation size)
      */
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
@@ -160,8 +158,9 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       computeSquaredSeparation(cdist);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
-        // Find closest center, and distance to two closest centers
-        double min1 = distance(fv, means[0]), min2 = distance(fv, means[1]);
+        // Find closest center, and distance to two closest centers:
+        double min1 = distance(fv, means[0]);
+        double min2 = k > 1 ? distance(fv, means[1]) : min1;
         int minIndex = 0;
         if(min2 < min1) {
           double tmp = min1;
@@ -186,44 +185,42 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
         clusters.get(minIndex).add(it);
         assignment.putInt(it, minIndex);
         plusEquals(sums[minIndex], fv);
-        upper.putDouble(it, isSquared ? FastMath.sqrt(min1) : min1);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(min2) : min2);
+        upper.putDouble(it, isSquared ? Math.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? Math.sqrt(min2) : min2);
       }
       return relation.size();
     }
 
     @Override
     protected int assignToNearestCluster() {
-      assert (k == means.length);
-      recomputeSeperation(means, sep);
+      recomputeSeperation(sep);
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final int cur = assignment.intValue(it);
+        final int orig = assignment.intValue(it);
         // Compute the current bound:
         final double z = lower.doubleValue(it);
-        final double sa = sep[cur];
+        final double sa = sep[orig];
         double u = upper.doubleValue(it);
         if(u <= z || u <= sa) {
           continue;
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, means[cur]);
-        u = isSquared ? FastMath.sqrt(curd2) : curd2;
-        upper.putDouble(it, u);
+        double curd2 = distance(fv, means[orig]);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
-        int minIndex = cur;
+        int cur = orig;
         for(int i = 0; i < k; i++) {
-          if(i == cur) {
+          if(i == orig) {
             continue;
           }
           double dist = distance(fv, means[i]);
           if(dist < min1) {
-            minIndex = i;
+            cur = i;
             min2 = min1;
             min1 = dist;
           }
@@ -231,15 +228,16 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
             min2 = dist;
           }
         }
-        if(minIndex != cur) {
-          clusters.get(minIndex).add(it);
-          clusters.get(cur).remove(it);
-          assignment.putInt(it, minIndex);
-          plusMinusEquals(sums[minIndex], sums[cur], fv);
+        // Object has to be reassigned.
+        if(cur != orig) {
+          clusters.get(cur).add(it);
+          clusters.get(orig).remove(it);
+          assignment.putInt(it, cur);
+          plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
       }
       return changed;
     }
@@ -249,10 +247,9 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
      * <p>
      * Used by Hamerly.
      *
-     * @param means Means
      * @param sep Output array of separation (half-sqrt scaled)
      */
-    protected void recomputeSeperation(double[][] means, double[] sep) {
+    protected void recomputeSeperation(double[] sep) {
       final int k = means.length;
       assert sep.length == k;
       Arrays.fill(sep, Double.POSITIVE_INFINITY);
@@ -266,7 +263,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       // We need half the Euclidean distance
       for(int i = 0; i < k; i++) {
-        sep[i] = .5 * (isSquared ? FastMath.sqrt(sep[i]) : sep[i]);
+        sep[i] = .5 * (isSquared ? Math.sqrt(sep[i]) : sep[i]);
       }
     }
 

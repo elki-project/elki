@@ -198,7 +198,7 @@ public class KDTreePruningKMeans<V extends NumberVector> extends AbstractKMeans<
     }
 
     @Override
-    protected void run(int maxiter) {
+    public void run(int maxiter) {
       final String prefix = KDTreePruningKMeans.this.getClass().getName();
       Duration construction = LOG.newDuration(prefix + ".k-d-tree-construction").begin();
       sorted = DBIDUtil.newArray(relation.getDBIDs());

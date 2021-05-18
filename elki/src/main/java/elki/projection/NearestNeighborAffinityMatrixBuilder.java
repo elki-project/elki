@@ -143,7 +143,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
       double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
           pij[ix.getOffset()] = new double[dists.size()]);
       if(mv != null) {
-        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
+        mv.put(beta > 0 ? Math.sqrt(.5 / beta) : 0.); // Sigma
       }
       indices[ix.getOffset()] = inds.toArray();
       LOG.incrementProcessed(prog);

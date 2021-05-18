@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,8 +87,8 @@ public class SVGPlot {
    * DOM implementations to try.
    */
   private static final String[] BATIK_DOMS = { //
+      "org.apache.batik.anim.dom.SVG12DOMImplementation", // Batik 1.8
       "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
-      "org.apache.batik.dom.svg.SVGDOMImplementation", // Batik 1.7
       "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
   };
 
@@ -319,19 +319,8 @@ public class SVGPlot {
   }
 
   /**
-   * Getter for style element.
-   *
-   * @return stylesheet DOM element
-   * @deprecated Contents will be overwritten by CSS class manager!
-   */
-  @Deprecated
-  public Element getStyle() {
-    return style;
-  }
-
-  /**
    * Get the plots CSS class manager.
-   *
+   * <p>
    * Note that you need to invoke {@link #updateStyleElement()} to make changes
    * take effect.
    *
@@ -370,7 +359,7 @@ public class SVGPlot {
 
   /**
    * Save document into a SVG file.
-   *
+   * <p>
    * References PNG images from the temporary files will be inlined
    * automatically.
    *
@@ -414,7 +403,7 @@ public class SVGPlot {
 
   /**
    * Clone the SVGPlot document for transcoding.
-   *
+   * <p>
    * This will usually be necessary for exporting the SVG document if it is
    * currently being displayed: otherwise, we break the Batik rendering trees.
    * (Discovered by Simon).
@@ -448,10 +437,10 @@ public class SVGPlot {
    */
   public void saveAsPDF(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
-      Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").newInstance();
+      Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").getDeclaredConstructor().newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException | IllegalAccessException e) {
+    catch(ReflectiveOperationException e) {
       throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
     }
   }
@@ -466,10 +455,10 @@ public class SVGPlot {
    */
   public void saveAsPS(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
-      Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").newInstance();
+      Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").getDeclaredConstructor().newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException | IllegalAccessException e) {
+    catch(ReflectiveOperationException e) {
       throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
     }
   }
@@ -484,10 +473,10 @@ public class SVGPlot {
    */
   public void saveAsEPS(Path file) throws IOException, TranscoderException, ClassNotFoundException {
     try {
-      Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").newInstance();
+      Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").getDeclaredConstructor().newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException | IllegalAccessException e) {
+    catch(ReflectiveOperationException e) {
       throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
     }
   }
@@ -503,8 +492,8 @@ public class SVGPlot {
    */
   public void saveAsPNG(Path file, int width, int height) throws IOException, TranscoderException {
     PNGTranscoder t = new PNGTranscoder();
-    t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
-    t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
+    t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, Float.valueOf(width));
+    t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, Float.valueOf(height));
     transcode(file, t);
   }
 
@@ -520,9 +509,9 @@ public class SVGPlot {
    */
   public void saveAsJPEG(Path file, int width, int height, float quality) throws IOException, TranscoderException {
     JPEGTranscoder t = new JPEGTranscoder();
-    t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(width));
-    t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new Float(height));
-    t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, new Float(quality));
+    t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, Float.valueOf(width));
+    t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, Float.valueOf(height));
+    t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, Float.valueOf(quality));
     transcode(file, t);
   }
 
@@ -586,8 +575,8 @@ public class SVGPlot {
    */
   public BufferedImage makeAWTImage(int width, int height) throws TranscoderException {
     ThumbnailTranscoder t = new ThumbnailTranscoder();
-    t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(width));
-    t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(height));
+    t.addTranscodingHint(PNGTranscoder.KEY_WIDTH, Float.valueOf(width));
+    t.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, Float.valueOf(height));
     // Don't clone. Assume this is used safely.
     TranscoderInput input = new TranscoderInput(document);
     t.transcode(input, null);

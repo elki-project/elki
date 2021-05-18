@@ -165,12 +165,12 @@ public class RayleighDistribution implements Distribution {
     if(val == 1.) {
       return Double.POSITIVE_INFINITY;
     }
-    return sigma * FastMath.sqrt(-2. * FastMath.log(1. - val));
+    return sigma * Math.sqrt(-2. * FastMath.log(1. - val));
   }
 
   @Override
   public double nextRandom(Random random) {
-    return mu + sigma * FastMath.sqrt(-2. * FastMath.log(random.nextDouble()));
+    return mu + sigma * Math.sqrt(-2. * FastMath.log(random.nextDouble()));
   }
 
   @Override

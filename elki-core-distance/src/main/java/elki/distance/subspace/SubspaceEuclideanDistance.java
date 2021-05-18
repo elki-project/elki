@@ -25,7 +25,6 @@ import java.util.Arrays;
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.datastructures.BitsUtil;
-import net.jafama.FastMath;
 
 /**
  * Euclidean distance function between {@link NumberVector}s only in specified
@@ -63,7 +62,7 @@ public class SubspaceEuclideanDistance extends SubspaceLPNormDistance {
       final double delta = v1.doubleValue(d) - v2.doubleValue(d);
       sqrDist += delta * delta;
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   @Override
@@ -88,7 +87,7 @@ public class SubspaceEuclideanDistance extends SubspaceLPNormDistance {
         // Else they intersect.
       }
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   @Override
@@ -112,7 +111,7 @@ public class SubspaceEuclideanDistance extends SubspaceLPNormDistance {
         // Else the mbrs intersect!
       }
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   @Override
@@ -122,7 +121,7 @@ public class SubspaceEuclideanDistance extends SubspaceLPNormDistance {
       final double delta = obj.doubleValue(d);
       sqrDist += delta * delta;
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   @Override

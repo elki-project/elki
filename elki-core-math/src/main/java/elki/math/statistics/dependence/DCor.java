@@ -26,7 +26,6 @@ import elki.utilities.Priority;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Distance correlation.
@@ -81,7 +80,7 @@ public class DCor implements Dependence {
       return 0.;
     }
     // distance correlation
-    return FastMath.sqrt(computeDCovar(dMatrixA, dMatrixB, len) / FastMath.sqrt(dVarA * dVarB));
+    return Math.sqrt(computeDCovar(dMatrixA, dMatrixB, len) / Math.sqrt(dVarA * dVarB));
   }
 
   @Override
@@ -106,7 +105,7 @@ public class DCor implements Dependence {
       for(int x = 0; x < y; x++, c++) {
         final double sqnorm = dVar[x] * dy;
         if(sqnorm > 0.) {
-          dCor[c] = FastMath.sqrt(computeDCovar(dMatrix[x], dMatrixy, len) / FastMath.sqrt(sqnorm));
+          dCor[c] = Math.sqrt(computeDCovar(dMatrix[x], dMatrixy, len) / Math.sqrt(sqnorm));
         }
       }
     }

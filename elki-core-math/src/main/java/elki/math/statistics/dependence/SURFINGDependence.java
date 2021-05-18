@@ -25,7 +25,6 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
@@ -112,7 +111,7 @@ public class SURFINGDependence implements Dependence {
         }
       }
       // sqrt to get Euclidean
-      kdistmean += knns[i] = FastMath.sqrt(heap.peek());
+      kdistmean += knns[i] = Math.sqrt(heap.peek());
     }
     kdistmean /= len;
     // Deviation from mean:

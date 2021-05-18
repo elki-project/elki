@@ -26,7 +26,6 @@ import elki.logging.Logging;
 import elki.utilities.Priority;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Pearson product-moment correlation coefficient.
@@ -76,7 +75,7 @@ public class PearsonCorrelationDependence implements Dependence {
     }
     final double vsq = v1 * v2;
     // Note: we did not normalize by len, as this cancels out.
-    return vsq > 0 ? cov / FastMath.sqrt(vsq) : 0.;
+    return vsq > 0 ? cov / Math.sqrt(vsq) : 0.;
   }
 
   @Override
@@ -113,7 +112,7 @@ public class PearsonCorrelationDependence implements Dependence {
       if(vst[y] == 0.) {
         LOG.warning("PearsonCorrelationDependence is not well defined for constant attributes.");
       }
-      vst[y] = FastMath.sqrt(vst[y]);
+      vst[y] = Math.sqrt(vst[y]);
     }
     for(int y = 1, c = 0; y < dims; y++) {
       for(int x = 0; x < y; x++) {

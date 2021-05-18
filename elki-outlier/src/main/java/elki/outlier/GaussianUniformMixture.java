@@ -196,7 +196,7 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
     final LUDecomposition lu = new LUDecomposition(builder.makeSampleMatrix());
     double[][] covInv = lu.inverse();
     // for each object compute probability and sum
-    double prob = (objids.size() - anomalous.size()) * -FastMath.log(FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * lu.det()));
+    double prob = (objids.size() - anomalous.size()) * -FastMath.log(Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * lu.det()));
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
       if(!anomalous.contains(iter)) {
         double[] xcent = minusEquals(relation.get(iter).toArray(), mean);

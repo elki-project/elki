@@ -22,8 +22,6 @@ package elki.itemsetmining.associationrules.interest;
 
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Cosine interestingness measure,
  * \(\tfrac{\text{support}(A\cup B)}{\sqrt{\text{support}(A)\text{support}(B)}}
@@ -55,6 +53,6 @@ public class Cosine implements InterestingnessMeasure {
 
   @Override
   public double measure(int t, int sX, int sY, int sXY) {
-    return sXY / FastMath.sqrt(sX * sY);
+    return sXY / Math.sqrt(sX * sY);
   }
 }

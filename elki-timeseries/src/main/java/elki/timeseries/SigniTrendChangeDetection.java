@@ -218,7 +218,7 @@ public class SigniTrendChangeDetection implements Algorithm {
         // Old estimate:
         final double avg = ewma[d], var = ewmv[d];
         // Change detection (using previous estimate!)
-        double sigma = (v - avg) / (FastMath.sqrt(var) + bias);
+        double sigma = (v - avg) / (Math.sqrt(var) + bias);
         if(sigma >= minsigma || sigma <= -minsigma) {
           changepoints.add(iter, d, sigma);
         }

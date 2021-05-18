@@ -39,8 +39,8 @@ import elki.utilities.optionhandling.Parameterizer;
  * Cosine distance then is defined as
  * \[ 1 - \tfrac{\vec{x}\cdot\vec{y}}{||a||\cdot||b||} \in [0;2] \]
  * <p>
- * {@link ArcCosineDistance} may sometimes be more appropriate, but also
- * more computationally expensive.
+ * {@link ArcCosineDistance} or {@link SqrtCosineDistance} can be used if you
+ * need a metric, but are more expensive to computate.
  *
  * @author Arthur Zimek
  * @since 0.1
@@ -63,16 +63,6 @@ public class CosineDistance implements SpatialPrimitiveDistance<NumberVector>, N
     super();
   }
 
-  /**
-   * Computes the cosine distance for two given feature vectors.
-   * 
-   * The cosine distance is computed from the cosine similarity by
-   * <code>1-(cosine similarity)</code>.
-   * 
-   * @param v1 first feature vector
-   * @param v2 second feature vector
-   * @return the cosine distance for two given feature vectors v1 and v2
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = VectorUtil.cosAngle(v1, v2);
@@ -83,6 +73,11 @@ public class CosineDistance implements SpatialPrimitiveDistance<NumberVector>, N
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = VectorUtil.minCosAngle(mbr1, mbr2);
     return (d <= 1) ? 1 - d : 0;
+  }
+
+  @Override
+  public boolean isSquared() {
+    return true;
   }
 
   @Override

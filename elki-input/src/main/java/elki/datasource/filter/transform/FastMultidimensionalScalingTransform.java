@@ -39,14 +39,13 @@ import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
-import net.jafama.FastMath;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
@@ -151,7 +150,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
         // Undo squared, unless we were given a squared distance function:
         if(!dist.isSquared()) {
           for(int i = 0; i < tdim; i++) {
-            lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
+            lambda[i] = Math.sqrt(Math.abs(lambda[i]));
           }
         }
 
@@ -219,7 +218,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       }
     }
     // Standardize:
-    final double s = 1. / FastMath.sqrt(l2);
+    final double s = 1. / Math.sqrt(l2);
     for(int d = 0; d < out.length; d++) {
       out[d] *= s;
     }
@@ -245,7 +244,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       out[d1] = t;
       l += t * t;
     }
-    return l > 0 ? FastMath.sqrt(l) : 0.;
+    return l > 0 ? Math.sqrt(l) : 0.;
   }
 
   /**

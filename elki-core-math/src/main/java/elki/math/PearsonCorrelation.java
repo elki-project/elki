@@ -21,7 +21,6 @@
 package elki.math;
 
 import elki.data.NumberVector;
-import net.jafama.FastMath;
 
 /**
  * Class to compute the Pearson correlation coefficient (PCC) also known as
@@ -132,7 +131,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / FastMath.sqrt(sumXX * sumYY);
+    return sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -210,7 +209,7 @@ public class PearsonCorrelation {
    * @return standard deviation
    */
   public double getPopulationStddevX() {
-    return FastMath.sqrt(getPopulationVarianceX());
+    return Math.sqrt(getPopulationVarianceX());
   }
 
   /**
@@ -219,7 +218,7 @@ public class PearsonCorrelation {
    * @return standard deviation
    */
   public double getSampleStddevX() {
-    return FastMath.sqrt(getSampleVarianceX());
+    return Math.sqrt(getSampleVarianceX());
   }
 
   /**
@@ -251,7 +250,7 @@ public class PearsonCorrelation {
    * @return stddev
    */
   public double getPopulationStddevY() {
-    return FastMath.sqrt(getPopulationVarianceY());
+    return Math.sqrt(getPopulationVarianceY());
   }
 
   /**
@@ -260,7 +259,7 @@ public class PearsonCorrelation {
    * @return stddev
    */
   public double getSampleStddevY() {
-    return FastMath.sqrt(getSampleVarianceY());
+    return Math.sqrt(getSampleVarianceY());
   }
 
   /**
@@ -309,7 +308,7 @@ public class PearsonCorrelation {
     }
     // One or both series were constant:
     return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
-        sumXY / FastMath.sqrt(sumXX * sumYY);
+        sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -352,7 +351,7 @@ public class PearsonCorrelation {
     }
     // One or both series were constant:
     return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
-        sumXY / FastMath.sqrt(sumXX * sumYY);
+        sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -397,7 +396,7 @@ public class PearsonCorrelation {
     }
     // One or both series were constant:
     return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
-        sumXY / FastMath.sqrt(sumXX * sumYY);
+        sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -443,7 +442,7 @@ public class PearsonCorrelation {
     }
     // One or both series were constant:
     return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
-        sumXY / FastMath.sqrt(sumXX * sumYY);
+        sumXY / Math.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -489,6 +488,6 @@ public class PearsonCorrelation {
     }
     // One or both series were constant:
     return !(sumXX > 0. && sumYY > 0.) ? sumXX == sumYY ? 1. : 0. : //
-        sumXY / FastMath.sqrt(sumXX * sumYY);
+        sumXY / Math.sqrt(sumXX * sumYY);
   }
 }

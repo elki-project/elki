@@ -28,8 +28,6 @@ import elki.database.query.PrioritySearcher;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 
-import net.jafama.FastMath;
-
 /**
  * Default linear scan search class, for Euclidean distance.
  * <p>
@@ -136,7 +134,7 @@ public abstract class LinearScanEuclideanPrioritySearcher<Q, O extends NumberVec
 
   @Override
   public double computeExactDistance() {
-    return curdist == curdist ? curdist : (curdist = FastMath.sqrt(getSquaredDistance()));
+    return curdist == curdist ? curdist : (curdist = Math.sqrt(getSquaredDistance()));
   }
 
   /**

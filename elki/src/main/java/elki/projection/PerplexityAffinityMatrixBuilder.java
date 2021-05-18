@@ -132,7 +132,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     for(int i = 0; i < size; i++) {
       double beta = computePi(i, dist[i], pij[i], perplexity, logPerp);
       if(mv != null) {
-        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
+        mv.put(beta > 0 ? Math.sqrt(.5 / beta) : 0.); // Sigma
       }
       LOG.incrementProcessed(prog);
     }

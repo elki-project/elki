@@ -122,6 +122,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     this.keymap = new Object2IntOpenHashMap<>();
     this.keymap.defaultReturnValue(-1);
     this.sparsefactory = factory;
+    this.warnedDim = true; // Disable this warning
   }
 
   @Override

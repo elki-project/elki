@@ -60,8 +60,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Algorithm to compute local correlation outlier probability.
  * <p>
@@ -152,7 +150,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
         CorrelationAnalysisSolution depsol = dependencyDerivator.generateModel(relation, nids);
 
         double stddev = depsol.getStandardDeviation();
-        double distance = FastMath.sqrt(depsol.squaredDistance(relation.get(id)));
+        double distance = Math.sqrt(depsol.squaredDistance(relation.get(id)));
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
 
         cop_score.putDouble(id, prob);

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,8 +32,6 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
-
-import net.jafama.FastMath;
 
 /**
  * Borgelt's Shallot k-means algorithm, exploiting the triangle inequality.
@@ -111,89 +109,89 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers:
-        double best = distance(fv, means[0]), bes2 = distance(fv, means[1]);
+        double min1 = distance(fv, means[0]);
+        double min2 = k > 1 ? distance(fv, means[1]) : min1;
         int minIdx = 0, minId2 = 1;
-        if(bes2 < best) {
-          double tmp = best;
-          best = bes2;
-          bes2 = tmp;
+        if(min2 < min1) {
+          double tmp = min1;
+          min1 = min2;
+          min2 = tmp;
           minIdx = 1;
           minId2 = 0;
         }
         for(int j = 2; j < k; j++) {
-          if(bes2 > cdist[minIdx][j]) {
+          if(min2 > cdist[minIdx][j]) {
             double dist = distance(fv, means[j]);
-            if(dist < best) {
+            if(dist < min1) {
               minId2 = minIdx;
               minIdx = j;
-              bes2 = best;
-              best = dist;
+              min2 = min1;
+              min1 = dist;
             }
-            else if(dist < bes2) {
+            else if(dist < min2) {
               minId2 = j;
-              bes2 = dist;
+              min2 = dist;
             }
           }
         }
         // Assign to nearest cluster.
         clusters.get(minIdx).add(it);
         assignment.putInt(it, minIdx);
+        plusEquals(sums[minIdx], fv);
+        upper.putDouble(it, isSquared ? Math.sqrt(min1) : min1);
+        lower.putDouble(it, isSquared ? Math.sqrt(min2) : min2);
         // Overall like Exponion, but also store second closest
         second.putInt(it, minId2);
-        plusEquals(sums[minIdx], fv);
-        upper.putDouble(it, isSquared ? FastMath.sqrt(best) : best);
-        lower.putDouble(it, isSquared ? FastMath.sqrt(bes2) : bes2);
       }
       return relation.size();
     }
 
     @Override
     protected int assignToNearestCluster() {
-      assert (k == means.length);
       recomputeSeperation(sep, cdist);
       nearestMeans(cdist, cnum);
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final int cur = assignment.intValue(it);
+        final int orig = assignment.intValue(it);
         // Compute the current bound:
         final double z = lower.doubleValue(it);
-        final double sa = sep[cur];
+        final double sa = sep[orig];
         double u = upper.doubleValue(it);
         if(u <= z || u <= sa) {
           continue;
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
-        double curd2 = distance(fv, means[cur]);
-        upper.putDouble(it, u = isSquared ? FastMath.sqrt(curd2) : curd2);
+        double curd2 = distance(fv, means[orig]);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
         if(u <= z || u <= sa) {
           continue;
         }
-        double r = u + 0.5 * sa; // Our cdist are scaled 0.5!
-        if(cdist[cur][cnum[cur][0]] > r) {
+        double r = u + 0.5 * sa; // Our cdist are scaled 0.5
+        if(cdist[orig][cnum[orig][0]] > r) {
           continue;
         }
         // Shallot modification #1: try old second-nearest first:
         int secn = second.intValue(it);
         // Exact distance to previous second nearest
         double secd2 = distance(fv, means[secn]);
-        int ref = cur; // closest center "z" in Borgelts paper
+        int ref = orig; // closest center "z" in Borgelts paper
         if(secd2 < curd2) {
           // Previous second closest is closer, swap:
           final double tmp = secd2;
           secd2 = curd2;
           curd2 = tmp;
           ref = secn;
-          secn = cur;
+          secn = orig;
           // Update u
-          u = isSquared ? FastMath.sqrt(curd2) : curd2;
+          u = isSquared ? Math.sqrt(curd2) : curd2;
         }
         // Second Shallot improvement: r
-        double l = Math.min(u + sa, 2 * u + cdist[cur][cnum[cur][0]]);
-        r = 0.5 * (u + l); // Our cdist are scaled by 0.5!
+        double l = Math.min(u + sa, 2 * u + cdist[orig][cnum[orig][0]]);
+        r = 0.5 * (u + l); // Our cdist are scaled by 0.5
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = secd2;
-        int minIdx = ref, minId2 = secn;
+        int cur = ref, minId2 = secn;
         for(int i = 0; i < k - 1; i++) {
           int c = cnum[ref][i];
           if(c == secn) {
@@ -204,8 +202,8 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           }
           double dist = distance(fv, means[c]);
           if(dist < min1) {
-            minId2 = minIdx;
-            minIdx = c;
+            minId2 = cur;
+            cur = c;
             min2 = min1;
             min1 = dist;
             // Second Shallot improvement: r shrinking
@@ -218,16 +216,16 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
             min2 = dist;
           }
         }
-        if(minIdx != cur) {
-          clusters.get(minIdx).add(it);
-          clusters.get(cur).remove(it);
-          assignment.putInt(it, minIdx);
+        if(cur != orig) {
+          clusters.get(cur).add(it);
+          clusters.get(orig).remove(it);
+          assignment.putInt(it, cur);
           second.putInt(it, minId2);
-          plusMinusEquals(sums[minIdx], sums[cur], fv);
+          plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, min1 == curd2 ? u : isSquared ? FastMath.sqrt(min1) : min1);
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? FastMath.sqrt(min2) : min2);
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
       }
       return changed;
     }

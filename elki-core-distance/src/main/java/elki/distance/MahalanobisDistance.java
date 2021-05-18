@@ -22,7 +22,6 @@ package elki.distance;
 
 import elki.data.NumberVector;
 import elki.utilities.documentation.Reference;
-import net.jafama.FastMath;
 
 /**
  * Mahalanobis quadratic form distance for feature vectors.
@@ -64,7 +63,7 @@ public class MahalanobisDistance extends MatrixWeightedQuadraticDistance {
 
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
-    return FastMath.sqrt(super.distance(o1, o2));
+    return Math.sqrt(super.distance(o1, o2));
   }
 
   @Override

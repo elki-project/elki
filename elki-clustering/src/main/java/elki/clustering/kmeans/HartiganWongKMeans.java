@@ -377,7 +377,7 @@ public class HartiganWongKMeans<V extends NumberVector> extends AbstractKMeans<V
     }
 
     @Override
-    Logging getLogger() {
+    protected Logging getLogger() {
       return LOG;
     }
   }

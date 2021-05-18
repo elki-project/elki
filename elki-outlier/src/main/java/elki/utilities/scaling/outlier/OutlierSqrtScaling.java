@@ -25,11 +25,10 @@ import elki.database.relation.DoubleRelation;
 import elki.math.DoubleMinMax;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary positive values to a value in the range of
@@ -72,7 +71,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    return value <= min ? 0. : Math.min(1, (FastMath.sqrt(value - min) / factor));
+    return value <= min ? 0. : Math.min(1, (Math.sqrt(value - min) / factor));
   }
 
   @Override
@@ -89,7 +88,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
       min = (pmin == null) ? mm.getMin() : pmin;
       max = (pmax == null) ? mm.getMax() : pmax;
     }
-    factor = FastMath.sqrt(max - min);
+    factor = Math.sqrt(max - min);
   }
 
   @Override
@@ -106,7 +105,7 @@ public class OutlierSqrtScaling implements OutlierScaling {
       min = (pmin == null) ? mm.getMin() : pmin;
       max = (pmax == null) ? mm.getMax() : pmax;
     }
-    factor = FastMath.sqrt(max - min);
+    factor = Math.sqrt(max - min);
   }
 
   @Override

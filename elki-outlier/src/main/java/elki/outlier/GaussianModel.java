@@ -101,7 +101,7 @@ public class GaussianModel implements OutlierAlgorithm {
 
     // Normalization factors for Gaussian PDF
     double det = new LUDecomposition(covarianceMatrix).det();
-    final double fakt = 1.0 / FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * det);
+    final double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * det);
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

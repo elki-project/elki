@@ -24,8 +24,6 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import net.jafama.FastMath;
-
 /**
  * Solve a constrained quadratic equation in the form
  * \( \tfrac12 x^T A x + b^T x + c \)
@@ -152,7 +150,7 @@ public class ConstrainedQuadraticProblemSolver {
     double[] buf = new double[2];
     for(int i = 0; i < min.length; i++) {
       calculateLinearDerivativeLimits(a, b, min, max, i, buf);
-      fm += (max[i] - min[i]) * 0.5 * FastMath.max(-buf[0], buf[1]);
+      fm += (max[i] - min[i]) * 0.5 * Math.max(-buf[0], buf[1]);
     }
     return fm;
   }

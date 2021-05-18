@@ -299,7 +299,7 @@ public class BetaDistribution implements Distribution {
     final double alphapbeta = alpha + beta, a1 = alpha - 1.0, b1 = beta - 1.0;
     final double mu = alpha / alphapbeta;
     final double lnmu = FastMath.log(mu), lnmuc = FastMath.log1p(-mu);
-    double t = FastMath.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
+    double t = Math.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
     final double xu;
     if(x > alpha / alphapbeta) {
       if(x >= 1.0) {
@@ -348,7 +348,7 @@ public class BetaDistribution implements Distribution {
    */
   protected static double rawQuantile(double p, double alpha, double beta, final double logbeta) {
     // Very fast approximation of y.
-    final double tmp = FastMath.sqrt(-2 * FastMath.log(p));
+    final double tmp = Math.sqrt(-2 * FastMath.log(p));
     double ya = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
 
     // Initial estimate for x
@@ -356,12 +356,12 @@ public class BetaDistribution implements Distribution {
     if(alpha > 1 && beta > 1) {
       final double r = (ya * ya - 3.) / 6., s = 1. / (alpha + alpha - 1.);
       final double t = 1. / (beta + beta - 1.), h = 2. / (s + t);
-      double w = ya * FastMath.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
+      double w = ya * Math.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
       x = alpha / (alpha + beta * FastMath.exp(w + w));
     }
     else {
       double r = beta + beta, t = 1. / (9. * beta);
-      final double a = 1. - t + ya * FastMath.sqrt(t);
+      final double a = 1. - t + ya * Math.sqrt(t);
       t = r * a * a * a;
       if(t <= 0.) {
         x = 1. - FastMath.exp((FastMath.log1p(-p) + FastMath.log(beta) + logbeta) / beta);

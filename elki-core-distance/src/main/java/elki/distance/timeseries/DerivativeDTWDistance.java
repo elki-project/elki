@@ -25,7 +25,6 @@ import java.util.Arrays;
 import elki.data.NumberVector;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import net.jafama.FastMath;
 
 /**
  * Derivative Dynamic Time Warping distance for numerical vectors.
@@ -117,7 +116,7 @@ public class DerivativeDTWDistance extends DTWDistance {
     }
 
     // TODO: support Euclidean, Manhattan here:
-    return FastMath.sqrt(buf[cur + dim2 - 1]);
+    return Math.sqrt(buf[cur + dim2 - 1]);
   }
 
   @Override

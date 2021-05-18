@@ -48,7 +48,6 @@ import elki.utilities.random.RandomFactory;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntIterator;
-import net.jafama.FastMath;
 
 /**
  * Random Projections used for computing neighbors and density estimates.
@@ -177,7 +176,7 @@ public class RandomProjectedNeighborsAndDensities {
         currRp[i] = fl;
         sum += fl * fl;
       }
-      sum = FastMath.sqrt(sum);
+      sum = Math.sqrt(sum);
       for(int i = 0; i < dim; i++) {
         currRp[i] /= sum;
       }

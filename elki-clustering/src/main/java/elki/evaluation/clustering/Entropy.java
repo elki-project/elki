@@ -549,7 +549,7 @@ public class Entropy {
       bibkey = "DBLP:journals/jmlr/StrehlG02")
   public double geometricNMI() {
     return entropyFirst * entropySecond <= 0 ? mutualInformation : //
-        mutualInformation / FastMath.sqrt(entropyFirst * entropySecond);
+        mutualInformation / Math.sqrt(entropyFirst * entropySecond);
   }
 
   /**
@@ -624,7 +624,7 @@ public class Entropy {
    */
   public double adjustedGeometricMI() {
     return entropyFirst * entropySecond <= 0 ? mutualInformation - expectedMutualInformation : //
-        (mutualInformation - expectedMutualInformation) / (FastMath.sqrt(entropyFirst * entropySecond) - expectedMutualInformation);
+        (mutualInformation - expectedMutualInformation) / (Math.sqrt(entropyFirst * entropySecond) - expectedMutualInformation);
   }
 
   /**

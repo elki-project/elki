@@ -22,7 +22,6 @@ package elki.distance.minkowski;
 
 import elki.data.SparseNumberVector;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Euclidean distance function, optimized for {@link SparseNumberVector}s.
@@ -90,7 +89,7 @@ public class SparseEuclideanDistance extends SparseLPNormDistance {
       accu += val * val;
       i2 = v2.iterAdvance(i2);
     }
-    return FastMath.sqrt(accu);
+    return Math.sqrt(accu);
   }
 
   @Override
@@ -100,7 +99,7 @@ public class SparseEuclideanDistance extends SparseLPNormDistance {
       final double val = v1.iterDoubleValue(it);
       accu += val * val;
     }
-    return FastMath.sqrt(accu);
+    return Math.sqrt(accu);
   }
 
   /**

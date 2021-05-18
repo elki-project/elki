@@ -319,7 +319,7 @@ public class NormalDistribution implements Distribution {
   public static double erfcinv(double y) {
     final double z = (y > 1) ? 2 - y : y;
     final double w = 0.916461398268964 - FastMath.log(z);
-    double u = FastMath.sqrt(w);
+    double u = Math.sqrt(w);
     double s = (FastMath.log(u) + 0.488826640273108) / w;
     double t = 1 / (u + 0.231729200323405);
     double x = u * (1 - s * (s * 0.124610454613712 + 0.5)) //

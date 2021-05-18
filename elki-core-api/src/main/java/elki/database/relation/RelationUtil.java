@@ -28,6 +28,7 @@ import elki.data.spatial.SpatialComparable;
 import elki.data.type.FieldTypeInformation;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.VectorFieldTypeInformation;
+import elki.data.type.VectorTypeInformation;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDIter;
@@ -93,6 +94,20 @@ public final class RelationUtil {
     final SimpleTypeInformation<? extends SpatialComparable> type = relation.getDataTypeInformation();
     if(type instanceof FieldTypeInformation) {
       return ((FieldTypeInformation) type).getDimensionality();
+    }
+    return -1;
+  }
+
+  /**
+   * Get the dimensionality of a database relation.
+   *
+   * @param relation relation
+   * @return Database dimensionality
+   */
+  public static int maxDimensionality(Relation<? extends SpatialComparable> relation) {
+    final SimpleTypeInformation<? extends SpatialComparable> type = relation.getDataTypeInformation();
+    if(type instanceof VectorTypeInformation) {
+      return ((VectorTypeInformation<?>) type).maxdim();
     }
     return -1;
   }

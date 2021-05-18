@@ -68,7 +68,6 @@ import elki.utilities.pairs.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.jafama.FastMath;
 
 /**
  * Algorithm for detecting subspace hierarchies.
@@ -605,7 +604,7 @@ public class DiSH implements SubspaceClusteringAlgorithm<SubspaceModel> {
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
-    return FastMath.sqrt(sqrDist);
+    return Math.sqrt(sqrDist);
   }
 
   /**

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,6 @@ import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import elki.logging.Logging;
-
-import net.jafama.FastMath;
 
 /**
  * Use the square rooted values of precomputed kNN.
@@ -52,7 +50,7 @@ public class PreprocessorSqrtKNNQuery extends PreprocessorKNNQuery {
   @Override
   public KNNList getKNN(DBIDRef id, int k) {
     final KNNList knnList = super.getKNN(id, k);
-    return knnList != null ? knnList.map(x -> FastMath.sqrt(x)) : null;
+    return knnList != null ? knnList.map(Math::sqrt) : null;
   }
 
   /**

@@ -687,7 +687,7 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
           double a = Math.max(p_m_r, r - p_m_r);
           dist += a * a;
         }
-        dist = FastMath.sqrt(dist);
+        dist = Math.sqrt(dist);
       }
       else if(!Double.isInfinite(t)) {
         dist = 0.0;

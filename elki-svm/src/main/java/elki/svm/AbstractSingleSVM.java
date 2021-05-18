@@ -28,8 +28,6 @@ import elki.svm.data.DataSet;
 import elki.svm.solver.Solver;
 import elki.utilities.datastructures.arrays.ArrayUtil;
 
-import net.jafama.FastMath;
-
 public abstract class AbstractSingleSVM {
   protected static final byte ONE = 1, MONE = -1;
 
@@ -58,7 +56,7 @@ public abstract class AbstractSingleSVM {
       // output SV counts
       int nSV = 0, nBSV = 0;
       for(int i = 0, l = x.size(); i < l; i++) {
-        double a_i = FastMath.abs(si.alpha[i]);
+        double a_i = Math.abs(si.alpha[i]);
         if(a_i > 0) {
           ++nSV;
           if(a_i >= ((x.value(i) > 0) ? si.upper_bound_p : si.upper_bound_n)) {

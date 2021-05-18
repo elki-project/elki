@@ -38,8 +38,6 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Abstract base class for the sparse-grid-cell based outlier detection of
  * Aggarwal and Yu.
@@ -141,7 +139,7 @@ public abstract class AbstractAggarwalYuOutlier implements OutlierAlgorithm {
   protected static double sparsity(final int setsize, final int dbsize, final int k, final double phi) {
     // calculate sparsity c
     final double fK = MathUtil.powi(1. / phi, k);
-    return (setsize - (dbsize * fK)) / FastMath.sqrt(dbsize * fK * (1 - fK));
+    return (setsize - (dbsize * fK)) / Math.sqrt(dbsize * fK * (1 - fK));
   }
 
   /**

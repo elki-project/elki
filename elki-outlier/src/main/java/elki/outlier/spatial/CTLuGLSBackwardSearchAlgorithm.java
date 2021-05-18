@@ -51,8 +51,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.pairs.Pair;
 
-import net.jafama.FastMath;
-
 /**
  * GLS-Backward Search is a statistical approach to detecting spatial outliers.
  * <p>
@@ -235,7 +233,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> implements O
     // sigma_sum_square = sigma_0*sigma_0 + sigma*sigma
     double[][] sigmaMat = times(F, minusEquals(times(X, b), times(F, Y)));
     final double sigma_sum_square = normF(sigmaMat) / (relationx.size() - 6 - 1);
-    final double norm = 1 / FastMath.sqrt(sigma_sum_square);
+    final double norm = 1 / Math.sqrt(sigma_sum_square);
 
     // calculate the absolute values of standard residuals
     double[][] E = timesEquals(times(F, minus(Y, times(X, b))), norm);
@@ -252,7 +250,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> implements O
       }
     }
 
-    return new Pair<>(worstid, FastMath.sqrt(worstscore));
+    return new Pair<>(worstid, Math.sqrt(worstscore));
   }
 
   /**

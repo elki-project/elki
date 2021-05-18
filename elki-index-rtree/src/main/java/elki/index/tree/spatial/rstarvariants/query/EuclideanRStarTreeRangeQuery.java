@@ -33,8 +33,6 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Instance of a range query for a particular spatial index.
  * <p>
@@ -94,7 +92,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
           double distance = squared.minDist(object, entry);
           tree.statistics.countDistanceCalculation();
           if(distance <= sqepsilon) {
-            result.add(FastMath.sqrt(distance), entry.getDBID());
+            result.add(Math.sqrt(distance), entry.getDBID());
           }
         }
       }

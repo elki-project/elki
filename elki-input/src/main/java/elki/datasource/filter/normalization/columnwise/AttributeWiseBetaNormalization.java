@@ -124,7 +124,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
       }
 
       // Beta distribution for projection
-      double p = FastMath.pow(alpha, -1 / FastMath.sqrt(dim));
+      double p = FastMath.pow(alpha, -1 / Math.sqrt(dim));
       BetaDistribution beta = new BetaDistribution(p, p);
       // Normalization scan
       double[] buf = new double[dim];

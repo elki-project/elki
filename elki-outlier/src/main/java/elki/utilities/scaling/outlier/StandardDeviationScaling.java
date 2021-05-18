@@ -29,12 +29,10 @@ import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -128,7 +126,7 @@ public class StandardDeviationScaling implements OutlierScaling {
           sqsum.put(val * val);
         }
       }
-      factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
     }
     factor = factor > 0 ? factor : Double.MIN_NORMAL;
   }
@@ -157,7 +155,7 @@ public class StandardDeviationScaling implements OutlierScaling {
           sqsum.put((val - mean) * (val - mean));
         }
       }
-      factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
     }
     factor = factor > 0 ? factor : Double.MIN_NORMAL;
   }

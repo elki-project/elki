@@ -272,7 +272,7 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
       }
 
       // Stopping Criteria
-      if(FastMath.abs(g1) < EPS && FastMath.abs(g2) < EPS) {
+      if(Math.abs(g1) < EPS && Math.abs(g2) < EPS) {
         break;
       }
 

@@ -20,26 +20,16 @@
  */
 package elki.similarity.kernel;
 
-import static elki.math.linearalgebra.VMath.copy;
-import static elki.math.linearalgebra.VMath.minus;
-import static elki.math.linearalgebra.VMath.minusEquals;
-import static elki.math.linearalgebra.VMath.plusEquals;
-import static elki.math.linearalgebra.VMath.times;
+import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 import java.util.logging.Level;
 
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.query.similarity.SimilarityQuery;
 import elki.database.relation.Relation;
-import elki.similarity.PrimitiveSimilarity;
 import elki.logging.LoggingUtil;
-import net.jafama.FastMath;
+import elki.similarity.PrimitiveSimilarity;
 
 /**
  * Kernel matrix representation.
@@ -207,7 +197,7 @@ public class KernelMatrix {
    * @return the distance between the two objects
    */
   public double getDistance(final DBIDRef o1, final DBIDRef o2) {
-    return FastMath.sqrt(getSquaredDistance(o1, o2));
+    return Math.sqrt(getSquaredDistance(o1, o2));
   }
 
   /**

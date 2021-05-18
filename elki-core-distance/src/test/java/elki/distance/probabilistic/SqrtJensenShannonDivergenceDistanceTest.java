@@ -28,7 +28,6 @@ import elki.data.DoubleVector;
 import elki.data.HyperBoundingBox;
 import elki.distance.AbstractDistanceTest;
 import elki.utilities.ELKIBuilder;
-import net.jafama.FastMath;
 
 /**
  * Unit test for Sqrt(Jensen-Shannon) distance.
@@ -55,7 +54,7 @@ public class SqrtJensenShannonDivergenceDistanceTest extends AbstractDistanceTes
       HyperBoundingBox mbri = new HyperBoundingBox(vecs[i], vecs[i]);
       for(int j = 0; j < vecs.length; j++) {
         DoubleVector vj = DoubleVector.wrap(vecs[j]);
-        assertEquals("Distance " + i + "," + j, FastMath.sqrt(0.5 * distances[i][j]), df.distance(vi, vj), 1e-15);
+        assertEquals("Distance " + i + "," + j, Math.sqrt(0.5 * distances[i][j]), df.distance(vi, vj), 1e-15);
         assertMBRDistances(vj, vi, mbri, df);
       }
     }

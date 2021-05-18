@@ -72,7 +72,7 @@ public class SphericalVincentyEarthModel extends AbstractEarthModel {
 
   @Override
   public double ecefToLatRad(double x, double y, double z) {
-    final double p = FastMath.sqrt(x * x + y * y);
+    final double p = Math.sqrt(x * x + y * y);
     return FastMath.atan2(z, p);
   }
 

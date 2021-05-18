@@ -36,8 +36,6 @@ import elki.math.linearalgebra.LinearEquationSystem;
 import elki.result.textwriter.TextWriteable;
 import elki.result.textwriter.TextWriterStream;
 
-import net.jafama.FastMath;
-
 /**
  * A solution of correlation analysis is a matrix of equations describing the
  * dependencies.
@@ -145,7 +143,7 @@ public class CorrelationAnalysisSolution implements TextWriteable, Model {
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       variance += squaredDistance(db.get(iter));
     }
-    standardDeviation = FastMath.sqrt(variance / ids.size());
+    standardDeviation = Math.sqrt(variance / ids.size());
   }
 
   /**

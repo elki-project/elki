@@ -158,7 +158,7 @@ public class EigenvalueDecomposition {
         h += dk * dk;
       }
       {
-        double f = d[i - 1], g = FastMath.sqrt(h);
+        double f = d[i - 1], g = Math.sqrt(h);
         g = (f > 0) ? -g : g;
         e[i] = scale * g;
         h -= f * g;
@@ -274,7 +274,7 @@ public class EigenvalueDecomposition {
 
   private double tql2ComputeImplicitShift(int l) {
     final double el = e[l], g = d[l], p = (d[l + 1] - g) / (2. * el);
-    final double r = FastMath.sqrt(p * p + 1.);
+    final double r = Math.sqrt(p * p + 1.);
     final double pr = (p >= 0) ? p + r : p - r;
     final double dl = d[l] = el / pr;
     d[l + 1] = el * pr;
@@ -367,7 +367,7 @@ public class EigenvalueDecomposition {
           double oi = ort[i] = H[i][m - 1] / scale;
           h += oi * oi;
         }
-        double g = FastMath.sqrt(h), om = ort[m];
+        double g = Math.sqrt(h), om = ort[m];
         g = (om > 0) ? -g : g;
         h -= om * g;
         ort[m] = om - g;
@@ -495,7 +495,7 @@ public class EigenvalueDecomposition {
           // Two roots found
           double w = Hn[n - 1] * Hnm1[n];
           double p = (Hnm1[n - 1] - Hn[n]) * 0.5, q = p * p + w;
-          double x = (Hn[n] += exshift), z = FastMath.sqrt(abs(q));
+          double x = (Hn[n] += exshift), z = Math.sqrt(abs(q));
           Hnm1[n - 1] += exshift;
 
           if(q >= 0) {
@@ -561,7 +561,7 @@ public class EigenvalueDecomposition {
           double s = (y - x) * 0.5;
           s = s * s + w;
           if(s > 0) {
-            s = FastMath.sqrt(s);
+            s = Math.sqrt(s);
             s = (y < x) ? -s : s;
             s = x - w / ((y - x) * 0.5 + s);
             for(int i = low; i <= n; i++) {

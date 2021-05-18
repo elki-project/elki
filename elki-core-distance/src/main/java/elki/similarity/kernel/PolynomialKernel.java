@@ -26,15 +26,14 @@ import elki.database.query.DistanceSimilarityQuery;
 import elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.distance.PrimitiveDistance;
-import elki.similarity.AbstractVectorSimilarity;
 import elki.math.MathUtil;
-import elki.utilities.optionhandling.Parameterizer;
+import elki.similarity.AbstractVectorSimilarity;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
-import net.jafama.FastMath;
 
 /**
  * Polynomial Kernel function that computes a similarity between the two feature
@@ -97,7 +96,7 @@ public class PolynomialKernel extends AbstractVectorSimilarity implements Primit
 
   @Override
   public double distance(NumberVector fv1, NumberVector fv2) {
-    return FastMath.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
+    return Math.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
   }
 
   @Override

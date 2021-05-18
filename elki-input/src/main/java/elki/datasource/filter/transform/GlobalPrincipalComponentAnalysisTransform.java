@@ -37,13 +37,11 @@ import elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.exceptions.AbortException;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Apply Principal Component Analysis (PCA) to the data set.
@@ -172,7 +170,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     proj = new double[pdim][dim];
     for(int d = 0; d < pdim; d++) {
       EigenPair ep = pcares.getEigenPairs()[d];
-      plusTimesEquals(proj[d], ep.getEigenvector(), mode == Mode.FULL ? 1. / FastMath.sqrt(ep.getEigenvalue()) : 1.);
+      plusTimesEquals(proj[d], ep.getEigenvector(), mode == Mode.FULL ? 1. / Math.sqrt(ep.getEigenvalue()) : 1.);
     }
     buf = new double[dim];
   }

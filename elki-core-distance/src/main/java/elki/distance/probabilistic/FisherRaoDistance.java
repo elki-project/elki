@@ -28,6 +28,7 @@ import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -86,7 +87,7 @@ public class FisherRaoDistance extends AbstractNumberVectorDistance implements S
       final double v12 = fv1.doubleValue(d) * fv2.doubleValue(d);
       assert (v12 >= 0) : "This distance is not defined on negative values.";
       if(v12 > 0) {
-        agg += FastMath.sqrt(v12);
+        agg += Math.sqrt(v12);
       }
     }
     return agg >= 1 ? 0 : agg <= -1 ? -Math.PI : 2 * FastMath.acos(agg);
@@ -101,7 +102,7 @@ public class FisherRaoDistance extends AbstractNumberVectorDistance implements S
       final double v12 = mbr1.getMax(d) * mbr2.getMax(d);
       assert (v12 >= 0) : "This distance is not defined on negative values.";
       if(v12 > 0) {
-        agg += FastMath.sqrt(v12);
+        agg += Math.sqrt(v12);
       }
     }
     return agg >= 1 ? 0 : agg <= -1 ? -Math.PI : 2 * FastMath.acos(agg);

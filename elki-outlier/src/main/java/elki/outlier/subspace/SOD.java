@@ -61,8 +61,6 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Subspace Outlier Degree: Outlier Detection in Axis-Parallel Subspaces of High
  * Dimensional Data.
@@ -250,7 +248,7 @@ public class SOD<V extends NumberVector> implements OutlierAlgorithm {
       sqrDist += delta * delta;
       card++;
     }
-    return sqrDist > 0 ? FastMath.sqrt(sqrDist) / card : 0.;
+    return sqrDist > 0 ? Math.sqrt(sqrDist) / card : 0.;
   }
 
   /**

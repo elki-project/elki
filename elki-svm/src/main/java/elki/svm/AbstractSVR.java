@@ -20,13 +20,12 @@
  */
 package elki.svm;
 
+import elki.math.MathUtil;
 import elki.svm.data.DataSet;
 import elki.svm.data.DoubleWeightedDataSet;
 import elki.svm.model.ProbabilisticRegressionModel;
 import elki.svm.model.RegressionModel;
 import elki.svm.solver.Solver.SolutionInfo;
-
-import net.jafama.FastMath;
 
 public abstract class AbstractSVR extends AbstractSingleSVM {
   public AbstractSVR(double eps, boolean shrinking, double cache_size) {
@@ -66,17 +65,17 @@ public abstract class AbstractSVR extends AbstractSingleSVM {
     cross_validation(x, nr_fold, ymv);
     for(int i = 0; i < l; i++) {
       ymv[i] = x.value(i) - ymv[i];
-      mae += FastMath.abs(ymv[i]);
+      mae += Math.abs(ymv[i]);
     }
-    double std = FastMath.sqrt(2) * mae / l;
+    double std = MathUtil.SQRT2 * mae / l;
     int count = 0;
     mae = 0;
     for(int i = 0; i < l; i++) {
-      if(FastMath.abs(ymv[i]) > 5 * std) {
+      if(Math.abs(ymv[i]) > 5 * std) {
         ++count;
       }
       else {
-        mae += FastMath.abs(ymv[i]);
+        mae += Math.abs(ymv[i]);
       }
     }
     mae /= (l - count);

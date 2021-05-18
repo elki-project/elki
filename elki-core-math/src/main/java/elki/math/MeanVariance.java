@@ -26,8 +26,6 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Do some simple statistics (mean, variance) using a numerically stable online
  * algorithm.
@@ -268,7 +266,7 @@ public class MeanVariance extends Mean {
    * @return stddev
    */
   public double getPopulationStddev() {
-    return FastMath.sqrt(getPopulationVariance());
+    return Math.sqrt(getPopulationVariance());
   }
 
   /**
@@ -277,7 +275,7 @@ public class MeanVariance extends Mean {
    * @return stddev
    */
   public double getSampleStddev() {
-    return FastMath.sqrt(getSampleVariance());
+    return Math.sqrt(getSampleVariance());
   }
 
   /**

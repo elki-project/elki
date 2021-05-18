@@ -43,8 +43,8 @@ import elki.utilities.optionhandling.Parameterizer;
  * This implementation <em>assumes</em> that \(||a||=||b||=1\). If this does not
  * hold for your data, use {@link CosineDistance} instead!
  * <p>
- * {@link ArcCosineUnitlengthDistance} may sometimes be more
- * appropriate, but also more computationally expensive.
+ * {@link ArcCosineUnitlengthDistance} or {@link SqrtCosineUnitlengthDistance}
+ * can be used if you need a metric, but are more expensive to computate.
  * 
  * @author Erich Schubert
  * @since 0.7.5
@@ -65,16 +65,6 @@ public class CosineUnitlengthDistance implements SpatialPrimitiveDistance<Number
     super();
   }
 
-  /**
-   * Computes the cosine distance for two given feature vectors.
-   * 
-   * The cosine distance is computed from the cosine similarity by
-   * <code>1-(cosine similarity)</code>.
-   * 
-   * @param v1 first feature vector
-   * @param v2 second feature vector
-   * @return the cosine distance for two given feature vectors v1 and v2
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = VectorUtil.dot(v1, v2);
@@ -85,6 +75,11 @@ public class CosineUnitlengthDistance implements SpatialPrimitiveDistance<Number
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = VectorUtil.minDot(mbr1, mbr2);
     return (d <= 1) ? 1 - d : 0;
+  }
+  
+  @Override
+  public boolean isSquared() {
+    return true;
   }
 
   @Override

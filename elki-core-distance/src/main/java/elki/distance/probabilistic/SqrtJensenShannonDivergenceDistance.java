@@ -24,7 +24,6 @@ import elki.data.NumberVector;
 import elki.data.spatial.SpatialComparable;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * The square root of Jensen-Shannon divergence is a metric.
@@ -68,12 +67,12 @@ public class SqrtJensenShannonDivergenceDistance extends JensenShannonDivergence
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    return FastMath.sqrt(super.distance(v1, v2));
+    return Math.sqrt(super.distance(v1, v2));
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return FastMath.sqrt(super.minDist(mbr1, mbr2));
+    return Math.sqrt(super.minDist(mbr1, mbr2));
   }
 
   @Override

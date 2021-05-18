@@ -44,7 +44,6 @@ import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
-import elki.utilities.Alias;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -55,7 +54,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.jafama.FastMath;
 
 /**
  * Hypercube-Based Outlier Detection.
@@ -80,7 +78,6 @@ import net.jafama.FastMath;
     title = "Fast and Scalable Outlier Detection with Sorted Hypercubes", //
     booktitle = "Proc. 29th ACM Int. Conf. on Information & Knowledge Management (CIKM'20)", //
     url = "https://doi.org/10.1145/3340531.3412033")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HySortOD", "hysort" })
 public class HySortOD implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -215,7 +212,7 @@ public class HySortOD implements OutlierAlgorithm {
       super();
       int[] coords = this.coords = new int[values.getDimensionality()];
       for(int d = 0; d < coords.length; d++) {
-        coords[d] = (int) FastMath.floor(values.doubleValue(d) / length);
+        coords[d] = (int) Math.floor(values.doubleValue(d) / length);
       }
     }
 
@@ -319,7 +316,7 @@ public class HySortOD implements OutlierAlgorithm {
     protected boolean isImmediate(Hypercube hi, Hypercube hk) {
       final int[] p = hi.getCoords(), q = hk.getCoords();
       for(int j = p.length - 1; j >= 0; j--) {
-        if(FastMath.abs(p[j] - q[j]) > 1) {
+        if(Math.abs(p[j] - q[j]) > 1) {
           return false;
         }
       }
@@ -336,7 +333,7 @@ public class HySortOD implements OutlierAlgorithm {
      * @return
      */
     protected boolean isProspective(Hypercube hi, Hypercube hk, int col) {
-      return FastMath.abs(hi.getCoordAt(col) - hk.getCoordAt(col)) <= 1;
+      return Math.abs(hi.getCoordAt(col) - hk.getCoordAt(col)) <= 1;
     }
   }
 
@@ -378,7 +375,7 @@ public class HySortOD implements OutlierAlgorithm {
             W[i] += H.get(k).getDensity();
           }
         }
-        Wmax = FastMath.max(Wmax, W[i]);
+        Wmax = Math.max(Wmax, W[i]);
       }
       return W;
     }

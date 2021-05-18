@@ -22,7 +22,6 @@ package elki.math.statistics.dependence;
 
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Spearman rank-correlation coefficient, also known as Spearmans Rho.
@@ -58,7 +57,7 @@ public class SpearmanCorrelationDependence implements Dependence {
       cov += d1 * d2;
     }
     // Note: we did not normalize by len, as this cancels out.
-    return cov / FastMath.sqrt(v1 * v2);
+    return cov / Math.sqrt(v1 * v2);
   }
 
   /**

@@ -154,7 +154,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> implements KNNIndex<V
       len += val * val;
       getOrCreateColumn(dim).add(val, ref);
     }
-    length.put(ref, FastMath.sqrt(len));
+    length.put(ref, Math.sqrt(len));
   }
 
   /**
@@ -197,7 +197,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> implements KNNIndex<V
         cands.add(n);
       }
     }
-    return FastMath.sqrt(len);
+    return Math.sqrt(len);
   }
 
   /**
@@ -226,7 +226,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> implements KNNIndex<V
         cands.add(n);
       }
     }
-    return FastMath.sqrt(len);
+    return Math.sqrt(len);
   }
 
   /**

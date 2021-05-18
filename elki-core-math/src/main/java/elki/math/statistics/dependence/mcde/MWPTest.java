@@ -29,8 +29,6 @@ import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.random.RandomFactory;
 
-import net.jafama.FastMath;
-
 /**
  * Implementation of Mann-Whitney U test returning the p-value (not the test
  * statistic, thus MWP) for {@link MCDEDependence}. Implements algorithm 1 and 3
@@ -176,7 +174,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
     final long b_end = corrected_ranks.correction[safeEnd - 1];
     final long b_start = safeStart == 0 ? 0 : corrected_ranks.correction[safeStart - 1];
     final double correction = (double) (b_end - b_start) / (cutLength * (cutLength - 1));
-    final double std = FastMath.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
+    final double std = Math.sqrt((((double) (n1 * n2)) / 12) * (cutLength + 1 - correction));
     final double Z = std > 0 ? Math.abs((U - (0.5 * n1 * n2)) / std) : 0.;
     // Note that this is equivalent to do 1-2*(1-cdf(Z,0,1));
     return NormalDistribution.erf(Z * MathUtil.SQRTHALF);

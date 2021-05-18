@@ -23,8 +23,8 @@ package elki.distance.colorhistogram;
 import elki.distance.MatrixWeightedQuadraticDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -92,7 +92,7 @@ public class HSBHistogramQuadraticDistance extends MatrixWeightedQuadraticDistan
         final double cos = chx * (sx + .5) / quants - chy * (sy + .5) / quants;
         final double sin = shx * (sx + .5) / quants - shy * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;
-        final double val = 1. - FastMath.sqrt((db * db + sin * sin + cos * cos) / 5);
+        final double val = 1. - Math.sqrt((db * db + sin * sin + cos * cos) / 5);
         m[x][y] = m[y][x] = val;
       }
     }

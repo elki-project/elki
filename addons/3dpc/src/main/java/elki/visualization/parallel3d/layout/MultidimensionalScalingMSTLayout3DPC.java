@@ -25,7 +25,6 @@ import java.util.List;
 import elki.math.linearalgebra.SingularValueDecomposition;
 import elki.math.statistics.dependence.Dependence;
 import elki.utilities.documentation.Reference;
-import net.jafama.FastMath;
 
 /**
  * Layout the axes by multi-dimensional scaling.
@@ -94,7 +93,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     for(int y = 1, o = 0; y < dim; y++) {
       for(int x = 0; x < y; x++, o++) {
         double v = max - Math.abs(mat[o]);
-        v = -.5 * FastMath.sqrt(v);
+        v = -.5 * Math.sqrt(v);
         means[x] += v;
         means[y] += v;
         mean += 2 * v;
@@ -110,7 +109,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
       d[y][y] = -2 * means[y] + mean;
       for(int x = 0; x < y; x++, o++) {
         double v = max - Math.abs(mat[o]);
-        v = -.5 * FastMath.sqrt(v) - means[x] - means[y] + mean;
+        v = -.5 * Math.sqrt(v) - means[x] - means[y] + mean;
         d[x][y] = d[y][x] = v;
       }
     }
@@ -118,8 +117,8 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     SingularValueDecomposition svd = new SingularValueDecomposition(d);
     double[][] u = svd.getU();
     double[] lambda = svd.getSingularValues();
-    lambda[0] = FastMath.sqrt(Math.abs(lambda[0]));
-    lambda[1] = FastMath.sqrt(Math.abs(lambda[1]));
+    lambda[0] = Math.sqrt(Math.abs(lambda[0]));
+    lambda[1] = Math.sqrt(Math.abs(lambda[1]));
 
     Layout l = new Layout();
     buildSpanningTree(dim, mat, l);
@@ -134,7 +133,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
         maxabs = v;
       }
     }
-    maxabs = 1. / FastMath.sqrt(maxabs);
+    maxabs = 1. / Math.sqrt(maxabs);
     for(int i = 0; i < dim; i++) {
       Node n = (Node) l.getNode(i);
       n.x *= maxabs;

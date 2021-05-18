@@ -28,6 +28,7 @@ import elki.math.MeanVariance;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -96,7 +97,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
           sqsum.put((val - mean) * (val - mean));
         }
       }
-      factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
     }
   }
 

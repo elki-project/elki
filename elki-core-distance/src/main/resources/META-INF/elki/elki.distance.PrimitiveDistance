@@ -6,6 +6,8 @@ elki.distance.ArcCosineDistance arccos
 elki.distance.ArcCosineUnitlengthDistance
 elki.distance.CosineDistance cosine
 elki.distance.CosineUnitlengthDistance
+elki.distance.SqrtCosineDistance
+elki.distance.SqrtCosineUnitlengthDistance
 elki.distance.minkowski.MaximumDistance maximum max chebyshev
 elki.distance.minkowski.MinimumDistance minimum min
 elki.distance.minkowski.SquaredEuclideanDistance squaredeuclidean

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,11 +36,10 @@ import elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import net.jafama.FastMath;
 
 /**
  * {@link CovarianceMatrixBuilder} with weights.
@@ -110,26 +109,22 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
 
     // find maximum distance
     double maxdist = 0.0, stddev = 0.0;
-    {
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        double distance = weightDistance.distance(centroid, relation.get(iter));
-        stddev += distance * distance;
-        if(distance > maxdist) {
-          maxdist = distance;
-        }
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      double distance = weightDistance.distance(centroid, relation.get(iter));
+      stddev += distance * distance;
+      if(distance > maxdist) {
+        maxdist = distance;
       }
-      if(maxdist == 0.0) {
-        maxdist = 1.0;
-      }
-      // compute standard deviation.
-      stddev = FastMath.sqrt(stddev / ids.size());
     }
+    if(maxdist == 0.0) {
+      maxdist = 1.0;
+    }
+    // compute standard deviation.
+    stddev = Math.sqrt(stddev / ids.size());
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       NumberVector obj = relation.get(iter);
-      double distance = weightDistance.distance(centroid, obj);
-      double weight = weightfunction.getWeight(distance, maxdist, stddev);
-      cmat.put(obj, weight);
+      cmat.put(obj, weightfunction.getWeight(weightDistance.distance(centroid, obj), maxdist, stddev));
     }
     return cmat.destroyToPopulationMatrix();
   }
@@ -154,28 +149,22 @@ public class WeightedCovarianceMatrixBuilder implements CovarianceMatrixBuilder 
 
     // find maximum distance
     double maxdist = 0.0, stddev = 0.0;
-    {
-      int i = 0;
-      for(DoubleDBIDListIter it = results.iter(); it.valid() && i < k; it.advance(), k++) {
-        final double dist = it.doubleValue();
-        stddev += dist * dist;
-        if(dist > maxdist) {
-          maxdist = dist;
-        }
-      }
-      if(maxdist == 0.0) {
-        maxdist = 1.0;
-      }
-      stddev = FastMath.sqrt(stddev / k);
-    }
-
-    // calculate weighted PCA
     int i = 0;
     for(DoubleDBIDListIter it = results.iter(); it.valid() && i < k; it.advance(), k++) {
       final double dist = it.doubleValue();
-      NumberVector obj = database.get(it);
-      double weight = weightfunction.getWeight(dist, maxdist, stddev);
-      cmat.put(obj, weight);
+      stddev += dist * dist;
+      if(dist > maxdist) {
+        maxdist = dist;
+      }
+    }
+    if(maxdist == 0.0) {
+      maxdist = 1.0;
+    }
+    stddev = Math.sqrt(stddev / k);
+
+    // calculate weighted PCA
+    for(DoubleDBIDListIter it = results.iter(); it.valid() && it.getOffset() < k; it.advance(), k++) {
+      cmat.put(database.get(it), weightfunction.getWeight(it.doubleValue(), maxdist, stddev));
     }
     return cmat.destroyToPopulationMatrix();
   }

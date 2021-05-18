@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,6 @@ import elki.database.query.LinearScanQuery;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-
-import net.jafama.FastMath;
 
 /**
  * Optimized linear scan for Euclidean distance range queries.
@@ -65,7 +63,7 @@ public class LinearScanEuclideanRangeByObject<O extends NumberVector> implements
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double sqdistance = squared.distance(obj, relation.get(iter));
       if(sqdistance <= sqrange) {
-        result.add(FastMath.sqrt(sqdistance), iter);
+        result.add(Math.sqrt(sqdistance), iter);
       }
     }
     return result;

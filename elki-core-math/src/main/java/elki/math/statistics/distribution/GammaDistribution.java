@@ -451,7 +451,7 @@ public class GammaDistribution implements Distribution {
     final double ss, s, d;
     if(k != -1.0) {
       ss = k - 0.5;
-      s = FastMath.sqrt(ss);
+      s = Math.sqrt(ss);
       d = 5.656854249 - 12.0 * s;
     }
     else {
@@ -476,7 +476,7 @@ public class GammaDistribution implements Distribution {
     final double b, c, si, q0;
     // Simpler accept cases & parameter computation
     {
-      final double t = v1 * FastMath.sqrt(-2.0 * FastMath.log(v12) / v12);
+      final double t = v1 * Math.sqrt(-2.0 * FastMath.log(v12) / v12);
       final double x = s + 0.5 * t;
       final double gds = x * x;
       if(t >= 0.0) {
@@ -617,7 +617,7 @@ public class GammaDistribution implements Distribution {
       // Wilson and Hilferty estimate: - AS 91 at 3
       final double x = NormalDistribution.quantile(p, 0, 1);
       final double p1 = 2. / (9. * nu);
-      final double a = x * FastMath.sqrt(p1) + 1 - p1;
+      final double a = x * Math.sqrt(p1) + 1 - p1;
       double ch = nu * a * a * a;
 
       // Better approximation for p tending to 1:
