@@ -21,9 +21,7 @@
 package elki.index.tree.metrical.vptree;
 
 import elki.data.NumberVector;
-import elki.data.VectorUtil;
 import elki.data.type.TypeInformation;
-import elki.database.datastore.DBIDDataStore;
 import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
@@ -37,9 +35,7 @@ import elki.index.IndexFactory;
 import elki.index.tree.metrical.covertree.CoverTree;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
-import elki.math.MathUtil;
 import elki.utilities.Alias;
-import elki.utilities.datastructures.arrays.ArrayUtil;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -52,10 +48,16 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Multi Vantage Point Tree with no further information
- * 
+ * Multi Vantage Point Tree
+ * <p>
  * In a Multi Vantage Point Tree the data is split into Voronoi Cells (Dirichlet
  * Domain) defined by the vantage Points
+ * <p>
+ * Reference:
+ * <p>
+ * Sergey Brin<br>
+ * Near Neighbor Search in Large Metric Spaces<br>
+ * VLDB'95, Proc. of 21th Int. Conf. on Very Large Data Bases (1995)
  * 
  * 
  * @author Robert Gehde
@@ -63,6 +65,11 @@ import elki.utilities.random.RandomFactory;
  * @param <O>
  *
  */
+@Reference(authors = "Sergey Brin", //
+    booktitle = "VLDB'95, Proc. of 21th Int. Conf. on Very Large Data Bases (1995)", //
+    title = "Near Neighbor Search in Large Metric Spaces", //
+    url = "http://www.vldb.org/conf/1995/P574.PDF", //
+    bibkey = "DBLP:conf/vldb/Brin95")
 
 public class MVPTree<O> implements DistancePriorityIndex<O> {
 
@@ -146,8 +153,8 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       this.upperBound = new double[vps][vps];
       for(int i = 0; i < vps; i++) {
         for(int j = 0; j < vps; j++) {
-          lowerBound[i][j] = -1.0; // dist cant be negative
-          upperBound[i][j] = Double.MAX_VALUE;
+          lowerBound[i][j] = Double.MAX_VALUE;
+          upperBound[i][j] = -1.0;// dist cant be negative
         }
       }
     }
@@ -205,17 +212,14 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     // sort content
     for(DBIDIter iter = content.iter(); iter.valid(); iter.advance()) {
       // check if iter is a vp
-      boolean isvp = false;
+      int isvp = -1;
       for(DBIDArrayIter vpiter = current.vps.iter().seek(0); vpiter.valid(); vpiter.advance()) {
         if(DBIDUtil.equal(iter, vpiter)) {
-          isvp = true;
+          isvp = vpiter.getOffset();
           break;
         }
       }
-      if(isvp) {
-        continue;
-      }
-      // iter is not a vp so we sort it into the according child
+      // sort to according child and calculate distance bounds
       int childoffset = -1;
       double mindist = Double.MAX_VALUE;
       for(DBIDArrayIter vpiter = current.vps.iter().seek(0); vpiter.valid(); vpiter.advance()) {
@@ -227,13 +231,20 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
           childoffset = vpiter.getOffset();
         }
       }
-      // childoffset is now the index of the voronoi cell containing iter
-      if(children[childoffset] == null) {
-        children[childoffset] = DBIDUtil.newArray();
+      // if not a vantage point, add to children
+      if(isvp == -1) {
+        // childoffset is now the index of the voronoi cell containing iter
+        if(children[childoffset] == null) {
+          children[childoffset] = DBIDUtil.newArray();
+        }
+        children[childoffset].add(iter);
       }
-      children[childoffset].add(iter);
-
-      // track bounds for children
+      // track bounds
+      // (paper applies this only to children, but if i understood that right,
+      // there can be a degenerate case where the vantage point is actually
+      // nearest or farthest from the other vp. That would mean that the vp is
+      // not checked in pruning cases, but could be in range. So we track that
+      // point as well)
       for(int i = 0; i < children.length; i++) {
         if(current.lowerBound[i][childoffset] > distances[i]) {
           current.lowerBound[i][childoffset] = distances[i];
@@ -257,9 +268,6 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
   }
 
   /**
-   * TODO size of random sample
-   * TODO random seed
-   * 
    * finds a vantage points in the DBIDs between left and right
    * 
    * @param left left bound
@@ -268,12 +276,15 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * @return vantage point
    */
   private ArrayDBIDs findVantagePoints(DBIDs content, int vps) {
+    if(content.size() < vps)
+      vps = content.size();
+    int sampleSize = Math.min(vps * 3, content.size());
     // target workset
     ArrayModifiableDBIDs target = DBIDUtil.newArray(vps);
     // sample candidates
-    ModifiableDBIDs candidates = DBIDUtil.randomSample(content, vps * 3, random);
+    ModifiableDBIDs candidates = DBIDUtil.randomSample(content, sampleSize, random);
     // saves the minimum distances to chosen candidates
-    ModifiableDoubleDBIDList distlist = DBIDUtil.newDistanceDBIDList(vps * 3);
+    ModifiableDoubleDBIDList distlist = DBIDUtil.newDistanceDBIDList(sampleSize);
     // first loop
     DBIDVar f = DBIDUtil.randomSample(candidates, random);
     target.add(f);
@@ -306,7 +317,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // only should work for same distance as construction distance
-    if(df.getClass().equals(distFunc.getClass())) {
+    if(df.equals(distFunc)) {
       return new MVPTreeKNNSearcher();
     }
     return null;
@@ -316,7 +327,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // only should work for same distance as construction distance
-    if(df.getClass().equals(distFunc.getClass())) {
+    if(df.equals(distFunc)) {
       return new MVPTreeRangeSearcher();
     }
     return null;
@@ -324,20 +335,35 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-//    Distance<? super O> df = distanceQuery.getDistance();
-//    // only should work for same distance as construction distance
-//    if(df.getClass().equals(distFunc.getClass())) {
-//      return new MVPTreePrioritySearcher();
-//    }
+    Distance<? super O> df = distanceQuery.getDistance();
+    // only should work for same distance as construction distance
+    if(df.equals(distFunc)) {
+      return new MVPTreePrioritySearcher();
+    }
     return null;
   }
 
   /**
-   * kNN query for the vp-tree.
+   * check intersection of 2 intervals
+   * 
+   * @param l1 first lower bound
+   * @param u1 first upper bound
+   * @param l2 second lower bound
+   * @param u2 second upper bound
+   * @return if intervals intersect
+   */
+  private static boolean intersect(double l1, double u1, double l2, double u2) {
+    return (l1 <= u2 && u1 >= l2);
+  }
+
+  /**
+   * kNN query for the mvp-tree.
    *
    * @author Robert Gehde
    */
   public class MVPTreeKNNSearcher implements KNNSearcher<O> {
+
+    int count = 0;
 
     @Override
     public KNNList getKNN(O obj, int k) {
@@ -353,39 +379,43 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       int numChild = node.vps.size();
       boolean[] ignoreChildren = new boolean[numChild];
       for(DBIDArrayIter iter = node.vps.iter().seek(0); iter.valid(); iter.advance()) {
+        if(ignoreChildren[iter.getOffset()]) {
+          continue;
+        }
+        // as vantage points are in range, we dont need to chech them if the
+        // range is ruled out
         double x = distQuery.distance(iter, obj);
         countDistanceComputation();
+        count++;
         if(x < tau) {
           knns.insert(x, iter);
           tau = knns.getKNNDistance();
-        }
-        // we only check the ingore flag after the distance calculation, because
-        // the vp is not tracked in the child bounds and thus could be closer
-        // and still valid
-        if(ignoreChildren[iter.getOffset()]) {
-          continue;
         }
         // check intersection of [x-range,x+range] and child[i] range as seen
         // from iter, if empty (not intersecting), ignore child
         for(int i = 0; i < numChild; i++) {
           if(!ignoreChildren[i] && node.children[i] != null // not ignored yet
-              && (x - tau < node.upperBound[iter.getOffset()][i] || x + tau > node.lowerBound[iter.getOffset()][i])) {
-            ignoreChildren[i] = true;
-          }
-          else if(node.children[i] == null) {
+              && !(intersect(x - tau, x + tau, node.lowerBound[iter.getOffset()][i], node.upperBound[iter.getOffset()][i]))) {
             ignoreChildren[i] = true;
           }
         }
       }
       // search children
       for(int i = 0; i < numChild; i++) {
-        if(!ignoreChildren[i])
+        if(!ignoreChildren[i] && node.children[i] != null)
           mvpKNNSearch(obj, knns, node.children[i], tau);
       }
       return tau;
     }
+
   }
 
+  /**
+   * range query for the mvp-tree
+   * 
+   * @author Robert Gehde
+   *
+   */
   public class MVPTreeRangeSearcher implements RangeSearcher<O> {
 
     @Override
@@ -401,32 +431,26 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       int numChild = node.vps.size();
       boolean[] ignoreChildren = new boolean[numChild];
       for(DBIDArrayIter iter = node.vps.iter().seek(0); iter.valid(); iter.advance()) {
+        if(ignoreChildren[iter.getOffset()]) {
+          continue;
+        }
         double x = distQuery.distance(iter, query);
         countDistanceComputation();
         if(x <= range) {
           result.add(x, iter);
         }
-        // we only check the ingore flag after the distance calculation, because
-        // the vp is not tracked in the child bounds and thus could be closer
-        // and still valid
-        if(ignoreChildren[iter.getOffset()]) {
-          continue;
-        }
         // check intersection of [x-range,x+range] and child[i] range as seen
         // from iter, if empty (not intersecting), ignore child
         for(int i = 0; i < numChild; i++) {
           if(!ignoreChildren[i] && node.children[i] != null // not ignored yet
-              && (x - range < node.upperBound[iter.getOffset()][i] || x + range > node.lowerBound[iter.getOffset()][i])) {
-            ignoreChildren[i] = true;
-          }
-          else if(node.children[i] == null) {
+              && !intersect(x - range, x + range, node.lowerBound[iter.getOffset()][i], node.upperBound[iter.getOffset()][i])) {
             ignoreChildren[i] = true;
           }
         }
       }
       // search children
       for(int i = 0; i < numChild; i++) {
-        if(!ignoreChildren[i])
+        if(!ignoreChildren[i] && node.children[i] != null)
           mvpRangeSearch(query, result, node.children[i], range);
       }
     }
@@ -435,13 +459,18 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
   /**
    * Search position for priority search.
    *
-   * @author Erich Schubert
+   * @author Robert Gehde
    */
   private class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
     /**
      * Minimum distance
      */
     double mindist;
+
+    /**
+     * associated vantage point
+     */
+    DBIDIter vp;
 
     /**
      * Node
@@ -456,9 +485,10 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
      * @param right Interval end (exclusive)
      * @param axis Next axis
      */
-    public PrioritySearchBranch(double mindist, Node node) {
+    public PrioritySearchBranch(double mindist, Node node, DBIDIter vp) {
       this.mindist = mindist;
       this.node = node;
+      this.vp = vp;
     }
 
     @Override
@@ -467,110 +497,130 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     }
   }
 
-//  public class MVPTreePrioritySearcher implements PrioritySearcher<O> {
-//
-//    /**
-//     * Min heap for searching.
-//     */
-//    private ComparableMinHeap<PrioritySearchBranch> heap = new ComparableMinHeap<>();
-//
-//    /**
-//     * Current query object.
-//     */
-//    private O query;
-//
-//    /**
-//     * Stopping threshold.
-//     */
-//    private double threshold;
-//
-//    /**
-//     * Current search position.
-//     */
-//    private PrioritySearchBranch cur;
-//
-//    @Override
-//    public PrioritySearcher<O> search(O query) {
-//      this.query = query;
-//      this.threshold = Double.POSITIVE_INFINITY;
-//      this.heap.clear();
-//      this.heap.add(new PrioritySearchBranch(0, root));
-//      return advance();
-//    }
-//
-//    @Override
-//    public PrioritySearcher<O> advance() {
-//      if(heap.isEmpty()) {
-//        cur = null;
-//        return this;
-//      }
-//      // Get next
-//      cur = heap.poll();
-//      if(cur.mindist > threshold) {
-//        cur = null;
-//        return this;
-//      }
-//      // border value
-//      double middist = (cur.node.leftHighBound + cur.node.rightLowBound) / 2;
-//
-//      // Distance to axis:
-//      final double delta = middist - distQuery.distance(query, cur.node.vp);
-//      countDistanceComputation();
-//      final double mindist = distFunc.isSquared() ? delta * delta : Math.abs(delta);
-//
-//      // Next axis:
-//      final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-//      if(cur.node.leftChild != null && ldist <= threshold) {
-//        heap.add(new PrioritySearchBranch(ldist, cur.node.leftChild));
-//      }
-//      final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-//      if(cur.node.rightChild != null && rdist <= threshold) {
-//        heap.add(new PrioritySearchBranch(rdist, cur.node.rightChild));
-//      }
-//      return this;
-//    }
-//
-//    @Override
-//    public int internalGetIndex() {
-//      return cur.node.vp.internalGetIndex();
-//    }
-//
-//    @Override
-//    public boolean valid() {
-//      return cur != null;
-//    }
-//
-//    @Override
-//    public PrioritySearcher<O> decreaseCutoff(double threshold) {
-//      assert threshold <= this.threshold : "Thresholds must only decreasee.";
-//      this.threshold = threshold;
-//      return this;
-//    }
-//
-//    @Override
-//    public double computeExactDistance() {
-//      return distQuery.distance(query, relation.get(cur.node.vp));
-//    }
-//
-//    @Override
-//    public double allLowerBound() {
-//      return cur.mindist;
-//    }
-//
-//    @Override
-//    public double getLowerBound() {
-//      return cur.mindist;
-//    }
-//  }
-//
-//  /**
-//   * Count a single object access.
-//   */
-//  protected void countObjectAccess() {
-//    if(objaccess != null) {
-//      objaccess.increment();
-//    }
-//  }
+  /**
+   * priority search query for mvp-tree
+   * 
+   * @author robert
+   *
+   */
+  public class MVPTreePrioritySearcher implements PrioritySearcher<O> {
+
+    /**
+     * Min heap for searching.
+     */
+    private ComparableMinHeap<PrioritySearchBranch> heap = new ComparableMinHeap<>();
+
+    /**
+     * Current query object.
+     */
+    private O query;
+
+    /**
+     * Stopping threshold.
+     */
+    private double threshold;
+
+    /**
+     * Current search position.
+     */
+    private PrioritySearchBranch cur;
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      this.query = query;
+      this.threshold = Double.POSITIVE_INFINITY;
+      this.heap.clear();
+      this.heap.add(new PrioritySearchBranch(0, root, null));
+      // process root node and put first childs on stack -> not valid yet
+      advance();
+      // process first child -> valid current
+      return advance();
+    }
+
+    @Override
+    public PrioritySearcher<O> advance() {
+      if(heap.isEmpty()) {
+        cur = null;
+        return this;
+      }
+      // Get next
+      cur = heap.poll();
+      if(cur.node != null) {
+        int numChild = cur.node.vps.size();
+        boolean[] ignoreChildren = new boolean[numChild];
+        double[] distances = new double[numChild];
+        for(DBIDArrayIter iter = cur.node.vps.iter().seek(0); iter.valid(); iter.advance()) {
+          if(ignoreChildren[iter.getOffset()]) {
+            continue;
+          }
+          double x = distQuery.distance(iter, query);
+          distances[iter.getOffset()] = x;
+          countDistanceComputation();
+          // check intersection of [x-range,x+range] and child[i] range as seen
+          // from iter, if empty (not intersecting), ignore child
+          for(int i = 0; i < numChild; i++) {
+            if(!ignoreChildren[i] && cur.node.children[i] != null //
+                && !intersect(x - threshold, x + threshold, cur.node.lowerBound[iter.getOffset()][i], cur.node.upperBound[iter.getOffset()][i])) {
+              ignoreChildren[i] = true;
+            }
+          }
+        }
+        // search children
+        for(int i = 0; i < numChild; i++) {
+          if(!ignoreChildren[i]) {
+            // distance to this vp - maxdist from cell point to vp
+            double delta = distances[i] - cur.node.upperBound[i][i];
+            double mindist = distFunc.isSquared() ? delta * delta : Math.abs(delta);
+            double cdist = delta < 0 ? cur.mindist : Math.max(mindist, cur.mindist);
+            heap.add(new PrioritySearchBranch(cdist, cur.node.children[i], cur.node.vps.iter().seek(i)));
+          }
+        }
+      }
+
+      return this;
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return cur.vp.internalGetIndex();
+    }
+
+    @Override
+    public boolean valid() {
+      return cur != null;
+    }
+
+    @Override
+    public PrioritySearcher<O> decreaseCutoff(double threshold) {
+      assert threshold <= this.threshold : "Thresholds must only decreasee.";
+      this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public double computeExactDistance() {
+      return distQuery.distance(query, relation.get(cur.vp));
+    }
+
+    @Override
+    public double allLowerBound() {
+      return cur.mindist;
+    }
+
+    @Override
+    public double getLowerBound() {
+      return cur.mindist;
+    }
+  }
+
+  /**
+   * Count a single object access.
+   */
+  protected void countObjectAccess() {
+    if(objaccess != null) {
+      objaccess.increment();
+    }
+  }
 
   /**
    * Count a distance computation.
@@ -607,7 +657,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     /**
      * Sample size
      */
-    int sampleSize;
+    int numbervps;
 
     /**
      * 
@@ -623,16 +673,16 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
      * Constructor.
      *
      */
-    public Factory(Distance<O> distFunc, RandomFactory random, int sampleSize) {
+    public Factory(Distance<O> distFunc, RandomFactory random, int numberVantagePoints) {
       super();
       this.distance = distFunc;
       this.random = random;
-      this.sampleSize = sampleSize;
+      this.numbervps = numberVantagePoints;
     }
 
     @Override
     public MVPTree<O> instantiate(Relation<O> relation) {
-      return new MVPTree<>(relation, distance, random, sampleSize);
+      return new MVPTree<>(relation, distance, random, numbervps);
     }
 
     @Override
@@ -656,7 +706,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       /**
        * Parameter to specify the sample size for choosing vantage point
        */
-      public final static OptionID SAMPLE_SIZE_ID = new OptionID("vptree.sampleSize", "Size of sample to select vantage point from.");
+      public final static OptionID NUMBER_VANTAGE_POINTS_ID = new OptionID("vptree.numberVantagePoints", "Number of Vantage points on root layer and thus number of children on root layer.");
 
       /**
        * Parameter to specify the random generator seed
@@ -676,7 +726,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       /**
        * Sample size
        */
-      protected int sampleSize;
+      protected int amountVantagePoints;
 
       @Override
       public void configure(Parameterization config) {
@@ -684,17 +734,17 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
             .grab(config, x -> {
               this.distance = x;
             });
-        new IntParameter(SAMPLE_SIZE_ID, 10) //
+        new IntParameter(NUMBER_VANTAGE_POINTS_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
             .grab(config, x -> {
-              this.sampleSize = x;
+              this.amountVantagePoints = x;
             });
         new RandomParameter(SEED_ID).grab(config, x -> random = x);
       }
 
       @Override
       public Factory<O> make() {
-        return new Factory<>(distance, random, sampleSize);
+        return new Factory<>(distance, random, amountVantagePoints);
       }
     }
   }

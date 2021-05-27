@@ -48,16 +48,22 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Vantage Point Tree with no further information
- * 
+ * Vantage Point Tree with no additional information
+ * <p>
  * In a Vantage Point Tree the Data is split at the median distance to a vantage
  * point at every node.
- * 
+ * <p>
  * The distance function in the original paper was bounded to have a limited tau
  * size. In this class the function is not bounded, as we can just limit tau to
  * Double.MAX_VALUE
+ * <p>
+ * Reference:
+ * <p>
+ * Peter N. Yianilos<br>
+ * Data Structures and Algorithms for Nearest Neighbor Search in General Metric Spaces<br>
+ * Proc. of the Fourth Annual {ACM/SIGACT-SIAM} Symposium on Discrete Algorithms (1993)
  * 
- * TODO: Ref in Doc
+ * 
  * @author Robert Gehde
  *
  * @param <O>
@@ -109,7 +115,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * Random factory for selecting vantage points
    */
   RandomFactory random;
-  
+
   /**
    * Sample size for selecting vantage points
    */
@@ -126,7 +132,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @author Robert Gehde
    *
    */
-  class Node {
+  static class Node {
     /**
      * vantage point
      */
@@ -214,55 +220,62 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         vantagePointOffset = iter.getOffset();
       }
     }
-    int middle = (left + 1 + right) >>> 1;
-    // sort left < median; right >= median
-    // quickselect only assures that the median is correct
-    // exclude current vantage point
-    sorted.swap(left, vantagePointOffset);
-    countObjectAccess();
-    QuickSelectDBIDs.quickSelect(sorted, left + 1, right, middle);
+    if(left + 1 == right) {
+      // node only has vp, the rest
+      current.leftLowBound = Double.POSITIVE_INFINITY;
+      current.rightLowBound = Double.POSITIVE_INFINITY;
+      current.leftHighBound = Double.NEGATIVE_INFINITY;
+      current.rightHighBound = Double.NEGATIVE_INFINITY;
+    }
+    else {
+      int middle = (left + 1 + right) >>> 1;
+      // sort left < median; right >= median
+      // quickselect only assures that the median is correct
+      // exclude current vantage point
+      sorted.swap(left, vantagePointOffset);
+      countObjectAccess();
+      QuickSelectDBIDs.quickSelect(sorted, left + 1, right, middle);
 
-    // offset for values == median, such that correct sorting is given
-    double median = iter.seek(middle).doubleValue();
-    countObjectAccess();
-    for(iter.seek(left + 1); iter.getOffset() < middle; iter.advance()) {
-      double d = iter.doubleValue();
-      if(d == median) {
-        sorted.swap(iter.getOffset(), --middle);
-        countObjectAccess();
-      }
-      else {
-        if(d < current.leftLowBound) {
-          current.leftLowBound = d;
+      // offset for values == median, such that correct sorting is given
+      double median = iter.seek(middle).doubleValue();
+      countObjectAccess();
+      for(iter.seek(left + 1); iter.getOffset() < middle; iter.advance()) {
+        double d = iter.doubleValue();
+        if(d == median) {
+          sorted.swap(iter.getOffset(), --middle);
+          countObjectAccess();
         }
-        if(d > current.leftHighBound) {
-          current.leftHighBound = d;
+        else {
+          if(d < current.leftLowBound) {
+            current.leftLowBound = d;
+          }
+          if(d > current.leftHighBound) {
+            current.leftHighBound = d;
+          }
         }
       }
-    }
-    for(iter.seek(middle); iter.getOffset() < right; iter.advance()) {
-      double d = iter.doubleValue();
-      if(d < current.rightLowBound) {
-        current.rightLowBound = d;
+      for(iter.seek(middle); iter.getOffset() < right; iter.advance()) {
+        double d = iter.doubleValue();
+        if(d < current.rightLowBound) {
+          current.rightLowBound = d;
+        }
+        if(d > current.rightHighBound) {
+          current.rightHighBound = d;
+        }
       }
-      if(d > current.rightHighBound) {
-        current.rightHighBound = d;
+      // construct child trees
+      if(middle - (left + 1) > 0) {
+        current.leftChild = new Node(left + 1, middle);
+        buildTree(current.leftChild, left + 1, middle, iter);
       }
-    }
-    // construct child trees
-    if(middle - (left + 1) > 0) {
-      current.leftChild = new Node(left + 1, middle);
-      buildTree(current.leftChild, left + 1, middle, iter);
-    }
-    if(right - middle > 0) {
-      current.rightChild = new Node(middle, right);
-      buildTree(current.rightChild, middle, right, iter);
+      if(right - middle > 0) {
+        current.rightChild = new Node(middle, right);
+        buildTree(current.rightChild, middle, right, iter);
+      }
     }
   }
 
   /**
-   * TODO size of random sample
-   * TODO random seed
    * 
    * finds a vantage points in the DBIDs between left and right
    * 
@@ -279,7 +292,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       workset.add(iter);
       countObjectAccess();
     }
-    // find vantage point (TODO maybe add s to objaccess)
+    // find vantage point
     ModifiableDBIDs candidates = DBIDUtil.randomSample(workset, s, random);
     DBID best = null;
     double bestSpread = Double.NEGATIVE_INFINITY;
@@ -303,7 +316,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @param check points to check with
    * @param it DBID to calculate the moment for
    * @param s sample size of check
-   * @return
+   * @return calculated moment
    */
   private double calcMoment(DBIDs check, DBIDIter it, int s) {
     // calc distances
@@ -329,7 +342,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // only should work for same distance as construction distance
-    if(df.getClass().equals(distFunc.getClass())) {
+    if(df.equals(distFunc)) {
       return new VPTreeKNNSearcher();
     }
     return null;
@@ -339,7 +352,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // only should work for same distance as construction distance
-    if(df.getClass().equals(distFunc.getClass())) {
+    if(df.equals(distFunc)) {
       return new VPTreeRangeSearcher();
     }
     return null;
@@ -349,7 +362,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     // only should work for same distance as construction distance
-    if(df.getClass().equals(distFunc.getClass())) {
+    if(df.equals(distFunc)) {
       return new VPTreePrioritySearcher();
     }
     return null;
@@ -473,6 +486,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       return Double.compare(this.mindist, o.mindist);
     }
   }
+
   /**
    * 
    * @author Robert Gehde
@@ -619,6 +633,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
      * Sample size
      */
     int sampleSize;
+
     /**
      * 
      * Constructor.
@@ -626,7 +641,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
      */
     @SuppressWarnings("unchecked")
     public Factory() {
-      this((Distance<O>) EuclideanDistance.STATIC, RandomFactory.DEFAULT,10);
+      this((Distance<O>) EuclideanDistance.STATIC, RandomFactory.DEFAULT, 10);
     }
 
     /**
@@ -682,6 +697,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
        * Random generator
        */
       protected RandomFactory random;
+
       /**
        * Sample size
        */
@@ -694,10 +710,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
               this.distance = x;
             });
         new IntParameter(SAMPLE_SIZE_ID, 10) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
-        .grab(config, x ->{
-          this.sampleSize = x;
-        });
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)//
+            .grab(config, x -> {
+              this.sampleSize = x;
+            });
         new RandomParameter(SEED_ID).grab(config, x -> random = x);
       }
 
