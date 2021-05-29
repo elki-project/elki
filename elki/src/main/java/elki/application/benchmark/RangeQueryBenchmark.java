@@ -20,6 +20,8 @@
  */
 package elki.application.benchmark;
 
+import java.util.Arrays;
+
 import elki.application.AbstractDistanceBasedApplication;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -38,9 +40,11 @@ import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
+import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
 import elki.utilities.Util;
+import elki.utilities.datastructures.arrays.ArrayUtil;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
@@ -140,7 +144,6 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     MeanVariance mv = new MeanVariance(); // result statistics to collect.
-    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     int hash;
     if(queries != null) {
       RangeSearcher<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeByObject();
@@ -152,7 +155,6 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
       hash = run(rangeQuery, relation, qrad, mv);
     }
-    LOG.statistics(dur.end());
     LOG.statistics("Result hashcode: " + hash);
     LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
     for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
@@ -172,12 +174,14 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
   protected int run(RangeSearcher<DBIDRef> rangeQuery, Relation<O> relation, Relation<NumberVector> radrel, MeanVariance mv) {
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     int hash = 0;
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList rres = rangeQuery.getRange(iditer, radrel.get(iditer).doubleValue(0));
       hash = Util.mixHashCodes(hash, processResult(rres, mv));
       LOG.incrementProcessed(prog);
     }
+    LOG.statistics(dur.end());
     LOG.ensureCompleted(prog);
     return hash;
   }
@@ -214,17 +218,17 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       }
       throw new IncompatibleDataException(buf.toString());
     }
-    // Random sampling is a bit of hack, sorry.
-    // But currently, we don't (yet) have an "integer random sample" function.
-    DBIDRange sids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
+    // Random sampling from the query data set:
+    int[] sample = MathUtil.sequence(0, bundle.dataLength());
+    int samplesize = (int) (sampling <= 1 ? sampling * sample.length : sampling);
+    ArrayUtil.randomShuffle(sample, random.getSingleThreadedRandom(), samplesize);
+    sample = Arrays.copyOf(sample, samplesize);
 
-    final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
-    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.length, LOG) : null;
+    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     int hash = 0;
     double[] buf = new double[dim];
-    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-      int off = sids.binarySearch(iditer);
-      assert (off >= 0);
+    for(int off : sample) {
       // Split query data into object + radius
       NumberVector o = (NumberVector) bundle.data(off, col);
       for(int i = 0; i < dim; i++) {
@@ -234,6 +238,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       hash = Util.mixHashCodes(hash, processResult(rres, mv));
       LOG.incrementProcessed(prog);
     }
+    LOG.statistics(dur.end());
     LOG.ensureCompleted(prog);
     return hash;
   }

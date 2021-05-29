@@ -20,6 +20,8 @@
  */
 package elki.application.benchmark;
 
+import java.util.Arrays;
+
 import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
@@ -34,9 +36,11 @@ import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
+import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
 import elki.utilities.Util;
+import elki.utilities.datastructures.arrays.ArrayUtil;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
@@ -112,79 +116,102 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    int hash;
+    MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
     // No query set - use original database.
     if(queries == null) {
       KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k);
-      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
-      Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
-      FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      int hash = 0;
-      MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
-      for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        KNNList knns = knnQuery.getKNN(iditer, k);
-        int ichecksum = 0;
-        for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
-          ichecksum += DBIDUtil.asInteger(it);
-        }
-        hash = Util.mixHashCodes(hash, ichecksum);
-        mv.put(knns.size());
-        mvdist.put(knns.getKNNDistance());
-        LOG.incrementProcessed(prog);
-      }
-      LOG.ensureCompleted(prog);
-      LOG.statistics(dur.end());
-      LOG.statistics("Result hashcode: " + hash);
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
-      if(mvdist.getCount() > 0) {
-        LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
-      }
+      hash = run(knnQuery, relation, mv, mvdist);
     }
     else { // Separate query set.
       KNNSearcher<O> knnQuery = new QueryBuilder<>(relation, distance).kNNByObject(k);
-      TypeInformation res = distance.getInputTypeRestriction();
-      MultipleObjectsBundle bundle = queries.loadData();
-      int col = -1;
-      for(int i = 0; i < bundle.metaLength(); i++) {
-        if(res.isAssignableFromType(bundle.meta(i))) {
-          col = i;
-          break;
-        }
+      hash = run(knnQuery, mv, mvdist);
+    }
+    LOG.statistics("Result hashcode: " + hash);
+    LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+    if(mvdist.getCount() > 0) {
+      LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
+    }
+    for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+      it.get().logStatistics();
+    }
+  }
+
+  /**
+   * Run with the database as query source
+   *
+   * @param knnQuery Query object
+   * @param relation Input data
+   * @param mv statistics collector
+   * @param mvdist statistics collector
+   * @return hash code of the results
+   */
+  private int run(KNNSearcher<DBIDRef> knnQuery, Relation<O> relation, MeanVariance mv, MeanVariance mvdist) {
+    int hash = 0;
+    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
+    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
+      KNNList knns = knnQuery.getKNN(iditer, k);
+      int ichecksum = 0;
+      for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
+        ichecksum += DBIDUtil.asInteger(it);
       }
-      if(col < 0) {
-        throw new IncompatibleDataException("No compatible data type in query input was found. Expected: " + res.toString());
-      }
-      // Random sampling is a bit of hack, sorry.
-      // But currently, we don't (yet) have an "integer random sample" function.
-      DBIDRange sids = DBIDUtil.generateStaticDBIDRange(bundle.dataLength());
-      final DBIDs sample = DBIDUtil.randomSample(sids, sampling, random);
-      FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-      int hash = 0;
-      MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
-      for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        int off = sids.binarySearch(iditer);
-        assert (off >= 0);
-        @SuppressWarnings("unchecked")
-        O o = (O) bundle.data(off, col);
-        KNNList knns = knnQuery.getKNN(o, k);
-        int ichecksum = 0;
-        for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
-          ichecksum += DBIDUtil.asInteger(it);
-        }
-        hash = Util.mixHashCodes(hash, ichecksum);
-        mv.put(knns.size());
-        mvdist.put(knns.getKNNDistance());
-        LOG.incrementProcessed(prog);
-      }
-      LOG.ensureCompleted(prog);
-      LOG.statistics("Result hashcode: " + hash);
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
-      if(mvdist.getCount() > 0) {
-        LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
-      }
-      for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
-        it.get().logStatistics();
+      hash = Util.mixHashCodes(hash, ichecksum);
+      mv.put(knns.size());
+      mvdist.put(knns.getKNNDistance());
+      LOG.incrementProcessed(prog);
+    }
+    LOG.statistics(dur.end());
+    LOG.ensureCompleted(prog);
+    return hash;
+  }
+
+  /**
+   * Run using a second database as query source
+   *
+   * @param knnQuery Query object
+   * @param mv statistics collector
+   * @param mvdist statistics collector
+   * @return hash code of the results
+   */
+  private int run(KNNSearcher<O> knnQuery, MeanVariance mv, MeanVariance mvdist) {
+    int hash = 0;
+    TypeInformation res = distance.getInputTypeRestriction();
+    MultipleObjectsBundle bundle = queries.loadData();
+    int col = -1;
+    for(int i = 0; i < bundle.metaLength(); i++) {
+      if(res.isAssignableFromType(bundle.meta(i))) {
+        col = i;
+        break;
       }
     }
+    if(col < 0) {
+      throw new IncompatibleDataException("No compatible data type in query input was found. Expected: " + res.toString());
+    }
+    // Random sampling from the query data set:
+    int[] sample = MathUtil.sequence(0, bundle.dataLength());
+    int samplesize = (int) (sampling <= 1 ? sampling * sample.length : sampling);
+    ArrayUtil.randomShuffle(sample, random.getSingleThreadedRandom(), samplesize);
+    sample = Arrays.copyOf(sample, samplesize);
+    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.length, LOG) : null;
+    for(int off : sample) {
+      @SuppressWarnings("unchecked")
+      O o = (O) bundle.data(off, col);
+      KNNList knns = knnQuery.getKNN(o, k);
+      int ichecksum = 0;
+      for(DBIDIter it = knns.iter(); it.valid(); it.advance()) {
+        ichecksum += DBIDUtil.asInteger(it);
+      }
+      hash = Util.mixHashCodes(hash, ichecksum);
+      mv.put(knns.size());
+      mvdist.put(knns.getKNNDistance());
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+    LOG.statistics(dur.end());
+    return hash;
   }
 
   /**
