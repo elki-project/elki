@@ -20,7 +20,6 @@
  */
 package elki.application.benchmark;
 
-import elki.Algorithm;
 import elki.application.AbstractDistanceBasedApplication;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
@@ -31,11 +30,14 @@ import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
+import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
 import elki.math.MeanVariance;
+import elki.result.Metadata;
 import elki.utilities.Util;
+import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -114,6 +116,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     if(queries == null) {
       KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k);
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+      Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
       FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       int hash = 0;
       MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
@@ -129,12 +132,11 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      if(LOG.isStatistics()) {
-        LOG.statistics("Result hashcode: " + hash);
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
-        if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
-        }
+      LOG.statistics(dur.end());
+      LOG.statistics("Result hashcode: " + hash);
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+      if(mvdist.getCount() > 0) {
+        LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
       }
     }
     else { // Separate query set.
@@ -174,12 +176,13 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      if(LOG.isStatistics()) {
-        LOG.statistics("Result hashcode: " + hash);
-        LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
-        if(mvdist.getCount() > 0) {
-          LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
-        }
+      LOG.statistics("Result hashcode: " + hash);
+      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+      if(mvdist.getCount() > 0) {
+        LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
+      }
+      for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+        it.get().logStatistics();
       }
     }
   }
@@ -237,11 +240,6 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      // Data input
-      inputstep = config.tryInstantiate(InputStep.class);
-      // Distance function
-      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
-          .grab(config, x -> distance = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);

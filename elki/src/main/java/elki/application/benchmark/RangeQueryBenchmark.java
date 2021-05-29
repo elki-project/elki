@@ -34,10 +34,14 @@ import elki.database.relation.RelationUtil;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.Distance;
+import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.Duration;
 import elki.math.MeanVariance;
+import elki.result.Metadata;
 import elki.utilities.Util;
+import elki.utilities.datastructures.iterator.It;
 import elki.utilities.exceptions.IncompatibleDataException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -135,8 +139,9 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    int hash;
     MeanVariance mv = new MeanVariance(); // result statistics to collect.
+    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
+    int hash;
     if(queries != null) {
       RangeSearcher<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeByObject();
       hash = run(rangeQuery, relation, queries, mv);
@@ -147,9 +152,11 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
       hash = run(rangeQuery, relation, qrad, mv);
     }
-    if(LOG.isStatistics()) {
-      LOG.statistics("Result hashcode: " + hash);
-      LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+    LOG.statistics(dur.end());
+    LOG.statistics("Result hashcode: " + hash);
+    LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+    for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
+      it.get().logStatistics();
     }
   }
 
