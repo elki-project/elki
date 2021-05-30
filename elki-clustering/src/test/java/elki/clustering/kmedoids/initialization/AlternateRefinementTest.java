@@ -58,9 +58,9 @@ public class AlternateRefinementTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 2) //
+        .with(CLARA.Par.RANDOM_ID, 6) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.994025);
-    assertClusterSizes(result, new int[] { 198, 199, 200, 201, 202 });
+    assertFMeasure(db, result, 0.9464);
+    assertClusterSizes(result, new int[] { 171, 200, 200, 200, 229 });
   }
 }

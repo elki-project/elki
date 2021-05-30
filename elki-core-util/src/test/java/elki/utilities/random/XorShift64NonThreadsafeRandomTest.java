@@ -38,9 +38,7 @@ public class XorShift64NonThreadsafeRandomTest {
   @Test
   public void testUniformity() {
     final int[] ranges = new int[] { 3, 6, 17, 63, 64, 1023, 1024, 49806 };
-    final double[] expected = new double[] { 0.434, 3.855, 15.517, 86.460, 74.437, 779.741, 806.818, 12028.688 };
-    // 0.99 expected:
-    // 9.2103,15.0863,31.9999,90.8015,92.0100,1130.1073,1131.1587,50542.1598
+    final double[] expected = new double[] { 7.950, 19.711, 31.216, 88.603, 89.356, 886.772, 872.781, 12753.803 };
     final int size = 10000, runs = 100;
     for(int j = 0; j < ranges.length; j++) {
       int range = ranges[j];
@@ -61,13 +59,10 @@ public class XorShift64NonThreadsafeRandomTest {
     }
   }
 
-
   @Test
   public void testUniformityDouble() {
     final int[] ranges = new int[] { 3, 6, 17, 63, 64, 1023, 1024, 49806 };
-    final double[] expected = new double[] { 0.434, 3.855, 15.517, 86.460, 74.437, 779.741, 806.818, 12028.688 };
-    // 0.99 expected:
-    // 9.2103,15.0863,31.9999,90.8015,92.0100,1130.1073,1131.1587,50542.1598
+    final double[] expected = new double[] { 7.950, 19.711, 31.216, 88.603, 89.356, 886.772, 872.781, 12753.803 };
     final int size = 10000, runs = 100;
     for(int j = 0; j < ranges.length; j++) {
       int range = ranges[j];
@@ -84,7 +79,14 @@ public class XorShift64NonThreadsafeRandomTest {
         double chisq = JavaRandomTest.computeChiSquared(counts, size);
         maxchisq = chisq > maxchisq ? chisq : maxchisq;
       }
-      assertEquals("Java random quality has changed.", expected[j], maxchisq, 1e-3);
+      assertEquals("Random quality has changed.", expected[j], maxchisq, 1e-3);
     }
+  }
+
+  @Test
+  public void testSmallIntSeeds() {
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift64NonThreadsafeRandom(i), 100, 2, 0.49, 0.51);
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift64NonThreadsafeRandom(i), 100, 3, 0.32, 0.35);
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift64NonThreadsafeRandom(i), 100, 4, 0.21, 0.30);
   }
 }

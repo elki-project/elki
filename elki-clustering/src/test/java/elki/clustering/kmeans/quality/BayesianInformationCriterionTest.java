@@ -44,7 +44,7 @@ public class BayesianInformationCriterionTest extends AbstractClusterAlgorithmTe
         .with(XMeans.Par.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
         .with(XMeans.Par.INFORMATION_CRITERION_ID, BayesianInformationCriterion.class) //
-        .with(KMeans.SEED_ID, 0) // // Initializer seed
+        .with(KMeans.SEED_ID, 1) // // Initializer seed
         .with(XMeans.Par.SEED_ID, 0) // // X-means seed
         .build().autorun(db);
     assertFMeasure(db, result, 0.959272);

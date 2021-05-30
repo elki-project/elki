@@ -86,4 +86,12 @@ public class XorShift1024NonThreadsafeRandomTest {
       assertEquals("Java random quality has changed.", expected[j], maxchisq, 1e-3);
     }
   }
+
+
+  @Test
+  public void testSmallIntSeeds() {
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift1024NonThreadsafeRandom(i), 100, 2, 0.48, 0.52);
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift1024NonThreadsafeRandom(i), 100, 3, 0.30, 0.37);
+    JavaRandomTest.assertSeedEntropy(i -> new XorShift1024NonThreadsafeRandom(i), 100, 4, 0.18, 0.31);
+  }
 }

@@ -38,9 +38,7 @@ public class Xoroshiro128NonThreadsafeRandomTest {
   @Test
   public void testUniformity() {
     final int[] ranges = new int[] { 3, 6, 17, 63, 64, 1023, 1024, 49806 };
-    final double[] expected = new double[] { 11.017, 12.616, 33.193, 92.304, 95.193, 894.961, 899.773, 12843.987 };
-    // 0.99 expected:
-    // 9.2103,15.0863,31.9999,90.8015,92.0100,1130.1073,1131.1587,50542.1598
+    final double[] expected = new double[] { 15.920, 22.267, 38.547, 93.806, 90.028, 902.313, 904.624, 12681.274 };
     final int size = 10000, runs = 100;
     for(int j = 0; j < ranges.length; j++) {
       int range = ranges[j];
@@ -61,13 +59,10 @@ public class Xoroshiro128NonThreadsafeRandomTest {
     }
   }
 
-
   @Test
   public void testUniformityDouble() {
     final int[] ranges = new int[] { 3, 6, 17, 63, 64, 1023, 1024, 49806 };
-    final double[] expected = new double[] { 11.017, 12.616, 33.193, 92.304, 93.151, 894.961, 869.022, 12843.987 };
-    // 0.99 expected:
-    // 9.2103,15.0863,31.9999,90.8015,92.0100,1130.1073,1131.1587,50542.1598
+    final double[] expected = new double[] { 15.920, 22.267, 38.547, 93.806, 94.486, 902.313, 891.195, 12681.274 };
     final int size = 10000, runs = 100;
     for(int j = 0; j < ranges.length; j++) {
       int range = ranges[j];
@@ -84,7 +79,14 @@ public class Xoroshiro128NonThreadsafeRandomTest {
         double chisq = JavaRandomTest.computeChiSquared(counts, size);
         maxchisq = chisq > maxchisq ? chisq : maxchisq;
       }
-      assertEquals("Java random quality has changed.", expected[j], maxchisq, 1e-3);
+      assertEquals("Random quality has changed.", expected[j], maxchisq, 1e-3);
     }
+  }
+
+  @Test
+  public void testSmallIntSeeds() {
+    JavaRandomTest.assertSeedEntropy(i -> new Xoroshiro128NonThreadsafeRandom(i), 100, 2, 0.42, 0.58);
+    JavaRandomTest.assertSeedEntropy(i -> new Xoroshiro128NonThreadsafeRandom(i), 100, 3, 0.32, 0.35);
+    JavaRandomTest.assertSeedEntropy(i -> new Xoroshiro128NonThreadsafeRandom(i), 100, 4, 0.19, 0.33);
   }
 }

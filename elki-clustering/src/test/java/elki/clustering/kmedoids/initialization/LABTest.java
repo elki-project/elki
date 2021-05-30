@@ -43,11 +43,11 @@ public class LABTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 5) //
+        .with(KMeans.SEED_ID, 0) //
         .with(KMeans.INIT_ID, LAB.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.9901);
-    assertClusterSizes(result, new int[] { 195, 200, 200, 200, 205 });
+    assertFMeasure(db, result, 0.98818);
+    assertClusterSizes(result, new int[] { 194, 200, 200, 200, 206 });
   }
 
   @Test
@@ -60,9 +60,9 @@ public class LABTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 0) //
+        .with(CLARA.Par.RANDOM_ID, 2) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99602);
-    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    assertFMeasure(db, result, 0.9730);
+    assertClusterSizes(result, new int[] { 186, 200, 200, 200, 214 });
   }
 }

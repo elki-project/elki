@@ -39,7 +39,7 @@ public class SameSizeKMeansTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<>(SameSizeKMeans.class) //
         .with(KMeans.K_ID, 6) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 2) //
         .build().autorun(db);
     // With k=5, it achieves even 100% on this data set, but it is more useful
     // for regression testing to use suboptimal results.

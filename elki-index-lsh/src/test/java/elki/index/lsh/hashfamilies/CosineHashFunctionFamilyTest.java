@@ -30,10 +30,8 @@ import elki.data.NumberVector;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.database.ids.DBIDUtil;
 import elki.database.relation.MaterializedRelation;
-import elki.database.relation.Relation;
 import elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
-import elki.utilities.ClassGenericsUtil;
-import elki.utilities.optionhandling.parameterization.ListParameterization;
+import elki.utilities.ELKIBuilder;
 
 /**
  * Unit test for random hyperplane / cosine distance.
@@ -57,15 +55,11 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
   }
 
   private LocalitySensitiveHashFunction<? super NumberVector> createCosineHashFunction(int numberOfProjections) {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(CosineHashFunctionFamily.Par.RANDOM_ID, 0L);
-    params.addParameter(CosineHashFunctionFamily.Par.NUMPROJ_ID, numberOfProjections);
-    CosineHashFunctionFamily cosineFamily = ClassGenericsUtil.parameterizeOrAbort(CosineHashFunctionFamily.class, params);
-    LocalitySensitiveHashFunction<? super NumberVector> hashFunction = cosineFamily.generateHashFunctions(mockRelation(5), numberOfProjections).get(0);
-    return hashFunction;
-  }
-
-  private Relation<NumberVector> mockRelation(final int dimension) {
-    return new MaterializedRelation<>(null, VectorFieldTypeInformation.typeRequest(NumberVector.class, dimension, dimension), DBIDUtil.EMPTYDBIDS);
+    return new ELKIBuilder<CosineHashFunctionFamily>(CosineHashFunctionFamily.class) //
+        .with(CosineHashFunctionFamily.Par.RANDOM_ID, 4L) //
+        .with(CosineHashFunctionFamily.Par.NUMPROJ_ID, numberOfProjections) //
+        .build().generateHashFunctions( //
+            new MaterializedRelation<>(null, VectorFieldTypeInformation.typeRequest(NumberVector.class, 5, 5), DBIDUtil.EMPTYDBIDS), //
+            numberOfProjections).get(0);
   }
 }

@@ -40,7 +40,7 @@ public class YinYangKMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<YinYangKMeans<DoubleVector>>(YinYangKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(YinYangKMeans.Par.T_ID, 2) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.998005);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });

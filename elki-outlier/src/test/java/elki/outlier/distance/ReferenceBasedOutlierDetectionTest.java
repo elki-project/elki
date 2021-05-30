@@ -79,8 +79,8 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
         .with(RandomGeneratedReferencePoints.Par.N_ID, 15)//
         .with(RandomGeneratedReferencePoints.Par.RANDOM_ID, 0)//
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.878203703);
-    assertSingleScore(result, 945, 0.910430564);
+    assertAUC(db, "Noise", result, 0.8830925);
+    assertSingleScore(result, 945, 0.8828635);
   }
 
   @Test
@@ -92,7 +92,7 @@ public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithm
         .with(RandomSampleReferencePoints.Par.N_ID, 15)//
         .with(RandomSampleReferencePoints.Par.RANDOM_ID, 0)//
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.829814814);
-    assertSingleScore(result, 945, 0.846881387);
+    assertAUC(db, "Noise", result, 0.851018);
+    assertSingleScore(result, 945, 0.861747);
   }
 }

@@ -31,7 +31,8 @@ import elki.utilities.documentation.Reference;
  * It is still the same Linear Congruential Generator (LCG), with a cycle length
  * of 2<sup>48</sup>, of which we only use 32 bits at a time. Given the same
  * seed, it is expected to produce the exact same random sequence as Java's
- * {@link java.util.Random}.
+ * {@link java.util.Random}, given the same seed. Which implies that you <b>need
+ * to randomize your seeds</b> with a better random source.
  * 
  * @author Erich Schubert
  * @since 0.6.0

@@ -41,10 +41,10 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(FeatureBagging.Par.NUM_ID, 10) //
-        .with(FeatureBagging.Par.SEED_ID, 1) //
+        .with(FeatureBagging.Par.SEED_ID, 5) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.94758434);
-    assertSingleScore(result, 1293, 12.816102);
+    assertAUC(db, "Noise", result, 0.952952);
+    assertSingleScore(result, 1293, 12.43078);
   }
 
   @Test
@@ -53,10 +53,10 @@ public class FeatureBaggingTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<>(FeatureBagging.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(FeatureBagging.Par.NUM_ID, 10) //
-        .with(FeatureBagging.Par.SEED_ID, 5) //
+        .with(FeatureBagging.Par.SEED_ID, 2) //
         .with(FeatureBagging.Par.BREADTH_ID) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.92470588);
-    assertSingleScore(result, 1293, 1.2047264);
+    assertAUC(db, "Noise", result, 0.94244);
+    assertSingleScore(result, 1293, 1.7582);
   }
 }

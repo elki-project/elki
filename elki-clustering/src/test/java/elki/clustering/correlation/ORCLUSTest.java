@@ -45,10 +45,10 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
     Clustering<Model> result = new ELKIBuilder<>(ORCLUS.class) //
         .with(ORCLUS.Par.K_ID, 3) //
         .with(ORCLUS.Par.L_ID, 1) //
-        .with(ORCLUS.Par.SEED_ID, 1) //
+        .with(ORCLUS.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.62504);
-    assertClusterSizes(result, new int[] { 28, 33, 389 });
+    assertFMeasure(db, result, 0.6298);
+    assertClusterSizes(result, new int[] { 22, 33, 395 });
   }
 
   @Test
@@ -59,7 +59,7 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
         .with(ORCLUS.Par.L_ID, 4) //
         .with(ORCLUS.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.848054);
-    assertClusterSizes(result, new int[] { 189, 200, 212 });
+    assertFMeasure(db, result, 0.63327);
+    assertClusterSizes(result, new int[] { 107, 152, 342 });
   }
 }

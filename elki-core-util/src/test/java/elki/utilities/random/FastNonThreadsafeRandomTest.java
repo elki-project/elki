@@ -111,4 +111,21 @@ public class FastNonThreadsafeRandomTest {
       assertEquals("Java random quality has changed.", expected[j], maxchisq, 1e-5);
     }
   }
+
+  @Test
+  public void testSmallIntSeeds() {
+    // Note: fails for seeds up to 1000, need 10000
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom(i), 10000, 2, 0.35, 0.65);
+    // Note: fails for seeds up to 1000, need 25000
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom(i), 25000, 3, 0.29, 0.39);
+    // Note: fails for seeds up to 1000, need 25000
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom(i), 25000, 4, 0.20, 0.35);
+    // Better way of using these:
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom( //
+        RandomFactory.murmurMix64(i)), 100, 2, 0.48, 0.52);
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom( //
+        RandomFactory.murmurMix64(i)), 100, 3, 0.32, 0.36);
+    JavaRandomTest.assertSeedEntropy(i -> new FastNonThreadsafeRandom( //
+        RandomFactory.murmurMix64(i)), 100, 4, 0.20, 0.31);
+  }
 }

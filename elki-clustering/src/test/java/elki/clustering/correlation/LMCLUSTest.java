@@ -41,10 +41,10 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
     Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
         .with(LMCLUS.Par.MINSIZE_ID, 100) //
         .with(LMCLUS.Par.THRESHOLD_ID, 10) //
-        .with(LMCLUS.Par.RANDOM_ID, 6) //
+        .with(LMCLUS.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.487716464);
-    assertClusterSizes(result, new int[] { 30, 570 });
+    assertFMeasure(db, result, 0.484274);
+    assertClusterSizes(result, new int[] { 37, 563 });
   }
 
   @Test
@@ -53,9 +53,9 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
     Clustering<Model> result = new ELKIBuilder<>(LMCLUS.class) //
         .with(LMCLUS.Par.MINSIZE_ID, 100) //
         .with(LMCLUS.Par.THRESHOLD_ID, 10) //
-        .with(LMCLUS.Par.RANDOM_ID, 0) //
+        .with(LMCLUS.Par.RANDOM_ID, 4) //
         .build().autorun(db);
-    assertClusterSizes(result, new int[] { 200, 201, 249 });
     assertFMeasure(db, result, 0.921865);
+    assertClusterSizes(result, new int[] { 200, 201, 249 });
   }
 }

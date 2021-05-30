@@ -39,10 +39,10 @@ public class ALOCITest extends AbstractOutlierAlgorithmTest {
   public void testALOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     OutlierResult result = new ELKIBuilder<ALOCI<DoubleVector>>(ALOCI.class) //
-        .with(ALOCI.Par.SEED_ID, 2) //
+        .with(ALOCI.Par.SEED_ID, 1) //
         .with(ALOCI.Par.GRIDS_ID, 3) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.7622222);
-    assertSingleScore(result, 146, 1.1305337);
+    assertAUC(db, "Noise", result, 0.7777777);
+    assertSingleScore(result, 146, 1.1242238);
   }
 }

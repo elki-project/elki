@@ -41,19 +41,19 @@ public class MultivariateGaussianModelTest extends AbstractClusterAlgorithmTest 
   public void testHierarchicalMLE() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 4) //
         .with(EM.Par.K_ID, 6) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.967410486);
-    assertClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    assertFMeasure(db, result, 0.941968);
+    assertClusterSizes(result, new int[] { 5, 13, 93, 98, 200, 301 });
   }
 
   @Test
   public void testHierarchicalMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 4) //
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //

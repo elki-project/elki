@@ -72,7 +72,7 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
    * @param seed Random generator seed.
    */
   public Xoroshiro128NonThreadsafeRandom(long seed) {
-    super(seed);
+    super(RandomFactory.murmurMix64(seed));
   }
 
   @Override
@@ -94,8 +94,8 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
     long t0 = s0, t1 = s1;
     final long result = t0 + t1;
     t1 ^= t0;
-    s0 = Long.rotateLeft(t0, 55) ^ t1 ^ (t1 << 14); // a, b
-    s1 = Long.rotateLeft(t1, 36); // c
+    s0 = Long.rotateLeft(t0, 24) ^ t1 ^ (t1 << 16); // a, b
+    s1 = Long.rotateLeft(t1, 37); // c
     return result;
   }
 

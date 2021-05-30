@@ -66,9 +66,9 @@ public class ParkJunTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 0) //
+        .with(CLARA.Par.RANDOM_ID, 5) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.7840668);
-    assertClusterSizes(result, new int[] { 78, 125, 200, 200, 397 });
+    assertFMeasure(db, result, 0.78364);
+    assertClusterSizes(result, new int[] { 86, 114, 200, 200, 400 });
   }
 }

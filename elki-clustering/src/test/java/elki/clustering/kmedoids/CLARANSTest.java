@@ -42,14 +42,14 @@ public class CLARANSTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<CLARANS<DoubleVector>>(CLARANS.class) //
         .with(KMeans.K_ID, 5) //
-        .with(CLARANS.Par.RANDOM_ID, 0) //
+        .with(CLARANS.Par.RANDOM_ID, 16) //
         .with(CLARANS.Par.NEIGHBORS_ID, 5) //
         .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().autorun(db);
     // This test uses fairly low parameters. It's easy to find some that give
     // perfect results, but that is less useful for regression testing.
-    assertFMeasure(db, result, 0.76375);
-    assertClusterSizes(result, new int[] { 114, 173, 200, 200, 313 });
+    assertFMeasure(db, result, 0.8946);
+    assertClusterSizes(result, new int[] { 163, 200, 200, 200, 237 });
   }
 
   @Test

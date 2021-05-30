@@ -47,11 +47,11 @@ public class KMeansPlusPlusTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 3) //
+        .with(KMeans.SEED_ID, 0) //
         .with(KMeans.INIT_ID, KMeansPlusPlus.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99205);
-    assertClusterSizes(result, new int[] { 197, 199, 200, 201, 203 });
+    assertFMeasure(db, result, 0.92973);
+    assertClusterSizes(result, new int[] { 162, 199, 200, 201, 238 });
   }
 
   /**
@@ -59,11 +59,11 @@ public class KMeansPlusPlusTest extends AbstractClusterAlgorithmTest {
    * standard.
    */
   @Test
-  public void testSingleAssignmentKMeansPlusPlusMedoids() {
+  public void testKMeansPlusPlusInitialMedoids() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 3) //
+        .with(KMeans.SEED_ID, 1) //
         .with(KMeans.INIT_ID, KMeansPlusPlus.class) //
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
