@@ -323,7 +323,7 @@ public class HartiganWongKMeans<V extends NumberVector> extends AbstractKMeans<V
           if(r1 > distance(vec, means[l2]) * an2[l2]) {
             icoun = optries = 0;
             itran[l1] = itran[l2] = true;
-            ncp[l1] = ncp[l2] = istep + relation.size();
+            ncp[l1] = ncp[l2] = istep + relation.size() - 1;
 
             transfer(it, vec, l1, l2);
             changed++;
