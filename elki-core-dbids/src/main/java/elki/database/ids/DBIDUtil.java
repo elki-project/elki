@@ -551,8 +551,8 @@ public final class DBIDUtil {
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random, final int limit) {
     final int end = ids.size();
-    for(int i = 1; i < limit; i++) {
-      ids.swap(i - 1, i + random.nextInt(end - i));
+    for(int i = 0; i < limit; i++) {
+      ids.swap(i, i + random.nextInt(end - i));
     }
   }
 
