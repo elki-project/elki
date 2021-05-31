@@ -384,6 +384,7 @@ public abstract class AbstractIndexStructureTest {
           assertFalse("Upper tolerance incorrect", exact > approx + atol);
         }
         ids.sort();
+        assertTrue("Did not return " + k + " results, but: " + ids.size(), ids.size() >= k);
         assertNeighbors(relation, dist, ids.slice(0, k), shouldd, shouldc);
       }
       assertNeighbors(relation, dist, prioq.getKNN(dv, k), shouldd, shouldc);
