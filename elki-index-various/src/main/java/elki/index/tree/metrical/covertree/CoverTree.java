@@ -648,6 +648,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      */
     protected PrioritySearcher<Q> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
+      this.candidates = DoubleDBIDListIter.EMPTY;
       pq.clear();
       pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
       lb = 0.;
