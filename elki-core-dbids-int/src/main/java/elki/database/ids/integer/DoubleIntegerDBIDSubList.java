@@ -56,7 +56,7 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
    */
   public DoubleIntegerDBIDSubList(DoubleIntegerDBIDList inner, int begin, int end) {
     this.inner = inner;
-    assert (end < inner.size()) : "Access beyond size of list.";
+    assert (end <= inner.size()) : "Access beyond size of list.";
     assert (begin >= 0 && end >= begin);
     this.begin = begin;
     this.end = end;
