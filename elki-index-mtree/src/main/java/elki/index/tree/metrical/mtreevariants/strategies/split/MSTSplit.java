@@ -36,7 +36,7 @@ import elki.utilities.documentation.Reference;
  * <p>
  * Unfortunately, the slim-tree paper does not detail how to choose the "most
  * appropriate edge from the longest ones" (to find a more balanced split), so
- * we try to longest 50%, and keep the choice which yields the most balanced
+ * we try the longest 50%, and keep the choice which yields the most balanced
  * split. This seems to work quite well.
  * <p>
  * Reference:
@@ -119,7 +119,7 @@ public class MSTSplit<E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>
   }
 
   /**
-   * Partition the data using the minimu spanning tree.
+   * Partition the data using the minimum spanning tree.
    *
    * @param matrix
    * @return partition assignments
