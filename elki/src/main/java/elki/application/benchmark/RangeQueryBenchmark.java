@@ -39,7 +39,9 @@ import elki.distance.Distance;
 import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
+import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
@@ -143,20 +145,34 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    MeanVariance mv = new MeanVariance(); // result statistics to collect.
+    final String key = getClass().getName();
+    Duration dur = LOG.newDuration(key + ".duration");
     int hash;
+    MeanVariance mv = new MeanVariance(); // result statistics to collect.
     if(queries != null) {
       RangeSearcher<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeByObject();
-      hash = run(rangeQuery, relation, queries, mv);
+      logIndexStatistics(database);
+      hash = run(rangeQuery, relation, queries, dur, mv);
     }
     else {
       RangeSearcher<DBIDRef> rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID();
+      logIndexStatistics(database);
       // Get a query radius relation:
       Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
-      hash = run(rangeQuery, relation, qrad, mv);
+      hash = run(rangeQuery, relation, qrad, dur, mv);
     }
-    LOG.statistics("Result hashcode: " + hash);
-    LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
+    LOG.statistics(new DoubleStatistic(key + ".results.mean", mv.getMean()));
+    LOG.statistics(new DoubleStatistic(key + ".results.std", mv.getPopulationStddev()));
+    logIndexStatistics(database);
+    LOG.statistics(new LongStatistic(key + ".checksum", hash));
+  }
+
+  /**
+   * Log index statistics before and after querying.
+   * 
+   * @param database Database
+   */
+  private void logIndexStatistics(Database database) {
     for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
@@ -171,17 +187,17 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param mv Mean and variance statistics
    * @return hash code over all results
    */
-  protected int run(RangeSearcher<DBIDRef> rangeQuery, Relation<O> relation, Relation<NumberVector> radrel, MeanVariance mv) {
+  protected int run(RangeSearcher<DBIDRef> rangeQuery, Relation<O> relation, Relation<NumberVector> radrel, Duration dur, MeanVariance mv) {
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
-    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     int hash = 0;
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    dur.begin();
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList rres = rangeQuery.getRange(iditer, radrel.get(iditer).doubleValue(0));
       hash = Util.mixHashCodes(hash, processResult(rres, mv));
       LOG.incrementProcessed(prog);
     }
-    LOG.statistics(dur.end());
+    dur.end();
     LOG.ensureCompleted(prog);
     return hash;
   }
@@ -195,7 +211,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param mv Statistics output
    * @return result hashcode
    */
-  protected int run(RangeSearcher<O> rangeQuery, Relation<O> relation, DatabaseConnection queries, MeanVariance mv) {
+  protected int run(RangeSearcher<O> rangeQuery, Relation<O> relation, DatabaseConnection queries, Duration dur, MeanVariance mv) {
     NumberVector.Factory<O> ofactory = RelationUtil.getNumberVectorFactory(relation);
     int dim = RelationUtil.dimensionality(relation);
 
@@ -225,8 +241,8 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     sample = Arrays.copyOf(sample, samplesize);
 
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.length, LOG) : null;
-    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     int hash = 0;
+    dur.begin();
     double[] buf = new double[dim];
     for(int off : sample) {
       // Split query data into object + radius
@@ -238,7 +254,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       hash = Util.mixHashCodes(hash, processResult(rres, mv));
       LOG.incrementProcessed(prog);
     }
-    LOG.statistics(dur.end());
+    dur.end();
     LOG.ensureCompleted(prog);
     return hash;
   }

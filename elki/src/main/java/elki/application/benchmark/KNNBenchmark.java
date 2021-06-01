@@ -35,7 +35,7 @@ import elki.distance.Distance;
 import elki.index.Index;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.logging.statistics.Duration;
+import elki.logging.statistics.*;
 import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
@@ -116,22 +116,39 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     }
     Database database = inputstep.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
+    final String key = getClass().getName();
+    Duration dur = LOG.newDuration(key + ".duration");
     int hash;
     MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
     // No query set - use original database.
     if(queries == null) {
       KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(k);
-      hash = run(knnQuery, relation, mv, mvdist);
+      logIndexStatistics(database);
+      hash = run(knnQuery, relation, dur, mv, mvdist);
     }
     else { // Separate query set.
       KNNSearcher<O> knnQuery = new QueryBuilder<>(relation, distance).kNNByObject(k);
-      hash = run(knnQuery, mv, mvdist);
+      logIndexStatistics(database);
+      hash = run(knnQuery, dur, mv, mvdist);
     }
-    LOG.statistics("Result hashcode: " + hash);
-    LOG.statistics("Mean number of results: " + mv.getMean() + " +- " + mv.getPopulationStddev());
-    if(mvdist.getCount() > 0) {
-      LOG.statistics("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getPopulationStddev());
+    LOG.statistics(dur);
+    if(dur instanceof MillisTimeDuration) {
+      LOG.statistics(new StringStatistic(key + ".duration.avg", dur.getDuration() / mv.getCount() * 1000. + " ns"));
     }
+    LOG.statistics(new DoubleStatistic(key + ".results.mean", mv.getMean()));
+    LOG.statistics(new DoubleStatistic(key + ".results.std", mv.getPopulationStddev()));
+    LOG.statistics(new DoubleStatistic(key + ".kdist.mean", mvdist.getMean()));
+    LOG.statistics(new DoubleStatistic(key + ".kdist.std", mvdist.getPopulationStddev()));
+    logIndexStatistics(database);
+    LOG.statistics(new LongStatistic(key + ".checksum", hash));
+  }
+
+  /**
+   * Log index statistics before and after querying.
+   * 
+   * @param database Database
+   */
+  private void logIndexStatistics(Database database) {
     for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
@@ -142,15 +159,16 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
    *
    * @param knnQuery Query object
    * @param relation Input data
+   * @param dur Duration
    * @param mv statistics collector
    * @param mvdist statistics collector
    * @return hash code of the results
    */
-  private int run(KNNSearcher<DBIDRef> knnQuery, Relation<O> relation, MeanVariance mv, MeanVariance mvdist) {
+  private int run(KNNSearcher<DBIDRef> knnQuery, Relation<O> relation, Duration dur, MeanVariance mv, MeanVariance mvdist) {
     int hash = 0;
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
-    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
+    dur.begin();
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       KNNList knns = knnQuery.getKNN(iditer, k);
       int ichecksum = 0;
@@ -162,7 +180,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       mvdist.put(knns.getKNNDistance());
       LOG.incrementProcessed(prog);
     }
-    LOG.statistics(dur.end());
+    dur.end();
     LOG.ensureCompleted(prog);
     return hash;
   }
@@ -171,11 +189,12 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
    * Run using a second database as query source
    *
    * @param knnQuery Query object
+   * @param dur Duration
    * @param mv statistics collector
    * @param mvdist statistics collector
    * @return hash code of the results
    */
-  private int run(KNNSearcher<O> knnQuery, MeanVariance mv, MeanVariance mvdist) {
+  private int run(KNNSearcher<O> knnQuery, Duration dur, MeanVariance mv, MeanVariance mvdist) {
     int hash = 0;
     TypeInformation res = distance.getInputTypeRestriction();
     MultipleObjectsBundle bundle = queries.loadData();
@@ -194,8 +213,8 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     int samplesize = (int) (sampling <= 1 ? sampling * sample.length : sampling);
     ArrayUtil.randomShuffle(sample, random.getSingleThreadedRandom(), samplesize);
     sample = Arrays.copyOf(sample, samplesize);
-    Duration dur = LOG.newDuration(this.getClass().getName() + ".duration").begin();
     FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.length, LOG) : null;
+    dur.begin();
     for(int off : sample) {
       @SuppressWarnings("unchecked")
       O o = (O) bundle.data(off, col);
@@ -209,8 +228,8 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       mvdist.put(knns.getKNNDistance());
       LOG.incrementProcessed(prog);
     }
+    dur.end();
     LOG.ensureCompleted(prog);
-    LOG.statistics(dur.end());
     return hash;
   }
 
