@@ -35,7 +35,6 @@ import elki.distance.Distance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
-import elki.logging.LoggingUtil;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.Alias;
 import elki.utilities.datastructures.QuickSelect;
@@ -943,7 +942,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
             .grab(config, x -> {
               this.distance = x;
               if(!distance.isMetric()) {
-                LoggingUtil.warning("CoverTree requires a metric to be exact.");
+                LOG.warning("VPTree requires a metric to be exact.");
               }
             });
         new IntParameter(SAMPLE_SIZE_ID, 10) //
