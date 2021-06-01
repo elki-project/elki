@@ -279,6 +279,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
      * @return vantage point
      */
     private DBIDVar chooseVantagePoint(int left, int right) {
+      // Random sampling:
+      if(sampleSize == 1) {
+        return scratch.assignVar(left + rnd.nextInt(right - left), DBIDUtil.newVar());
+      }
       final int s = Math.min(sampleSize, right - left);
       double bestSpread = Double.NEGATIVE_INFINITY;
       DBIDVar best = DBIDUtil.newVar();
@@ -288,7 +292,8 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         workset.add(scratchit);
       }
       for(DBIDMIter it = DBIDUtil.randomSample(workset, s, rnd).iter(); it.valid(); it.advance()) {
-        DBIDUtil.randomShuffle(workset, rnd, s); // Sample s objects
+        // Sample s+1 objects in case `it` is contained.
+        DBIDUtil.randomShuffle(workset, rnd, Math.min(s + 1, workset.size()));
         double spread = calcMoment(it, workset, s);
         if(spread > bestSpread) {
           bestSpread = spread;
@@ -310,7 +315,9 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       double[] dists = new double[Math.min(size, check.size())];
       int i = 0;
       for(DBIDIter iter = check.iter(); iter.valid() && i < size; iter.advance()) {
-        dists[i++] = distance(p, iter);
+        if(!DBIDUtil.equal(iter, p)) {
+          dists[i++] = distance(p, iter);
+        }
       }
       double median = QuickSelect.median(dists);
       double ssq = 0;

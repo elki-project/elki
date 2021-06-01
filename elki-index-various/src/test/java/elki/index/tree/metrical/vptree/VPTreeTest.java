@@ -42,4 +42,18 @@ public class VPTreeTest extends AbstractIndexStructureTest {
     assertPrioritySearchEuclidean(factory, VPTree.VPTreePrioritySearcher.class);
     assertSinglePoint(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
   }
+
+  /**
+   * Test with samplesize 1, which has a special handling.
+   */
+  @Test
+  public void testVPTreeOne() {
+    VPTree.Factory<?> factory = new ELKIBuilder<>(VPTree.Factory.class) //
+        .with(VPTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class)//
+        .with(VPTree.Factory.Par.SAMPLE_SIZE_ID, 1)//
+        .with(VPTree.Factory.Par.SEED_ID, 1234).build();
+    assertExactEuclidean(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
+    assertPrioritySearchEuclidean(factory, VPTree.VPTreePrioritySearcher.class);
+    assertSinglePoint(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
+  }
 }
