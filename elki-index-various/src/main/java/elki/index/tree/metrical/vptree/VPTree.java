@@ -217,6 +217,14 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       }
       assert tied > 0;
       assert DBIDUtil.equal(vantagePoint, scratchit.seek(left)) : "tied: " + tied;
+      // Note: many duplicates of vantage point:
+      if(left + tied + truncate > right) {
+        ModifiableDoubleDBIDList vps = DBIDUtil.newDistanceDBIDList(right - left);
+        for(scratchit.seek(left); scratchit.getOffset() < right; scratchit.advance()) {
+          vps.add(scratchit.doubleValue(), scratchit);
+        }
+        return new Node(vps);
+      }
       int middle = (left + tied + right) >>> 1;
       // sort left < median; right >= median
       // quickselect only assures that the median is correct
@@ -243,14 +251,6 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         final double d = scratchit.doubleValue();
         rightLowBound = d < rightLowBound ? d : rightLowBound;
         rightHighBound = d > rightHighBound ? d : rightHighBound;
-      }
-      // Note: many duplicates of vantage point:
-      if(left + tied + truncate > right) {
-        ModifiableDoubleDBIDList vps = DBIDUtil.newDistanceDBIDList(right - left);
-        for(scratchit.seek(left); scratchit.getOffset() < right; scratchit.advance()) {
-          vps.add(scratchit.doubleValue(), scratchit);
-        }
-        return new Node(vps);
       }
       assert right > middle;
       // Recursive build, include ties with parent:
