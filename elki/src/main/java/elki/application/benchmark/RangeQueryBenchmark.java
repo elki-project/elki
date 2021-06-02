@@ -38,6 +38,8 @@ import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.Distance;
 import elki.index.Index;
 import elki.logging.Logging;
+import elki.logging.Logging.Level;
+import elki.logging.LoggingConfiguration;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
@@ -274,6 +276,16 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       ichecksum += DBIDUtil.asInteger(it);
     }
     return ichecksum;
+  }
+
+  /**
+   * Runs the benchmark
+   * 
+   * @param args parameter list according to description
+   */
+  public static void main(String[] args) {
+    LoggingConfiguration.setDefaultLevel(Level.STATISTICS);
+    runCLIApplication(KNNBenchmark.class, args);
   }
 
   /**

@@ -34,6 +34,8 @@ import elki.datasource.bundle.MultipleObjectsBundle;
 import elki.distance.Distance;
 import elki.index.Index;
 import elki.logging.Logging;
+import elki.logging.LoggingConfiguration;
+import elki.logging.Logging.Level;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.*;
 import elki.math.MathUtil;
@@ -231,6 +233,16 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
     dur.end();
     LOG.ensureCompleted(prog);
     return hash;
+  }
+
+  /**
+   * Runs the benchmark
+   * 
+   * @param args parameter list according to description
+   */
+  public static void main(String[] args) {
+    LoggingConfiguration.setDefaultLevel(Level.STATISTICS);
+    runCLIApplication(KNNBenchmark.class, args);
   }
 
   /**
