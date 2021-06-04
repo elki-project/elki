@@ -955,7 +955,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         new IntParameter(SAMPLE_SIZE_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.sampleSize = x);
-        new IntParameter(TRUNCATE_ID, 10) //
+        new IntParameter(TRUNCATE_ID, 5) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.truncate = x);
         new RandomParameter(SEED_ID).grab(config, x -> random = x);
