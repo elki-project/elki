@@ -255,11 +255,17 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int ai = assignment.intValue(it);
         final double v1 = lsim.doubleValue(it), v2 = msim[ai];
+        // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
+        // should be equivalent: v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2))
+        // less tight but cheaper: v1 * v2 + vmin * vmin - 1
         lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
         double[] us = usim.get(it);
         for(int i = 0; i < us.length; i++) {
           final double w1 = us[i], w2 = msim[i];
-          us[i] = w2 > 0 ? (w1 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))) / w2 : Double.POSITIVE_INFINITY;
+          // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
+          // should be equivalent: w1 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))) / w2
+          // less tight but cheaper: (w1 - wmin * wmin + 1) / w2
+          us[i] = w2 > 0 ? (w1 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))) / w2 : 1.;
         }
       }
     }
