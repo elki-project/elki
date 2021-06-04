@@ -328,7 +328,6 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * @author Robert Gehde
    */
   public class MVPTreeKNNSearcher implements KNNSearcher<O> {
-    double[] scrapDists = new double[numberVPs];
     @Override
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
@@ -340,38 +339,39 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       if(node == null) {
         return tau;
       }
-      final int numChilds =node.vps.size(); 
-      int[] ind = new int[numChilds];
-      //sort distance and check vps
-      for(DBIDArrayIter iter = node.vps.iter().seek(0); iter.valid(); iter.advance()) {
+      DBIDArrayIter iter = node.vps.iter();
+      double[] scrapDists = new double[node.vps.size()];
+      int[] ind = new int[node.vps.size()];
+      // sort distance and check vps
+      for(iter.seek(0); iter.valid(); iter.advance()) {
         double x = distQuery.distance(iter, obj);
-        ind[iter.getOffset()] = iter.getOffset();
-        // either sort to distance_to_vp (x) or mindist_to_child (x-upperbound[offset][offset])
-        scrapDists[iter.getOffset()] = x; 
-        if(x <= tau) {
-          tau = knns.insert(x, iter);
-        }
+        countDistanceComputation();
+        tau = knns.insert(x, iter);
+        final int off = iter.getOffset();
+        // prioritize by distance to vantage point
+        scrapDists[off] = x;
+        ind[off] = off;
+        // alternative: minimum distance to a child
+        // But beware that the distances are accessed below again!
+        // scrapDists[candidates++] = x - node.upperBound[off][off];
       }
-      DoubleIntegerArrayQuickSort.sort(scrapDists, ind, numChilds);
+      DoubleIntegerArrayQuickSort.sort(scrapDists, ind, ind.length);
 
-      DBIDArrayIter itChild = node.vps.iter();
-      for(int i = 0; i < numChilds; i++) {
-        if(node.children[ind[i]] == null) {
+      outer: for(int i = 0; i < ind.length; i++) {
+        final int offi = ind[i];
+        if(node.children[offi] == null) {
           continue;
         }
         // check bounds for this child
-        boolean skip = false;
-        itChild.seek(ind[i]);
-        for(DBIDArrayIter itComp = node.vps.iter().seek(0); itComp.valid(); itComp.advance()) {
-          double x = distQuery.distance(obj, itComp);
-          if(!(intersect(x - tau, x + tau, node.lowerBound[itComp.getOffset()][ind[i]], node.upperBound[itComp.getOffset()][ind[i]]))) {
-            skip = true;
+        for(int j = 0; j < ind.length; j++) {
+          final int offj = ind[j];
+          final double x = scrapDists[j];
+          if(x > node.upperBound[offj][offi] + tau || x < node.lowerBound[offj][offi] - tau) {
+            continue outer;
           }
         }
-        //call child
-        if(!skip) {
-          tau = mvpKNNSearch(obj, knns, node.children[ind[i]], tau);
-        }
+        // recurse into child:
+        tau = mvpKNNSearch(obj, knns, node.children[offi], tau);
       }
 
       return tau;
