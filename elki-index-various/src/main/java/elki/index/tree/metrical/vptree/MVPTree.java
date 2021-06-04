@@ -36,6 +36,7 @@ import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
+import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -327,6 +328,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * @author Robert Gehde
    */
   public class MVPTreeKNNSearcher implements KNNSearcher<O> {
+    double[] scrapDists = new double[numberVPs];
     @Override
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
@@ -338,35 +340,40 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       if(node == null) {
         return tau;
       }
-      int numChild = node.vps.size();
-      boolean[] ignoreChildren = new boolean[numberVPs];
+      final int numChilds =node.vps.size(); 
+      int[] ind = new int[numChilds];
+      //sort distance and check vps
       for(DBIDArrayIter iter = node.vps.iter().seek(0); iter.valid(); iter.advance()) {
-        final int vi = iter.getOffset(); // Vantage point number
-        if(ignoreChildren[vi]) {
-          continue;
-        }
-        // as vantage points are in range, we don't need to check them if the
-        // range is ruled out
         double x = distQuery.distance(iter, obj);
-        countDistanceComputation();
+        ind[iter.getOffset()] = iter.getOffset();
+        // either sort to distance_to_vp (x) or mindist_to_child (x-upperbound[offset][offset])
+        scrapDists[iter.getOffset()] = x; 
         if(x <= tau) {
           tau = knns.insert(x, iter);
         }
-        // check intersection of [x-range,x+range] and child[i] range as seen
-        // from iter, if empty (not intersecting), ignore child
-        for(int i = 0; i < numChild; i++) {
-          if(!ignoreChildren[i] && node.children[i] != null // not ignored yet
-              && !(intersect(x - tau, x + tau, node.lowerBound[vi][i], node.upperBound[vi][i]))) {
-            ignoreChildren[i] = true;
+      }
+      DoubleIntegerArrayQuickSort.sort(scrapDists, ind, numChilds);
+
+      DBIDArrayIter itChild = node.vps.iter();
+      for(int i = 0; i < numChilds; i++) {
+        if(node.children[ind[i]] == null) {
+          continue;
+        }
+        // check bounds for this child
+        boolean skip = false;
+        itChild.seek(ind[i]);
+        for(DBIDArrayIter itComp = node.vps.iter().seek(0); itComp.valid(); itComp.advance()) {
+          double x = distQuery.distance(obj, itComp);
+          if(!(intersect(x - tau, x + tau, node.lowerBound[itComp.getOffset()][ind[i]], node.upperBound[itComp.getOffset()][ind[i]]))) {
+            skip = true;
           }
         }
-      }
-      // search children
-      for(int i = 0; i < numChild; i++) {
-        if(!ignoreChildren[i] && node.children[i] != null) {
-          tau = mvpKNNSearch(obj, knns, node.children[i], tau);
+        //call child
+        if(!skip) {
+          tau = mvpKNNSearch(obj, knns, node.children[ind[i]], tau);
         }
       }
+
       return tau;
     }
   }
@@ -667,7 +674,12 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       @Override
       public void configure(Parameterization config) {
         new ObjectParameter<Distance<? super O>>(DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class)//
-            .grab(config, x -> this.distance = x);
+            .grab(config, x -> {
+              this.distance = x;
+              if(!distance.isMetric()) {
+                LOG.warning("MVPTree requires a metric to be exact.");
+              }
+            });
         new IntParameter(NUMBER_VANTAGE_POINTS_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.amountVantagePoints = x);
