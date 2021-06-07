@@ -10,6 +10,7 @@ elki.clustering.kmeans.initialization.Ostrovsky
 elki.clustering.kmeans.initialization.RandomUniformGenerated
 elki.clustering.kmeans.initialization.RandomNormalGenerated
 elki.clustering.kmeans.initialization.Predefined
+elki.clustering.kmeans.initialization.SparseKMeansPlusPlus
 elki.clustering.kmedoids.initialization.BUILD
 elki.clustering.kmedoids.initialization.LAB
 elki.clustering.kmedoids.initialization.ParkJun

@@ -25,12 +25,16 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.LloydKMeans;
+import elki.clustering.kmeans.initialization.SphericalKMeansPlusPlus;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;
+import elki.datasource.AbstractDatabaseConnection;
+import elki.datasource.filter.normalization.instancewise.LengthNormalization;
 import elki.distance.CosineDistance;
 import elki.distance.SqrtCosineDistance;
 import elki.utilities.ELKIBuilder;
+import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Regression test spherical k-means (although on not very well suited data).
@@ -63,5 +67,19 @@ public class SphericalKMeansTest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     assertFMeasure(db, result, 0.864004);
     assertClusterSizes(result, new int[] { 132, 200, 200, 202, 266 });
+  }
+
+  @Test
+  public void testSphericalKMeansPlusPlus() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000, new ListParameterization() //
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, LengthNormalization.class));
+    Clustering<?> result = new ELKIBuilder<SphericalKMeans<DoubleVector>>(SphericalKMeans.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 7) //
+        .with(SphericalKMeansPlusPlus.Par.ALPHA_ID, 1) //
+        .with(KMeans.INIT_ID, SphericalKMeansPlusPlus.class) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.8637358);
+    assertClusterSizes(result, new int[] { 149, 198, 200, 205, 248 });
   }
 }
