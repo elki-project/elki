@@ -232,6 +232,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     // first loop
     DBIDVar f = DBIDUtil.randomSample(candidates, random);
     target.add(f);
+    candidates.remove(f);
     for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
       distlist.add(distQuery.distance(f, iter), iter);
     }
@@ -246,6 +247,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
         }
       }
       target.add(best);
+      candidates.remove(best);
       // update minimum distances to chosen candidates
       for(DoubleDBIDListMIter iter = distlist.iter(); iter.valid(); iter.advance()) {
         double newdist = distQuery.distance(best, iter);
@@ -332,6 +334,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
       mvpKNNSearch(obj, knns, root, Double.MAX_VALUE);
+      // System.out.println(returned);
       return knns.toKNNList();
     }
 
