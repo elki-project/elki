@@ -21,17 +21,23 @@
 package elki.datasource.filter.normalization.instancewise;
 
 import elki.data.NumberVector;
+import elki.data.SparseNumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
 import elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import elki.datasource.filter.normalization.Normalization;
 import elki.distance.Norm;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.ManhattanDistance;
+import elki.distance.minkowski.SparseEuclideanDistance;
+import elki.distance.minkowski.SparseManhattanDistance;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
  * Class to perform a normalization on vectors to norm 1.
@@ -49,6 +55,11 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
   Norm<? super V> norm;
 
   /**
+   * Map used if converting sparse vectors.
+   */
+  Int2DoubleOpenHashMap map;
+
+  /**
    * Constructor.
    * 
    * @param norm Norm to use
@@ -58,10 +69,36 @@ public class LengthNormalization<V extends NumberVector> extends AbstractVectorS
     this.norm = norm;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected V filterSingleObject(V featureVector) {
+    // generic casts here are not safe, but will do:
+    Norm<? super V> norm = this.norm;
+    if(featureVector instanceof SparseNumberVector) {
+      // Special override, as it will be easily used inefficiently otherwise
+      if(EuclideanDistance.STATIC.equals(norm)) {
+        norm = (Norm<? super V>) SparseEuclideanDistance.STATIC;
+      }
+      else if(ManhattanDistance.STATIC.equals(norm)) {
+        norm = (Norm<? super V>) SparseManhattanDistance.STATIC;
+      }
+    }
     final double d = norm.norm(featureVector);
-    return factory.newNumberVector(VMath.timesEquals(featureVector.toArray(), d > 0 ? 1 / d : 1.));
+    final double factor = d > 0 ? 1 / d : 1.;
+    // Optimized codepath when converting sparse vectors
+    if(featureVector instanceof SparseNumberVector && factory instanceof SparseNumberVector.Factory) {
+      SparseNumberVector fv = (SparseNumberVector) featureVector;
+      SparseNumberVector.Factory<?> sfact = (SparseNumberVector.Factory<?>) factory;
+      if(map == null) {
+        map = new Int2DoubleOpenHashMap();
+      }
+      map.clear();
+      for(int j = fv.iter(); fv.iterValid(j); j = fv.iterAdvance(j)) {
+        map.put(fv.iterDim(j), fv.iterDoubleValue(j) * factor);
+      }
+      return (V) sfact.newNumberVector(map, fv.getDimensionality());
+    }
+    return factory.newNumberVector(VMath.timesEquals(featureVector.toArray(), factor));
   }
 
   @Override
