@@ -130,7 +130,8 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
         return initialAssignToNearestCluster();
       }
       meansFromSums(newmeans, sums);
-      updateBounds(csim, movedSimilarity(means, newmeans, csim));
+      movedSimilarity(means, newmeans, csim);
+      updateBounds(csim);
       copyMeans(newmeans, means);
       return assignToNearestCluster();
     }
@@ -143,16 +144,13 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
      * @param means Old means
      * @param newmeans New means
      * @param sims Similarities moved (output)
-     * @return Minimum similarity moved
      */
-    protected double movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
+    protected void movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
       assert newmeans.length == means.length && sims.length == means.length;
-      double min = sims[0] = Math.min(1, similarity(means[0], newmeans[0]));
+      sims[0] = Math.min(1, similarity(means[0], newmeans[0]));
       for(int i = 1; i < means.length; i++) {
-        double s = sims[i] = Math.min(1, similarity(means[i], newmeans[i]));
-        min = s < min ? s : min;
+        sims[i] = Math.min(1, similarity(means[i], newmeans[i]));
       }
-      return min;
     }
 
     /**
@@ -259,9 +257,21 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
      * Update the bounds for k-means.
      *
      * @param msin Similarity movement of centers
-     * @param min Minimum center self-similarity
      */
-    protected void updateBounds(double[] msim, double min) {
+    protected void updateBounds(double[] msim) {
+      // Find the maximum and second smallest similarity.
+      int least = 0;
+      double delta = msim[0], delta2 = 2;
+      for(int i = 1; i < msim.length; i++) {
+        final double m = msim[i];
+        if(m < delta) {
+          delta2 = delta;
+          delta = msim[least = i];
+        }
+        else if(m < delta2) {
+          delta2 = m;
+        }
+      }
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int ai = assignment.intValue(it);
         final double v1 = lsim.doubleValue(it), v2 = msim[ai];
@@ -269,7 +279,7 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
         // should be equivalent: v1*v2 - Math.sqrt((1 - v1*v1) * (1 - v2*v2))
         // less tight but cheaper: v1 * v2 + vmin * vmin - 1
         lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
-        double w1 = usim.doubleValue(it), w2 = min;
+        double w1 = usim.doubleValue(it), w2 = least == ai ? delta2 : delta;
         // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
         // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
         // less tight but cheaper: (w1 * w - wmin * wmin + 1)

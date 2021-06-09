@@ -152,16 +152,13 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
      * @param means Old means
      * @param newmeans New means
      * @param sims Similarities moved (output)
-     * @return Minimum similarity moved
      */
-    protected double movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
+    protected void movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
       assert newmeans.length == means.length && sims.length == means.length;
-      double min = sims[0] = Math.min(1, similarity(means[0], newmeans[0]));
+      sims[0] = Math.min(1, similarity(means[0], newmeans[0]));
       for(int i = 1; i < means.length; i++) {
-        double s = sims[i] = Math.min(1, similarity(means[i], newmeans[i]));
-        min = s < min ? s : min;
+        sims[i] = Math.min(1, similarity(means[i], newmeans[i]));
       }
-      return min;
     }
 
     /**
