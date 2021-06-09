@@ -266,14 +266,14 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
         final int ai = assignment.intValue(it);
         final double v1 = lsim.doubleValue(it), v2 = msim[ai];
         // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
-        // should be equivalent: v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2))
+        // should be equivalent: v1*v2 - Math.sqrt((1 - v1*v1) * (1 - v2*v2))
         // less tight but cheaper: v1 * v2 + vmin * vmin - 1
         lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
         double w1 = usim.doubleValue(it), w2 = min;
         // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
-        // should be equivalent: w1 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))) / w2
-        // less tight but cheaper: (w1 - wmin * wmin + 1) / w2
-        usim.putDouble(it, w2 > 0 ? (w1 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))) / w2 : 1.);
+        // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
+        // less tight but cheaper: (w1 * w - wmin * wmin + 1)
+        usim.putDouble(it, w1 * w2 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2)));
       }
     }
 
