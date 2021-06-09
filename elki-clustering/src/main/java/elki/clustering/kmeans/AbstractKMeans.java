@@ -714,21 +714,17 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     /**
      * Maximum distance moved.
      * <p>
-     * Used by Hamerly, Elkan (not using the maximum).
+     * Used by Hamerly, Elkan, and derived classes.
      *
      * @param means Old means
      * @param newmeans New means
      * @param dists Distances moved (output)
-     * @return Maximum distance moved
      */
-    protected double movedDistance(double[][] means, double[][] newmeans, double[] dists) {
+    protected void movedDistance(double[][] means, double[][] newmeans, double[] dists) {
       assert newmeans.length == means.length && dists.length == means.length;
-      double max = 0.;
       for(int i = 0; i < means.length; i++) {
-        double d = dists[i] = sqrtdistance(means[i], newmeans[i]);
-        max = (d > max) ? d : max;
+        dists[i] = sqrtdistance(means[i], newmeans[i]);
       }
-      return max;
     }
 
     /**
