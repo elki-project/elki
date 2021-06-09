@@ -132,7 +132,8 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
         return initialAssignToNearestCluster();
       }
       meansFromSums(newmeans, sums);
-      updateBounds(sep, movedDistance(means, newmeans, sep));
+      movedDistance(means, newmeans, sep);
+      updateBounds(sep);
       copyMeans(newmeans, means);
       return assignToNearestCluster();
     }
@@ -242,13 +243,25 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
      * Update the bounds for k-means.
      *
      * @param move Movement of centers
-     * @param delta Maximum center movement.
      */
-    protected void updateBounds(double[] move, double delta) {
-      delta = -delta;
+    protected void updateBounds(double[] move) {
+      // Find the maximum and second largest movement.
+      int most = 0;
+      double delta = move[0], delta2 = 0;
+      for(int i = 1; i < move.length; i++) {
+        final double m = move[i];
+        if(m > delta) {
+          delta2 = delta;
+          delta = move[most = i];
+        }
+        else if(m > delta2) {
+          delta2 = m;
+        }
+      }
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        upper.increment(it, move[assignment.intValue(it)]);
-        lower.increment(it, delta);
+        final int a = assignment.intValue(it);
+        upper.increment(it, move[a]);
+        lower.increment(it, a == most ? -delta2 : -delta);
       }
     }
 
