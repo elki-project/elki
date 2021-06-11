@@ -38,7 +38,6 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.CosineDistance;
 import elki.logging.Logging;
-import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -146,13 +145,12 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
             maxSim = sim;
           }
         }
-        varsum[maxIndex] += (1 - maxSim);
+        varsum[maxIndex] += 2 * (1 - maxSim);
         clusters.get(maxIndex).add(iditer);
         if(assignment.putInt(iditer, maxIndex) != maxIndex) {
           ++changed;
         }
       }
-      VMath.timesEquals(varsum, MathUtil.SQRT2);
       return changed;
     }
 
