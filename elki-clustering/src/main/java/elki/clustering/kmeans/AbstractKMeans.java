@@ -602,10 +602,16 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      * 
      * @param dst Output means
      * @param sums Input sums
+     * @param prev Previous means, to handle empty clusters
      */
-    protected void meansFromSums(double[][] dst, double[][] sums) {
+    protected void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
       for(int i = 0; i < k; i++) {
-        VMath.overwriteTimes(dst[i], sums[i], 1. / clusters.get(i).size());
+        final int size = clusters.get(i).size();
+        if(size == 0) {
+          System.arraycopy(prev[i], 0, dst[i], 0, prev[i].length);
+          continue;
+        }
+        VMath.overwriteTimes(dst[i], sums[i], 1. / size);
       }
     }
 

@@ -142,7 +142,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       if(iteration == 1) {
         return initialAssignToNearestCluster();
       }
-      meansFromSums(newmeans, sums);
+      meansFromSums(newmeans, sums, means);
       movedDistance(means, newmeans, sep);
       updateBounds(sep);
       copyMeans(newmeans, means);
