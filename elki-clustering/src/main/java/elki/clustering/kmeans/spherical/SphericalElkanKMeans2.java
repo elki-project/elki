@@ -96,7 +96,7 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
     /**
      * Initial separation of means. Used by Elkan.
      *
-     * @param cdist Output square root of pairwise separation
+     * @param ccsim Output square root of pairwise separation
      */
     protected void initialSeparation(double[][] ccsim) {
       final int k = means.length;
@@ -104,7 +104,7 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
         double[] mi = means[i];
         for(int j = 0; j < i; j++) {
           double s = similarity(mi, means[j]);
-          ccsim[i][j] = ccsim[j][i] = Math.sqrt((s + 1) * 0.5);
+          ccsim[i][j] = ccsim[j][i] = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
         }
       }
     }
@@ -165,7 +165,7 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
         double[] mi = means[i];
         for(int j = 0; j < i; j++) {
           double s = similarity(mi, means[j]);
-          double sqrtsim = Math.sqrt((s + 1) * 0.5);
+          double sqrtsim = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
           ccsim[i][j] = ccsim[j][i] = sqrtsim;
           csim[i] = (sqrtsim > csim[i]) ? sqrtsim : csim[i];
           csim[j] = (sqrtsim > csim[j]) ? sqrtsim : csim[j];

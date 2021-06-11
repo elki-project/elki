@@ -135,7 +135,7 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
       if(iteration == 1) {
         return initialAssignToNearestCluster();
       }
-      meansFromSums(newmeans, sums);
+      meansFromSums(newmeans, sums, means);
       movedDistance(means, newmeans, sep);
       updateBounds(sep);
       copyMeans(newmeans, means);
@@ -210,23 +210,6 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
         }
       }
       return changed;
-    }
-
-    /**
-     * Compute means from cluster sums by adding and normalizing.
-     * 
-     * @param dst Output means
-     * @param sums Input sums
-     */
-    protected void meansFromSums(double[][] dst, double[][] sums) {
-      for(int i = 0; i < k; i++) {
-        final double w = VMath.euclideanLength(sums[i]);
-        if(!(w > 0)) {
-          // Could be zero! Then keep previous.
-          continue;
-        }
-        VMath.overwriteTimes(dst[i], sums[i], 1. / w);
-      }
     }
 
     /**

@@ -20,6 +20,8 @@
  */
 package elki.clustering.kmeans.spherical;
 
+import java.util.Arrays;
+
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -31,7 +33,6 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
-import elki.math.linearalgebra.VMath;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -129,7 +130,7 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
       if(iteration == 1) {
         return initialAssignToNearestCluster();
       }
-      meansFromSums(newmeans, sums);
+      meansFromSums(newmeans, sums, means);
       movedSimilarity(means, newmeans, csim);
       updateBounds(csim);
       copyMeans(newmeans, means);
@@ -160,6 +161,8 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
      */
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
+      double[][] csep = new double[k][k];
+      initialSeparation(csep);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to the second closest center
@@ -173,14 +176,16 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
           maxIndex = 1;
         }
         for(int i = 2; i < k; i++) {
-          double sim = similarity(fv, means[i]);
-          if(sim > max1) {
-            maxIndex = i;
-            max2 = max1;
-            max1 = sim;
-          }
-          else if(sim > max2) {
-            max2 = sim;
+          if(max2 < csep[maxIndex][i]) {
+            double sim = similarity(fv, means[i]);
+            if(sim > max1) {
+              maxIndex = i;
+              max2 = max1;
+              max1 = sim;
+            }
+            else if(sim > max2) {
+              max2 = sim;
+            }
           }
         }
         // Assign to nearest cluster.
@@ -193,24 +198,42 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
       return relation.size();
     }
 
+    /**
+     * Initial separation of means. Used by Hamerly.
+     *
+     * @param cdist Output square root of pairwise separation
+     */
+    protected void initialSeparation(double[][] ccsim) {
+      final int k = means.length;
+      for(int i = 1; i < k; i++) {
+        double[] mi = means[i];
+        for(int j = 0; j < i; j++) {
+          double s = similarity(mi, means[j]);
+          ccsim[i][j] = ccsim[j][i] = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
+        }
+      }
+    }
+
     @Override
     protected int assignToNearestCluster() {
+      recomputeSeperation(csim);
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
         // Compute the current bound:
         final double us = usim.doubleValue(it);
+        final double sa = csim[orig];
         double ls = lsim.doubleValue(it);
-        if(ls >= us) {
+        if(ls >= us || ls >= sa) {
           continue;
         }
         // Update the lower similarity bound
         NumberVector fv = relation.get(it);
         lsim.putDouble(it, ls = similarity(fv, means[orig]));
-        if(ls >= us) {
+        if(ls >= us || ls >= sa) {
           continue;
         }
-        // Find closest center, and distance to second closest center
+        // Find closest center, and distance to the second closest center
         double max2 = Double.NEGATIVE_INFINITY;
         int cur = orig;
         for(int i = 0; i < k; i++) {
@@ -242,19 +265,24 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
     }
 
     /**
-     * Compute means from cluster sums by adding and normalizing.
-     * 
-     * @param dst Output means
-     * @param sums Input sums
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Hamerly.
+     *
+     * @param sep Output array of separation
      */
-    protected void meansFromSums(double[][] dst, double[][] sums) {
-      for(int i = 0; i < k; i++) {
-        final double w = VMath.euclideanLength(sums[i]);
-        if(!(w > 0)) {
-          // Could be zero! Then keep previous.
-          continue;
+    protected void recomputeSeperation(double[] csim) {
+      final int k = means.length;
+      assert csim.length == k;
+      Arrays.fill(csim, 0.); // or -1?
+      for(int i = 1; i < k; i++) {
+        double[] m1 = means[i];
+        for(int j = 0; j < i; j++) {
+          double s = similarity(m1, means[j]);
+          double sqrtsim = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
+          csim[i] = (sqrtsim > csim[i]) ? sqrtsim : csim[i];
+          csim[j] = (sqrtsim > csim[j]) ? sqrtsim : csim[j];
         }
-        VMath.overwriteTimes(dst[i], sums[i], 1. / w);
       }
     }
 

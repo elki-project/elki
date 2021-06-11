@@ -165,7 +165,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      */
     protected double similarity(NumberVector vec1, double[] vec2) {
       diststat++;
-      return VectorUtil.dot(vec1, vec2);
+      return Math.min(1, VectorUtil.dot(vec1, vec2));
     }
 
     /**
@@ -177,7 +177,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      */
     protected double similarity(double[] vec1, double[] vec2) {
       diststat++;
-      return VMath.dot(vec1, vec2);
+      return Math.min(1, VMath.dot(vec1, vec2));
     }
 
     @Override
@@ -217,6 +217,24 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       ++diststat;
       final double s = VectorUtil.dot(x, y);
       return s < 1 ? Math.sqrt(2 - 2 * s) : 0;
+    }
+
+    /**
+     * Compute means from cluster sums by adding and normalizing.
+     * 
+     * @param dst Output means
+     * @param sums Input sums
+     * @param prev Previous means (to handle empty clusters)
+     */
+    protected final void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
+      for(int i = 0; i < dst.length; i++) {
+        final double w = VMath.euclideanLength(sums[i]);
+        if(!(w > 1e-7)) { // Empty cluster
+          System.arraycopy(prev[i], 0, dst[i], 0, prev[i].length);
+          continue;
+        }
+        VMath.overwriteTimes(dst[i], sums[i], 1. / w);
+      }
     }
 
     @Override
