@@ -220,7 +220,12 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
      */
     protected void meansFromSums(double[][] dst, double[][] sums) {
       for(int i = 0; i < k; i++) {
-        VMath.overwriteTimes(dst[i], sums[i], 1. / VMath.euclideanLength(sums[i]));
+        final double w = VMath.euclideanLength(sums[i]);
+        if(!(w > 0)) {
+          // Could be zero! Then keep previous.
+          continue;
+        }
+        VMath.overwriteTimes(dst[i], sums[i], 1. / w);
       }
     }
 
