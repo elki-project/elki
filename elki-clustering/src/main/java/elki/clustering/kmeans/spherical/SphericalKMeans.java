@@ -136,10 +136,12 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector fv = relation.get(iditer);
-        double maxSim = similarity(fv, means[0]);
+        double maxSim = VectorUtil.dot(fv, means[0]);
+        ++diststat;
         int maxIndex = 0;
         for(int i = 1; i < k; i++) {
-          double sim = similarity(fv, means[i]);
+          double sim = VectorUtil.dot(fv, means[i]);
+          ++diststat;
           if(sim > maxSim) {
             maxIndex = i;
             maxSim = sim;
