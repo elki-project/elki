@@ -36,6 +36,11 @@ import elki.database.relation.Relation;
 import elki.distance.*;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
+import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
@@ -43,11 +48,22 @@ import elki.utilities.random.RandomFactory;
  * <p>
  * FIXME: currently assumes the vectors to be L2 normalized beforehand, but does
  * not ensure that this is true.
+ * <p>
+ * Reference:
+ * <p>
+ * Y. Endo and S. Miyamoto<br>
+ * Spherical k-Means++ Clustering<br>
+ * Modeling Decisions for Artificial Intelligence
  *
  * @author Erich Schubert
  *
  * @param <O> Vector type
  */
+@Reference(authors = "Y. Endo and S. Miyamoto", //
+    title = "Spherical k-Means++ Clustering", //
+    booktitle = "Modeling Decisions for Artificial Intelligence", //
+    url = "https://doi.org/10.1007/978-3-319-23240-9_9", //
+    bibkey = "DBLP:conf/mdai/EndoM15")
 public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
   /**
    * Class logger.
@@ -55,12 +71,19 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
   private static final Logging LOG = Logging.getLogger(SphericalKMeansPlusPlus.class);
 
   /**
+   * Parameter to balance distance vs. uniform sampling.
+   */
+  protected double alpha;
+
+  /**
    * Constructor.
    *
+   * @param alpha alpha-SKM parameter, usually 1.5
    * @param rnd Random generator.
    */
-  public SphericalKMeansPlusPlus(RandomFactory rnd) {
+  public SphericalKMeansPlusPlus(double alpha, RandomFactory rnd) {
     super(rnd);
+    this.alpha = alpha;
   }
 
   @Override
@@ -70,7 +93,7 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
     }
     if(distance instanceof CosineDistance || distance instanceof CosineUnitlengthDistance //
         || distance instanceof ArcCosineDistance || distance instanceof ArcCosineUnitlengthDistance) {
-      return new Instance(relation, rnd).run(k);
+      return new Instance(relation, alpha, rnd).run(k);
     }
     LOG.warning("Spherical k-means++ was used with an instance of " + distance.getClass() + ". Falling back to regular k-means++.");
     return new KMeansPlusPlus.NumberVectorInstance(relation, distance, rnd).run(k);
@@ -82,6 +105,11 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
    * @author Erich Schubert
    */
   protected static class Instance {
+    /**
+     * Parameter to balance distance vs. uniform sampling.
+     */
+    protected double alpha;
+
     /**
      * Data relation.
      */
@@ -106,10 +134,12 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
      * Constructor.
      *
      * @param relation Data relation
+     * @param alpha Alpha parameter
      * @param rnd Random generator
      */
-    public Instance(Relation<? extends NumberVector> relation, RandomFactory rnd) {
+    public Instance(Relation<? extends NumberVector> relation, double alpha, RandomFactory rnd) {
       this.relation = relation;
+      this.alpha = alpha;
       this.random = rnd.getSingleThreadedRandom();
       this.weights = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
     }
@@ -192,7 +222,7 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
       double weightsum = 0.;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         // Distance will usually already be squared
-        double weight = 1 - similarity(first, it);
+        double weight = alpha - similarity(first, it);
         weights.putDouble(it, weight);
         weightsum += weight;
       }
@@ -213,7 +243,7 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
           continue; // Duplicate, or already chosen.
         }
         // Distances are assumed to be squared already
-        double newweight = 1 - similarity(latest, it);
+        double newweight = alpha - similarity(latest, it);
         if(newweight < weight) {
           weights.putDouble(it, newweight);
           weight = newweight;
@@ -238,9 +268,27 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
    * @author Erich Schubert
    */
   public static class Par<V> extends AbstractKMeansInitialization.Par {
+    /**
+     * Alpha parameter, usually 1.5
+     */
+    public static final OptionID ALPHA_ID = new OptionID("skmpp.alpha", "Alpha parameter for alpha-SKM, usually 1.5 to achieve triangular inequality.");
+
+    /**
+     * Parameter to balance distance vs. uniform sampling.
+     */
+    protected double alpha;
+
+    @Override
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new DoubleParameter(ALPHA_ID, 1.5) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
+    }
+
     @Override
     public SphericalKMeansPlusPlus<V> make() {
-      return new SphericalKMeansPlusPlus<>(rnd);
+      return new SphericalKMeansPlusPlus<>(alpha, rnd);
     }
   }
 }
