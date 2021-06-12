@@ -73,7 +73,7 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
 
   /**
    * Inner instance, storing state for a single data set.
-   * 
+   *
    * @author Erich Schubert
    */
   protected static class Instance extends SphericalSimplifiedElkanKMeans2.Instance {
@@ -93,22 +93,6 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
       ccsim = new double[k][k];
     }
 
-    /**
-     * Initial separation of means. Used by Elkan.
-     *
-     * @param ccsim Output square root of pairwise separation
-     */
-    protected void initialSeparation(double[][] ccsim) {
-      final int k = means.length;
-      for(int i = 1; i < k; i++) {
-        double[] mi = means[i];
-        for(int j = 0; j < i; j++) {
-          double s = similarity(mi, means[j]);
-          ccsim[i][j] = ccsim[j][i] = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
-        }
-      }
-    }
-
     @Override
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
@@ -118,12 +102,12 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
         double[] us = usim.get(it);
         // Check all (other) means:
         double best = us[0] = similarity(fv, means[0]);
-        int minIndex = 0;
+        int maxIndex = 0;
         for(int j = 1; j < k; j++) {
-          if(best < ccsim[minIndex][j]) {
+          if(best < ccsim[maxIndex][j]) {
             double sim = us[j] = similarity(fv, means[j]);
             if(sim > best) {
-              minIndex = j;
+              maxIndex = j;
               best = sim;
             }
           }
@@ -136,14 +120,14 @@ public class SphericalElkanKMeans2<V extends NumberVector> extends SphericalSimp
         for(int j = 1; j < k; j++) {
           if(us[j] == 2.) {
             // note: cc=sqrt((sim+1)/2), hence sim=cc^2*2-1
-            double cc = ccsim[minIndex][j], simcc = cc * cc * 2 - 1;
+            double cc = ccsim[maxIndex][j], simcc = cc * cc * 2 - 1;
             us[j] = best * simcc + Math.sqrt((1 - best * best) * (1 - simcc * simcc));
           }
         }
         // Assign to nearest cluster.
-        clusters.get(minIndex).add(it);
-        assignment.putInt(it, minIndex);
-        plusEquals(sums[minIndex], fv);
+        clusters.get(maxIndex).add(it);
+        assignment.putInt(it, maxIndex);
+        plusEquals(sums[maxIndex], fv);
         lsim.putDouble(it, best);
       }
       return relation.size();

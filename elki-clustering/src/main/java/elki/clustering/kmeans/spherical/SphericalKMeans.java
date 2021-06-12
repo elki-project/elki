@@ -147,7 +147,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
             maxSim = sim;
           }
         }
-        varsum[maxIndex] += 2 * (1 - maxSim);
+        varsum[maxIndex] += maxSim < 1 ? 2 * (1 - maxSim) : 0;
         clusters.get(maxIndex).add(iditer);
         if(assignment.putInt(iditer, maxIndex) != maxIndex) {
           ++changed;
@@ -188,7 +188,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
         double v = x[i] - y[i];
         d += v * v;
       }
-      return d;
+      return d > 0 ? d : 0;
     }
 
     @Override
@@ -220,13 +220,45 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
     }
 
     /**
+     * Initial separation of means. Used by Elkan and Hamerly.
+     *
+     * @param ccsim Output square root of pairwise separation
+     */
+    protected void initialSeparation(double[][] ccsim) {
+      final int k = means.length;
+      for(int i = 1; i < k; i++) {
+        double[] mi = means[i];
+        for(int j = 0; j < i; j++) {
+          double s = similarity(mi, means[j]);
+          ccsim[i][j] = ccsim[j][i] = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
+        }
+      }
+    }
+
+    /**
+     * Similarity to previous locations.
+     * <p>
+     * Used by Hamerly, (Simplified)Elkan.
+     *
+     * @param means Old means
+     * @param newmeans New means
+     * @param sims Similarities moved (output)
+     */
+    protected void movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
+      assert newmeans.length == means.length && sims.length == means.length;
+      for(int i = 0; i < means.length; i++) {
+        sims[i] = similarity(means[i], newmeans[i]);
+      }
+    }
+
+    /**
      * Compute means from cluster sums by adding and normalizing.
      * 
      * @param dst Output means
      * @param sums Input sums
      * @param prev Previous means (to handle empty clusters)
      */
-    protected final void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
+    protected void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
       for(int i = 0; i < dst.length; i++) {
         final double w = VMath.euclideanLength(sums[i]);
         if(!(w > 1e-7)) { // Empty cluster

@@ -146,7 +146,7 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
       assert k == means.length;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
-        // Find closest center, and distance to two closest centers
+        // Find closest center, and distance to the second closest center
         double max1 = similarity(fv, means[0]);
         double max2 = k > 1 ? similarity(fv, means[1]) : max1;
         int maxIndex = 0;
@@ -156,10 +156,10 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
           max2 = tmp;
           maxIndex = 1;
         }
-        for(int i = 2; i < k; i++) {
-          double sim = similarity(fv, means[i]);
+        for(int j = 2; j < k; j++) {
+          double sim = similarity(fv, means[j]);
           if(sim > max1) {
-            maxIndex = i;
+            maxIndex = j;
             max2 = max1;
             max1 = sim;
           }
@@ -239,7 +239,8 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
         final double m = move[i];
         if(m > delta) {
           delta2 = delta;
-          delta = move[most = i];
+          delta = m;
+          most = i;
         }
         else if(m > delta2) {
           delta2 = m;

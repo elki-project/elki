@@ -81,7 +81,7 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
 
   /**
    * Inner instance, storing state for a single data set.
-   * 
+   *
    * @author Erich Schubert
    */
   protected static class Instance extends SphericalKMeans.Instance {
@@ -118,7 +118,7 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
      */
     public Instance(Relation<? extends NumberVector> relation, double[][] means) {
       super(relation, means);
-      lsim = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
+      lsim = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       usim = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, double[].class);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final double[] a = new double[k];
@@ -141,23 +141,6 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
       updateBounds(csim);
       copyMeans(newmeans, means);
       return assignToNearestCluster();
-    }
-
-    /**
-     * Similarity to previous locations.
-     * <p>
-     * Used by Hamerly, Elkan (not using the maximum).
-     *
-     * @param means Old means
-     * @param newmeans New means
-     * @param sims Similarities moved (output)
-     */
-    protected void movedSimilarity(double[][] means, double[][] newmeans, double[] sims) {
-      assert newmeans.length == means.length && sims.length == means.length;
-      sims[0] = Math.min(1, similarity(means[0], newmeans[0]));
-      for(int i = 1; i < means.length; i++) {
-        sims[i] = Math.min(1, similarity(means[i], newmeans[i]));
-      }
     }
 
     /**
@@ -238,14 +221,14 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
     protected void updateBounds(double[] msim) {
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int ai = assignment.intValue(it);
-        final double v1 = lsim.doubleValue(it), v2 = msim[ai];
+        final double v1 = Math.min(1, lsim.doubleValue(it)), v2 = msim[ai];
         // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
         // should be equivalent: v1*v2 - Math.sqrt((1 - v1*v1) * (1 - v2*v2))
         // less tight but cheaper: v1 * v2 + vmin * vmin - 1
         lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
         double[] us = usim.get(it);
         for(int i = 0; i < us.length; i++) {
-          final double w1 = us[i], w2 = msim[i];
+          final double w1 = Math.min(1, us[i]), w2 = msim[i];
           // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
           // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
           // less tight but cheaper: (w1 * w2 - wmin * wmin + 1)
