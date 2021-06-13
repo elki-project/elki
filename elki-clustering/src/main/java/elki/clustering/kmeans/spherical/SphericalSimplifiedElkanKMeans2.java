@@ -108,7 +108,7 @@ public class SphericalSimplifiedElkanKMeans2<V extends NumberVector> extends Sph
     /**
      * Cluster self-similarity.
      */
-    double[] csim = new double[k];
+    double[] csim;
 
     /**
      * Constructor.
