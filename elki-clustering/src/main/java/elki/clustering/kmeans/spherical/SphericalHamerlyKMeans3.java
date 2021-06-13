@@ -47,11 +47,11 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @param <V> vector datatype
  */
-public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKMeans<V> {
+public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKMeans<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(SphericalHamerlyKMeans2.class);
+  private static final Logging LOG = Logging.getLogger(SphericalHamerlyKMeans3.class);
 
   /**
    * Flag whether to compute the final variance statistic.
@@ -66,7 +66,7 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public SphericalHamerlyKMeans2(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+  public SphericalHamerlyKMeans3(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(k, maxiter, initializer);
     this.varstat = varstat;
   }
@@ -251,8 +251,9 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
      */
     protected void updateBounds(double[] msim) {
       // Find the minimum and second smallest similarity.
-      int least = 0;
+      int least = 0; // , most = 0;
       double delta = msim[0], delta2 = 1;
+      // double tau = delta, tau2 = -1;
       for(int i = 1; i < msim.length; i++) {
         final double m = msim[i];
         if(m < delta) {
@@ -263,10 +264,20 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
         else if(m < delta2) {
           delta2 = m;
         }
+        /*if(m > tau) {
+          tau2 = tau;
+          tau = m;
+          most = i;
+        }
+        else if(m > tau2) {
+          tau2 = m;
+        }*/
       }
+      delta = 1 - delta * delta;
+      delta2 = 1 - delta2 * delta2;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int ai = assignment.intValue(it);
-        double v2 = msim[ai];
+        final double v2 = msim[ai];
         if(v2 < 1) {
           final double v1 = Math.min(1, lsim.doubleValue(it));
           // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
@@ -274,16 +285,14 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
           // less tight but cheaper: v1 * v2 + vmin * vmin - 1
           lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
         }
-        double w2 = least == ai ? delta2 : delta;
+        final double w2 = least == ai ? delta2 : delta;
         if(w2 > 0) {
           double w1 = Math.min(1, usim.doubleValue(it));
           // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
           // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
           // less tight but cheaper: (w1 * w2 - wmin * wmin + 1)
-          // final double w1s = w1 * w1, w2s = w2 * w2;
-          usim.putDouble(it, (w2 <= w1 ? w2 * (w1 - w2) + 1 : w1 * w2 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2))));
-          // usim.putDouble(it, w1 * w2 + Math.sqrt((1 - w1 * w1) * (1 - w2 *
-          // w2)));
+          // double w2p = most == ai ? tau2 : tau;
+          usim.putDouble(it, w1 + Math.sqrt((1 - w1 * w1) * w2));
         }
       }
     }
@@ -312,8 +321,8 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
     }
 
     @Override
-    public SphericalHamerlyKMeans2<V> make() {
-      return new SphericalHamerlyKMeans2<>(k, maxiter, initializer, varstat);
+    public SphericalHamerlyKMeans3<V> make() {
+      return new SphericalHamerlyKMeans3<>(k, maxiter, initializer, varstat);
     }
   }
 }
