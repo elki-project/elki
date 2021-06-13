@@ -149,16 +149,9 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to the second closest center
-        double max1 = similarity(fv, means[0]);
-        double max2 = k > 1 ? similarity(fv, means[1]) : max1;
+        double max1 = similarity(fv, means[0]), max2 = -1;
         int maxIndex = 0;
-        if(max2 > max1) {
-          double tmp = max1;
-          max1 = max2;
-          max2 = tmp;
-          maxIndex = 1;
-        }
-        for(int j = 2; j < k; j++) {
+        for(int j = 1; j < k; j++) {
           if(max2 < ccsim[maxIndex][j]) {
             double sim = similarity(fv, means[j]);
             if(sim > max1) {
@@ -209,9 +202,8 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
-        // Compute the current bound:
-        final double us = usim.doubleValue(it);
         double ls = lsim.doubleValue(it);
+        final double us = usim.doubleValue(it);
         if(ls >= us || ls >= csim[orig]) {
           continue;
         }
@@ -284,7 +276,8 @@ public class SphericalHamerlyKMeans2<V extends NumberVector> extends SphericalKM
         // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
         // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
         // less tight but cheaper: (w1 * w2 - wmin * wmin + 1)
-        usim.putDouble(it, w1 * w2 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2)));
+        final double w1s = w1 * w1, w2s = w2 * w2;
+        usim.putDouble(it, w1 * w2 + (w2s > w1s ? Math.sqrt((1 - w1s) * (1 - w2s)) : 1 - w2s));
       }
     }
 
