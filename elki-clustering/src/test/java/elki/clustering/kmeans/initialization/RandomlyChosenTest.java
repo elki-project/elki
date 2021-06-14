@@ -47,11 +47,11 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 1) //
         .with(KMeans.INIT_ID, RandomlyChosen.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.702733);
-    assertClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
+    assertFMeasure(db, result, 0.78645);
+    assertClusterSizes(result, new int[] { 73, 127, 200, 200, 400 });
   }
 
   /**
@@ -63,14 +63,14 @@ public class RandomlyChosenTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<CLARA<DoubleVector>>(CLARA.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 0) //
         .with(KMeans.INIT_ID, RandomlyChosen.class) //
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99602);
-    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    assertFMeasure(db, result, 0.99404);
+    assertClusterSizes(result, new int[] { 197, 200, 200, 200, 203 });
   }
 }

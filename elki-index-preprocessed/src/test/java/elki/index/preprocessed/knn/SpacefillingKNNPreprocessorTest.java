@@ -126,7 +126,7 @@ public class SpacefillingKNNPreprocessorTest {
             .with(SpacefillingKNNPreprocessor.Factory.Par.VARIANTS_ID, 10) //
             .with(SpacefillingKNNPreprocessor.Factory.Par.WINDOW_ID, 5.) //
             .with(SpacefillingKNNPreprocessor.Factory.Par.RANDOM_ID, 0L) //
-            .with(CauchyRandomProjectionFamily.Par.RANDOM_ID, 0L)//
+            .with(CauchyRandomProjectionFamily.Par.RANDOM_ID, 1L)//
             .build().instantiate(relation);
     preproc.initialize();
     // add as index

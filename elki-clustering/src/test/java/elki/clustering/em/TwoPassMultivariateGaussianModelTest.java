@@ -39,25 +39,25 @@ public class TwoPassMultivariateGaussianModelTest extends AbstractClusterAlgorit
   public void testHierarchicalMLE() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 3) //
         .with(EM.Par.K_ID, 6) //
         .with(EM.Par.MODEL_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.967410486);
-    assertClusterSizes(result, new int[] { 3, 5, 91, 98, 200, 313 });
+    assertFMeasure(db, result, 0.942254);
+    assertClusterSizes(result, new int[] { 5, 13, 91, 100, 200, 301 });
   }
 
   @Test
   public void testHierarchicalMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 3) //
         .with(EM.Par.PRIOR_ID, 10) //
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.MODEL_ID, TwoPassMultivariateGaussianModelFactory.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.958843);
-    assertClusterSizes(result, new int[] { 3, 95, 97, 202, 313 });
+    assertFMeasure(db, result, 0.95582);
+    assertClusterSizes(result, new int[] { 0, 96, 97, 202, 315 });
   }
 
   @Test

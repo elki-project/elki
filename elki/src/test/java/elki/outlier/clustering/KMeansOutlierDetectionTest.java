@@ -45,7 +45,7 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 0) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.80386666);
-    assertSingleScore(result, 416, 0.01551616);
+    assertAUC(db, "Noise", result, 0.8654);
+    assertSingleScore(result, 416, 0.0102546);
   }
 }

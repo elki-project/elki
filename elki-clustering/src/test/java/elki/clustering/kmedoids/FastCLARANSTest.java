@@ -42,7 +42,7 @@ public class FastCLARANSTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<MedoidModel> result = new ELKIBuilder<FastCLARANS<DoubleVector>>(FastCLARANS.class) //
         .with(KMeans.K_ID, 5) //
-        .with(CLARANS.Par.RANDOM_ID, 2) //
+        .with(CLARANS.Par.RANDOM_ID, 16) //
         .with(CLARANS.Par.NEIGHBORS_ID, 3) //
         .with(CLARANS.Par.RESTARTS_ID, 5) //
         .build().autorun(db);

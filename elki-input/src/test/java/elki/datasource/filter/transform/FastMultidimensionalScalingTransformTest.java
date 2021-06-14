@@ -78,7 +78,7 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
         DoubleVector dUnfil_2 = get(unfilteredBundle, row, 0, DoubleVector.class);
         final double distF = EuclideanDistance.STATIC.distance(dFil_1, dFil_2);
         final double distU = EuclideanDistance.STATIC.distance(dUnfil_1, dUnfil_2);
-        assertEquals("Expected same distance", distU, distF, 1e-10);
+        assertEquals("Expected same distance", distU, distF, 1e-9);
       }
     }
 
@@ -86,14 +86,10 @@ public class FastMultidimensionalScalingTransformTest extends AbstractDataSource
     // Verify that this SVD represents the diagonals of the covariance matrix of
     // the filtered data.
 
-    double[][] ncmUnfil = cmUnfil.destroyToPopulationMatrix();
     double[][] ncmFil = cmFil.destroyToPopulationMatrix();
-
-    SingularValueDecomposition svd = new SingularValueDecomposition(ncmUnfil);
-    double[] dia = svd.getSingularValues();
-
+    double[] dia = new SingularValueDecomposition(cmUnfil.destroyToPopulationMatrix()).getSingularValues();
     for(int ii = 0; ii < dia.length; ii++) {
-      assertEquals("Unexpected covariance", dia[ii], ncmFil[ii][ii], 1e-8);
+      assertEquals("Unexpected covariance", dia[ii], ncmFil[ii][ii], 1e-7);
     }
   }
 }

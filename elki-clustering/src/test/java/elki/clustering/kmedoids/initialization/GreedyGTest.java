@@ -57,9 +57,9 @@ public class GreedyGTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 2) //
+        .with(CLARA.Par.RANDOM_ID, 1) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.998005);
-    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    assertFMeasure(db, result, 0.996);
+    assertClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
   }
 }

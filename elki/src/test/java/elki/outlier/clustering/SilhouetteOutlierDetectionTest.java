@@ -43,9 +43,9 @@ public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest
     OutlierResult result = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
         .with(SilhouetteOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
         .with(KMeans.K_ID, 10) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 0) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.69553333);
-    assertSingleScore(result, 416, 0.48453988);
+    assertAUC(db, "Noise", result, 0.73073);
+    assertSingleScore(result, 416, 0.4743337);
   }
 }

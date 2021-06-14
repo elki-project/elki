@@ -74,7 +74,7 @@ public class NNDescentTest {
     NNDescent<DoubleVector> preproc = new ELKIBuilder<NNDescent.Factory<DoubleVector>>(NNDescent.Factory.class) //
         .with(NNDescent.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistance()) //
         .with(NNDescent.Factory.K_ID, k) //
-        .with(NNDescent.Factory.Par.SEED_ID, 0) //
+        .with(NNDescent.Factory.Par.SEED_ID, 1) //
         .with(NNDescent.Factory.Par.DELTA_ID, 0.1) //
         .with(NNDescent.Factory.Par.RHO_ID, 0.5) //
         .build().instantiate(relation);
@@ -84,8 +84,8 @@ public class NNDescentTest {
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanKNNByObject);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k, 16);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k, 37);
     // also test partial queries, forward only
-    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2, 6);
+    MaterializedKNNPreprocessorTest.testKNNQueries(relation, lin_knn_query, preproc_knn_query, k / 2, 10);
   }
 }

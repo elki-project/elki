@@ -90,7 +90,7 @@ public class RandomFactory {
    * @return Random generator
    */
   public Random getRandom() {
-    return new Random(seed++);
+    return new Random(murmurMix64(seed++));
   }
 
   /**
@@ -99,7 +99,37 @@ public class RandomFactory {
    * @return Random generator
    */
   public Random getSingleThreadedRandom() {
-    return new Xoroshiro128NonThreadsafeRandom(seed++);
+    return new Xoroshiro128NonThreadsafeRandom(murmurMix64(seed++));
+  }
+
+  /**
+   * MurmurHash3 mixing function.
+   * 
+   * @param h input
+   * @return Output
+   */
+  public static int murmurMix32(int h) {
+    h ^= h >>> 16;
+    h *= 0x85ebca6b;
+    h ^= h >>> 13;
+    h *= 0xc2b2ae35;
+    h ^= h >>> 16;
+    return h;
+  }
+
+  /**
+   * MurmurHash3 mixing function.
+   * 
+   * @param h input
+   * @return Output
+   */
+  public static long murmurMix64(long k) {
+    k ^= k >>> 33;
+    k *= 0xff51afd7ed558ccdL;
+    k ^= k >>> 33;
+    k *= 0xc4ceb9fe1a85ec53L;
+    k ^= k >>> 33;
+    return k;
   }
 
   @Override

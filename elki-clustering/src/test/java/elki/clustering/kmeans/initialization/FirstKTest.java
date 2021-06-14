@@ -66,9 +66,9 @@ public class FirstKTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.MAXITER_ID, 1) //
         .with(CLARA.Par.NOKEEPMED_ID) //
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
-        .with(CLARA.Par.RANDOM_ID, 0) //
+        .with(CLARA.Par.RANDOM_ID, 1) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.7454859);
-    assertClusterSizes(result, new int[] { 45, 155, 200, 287, 313 });
+    assertFMeasure(db, result, 0.98818);
+    assertClusterSizes(result, new int[] { 194, 200, 200, 200, 206 });
   }
 }

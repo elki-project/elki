@@ -51,13 +51,13 @@ public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
   public void testHierarchicalMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 3) //
+        .with(KMeans.SEED_ID, 4) //
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.MODEL_ID, DiagonalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.949566);
-    assertClusterSizes(result, new int[] { 6, 97, 98, 202, 307 });
+    assertFMeasure(db, result, 0.9564);
+    assertClusterSizes(result, new int[] { 3, 93, 98, 202, 314 });
   }
 
   @Test

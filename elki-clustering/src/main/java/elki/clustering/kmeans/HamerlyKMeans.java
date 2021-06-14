@@ -124,6 +124,7 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
@@ -198,20 +199,20 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
         // Compute the current bound:
-        final double z = lower.doubleValue(it);
+        final double l = lower.doubleValue(it);
         final double sa = sep[orig];
         double u = upper.doubleValue(it);
-        if(u <= z || u <= sa) {
+        if(u <= l || u <= sa) {
           continue;
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
         upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-        if(u <= z || u <= sa) {
+        if(u <= l || u <= sa) {
           continue;
         }
-        // Find closest center, and distance to two closest centers
+        // Find closest center, and distance to the second closest center
         double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
         int cur = orig;
         for(int i = 0; i < k; i++) {

@@ -49,7 +49,7 @@ public class RandomUniformGeneratedTest extends AbstractClusterAlgorithmTest {
         .with(KMeans.SEED_ID, 0) //
         .with(KMeans.INIT_ID, RandomUniformGenerated.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.74344789);
-    assertClusterSizes(result, new int[] { 1, 145, 208, 246, 400 });
+    assertFMeasure(db, result, 0.895436);
+    assertClusterSizes(result, new int[] { 153, 191, 202, 206, 248 });
   }
 }

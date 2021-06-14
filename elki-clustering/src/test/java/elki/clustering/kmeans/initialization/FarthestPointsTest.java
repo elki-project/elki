@@ -61,7 +61,7 @@ public class FarthestPointsTest extends AbstractClusterAlgorithmTest {
         .with(CLARA.Par.SAMPLESIZE_ID, 10) //
         .with(CLARA.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99012);
-    assertClusterSizes(result, new int[] { 195, 200, 200, 200, 205 });
+    assertFMeasure(db, result, 0.98818);
+    assertClusterSizes(result, new int[] { 194, 200, 200, 200, 206 });
   }
 }

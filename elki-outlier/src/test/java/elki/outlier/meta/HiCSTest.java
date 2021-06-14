@@ -43,7 +43,7 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<>(HiCS.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(HiCS.Par.LIMIT_ID, 10) //
-        .with(HiCS.Par.SEED_ID, 0) //
+        .with(HiCS.Par.SEED_ID, 3) //
         .with(HiCS.Par.TEST_ID, KolmogorovSmirnovTest.STATIC) //
         .build().autorun(db);
     assertAUC(db, "Noise", result, 0.85340056);
@@ -56,10 +56,10 @@ public class HiCSTest extends AbstractOutlierAlgorithmTest {
     OutlierResult result = new ELKIBuilder<>(HiCS.class) //
         .with(LOF.Par.K_ID, 10) //
         .with(HiCS.Par.LIMIT_ID, 10) //
-        .with(HiCS.Par.SEED_ID, 0) //
+        .with(HiCS.Par.SEED_ID, 5) //
         .with(HiCS.Par.TEST_ID, WelchTTest.STATIC) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.867159);
-    assertSingleScore(result, 1293, 4.7877822);
+    assertAUC(db, "Noise", result, 0.88036);
+    assertSingleScore(result, 1293, 3.7432);
   }
 }

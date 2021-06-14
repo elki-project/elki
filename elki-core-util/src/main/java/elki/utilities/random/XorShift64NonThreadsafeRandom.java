@@ -57,13 +57,13 @@ public class XorShift64NonThreadsafeRandom extends Random {
   /**
    * State of random number generator.
    */
-  private long x = 4101842887655102017L;
+  long x;
 
   /**
    * Constructor called only by localRandom.initialValue.
    */
   public XorShift64NonThreadsafeRandom() {
-    super();
+    super(4101842887655102017L);
   }
 
   /**
@@ -72,12 +72,12 @@ public class XorShift64NonThreadsafeRandom extends Random {
    * @param seed Random generator seed.
    */
   public XorShift64NonThreadsafeRandom(long seed) {
-    super(seed);
+    super(RandomFactory.murmurMix64(seed));
   }
 
   @Override
   public void setSeed(long seed) {
-    x = seed != 0 ? seed : 4101842887655102017L;
+    x = seed != 0L ? seed : 4101842887655102017L;
   }
 
   @Override

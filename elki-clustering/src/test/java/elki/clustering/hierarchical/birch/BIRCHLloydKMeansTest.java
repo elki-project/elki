@@ -43,7 +43,7 @@ public class BIRCHLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractKMeans.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.84944);
-    assertClusterSizes(clustering, new int[] { 96, 104, 211, 227 });
+    assertFMeasure(db, clustering, 0.84932);
+    assertClusterSizes(clustering, new int[] { 98, 102, 211, 227 });
   }
 }

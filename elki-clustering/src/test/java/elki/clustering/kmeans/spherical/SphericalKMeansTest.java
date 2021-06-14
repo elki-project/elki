@@ -43,7 +43,7 @@ public class SphericalKMeansTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SphericalKMeans<DoubleVector>>(SphericalKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 6) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.8625509);
     assertClusterSizes(result, new int[] { 131, 200, 200, 203, 266 });

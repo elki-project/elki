@@ -35,11 +35,11 @@ import elki.utilities.ELKIBuilder;
  */
 public class HartiganWongKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testKMeansYinYang() {
+  public void testKMeansHartiganWong() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<HartiganWongKMeans<DoubleVector>>(HartiganWongKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 8) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.998005);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });

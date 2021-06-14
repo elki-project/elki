@@ -30,7 +30,7 @@ import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Test the simple spherical gaussian model.
+ * Test the simple spherical Gaussian model.
  *
  * @author Erich Schubert
  */
@@ -51,7 +51,7 @@ public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
   public void testHierarchicalMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 1) //
+        .with(KMeans.SEED_ID, 2) //
         .with(EM.Par.K_ID, 4) //
         .with(EM.Par.MODEL_ID, SphericalGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //

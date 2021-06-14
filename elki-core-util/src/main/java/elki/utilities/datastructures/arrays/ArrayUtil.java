@@ -21,6 +21,7 @@
 package elki.utilities.datastructures.arrays;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Utility functions for manipulating arrays.
@@ -119,5 +120,98 @@ public class ArrayUtil {
     float tmp = data[i];
     data[i] = data[j];
     data[j] = tmp;
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   */
+  public static void randomShuffle(int[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   */
+  public static void randomShuffle(short[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   */
+  public static void randomShuffle(byte[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   */
+  public static void randomShuffle(double[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   */
+  public static void randomShuffle(float[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   * @param <T> Array object type
+   */
+  public static <T> void randomShuffle(T[] data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.length - i));
+    }
+  }
+
+  /**
+   * Random shuffle (part) of an array.
+   * 
+   * @param data Input array
+   * @param random Random generator
+   * @param limit Number of elements to randomize
+   * @param <T> Array object type
+   */
+  public static <T> void randomShuffle(ArrayList<T> data, Random random, final int limit) {
+    for(int i = 0; i < limit; i++) {
+      swap(data, i, i + random.nextInt(data.size() - i));
+    }
   }
 }

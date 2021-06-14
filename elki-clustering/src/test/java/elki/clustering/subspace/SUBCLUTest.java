@@ -70,16 +70,16 @@ public class SUBCLUTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSUBCLUSubspaceAxisParallel() {
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, RandomSamplingStreamFilter.class);
-    inp.addParameter(RandomSamplingStreamFilter.Par.PROB_ID, .25);
-    inp.addParameter(RandomSamplingStreamFilter.Par.SEED_ID, 0);
-    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 601, inp);
+    inp.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, RandomSamplingStreamFilter.class) //
+    .addParameter(RandomSamplingStreamFilter.Par.PROB_ID, .25) //
+    .addParameter(RandomSamplingStreamFilter.Par.SEED_ID, 0);
+    Database db = makeSimpleDatabase(UNITTEST + "axis-parallel-subspace-clusters-6d.csv.gz", 630, inp);
     Clustering<SubspaceModel> result = new ELKIBuilder<SUBCLU<DoubleVector>>(SUBCLU.class) //
         .with(SUBCLU.Par.EPSILON_ID, 5) //
         .with(SUBCLU.Par.MINPTS_ID, 50) //
         .with(SUBCLU.Par.MINDIM_ID, 2) //
         .build().autorun(db);
     // PairCounting is not appropriate here: overlapping clusterings!
-    assertClusterSizes(result, new int[] { 72, 135, 145, 157, 161 });
+    assertClusterSizes(result, new int[] { 59, 79, 146, 152, 161, 167 });
   }
 }

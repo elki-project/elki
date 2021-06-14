@@ -91,12 +91,13 @@ public class ElkanKMeans<V extends NumberVector> extends SimplifiedElkanKMeans<V
     /**
      * Cluster center distances
      */
-    double[][] cdist = new double[k][k];
+    double[][] cdist;
 
     /**
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

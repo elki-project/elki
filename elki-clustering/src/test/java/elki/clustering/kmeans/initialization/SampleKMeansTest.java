@@ -32,7 +32,7 @@ import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Performs a single assignment with different k-means initializations.
+ * Initialize k-means by clustering different samples.
  *
  * @author Erich Schubert
  * @since 0.7.5
@@ -47,13 +47,13 @@ public class SampleKMeansTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 8) //
+        .with(KMeans.SEED_ID, 1) //
         .with(KMeans.INIT_ID, SampleKMeans.class) //
         .with(SampleKMeans.Par.KMEANS_ID, HamerlyKMeans.class) //
-        .with(KMeans.SEED_ID, 8) //
+        .with(KMeans.SEED_ID, 1) //
         .with(SampleKMeans.Par.SAMPLE_ID, 100) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.99601);
-    assertClusterSizes(result, new int[] { 199, 199, 200, 201, 201 });
+    assertFMeasure(db, result, 0.998);
+    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 }

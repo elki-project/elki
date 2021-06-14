@@ -42,10 +42,10 @@ public class OstrovskyTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 3) //
+        .with(KMeans.SEED_ID, 1) //
         .with(KMeans.INIT_ID, Ostrovsky.class) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.9980);
-    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    assertFMeasure(db, result, 0.9767);
+    assertClusterSizes(result, new int[] { 188, 200, 200, 200, 212 });
   }
 }
