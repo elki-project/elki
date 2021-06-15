@@ -45,4 +45,16 @@ public class ExponionKMeansTest extends AbstractClusterAlgorithmTest {
     assertFMeasure(db, result, 0.998005);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
+
+    // Tests Issue 87
+    @Test
+    public void testKMeansExponion_SingleCluster_shouldPutAllInOneCluster() {
+        Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+        Clustering<?> result = new ELKIBuilder<ExponionKMeans<DoubleVector>>(ExponionKMeans.class) //
+                .with(KMeans.K_ID, 1) //
+                .with(KMeans.SEED_ID, 7) //
+                .build().autorun(db);
+        assertClusterSizes(result, new int[] { 1000});
+    }
+
 }

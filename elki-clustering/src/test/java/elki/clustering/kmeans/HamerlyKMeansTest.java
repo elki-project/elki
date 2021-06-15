@@ -35,14 +35,25 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.0
  */
 public class HamerlyKMeansTest extends AbstractClusterAlgorithmTest {
-  @Test
-  public void testKMeansHamerly() {
-    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<?> result = new ELKIBuilder<HamerlyKMeans<DoubleVector>>(HamerlyKMeans.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.998005);
-    assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
-  }
+    @Test
+    public void testKMeansHamerly() {
+        Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+        Clustering<?> result = new ELKIBuilder<HamerlyKMeans<DoubleVector>>(HamerlyKMeans.class) //
+            .with(KMeans.K_ID, 5) //
+            .with(KMeans.SEED_ID, 7) //
+            .build().autorun(db);
+        assertFMeasure(db, result, 0.998005);
+        assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    }
+
+    // Tests Issue 87
+    @Test
+    public void testKMeansHamerly_SingleCluster_shouldPutAllInOneCluster() {
+        Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+        Clustering<?> result = new ELKIBuilder<HamerlyKMeans<DoubleVector>>(HamerlyKMeans.class) //
+                .with(KMeans.K_ID, 1) //
+                .with(KMeans.SEED_ID, 7) //
+                .build().autorun(db);
+        assertClusterSizes(result, new int[] { 1000 });
+    }
 }
