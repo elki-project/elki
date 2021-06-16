@@ -25,8 +25,6 @@ import java.util.List;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -141,7 +139,7 @@ public class Silhouette<O> implements Evaluator {
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
     // Store values for the Silhouette plot
-    WritableDoubleDataStore perIDStore = DataStoreUtil.makeDoubleStorage(rel.getDBIDs(), rel.size());
+    SilhouetteResult perIDStore = new SilhouetteResult(rel.size());
     for(Cluster<?> cluster : clusters) {
       // Note: we treat 1-element clusters the same as noise.
       if(cluster.size() <= 1 || cluster.isNoise()) {
@@ -152,6 +150,7 @@ public class Silhouette<O> implements Evaluator {
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
           msil.put(0., cluster.size());
+          perIDStore.putDouble(cluster.getIDs().iter(), 0);
           continue;
         case MERGE_NOISE:
           break; // Treat as cluster below

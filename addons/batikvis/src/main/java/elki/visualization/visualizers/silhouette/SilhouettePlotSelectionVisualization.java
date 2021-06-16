@@ -20,20 +20,14 @@
  */
 package elki.visualization.visualizers.silhouette;
 
-import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.svg.SVGPoint;
-
 import elki.database.ids.*;
-import elki.logging.Logging;
 import elki.result.DBIDSelection;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
-import elki.visualization.batikutil.DragableArea;
 import elki.visualization.css.CSSClass;
 import elki.visualization.gui.VisualizationPlot;
 import elki.visualization.projections.Projection;
@@ -44,7 +38,7 @@ import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.Visualization;
 
 /**
- * Handle the marker in an Silhouette plot.
+ * Visualize the selection in a Silhouette Plot.
  *
  * @author Robert Gehde
  *
@@ -54,22 +48,9 @@ import elki.visualization.visualizers.Visualization;
  */
 public class SilhouettePlotSelectionVisualization implements VisFactory {
   /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(SilhouettePlotSelectionVisualization.class);
-
-  /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Silhouette Selection";
-
-  /**
-   * Input modes
-   */
-  // TODO: Refactor all Mode copies into a shared class?
-  private enum Mode {
-    REPLACE, ADD, INVERT
-  }
 
   /**
    * Constructor.
@@ -93,12 +74,6 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
     return new Instance(context, task, plot, width, height, proj);
   }
 
-  @Override
-  public boolean allowThumbnails(VisualizationTask task) {
-    // Don't use thumbnails
-    return false;
-  }
-
   /**
    * Instance.
    *
@@ -106,7 +81,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
    *
    * @has - visualizes 1 DBIDSelection
    */
-  public class Instance extends AbstractSilhouetteVisualization implements DragableArea.DragListener {
+  public class Instance extends AbstractSilhouetteVisualization {
     /**
      * CSS class for markers
      */
@@ -156,8 +131,6 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
 
       layer.appendChild(mtag = svgp.svgElement(SVGConstants.SVG_G_TAG));
       addMarker();
-
-      layer.appendChild(new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this).getElement());
     }
 
     /**
@@ -208,128 +181,8 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
      * @param width Width of an entry
      * @return SVG-Element svg-rectangle
      */
-    public Element addMarkerRect(double x1, double width) {
+    private Element addMarkerRect(double x1, double width) {
       return svgp.svgRect(x1, 0, width, plotheight);
-    }
-
-    @Override
-    public boolean startDrag(SVGPoint startPoint, Event evt) {
-      int mouseActIndex = getSelectedIndex(startPoint);
-      if(mouseActIndex >= 0 && mouseActIndex < plotSize) {
-        double width = plotwidth / plotSize;
-        double x1 = mouseActIndex * width;
-        Element marker = addMarkerRect(x1, width);
-        SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
-        mtag.appendChild(marker);
-        return true;
-      }
-      return false;
-    }
-
-    @Override
-    public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      int mouseDownIndex = getSelectedIndex(startPoint);
-      int mouseActIndex = getSelectedIndex(dragPoint);
-      final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
-      final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), plotSize);
-      double width = plotwidth / plotSize;
-      double x1 = begin * width;
-      double x2 = (end * width) + width;
-      mtag.removeChild(mtag.getLastChild());
-      Element marker = addMarkerRect(x1, x2 - x1);
-      SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
-      mtag.appendChild(marker);
-      return true;
-    }
-
-    @Override
-    public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      int mouseDownIndex = getSelectedIndex(startPoint);
-      int mouseActIndex = getSelectedIndex(dragPoint);
-      Mode mode = getInputMode(evt);
-      final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
-      final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), plotSize);
-      updateSelection(mode, begin, end);
-      return true;
-    }
-
-    /**
-     * Get the current input mode, on each mouse event.
-     *
-     * @param evt Mouse event.
-     * @return Input mode
-     */
-    private Mode getInputMode(Event evt) {
-      if(evt instanceof DOMMouseEvent) {
-        DOMMouseEvent domme = (DOMMouseEvent) evt;
-        // TODO: visual indication ofF mode possible?
-        return domme.getShiftKey() ? Mode.ADD : domme.getCtrlKey() ? Mode.INVERT : Mode.REPLACE;
-      }
-      // Default mode is replace.
-      return Mode.REPLACE;
-    }
-
-    /**
-     * Gets the Index of the ClusterOrderEntry where the event occurred
-     *
-     * @param order List of ClusterOrderEntries
-     * @param cPt clicked point
-     * @return Index of the object
-     */
-    private int getSelectedIndex(SVGPoint cPt) {
-      return (int) ((cPt.getX() / plotwidth) * plotSize);
-    }
-
-    /**
-     * Updates the selection for the given ClusterOrderEntry.
-     *
-     * @param mode Input mode
-     * @param begin first index to select
-     * @param end last index to select
-     */
-    protected void updateSelection(Mode mode, int begin, int end) {
-      DoubleDBIDList[] values = silhouette.getSilhouetteValues();
-      if(begin < 0 || begin > end || end >= plotSize) {
-        LOG.warning("Invalid range in updateSelection: " + begin + " .. " + end);
-        return;
-      }
-
-      DBIDSelection selContext = context.getSelection();
-      HashSetModifiableDBIDs selection = (selContext == null || mode == Mode.REPLACE) ? DBIDUtil.newHashSet() //
-          : DBIDUtil.newHashSet(selContext.getSelectedIds());
-
-      int clusbegin = 0;
-      for(int i = 0; i < values.length; i++) {
-        DoubleDBIDList cluster = values[i];
-        int tbegin = begin, tend = end;
-        if(begin < clusbegin) {
-          tbegin = 0;
-        }
-        else {
-          tbegin = begin - clusbegin;
-        }
-        if(end >= clusbegin + cluster.size()) {
-          tend = cluster.size() - 1;
-        }
-        else {
-          tend = end - clusbegin;
-        }
-        for(DBIDArrayIter it = cluster.iter().seek(tbegin); it.getOffset() <= tend; it.advance()) {
-          if(mode == Mode.INVERT) {
-            if(!selection.add(it)) {
-              selection.remove(it);
-            }
-          }
-          else {
-            // In REPLACE and ADD, add objects.
-            // The difference was done before by not re-using the selection.
-            // Since we are using a set, we can just add in any case.
-            selection.add(it);
-          }
-        }
-        clusbegin += cluster.size() + 3;
-      }
-      context.setSelection(new DBIDSelection(selection));
     }
 
     /**

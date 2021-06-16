@@ -21,7 +21,7 @@
 package elki.visualization.projector;
 
 import elki.data.Clustering;
-import elki.database.datastore.DoubleDataStore;
+import elki.evaluation.clustering.internal.SilhouetteResult;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
 
@@ -47,8 +47,7 @@ public class SilhouettePlotFactory implements ProjectorFactory {
     if(c == null) {
       return;
     }
-    VisualizationTree.findNewResults(context, start).filter(DoubleDataStore.class).forEach(dds -> {
-      // FIXME: ensure that the DoubleDataStore *is* Silhouette scores!
+    VisualizationTree.findNewResults(context, start).filter(SilhouetteResult.class).forEach(dds -> {
       context.addVis(c, new SilhouettePlotProjector(c, dds));
     });
   }

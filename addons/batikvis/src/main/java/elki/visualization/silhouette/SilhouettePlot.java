@@ -120,7 +120,6 @@ public class SilhouettePlot {
     scale = scale != null ? scale : computeScale(silhouettes);
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
     int x = 0;
     final int start = scaleToPixel(0);
     for(DoubleDBIDList list : silhouettes) {
@@ -154,7 +153,7 @@ public class SilhouettePlot {
    */
   public int scaleToPixel(double silhouette) {
     return (Double.isInfinite(silhouette) || Double.isNaN(silhouette)) ? 0 : //
-        (int) Math.round(scale.getScaled(silhouette, height - .5, .5));
+        (int) Math.round(scale.getScaled(silhouette, height - 1, 0));
   }
 
   /**
