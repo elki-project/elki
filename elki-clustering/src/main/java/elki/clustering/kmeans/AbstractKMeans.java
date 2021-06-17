@@ -581,7 +581,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
             log.statistics(new DoubleStatistic(key + "." + iteration + ".variance-sum", s));
           }
         }
-        if(changed == 0) {
+        if(changed <= 0) {
           break;
         }
       }
