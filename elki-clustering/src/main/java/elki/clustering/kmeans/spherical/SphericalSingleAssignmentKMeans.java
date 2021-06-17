@@ -60,7 +60,7 @@ public class SphericalSingleAssignmentKMeans<V extends NumberVector> extends Sph
   public Clustering<KMeansModel> run(Relation<V> relation) {
     Instance instance = new Instance(relation, initialMeans(relation));
     instance.run(1);
-    return instance.buildResult(false, relation);
+    return instance.buildResult();
   }
 
   @Override

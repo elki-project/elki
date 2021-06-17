@@ -735,10 +735,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
 
     /**
      * Build a standard k-means result, with known cluster variance sums.
+     * <p>
+     * Note: this expects the <tt>varsum</tt> field to be correct!
      *
      * @return Clustering result
      */
-    protected Clustering<KMeansModel> buildResult() {
+    public Clustering<KMeansModel> buildResult() {
       Clustering<KMeansModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Means Clustering");
       for(int i = 0; i < clusters.size(); i++) {
@@ -746,7 +748,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
         if(ids.isEmpty()) {
           getLogger().warning("K-Means produced an empty cluster - bad initialization?");
         }
-        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
+        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum != null ? varsum[i] : Double.NaN)));
       }
       return result;
     }
@@ -761,45 +763,36 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     public Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
       Logging log = getLogger();
-      Clustering<KMeansModel> result = new Clustering<>();
-      Metadata.of(result).setLongName("k-Means Clustering");
-      if(relation.size() <= 0) {
-        return result;
-      }
-      if(!varstat) {
-        for(int i = 0; i < clusters.size(); i++) {
-          DBIDs ids = clusters.get(i);
-          if(ids.isEmpty()) {
-            continue;
-          }
-          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], Double.NaN)));
-        }
+      if(varstat) {
+        long beforestat = diststat;
+        log.statistics(new LongStatistic(key + ".distance-computations.main", diststat));
+        recomputeVariance(relation);
+        log.statistics(new DoubleStatistic(key + ".variance-sum", sum(varsum)));
+        log.statistics(new LongStatistic(key + ".variance.distance-computations", diststat - beforestat));
       }
       else {
-        long beforestat = diststat;
-        double totalvariance = 0.;
-        for(int i = 0; i < clusters.size(); i++) {
-          DBIDs ids = clusters.get(i);
-          if(ids.isEmpty()) {
-            continue;
-          }
-          double vsum = 0;
-          double[] mean = means[i];
-          for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-            vsum += distance(relation.get(it), mean);
-          }
-          totalvariance += vsum;
-          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, vsum)));
-        }
-        if(log.isStatistics()) {
-          log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
-          log.statistics(new LongStatistic(key + ".variance.distance-computations", diststat - beforestat));
-        }
+        Arrays.fill(varsum, Double.NaN); // Do not use below
       }
-      if(log.isStatistics()) {
-        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
-      }
+      Clustering<KMeansModel> result = buildResult();
+      log.statistics(new LongStatistic(key + ".distance-computations", diststat));
       return result;
+    }
+
+    /**
+     * Recompute the cluster variances.
+     *
+     * @param relation Data relation
+     */
+    protected void recomputeVariance(Relation<? extends NumberVector> relation) {
+      Arrays.fill(varsum, 0);
+      for(int i = 0; i < clusters.size(); i++) {
+        double[] mean = means[i];
+        double vsum = 0;
+        for(DBIDIter it = clusters.get(i).iter(); it.valid(); it.advance()) {
+          vsum += distance(relation.get(it), mean);
+        }
+        varsum[i] = vsum;
+      }
     }
 
     /**
