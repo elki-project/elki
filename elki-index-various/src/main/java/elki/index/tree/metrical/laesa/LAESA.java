@@ -109,7 +109,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
    * Data storage for precomputed distances to reference points.
    */
   DoubleDataStore[] dists;
-  
+
   /**
    * fast lookup
    */
@@ -207,31 +207,38 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
     private void laesaKNNSearch(O query, KNNHeap knns) {
       double dBest = Double.POSITIVE_INFINITY;
       ModifiableDoubleDBIDList P = DBIDUtil.newDistanceDBIDList(relation.size());
+      DBIDArrayIter refIter = refp.iter();
+      // arbitrary
+      /*DBIDVar*/DBIDArrayIter s = refIter;// DBIDUtil.newVar(refIter);
       for(DBIDIter p = relation.iterDBIDs(); p.valid(); p.advance()) {
-        P.add(0, p);
+        if(!DBIDUtil.equal(p, s))
+          P.add(0, p);
       }
-      DBIDArrayIter s = refp.iter(); // arbitrary
-      int si = findInP(P, s), bsi = -1;
-      assert si > -1;
+      DoubleDBIDListMIter pIter = P.iter();
+
+      int si = -1, bsi = -1;
       int nc = 0, psize = P.size();
+
       while(psize > 0) {
         // distance computing
-        double dxs = distq.distance(query, DBIDUtil.deref(s));
+        double dxs = distq.distance(query, s);
         nc++;
         // update pbest dbest
         if(dxs < dBest) {
           dBest = knns.insert(dxs, s);
         }
-        P.swap(si, --psize);
-        // P.remove(P.size() - 1);
+        if(si >= 0)
+          P.swap(si, --psize);
+
         int q = -1;
         bsi = -1;
         double gq = Double.POSITIVE_INFINITY, // nonref lower bound
             gb = Double.POSITIVE_INFINITY; // ref lower bound
-        boolean rp = chosenRefP.contains(s);
-        for(DoubleDBIDListMIter p = P.iter(); p.getOffset() < psize;) {
+        final boolean rp = chosenRefP.contains(s);
+        int offset = rp ? findInRef(s, refIter).getOffset() : 0;
+        for(DoubleDBIDListMIter p = pIter; p.getOffset() < psize;) {
           if(rp) { // updating G if possible
-            double t = Math.abs(dists[s.getOffset()].doubleValue(p) - dxs);
+            double t = Math.abs(dists[offset].doubleValue(p) - dxs);
             if(t > p.doubleValue()) {
               p.setDouble(t);
             }
@@ -241,7 +248,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
           if(chosenRefP.contains(p)) {
             if(gp >= dBest && nc > ((double) m) / k) {
               P.swap(p.getOffset(), --psize);
-              // P.remove(P.size() - 1);
             }
             else {
               if(gp < gb) {
@@ -254,7 +260,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
           else {
             if(gp >= dBest) {
               P.swap(p.getOffset(), --psize);
-              // P.remove(P.size() - 1);
             }
             else {
               if(gp < gq) {
@@ -267,27 +272,19 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
         }
         if(bsi != -1) {
           assert bsi > -1;
-          s = findInRef(P.iter().seek(bsi));
+
+          s = pIter.seek(bsi);// P.assignVar(bsi, s);
           si = bsi;
         }
         else if(q != -1) {
-          s = P.iter().seek(q);
+          s = pIter.seek(q);// P.assignVar(q, s);
           si = q;
         }
       }
     }
 
-    private int findInP(ModifiableDoubleDBIDList p, DBIDArrayIter s) {
-      for(DBIDArrayIter iter = p.iter(); iter.valid(); iter.advance()) {
-        if(DBIDUtil.compare(iter, s) == 0) {
-          return iter.getOffset();
-        }
-      }
-      return -1;
-    }
-
-    private DBIDArrayIter findInRef(DBIDArrayMIter p) {
-      for(DBIDArrayIter iter = refp.iter(); iter.valid(); iter.advance()) {
+    private DBIDArrayIter findInRef(/*DBIDVar*/DBIDArrayIter p, DBIDArrayIter ref) {
+      for(DBIDArrayIter iter = ref.seek(0); iter.valid(); iter.advance()) {
         if(DBIDUtil.compare(p, iter) == 0) {
           return iter;
         }
@@ -307,13 +304,12 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
 
     private void laesaRangeSearch(O query, double range, ModifiableDoubleDBIDList result) {
       ModifiableDoubleDBIDList refpdists = DBIDUtil.newDistanceDBIDList(m);
-      ModifiableDoubleDBIDList lowerbounds = DBIDUtil.newDistanceDBIDList(relation.size());
-      
+
       for(DBIDIter it = refp.iter(); it.valid(); it.advance()) {
         refpdists.add(distq.distance(query, it), it);
       }
-      
-      for(DBIDIter p = relation.iterDBIDs(); p.valid();p.advance()) {
+
+      for(DBIDIter p = relation.iterDBIDs(); p.valid(); p.advance()) {
         double highlowbound = 0;
         for(DoubleDBIDListMIter r = refpdists.iter(); r.valid(); r.advance()) {
           double t = Math.abs(dists[r.getOffset()].doubleValue(p) - r.doubleValue());
@@ -322,13 +318,10 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
           }
         }
         if(highlowbound <= range) {
-          lowerbounds.add(highlowbound, p);
-        }
-      }
-      for(DoubleDBIDListMIter p = lowerbounds.iter(); p.valid();p.advance()) {
-        final double dist = distq.distance(query, p);
-        if(dist <= range) {
-          result.add(dist,p);
+          final double dist = distq.distance(query, p);
+          if(dist <= range) {
+            result.add(dist, p);
+          }
         }
       }
     }
