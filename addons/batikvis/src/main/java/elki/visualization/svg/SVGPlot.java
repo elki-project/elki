@@ -87,9 +87,9 @@ public class SVGPlot {
    * DOM implementations to try.
    */
   private static final String[] BATIK_DOMS = { //
-      "org.apache.batik.anim.dom.SVG12DOMImplementation", // Batik 1.8
       "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
       "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
+      "org.apache.batik.anim.dom.SVG12DOMImplementation", // Batik 1.8, defect
   };
 
   // Locate a usable DOM implementation.
