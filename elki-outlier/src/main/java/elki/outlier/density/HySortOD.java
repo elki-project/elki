@@ -492,10 +492,7 @@ public class HySortOD implements OutlierAlgorithm {
      * @return Density
      */
     private int density(int i, Node parent, int col) {
-      if(parent == null) {
-        return 0;
-      }
-      if(parent.children != null) {
+      if(parent.children == null) {
         int density = 0;
         for(int k = parent.begin; k <= parent.end; k++) {
           if(isImmediate(this.H.get(i), this.H.get(k))) {
@@ -506,9 +503,12 @@ public class HySortOD implements OutlierAlgorithm {
       }
       final int midVal = this.H.get(i).getCoordAt(col);
       final int nextCol = Math.min(col + 1, this.H.get(i).getNumDimensions() - 1);
-      return density(i, parent.children.get(midVal - 1), nextCol) //
-          + density(i, parent.children.get(midVal), nextCol) //
-          + density(i, parent.children.get(midVal + 1), nextCol);
+      final Node lftNode = parent.children.get(midVal - 1);
+      final Node midNode = parent.children.get(midVal);
+      final Node rgtNode = parent.children.get(midVal + 1);
+      return (lftNode != null ? density(i, lftNode, nextCol) : 0) //
+          + (midNode != null ? density(i, midNode, nextCol) : 0) //
+          + (rgtNode != null ? density(i, rgtNode, nextCol) : 0);
     }
 
     /**
