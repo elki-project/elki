@@ -38,7 +38,6 @@ public class LaesaTest extends AbstractIndexStructureTest {
     LAESA.Factory<?> factory = new ELKIBuilder<>(LAESA.Factory.class) //
         .with(LAESA.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
     assertExactEuclidean(factory, LAESA.LAESAKNNSearcher.class, LAESA.LAESARangeSearcher.class);
-//    assertPrioritySearchEuclidean(factory, CoverTree.CoverTreePrioritySearcher.class);
-//    assertSinglePoint(factory, CoverTree.CoverTreePrioritySearcher.class, CoverTree.CoverTreeRangeSearcher.class);
+    assertSinglePoint(factory, LAESA.LAESAKNNByDBIDSearcher.class, LAESA.LAESARangeByDBIDSearcher.class);
   }
 }
