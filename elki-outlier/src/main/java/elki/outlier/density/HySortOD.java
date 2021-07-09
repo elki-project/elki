@@ -20,10 +20,7 @@
  */
 package elki.outlier.density;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
@@ -125,7 +122,7 @@ public class HySortOD implements OutlierAlgorithm {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax minmax = new DoubleMinMax();
     // compute score by hypercube
-    LOG.beginStep(stepprog, 3, "Computing hypercube scores");
+    LOG.beginStep(stepprog, 3, "Computing hypercube scores.");
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("HySortOD scores", relation.size(), LOG) : null;
     for(int hypercube = 0; hypercube < H.size(); hypercube++) {
@@ -492,39 +489,23 @@ public class HySortOD implements OutlierAlgorithm {
      * @return Density
      */
     private int density(int i, Node parent, int col) {
-      int density = 0;
-
-      if(parent.children.isEmpty()) {
+      if(parent.children == null) {
+        int density = 0;
         for(int k = parent.begin; k <= parent.end; k++) {
           if(isImmediate(this.H.get(i), this.H.get(k))) {
             density += H.get(k).getDensity();
           }
         }
+        return density;
       }
-      else {
-
-        int lftVal = this.H.get(i).getCoordAt(col) - 1;
-        int midVal = this.H.get(i).getCoordAt(col);
-        int rgtVal = this.H.get(i).getCoordAt(col) + 1;
-
-        Node lftNode = parent.children.get(lftVal);
-        Node midNode = parent.children.get(midVal);
-        Node rgtNode = parent.children.get(rgtVal);
-
-        int nextCol = Math.min(col + 1, this.H.get(i).getNumDimensions() - 1);
-
-        if(lftNode != null) {
-          density += density(i, lftNode, nextCol);
-        }
-        if(midNode != null) {
-          density += density(i, midNode, nextCol);
-        }
-        if(rgtNode != null) {
-          density += density(i, rgtNode, nextCol);
-        }
-      }
-
-      return density;
+      final int midVal = this.H.get(i).getCoordAt(col);
+      final int nextCol = Math.min(col + 1, this.H.get(i).getNumDimensions() - 1);
+      final Node lftNode = parent.children.get(midVal - 1);
+      final Node midNode = parent.children.get(midVal);
+      final Node rgtNode = parent.children.get(midVal + 1);
+      return (lftNode != null ? density(i, lftNode, nextCol) : 0) //
+          + (midNode != null ? density(i, midNode, nextCol) : 0) //
+          + (rgtNode != null ? density(i, rgtNode, nextCol) : 0);
     }
 
     /**
@@ -554,7 +535,6 @@ public class HySortOD implements OutlierAlgorithm {
         this.value = value;
         this.begin = begin;
         this.end = end;
-        this.children = new Int2ObjectOpenHashMap<>();
       }
 
       @Override
@@ -569,6 +549,9 @@ public class HySortOD implements OutlierAlgorithm {
        */
       public void add(Node node) {
         if(node != null) {
+          if(children == null) {
+            children = new Int2ObjectOpenHashMap<>();
+          }
           children.put(node.value, node);
         }
       }
