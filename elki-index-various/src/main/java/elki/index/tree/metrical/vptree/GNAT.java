@@ -26,6 +26,7 @@ import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -35,7 +36,8 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
-import elki.logging.statistics.Counter;
+import elki.logging.statistics.LongStatistic;
+import elki.utilities.Alias;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
@@ -49,7 +51,8 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Multi Vantage Point Tree
+ * Geometric Near-neighbor Access Tree (GNAT), also known as Multi Vantage Point
+ * Tree or MVP-Tree.
  * <p>
  * In a Multi Vantage Point Tree the data is split into Voronoi Cells (Dirichlet
  * Domain) defined by the vantage Points
@@ -69,16 +72,16 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. 21th Int. Conf. on Very Large Data Bases (VLDB)", //
     url = "http://www.vldb.org/conf/1995/P574.PDF", //
     bibkey = "DBLP:conf/vldb/Brin95")
-public class MVPTree<O> implements DistancePriorityIndex<O> {
+public class GNAT<O> implements DistancePriorityIndex<O> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(MVPTree.class);
+  private static final Logging LOG = Logging.getLogger(GNAT.class);
 
   /**
    * Counter for distance computations.
    */
-  protected final Counter distcalc;
+  protected long distComputations;
 
   /**
    * The representation we are bound to.
@@ -121,13 +124,12 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * @param relation data for tree construction
    * @param distance distance function for tree construction
    */
-  public MVPTree(Relation<O> relation, Distance<? super O> distance, RandomFactory random, int numberVPs) {
+  public GNAT(Relation<O> relation, Distance<? super O> distance, RandomFactory random, int numberVPs) {
     this.relation = relation;
     this.distFunc = distance;
     this.random = random;
     this.distQuery = distance.instantiate(relation);
     this.numberVPs = numberVPs;
-    this.distcalc = LOG.isStatistics() ? LOG.newCounter(this.getClass().getName() + ".distancecalcs") : null;
   }
 
   @Override
@@ -138,6 +140,30 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     }
     root = new Node(numberVPs);
     buildTree(root, relation.getDBIDs(), numberVPs);
+  }
+
+  /**
+   * Compute a distance, and count.
+   *
+   * @param a First object
+   * @param b Second object
+   * @return Distance
+   */
+  private double distance(DBIDRef a, DBIDRef b) {
+    ++distComputations;
+    return distQuery.distance(a, b);
+  }
+
+  /**
+   * Compute a distance, and count.
+   *
+   * @param a First object
+   * @param b Second object
+   * @return Distance
+   */
+  private double distance(O a, DBIDRef b) {
+    ++distComputations;
+    return distQuery.distance(a, b);
   }
 
   /**
@@ -169,8 +195,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       int childoffset = -1;
       double mindist = Double.MAX_VALUE;
       for(DBIDArrayIter vpiter = current.vps.iter(); vpiter.valid(); vpiter.advance()) {
-        double distance = distQuery.distance(vpiter, iter);
-        countDistanceComputation();
+        final double distance = distance(vpiter, iter);
         distances[vpiter.getOffset()] = distance;
         if(distance < mindist) {
           mindist = distance;
@@ -261,20 +286,44 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    // only should work for same distance as construction distance
-    return distanceQuery.getDistance().equals(distFunc) ? new MVPTreeKNNSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATKNNObjectSearcher() : null;
+  }
+
+  @Override
+  public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATKNNDBIDSearcher() : null;
   }
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    // only should work for same distance as construction distance
-    return distanceQuery.getDistance().equals(distFunc) ? new MVPTreeRangeSearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATRangeObjectSearcher() : null;
+  }
+
+  @Override
+  public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATRangeDBIDSearcher() : null;
   }
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    // only should work for same distance as construction distance
-    return distanceQuery.getDistance().equals(distFunc) ? new MVPTreePrioritySearcher() : null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATPriorityObjectSearcher() : null;
+  }
+
+  @Override
+  public PrioritySearcher<DBIDRef> priorityByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
+            new GNATPriorityDBIDSearcher() : null;
   }
 
   /**
@@ -288,6 +337,13 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    */
   private static boolean intersect(double l1, double u1, double l2, double u2) {
     return l1 <= u2 && l2 <= u1;
+  }
+
+  @Override
+  public void logStatistics() {
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getName() + ".distancecalcs", distComputations));
+    }
   }
 
   /**
@@ -329,16 +385,16 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    *
    * @author Robert Gehde
    */
-  public class MVPTreeKNNSearcher implements KNNSearcher<O> {
-    @Override
-    public KNNList getKNN(O obj, int k) {
-      final KNNHeap knns = DBIDUtil.newHeap(k);
-      mvpKNNSearch(obj, knns, root, Double.MAX_VALUE);
-      // System.out.println(returned);
-      return knns.toKNNList();
-    }
-
-    private double mvpKNNSearch(O obj, KNNHeap knns, Node node, double tau) {
+  public abstract class GNATKNNSearcher {
+    /**
+     * Search the k nearest neighbors
+     * 
+     * @param knns Output heap
+     * @param node Current node
+     * @param tau Threshold tau
+     * @return new threshold
+     */
+    protected double mvpKNNSearch(KNNHeap knns, Node node, double tau) {
       if(node == null) {
         return tau;
       }
@@ -347,8 +403,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       int[] ind = new int[node.vps.size()];
       // sort distance and check vps
       for(iter.seek(0); iter.valid(); iter.advance()) {
-        double x = distQuery.distance(iter, obj);
-        countDistanceComputation();
+        double x = queryDistance(iter);
         tau = knns.insert(x, iter);
         final int off = iter.getOffset();
         // prioritize by distance to vantage point
@@ -374,10 +429,69 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
           }
         }
         // recurse into child:
-        tau = mvpKNNSearch(obj, knns, node.children[offi], tau);
+        tau = mvpKNNSearch(knns, node.children[offi], tau);
       }
-
       return tau;
+    }
+
+    /**
+     * Query the distance to a query object.
+     *
+     * @param iter Target object
+     * @return Distance
+     */
+    protected abstract double queryDistance(DBIDRef iter);
+  }
+
+  /**
+   * kNN search for the VP-Tree.
+   *
+   * @author Robert Gehde
+   * @author Erich Schubert
+   */
+  public class GNATKNNObjectSearcher extends GNATKNNSearcher implements KNNSearcher<O> {
+    /**
+     * Current query object
+     */
+    private O query;
+
+    @Override
+    public KNNList getKNN(O query, int k) {
+      final KNNHeap knns = DBIDUtil.newHeap(k);
+      this.query = query;
+      mvpKNNSearch(knns, root, Double.POSITIVE_INFINITY);
+      return knns.toKNNList();
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
+    }
+  }
+
+  /**
+   * kNN search for the VP-Tree.
+   *
+   * @author Robert Gehde
+   * @author Erich Schubert
+   */
+  public class GNATKNNDBIDSearcher extends GNATKNNSearcher implements KNNSearcher<DBIDRef> {
+    /**
+     * Current query object
+     */
+    private DBIDRef query;
+
+    @Override
+    public KNNList getKNN(DBIDRef query, int k) {
+      final KNNHeap knns = DBIDUtil.newHeap(k);
+      this.query = query;
+      mvpKNNSearch(knns, root, Double.POSITIVE_INFINITY);
+      return knns.toKNNList();
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
     }
   }
 
@@ -386,14 +500,15 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * 
    * @author Robert Gehde
    */
-  public class MVPTreeRangeSearcher implements RangeSearcher<O> {
-    @Override
-    public ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result) {
-      mvpRangeSearch(query, result, root, range);
-      return result;
-    }
-
-    private void mvpRangeSearch(O query, ModifiableDoubleDBIDList result, Node node, double range) {
+  public abstract class GNATRangeSearcher {
+    /**
+     * Perform a range search on the MVP Tree
+     *
+     * @param result Output storage
+     * @param node Current node
+     * @param range Range threshold
+     */
+    protected void mvpRangeSearch(ModifiableDoubleDBIDList result, Node node, double range) {
       if(node == null) {
         return;
       }
@@ -403,8 +518,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
         if(ignoreChildren[iter.getOffset()]) {
           continue;
         }
-        double x = distQuery.distance(iter, query);
-        countDistanceComputation();
+        double x = queryDistance(iter);
         if(x <= range) {
           result.add(x, iter);
         }
@@ -420,9 +534,67 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
       // search children
       for(int i = 0; i < numChild; i++) {
         if(!ignoreChildren[i] && node.children[i] != null) {
-          mvpRangeSearch(query, result, node.children[i], range);
+          mvpRangeSearch(result, node.children[i], range);
         }
       }
+    }
+
+    /**
+     * Query the distance to a query object.
+     *
+     * @param iter Target object
+     * @return Distance
+     */
+    protected abstract double queryDistance(DBIDRef iter);
+  }
+
+  /**
+   * Range search for the VP-tree.
+   * 
+   * @author Robert Gehde
+   * @author Erich Schubert
+   */
+  public class GNATRangeObjectSearcher extends GNATRangeSearcher implements RangeSearcher<O> {
+    /**
+     * Current query object
+     */
+    private O query;
+
+    @Override
+    public ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result) {
+      this.query = query;
+      mvpRangeSearch(result, root, range);
+      return result;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
+    }
+  }
+
+  /**
+   * Range search for the VP-tree.
+   * 
+   * @author Robert Gehde
+   * @author Erich Schubert
+   */
+  public class GNATRangeDBIDSearcher extends GNATRangeSearcher implements RangeSearcher<DBIDRef> {
+    /**
+     * Current query object
+     */
+    private DBIDRef query;
+
+    @Override
+    public ModifiableDoubleDBIDList getRange(DBIDRef query, double range, ModifiableDoubleDBIDList result) {
+      this.query = query;
+      mvpRangeSearch(result, root, range);
+      return result;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
     }
   }
 
@@ -431,7 +603,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    *
    * @author Robert Gehde
    */
-  private class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
+  private static class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
     /**
      * Minimum distance
      */
@@ -471,17 +643,14 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
    * priority search query for mvp-tree
    * 
    * @author Robert Gehde
+   *
+   * @param <T> Query object
    */
-  public class MVPTreePrioritySearcher implements PrioritySearcher<O> {
+  public abstract class GNATPrioritySearcher<T> implements PrioritySearcher<T> {
     /**
      * Min heap for searching.
      */
     private ComparableMinHeap<PrioritySearchBranch> heap = new ComparableMinHeap<>();
-
-    /**
-     * Current query object.
-     */
-    private O query;
 
     /**
      * Stopping threshold.
@@ -493,9 +662,12 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
      */
     private PrioritySearchBranch cur;
 
-    @Override
-    public PrioritySearcher<O> search(O query) {
-      this.query = query;
+    /**
+     * Start the next search.
+     *
+     * @return Searcher
+     */
+    protected PrioritySearcher<T> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
       this.heap.clear();
       this.heap.add(new PrioritySearchBranch(0, root, null));
@@ -506,7 +678,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     }
 
     @Override
-    public PrioritySearcher<O> advance() {
+    public PrioritySearcher<T> advance() {
       if(heap.isEmpty()) {
         cur = null;
         return this;
@@ -523,8 +695,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
           if(ignoreChildren[vi]) {
             continue;
           }
-          double x = distances[vi] = distQuery.distance(iter, query);
-          countDistanceComputation();
+          double x = distances[vi] = queryDistance(iter);
           // check intersection of [x-range,x+range] and child[i] range as seen
           // from iter, if empty (not intersecting), ignore child
           for(int i = 0; i < numChild; i++) {
@@ -543,7 +714,6 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
           }
         }
       }
-
       return this;
     }
 
@@ -558,7 +728,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     }
 
     @Override
-    public PrioritySearcher<O> decreaseCutoff(double threshold) {
+    public PrioritySearcher<T> decreaseCutoff(double threshold) {
       assert threshold <= this.threshold : "Thresholds must only decreasee.";
       this.threshold = threshold;
       return this;
@@ -566,7 +736,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
 
     @Override
     public double computeExactDistance() {
-      return distQuery.distance(query, relation.get(cur.vp));
+      return queryDistance(cur.vp);
     }
 
     @Override
@@ -578,24 +748,74 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     public double getLowerBound() {
       return cur.mindist;
     }
+
+    /**
+     * Query the distance to a query object.
+     *
+     * @param iter Target object
+     * @return Distance
+     */
+    protected abstract double queryDistance(DBIDRef iter);
   }
 
   /**
-   * Count a distance computation.
+   * Range search for the VP-tree.
+   * 
+   * @author Robert Gehde
+   * @author Erich Schubert
    */
-  protected void countDistanceComputation() {
-    if(distcalc != null) {
-      distcalc.increment();
+  public class GNATPriorityObjectSearcher extends GNATPrioritySearcher<O> {
+    /**
+     * Current query object
+     */
+    private O query;
+
+    @Override
+    public PrioritySearcher<O> search(O query) {
+      this.query = query;
+      doSearch();
+      return this;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
     }
   }
 
-  @Override
-  public void logStatistics() {
-    if(distcalc != null) {
-      LOG.statistics(distcalc);
+  /**
+   * Range search for the VP-tree.
+   * 
+   * @author Robert Gehde
+   * @author Erich Schubert
+   */
+  public class GNATPriorityDBIDSearcher extends GNATPrioritySearcher<DBIDRef> {
+    /**
+     * Current query object
+     */
+    private DBIDRef query;
+
+    @Override
+    public PrioritySearcher<DBIDRef> search(DBIDRef query) {
+      this.query = query;
+      doSearch();
+      return this;
+    }
+
+    @Override
+    protected double queryDistance(DBIDRef p) {
+      return GNAT.this.distance(query, p);
     }
   }
 
+  /**
+   * Index Factory
+   *
+   * @author Robert Gehde
+   *
+   * @param <O> Object type
+   */
+  @Alias({ "MVPTree", "mvp" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O> {
     /**
      * Distance Function
@@ -627,8 +847,8 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
     }
 
     @Override
-    public MVPTree<O> instantiate(Relation<O> relation) {
-      return new MVPTree<>(relation, distance, random, numbervps);
+    public GNAT<O> instantiate(Relation<O> relation) {
+      return new GNAT<>(relation, distance, random, numbervps);
     }
 
     @Override
@@ -680,7 +900,7 @@ public class MVPTree<O> implements DistancePriorityIndex<O> {
             .grab(config, x -> {
               this.distance = x;
               if(!distance.isMetric()) {
-                LOG.warning("MVPTree requires a metric to be exact.");
+                LOG.warning("GNAT requires a metric to be exact.");
               }
             });
         new IntParameter(NUMBER_VANTAGE_POINTS_ID, 10) //

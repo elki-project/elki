@@ -22,23 +22,24 @@ package elki.index.tree.metrical.vptree;
 
 import org.junit.Test;
 
-import elki.database.query.knn.WrappedKNNDBIDByLookup;
-import elki.database.query.range.WrappedRangeDBIDByLookup;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
 
-public class MVPTreeTest extends AbstractIndexStructureTest {
-
+/**
+ * Unit test for GNAT.
+ *
+ * @author Robert Gehde
+ */
+public class GNATTest extends AbstractIndexStructureTest {
   @Test
-  public void testMVPTree() {
-    MVPTree.Factory<?> factory = new ELKIBuilder<>(MVPTree.Factory.class) //
-        .with(MVPTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class)//
-        .with(MVPTree.Factory.Par.NUMBER_VANTAGE_POINTS_ID, 10)//
-        .with(MVPTree.Factory.Par.SEED_ID, 1234).build();
-    assertExactEuclidean(factory, MVPTree.MVPTreeKNNSearcher.class, MVPTree.MVPTreeRangeSearcher.class);
-    assertPrioritySearchEuclidean(factory, MVPTree.MVPTreePrioritySearcher.class);
-    assertSinglePoint(factory, WrappedKNNDBIDByLookup.class, WrappedRangeDBIDByLookup.class);
+  public void testGNAT() {
+    GNAT.Factory<?> factory = new ELKIBuilder<>(GNAT.Factory.class) //
+        .with(GNAT.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class)//
+        .with(GNAT.Factory.Par.NUMBER_VANTAGE_POINTS_ID, 10)//
+        .with(GNAT.Factory.Par.SEED_ID, 1234).build();
+    assertExactEuclidean(factory, GNAT.GNATKNNObjectSearcher.class, GNAT.GNATRangeObjectSearcher.class);
+    assertPrioritySearchEuclidean(factory, GNAT.GNATPrioritySearcher.class);
+    assertSinglePoint(factory, GNAT.GNATKNNDBIDSearcher.class, GNAT.GNATRangeDBIDSearcher.class);
   }
-
 }
