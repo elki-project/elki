@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.metrical.laesa;
+package elki.index.laesa;
 
 import org.junit.Test;
 
@@ -29,14 +29,15 @@ import elki.utilities.ELKIBuilder;
 /**
  * Unit test for the {@link LAESA}.
  *
- * @author Erich Schubert
- * @since 0.7.5
+ * @author Robert Gehde
  */
-public class LaesaTest extends AbstractIndexStructureTest {
+public class LAESATest extends AbstractIndexStructureTest {
   @Test
   public void testLAESA() {
     LAESA.Factory<?> factory = new ELKIBuilder<>(LAESA.Factory.class) //
-        .with(LAESA.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class).build();
+        .with(LAESA.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class) //
+        .with(LAESA.Factory.Par.M_ID, 100) //
+        .build();
     assertExactEuclidean(factory, LAESA.LAESAKNNSearcher.class, LAESA.LAESARangeSearcher.class);
     assertSinglePoint(factory, LAESA.LAESAKNNByDBIDSearcher.class, LAESA.LAESARangeByDBIDSearcher.class);
   }

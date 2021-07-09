@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.metrical.laesa;
+package elki.index.laesa;
 
 import java.util.Random;
 
@@ -29,6 +29,7 @@ import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.memory.ArrayDoubleStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -61,6 +62,7 @@ import elki.utilities.random.RandomFactory;
  * Pattern Recognit. Lett. 15(1)
  * 
  * @author Erich Schubert
+ * @author Robert Gehde
  * 
  * @param <O> Object type
  */
@@ -89,9 +91,9 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
    * Number of reference points
    */
   int m;
-  
+
   /**
-   * condition parameter
+   * Condition parameter
    */
   int k;
 
@@ -151,7 +153,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
     WritableDoubleDataStore a = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0);
     WritableDoubleDataStore ds;
     FiniteProgress rprog = LOG.isVerbose() ? new FiniteProgress("Computing distances to reference points", m, LOG) : null;
-    FiniteProgress distances = LOG.isVerbose() ? new FiniteProgress("Distance computations", ids.size() * m - m * (m + 1) / 2, LOG) : null;
     for(int i = 0; i < m; i++) {
       refp.add(aids.assignVar(best, cur));
       chosen.add(cur);
@@ -181,7 +182,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
           besta = ap;
           best = iter.getOffset();
         }
-        LOG.incrementProcessed(distances);
       }
       dists[i] = ds;
       LOG.incrementProcessed(rprog);
@@ -192,30 +192,30 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    if(distanceQuery != null && this.distance.equals(distq.getDistance()))
-      return new LAESAKNNByObjectSearcher(k);
-    return null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distq.getDistance()) ? //
+            new LAESAKNNByObjectSearcher(k) : null;
   }
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    if(distanceQuery != null && this.distance.equals(distq.getDistance()))
-      return new LAESAKNNByDBIDSearcher(k);
-    return null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new LAESAKNNByDBIDSearcher(k) : null;
   }
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    if(distanceQuery != null && this.distance.equals(distq.getDistance()))
-      return new LAESARangeByObjectSearcher();
-    return null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new LAESARangeByObjectSearcher() : null;
   }
 
   @Override
   public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    if(distanceQuery != null && this.distance.equals(distq.getDistance()))
-      return new LAESARangeByDBIDSearcher();
-    return null;
+    return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+        distanceQuery.getRelation() == relation && this.distance.equals(distanceQuery.getDistance()) ? //
+            new LAESARangeByDBIDSearcher() : null;
   }
 
   /**
@@ -226,26 +226,25 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
    * @param <Q> query object
    */
   public abstract class LAESAKNNSearcher<Q> implements KNNSearcher<Q> {
+    /**
+     * Maximum number of distance computations before also pruning reference
+     * points.
+     */
+    int maxnc;
 
     /**
-     * parameter to control when reference points are deleted
-     * from the search list
-     */
-    int k = 1;
-    
-    /**
-     * 
      * Constructor.
      *
      * @param k condition parameter
      */
     public LAESAKNNSearcher(int k) {
       super();
-      this.k = k;
+      this.maxnc = m / k;
+      assert maxnc < Integer.MAX_VALUE;
     }
 
     /**
-     * search the k nearest neighbors
+     * Search the k nearest neighbors
      * 
      * @param knns result heap
      */
@@ -255,102 +254,90 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
       ModifiableDoubleDBIDList RP = DBIDUtil.newDistanceDBIDList(m);
       DBIDArrayIter refIter = refp.iter();
       for(DBIDIter p = relation.iterDBIDs(); p.valid(); p.advance()) {
-        if(chosenRefP.contains(p))
-          RP.add(0, p);
-        else
-          P.add(0, p);
+        (chosenRefP.contains(p) ? RP : P).add(0, p);
       }
-      // arbitrary
+      // Always choose first reference point as "arbitrary" starting point.
       DoubleDBIDListMIter pIter = P.iter(), rpIter = RP.iter();
-      DBIDVar s = DBIDUtil.newVar(rpIter);
+      final DBIDVar s = DBIDUtil.newVar(rpIter);
+      RP.removeSwap(0);
 
-      int psi = -1, rpsi = 0;
-      int nc = 0, psize = P.size(), rpsize = RP.size();
-
-      while(psize + rpsize > 0) {
+      boolean isrp = true;
+      int nc = 0;
+      while(true) {
         // distance computing
-        double dxs = queryDistance(s);
-        nc++;
-        // update pbest dbest
-        if(dxs <= dBest) {
-          dBest = knns.insert(dxs, s);
+        final double dxs = queryDistance(s);
+        nc++; // count number of distances
+        dBest = knns.insert(dxs, s);
+        DoubleDataStore rdists = isrp ? dists[findInRef(s, refIter)] : null;
+        int rpsi = processPoints(RP, rpIter, dBest, dxs, rdists, nc);
+        int psi = processPoints(P, pIter, dBest, dxs, rdists, Integer.MAX_VALUE);
+        // Choose next element s:
+        if(rpsi > -1) {
+          RP.assignVar(rpsi, s);
+          RP.removeSwap(rpsi);
+          isrp = true;
         }
-        if(psi >= 0) {
-          P.swap(psi, --psize);
+        else if(psi > -1) {
+          P.assignVar(psi, s);
+          P.removeSwap(psi);
+          isrp = false;
         }
         else {
-          RP.swap(rpsi, --rpsize);
-        }
-        psi = -1;
-        rpsi = -1;
-        double gq = Double.POSITIVE_INFINITY, // nonref lower bound
-            gb = Double.POSITIVE_INFINITY; // ref lower bound
-        final boolean isrp = chosenRefP.contains(s);
-        int offset = isrp ? findInRef(s, refIter).getOffset() : -1;
-        for(rpIter.seek(0); rpIter.getOffset() < rpsize;) {
-          if(isrp) { // updating G if possible
-            double t = Math.abs(dists[offset].doubleValue(rpIter) - dxs);
-            if(t > rpIter.doubleValue()) {
-              rpIter.setDouble(t);
-            }
-          }
-          double gp = rpIter.doubleValue();
-          if(gp > dBest && nc > ((double) m) / k) {
-            RP.swap(rpIter.getOffset(), --rpsize);
-          }
-          else {
-            if(gp < gb) {
-              gb = gp;
-              rpsi = rpIter.getOffset();
-            }
-            rpIter.advance();
-          }
-        }
-        for(pIter.seek(0); pIter.getOffset() < psize;) {
-          if(isrp) { // updating G if possible
-            double t = Math.abs(dists[offset].doubleValue(pIter) - dxs);
-            if(t > pIter.doubleValue()) {
-              pIter.setDouble(t);
-            }
-          }
-          double gp = pIter.doubleValue();
-          if(gp > dBest) {
-            P.swap(pIter.getOffset(), --psize);
-          }
-          else {
-            if(gp < gq) {
-              gq = gp;
-              psi = pIter.getOffset();
-            }
-            pIter.advance();
-          }
-        }
-        if(rpsi != -1) {
-          assert rpsi > -1;
-          s = RP.assignVar(rpsi, s);//
-          psi = -1;
-        }
-        else if(psi != -1) {
-          s = P.assignVar(psi, s);//
-          rpsi = -1;
+          break; // No more candidates
         }
       }
     }
 
     /**
-     * find the given DBIDVar p in the reference iter
-     * 
-     * @param p DBIDVar to find
-     * @param ref Reference iterator
-     * @return iterator at the specific position
+     * Process a set of points
+     *
+     * @param cands Points to process
+     * @param iter iterator
+     * @param threshold Pruning distance
+     * @param dxs Distance to current point
+     * @param rdists Precomputed distances
+     * @param nc Number of distance computations
+     * @return Index of best candidate
      */
-    private DBIDArrayIter findInRef(DBIDVar p, DBIDArrayIter ref) {
-      for(DBIDArrayIter iter = ref.seek(0); iter.valid(); iter.advance()) {
-        if(DBIDUtil.equal(p, iter)) {
-          return iter;
+    private int processPoints(ModifiableDoubleDBIDList cands, DoubleDBIDListMIter iter, double threshold, final double dxs, DoubleDataStore rdists, int nc) {
+      double best = Double.POSITIVE_INFINITY; // best candidate
+      int bestindex = -1;
+      for(iter.seek(0); iter.valid(); iter.advance()) {
+        double gp = iter.doubleValue();
+        // Integrate new information, if available:
+        if(rdists != null) {
+          final double t = Math.abs(rdists.doubleValue(iter) - dxs);
+          if(t > gp) {
+            iter.setDouble(gp = t);
+          }
+        }
+        // Point elimination (nc is only used for reference points)
+        if(gp > threshold && nc > maxnc) {
+          cands.removeSwap(iter.getOffset());
+          iter.retract();
+        }
+        else if(gp < best) {
+          best = gp;
+          bestindex = iter.getOffset();
         }
       }
-      return null;
+      return bestindex;
+    }
+
+    /**
+     * Find the given DBIDVar p in the reference iter
+     * 
+     * @param p Object to find
+     * @param ref Reference iterator
+     * @return index into the reference points list
+     */
+    private int findInRef(DBIDRef p, DBIDArrayIter ref) {
+      for(ref.seek(0); ref.valid(); ref.advance()) {
+        if(DBIDUtil.equal(p, ref)) {
+          return ref.getOffset();
+        }
+      }
+      return -1;
     }
 
     /**
@@ -366,11 +353,14 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
    * KNN searcher by object class
    * 
    * @author Robert Gehde
-   *
    */
   public class LAESAKNNByObjectSearcher extends LAESAKNNSearcher<O> {
     /**
-     * 
+     * Query object
+     */
+    private O query;
+
+    /**
      * Constructor.
      *
      * @param k condition parameter
@@ -378,8 +368,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
     public LAESAKNNByObjectSearcher(int k) {
       super(k);
     }
-
-    private O query;
 
     @Override
     public KNNList getKNN(O query, int k) {
@@ -399,11 +387,14 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
    * KNN searcher by DBID class
    * 
    * @author Robert Gehde
-   *
    */
   public class LAESAKNNByDBIDSearcher extends LAESAKNNSearcher<DBIDRef> {
     /**
-     * 
+     * Query object
+     */
+    private DBIDRef query;
+
+    /**
      * Constructor.
      *
      * @param k condition parameter
@@ -411,8 +402,6 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
     public LAESAKNNByDBIDSearcher(int k) {
       super(k);
     }
-
-    private DBIDRef query;
 
     @Override
     public KNNList getKNN(DBIDRef query, int k) {
@@ -429,23 +418,21 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
   }
 
   /**
-   * range searcher class
+   * Range searcher class
    * 
    * @author Robert Gehde
    *
    * @param <Q> query object
    */
   public abstract class LAESARangeSearcher<Q> implements RangeSearcher<Q> {
-
     /**
-     * perform a range search
+     * Perform a range search
      * 
      * @param range radius to search
      * @param result result list
      */
     protected void laesaRangeSearch(double range, ModifiableDoubleDBIDList result) {
       ModifiableDoubleDBIDList refpdists = DBIDUtil.newDistanceDBIDList(m);
-
       for(DBIDIter it = refp.iter(); it.valid(); it.advance()) {
         refpdists.add(queryDistance(it), it);
       }
@@ -459,6 +446,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
           }
         }
         if(highlowbound <= range) {
+          // Refinement
           final double dist = queryDistance(p);
           if(dist <= range) {
             result.add(dist, p);
@@ -477,13 +465,15 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
   }
 
   /**
-   * range searcher by object class
+   * Range searcher by object class
    * 
    * @author Robert Gehde
-   *
    */
   public class LAESARangeByObjectSearcher extends LAESARangeSearcher<O> {
-    O query;
+    /**
+     * Query object
+     */
+    private O query;
 
     @Override
     public ModifiableDoubleDBIDList getRange(O query, double range, ModifiableDoubleDBIDList result) {
@@ -499,13 +489,15 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
   }
 
   /**
-   * range searcher by DBID class
+   * Range searcher by DBID class
    * 
    * @author Robert Gehde
-   *
    */
   public class LAESARangeByDBIDSearcher extends LAESARangeSearcher<DBIDRef> {
-    DBIDRef query;
+    /**
+     * Query object
+     */
+    private DBIDRef query;
 
     @Override
     public ModifiableDoubleDBIDList getRange(DBIDRef query, double range, ModifiableDoubleDBIDList result) {
@@ -537,9 +529,9 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
      * Number of reference points
      */
     int m = 10;
-    
+
     /**
-     * condition parameter
+     * Condition parameter
      */
     int k = Integer.MAX_VALUE;
 
@@ -591,9 +583,10 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
       public static final OptionID M_ID = new OptionID("laesa.m", "Number of reference points to use.");
 
       /**
-       * Condition parameter. Controls the deletion of reference points during knn search.
+       * Condition parameter. Controls the deletion of reference points during
+       * knn search.
        */
-      public static final OptionID K_ID = new OptionID("laesa.m", "Condition parameter. Controls the deletion of reference points during knn search.");
+      public static final OptionID K_ID = new OptionID("laesa.k", "Condition parameter. Controls the deletion of reference points during knn search.");
 
       /**
        * Random generator to use
@@ -613,7 +606,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
       /**
        * condition parameter
        */
-      int k;
+      int k = Integer.MAX_VALUE;
 
       /**
        * Random generator
@@ -632,7 +625,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
         new IntParameter(M_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> m = x);
-        new IntParameter(K_ID, Integer.MAX_VALUE) //
+        new IntParameter(K_ID).setOptional(true) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> k = x);
         new RandomParameter(SEED_ID) //
