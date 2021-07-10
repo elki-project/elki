@@ -34,8 +34,10 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -59,12 +61,35 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
   protected Distance<? super O> distance;
 
   /**
+   * Linkage variant to use
+   */
+  protected Variant variant;
+
+  /**
+   * Variants of the HACAM method.
+   *
+   * @author Erich Schubert
+   */
+  public static enum Variant {
+    /**
+     * Minimum sum variant
+     */
+    MINIMUM_SUM,
+    /**
+     * Minimum sum increase variant
+     */
+    MINIMUM_SUM_INCREASE
+  }
+
+  /**
    * Constructor.
    *
    * @param distance Distance function to use
+   * @param variant Variant to use
    */
-  public HACAM(Distance<? super O> distance) {
+  public HACAM(Distance<? super O> distance, Variant variant) {
     this.distance = distance;
+    this.variant = variant;
   }
 
   /**
@@ -82,6 +107,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
     // Initialize space for result:
     PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
+    double[] tds = variant == Variant.MINIMUM_SUM_INCREASE ? new double[ids.size()] : null;
 
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);
@@ -100,7 +126,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
     DBIDArrayIter ix = mat.ix;
     for(int i = 1, end = size; i < size; i++) {
       end = AGNES.shrinkActiveSet(ix, builder, end, //
-          findMerge(end, mat, protiter, builder, clusters, bestd, besti, dq));
+          findMerge(end, mat, protiter, builder, clusters, bestd, besti, dq, tds));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -149,9 +175,10 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
    * @param bestd the distances to the nearest neighboring cluster
    * @param besti the nearest neighboring cluster
    * @param dq the range query
+   * @param tds per cluster TD
    * @return x, for shrinking the active set.
    */
-  protected int findMerge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
+  protected int findMerge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq, double[] tds) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
@@ -176,7 +203,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       y = tmp;
     }
     assert (y < x);
-    merge(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
+    merge(size, mat, prots, builder, clusters, dq, bestd, besti, x, y, tds);
     return x;
   }
 
@@ -193,8 +220,9 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
    * @param besti the nearest neighboring cluster
    * @param x first cluster to merge, with {@code x > y}
    * @param y second cluster to merge, with {@code y < x}
+   * @param tds per cluster TD
    */
-  protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y, double[] tds) {
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
     int offset = MatrixParadigm.triangleSize(x) + y;
@@ -219,13 +247,16 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       clusters.remove(x);
     }
     clusters.put(y, cy);
+    if(tds != null) { // min-sum-increase variant
+      tds[y] = distances[offset] + tds[x] + tds[y];
+    }
 
     // parent of x is set to y
     builder.add(ix, distances[offset], iy, prots.seek(offset));
 
     // Deactivate x in cache:
     besti[x] = -1;
-    updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
+    updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y, tds);
     if(besti[y] == x) {
       findBest(size, distances, bestd, besti, y);
     }
@@ -245,8 +276,9 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
    * @param besti the nearest neighboring cluster
    * @param x first cluster to merge, with {@code x > y}
    * @param y second cluster to merge, with {@code y < x}
+   * @param tds per cluster TD
    */
-  private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y, double[] tds) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] distances = mat.matrix;
     // c is the new cluster.
@@ -261,7 +293,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       if(builder.isLinked(iy.seek(b))) {
         continue;
       }
-      updateEntry(mat, prots, clusters, dq, a, b);
+      updateEntry(mat, prots, clusters, dq, a, b, tds);
       updateCache(size, distances, bestd, besti, x, y, b, distances[yoffset + b]);
     }
 
@@ -274,7 +306,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       if(builder.isLinked(ix.seek(a))) {
         continue;
       }
-      updateEntry(mat, prots, clusters, dq, a, b);
+      updateEntry(mat, prots, clusters, dq, a, b, tds);
       updateCache(size, distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
     }
   }
@@ -288,8 +320,9 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
    * @param dq distance query on the data set
    * @param x index of cluster, {@code x > y}
    * @param y index of cluster, {@code y < x}
+   * @param tds per cluster TD
    */
-  protected static void updateEntry(MatrixParadigm mat, DBIDArrayMIter prots, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void updateEntry(MatrixParadigm mat, DBIDArrayMIter prots, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y, double[] tds) {
     assert (y < x);
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] distances = mat.matrix;
@@ -313,6 +346,9 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
     else {
       minMaxDist = dq.distance(ix.seek(x), iy.seek(y));
       prototype.set(ix);
+    }
+    if(tds != null) { // min-sum-increase variant
+      minMaxDist -= tds[x] + tds[y];
     }
 
     final int offset = MatrixParadigm.triangleSize(x) + y;
@@ -479,19 +515,31 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
    */
   public static class Par<O> implements Parameterizer {
     /**
+     * Variant of the algorithm to use
+     */
+    public static final OptionID VARIANT_ID = new OptionID("hacam.variant", "Variant of the algorithm to use.");
+
+    /**
      * The distance function to use.
      */
     protected Distance<? super O> distance;
+
+    /**
+     * Variant to use
+     */
+    protected Variant variant;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<Distance<O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
+      new EnumParameter<Variant>(VARIANT_ID, Variant.class, Variant.MINIMUM_SUM_INCREASE) //
+          .grab(config, x -> variant = x);
     }
 
     @Override
     public HACAM<O> make() {
-      return new HACAM<>(distance);
+      return new HACAM<>(distance, variant);
     }
   }
 }
