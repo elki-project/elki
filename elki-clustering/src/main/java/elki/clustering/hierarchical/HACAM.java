@@ -25,7 +25,6 @@ import java.util.Arrays;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -47,7 +46,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  *
  * @author Erich Schubert
  *
- * @has - - - PointerPrototypeHierarchyRepresentationResult
+ * @has - - - PointerPrototypeHierarchyResult
+ *
+ * @param <O> Object type
  */
 public class HACAM<O> implements HierarchicalClusteringAlgorithm {
   /**
@@ -95,11 +96,10 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Run the algorithm
    *
-   * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyResult run(Database db, Relation<O> relation) {
+  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
@@ -252,7 +252,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
     }
 
     // parent of x is set to y
-    builder.add(ix, distances[offset], iy, prots.seek(offset));
+    builder.strictAdd(ix, distances[offset], iy, prots.seek(offset));
 
     // Deactivate x in cache:
     besti[x] = -1;
