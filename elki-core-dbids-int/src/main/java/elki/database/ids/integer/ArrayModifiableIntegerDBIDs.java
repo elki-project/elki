@@ -204,6 +204,16 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     if(index < 0 || index >= size) {
       throw new ArrayIndexOutOfBoundsException(index);
     }
+    if(index < --size) {
+      System.arraycopy(store, index + 1, store, index, size - index);
+    }
+  }
+
+  @Override
+  public void removeSwap(int index) {
+    if(index < 0 || index >= size) {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
     if(--size > 0) {
       store[index] = store[size];
     }
