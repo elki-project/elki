@@ -133,7 +133,7 @@ public class PointerHierarchyBuilder {
     if(c == 0) {
       throw new IllegalStateException("Merging cluster to itself!");
     }
-    strictAdd(c < 0 ? p : q, dist, c < 0 ? q : p);
+    strictAdd(c > 0 ? p : q, dist, c > 0 ? q : p);
   }
 
   /**
@@ -147,6 +147,7 @@ public class PointerHierarchyBuilder {
    */
   public void strictAdd(DBIDRef source, double distance, DBIDRef target) {
     assert prototypes == null;
+    assert DBIDUtil.compare(source, target) > 0;
     parent.putDBID(source, target);
     double olddist = parentDistance.putDouble(source, distance);
     assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
@@ -155,23 +156,57 @@ public class PointerHierarchyBuilder {
   }
 
   /**
+   * A more robust "add" operation (involving a union-find) where we may use
+   * arbitrary objects i and j to refer to clusters, not only the largest ID
+   * in each cluster.
+   * <p>
+   * TODO: worth implementing a union-find halving optimization?
+   * 
+   * @param i First cluster
+   * @param dist Link distance
+   * @param j Second cluster
+   * @param prototype Cluster prototype
+   */
+  public void add(DBIDRef i, double dist, DBIDRef j, DBIDRef prototype) {
+    p.set(i);
+    // Follow p to its parent.
+    while(!DBIDUtil.equal(p, parent.assignVar(p, n))) {
+      p.set(n);
+    }
+    // Follow q to its parent.
+    q.set(j);
+    while(!DBIDUtil.equal(q, parent.assignVar(q, n))) {
+      q.set(n);
+    }
+    // By definition of the pointer representation, the largest element in
+    // each cluster is the cluster lead.
+    // The extraction methods currently rely on this!
+    final int c = DBIDUtil.compare(p, q);
+    if(c == 0) {
+      throw new IllegalStateException("Merging cluster to itself!");
+    }
+    strictAdd(c > 0 ? p : q, dist, c > 0 ? q : p, prototype);
+  }
+
+  /**
    * Add an element to the pointer representation.
    *
-   * @param cur Current object
+   * @param source Current object
    * @param distance Link distance
-   * @param par Parent
-   * @param prototype
+   * @param target Parent
+   * @param prototype Cluster prototype
    */
-  public void add(DBIDRef cur, double distance, DBIDRef par, DBIDRef prototype) {
+  public void strictAdd(DBIDRef source, double distance, DBIDRef target, DBIDRef prototype) {
     if(mergecount == 0) {
       prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     }
     assert prototypes != null;
-    parent.putDBID(cur, par);
-    prototypes.putDBID(cur, prototype);
-    double olddist = parentDistance.putDouble(cur, distance);
+    assert DBIDUtil.compare(source, target) > 0;
+    parent.putDBID(source, target);
+    prototypes.putDBID(source, prototype);
+    double olddist = parentDistance.putDouble(source, distance);
     assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
-    order.putInt(cur, mergecount);
+    order.putInt(source, mergecount);
     ++mergecount;
   }
 

@@ -200,7 +200,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     clusters.put(y, cy);
 
     // parent of x is set to y
-    builder.add(ix, distances[offset], iy, prots.seek(offset));
+    builder.strictAdd(ix, distances[offset], iy, prots.seek(offset));
     besti[x] = -1; // Deactivate x in cache:
     updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
     if(y > 0) {
