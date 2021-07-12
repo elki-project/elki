@@ -22,6 +22,7 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.math.MathUtil;
@@ -229,5 +230,15 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, covariance);
+  }
+
+  @Override
+  public double estimateLogDensity(CFInterface clusteringFeature) {
+    throw new IllegalStateException("Two-Pass-Multi-Variate-Gauss doesn't work with BETULA.");
+  }
+
+  @Override
+  public void updateE(CFInterface clusteringFeature, double prob) {
+    throw new IllegalStateException("Two-Pass-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 }

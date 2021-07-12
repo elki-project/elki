@@ -1,0 +1,186 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2019
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package elki.clustering.hierarchical.betula;
+
+import org.junit.Test;
+
+import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.hierarchical.betula.vii.AverageInterclusterDistance;
+import elki.clustering.hierarchical.betula.vii.AverageIntraclusterDistance;
+import elki.clustering.hierarchical.betula.vii.CentroidEuclideanDistance;
+import elki.clustering.hierarchical.betula.vii.CentroidManhattanDistance;
+import elki.clustering.hierarchical.betula.vii.MivarDistance;
+import elki.clustering.hierarchical.betula.vii.MnssqDistance;
+import elki.clustering.hierarchical.betula.vii.UmidisDistance;
+import elki.clustering.hierarchical.betula.vii.VIIModel;
+import elki.clustering.hierarchical.betula.vii.WmidisDistance;
+import elki.data.Clustering;
+import elki.database.Database;
+import elki.utilities.ELKIBuilder;
+
+/**
+ * Regression test for BIRCH clustering.
+ *
+ * @author Erich Schubert
+ *
+ */
+public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
+
+  @Test
+  public void testRadius() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.86190);
+    assertClusterSizes(clustering, new int[] { 105, 112, 200, 221 });
+  }
+
+  @Test
+  public void testEuclideanDistance() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  @Test
+  public void testCentroidEuclidean() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageInterclusterDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93909);
+    assertClusterSizes(clustering, new int[] { 168, 198, 200, 72 });
+  }
+
+  @Test
+  public void testCentroidManhattan() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, CentroidManhattanDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.92236);
+    assertClusterSizes(clustering, new int[] { 83, 154, 200, 201 });
+  }
+
+  @Test
+  public void testAverageIntercluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, AverageInterclusterDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.86062);
+    assertClusterSizes(clustering, new int[] { 102, 114, 200, 222 });
+  }
+
+  @Test
+  public void testAverageIntracluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.820235);
+    assertClusterSizes(clustering, new int[] { 158, 224, 256 });
+  }
+
+  @Test
+  public void testWmidiscluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, WmidisDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, WmidisDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.45518684673);
+    assertClusterSizes(clustering, new int[] { 13, 625 });
+  }
+
+  @Test
+  public void testUmidiscluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, UmidisDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, UmidisDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 15) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.8791749174);
+    assertClusterSizes(clustering, new int[] { 1, 2, 45, 154, 209, 227 });
+  }
+
+  @Test
+  public void testMnssqcluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, MnssqDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, MnssqDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.7738058388);
+    assertClusterSizes(clustering, new int[] { 141, 242, 255 });
+  }
+
+  @Test
+  public void testMivarcluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(VIIModel.Par.DISTANCE_ID, MivarDistance.class)//
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.742297684);
+    assertClusterSizes(clustering, new int[] { 110, 163, 179, 186 });
+  }
+
+  @Test
+  public void testOverflowing() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.88570);
+    assertClusterSizes(clustering, new int[] { 71, 147, 199, 221 });
+  }
+}

@@ -20,6 +20,7 @@
  */
 package elki.clustering.em;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.model.Model;
 
 /**
@@ -111,4 +112,20 @@ public interface EMClusterModel<O, M extends Model> {
    * @param weight Cluster weight
    */
   void setWeight(double weight);
+
+  /**
+   * Estimate the log likelihood of a clustering feature.
+   * 
+   * @param cf ClusteringFeature
+   * @return log likelihood
+   */
+  double estimateLogDensity(CFInterface cf);
+
+  /**
+   * Process one clustering feature in the E step.
+   * 
+   * @param cf Clustering feature to process.
+   * @param prob weight of the clustering feature.
+   */
+  void updateE(CFInterface cf, double prob);
 }

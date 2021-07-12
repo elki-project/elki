@@ -24,6 +24,7 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.math.MathUtil;
@@ -104,6 +105,9 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
         this.variances[i] = MathUtil.max(vars[i], SINGULARITY_CHEAT);
       }
       this.priordiag = vars;
+    }
+    for(int i = 0; i < variances.length; i++) {
+      variances[i] = Math.max(variances[i], SINGULARITY_CHEAT);
     }
     this.wsum = 0.;
   }
@@ -215,5 +219,47 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, diagonal(variances));
+  }
+
+  @Override
+  public double estimateLogDensity(CFInterface cf) {
+    double[] v = variances.clone();
+    for(int i = 0; i < mean.length; i++) {
+      v[i] += cf.variance(i);
+    }
+    double agg = 0.;
+    for(int i = 0; i < mean.length; i++) {
+      double diff = cf.centroid(i) - mean[i];
+      agg += diff / v[i] * diff;
+    }
+    double cLogDet = 0.;
+
+    for(int i = 0; i < mean.length; i++) {
+      cLogDet += FastMath.log(v[i]);
+    }
+    double cLogNormDet = -.5 * (logNorm + cLogDet);
+    return -.5 * agg + cLogNormDet;
+  }
+
+  @Override
+  public void updateE(CFInterface cf, double wei) {
+    assert (cf.getDimensionality() == mean.length);
+    final double nwsum = wsum + wei;
+    // Compute new means
+    for(int i = 0; i < mean.length; i++) {
+      final double delta = cf.centroid(i) - mean[i];
+      final double rval = delta * wei / nwsum;
+      nmea[i] = mean[i] + rval;
+    }
+    // Update variances
+    for(int i = 0; i < mean.length; i++) {
+      double vi = cf.centroid(i);
+      // variances contains SSE
+      variances[i] += wei * cf.variance(i) + (vi - nmea[i]) * (vi - mean[i]) * wei;
+    }
+    // Use new values.
+    wsum = nwsum;
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
+
   }
 }

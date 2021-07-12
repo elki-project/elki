@@ -243,7 +243,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
-    double bestloglikelihood = loglikelihood; // For detecting instabilities.
+    double bestloglikelihood = Double.NEGATIVE_INFINITY;//loglikelihood; // For detecting instabilities.
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);

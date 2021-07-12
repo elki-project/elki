@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2020
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,7 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.identity;
-import static elki.math.linearalgebra.VMath.timesEquals;
+import static elki.math.linearalgebra.VMath.*;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
@@ -31,24 +30,18 @@ import elki.math.MathUtil;
 import net.jafama.FastMath;
 
 /**
- * Simple spherical Gaussian cluster (scaled identity matrixes).
+ * Simple spherical Gaussian cluster.
  * 
- * @author Erich Schubert
- * @since 0.7.0
+ * @author Andreas Lang
  */
-public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
-  /**
-   * Constant to avoid zero values.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-10;
-
+public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**
    * Mean vector.
    */
   double[] mean;
 
   /**
-   * Single variances for all dimensions.
+   * Variances.
    */
   double variance;
 
@@ -68,7 +61,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   double weight, wsum;
 
   /**
-   * Prior variance.
+   * Prior variance, for MAP estimation.
    */
   double priorvar;
 
@@ -78,7 +71,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
    * @param weight Cluster weight
    * @param mean Initial mean
    */
-  public SphericalGaussianModel(double weight, double[] mean) {
+  public TextbookSphericalGaussianModel(double weight, double[] mean) {
     this(weight, mean, 1.);
   }
 
@@ -89,13 +82,13 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
    * @param mean Initial mean
    * @param var Initial variance
    */
-  public SphericalGaussianModel(double weight, double[] mean, double var) {
+  public TextbookSphericalGaussianModel(double weight, double[] mean, double var) {
     this.weight = weight;
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
-    this.variance = var > 0 ? var : SINGULARITY_CHEAT;
+    this.variance = var > 0 ? var : 1e-10;
     this.priorvar = this.variance;
     this.wsum = 0.;
   }
@@ -103,53 +96,56 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   @Override
   public void beginEStep() {
     wsum = 0.;
+    clear(mean);
     variance = 0.;
   }
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert vec.getDimensionality() == mean.length;
-    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
-    if(wei < Double.MIN_NORMAL) {
-      return;
-    }
-    final double nwsum = wsum + wei;
-    final double f = wei / nwsum; // Do division only once
-    // Compute new means
+    final int dim = mean.length;
+    assert (vec.getDimensionality() == dim);
+    assert (wei >= 0 && wei < Double.POSITIVE_INFINITY) : wei;
+    // Compute new means and variance
     for(int i = 0; i < mean.length; i++) {
-      final double delta = vec.doubleValue(i) - mean[i];
-      nmea[i] = mean[i] + delta * f;
-    }
-    // Update variances
-    for(int i = 0; i < mean.length; i++) {
-      // We DO want to use the new mean once and the old mean once!
-      // It does not matter which one is which.
       double vi = vec.doubleValue(i);
-      variance += (vi - nmea[i]) * (vi - mean[i]) * wei;
+      double vi_wei = vi * wei;
+      mean[i] += vi_wei;
+      variance += vi_wei * vi;
     }
     // Use new values.
-    wsum = nwsum;
-    System.arraycopy(nmea, 0, mean, 0, nmea.length);
+    wsum += wei;
+    // System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
   public void finalizeEStep(double weight, double prior) {
     final int dim = mean.length;
     this.weight = weight;
-    if(prior > 0 && priorvar > 0) { // MAP
-      double nu = dim + 2.; // Popular default.
-      variance = variance / dim + prior * priorvar;
-      variance /= (wsum + prior * (nu + dim + 2));
+    double logDet = 0.;
+    final double f = (wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY) ? 1. / wsum : 1.;
+    for(int i = 0; i < dim; i++) {
+      mean[i] *= f;
+    }
+    if(prior > 0) { // TODO MAP
+      double nu = dim + 2; // Popular default.F
+      double f2 = 1. / (wsum + prior * (nu + dim + 2));
+      double newvar = 0.;
+      for(int i = 0; i < dim; i++) {
+        newvar += (variance - mean[i] * mean[i] * wsum + prior * priorvar) * f2;
+      }
+      variance = newvar;
+      logDet = FastMath.log(variance); // * dim ?
     }
     else if(wsum > 0.) { // MLE
-      variance /= dim * wsum; // variance sum -> average variance
-    } // else: variance must be 0
-    // Note: for dim dimenions, we have dim times the variance
-    double logDet = dim * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
+      double newvar = 0.;
+      final double wf = (wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY) ? 1. / (wsum * dim) : 1. / dim;
+      for(int i = 0; i < dim; i++) {
+        newvar += (variance * wf - (mean[i] * mean[i]));
+      }
+      variance = newvar / dim;
+      logDet = FastMath.log(variance) * dim;
+    } // Else degenerate
     logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
-    if(prior > 0 && priorvar == 0) {
-      priorvar = variance;
-    }
   }
 
   /**
@@ -204,41 +200,11 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
 
   @Override
   public double estimateLogDensity(CFInterface cf) {
-    final int dim = mean.length;
-    double v = 0;
-    for(int i = 0; i < dim; i++) {
-      v += cf.variance(i);
-    }
-    v = v / dim + variance;
-    double agg = 0.;
-    for(int i = 0; i < dim; i++) {
-      double diff = cf.centroid(i) - mean[i];
-      agg += diff / v * diff;
-    }
-    double cLogNormDet = -.5 * (logNorm + FastMath.log(v) * dim);
-    return -.5 * agg + cLogNormDet;
+    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 
   @Override
   public void updateE(CFInterface cf, double wei) {
-    assert (cf.getDimensionality() == mean.length);
-    final double nwsum = wsum + wei;
-    // Compute new means
-    for(int i = 0; i < mean.length; i++) {
-      final double delta = cf.centroid(i) - mean[i];
-      final double rval = delta * wei / nwsum;
-      nmea[i] = mean[i] + rval;
-    }
-    // Update variances
-    double ovar = variance / mean.length;
-    variance = 0;
-    for(int i = 0; i < mean.length; i++) {
-      double vi = cf.centroid(i);
-      double delta = wei * (vi - nmea[i]) * (vi - mean[i]);
-      variance += ovar + wei * cf.variance(i) + delta; // variance contains SSE
-    }
-    // Use new values.
-    wsum = nwsum;
-    System.arraycopy(nmea, 0, mean, 0, nmea.length);
+    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 }

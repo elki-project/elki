@@ -22,6 +22,7 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.logging.Logging;
@@ -269,5 +270,46 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, covariance);
+  }
+
+  @Override
+  public double estimateLogDensity(CFInterface cf) {
+    double[][] combinedCov = cf.covariance();
+    double[] delta = new double[mean.length];
+    double cw = cf.getWeight() + wsum;
+    for(int i = 0; i < mean.length; i++) {
+      delta[i] = mean[i] - cf.centroid(i);
+      for(int j = 0; j <= i; j++) {
+        combinedCov[j][i] = combinedCov[i][j] += covariance[i][j];
+      }
+    }
+    CholeskyDecomposition cchol = updateCholesky(combinedCov, chol);
+    double clogNormDet = FastMath.log(cw) - 0.5 * logNorm - getHalfLogDeterminant(cchol);
+    return -0.5 * squareSum(chol.solveLInplace(delta)) + clogNormDet;
+  }
+
+  @Override
+  public void updateE(CFInterface cf, double wei) {
+    assert cf.getDimensionality() == mean.length;
+    assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
+    if(wei < Double.MIN_NORMAL) {
+      return;
+    }
+    final int dim = mean.length;
+    final double nwsum = wsum + wei;
+    final double f = wei / nwsum; // Do division only once
+    final double[][] cfcov = timesEquals(cf.covariance(), wei);
+    // Compute new means and covariance
+    for(int i = 0; i < dim; i++) {
+      final double delta = cf.centroid(i) - mean[i];
+      nmea[i] = mean[i] + delta * f;
+      for(int j = 0; j <= i; j++) {
+        covariance[i][j] += cfcov[i][j] + wei * (delta * (cf.centroid(j) - nmea[j]));
+      }
+      // Other half is NOT updated here, but in finalizeEStep!
+    }
+    // Use new Values
+    wsum = nwsum;
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 }
