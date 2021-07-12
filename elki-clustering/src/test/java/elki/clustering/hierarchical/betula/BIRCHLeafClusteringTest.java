@@ -120,58 +120,6 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   }
 
   @Test
-  public void testWmidiscluster() {
-    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, WmidisDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, WmidisDistance.class)//
-        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().autorun(db);
-    assertFMeasure(db, clustering, 0.45518684673);
-    assertClusterSizes(clustering, new int[] { 13, 625 });
-  }
-
-  @Test
-  public void testUmidiscluster() {
-    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, UmidisDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, UmidisDistance.class)//
-        .with(CFTree.Factory.Par.MAXLEAVES_ID, 15) //
-        .build().autorun(db);
-    assertFMeasure(db, clustering, 0.8791749174);
-    assertClusterSizes(clustering, new int[] { 1, 2, 45, 154, 209, 227 });
-  }
-
-  @Test
-  public void testMnssqcluster() {
-    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, MnssqDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, MnssqDistance.class)//
-        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().autorun(db);
-    assertFMeasure(db, clustering, 0.7738058388);
-    assertClusterSizes(clustering, new int[] { 141, 242, 255 });
-  }
-
-  @Test
-  public void testMivarcluster() {
-    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, MivarDistance.class)//
-        .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
-        .build().autorun(db);
-    assertFMeasure(db, clustering, 0.742297684);
-    assertClusterSizes(clustering, new int[] { 110, 163, 179, 186 });
-  }
-
-  @Test
   public void testOverflowing() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
