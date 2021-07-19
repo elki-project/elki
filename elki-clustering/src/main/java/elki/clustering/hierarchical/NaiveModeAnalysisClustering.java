@@ -112,7 +112,7 @@ public class NaiveModeAnalysisClustering<O> implements ClusteringAlgorithm<Clust
 
     // Result
     Clustering<DendrogramModel> clustering = new Clustering<DendrogramModel>();
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(adbids, distanceFunction.isSquared());
+    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(adbids, distanceFunction.isSquared());
 
     // find distance k-th nearest neighbour for all points
     ModifiableDoubleDBIDList distances = initializeWorkOrder(mat, knn, offsetStore, unions);
@@ -324,7 +324,7 @@ public class NaiveModeAnalysisClustering<O> implements ClusteringAlgorithm<Clust
    * @param j Second node index (discard)
    * @param distance distance value for the node
    */
-  private void updateBuilder(PointerHierarchyRepresentationBuilder builder, MatrixParadigm mat, int i, int j, double distance) {
+  private void updateBuilder(PointerHierarchyBuilder builder, MatrixParadigm mat, int i, int j, double distance) {
     final int sizex = builder.getSize(mat.ix.seek(i)),
         sizey = builder.getSize(mat.iy.seek(j));
 
