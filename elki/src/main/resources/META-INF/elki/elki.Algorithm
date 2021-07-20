@@ -8,6 +8,8 @@ elki.outlier.clustering.KMeansOutlierDetection
 elki.outlier.clustering.SilhouetteOutlierDetection
 elki.outlier.clustering.CBLOF
 elki.outlier.clustering.GLOSH
+elki.outlier.clustering.KMeansMinusMinusOutlierDetection
+elki.outlier.clustering.NoiseAsOutliers
 elki.outlier.OPTICSOF
 elki.outlier.SimpleCOP
 elki.outlier.subspace.OutRankS1
