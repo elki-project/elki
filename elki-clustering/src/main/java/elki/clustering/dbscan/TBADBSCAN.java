@@ -1,6 +1,5 @@
 package elki.clustering.dbscan;
 
-import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.clustering.kmedoids.initialization.BUILD;
@@ -33,6 +32,12 @@ import elki.utilities.random.RandomFactory;
 
 import java.util.*;
 
+/**
+ * TBA-DBSCAN based on master thesis: Beschleunigung von DBSCAN mithilfe der Dreiecksungleichung
+ *
+ * @author Felix Krause
+ * @param <O> the type of Object the algorithm is applied to
+ */
 public class TBADBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class
