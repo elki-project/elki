@@ -20,6 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.initialization;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
@@ -63,7 +64,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<CFInterface> tree, CFInterface[] cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
     return run(tree, cfs, k);
   }
 
@@ -74,49 +75,50 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param k K
    * @return Initial cluster centers
    */
-  public double[][] run(CFTree<CFInterface> tree, final CFInterface[] cf, int k) {
+  public double[][] run(CFTree<?> tree, ArrayList<? extends CFInterface> cf, int k) {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
-    int first;
+    CFInterface first;
     if(!first_var) {
-      first = rnd.nextInt(cf.length);
+      first = cf.get(rnd.nextInt(cf.size()));
     }
     else {
       first = sampleFirst(tree.getRoot(), cf, rnd);
     }
-    int d = cf[first].getDimensionality();
+    int d = first.getDimensionality();
     double[] mean = new double[d];
     for(int i = 0; i < d; i++) {
-      mean[i] = cf[first].centroid(i);
+      mean[i] = first.centroid(i);
     }
     means[0] = mean;
-    double weightsum = initialWeights(cf[first], cf, distance);
+    double weightsum = initialWeights(first, cf, distance);
     for(int m = 1; m < k; m++) {
       if(weightsum > Double.MAX_VALUE) {
         throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
       }
       double r = rnd.nextDouble() * weightsum;
       int i = 0;
-      while(i < cf.length) {
+      while(i < cf.size()) {
         if((r -= weights[i]) <= 0) {
           break;
         }
         i++;
       }
-      if(i >= cf.length) { // Rare case, but happens due to floating math
+      if(i >= cf.size()) { // Rare case, but happens due to floating math
         weightsum -= r; // Decrease
         continue; // Retry
       }
+      CFInterface cfi = cf.get(i);
       // Add new mean:
       mean = new double[d];
-      for(int j = 0; j < cf[first].getDimensionality(); j++) {
-        mean[j] = cf[i].centroid(j);
+      for(int j = 0; j < mean.length; j++) {
+        mean[j] = cfi.centroid(j);
       }
       means[m] = mean;
       if(m < k) {
         // Update weights:
         weights[i] = 0.;
-        weightsum = updateWeights(cf[i], cf, distance);
+        weightsum = updateWeights(cfi, cf, distance);
       }
     }
     return means;
@@ -129,11 +131,12 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param x Input data.
    * @return Sum of weights
    */
-  private double initialWeights(CFInterface first, CFInterface[] cf, CFIDistance distance) {
+  private double initialWeights(CFInterface first, ArrayList<? extends CFInterface> cf, CFIDistance distance) {
+    final int e = cf.size();
     double weightsum = 0.;
-    weights = new double[cf.length];
-    for(int i = 0; i < cf.length; i++) {
-      weightsum += weights[i] = distance.squaredDistance(first, cf[i]);
+    weights = new double[e];
+    for(int i = 0; i < e; i++) {
+      weightsum += weights[i] = distance.squaredDistance(first, cf.get(i));
     }
     return weightsum;
   }
@@ -144,34 +147,35 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param latest Latest center
    * @return Weight sum
    */
-  private double updateWeights(CFInterface latest, CFInterface[] cf, CFIDistance distance) {
+  private double updateWeights(CFInterface latest, ArrayList<? extends CFInterface> cf, CFIDistance distance) {
     double weightsum = 0.;
-    for(int i = 0; i < cf.length; i++) {
+    for(int i = 0, e = cf.size(); i < e; i++) {
       double weight = weights[i];
       if(weight <= 0.) {
         continue; // Duplicate, or already chosen.
       }
-      double newweight = distance.squaredDistance(latest, cf[i]);
+      double newweight = distance.squaredDistance(latest, cf.get(i));
       weightsum += newweight < weight ? (weights[i] = newweight) : weight;
     }
     return weightsum;
   }
 
-  int sampleFirst(CFInterface root, CFInterface[] cfs, Random rnd) {
+  private CFInterface sampleFirst(CFInterface root, ArrayList<? extends CFInterface> cfs, Random rnd) {
+    final int e = cfs.size();
     double weightsum = 0;
-    double[] tmpWeight = new double[cfs.length];
-    for(int i = 0; i < cfs.length; i++) {
+    double[] tmpWeight = new double[e];
+    for(int i = 0; i < e; i++) {
       double weight;
-      weight = distance.squaredDistance(root, cfs[i]);
+      weight = distance.squaredDistance(root, cfs.get(i));
       tmpWeight[i] = weight;
       weightsum += weight;
     }
     while(true) {
       double r = rnd.nextDouble() * weightsum;
       int i = 0;
-      while(i < cfs.length) {
+      while(i < e) {
         if((r -= tmpWeight[i]) <= 0) {
-          return i;
+          return cfs.get(i);
         }
         i++;
       }

@@ -26,63 +26,60 @@ package elki.clustering.hierarchical.betula;
  * @author Andreas Lang
  * 
  * @param <L> CF Model
- * @param <N> TreeNode Model
  */
 public interface CFNode<L extends CFInterface> extends CFInterface {
+  /**
+   * Set child with index i to CF cf
+   * 
+   * @param i Index
+   * @param cf Clustering Feature
+   */
+  void setChild(int i, L cf);
 
-    /**
-     * Set Child with index i to CF cf
-     * 
-     * @param i Index
-     * @param cf Clustering Feature
-     */
-    public void setChild(int i, L cf);
+  /**
+   * Get CF from Index i
+   * 
+   * @param i Index
+   * @return CF
+   */
+  L getChild(int i);
 
-    /**
-     * Get CF from Index i
-     * 
-     * @param i Index
-     * @return CF
-     */
-    public L getChild(int i);
+  /**
+   * Get the node capacity.
+   * 
+   * @return Node capacity
+   */
+  int capacity();
 
-    /**
-     * Get CF array of Childs
-     * 
-     * @return CF Array
-     */
-    public L[] getChilds();
+  /**
+   * Add CF to statistics of TreeNode an save at index i
+   * 
+   * @param i Index
+   * @param cf CF
+   */
+  void addToStatistics(int i, L cf);
 
-    /**
-     * Add CF to Statistics of TreeNode an save at index i
-     * 
-     * @param i Index
-     * @param cf CF
-     */
-    public void addToStatistics(int i, L cf);
+  /**
+   * Add TreeNode to Statistics of TreeNode an save at index i
+   * 
+   * @param i Index
+   * @param cf TreeNode
+   */
+  void addToStatistics(int i, CFNode<L> cf);
 
-    /**
-     * Add TreeNode to Statistics of TreeNode an save at index i
-     * 
-     * @param i Index
-     * @param cf TreeNode
-     */
-    public void addToStatistics(int i, CFNode<L> cf);
+  /**
+   * Add CF to TreeNode but not the statistics
+   * 
+   * @param other CF
+   * @return success
+   */
+  boolean addCF(L other);
 
-    /**
-     * Add CF to TreeNode but not the statistics
-     * 
-     * @param other CF
-     * @return success
-     */
-    public boolean addCF(L other);
-
-    /**
-     * Add CF to TreeNode but not the statistics
-     * 
-     * @param other CF
-     * @return success
-     */
-    public boolean addCF(CFNode<L> other);
-
+  /**
+   * Add CF to TreeNode but not the statistics
+   * 
+   * @param other CF
+   * @return success
+   */
+  boolean addCF(CFNode<L> other);
 }

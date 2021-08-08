@@ -28,7 +28,7 @@ import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.em.EMClusterModel;
-import elki.clustering.hierarchical.betula.CFTree.LeafIterator;
+import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
@@ -180,16 +180,10 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
 
     // Store clustering features:
     Duration modeltime = LOG.newDuration(getClass().getName().replace("BIRCHEM", "BIRCHEM.modeltime")).begin();
-    CFInterface[] cfs = new CFInterface[tree.leaves];
-
-    int z = 0;
-    for(LeafIterator<?> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
-      cfs[z] = iter.get();
-      z++;
-    }
+    ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
     // Initialize EM Model
     List<? extends EMClusterModel<NumberVector, M>> models = initializer.buildInitialModels(cfs, k, tree);
-    HashMap<CFInterface, double[]> probClusterIGivenX = new HashMap<>(cfs.length);
+    HashMap<CFInterface, double[]> probClusterIGivenX = new HashMap<>(cfs.size());
     double loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
     LOG.statistics(likestat.setDouble(loglikelihood));
@@ -262,23 +256,24 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public double assignProbabilitiesToInstances(CFInterface[] cfs, List<? extends EMClusterModel<NumberVector, M>> models, HashMap<CFInterface, double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(ArrayList<? extends CFInterface> cfs, List<? extends EMClusterModel<NumberVector, M>> models, HashMap<CFInterface, double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
     int n = 0;
-    for(int i = 0; i < cfs.length; i++) {
+    for(int i = 0; i < cfs.size(); i++) {
+      CFInterface cfsi = cfs.get(i);
       double[] probs = new double[k];
       for(int j = 0; j < k; j++) {
-        double v = models.get(j).estimateLogDensity(cfs[i]);
+        double v = models.get(j).estimateLogDensity(cfsi);
         probs[j] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
       }
       final double logP = logSumExp(probs);
       for(int j = 0; j < k; j++) {
         probs[j] = FastMath.exp(probs[j] - logP);
       }
-      probClusterIGivenX.put(cfs[i], probs);
-      emSum += logP * cfs[i].getWeight();
-      n += cfs[i].getWeight();
+      probClusterIGivenX.put(cfsi, probs);
+      emSum += logP * cfsi.getWeight();
+      n += cfsi.getWeight();
     }
     return emSum / n;
   }
@@ -324,7 +319,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
    */
-  public void recomputeCovarianceMatrices(CFInterface[] cfs, HashMap<CFInterface, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
+  public void recomputeCovarianceMatrices(ArrayList<? extends CFInterface> cfs, HashMap<CFInterface, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
     final int k = models.size();
     boolean needsTwoPass = false;
     for(EMClusterModel<NumberVector, M> m : models) {
@@ -336,16 +331,15 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
       throw new IllegalStateException("Not Implemented");
     }
     double[] wsum = new double[k];
-    for(int i = 0; i < cfs.length; i++) {
-      double[] clusterProbabilities = probClusterIGivenX.get(cfs[i]);
+    for(int i = 0; i < cfs.size(); i++) {
+      CFInterface cfsi = cfs.get(i);
+      double[] clusterProbabilities = probClusterIGivenX.get(cfsi);
       for(int j = 0; j < clusterProbabilities.length; j++) {
         final double prob = clusterProbabilities[j];
         if(prob > 1e-10) {
-          models.get(j).updateE(cfs[i], prob * cfs[i].getWeight());// TODO
-                                                                   // weight of
-                                                                   // clusters?
+          models.get(j).updateE(cfsi, prob * cfsi.getWeight());
         }
-        wsum[j] += prob * cfs[i].getWeight(); // TODO weight of clusters?
+        wsum[j] += prob * cfsi.getWeight();
       }
     }
     for(int i = 0; i < models.size(); i++) {

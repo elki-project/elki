@@ -22,6 +22,7 @@ package elki.clustering.hierarchical.betula.initialization;
 
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
@@ -34,48 +35,45 @@ import elki.utilities.random.RandomFactory;
  * {@link RandomlyChosen}.
  * 
  * @author Andreas Lang
- *
  */
 public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
+  public CFRandomlyChosen(RandomFactory rf) {
+    super(rf);
+  }
 
-    public CFRandomlyChosen(RandomFactory rf) {
-        super(rf);
+  @Override
+  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
+    final int leaves = cfs.size();
+    if(leaves < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + leaves + " < k objects.");
     }
+    Random rnd = rf.getSingleThreadedRandom();
+    int d = cfs.get(0).getDimensionality();
+    double[][] means = new double[k][d];
+    int remaining = leaves;
+    for(int i = 0; i < leaves && k > 0; i++) {
+      final CFInterface cfsi = cfs.get(i);
+      double prob = rnd.nextDouble();
+      if(prob < ((double) k / remaining)) {
+        int c = --k;
+        for(int j = 0; j < d; j++) {
+          means[c][j] = cfsi.centroid(j);
+        }
+      }
+      remaining--;
+    }
+    return means;
+  }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Andreas Lang
+   */
+  public static class Par extends AbstractCFKMeansInitialization.Par {
     @Override
-    public double[][] chooseInitialMeans(CFTree<CFInterface> tree, CFInterface[] cfs, int k) {
-        int leaves = cfs.length;
-        if(leaves < k) {
-            throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + leaves + " < k objects.");
-        }
-        Random rnd = rf.getSingleThreadedRandom();
-        int d = cfs[0].getDimensionality();
-        double[][] means = new double[k][d];
-        int remaining = leaves;
-        for(int i = 0; i < leaves && k > 0; i++) {
-            double prob = rnd.nextDouble();
-            if(prob < ((double) k / remaining)) {
-                int c = --k;
-                for(int j = 0; j < d; j++) {
-                    means[c][j] = cfs[i].centroid(j);
-                }
-            }
-            remaining--;
-        }
-        return means;
+    public CFRandomlyChosen make() {
+      return new CFRandomlyChosen(rnd);
     }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Andreas Lang
-     */
-    public static class Par extends AbstractCFKMeansInitialization.Par {
-
-        @Override
-        public CFRandomlyChosen make() {
-            return new CFRandomlyChosen(rnd);
-        }
-    }
-
+  }
 }

@@ -29,36 +29,34 @@ package elki.clustering.hierarchical.betula;
  * @param <N> TreeNode Model
  */
 public interface CFModel<L extends CFInterface> {
+  /**
+   * Creates a CF of the corresponding Model.
+   * 
+   * @param d Dimensionality
+   * @return new CF
+   */
+  L make(int d);
 
-    /**
-     * Creates a CF Feature of the corresponding Model.
-     * 
-     * @param d Dimensionality
-     * @return
-     */
-    public L make(int d);
+  /**
+   * Creates a TreeNode of the corresponding Model.
+   * 
+   * @param d Dimensionality
+   * @param capacity Fanout
+   * @return
+   */
+  CFNode<L> treeNode(int d, int capacity);
 
-    /**
-     * Creates a TreeNode of the corresponding Model.
-     * 
-     * @param d Dimensionality
-     * @param capacity Fanout
-     * @return
-     */
-    public CFNode<L> treeNode(int d, int capacity);
+  /**
+   * The selected distance Function
+   * 
+   * @return distance Function
+   */
+  CFDistance<L> distance();
 
-    /**
-     * The selected distance Function
-     * 
-     * @return distance Function
-     */
-    public CFDistance<L> distance();
-
-    /**
-     * The selected absorption Criteria
-     * 
-     * @return distance Function
-     */
-    public CFDistance<L> absorption();
-
+  /**
+   * The selected absorption Criteria
+   * 
+   * @return distance Function
+   */
+  CFDistance<L> absorption();
 }

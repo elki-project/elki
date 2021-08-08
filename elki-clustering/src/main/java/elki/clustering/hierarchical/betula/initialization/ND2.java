@@ -15,7 +15,7 @@ public class ND2 implements CFIDistance {
             double delta = candidate.centroid(d) - clusterCenter.doubleValue(d);
             sum += (delta * delta);
         }
-        sum += div * candidate.SoD();
+        sum += div * candidate.sumdev();
         return sum > 0 ? sum * candidate.getWeight() : 0;
     }
 
@@ -29,7 +29,7 @@ public class ND2 implements CFIDistance {
             double delta = candidate.centroid(d) - clusterCenter[d];
             sum += (delta * delta);
         }
-        sum += div * candidate.SoD();
+        sum += div * candidate.sumdev();
         return sum > 0 ? sum * candidate.getWeight() : 0;
     }
 
@@ -44,7 +44,7 @@ public class ND2 implements CFIDistance {
             double delta = clusterCenter.centroid(d) - candidate.centroid(d);
             sum += (delta * delta);
         }
-        sum += div1 * clusterCenter.SoD() + div2 * candidate.SoD();
+        sum += div1 * clusterCenter.sumdev() + div2 * candidate.sumdev();
         return sum > 0 ? sum * candidate.getWeight() : 0;
     }
 

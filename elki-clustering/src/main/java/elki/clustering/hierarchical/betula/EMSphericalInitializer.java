@@ -46,8 +46,8 @@ public class EMSphericalInitializer extends AbstractEMInitializer<NumberVector, 
   }
 
   @Override
-  public List<SphericalGaussianModel> buildInitialModels(final CFInterface[] cfs, int k, CFTree<CFInterface> tree) {
-    int dim = cfs[0].getDimensionality();
+  public List<SphericalGaussianModel> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree) {
+    final int dim = cfs.get(0).getDimensionality();
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     double varsum = 0.;

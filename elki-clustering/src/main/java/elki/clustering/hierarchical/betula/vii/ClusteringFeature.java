@@ -124,7 +124,7 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double SoD() {
+  public double sumdev() {
     return ssd;
   }
 

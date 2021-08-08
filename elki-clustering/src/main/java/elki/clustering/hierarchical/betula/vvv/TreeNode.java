@@ -22,71 +22,74 @@ package elki.clustering.hierarchical.betula.vvv;
 
 import elki.clustering.hierarchical.betula.CFNode;
 
+/**
+ * Tree node for the VVV model (full variances).
+ * 
+ * @author Andreas Lang
+ */
 public final class TreeNode extends ClusteringFeature implements CFNode<ClusteringFeature> {
-    /**
-     * Children of the TreeNode
-     */
-    ClusteringFeature[] children;
+  /**
+   * Children of the TreeNode
+   */
+  ClusteringFeature[] children;
 
-    /**
-     * Constructor
-     * 
-     * @param dim Dimensionality
-     * @param capacity Fanout of the Tree
-     */
-    public TreeNode(int dim, int capacity) {
-        super(dim);
-        children = new ClusteringFeature[capacity];
-    }
+  /**
+   * Constructor
+   * 
+   * @param dim Dimensionality
+   * @param capacity Fanout of the Tree
+   */
+  public TreeNode(int dim, int capacity) {
+    super(dim);
+    children = new ClusteringFeature[capacity];
+  }
 
-    @Override
-    public ClusteringFeature[] getChilds() {
-        return children;
-    }
+  @Override
+  public void setChild(int i, ClusteringFeature cf) {
+    children[i] = cf;
+  }
 
-    @Override
-    public void setChild(int i, ClusteringFeature cf) {
-        children[i] = cf;
+  @Override
+  public ClusteringFeature getChild(int i) {
+    return children[i];
+  }
 
-    }
+  @Override
+  public int capacity() {
+    return children.length;
+  }
 
-    @Override
-    public ClusteringFeature getChild(int i) {
-        return children[i];
+  @Override
+  public void addToStatistics(int i, ClusteringFeature other) {
+    addToStatistics(other);
+    children[i] = other;
+  }
 
-    }
+  @Override
+  public void addToStatistics(int i, CFNode<ClusteringFeature> other) {
+    addToStatistics(other);
+    children[i] = (TreeNode) other;
+  }
 
-    @Override
-    public void addToStatistics(int i, ClusteringFeature other) {
-        addToStatistics(other);
+  @Override
+  public boolean addCF(ClusteringFeature other) {
+    for(int i = 0; i < children.length; i++) {
+      if(children[i] == null) {
         children[i] = other;
+        return true;
+      }
     }
+    return false;
+  }
 
-    @Override
-    public void addToStatistics(int i, CFNode<ClusteringFeature> other) {
-        addToStatistics(other);
+  @Override
+  public boolean addCF(CFNode<ClusteringFeature> other) {
+    for(int i = 0; i < children.length; i++) {
+      if(children[i] == null) {
         children[i] = (TreeNode) other;
+        return true;
+      }
     }
-
-    @Override
-    public boolean addCF(ClusteringFeature other) {
-        for(int i = 0; i < children.length; i++) {
-            if(children[i] == null) {
-                children[i] = other;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addCF(CFNode<ClusteringFeature> other) {
-        for(int i = 0; i < children.length; i++) {
-            if(children[i] == null) {
-                children[i] = (TreeNode) other;
-                return true;
-            }
-        }
-        return false;
-    }
+    return false;
+  }
 }

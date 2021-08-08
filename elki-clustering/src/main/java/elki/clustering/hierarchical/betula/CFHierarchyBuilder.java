@@ -24,16 +24,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import elki.clustering.hierarchical.PointerHierarchyResult;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayMIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
+import elki.database.datastore.*;
+import elki.database.ids.*;
 import elki.logging.Logging;
 
 /**

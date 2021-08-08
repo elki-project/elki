@@ -20,6 +20,7 @@
  */
 package elki.clustering.hierarchical.betula;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.em.EMClusterModel;
@@ -59,10 +60,17 @@ public abstract class AbstractEMInitializer<O, M extends MeanModel> {
    * @param cfs List of clustering features
    * @param k Number of clusters.
    * @param root Summary statistic of the tree.
-   * @return
+   * @return Initial models
    */
-  public abstract List<? extends EMClusterModel<O, M>> buildInitialModels(final CFInterface[] cfs, int k, CFTree<CFInterface> tree);
+  public abstract List<? extends EMClusterModel<O, M>> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree);
 
+  /**
+   * Parameterization class
+   *
+   * @author Andreas Lang
+   *
+   * @param <V> Vector type
+   */
   public abstract static class Par<V extends NumberVector> implements Parameterizer {
     /**
      * Parameter to specify the cluster center initialization.

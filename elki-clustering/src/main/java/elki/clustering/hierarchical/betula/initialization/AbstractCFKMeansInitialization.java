@@ -22,6 +22,8 @@ package elki.clustering.hierarchical.betula.initialization;
 
 import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
 
+import java.util.ArrayList;
+
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
 import elki.utilities.optionhandling.OptionID;
@@ -38,62 +40,63 @@ import elki.clustering.hierarchical.betula.CFTree.LeafIterator;
  * @author Andreas Lang
  */
 public abstract class AbstractCFKMeansInitialization {
-    /**
-     * Random number generator
-     */
-    protected RandomFactory rf;
+  /**
+   * Random number generator
+   */
+  protected RandomFactory rf;
 
-    /**
-     * Constructor.
-     * 
-     * @param rnd Random number generator.
-     */
-    public AbstractCFKMeansInitialization(RandomFactory rf) {
-        this.rf = rf;
+  /**
+   * Constructor.
+   * 
+   * @param rnd Random number generator.
+   */
+  public AbstractCFKMeansInitialization(RandomFactory rf) {
+    this.rf = rf;
+  }
+
+  /**
+   * Build the initial models.
+   * 
+   * @param cfs List of clustering features
+   * @param k Number of clusters.
+   * @param root Summary statistic of the tree.
+   * @return
+   */
+  public abstract double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k);
+
+  /**
+   * Extract the leaves of the tree.
+   *
+   * @param tree Tree
+   * @return Leaves
+   */
+  public static <L extends CFInterface> ArrayList<L> flattenTree(CFTree<L> tree) {
+    ArrayList<L> cfs = new ArrayList<>(tree.getLeaves());
+    for(LeafIterator<L> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
+      cfs.add(iter.get());
     }
+    return cfs;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Andreas Lang
+   */
+  public abstract static class Par implements Parameterizer {
+    /**
+     * Parameter to specify the random generator seed.
+     */
+    public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
 
     /**
-     * Build the initial models.
-     * 
-     * @param cfs List of clustering features
-     * @param k Number of clusters.
-     * @param root Summary statistic of the tree.
-     * @return
+     * Random generator
      */
-    public abstract double[][] chooseInitialMeans(CFTree<CFInterface> tree, CFInterface[] cfs, int k);
+    protected RandomFactory rnd;
 
-    public CFInterface[] flattenTree(CFTree<CFInterface> tree) {
-        // For efficiency, we also need the mean of each CF:
-        CFInterface[] cfs = new CFInterface[tree.getLeaves()];
-
-        int z = 0;
-        for(LeafIterator<CFInterface> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
-            cfs[z] = iter.get();
-            z++;
-        }
-        return cfs;
+    @Override
+    public void configure(Parameterization config) {
+      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
     }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Andreas Lang
-     */
-    public abstract static class Par implements Parameterizer {
-        /**
-         * Parameter to specify the random generator seed.
-         */
-        public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
-
-        /**
-         * Random generator
-         */
-        protected RandomFactory rnd;
-
-        @Override
-        public void configure(Parameterization config) {
-            new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
-        }
-
-    }
+  }
 }

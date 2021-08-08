@@ -20,12 +20,12 @@
  */
 package elki.clustering.hierarchical.betula;
 
-import static elki.math.linearalgebra.VMath.*;
+import static elki.math.linearalgebra.VMath.timesEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.hierarchical.betula.CFTree.LeafIterator;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
 import elki.clustering.kmeans.AbstractKMeans;
@@ -139,7 +139,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
     CFTree<CFInterface> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
 
     // For efficiency, we also need the mean of each CF:
-    CFInterface[] cfs = initialization.flattenTree(tree);
+    ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
 
     int[] assignment = new int[tree.leaves], weights = new int[k];
     Arrays.fill(assignment, -1);
@@ -188,7 +188,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param weights Cluster weight output
    * @return Cluster means
    */
-  private double[][] kmeans(CFInterface[] cfs, int[] assignment, int[] weights, CFTree<CFInterface> tree) {
+  private double[][] kmeans(ArrayList<? extends CFInterface> cfs, int[] assignment, int[] weights, CFTree<CFInterface> tree) {
     double[][] means = initialization.chooseInitialMeans(tree, cfs, k);
     for(int i = 1; i <= maxiter || maxiter < 0; i++) {
       means = i == 1 ? means : means(assignment, means, cfs, weights);
@@ -217,12 +217,12 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    *        * @param cfwmeans Cluster feature weighted means
    * @return Means of clusters.
    */
-  private double[][] means(int[] assignment, double[][] means, CFInterface[] cfs, int[] weights) {
+  private double[][] means(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
     Arrays.fill(weights, 0);
     double[][] newMeans = new double[k][];
     for(int i = 0; i < assignment.length; i++) {
       int c = assignment[i];
-      final CFInterface cf = cfs[i];
+      final CFInterface cf = cfs.get(i);
       int d = cf.getDimensionality();
       int n = 1;// cf.getWeight();
       if(newMeans[c] == null) {
@@ -257,13 +257,14 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param weights Cluster weights (output)
    * @return Number of reassigned elements
    */
-  private int assignToNearestCluster(int[] assignment, double[][] means, CFInterface[] cfs, int[] weights) {
+  private int assignToNearestCluster(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
     Arrays.fill(weights, 0);
     int changed = 0;
-    for(int i = 0; i < cfs.length; i++) {
-      double[] mean = new double[cfs[i].getDimensionality()];
-      for(int j = 0; j < cfs[i].getDimensionality(); j++) {
-        mean[j] = cfs[i].centroid(j);
+    for(int i = 0; i < cfs.size(); i++) {
+      CFInterface cfsi = cfs.get(i);
+      double[] mean = new double[cfsi.getDimensionality()];
+      for(int j = 0; j < mean.length; j++) {
+        mean[j] = cfsi.centroid(j);
       }
       double mindist = distance(mean, means[0]);
       int minIndex = 0;
@@ -278,13 +279,13 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
         changed++;
         assignment[i] = minIndex;
       }
-      weights[minIndex] += cfs[i].getWeight();
+      weights[minIndex] += cfsi.getWeight();
     }
     return changed;
   }
 
   /**
-   * Compute a distance (and count the distance computations).
+   * Compute a distance.
    *
    * @param x First object
    * @param y Second object
@@ -300,7 +301,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
   }
 
   /**
-   * Compute a distance (and count the distance computations).
+   * Compute a distance.
    *
    * @param x First object
    * @param y Second object
@@ -326,15 +327,15 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param weights Cluster weights
    * @return Per-cluster variances
    */
-  private double[] calculateVariances(int[] assignment, double[][] means, CFInterface[] cfs, int[] weights) {
+  private double[] calculateVariances(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
     double[] ss = new double[k];
     for(int i = 0; i < assignment.length; i++) {
+      CFInterface cfsi = cfs.get(i);
       for(int d = 0; d < means[0].length; d++) {
-        double dx = cfs[i].centroid(d) - means[assignment[i]][d];
-        ss[assignment[i]] += cfs[i].getWeight() * cfs[i].variance(d) + cfs[i].getWeight() * dx * dx;
+        double dx = cfsi.centroid(d) - means[assignment[i]][d];
+        ss[assignment[i]] += cfsi.getWeight() * cfsi.variance(d) + cfsi.getWeight() * dx * dx;
         // TODO check if cfs[i].variance is sufficient
       }
-
     }
     return ss;
   }

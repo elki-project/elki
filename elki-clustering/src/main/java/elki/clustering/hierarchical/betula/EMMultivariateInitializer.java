@@ -49,7 +49,7 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<NumberVecto
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(CFInterface[] cfs, int k, CFTree<CFInterface> tree) {
+  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree) {
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     double[][] covmat = tree.root.covariance().clone();

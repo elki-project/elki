@@ -26,44 +26,40 @@ import elki.data.NumberVector;
  * Interface for basic ClusteringFeature functions
  * 
  * @author Andreas Lang
- * 
- * @param <T> ClusteringFeature
  */
 public interface CFInterface {
-
   /**
    * Add NumberVector to CF
    * 
    * @param nv NumberVector
    */
-  public void addToStatistics(NumberVector nv);
+  void addToStatistics(NumberVector nv);
 
   /**
    * Add other CF to CF
    * 
    * @param other other CF
    */
-  public void addToStatistics(CFInterface other);
+  void addToStatistics(CFInterface other);
 
   /**
-   * resets all Statistics of CF
+   * Resets all statistics of CF
    */
-  public void resetStatistics();
+  void resetStatistics();
 
   /**
-   * Number of dimensions
+   * Returns the number of dimensions
    * 
    * @return dimensionality
    */
-  public int getDimensionality();
+  int getDimensionality();
 
   /**
-   * 
-   * weight
+   * Return the weight
    * 
    * @return weight of CF
    */
-  public int getWeight();
+  int getWeight();
 
   /**
    * Returns the mean of the specified dimension.
@@ -71,21 +67,21 @@ public interface CFInterface {
    * @param d dimension
    * @return mean of this dimension
    */
-  public double centroid(int d);
+  double centroid(int d);
 
   /**
    * Returns the total variance.
    * 
    * @return variance.
    */
-  public double variance();
+  double variance();
 
   /**
    * Returns the total sum of Deviations.
    * 
-   * @return Sum of Deviances.
+   * @return Sum of Deviations.
    */
-  public double SoD();
+  double sumdev();
 
   /**
    * Returns the variance in the specified dimension.
@@ -93,13 +89,12 @@ public interface CFInterface {
    * @param d dimension
    * @return variance in this dimension.
    */
-  public double variance(int d);
+  double variance(int d);
 
   /**
    * returns the covariance matrix
    * 
    * @return covariance
    */
-  public double[][] covariance();
-
+  double[][] covariance();
 }

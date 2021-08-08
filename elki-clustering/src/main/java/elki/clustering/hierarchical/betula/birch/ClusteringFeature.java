@@ -30,7 +30,6 @@ import elki.math.linearalgebra.VMath;
  * Clustering Feature of BIRCH, only for comparison
  * 
  * @author Erich Schubert
- * @since 0.7.5
  */
 public class ClusteringFeature implements CFInterface {
   /**
@@ -164,17 +163,16 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double SoD() {
+  public double sumdev() {
     double v = (1. / n) * ss;
     for(int d = 0; d < ls.length; d++) {
       v -= (ls[d] / n) * (ls[d] / n);
     }
-    return v * n; // TODO improve performance
+    return v * n;
   }
 
   @Override
   public double[][] covariance() {
     throw new IllegalStateException("This CF Model doesn't support this method.");
   }
-
 }

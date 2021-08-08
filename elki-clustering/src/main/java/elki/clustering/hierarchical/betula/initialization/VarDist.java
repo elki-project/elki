@@ -34,7 +34,7 @@ public class VarDist implements CFIDistance {
     public double squaredDistance(NumberVector clusterCenter, CFInterface candidate) {
         final int d = clusterCenter.getDimensionality();
         assert (d == candidate.getDimensionality());
-        double sum = candidate.SoD();
+        double sum = candidate.sumdev();
         for(int i = 0; i < d; i++) {
             double dx = candidate.centroid(i) - clusterCenter.doubleValue(i);
             sum += candidate.getWeight() * dx * dx;
@@ -46,7 +46,7 @@ public class VarDist implements CFIDistance {
     public double squaredDistance(double[] clusterCenter, CFInterface candidate) {
         final int d = clusterCenter.length;
         assert (d == candidate.getDimensionality());
-        double sum = candidate.SoD();
+        double sum = candidate.sumdev();
         for(int i = 0; i < d; i++) {
             double dx = candidate.centroid(i) - clusterCenter[i];
             sum += candidate.getWeight() * dx * dx;
@@ -58,7 +58,7 @@ public class VarDist implements CFIDistance {
     public double squaredDistance(CFInterface clusterCenter, CFInterface candidate) {
         final int d = clusterCenter.getDimensionality();
         assert (d == candidate.getDimensionality());
-        double sum = candidate.SoD();
+        double sum = candidate.sumdev();
         for(int i = 0; i < d; i++) {
             double dx = candidate.centroid(i) - clusterCenter.centroid(i);
             sum += candidate.getWeight() * dx * dx;

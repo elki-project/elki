@@ -152,7 +152,7 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double SoD() {
+  public double sumdev() {
     double var = 0.;
     for(int i = 0; i < ssd.length; i++) {
       var += ssd[i][i];
