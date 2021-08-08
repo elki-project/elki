@@ -45,6 +45,7 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
     this.subInit = subInit;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
     if(tree.getLeaves() < k) {

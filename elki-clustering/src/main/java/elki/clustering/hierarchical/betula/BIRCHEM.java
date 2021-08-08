@@ -23,8 +23,8 @@ package elki.clustering.hierarchical.betula;
 import static elki.math.linearalgebra.VMath.argmax;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.em.EMClusterModel;
@@ -59,6 +59,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.jafama.FastMath;
 
 /**
@@ -76,7 +77,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
   /**
    * CFTree factory.
    */
-  CFTree.Factory<CFInterface> cffactory;
+  CFTree.Factory<?> cffactory;
 
   /**
    * Number of cluster centers to initialize.
@@ -126,31 +127,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param maxiter Maximum number of iterations
    * @param initialization Initialization method
    */
-  public BIRCHEM(CFTree.Factory<CFInterface> cffactory, double delta, int k, AbstractEMInitializer<NumberVector, M> initialization) {
-    this(cffactory, delta, k, -1, false, initialization);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param cffactory CFTree factory
-   * @param k Number of clusters
-   * @param maxiter Maximum number of iterations
-   * @param initialization Initialization method
-   */
-  public BIRCHEM(CFTree.Factory<CFInterface> cffactory, double delta, int k, int maxiter, AbstractEMInitializer<NumberVector, M> initialization) {
-    this(cffactory, delta, k, maxiter, false, initialization);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param cffactory CFTree factory
-   * @param k Number of clusters
-   * @param maxiter Maximum number of iterations
-   * @param initialization Initialization method
-   */
-  public BIRCHEM(CFTree.Factory<CFInterface> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<NumberVector, M> initialization) {
+  public BIRCHEM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<NumberVector, M> initialization) {
     super();
     this.cffactory = cffactory;
     this.k = k;
@@ -176,23 +153,21 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // generate Tree
-    CFTree<CFInterface> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
 
     // Store clustering features:
     Duration modeltime = LOG.newDuration(getClass().getName().replace("BIRCHEM", "BIRCHEM.modeltime")).begin();
     ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
     // Initialize EM Model
     List<? extends EMClusterModel<NumberVector, M>> models = initializer.buildInitialModels(cfs, k, tree);
-    HashMap<CFInterface, double[]> probClusterIGivenX = new HashMap<>(cfs.size());
+    Map<CFInterface, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());
     double loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
     LOG.statistics(likestat.setDouble(loglikelihood));
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
-    double bestloglikelihood = Double.NEGATIVE_INFINITY;// loglikelihood; // For
-                                                        // detecting
-                                                        // instabilities.
+    double bestloglikelihood = Double.NEGATIVE_INFINITY;// loglikelihood
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(cfs, probClusterIGivenX, models, prior, tree.root.getWeight());
@@ -256,7 +231,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public double assignProbabilitiesToInstances(ArrayList<? extends CFInterface> cfs, List<? extends EMClusterModel<NumberVector, M>> models, HashMap<CFInterface, double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(ArrayList<? extends CFInterface> cfs, List<? extends EMClusterModel<NumberVector, M>> models, Map<CFInterface, double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
     int n = 0;
@@ -319,7 +294,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
    */
-  public void recomputeCovarianceMatrices(ArrayList<? extends CFInterface> cfs, HashMap<CFInterface, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
+  public void recomputeCovarianceMatrices(ArrayList<? extends CFInterface> cfs, Map<CFInterface, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
     final int k = models.size();
     boolean needsTwoPass = false;
     for(EMClusterModel<NumberVector, M> m : models) {
@@ -390,7 +365,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
     /**
      * CFTree factory.
      */
-    CFTree.Factory<CFInterface> cffactory;
+    CFTree.Factory<?> cffactory;
 
     /**
      * k Parameter.

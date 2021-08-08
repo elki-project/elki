@@ -22,7 +22,6 @@ package elki.clustering.hierarchical.betula;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import elki.clustering.hierarchical.betula.vvi.VVIModel;
@@ -50,6 +49,8 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 /**
  * Partial implementation of the CFTree as used by BIRCH.
@@ -150,7 +151,7 @@ public class CFTree<L extends CFInterface> {
   /**
    * Stored leaf entry to dbid relation
    */
-  protected Map<CFInterface, ArrayModifiableDBIDs> idmap = null;
+  protected Map<CFInterface, ArrayModifiableDBIDs> idmap;
 
   /**
    * Cluster feature model
@@ -718,7 +719,7 @@ public class CFTree<L extends CFInterface> {
       CFTree<L> tree = new CFTree<L>(cfModel, relation, threshold, branchingFactor, tCriterium);
       final double max = maxleaves <= 1 ? maxleaves * ids.size() : maxleaves;
       if(storeIds) {
-        tree.idmap = new HashMap<CFInterface, ArrayModifiableDBIDs>((int) maxleaves);
+        tree.idmap = new Reference2ObjectOpenHashMap<CFInterface, ArrayModifiableDBIDs>((int) maxleaves);
       }
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {

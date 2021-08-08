@@ -22,7 +22,6 @@ package elki.clustering.hierarchical.betula;
 
 import static elki.math.linearalgebra.VMath.diagonal;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
@@ -42,6 +41,8 @@ import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 /**
  * BIRCH-based clustering algorithm that simply treats the leafs of the CFTree
@@ -76,14 +77,14 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
   /**
    * CFTree factory.
    */
-  CFTree.Factory<CFInterface> cffactory;
+  CFTree.Factory<?> cffactory;
 
   /**
    * Constructor.
    *
    * @param cffactory CFTree Factory
    */
-  public BIRCHLeafClusteringMM(CFTree.Factory<CFInterface> cffactory) {
+  public BIRCHLeafClusteringMM(CFTree.Factory<?> cffactory) {
     super();
     this.cffactory = cffactory;
   }
@@ -101,11 +102,11 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
    */
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    CFTree<CFInterface> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
     // The CFTree does not store points. We have to reassign them (and the
     // quality is better than if we used the initial assignment, because centers
     // move in particular in the beginning, so we always had many outliers.
-    Map<CFInterface, ModifiableDBIDs> idmap = new HashMap<CFInterface, ModifiableDBIDs>(tree.leaves);
+    Map<CFInterface, ModifiableDBIDs> idmap = new Reference2ObjectOpenHashMap<CFInterface, ModifiableDBIDs>(tree.leaves);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       CFInterface cf = tree.findLeaf(relation.get(iter));
       ModifiableDBIDs ids = idmap.get(cf);
@@ -138,7 +139,7 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
     /**
      * CFTree factory.
      */
-    CFTree.Factory<CFInterface> cffactory;
+    CFTree.Factory<?> cffactory;
 
     @Override
     public void configure(Parameterization config) {

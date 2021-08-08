@@ -91,7 +91,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
   /**
    * CFTree factory.
    */
-  CFTree.Factory<CFInterface> cffactory;
+  CFTree.Factory<?> cffactory;
 
   /**
    * Number of cluster centers to initialize.
@@ -116,7 +116,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param maxiter Maximum number of iterations
    * @param initialization Initialization method for k-means
    */
-  public BIRCHKMsimple(CFTree.Factory<CFInterface> cffactory, int k, int maxiter, AbstractCFKMeansInitialization initialization) {
+  public BIRCHKMsimple(CFTree.Factory<?> cffactory, int k, int maxiter, AbstractCFKMeansInitialization initialization) {
     super();
     this.cffactory = cffactory;
     this.k = k;
@@ -136,7 +136,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @return Clustering
    */
   public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
-    CFTree<CFInterface> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
 
     // For efficiency, we also need the mean of each CF:
     ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
@@ -188,7 +188,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param weights Cluster weight output
    * @return Cluster means
    */
-  private double[][] kmeans(ArrayList<? extends CFInterface> cfs, int[] assignment, int[] weights, CFTree<CFInterface> tree) {
+  private double[][] kmeans(ArrayList<? extends CFInterface> cfs, int[] assignment, int[] weights, CFTree<?> tree) {
     double[][] means = initialization.chooseInitialMeans(tree, cfs, k);
     for(int i = 1; i <= maxiter || maxiter < 0; i++) {
       means = i == 1 ? means : means(assignment, means, cfs, weights);
@@ -355,7 +355,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
     /**
      * CFTree factory.
      */
-    CFTree.Factory<CFInterface> cffactory;
+    CFTree.Factory<?> cffactory;
 
     /**
      * k Parameter.

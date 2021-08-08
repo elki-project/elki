@@ -73,14 +73,14 @@ public class BIRCHLeafClusteringM implements ClusteringAlgorithm<Clustering<Mean
   /**
    * CFTree factory.
    */
-  CFTree.Factory<CFInterface> cffactory;
+  CFTree.Factory<?> cffactory;
 
   /**
    * Constructor.
    *
    * @param cffactory CFTree Factory
    */
-  public BIRCHLeafClusteringM(CFTree.Factory<CFInterface> cffactory) {
+  public BIRCHLeafClusteringM(CFTree.Factory<?> cffactory) {
     super();
     this.cffactory = cffactory;
   }
@@ -98,20 +98,7 @@ public class BIRCHLeafClusteringM implements ClusteringAlgorithm<Clustering<Mean
    */
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    CFTree<CFInterface> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
-    // The CFTree does not store points. We have to reassign them (and the
-    // quality is better than if we used the initial assignment, because centers
-    // move in particular in the beginning, so we always had many outliers.
-    // Map<CFInterface, ModifiableDBIDs> idmap = new HashMap<CFInterface,
-    // ModifiableDBIDs>(tree.leaves);
-    // for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-    // CFInterface cf = tree.findLeaf(relation.get(iter));
-    // ModifiableDBIDs ids = idmap.get(cf);
-    // if(ids == null) {
-    // idmap.put(cf, ids = DBIDUtil.newArray(cf.getWeight()));
-    // }
-    // ids.add(iter);
-    // }
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
     Map<CFInterface, ArrayModifiableDBIDs> idmap = tree.idmap;
     Clustering<MeanModel> result = new Clustering<>();
     for(Map.Entry<CFInterface, ArrayModifiableDBIDs> ent : idmap.entrySet()) {
@@ -137,7 +124,7 @@ public class BIRCHLeafClusteringM implements ClusteringAlgorithm<Clustering<Mean
     /**
      * CFTree factory.
      */
-    CFTree.Factory<CFInterface> cffactory;
+    CFTree.Factory<?> cffactory;
 
     @Override
     public void configure(Parameterization config) {

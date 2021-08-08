@@ -79,6 +79,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
       int depth = maxdepth;
       while(next instanceof CFNode && depth != 0) {
         depth--;
+        @SuppressWarnings("unchecked")
         CFNode<CFInterface> current = (CFNode<CFInterface>) next;
         next = chooseNextNode(current, ccs, m, rnd);
       }
