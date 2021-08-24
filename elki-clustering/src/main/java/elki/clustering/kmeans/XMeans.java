@@ -100,12 +100,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = XMeans.class.getName();
+  private String key;
 
   /**
    * Inner k-means algorithm.
    */
-  private KMeans<V, M> innerKMeans;
+  protected KMeans<V, M> innerKMeans;
 
   /**
    * Effective number of clusters, minimum and maximum.
@@ -139,8 +139,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistance<? super V> distance, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+  public XMeans(NumberVectorDistance<? super V> distance, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, String key, RandomFactory random) {
     super(distance, k_min, maxiter, initializer);
+    this.key = key;
     this.k_min = k_min;
     this.k_max = k_max;
     this.k = k_min;
@@ -160,11 +161,11 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   @Override
   public Clustering<M> run(Relation<V> relation) {
-    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("X-means number of clusters", k_max, LOG) : null;
+    MutableProgress prog = LOG.isVerbose() ? new MutableProgress(key + " number of clusters", k_max, LOG) : null;
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    LOG.statistics(new StringStatistic(key + ".initialization", initializer.toString()));
     splitInitializer.setInitialMeans(initializer.chooseInitialMeans(relation, k_min, distance));
     Clustering<M> clustering = innerKMeans.run(relation);
 
@@ -194,6 +195,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         break;
       }
       // Improve-Params:
+      innerKMeans.setInitializer(splitInitializer);
       splitInitializer.setInitialClusters(nextClusters);
       innerKMeans.setK(nextClusters.size());
       clustering = innerKMeans.run(relation);
@@ -206,7 +208,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       prog.setTotal(k);
       prog.setProcessed(k, LOG);
     }
-    LOG.statistics(new LongStatistic(KEY + ".num-clusters", clusters.size()));
+    LOG.statistics(new LongStatistic(key + ".num-clusters", clusters.size()));
     Clustering<M> result = new Clustering<>(clusters);
     Metadata.of(result).setLongName("X-Means Clustering");
     return result;
@@ -338,7 +340,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     /**
      * Random number generator.
      */
-    private RandomFactory random;
+    protected RandomFactory random;
 
     @Override
     public void configure(Parameterization config) {
@@ -371,15 +373,19 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
                 distance : SquaredEuclideanDistance.STATIC), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
+        configureInformationCriterion(config);
       }
 
+    }
+
+    protected void configureInformationCriterion(Parameterization config) {
       new ObjectParameter<KMeansQualityMeasure<V>>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class) //
           .grab(config, x -> informationCriterion = x);
     }
 
     @Override
     public XMeans<V, M> make() {
-      return new XMeans<>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
+      return new XMeans<>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion,XMeans.class.getName(), random);
     }
   }
 }
