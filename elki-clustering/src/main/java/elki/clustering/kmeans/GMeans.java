@@ -57,10 +57,6 @@ import elki.utilities.random.RandomFactory;
  * Greg Hamerly and Charles Elkan<br>
  * Learning the K in K-Means<br>
  * Advances in Neural Information Processing Systems 17 (NIPS 2004)
- * <p>
- * Lorentz Jäntschi and Sorana D. Bolboacă<br>
- * Computation of Probability Associated with Anderson–Darling Statistic<br>
- * Mathematics (MDPI, 2018) <br>
  * 
  * @author Robert Gehde
  *
@@ -71,10 +67,6 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Advances in Neural Information Processing Systems 17 (NIPS 2004)", //
     title = "Learning the k in k-means", //
     url = "https://www.researchgate.net/publication/2869155_Learning_the_K_in_K-Means")
-@Reference(authors = "Jäntschi, Lorentz and Bolboacă, Sorana D.", //
-    booktitle = "Mathematics", //
-    title = "Computation of Probability Associated with Anderson–Darling Statistic", //
-    url = "https://www.mdpi.com/2227-7390/6/6/88")
 public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<V, M> {
   /**
    * The logger for this class.
@@ -176,7 +168,7 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
     Arrays.sort(projectedValues);
     double A2 = AndersonDarlingTest.A2StandardNormal(projectedValues);
     A2 = AndersonDarlingTest.removeBiasNormalDistribution(A2, n);
-    double pValue = pValueAdjA2(A2);
+    double pValue = 1 - AndersonDarlingTest.calculateQuantileCase4(A2);
     if(LOG.isDebugging()) {
       LOG.debug("AndersonDarlingValue: " + A2);
       LOG.debug("p-value: " + pValue);
@@ -201,27 +193,6 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
     sig = Math.sqrt(1.0 / (n - 1.0) * sig);
     for(int i = 0; i < data.length; i++) {
       data[i] = (data[i] - mean) / sig;
-    }
-  }
-
-  /**
-   * calculate p-value for adjusted Anderson Darling test and case 3
-   * 
-   * @param A2
-   * @return
-   */
-  private double pValueAdjA2(double A2) {
-    if(A2 >= 0.6) {
-      return Math.exp(1.2937 - 5.709 * A2 + 0.0186 * A2 * A2);
-    }
-    else if(A2 >= 0.34) {
-      return Math.exp(0.9177 - 4.279 * A2 - 1.38 * A2 * A2);
-    }
-    else if(A2 >= 0.2) {
-      return 1 - Math.exp(-8.318 + 42.796 * A2 - 59.938 * A2 * A2);
-    }
-    else {
-      return 1 - Math.exp(-13.436 - 101.14 * A2 + 223.73 * A2 * A2);
     }
   }
 

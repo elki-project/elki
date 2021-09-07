@@ -28,6 +28,7 @@ import org.junit.Test;
  * Validate the Anderson Darling test.
  *
  * @author Erich Schubert
+ * @author Robert Gehde
  * @since 0.7.0
  */
 public class AndersonDarlingTestTest {
@@ -93,5 +94,23 @@ public class AndersonDarlingTestTest {
       assertEquals("A2 does not match for " + i, scipy_central[i], A2, 1e-14);
       assertEquals("A2 does not match for " + i, scipy_central[i], A2nc, 1e-14);
     }
+  }
+  @Test
+  public void testAndersonDarlingQuantileCase0() {
+    double quantile = AndersonDarlingTest.calculateQuantileCase0(3.878, 1000);
+    assertEquals("A2-Quantile (case 0) does not match.", 0.989993484322892,quantile, 1e-15);
+  }
+  @Test
+  public void testAndersonDarlingQuantileCase4() {
+    double quantile0 = AndersonDarlingTest.calculateQuantileCase4(0.7);
+    double quantile1 = AndersonDarlingTest.calculateQuantileCase4(0.5);
+    double quantile2 = AndersonDarlingTest.calculateQuantileCase4(0.3);
+    double quantile3 = AndersonDarlingTest.calculateQuantileCase4(0.1);
+
+    assertEquals("A2-Quantile (case 4) for A2 = 0.7 does not match.", 0.932355281610499,quantile0, 1e-15);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.5 does not match.", 0.791288006730989,quantile1, 1e-15);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.3 does not match.", 0.417437686384333,quantile2, 1e-15);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.1 does not match.", 0.000000000554640,quantile3, 1e-15);
+
   }
 }
