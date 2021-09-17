@@ -23,6 +23,9 @@ package elki.clustering.kmeans;
 import java.util.Arrays;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmeans.quality.BayesianInformationCriterion;
+import elki.clustering.kmeans.quality.BayesianInformationCriterionXMeans;
+import elki.clustering.kmeans.quality.KMeansQualityMeasure;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
@@ -86,7 +89,14 @@ public class HamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMe
   public Clustering<KMeansModel> run(Relation<V> relation) {
     Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
-    return instance.buildResult(varstat, relation);
+    // return instance.buildResult(varstat, relation);
+    {
+      Clustering<KMeansModel> result = instance.buildResult(varstat, relation);
+      KMeansQualityMeasure<NumberVector> informationCriterion = new BayesianInformationCriterion();
+      double bic = informationCriterion.quality(result, distance, relation);
+      System.out.println("bic: " + bic);
+      return result;
+    }
   }
 
   /**

@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
+import elki.clustering.kmeans.quality.BayesianInformationCriterion;
+import elki.clustering.kmeans.quality.KMeansQualityMeasure;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -99,7 +101,14 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
   public Clustering<KMeansModel> run(Relation<V> relation) {
     Instance instance = new Instance(relation, distance, initialMeans(relation));
     instance.run(maxiter);
-    return instance.buildResultWithNoise();
+//    return instance.buildResultWithNoise();
+    {
+      Clustering<KMeansModel> result = instance.buildResultWithNoise();
+      KMeansQualityMeasure<NumberVector> informationCriterion = new BayesianInformationCriterion();
+      double bic = informationCriterion.quality(result, distance, relation);
+      System.out.println("bic: " + bic);
+      return result;
+    }
   }
 
   /**
