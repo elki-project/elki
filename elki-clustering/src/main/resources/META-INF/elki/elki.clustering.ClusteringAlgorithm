@@ -15,6 +15,7 @@ elki.clustering.hierarchical.extraction.CutDendrogramByHeight
 elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
 elki.clustering.hierarchical.birch.BIRCHLloydKMeans
 elki.clustering.hierarchical.birch.BIRCHLeafClustering
+elki.clustering.kcenter.GreedyKCenter
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans
 elki.clustering.kmeans.BisectingKMeans

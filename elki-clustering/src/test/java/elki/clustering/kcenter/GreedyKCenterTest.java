@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering;
+package elki.clustering.kcenter;
 
 import org.junit.Test;
 
+import elki.Algorithm;
+import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.ManhattanDistance;
 import elki.utilities.ELKIBuilder;
 
@@ -35,27 +36,26 @@ import elki.utilities.ELKIBuilder;
  * @author Robert Gehde
  */
 public class GreedyKCenterTest extends AbstractClusterAlgorithmTest {
-  
   @Test
   public void testEuclidean() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> result = new ELKIBuilder<GreedyKCenter<DoubleVector>>(GreedyKCenter.class) //
-        .with(GreedyKCenter.Par.DISTANCE_ID, EuclideanDistance.class) //
         .with(GreedyKCenter.Par.K_ID, 3) //
+        .with(GreedyKCenter.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.78696);
-    assertClusterSizes(result, new int[] { 1, 164, 165 });
+    assertFMeasure(db, result, 0.91352);
+    assertClusterSizes(result, new int[] { 55, 118, 157 });
   }
 
   @Test
   public void testManhattan() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> result = new ELKIBuilder<GreedyKCenter<DoubleVector>>(GreedyKCenter.class) //
-        .with(GreedyKCenter.Par.DISTANCE_ID, ManhattanDistance.class) //
+        .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, ManhattanDistance.STATIC) //
         .with(GreedyKCenter.Par.K_ID, 3) //
+        .with(GreedyKCenter.Par.RANDOM_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.78696);
-    assertClusterSizes(result, new int[] { 1, 164, 165 });
+    assertFMeasure(db, result, 0.91436);
+    assertClusterSizes(result, new int[] { 56, 117, 157 });
   }
-
 }
