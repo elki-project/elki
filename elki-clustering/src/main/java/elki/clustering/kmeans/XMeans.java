@@ -24,6 +24,7 @@ import static elki.math.linearalgebra.VMath.normalize;
 import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -105,7 +106,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   /**
    * Effective number of clusters, minimum and maximum.
    */
-  private int k, k_min, k_max;
+  private int k_min, k_max;
 
   /**
    * Initializer for k-means.
@@ -138,7 +139,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     super(distance, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
-    this.k = k_min;
     this.innerKMeans = innerKMeans;
     this.splitInitializer = new Predefined((double[][]) null);
     this.innerKMeans.setInitializer(this.splitInitializer);
@@ -218,14 +218,10 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *         clusters when split improves clustering.
    */
   protected List<Cluster<M>> splitCluster(Cluster<M> parentCluster, Relation<V> relation) {
-    // Transform parent cluster into a clustering
-    ArrayList<Cluster<M>> parentClusterList = new ArrayList<>(1);
-    parentClusterList.add(parentCluster);
     if(parentCluster.size() <= 1) {
-      // Split is not possbile
-      return parentClusterList;
+      return Arrays.asList(parentCluster); // too small
     }
-    Clustering<M> parentClustering = new Clustering<>(parentClusterList);
+    Clustering<M> parentClustering = new Clustering<>(Arrays.asList(parentCluster));
     splitInitializer.setInitialMeans(splitCentroid(parentCluster, relation));
     innerKMeans.setK(2);
     Clustering<M> childClustering = innerKMeans.run(new ProxyView<V>(parentCluster.getIDs(), relation));
@@ -239,7 +235,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     // Check if split is an improvement:
-    return informationCriterion.isBetter(parentEvaluation, childrenEvaluation) ? parentClusterList : childClustering.getAllClusters();
+    return informationCriterion.isBetter(parentEvaluation, childrenEvaluation) ? Arrays.asList(parentCluster) : childClustering.getAllClusters();
   }
 
   /**

@@ -57,6 +57,10 @@ import net.jafama.FastMath;
  * EDF Statistics for Goodness of Fit and Some Comparisons<br>
  * Journal of the American Statistical Association 69(347)
  * <p>
+ * Ralph B. D'Agostino<br>
+ * Tests for the Normal Distribution<br>
+ * Goodness-of-Fit Techniques
+ * <p>
  * L. Jäntschi and S. D. Bolboacă<br>
  * Computation of Probability Associated with Anderson–Darling Statistic<br>
  * Mathematics (MDPI, 2018) <br>
@@ -70,10 +74,6 @@ import net.jafama.FastMath;
     booktitle = "Annals of mathematical statistics 23(2)", //
     url = "https://doi.org/10.1214/aoms/1177729437", //
     bibkey = "doi:10.1214/aoms/1177729437")
-@Reference(authors = "L. Jäntschi and S. D: Bolboacă", //
-    booktitle = "Mathematics", //
-    title = "Computation of Probability Associated with Anderson-Darling Statistic", //
-    url = "https://www.mdpi.com/2227-7390/6/6/88")
 public class AndersonDarlingTest {
   /**
    * Private constructor. Static methods only.
@@ -81,6 +81,11 @@ public class AndersonDarlingTest {
   private AndersonDarlingTest() {
     // Do not use.
   }
+
+  /**
+   * Cut-off for extreme values.
+   */
+  private static final double SMALL = FastMath.log(0.00000001);
 
   /**
    * Test a <i>sorted</i> data set against the standard normal distribution.
@@ -99,25 +104,13 @@ public class AndersonDarlingTest {
     final int l = sorted.length;
     assert (l > 0);
     double A2 = 0.;
-    // This complicated approach allows us to avoid computing the CDF values
-    // twice, nor having to store them.
-    int i = 0, j = l - 1;
-    int i2 = 1, j2 = (j << 1) + 1;
-    for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
+    for(int i = 0; i < l; ++i) {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
-      final double y = NormalDistribution.standardNormalCDF(sorted[j]);
-      if(x == 0 || x == 1 || y == 0 || y == 1) {
-        return Double.POSITIVE_INFINITY; // extreme outliers
-      }
-      final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
-      final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
-      A2 += i2 * diff1 + j2 * diff2;
+      final double logx = x > 0.00000001 ? FastMath.log(x) : SMALL;
+      final double log1mx = x < 0.99999999 ? FastMath.log(1 - x) : SMALL;
+      A2 += ((i << 1) + 1.) / l * logx + (((l - i) << 1) - 1.) / l * log1mx;
     }
-    if(i == j) {
-      final double x = NormalDistribution.standardNormalCDF(sorted[i]);
-      A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
-    }
-    return -l - A2 / l;
+    return -l - A2;
   }
 
   /**
@@ -141,28 +134,15 @@ public class AndersonDarlingTest {
       final double d = sorted[i] - m;
       var += d * d;
     }
-    var /= (l - 1); // Variance
-    final double isigma = var > 0 ? Math.sqrt(1. / var) : 1.;
+    final double isigma = var > 0 ? Math.sqrt((l - 1) / var) : 1.;
     double A2 = 0.;
-    // This complicated approach allows us to avoid computing the CDF values
-    // twice, nor having to store them.
-    int i = 0, j = l - 1;
-    int i2 = 1, j2 = (j << 1) + 1;
-    for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
+    for(int i = 0; i < l; ++i) {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
-      final double y = NormalDistribution.standardNormalCDF((sorted[j] - m) * isigma);
-      if(x == 0 || x == 1 || y == 0 || y == 1) {
-        return Double.POSITIVE_INFINITY; // extreme outliers
-      }
-      final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
-      final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
-      A2 += i2 * diff1 + j2 * diff2;
+      final double logx = x > 0.00000001 ? FastMath.log(x) : SMALL;
+      final double log1mx = x < 0.99999999 ? FastMath.log(1 - x) : SMALL;
+      A2 += ((i << 1) + 1.) / l * logx + (((l - i) << 1) - 1.) / l * log1mx;
     }
-    if(i == j) {
-      final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
-      A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
-    }
-    return -l - A2 / l;
+    return -l - A2;
   }
 
   /**
@@ -184,34 +164,66 @@ public class AndersonDarlingTest {
   }
 
   /**
+   * Remove bias from the Anderson-Darling statistic if the mean and standard
+   * deviation were estimated from the data, and a normal distribution was
+   * assumed.
+   * 
+   * @param A2 A2 statistic
+   * @param n Sample size
+   * @return Unbiased test statistic
+   */
+  @Reference(authors = "R. B. D'Agostino", //
+      title = "Tests for the Normal Distribution", //
+      booktitle = "Goodness-of-Fit Techniques", //
+      url = "https://doi.org/10.1201/9780203753064-9", //
+      bibkey = "doi:10.1201/9780203753064-9")
+  public static double removeBiasNormalDistributionDAgostino(double A2, int n) {
+    return A2 * (1 + .75 / n + 2.25 / (n * n));
+  }
+
+  /**
    * Calculates the quantile for an Anderson Darling statistic in the case where
    * both center and variance are unknown.
+   * <p>
+   * Note: the equations assume a correction with
+   * {@link #removeBiasNormalDistributionDAgostino}.
    * 
    * @param A2 Anderson Darling statistic
    * @return quantile
    */
-  public static double calculateQuantileCase4(double A2) {
-    return 1 - pValueCase4(A2);
+  public static double calculateQuantileCase3(double A2) {
+    return 1 - pValueCase3(A2);
   }
 
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
    * both center and variance are unknown.
+   * <p>
+   * Note: the equations assume a correction with
+   * {@link #removeBiasNormalDistributionDAgostino}.
    * 
    * @param A2 Anderson Darling statistic
    * @return quantile
    */
-  public static double pValueCase4(double A2) {
-    return A2 == Double.POSITIVE_INFINITY ? 1 : //
-        A2 >= 0.6 ? Math.exp(1.2937 - 5.709 * A2 + 0.0186 * A2 * A2) : //
-            A2 >= 0.34 ? Math.exp(0.9177 - 4.279 * A2 - 1.38 * A2 * A2) : //
-                A2 >= 0.2 ? 1 - Math.exp(-8.318 + 42.796 * A2 - 59.938 * A2 * A2) : //
-                    1 - Math.exp(-13.436 - 101.14 * A2 + 223.73 * A2 * A2);
+  @Reference(authors = "R. B. D'Agostino", //
+      title = "Tests for the Normal Distribution", //
+      booktitle = "Goodness-of-Fit Techniques", //
+      url = "https://doi.org/10.1201/9780203753064-9", //
+      bibkey = "doi:10.1201/9780203753064-9")
+  public static double pValueCase3(double A2) {
+    return A2 == Double.POSITIVE_INFINITY ? 0 : //
+        A2 >= 0.6 ? FastMath.exp(1.2937 - 5.709 * A2 + 0.0186 * A2 * A2) : //
+            A2 >= 0.34 ? FastMath.exp(0.9177 - 4.279 * A2 - 1.38 * A2 * A2) : //
+                A2 >= 0.2 ? 1 - FastMath.exp(-8.318 + 42.796 * A2 - 59.938 * A2 * A2) : //
+                    1 - FastMath.exp(-13.436 + 101.14 * A2 - 223.73 * A2 * A2);
   }
 
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
    * both center and variance are known.
+   * <p>
+   * Note: the equations assume a correction with
+   * {@link #removeBiasNormalDistributionDAgostino}.
    * 
    * @param A2 Anderson Darling statistic
    * @param n sample size
@@ -224,16 +236,23 @@ public class AndersonDarlingTest {
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
    * both center and variance are known.
+   * <p>
+   * Note: the equations assume a correction with
+   * {@link #removeBiasNormalDistributionDAgostino}.
    * 
    * @param A2 Anderson Darling statistic
    * @param n sample size
    * @return quantile
    */
+  @Reference(authors = "L. Jäntschi and S. D: Bolboacă", //
+      booktitle = "Mathematics", //
+      title = "Computation of Probability Associated with Anderson-Darling Statistic", //
+      url = "https://www.mdpi.com/2227-7390/6/6/88")
   public static double pValueCase0(double A2, int n) {
     if(A2 == Double.POSITIVE_INFINITY) {
-      return 1;
+      return 0;
     }
-    final double x = Math.exp(A2), sx = Math.sqrt(x), ssx = Math.sqrt(sx);
+    final double x = FastMath.exp(A2), sx = Math.sqrt(x), ssx = Math.sqrt(sx);
     final double npows1 = 1. / n, npows2 = npows1 * npows1,
         npows3 = npows1 * npows2, npows4 = npows2 * npows2;
     final double stat = (5.6737 - 38.9087 * npows1 + 88.7461 * npows2 - 179.547 * npows3 + 199.3247 * npows4) //

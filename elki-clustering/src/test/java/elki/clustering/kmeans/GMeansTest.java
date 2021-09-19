@@ -40,11 +40,24 @@ public class GMeansTest extends AbstractClusterAlgorithmTest {
     Clustering<?> result = new ELKIBuilder<GMeans<DoubleVector, ?>>(GMeans.class) //
         .with(GMeans.Par.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
-        .with(KMeans.SEED_ID, 0) // // Initializer seed
-        .with(GMeans.Par.SEED_ID, 0) // // X-means seed
-        .with(GMeans.Par.ALPHA_ID, 0.0001) // // Significance level
+        .with(KMeans.SEED_ID, 0) // Initializer seed
+        .with(GMeans.Par.SEED_ID, 0) // X-means seed
         .build().autorun(db);
-    assertFMeasure(db, result, 0.898979);
-    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 3, 3, 4, 4, 5, 41, 51, 61, 153 });
+    assertFMeasure(db, result, 0.6856772);
+    assertClusterSizes(result, new int[] { 2, 2, 3, 3, 3, 3, 4, 5, 41, 51, 61, 74, 78 });
+  }
+
+  @Test
+  public void testGMeansCritical() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<?> result = new ELKIBuilder<GMeans<DoubleVector, ?>>(GMeans.class) //
+        .with(GMeans.Par.K_MIN_ID, 2) //
+        .with(KMeans.K_ID, 20) //
+        .with(KMeans.SEED_ID, 0) // Initializer seed
+        .with(GMeans.Par.SEED_ID, 0) // X-means seed
+        .with(GMeans.Par.CRITICAL_ID, 20) // critical value
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.93169);
+    assertClusterSizes(result, new int[] { 7, 57, 110, 156 });
   }
 }

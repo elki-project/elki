@@ -100,9 +100,25 @@ public class AndersonDarlingTestTest {
 
   @Test
   public void testAndersonDarlingQuantileCase4() {
-    assertEquals("A2-Quantile (case 4) for A2 = 0.7 does not match.", 0.932355281610499, AndersonDarlingTest.calculateQuantileCase4(0.7), 1e-15);
-    assertEquals("A2-Quantile (case 4) for A2 = 0.5 does not match.", 0.791288006730989, AndersonDarlingTest.calculateQuantileCase4(0.5), 1e-15);
-    assertEquals("A2-Quantile (case 4) for A2 = 0.3 does not match.", 0.417437686384333, AndersonDarlingTest.calculateQuantileCase4(0.3), 1e-15);
-    assertEquals("A2-Quantile (case 4) for A2 = 0.1 does not match.", 0.000000000554640, AndersonDarlingTest.calculateQuantileCase4(0.1), 1e-15);
+    // Stephens, 1974, very rough values, used by scipy
+    assertEquals("A2-Quantile (case 4) for A2 = 1.092 does not match.", 0.99, AndersonDarlingTest.calculateQuantileCase3(1.092), 1e-2);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.918 does not match.", 0.975, AndersonDarlingTest.calculateQuantileCase3(0.918), 1e-2);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.787 does not match.", 0.95, AndersonDarlingTest.calculateQuantileCase3(0.787), 1e-2);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.656 does not match.", 0.90, AndersonDarlingTest.calculateQuantileCase3(0.656), 2e-2);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.576 does not match.", 0.85, AndersonDarlingTest.calculateQuantileCase3(0.576), 2e-2);
+    // Some table values from literature
+    assertEquals("A2-Quantile (case 4) for A2 = 1.8692 does not match.", 0.9999, AndersonDarlingTest.calculateQuantileCase3(1.8692), 1e-4);
+    assertEquals("A2-Quantile (case 4) for A2 = 1.159 does not match.", 0.995, AndersonDarlingTest.calculateQuantileCase3(1.159), 1e-5);
+    assertEquals("A2-Quantile (case 4) for A2 = 1.1578 does not match.", 0.995, AndersonDarlingTest.calculateQuantileCase3(1.1578), 1e-4);
+    assertEquals("A2-Quantile (case 4) for A2 = 1.1517 does not match.", 0.995, AndersonDarlingTest.calculateQuantileCase3(1.1517), 1e-3);
+    assertEquals("A2-Quantile (case 4) for A2 = 1.0348 does not match.", 0.99, AndersonDarlingTest.calculateQuantileCase3(1.0348), 1e-3);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.8728 does not match.", 0.975, AndersonDarlingTest.calculateQuantileCase3(0.8728), 1e-3);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.7514 does not match.", 0.95, AndersonDarlingTest.calculateQuantileCase3(0.7514), 1e-3);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.6305 does not match.", 0.9, AndersonDarlingTest.calculateQuantileCase3(0.6305), 1e-3);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.5091 does not match.", 0.8, AndersonDarlingTest.calculateQuantileCase3(0.5091), 1e-2);
+    // Regression tests
+    assertEquals("A2-Quantile (case 4) for A2 = 0.7 does not match.", 0.932355281610499, AndersonDarlingTest.calculateQuantileCase3(0.7), 1e-15);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.5 does not match.", 0.791288006730989, AndersonDarlingTest.calculateQuantileCase3(0.5), 1e-15);
+    assertEquals("A2-Quantile (case 4) for A2 = 0.3 does not match.", 0.417437686384333, AndersonDarlingTest.calculateQuantileCase3(0.3), 1e-15);
   }
 }
