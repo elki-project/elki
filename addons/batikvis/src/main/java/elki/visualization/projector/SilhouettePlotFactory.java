@@ -21,7 +21,8 @@
 package elki.visualization.projector;
 
 import elki.data.Clustering;
-import elki.evaluation.clustering.internal.SilhouetteResult;
+import elki.database.relation.DoubleRelation;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.visualization.VisualizationTree;
 import elki.visualization.VisualizerContext;
 
@@ -47,8 +48,10 @@ public class SilhouettePlotFactory implements ProjectorFactory {
     if(c == null) {
       return;
     }
-    VisualizationTree.findNewResults(context, start).filter(SilhouetteResult.class).forEach(dds -> {
-      context.addVis(c, new SilhouettePlotProjector(c, dds));
+    VisualizationTree.findNewResults(context, start).filter(DoubleRelation.class).forEach(dds -> {
+      if(dds.getLongName().equals(Silhouette.SILHOUETTE_NAME)) {
+        context.addVis(c, new SilhouettePlotProjector(c, dds));
+      }
     });
   }
 }

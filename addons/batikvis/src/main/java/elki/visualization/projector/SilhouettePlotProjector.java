@@ -26,11 +26,11 @@ import java.util.List;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.database.datastore.DoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DoubleDBIDList;
 import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.relation.DoubleRelation;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizerContext;
 import elki.visualization.gui.overview.PlotItem;
@@ -64,7 +64,7 @@ public class SilhouettePlotProjector implements Projector {
    * @param clustering clustering on which the silhouette values are calculated
    * @param dds silhouette values sorted by clusters
    */
-  public SilhouettePlotProjector(Clustering<?> clustering, DoubleDataStore dds) {
+  public SilhouettePlotProjector(Clustering<?> clustering, DoubleRelation dds) {
     super();
     this.clustering = clustering;
     this.values = sortSilhouette(clustering, dds);
@@ -77,7 +77,7 @@ public class SilhouettePlotProjector implements Projector {
    * @param dds Silhouette values
    * @return Sorted silhouette per cluster
    */
-  private static DoubleDBIDList[] sortSilhouette(Clustering<?> c, DoubleDataStore dds) {
+  private static DoubleDBIDList[] sortSilhouette(Clustering<?> c, DoubleRelation dds) {
     DoubleDBIDList[] silhouettes = new DoubleDBIDList[c.getAllClusters().size()];
     int i = 0;
     for(Cluster<?> cluster : c.getAllClusters()) {
