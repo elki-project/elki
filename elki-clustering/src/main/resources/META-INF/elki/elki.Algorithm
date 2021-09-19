@@ -34,6 +34,7 @@ elki.clustering.kmeans.BisectingKMeans
 elki.clustering.kmeans.ElkanKMeans
 elki.clustering.kmeans.ExponionKMeans
 elki.clustering.kmeans.CompareMeans
+elki.clustering.kmeans.GMeans
 elki.clustering.kmeans.HamerlyKMeans
 elki.clustering.kmeans.HartiganWongKMeans
 elki.clustering.kmeans.KDTreeFilteringKMeans

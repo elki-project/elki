@@ -98,11 +98,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   private static final Logging LOG = Logging.getLogger(XMeans.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private String key;
-
-  /**
    * Inner k-means algorithm.
    */
   protected KMeans<V, M> innerKMeans;
@@ -139,9 +134,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistance<? super V> distance, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, String key, RandomFactory random) {
+  public XMeans(NumberVectorDistance<? super V> distance, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
     super(distance, k_min, maxiter, initializer);
-    this.key = key;
     this.k_min = k_min;
     this.k_max = k_max;
     this.k = k_min;
@@ -161,7 +155,8 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   @Override
   public Clustering<M> run(Relation<V> relation) {
-    MutableProgress prog = LOG.isVerbose() ? new MutableProgress(key + " number of clusters", k_max, LOG) : null;
+    final String key = getClass().getName();
+    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("Number of clusters", k_max, LOG) : null;
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
@@ -361,7 +356,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       getParameterDistance(config);
 
       new RandomParameter(SEED_ID).grab(config, x -> random = x);
-      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, LloydKMeans.class);
+      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, HamerlyKMeans.class);
       if(config.grab(innerKMeansP)) {
         ChainedParameterization combinedConfig = new ChainedParameterization(new ListParameterization() //
             .addParameter(KMeans.K_ID, k_min) //
@@ -375,9 +370,14 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
         configureInformationCriterion(config);
       }
-
     }
 
+    /**
+     * Configure the information criterion option, to allow overriding by
+     * {@link GMeans}.
+     *
+     * @param config Parameterization
+     */
     protected void configureInformationCriterion(Parameterization config) {
       new ObjectParameter<KMeansQualityMeasure<V>>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class) //
           .grab(config, x -> informationCriterion = x);
@@ -385,7 +385,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     @Override
     public XMeans<V, M> make() {
-      return new XMeans<>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion,XMeans.class.getName(), random);
+      return new XMeans<>(distance, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }
   }
 }

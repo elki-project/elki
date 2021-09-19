@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,21 +34,17 @@ import elki.utilities.ELKIBuilder;
  * @author Robert Gehde
  */
 public class GMeansTest extends AbstractClusterAlgorithmTest {
-  /**
-   * G-means test run.
-   */
   @Test
   public void testGMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
     Clustering<?> result = new ELKIBuilder<GMeans<DoubleVector, ?>>(GMeans.class) //
         .with(GMeans.Par.K_MIN_ID, 2) //
         .with(KMeans.K_ID, 20) //
-        .with(GMeans.Par.INNER_KMEANS_ID, ExponionKMeans.class) //
         .with(KMeans.SEED_ID, 0) // // Initializer seed
         .with(GMeans.Par.SEED_ID, 0) // // X-means seed
         .with(GMeans.Par.ALPHA_ID, 0.0001) // // Significance level
         .build().autorun(db);
-    assertFMeasure(db, result, 0.5941747572815534);
-    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 4, 5, 41, 46, 51, 51, 53, 61 });
+    assertFMeasure(db, result, 0.898979);
+    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 3, 3, 4, 4, 5, 41, 51, 61, 153 });
   }
 }

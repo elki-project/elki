@@ -20,10 +20,11 @@
  */
 package elki.clustering.kmeans;
 
+import static elki.math.linearalgebra.VMath.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.Predefined;
@@ -34,8 +35,11 @@ import elki.data.model.MeanModel;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
+import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
+import elki.math.MathUtil;
+import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.linearalgebra.VMath;
 import elki.math.statistics.tests.AndersonDarlingTest;
 import elki.utilities.datastructures.iterator.It;
@@ -50,23 +54,23 @@ import elki.utilities.random.RandomFactory;
  * G-Means extends K-Means and estimates the number of centers with Anderson
  * Darling Test.<br>
  * Implemented as specialization of XMeans.
- * 
  * <p>
  * Reference:
  * <p>
- * Greg Hamerly and Charles Elkan<br>
+ * G. Hamerly and C. Elkan<br>
  * Learning the K in K-Means<br>
- * Advances in Neural Information Processing Systems 17 (NIPS 2004)
+ * Neural Information Processing Systems
  * 
  * @author Robert Gehde
  *
  * @param <V> Vector
  * @param <M> Model
  */
-@Reference(authors = "Greg Hamerly and Charles Elkan", //
-    booktitle = "Advances in Neural Information Processing Systems 17 (NIPS 2004)", //
+@Reference(authors = "G. Hamerly and C. Elkan", //
     title = "Learning the k in k-means", //
-    url = "https://www.researchgate.net/publication/2869155_Learning_the_K_in_K-Means")
+    booktitle = "Neural Information Processing Systems", //
+    url = "https://www.researchgate.net/publication/2869155_Learning_the_K_in_K-Means", //
+    bibkey = "DBLP:conf/nips/HamerlyE03")
 public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<V, M> {
   /**
    * The logger for this class.
@@ -74,19 +78,25 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
   private static final Logging LOG = Logging.getLogger(GMeans.class);
 
   /**
-   * Random object.
-   */
-  Random rand;
-
-  /**
    * Significance level.
    */
   double alpha;
 
+  /**
+   * Constructor.
+   *
+   * @param distance Distance function
+   * @param alpha
+   * @param k_min
+   * @param k_max
+   * @param maxiter
+   * @param innerKMeans
+   * @param initializer
+   * @param random
+   */
   public GMeans(NumberVectorDistance<? super V> distance, double alpha, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization initializer, RandomFactory random) {
-    super(distance, k_min, k_max, maxiter, innerKMeans, initializer, null, GMeans.class.getName(), random);
+    super(distance, k_min, k_max, maxiter, innerKMeans, initializer, null, random);
     this.alpha = alpha;
-    this.rand = this.rnd.getRandom();
   }
 
   @Override
@@ -95,105 +105,58 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
     ArrayList<Cluster<M>> parentClusterList = new ArrayList<>(1);
     parentClusterList.add(parentCluster);
     if(parentCluster.size() <= 1) {
-      // Split is not possbile
+      // Split is not possible
       return parentClusterList;
     }
     // splitting
-    ProxyView<V> parentview = new ProxyView<V>(parentCluster.getIDs(), relation);
-    int dim = relation.get(relation.iterDBIDs()).getDimensionality();
-    int n = parentCluster.size();
-    // calculate new centers
-    // 0: get points vectors
-    double[][] points = new double[n][];
-    int c = 0;
-    for(DBIDIter it = parentview.iterDBIDs(); it.valid(); it.advance()) {
-      points[c++] = relation.get(it).toArray();
-    }
-    // 1: calc old center c
-    double[] center = new double[dim];
-    for(int i = 0; i < points.length; i++) {
-      for(int j = 0; j < center.length; j++) {
-        center[j] += points[i][j];
-      }
-    }
-    for(int j = 0; j < center.length; j++) {
-      center[j] /= n;
-    }
-    // 2: calculate eigenvector
-    // 2.1: calc cov
-    for(int i = 0; i < points.length; i++) {
-      points[i] = VMath.minusEquals(points[i], center);
-    }
-    double[][] cov = VMath.timesEquals(VMath.transposeTimes(points, points), 1.0 / (n - (1.0)));
-    // 2.2: main principal component via power method
-    double[] s = new double[dim];
-    for(int i = 0; i < s.length; i++) {
-      s[i] = rand.nextDouble();
-    }
-    VMath.normalize(s);
-    for(int i = 0; i < 100; i++) {
-      s = VMath.times(cov, s);
-      s = VMath.normalize(s);
+    final int dim = RelationUtil.dimensionality(relation);
+    final int n = parentCluster.size();
+    // New covariance matrix and center:
+    CovarianceMatrix cov = CovarianceMatrix.make(relation, parentCluster.getIDs());
+    double[][] mat = cov.destroyToSampleMatrix();
+    // Find principal component via power iteration method
+    double[] s = normalizeEquals(MathUtil.randomDoubleArray(dim, this.rnd.getSingleThreadedRandom()));
+    for(int i = 0; i < 30; i++) {
+      s = normalizeEquals(times(mat, s));
     }
     // 2.3: Eigenvalue
-    double l = VMath.transposeTimesTimes(s, cov, s);
+    double l = transposeTimesTimes(s, mat, s);
     // 3: deviation is m = s * sqrt(2l/pi)
-    double[] m = VMath.times(s, Math.sqrt(2 * l / Math.PI));
+    double[] m = times(s, Math.sqrt(2 * l / Math.PI));
     // 4: new centers are c +/- m
-    double[][] newCenters = new double[2][dim];
-    newCenters[0] = VMath.plus(center, m);
-    newCenters[1] = VMath.minus(center, m);
+    double[][] newCenters = new double[][] { plus(cov.getMeanVector(), m), minus(cov.getMeanVector(), m) };
     Predefined init = new Predefined(newCenters);
 
     // run it a bit
     innerKMeans.setK(2);
     innerKMeans.setInitializer(init);
-    // ich würde das gerne nur 1mal laufen lassen....
-    Clustering<M> childClustering = innerKMeans.run(parentview);
-    c = 0;
+    Clustering<M> childClustering = innerKMeans.run(new ProxyView<>(parentCluster.getIDs(), relation));
+    int nc = 0;
     for(It<Cluster<M>> it = childClustering.iterToplevelClusters(); it.valid(); it.advance()) {
-      newCenters[c++] = it.get().getModel().getMean();
+      if(it.get().size() > 0) {
+        newCenters[nc++] = it.get().getModel().getMean();
+      }
     }
-    // evaluation
-    // v = c2 - c1 = 2m
+    if(nc < 2) {
+      return parentClusterList; // one cluster empty.
+    }
+    // Evaluation via v = c2 - c1 = 2m
     double[] v = VMath.minus(newCenters[1], newCenters[0]);
-    double length = VMath.euclideanLength(v);
+    // double ilength = 1. / euclideanLength(v);
     double[] projectedValues = new double[n];
-    for(int i = 0; i < projectedValues.length; i++) {
-      projectedValues[i] = VMath.dot(points[i], v) / length;
+    int i = 0;
+    for(DBIDIter it = parentCluster.getIDs().iter(); it.valid(); it.advance()) {
+      projectedValues[i++] = transposeTimes(relation.get(it).toArray(), v);
     }
-    // transform data to center 0 and var 1
-    normalize(projectedValues, n);
-    // test
     Arrays.sort(projectedValues);
-    double A2 = AndersonDarlingTest.A2StandardNormal(projectedValues);
-    A2 = AndersonDarlingTest.removeBiasNormalDistribution(A2, n);
-    double pValue = 1 - AndersonDarlingTest.calculateQuantileCase4(A2);
+    double A2 = AndersonDarlingTest.A2Noncentral(projectedValues);
+    A2 = AndersonDarlingTest.removeBiasNormalDistribution(A2, projectedValues.length);
+    double pValue = AndersonDarlingTest.pValueCase4(A2);
     if(LOG.isDebugging()) {
-      LOG.debug("AndersonDarlingValue: " + A2);
-      LOG.debug("p-value: " + pValue);
+      LOG.debug("AndersonDarlingValue: " + A2 + " p-value: " + pValue);
     }
     // Check if split is an improvement:
     return pValue > alpha ? parentClusterList : childClustering.getAllClusters();
-  }
-
-  /**
-   * normalizes the values such that mean is 0 and variance is 1
-   */
-  private void normalize(double[] data, int n) {
-    double mean = 0;
-    for(int i = 0; i < data.length; i++) {
-      mean += data[i];
-    }
-    mean /= n;
-    double sig = 0;
-    for(int i = 0; i < data.length; i++) {
-      sig += Math.pow(data[i] - mean, 2);
-    }
-    sig = Math.sqrt(1.0 / (n - 1.0) * sig);
-    for(int i = 0; i < data.length; i++) {
-      data[i] = (data[i] - mean) / sig;
-    }
   }
 
   @Override
@@ -205,8 +168,6 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
    * Parameterization class.
    * 
    * @author Robert Gehde
-   *
-   * @hidden
    *
    * @param <V> Vector type
    * @param <M> Model type of inner algorithm
@@ -226,10 +187,10 @@ public class GMeans<V extends NumberVector, M extends MeanModel> extends XMeans<
     protected void configureInformationCriterion(Parameterization config) {
       // GMeans doesn't need an Information Criterion
       // but the significance level for AD Tests
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.0001) //
+      new DoubleParameter(ALPHA_ID, 0.0001) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
-      alphaP.grab(config, x -> alpha = x);
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE) //
+          .grab(config, x -> alpha = x);
     }
 
     @Override

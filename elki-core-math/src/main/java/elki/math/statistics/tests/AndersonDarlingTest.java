@@ -22,6 +22,7 @@ package elki.math.statistics.tests;
 
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -56,10 +57,9 @@ import net.jafama.FastMath;
  * EDF Statistics for Goodness of Fit and Some Comparisons<br>
  * Journal of the American Statistical Association 69(347)
  * <p>
- * Lorentz Jäntschi and Sorana D. Bolboacă<br>
+ * L. Jäntschi and S. D. Bolboacă<br>
  * Computation of Probability Associated with Anderson–Darling Statistic<br>
  * Mathematics (MDPI, 2018) <br>
- * 
  * 
  * @author Erich Schubert
  * @author Robert Gehde
@@ -70,9 +70,9 @@ import net.jafama.FastMath;
     booktitle = "Annals of mathematical statistics 23(2)", //
     url = "https://doi.org/10.1214/aoms/1177729437", //
     bibkey = "doi:10.1214/aoms/1177729437")
-@Reference(authors = "Jäntschi, Lorentz and Bolboacă, Sorana D.", //
+@Reference(authors = "L. Jäntschi and S. D: Bolboacă", //
     booktitle = "Mathematics", //
-    title = "Computation of Probability Associated with Anderson–Darling Statistic", //
+    title = "Computation of Probability Associated with Anderson-Darling Statistic", //
     url = "https://www.mdpi.com/2227-7390/6/6/88")
 public class AndersonDarlingTest {
   /**
@@ -106,6 +106,9 @@ public class AndersonDarlingTest {
     for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
       final double y = NormalDistribution.standardNormalCDF(sorted[j]);
+      if(x == 0 || x == 1 || y == 0 || y == 1) {
+        return Double.POSITIVE_INFINITY; // extreme outliers
+      }
       final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
       final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
       A2 += i2 * diff1 + j2 * diff2;
@@ -114,9 +117,7 @@ public class AndersonDarlingTest {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
       A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
     }
-    A2 /= l;
-    A2 += l;
-    return -A2;
+    return -l - A2 / l;
   }
 
   /**
@@ -150,6 +151,9 @@ public class AndersonDarlingTest {
     for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
       final double y = NormalDistribution.standardNormalCDF((sorted[j] - m) * isigma);
+      if(x == 0 || x == 1 || y == 0 || y == 1) {
+        return Double.POSITIVE_INFINITY; // extreme outliers
+      }
       final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
       final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
       A2 += i2 * diff1 + j2 * diff2;
@@ -158,9 +162,7 @@ public class AndersonDarlingTest {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
       A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
     }
-    A2 /= l;
-    A2 += l;
-    return -A2;
+    return -l - A2 / l;
   }
 
   /**
@@ -183,7 +185,7 @@ public class AndersonDarlingTest {
 
   /**
    * Calculates the quantile for an Anderson Darling statistic in the case where
-   * both center and variance are unknown
+   * both center and variance are unknown.
    * 
    * @param A2 Anderson Darling statistic
    * @return quantile
@@ -191,33 +193,25 @@ public class AndersonDarlingTest {
   public static double calculateQuantileCase4(double A2) {
     return 1 - pValueCase4(A2);
   }
-  
+
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
-   * both center and variance are unknown
+   * both center and variance are unknown.
    * 
    * @param A2 Anderson Darling statistic
    * @return quantile
    */
-  private static double pValueCase4(double A2) {
-    if(A2 >= 0.6) {
-      return Math.exp(1.2937 - 5.709 * A2 + 0.0186 * A2 * A2);
-    }
-    else if(A2 >= 0.34) {
-      return Math.exp(0.9177 - 4.279 * A2 - 1.38 * A2 * A2);
-    }
-    else if(A2 >= 0.2) {
-      return 1 - Math.exp(-8.318 + 42.796 * A2 - 59.938 * A2 * A2);
-    }
-    else {
-      return 1 - Math.exp(-13.436 - 101.14 * A2 + 223.73 * A2 * A2);
-    }
+  public static double pValueCase4(double A2) {
+    return A2 == Double.POSITIVE_INFINITY ? 1 : //
+        A2 >= 0.6 ? Math.exp(1.2937 - 5.709 * A2 + 0.0186 * A2 * A2) : //
+            A2 >= 0.34 ? Math.exp(0.9177 - 4.279 * A2 - 1.38 * A2 * A2) : //
+                A2 >= 0.2 ? 1 - Math.exp(-8.318 + 42.796 * A2 - 59.938 * A2 * A2) : //
+                    1 - Math.exp(-13.436 - 101.14 * A2 + 223.73 * A2 * A2);
   }
-
 
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
-   * both center and variance are known
+   * both center and variance are known.
    * 
    * @param A2 Anderson Darling statistic
    * @param n sample size
@@ -229,29 +223,24 @@ public class AndersonDarlingTest {
 
   /**
    * Calculates the p-value for an Anderson Darling statistic in the case where
-   * both center and variance are known
+   * both center and variance are known.
    * 
    * @param A2 Anderson Darling statistic
    * @param n sample size
    * @return quantile
    */
-  private static double pValueCase0(double A2, int n) {
-    double x = Math.exp(A2);
-    double[] xpows = { 1, //
-        Math.pow(x, .25), //
-        Math.pow(x, .5), //
-        Math.pow(x, .75), //
-        x };
-    double[] npows = { 1, //
-        Math.pow(n, -1), //
-        Math.pow(n, -2), //
-        Math.pow(n, -3), //
-        Math.pow(n, -4) };
-    double stat = xpows[0] * (5.6737 * npows[0] - 38.9087 * npows[1] + 88.7461 * npows[2] - 179.547 * npows[3] + 199.3247 * npows[4]) //
-        + xpows[1] * (-13.5729 * npows[0] + 83.65 * npows[1] - 181.6768 * npows[2] + 347.6606 * npows[3] - 367.4883 * npows[4]) //
-        + xpows[2] * (12.075 * npows[0] - 70.377 * npows[1] + 139.8035 * npows[2] - 245.6051 * npows[3] + 243.5784 * npows[4]) //
-        + xpows[3] * (-7.319 * npows[0] + 30.4792 * npows[1] - 49.9105 * npows[2] + 76.7476 * npows[3] - 70.1764 * npows[4])//
-        + xpows[4] * (3.7309 * npows[0] - 6.1885 * npows[1] + 7.342 * npows[2] - 9.3021 * npows[3] + 7.7018 * npows[4]);
+  public static double pValueCase0(double A2, int n) {
+    if(A2 == Double.POSITIVE_INFINITY) {
+      return 1;
+    }
+    final double x = Math.exp(A2), sx = Math.sqrt(x), ssx = Math.sqrt(sx);
+    final double npows1 = 1. / n, npows2 = npows1 * npows1,
+        npows3 = npows1 * npows2, npows4 = npows2 * npows2;
+    final double stat = (5.6737 - 38.9087 * npows1 + 88.7461 * npows2 - 179.547 * npows3 + 199.3247 * npows4) //
+        + ssx * (-13.5729 + 83.65 * npows1 - 181.6768 * npows2 + 347.6606 * npows3 - 367.4883 * npows4) //
+        + sx * (12.075 - 70.377 * npows1 + 139.8035 * npows2 - 245.6051 * npows3 + 243.5784 * npows4) //
+        + sx * ssx * (-7.319 + 30.4792 * npows1 - 49.9105 * npows2 + 76.7476 * npows3 - 70.1764 * npows4)//
+        + x * (3.7309 - 6.1885 * npows1 + 7.342 * npows2 - 9.3021 * npows3 + 7.7018 * npows4);
     return 1.0 / stat;
   }
 }
