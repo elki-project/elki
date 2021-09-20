@@ -33,34 +33,30 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
-import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
+import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Outlier detection algorithm using Generalized DBSCAN Clustering.
+ * Outlier detection algorithm using DBSCAN Clustering.
+ * <p>
  * The outlierness score is attributed to each point according to the set to
  * which it is linked: global outliers (noise points), local outliers (border
  * points), and inliers (core points).
- * <p>
  *
  * @author Braulio V.S. Vinces
  * @since 0.7.5
  * 
  * @has - - - GeneralizedDBSCAN
- * 
  */
 @Title("DBSCAN Outlier Detection: Outlier Detection based on the Generalized DBSCAN clustering")
 public class DBSCANOutlierDetection implements OutlierAlgorithm {
@@ -90,7 +86,6 @@ public class DBSCANOutlierDetection implements OutlierAlgorithm {
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     final double noise = 1., border = .5, core = 0.;
-    DoubleMinMax mm = new DoubleMinMax(noise, core);
 
     // Iterate over all clusters:
     List<?> topLevelClusters = c.getToplevelClusters();
@@ -101,33 +96,30 @@ public class DBSCANOutlierDetection implements OutlierAlgorithm {
         for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
           scores.put(iter, noise);
         }
+        continue;
+      }
+      // GeneralizedDBSCAN with core enabled
+      if(cluster.getModel() instanceof CoreObjectsModel) {
+        DBIDs coreObjects = ((CoreObjectsModel) cluster.getModel()).getCoreObjects();
+        for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+          scores.put(iter, border); // core points will be overwritten below:
+        }
+        for(DBIDIter iter = coreObjects.iter(); iter.valid(); iter.advance()) {
+          scores.put(iter, core);
+        }
       }
       else {
-        if(cluster.getModel() instanceof CoreObjectsModel) { // if the cluster has core points
-          DBIDs coreObjects = ((CoreObjectsModel) cluster.getModel()).getCoreObjects();
-          ModifiableDBIDs borderPoints = DBIDUtil.difference(cluster.getIDs(), coreObjects);
-          for(DBIDIter iter = borderPoints.iter(); iter.valid(); iter.advance()) {
-            scores.put(iter, border);
-          }
-          for(DBIDIter iter = coreObjects.iter(); iter.valid(); iter.advance()) {
-            scores.put(iter, core);
-          }
-        }
-        else {
-          for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-            scores.put(iter, core);
-          }
+        for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+          scores.put(iter, core);
         }
       }
     }
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("DBSCAN outlier score", relation.getDBIDs(), scores);
-    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
-    // combine results.
+    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0., 1., 0., 1., 0.);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    // TODO: how to retain the clustering result without losing outlier detection metrics?
-    // Metadata.hierarchyOf(result).addChild(c);
+    Metadata.hierarchyOf(result).addChild(c);
     return result;
   }
 
@@ -149,15 +141,12 @@ public class DBSCANOutlierDetection implements OutlierAlgorithm {
 
     @Override
     public void configure(Parameterization config) {
-      Class<GeneralizedDBSCAN> cls = ClassGenericsUtil.uglyCastIntoSubclass(GeneralizedDBSCAN.class);
-      clusterer = config.tryInstantiate(cls);
+      clusterer = config.tryInstantiate(GeneralizedDBSCAN.class);
     }
 
     @Override
     public DBSCANOutlierDetection make() {
       return new DBSCANOutlierDetection(clusterer);
     }
-
   }
-
 }

@@ -36,9 +36,8 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class DBSCANOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
-
   @Test
-  public void TestDBSCANOutlierDetection() {
+  public void testDBSCANOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection>(DBSCANOutlierDetection.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.04) //
@@ -50,12 +49,12 @@ public class DBSCANOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   }
 
   @Test
-  public void TestDBSCANOutlierDetectionWithCoreObjects() {
+  public void testDBSCANOutlierDetectionWithCoreObjects() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection>(DBSCANOutlierDetection.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.04) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
-        .with(GeneralizedDBSCAN.Par.COREMODEL_ID, true) //
+        .with(GeneralizedDBSCAN.Par.COREMODEL_ID) //
         .build().autorun(db);
     assertAUC(db, "Noise", result, 0.7772);
     assertSingleScore(result, 416, 1.0); // noise point
