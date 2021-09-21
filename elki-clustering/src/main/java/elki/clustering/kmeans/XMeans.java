@@ -24,6 +24,7 @@ import static elki.math.linearalgebra.VMath.normalize;
 import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -98,19 +99,14 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
   private static final Logging LOG = Logging.getLogger(XMeans.class);
 
   /**
-   * Key for statistics logging.
-   */
-  private static final String KEY = XMeans.class.getName();
-
-  /**
    * Inner k-means algorithm.
    */
-  private KMeans<V, M> innerKMeans;
+  protected KMeans<V, M> innerKMeans;
 
   /**
    * Effective number of clusters, minimum and maximum.
    */
-  private int k, k_min, k_max;
+  private int k_min, k_max;
 
   /**
    * Initializer for k-means.
@@ -143,7 +139,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     super(distance, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
-    this.k = k_min;
     this.innerKMeans = innerKMeans;
     this.splitInitializer = new Predefined((double[][]) null);
     this.innerKMeans.setInitializer(this.splitInitializer);
@@ -160,11 +155,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    */
   @Override
   public Clustering<M> run(Relation<V> relation) {
-    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("X-means number of clusters", k_max, LOG) : null;
+    final String key = getClass().getName();
+    MutableProgress prog = LOG.isVerbose() ? new MutableProgress("Number of clusters", k_max, LOG) : null;
 
     // Run initial k-means to find at least k_min clusters
     innerKMeans.setK(k_min);
-    LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
+    LOG.statistics(new StringStatistic(key + ".initialization", initializer.toString()));
     splitInitializer.setInitialMeans(initializer.chooseInitialMeans(relation, k_min, distance));
     Clustering<M> clustering = innerKMeans.run(relation);
 
@@ -194,6 +190,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
         break;
       }
       // Improve-Params:
+      innerKMeans.setInitializer(splitInitializer);
       splitInitializer.setInitialClusters(nextClusters);
       innerKMeans.setK(nextClusters.size());
       clustering = innerKMeans.run(relation);
@@ -206,7 +203,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       prog.setTotal(k);
       prog.setProcessed(k, LOG);
     }
-    LOG.statistics(new LongStatistic(KEY + ".num-clusters", clusters.size()));
+    LOG.statistics(new LongStatistic(key + ".num-clusters", clusters.size()));
     Clustering<M> result = new Clustering<>(clusters);
     Metadata.of(result).setLongName("X-Means Clustering");
     return result;
@@ -221,14 +218,10 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *         clusters when split improves clustering.
    */
   protected List<Cluster<M>> splitCluster(Cluster<M> parentCluster, Relation<V> relation) {
-    // Transform parent cluster into a clustering
-    ArrayList<Cluster<M>> parentClusterList = new ArrayList<>(1);
-    parentClusterList.add(parentCluster);
     if(parentCluster.size() <= 1) {
-      // Split is not possbile
-      return parentClusterList;
+      return Arrays.asList(parentCluster); // too small
     }
-    Clustering<M> parentClustering = new Clustering<>(parentClusterList);
+    Clustering<M> parentClustering = new Clustering<>(Arrays.asList(parentCluster));
     splitInitializer.setInitialMeans(splitCentroid(parentCluster, relation));
     innerKMeans.setK(2);
     Clustering<M> childClustering = innerKMeans.run(new ProxyView<V>(parentCluster.getIDs(), relation));
@@ -242,7 +235,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     // Check if split is an improvement:
-    return informationCriterion.isBetter(parentEvaluation, childrenEvaluation) ? parentClusterList : childClustering.getAllClusters();
+    return informationCriterion.isBetter(parentEvaluation, childrenEvaluation) ? Arrays.asList(parentCluster) : childClustering.getAllClusters();
   }
 
   /**
@@ -338,7 +331,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     /**
      * Random number generator.
      */
-    private RandomFactory random;
+    protected RandomFactory random;
 
     @Override
     public void configure(Parameterization config) {
@@ -359,7 +352,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       getParameterDistance(config);
 
       new RandomParameter(SEED_ID).grab(config, x -> random = x);
-      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, LloydKMeans.class);
+      ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, HamerlyKMeans.class);
       if(config.grab(innerKMeansP)) {
         ChainedParameterization combinedConfig = new ChainedParameterization(new ListParameterization() //
             .addParameter(KMeans.K_ID, k_min) //
@@ -371,8 +364,17 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
                 distance : SquaredEuclideanDistance.STATIC), config);
         combinedConfig.errorsTo(config);
         innerKMeans = innerKMeansP.instantiateClass(combinedConfig);
+        configureInformationCriterion(config);
       }
+    }
 
+    /**
+     * Configure the information criterion option, to allow overriding by
+     * {@link GMeans}.
+     *
+     * @param config Parameterization
+     */
+    protected void configureInformationCriterion(Parameterization config) {
       new ObjectParameter<KMeansQualityMeasure<V>>(INFORMATION_CRITERION_ID, KMeansQualityMeasure.class, BayesianInformationCriterionXMeans.class) //
           .grab(config, x -> informationCriterion = x);
     }

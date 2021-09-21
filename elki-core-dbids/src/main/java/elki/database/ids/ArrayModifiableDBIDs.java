@@ -56,11 +56,19 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
   ArrayModifiableDBIDs clear();
 
   /**
-   * Remove the i'th entry (starting at 0)
+   * Remove the entry at position i by shifting the remainder forward.
    *
    * @param i Index
    */
   void remove(int i);
+
+  /**
+   * Remove the entry at position i by swapping with the last (not preserving
+   * the order).
+   *
+   * @param i Entry offset to remove
+   */
+  void removeSwap(int i);
 
   /**
    * Replace the i'th entry (starting at 0)

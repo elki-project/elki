@@ -2,6 +2,7 @@ elki.visualization.projector.HistogramFactory
 elki.visualization.projector.ScatterPlotFactory
 elki.visualization.projector.ParallelPlotFactory
 elki.visualization.projector.OPTICSProjectorFactory
+elki.visualization.projector.SilhouettePlotFactory
 elki.visualization.visualizers.actions.ClusterStyleAction
 elki.visualization.visualizers.scatterplot.AxisVisualization
 elki.visualization.visualizers.scatterplot.MarkerVisualization
@@ -31,6 +32,9 @@ elki.visualization.visualizers.scatterplot.selection.SelectionToolDotVisualizati
 elki.visualization.visualizers.scatterplot.uncertain.UncertainBoundingBoxVisualization
 elki.visualization.visualizers.scatterplot.uncertain.UncertainSamplesVisualization
 elki.visualization.visualizers.scatterplot.uncertain.UncertainInstancesVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotSelectionToolVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotSelectionVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotVisualizer
 elki.visualization.visualizers.histogram.ColoredHistogramVisualizer
 elki.visualization.visualizers.parallel.LineVisualization
 elki.visualization.visualizers.parallel.BoundingBoxVisualization

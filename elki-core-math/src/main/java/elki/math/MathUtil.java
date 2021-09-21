@@ -175,6 +175,11 @@ public final class MathUtil {
   public static final double RAD2DEG = 180 / Math.PI;
 
   /**
+   * Euler–Mascheroni constant.
+   */
+  public static final double EULERMASCHERONI = 0.577215664901532;
+
+  /**
    * Fake constructor for static class.
    */
   private MathUtil() {

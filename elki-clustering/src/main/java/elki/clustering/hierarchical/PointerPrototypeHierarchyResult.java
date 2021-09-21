@@ -84,6 +84,9 @@ public class PointerPrototypeHierarchyResult extends PointerHierarchyResult {
    * @return The prototype of the cluster
    */
   public DBID findPrototype(DBIDs members) {
+    if(members.size() == 1) {
+      return DBIDUtil.deref(members.iter());
+    }
     // Find the last merge within the cluster.
     // The object with maximum priority will merge outside of the cluster,
     // So we need the second largest priority.

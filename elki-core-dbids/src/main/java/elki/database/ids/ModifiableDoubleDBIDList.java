@@ -57,6 +57,13 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
   ModifiableDoubleDBIDList sort();
 
   /**
+   * Sort the result in descending order
+   * 
+   * @return this
+   */
+  ModifiableDoubleDBIDList sortDescending();
+
+  /**
    * Swap to entries in the list.
    *
    * @param i First entry
