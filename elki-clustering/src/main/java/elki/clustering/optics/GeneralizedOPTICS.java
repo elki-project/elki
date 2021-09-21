@@ -125,7 +125,7 @@ public abstract interface GeneralizedOPTICS extends OPTICSTypeAlgorithm {
           int last = candidates.size() - 1;
           QuickSelectDBIDs.quickSelect(candidates, this, last);
           candidates.assignVar(last, cur);
-          candidates.remove(last);
+          candidates.removeSwap(last);
           processedIDs.add(cur);
 
           expandDBID(cur);

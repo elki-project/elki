@@ -56,3 +56,6 @@ elki.visualization.visualizers.optics.OPTICSPlotCutVisualization
 elki.visualization.visualizers.optics.OPTICSPlotSelectionVisualization
 elki.visualization.visualizers.optics.OPTICSPlotVisualizer
 elki.visualization.visualizers.optics.OPTICSSteepAreaVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotSelectionToolVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotSelectionVisualization
+elki.visualization.visualizers.silhouette.SilhouettePlotVisualizer

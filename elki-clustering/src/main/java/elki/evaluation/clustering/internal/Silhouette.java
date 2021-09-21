@@ -25,9 +25,12 @@ import java.util.List;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -43,8 +46,8 @@ import elki.result.Metadata;
 import elki.result.ResultUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -82,6 +85,11 @@ public class Silhouette<O> implements Evaluator {
   private static final Logging LOG = Logging.getLogger(Silhouette.class);
 
   /**
+   * Name of the silhouette result.
+   */
+  public static final String SILHOUETTE_NAME = "Silhouette scores";
+
+  /**
    * Distance function to use.
    */
   private Distance<? super O> distance;
@@ -94,12 +102,12 @@ public class Silhouette<O> implements Evaluator {
   /**
    * Penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  private boolean penalize = true;
+  private boolean penalize;
 
   /**
    * Key for logging statistics.
    */
-  private String key = Silhouette.class.getName();
+  private static final String key = Silhouette.class.getName();
 
   /**
    * Constructor.
@@ -138,6 +146,8 @@ public class Silhouette<O> implements Evaluator {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
+    // Store values for the Silhouette plot
+    WritableDoubleDataStore silhouettes = DataStoreFactory.FACTORY.makeDoubleStorage(rel.getDBIDs(), DataStoreFactory.HINT_DB);
     for(Cluster<?> cluster : clusters) {
       // Note: we treat 1-element clusters the same as noise.
       if(cluster.size() <= 1 || cluster.isNoise()) {
@@ -148,6 +158,9 @@ public class Silhouette<O> implements Evaluator {
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
           msil.put(0., cluster.size());
+          for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+            silhouettes.putDouble(it, 0);
+          }
           continue;
         case MERGE_NOISE:
           break; // Treat as cluster below
@@ -194,9 +207,10 @@ public class Silhouette<O> implements Evaluator {
           btmp /= oids.size(); // Average
           b = btmp < b ? btmp : b; // Minimum average
         }
-        // One cluster only?
-        b = b < Double.POSITIVE_INFINITY ? b : a;
-        msil.put((b - a) / (b > a ? b : a));
+        // One cluster only? Then use 0.
+        final double s = b < Double.POSITIVE_INFINITY ? (b - a) / (b > a ? b : a) : 0;
+        msil.put(s);
+        silhouettes.putDouble(it1, s);
       }
     }
     double penalty = 1.;
@@ -221,6 +235,7 @@ public class Silhouette<O> implements Evaluator {
     if(!Metadata.hierarchyOf(c).addChild(ev)) {
       Metadata.of(ev).notifyChanged();
     }
+    Metadata.hierarchyOf(c).addChild(new MaterializedDoubleRelation(SILHOUETTE_NAME, rel.getDBIDs(), silhouettes));
     return meansil;
   }
 

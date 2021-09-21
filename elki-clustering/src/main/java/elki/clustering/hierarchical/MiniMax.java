@@ -229,7 +229,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
     clusters.put(y, cy);
 
     // parent of x is set to y
-    builder.add(ix, distances[offset], iy, prots.seek(offset));
+    builder.strictAdd(ix, distances[offset], iy, prots.seek(offset));
 
     updateMatrices(size, mat, prots, builder, clusters, dq, y);
   }
