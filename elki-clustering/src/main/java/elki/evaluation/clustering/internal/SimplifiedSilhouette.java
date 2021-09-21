@@ -27,7 +27,10 @@ import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.ModelUtil;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
+import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
@@ -114,6 +117,7 @@ public class SimplifiedSilhouette implements Evaluator {
     int ignorednoise = centroids(rel, clusters, centroids, noiseOption);
 
     MeanVariance mssil = new MeanVariance();
+    WritableDoubleDataStore silhouettes = DataStoreFactory.FACTORY.makeDoubleStorage(rel.getDBIDs(), DataStoreFactory.HINT_DB);
 
     Iterator<? extends Cluster<?>> ci = clusters.iterator();
     for(int i = 0; ci.hasNext(); i++) {
@@ -121,6 +125,9 @@ public class SimplifiedSilhouette implements Evaluator {
       if(cluster.size() <= 1) {
         // As suggested in Rousseeuw, we use 0 for singletons.
         mssil.put(0., cluster.size());
+        for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+          silhouettes.putDouble(it, 0);
+        }
         continue;
       }
       if(cluster.isNoise()) {
@@ -130,6 +137,9 @@ public class SimplifiedSilhouette implements Evaluator {
         case TREAT_NOISE_AS_SINGLETONS:
           // As suggested in Rousseeuw, we use 0 for singletons.
           mssil.put(0., cluster.size());
+          for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+            silhouettes.putDouble(it, 0);
+          }
           continue;
         case MERGE_NOISE:
           break; // Treat as cluster below
@@ -175,7 +185,10 @@ public class SimplifiedSilhouette implements Evaluator {
 
         // One 'real' cluster only?
         min = min < Double.POSITIVE_INFINITY ? min : a;
-        mssil.put((min - a) / (min > a ? min : a));
+
+        double s = (min - a) / (min > a ? min : a);
+        mssil.put(s);
+        silhouettes.putDouble(it, s);
       }
     }
 
@@ -201,6 +214,7 @@ public class SimplifiedSilhouette implements Evaluator {
     if(!Metadata.hierarchyOf(c).addChild(ev)) {
       Metadata.of(ev).notifyChanged();
     }
+    Metadata.hierarchyOf(c).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, rel.getDBIDs(), silhouettes));
     return meanssil;
   }
 

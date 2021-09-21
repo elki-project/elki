@@ -1,3 +1,4 @@
+elki.outlier.clustering.DBSCANOutlierDetection
 elki.outlier.clustering.CBLOF
 elki.outlier.clustering.EMOutlier
 elki.outlier.clustering.KMeansOutlierDetection
