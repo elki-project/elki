@@ -33,6 +33,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,7 +43,19 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
- * Hierarchical Agglomerative Clustering Around Medoids.
+ * Hierarchical Agglomerative Clustering Around Medoids (HACAM) is a
+ * hierarchical clustering method that merges the clusters with the smallest
+ * distance to the medoid of the union. This is different from the earlier
+ * {@link MedoidLinkage}, which used the distance of the two previous medoids.
+ * <p>
+ * The implementation incorporates the approach of Anderson for acceleration.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert<br>
+ * HACAM: Hierarchical Agglomerative Clustering Around Medoids
+ * - and its Limitations<br>
+ * Proceedings of the Conference "Lernen, Wissen, Daten, Analysen", LWDA
  *
  * @author Erich Schubert
  *
@@ -50,6 +63,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  *
  * @param <O> Object type
  */
+@Reference(authors = "Erich Schubert", //
+    title = "HACAM: Hierarchical Agglomerative Clustering Around Medoids - and its Limitations", //
+    booktitle = "Proc. Conf. \"Lernen, Wissen, Daten, Analysen\", LWDA", //
+    bibkey = "DBLP:conf/lwa/Schubert21")
 public class HACAM<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
