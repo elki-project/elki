@@ -25,9 +25,9 @@ import elki.data.NumberVector;
 
 /**
  * Distance function for BIRCH clustering.
- *
+ * <p>
  * For performance we (usually) use squared distances.
- *
+ * <p>
  * The exception to this rule is Manhattan.
  *
  * @author Erich Schubert

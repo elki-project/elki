@@ -35,7 +35,6 @@ import elki.utilities.optionhandling.Parameterizer;
  * Doctoral Dissertation, 1997.
  *
  * @author Andreas Lang
- *
  */
 @Alias({ "D2" })
 @Reference(authors = "T. Zhang", //
@@ -52,29 +51,26 @@ public class AverageInterclusterDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf) {
     final int dim = nv.getDimensionality();
-    assert (dim == cf.getDimensionality());
+    assert dim == cf.getDimensionality();
     double sum = 0;
-    double div = 1. / cf.n;
     for(int d = 0; d < dim; d++) {
-      double delta = cf.centroid(d) - nv.doubleValue(d);
-      sum += (delta * delta);
+      final double delta = cf.centroid(d) - nv.doubleValue(d);
+      sum += delta * delta;
     }
-    sum += div * cf.ssd;
+    sum += cf.ssd / cf.n;
     return sum > 0 ? sum : 0;
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
-    assert (dim == cf2.getDimensionality());
-    double div1 = 1. / cf1.n;
-    double div2 = 1. / cf2.n;
+    assert dim == cf2.getDimensionality();
     double sum = 0;
     for(int d = 0; d < dim; d++) {
-      double delta = cf1.centroid(d) - cf2.centroid(d);
-      sum += (delta * delta);
+      final double delta = cf1.centroid(d) - cf2.centroid(d);
+      sum += delta * delta;
     }
-    sum += div1 * cf1.ssd + div2 * cf2.ssd;
+    sum += cf1.ssd / cf1.n + cf2.ssd / cf2.n;
     return sum > 0 ? sum : 0;
   }
 

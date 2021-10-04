@@ -32,7 +32,7 @@ public class EuclideanDistance implements CFIDistance {
   @Override
   public double squaredDistance(NumberVector v, CFInterface cf) {
     final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
+    assert d == cf.getDimensionality();
     double sum = 0.;
     for(int i = 0; i < d; i++) {
       double dx = cf.centroid(i) - v.doubleValue(i);
@@ -44,7 +44,7 @@ public class EuclideanDistance implements CFIDistance {
   @Override
   public double squaredDistance(double[] v, CFInterface cf) {
     final int d = v.length;
-    assert (d == cf.getDimensionality());
+    assert d == cf.getDimensionality();
     double sum = 0.;
     for(int i = 0; i < d; i++) {
       double dx = cf.centroid(i) - v[i];

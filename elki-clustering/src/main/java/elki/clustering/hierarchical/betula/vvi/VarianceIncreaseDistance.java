@@ -35,7 +35,6 @@ import elki.utilities.optionhandling.Parameterizer;
  * Doctoral Dissertation, 1997.
  *
  * @author Andreas Lang
- *
  */
 @Alias({ "D4" })
 @Reference(authors = "T. Zhang", //
@@ -52,23 +51,25 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf) {
     final int dim = nv.getDimensionality();
-    assert (dim == cf.getDimensionality());
+    assert dim == cf.getDimensionality();
     double sum = 0.;
     for(int i = 0; i < dim; i++) {
-      sum += (cf.centroid(i) - nv.doubleValue(i)) * (cf.centroid(i) - nv.doubleValue(i)) * (cf.n) / (cf.n + 1);
+      final double delta = cf.centroid(i) - nv.doubleValue(i);
+      sum += delta * delta;
     }
-    return sum > 0 ? sum : 0;
+    return sum > 0 ? sum * cf.n / (cf.n + 1) : 0;
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
-    assert (dim == cf2.getDimensionality());
+    assert dim == cf2.getDimensionality();
     double sum = 0.;
     for(int i = 0; i < dim; i++) {
-      sum += (cf1.centroid(i) - cf2.centroid(i)) * (cf1.centroid(i) - cf2.centroid(i)) * (cf1.n * cf2.n) / (cf1.n + cf2.n);
+      final double delta = cf1.centroid(i) - cf2.centroid(i);
+      sum += delta * delta;
     }
-    return sum > 0 ? sum : 0;
+    return sum > 0 ? sum * (cf1.n * cf2.n) / (cf1.n + cf2.n) : 0;
   }
 
   /**

@@ -52,7 +52,7 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(NumberVector v, ClusteringFeature cf) {
     final int dim = v.getDimensionality();
-    assert (dim == cf.getDimensionality());
+    assert dim == cf.getDimensionality();
     final int n2 = cf.n, n3 = 1 + n2;
     final double div2 = 1. / n2, div3 = 1. / n3;
     double dot1 = 0., dot2 = 0., dot3 = 0.;
@@ -72,7 +72,7 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
-    assert (dim == cf2.getDimensionality());
+    assert dim == cf2.getDimensionality();
     final int n1 = cf1.n, n2 = cf2.n, n3 = n1 + n2;
     final double div1 = 1. / n1, div2 = 1. / n2, div3 = 1. / n3;
     double dot1 = 0., dot2 = 0., dot3 = 0.;

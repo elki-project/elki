@@ -37,7 +37,6 @@ import elki.utilities.optionhandling.Parameterizer;
  * Note: this distance did not work well in the original work, apparently.
  *
  * @author Andreas Lang
- *
  */
 @Alias({ "D3" })
 @Reference(authors = "T. Zhang", //
@@ -56,28 +55,26 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
     if(cf1.n <= 0) {
       return 0.;
     }
-    double diameter = 0.;
-    double deltas = 0.;
-    double n = cf1.n + 1.;
+    double diameter = 0., sum = 0.;
     for(int i = 0; i < nv.getDimensionality(); i++) {
       double delta = cf1.centroid(i) - nv.doubleValue(i);
       diameter += cf1.ssd[i][i];
-      deltas += delta * delta;
+      sum += delta * delta;
     }
-    diameter = n * diameter + cf1.n * deltas;
-    return diameter > 0 ? (2 * diameter) / (n * (n - 1.)) : 0.;
+    final double n = cf1.n + 1.;
+    diameter = n * diameter + cf1.n * sum;
+    return diameter > 0 ? (2 * diameter) / (n * cf1.n) : 0.;
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    double n12 = cf1.n + cf2.n;
+    final double n12 = cf1.n + cf2.n;
     if(n12 <= 0) {
       return 0.;
     }
-    double diameter = 0.;
-    double deltas = 0.;
+    double diameter = 0., deltas = 0.;
     for(int i = 0; i < cf1.getDimensionality(); i++) {
-      double delta = cf1.centroid(i) - cf2.centroid(i);
+      final double delta = cf1.centroid(i) - cf2.centroid(i);
       diameter += cf1.ssd[i][i] + cf2.ssd[i][i];
       deltas += delta * delta;
     }

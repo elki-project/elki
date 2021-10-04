@@ -35,7 +35,6 @@ import elki.utilities.optionhandling.Parameterizer;
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  *
  * @author Andreas Lang
- *
  */
 @Alias("R")
 @Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
@@ -54,29 +53,27 @@ public class RadiusDistance implements BIRCHDistance {
     if(cf1.n <= 0) {
       return 0.;
     }
-    final int dim = cf1.ssd.length;
-    final double div = 1. / (cf1.n + 1.);
     double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      sum += cf1.ssd[i] + cf1.n / (cf1.n + 1.) * ((cf1.centroid(i) - nv.doubleValue(i)) * (cf1.centroid(i) - nv.doubleValue(i)));
+    for(int i = 0, dim = cf1.ssd.length; i < dim; i++) {
+      final double delta = cf1.centroid(i) - nv.doubleValue(i);
+      sum += cf1.ssd[i] + cf1.n / (cf1.n + 1.) * (delta * delta);
     }
-    return sum > 0 ? sum * div : 0.;
+    return sum > 0 ? sum / (cf1.n + 1.) : 0.;
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final double n12 = cf1.n + cf2.n;
+    final double n1 = cf1.n, n2 = cf2.n, n12 = n1 + n2;
     if(n12 <= 1) {
       return 0.;
     }
-    final double n1 = cf1.n, n2 = cf2.n;
-    final int dim = cf1.ssd.length;
-    final double div = 1. / (n12);
+    final double f12 = (n1 * n2) / n12;
     double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      sum += cf1.ssd[i] + cf2.ssd[i] + (n1 * n2) / (n12) * ((cf1.centroid(i) - cf2.centroid(i)) * (cf1.centroid(i) - cf2.centroid(i)));
+    for(int i = 0, dim = cf1.ssd.length; i < dim; i++) {
+      final double delta = cf1.centroid(i) - cf2.centroid(i);
+      sum += cf1.ssd[i] + cf2.ssd[i] + f12 * (delta * delta);
     }
-    return sum > 0 ? sum * div : 0.;
+    return sum > 0 ? sum / n12 : 0.;
   }
 
   /**

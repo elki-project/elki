@@ -37,7 +37,6 @@ import elki.utilities.optionhandling.Parameterizer;
  * Note: this distance did not work well in the original work, apparently.
  *
  * @author Andreas Lang
- *
  */
 @Alias({ "D3" })
 @Reference(authors = "T. Zhang", //
@@ -56,15 +55,14 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
     if(cf1.n <= 0) {
       return 0.;
     }
-    double diameter = 0.;
-    double deltas = 0.;
-    double n = cf1.n + 1.;
+    double sum = 0.;
     for(int i = 0; i < nv.getDimensionality(); i++) {
-      double delta = cf1.centroid(i) - nv.doubleValue(i);
-      deltas += delta * delta;
+      final double delta = cf1.centroid(i) - nv.doubleValue(i);
+      sum += delta * delta;
     }
-    diameter = n * cf1.ssd + cf1.n * deltas;
-    return diameter > 0 ? (2 * diameter) / (n * (n - 1.)) : 0.;
+    final double n = cf1.n + 1.;
+    double diameter = n * cf1.ssd + cf1.n * sum;
+    return diameter > 0 ? (2 * diameter) / (n * cf1.n) : 0.;
   }
 
   @Override
@@ -73,19 +71,18 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
     if(n12 <= 0) {
       return 0.;
     }
-    double diameter = 0.;
-    double deltas = 0.;
+    double sum = 0.;
     for(int i = 0; i < cf1.getDimensionality(); i++) {
       double delta = cf1.centroid(i) - cf2.centroid(i);
-      deltas += delta * delta;
+      sum += delta * delta;
     }
-    diameter = n12 * (cf1.ssd + cf2.ssd) + cf1.n * cf2.n * deltas;
+    double diameter = n12 * (cf1.ssd + cf2.ssd) + cf1.n * cf2.n * sum;
     return diameter > 0 ? (2 * diameter) / (n12 * (n12 - 1.)) : 0.;
   }
 
   @Override
   public double matSelfInit(ClusteringFeature cf) {
-    return (2 * cf.sumOfSquaredDev()) / (cf.n - 1);
+    return 2 * cf.sumOfSquaredDev() / (cf.n - 1);
   }
 
   /**

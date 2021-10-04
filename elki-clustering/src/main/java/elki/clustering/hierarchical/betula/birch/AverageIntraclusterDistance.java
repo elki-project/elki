@@ -54,7 +54,7 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(NumberVector v, ClusteringFeature cf) {
     final int dim = v.getDimensionality();
-    assert (dim == cf.getDimensionality());
+    assert dim == cf.getDimensionality();
     final double div1 = 1. / (1 + cf.n), div2 = 1. / cf.n;
     double sum = (cf.sumOfSumOfSquares() + ClusteringFeature.sumOfSquares(v)) * div2;
     for(int d = 0; d < dim; d++) {
@@ -67,7 +67,7 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
-    assert (dim == cf2.getDimensionality());
+    assert dim == cf2.getDimensionality();
     final int n12 = cf1.n + cf2.n;
     final double div1 = 1. / n12, div2 = 1. / (n12 - 1);
     double sum = (cf1.sumOfSumOfSquares() + cf2.sumOfSumOfSquares()) * div2;
