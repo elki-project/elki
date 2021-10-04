@@ -50,26 +50,12 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf) {
-    final int dim = nv.getDimensionality();
-    assert dim == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      final double delta = cf.centroid(i) - nv.doubleValue(i);
-      sum += delta * delta;
-    }
-    return sum > 0 ? sum * cf.n / (cf.n + 1) : 0;
+    return cf.squaredCenterDistance(nv) * cf.n / (cf.n + 1);
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final int dim = cf1.getDimensionality();
-    assert dim == cf2.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      final double delta = cf1.centroid(i) - cf2.centroid(i);
-      sum += delta * delta;
-    }
-    return sum > 0 ? sum * (cf1.n * cf2.n) / (cf1.n + cf2.n) : 0;
+    return cf1.squaredCenterDistance(cf2) * cf1.n * cf2.n / (cf1.n + cf2.n);
   }
 
   /**

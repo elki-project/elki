@@ -30,7 +30,6 @@ import elki.data.NumberVector;
  * feature
  * 
  * @author Andreas Lang
- * 
  */
 public class ClusteringFeature implements CFInterface {
   /**
@@ -158,4 +157,45 @@ public class ClusteringFeature implements CFInterface {
     return n;
   }
 
+  @Override
+  public double squaredCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - v.doubleValue(d);
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double squaredCenterDistance(CFInterface other) {
+    double[] omean = ((ClusteringFeature) other).mean;
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - omean[d];
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - v.doubleValue(d);
+      sum += Math.abs(delta);
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(CFInterface other) {
+    double[] omean = ((ClusteringFeature) other).mean;
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - omean[d];
+      sum += Math.abs(delta);
+    }
+    return sum;
+  }
 }

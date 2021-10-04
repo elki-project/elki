@@ -640,7 +640,7 @@ public class CFTree<L extends CFInterface> {
    * @param d Depth
    * @return Output buffer
    */
-  protected StringBuilder printDebug(StringBuilder buf, CFInterface n, int d) {
+  protected static StringBuilder printDebug(StringBuilder buf, CFInterface n, int d) {
     FormatUtil.appendSpace(buf, d).append(n.getWeight());
     for(int i = 0; i < n.getDimensionality(); i++) {
       buf.append(' ').append(n.centroid(i));

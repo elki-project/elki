@@ -51,26 +51,12 @@ public class CentroidManhattanDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double delta = cf.centroid(i) - v.doubleValue(i);
-      sum += Math.abs(delta);
-    }
-    return sum;
+    return cf.absoluteCenterDistance(v);
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double delta = cf.centroid(i) - v.centroid(i);
-      sum += Math.abs(delta);
-    }
-    return sum;
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    return cf1.absoluteCenterDistance(cf2);
   }
 
   /**

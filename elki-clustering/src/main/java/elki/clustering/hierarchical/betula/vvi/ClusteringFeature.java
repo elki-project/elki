@@ -29,7 +29,6 @@ import elki.data.NumberVector;
  * Clustering Feature of stable BIRCH with variance per dimension
  * 
  * @author Andreas Lang
- * 
  */
 public class ClusteringFeature implements CFInterface {
   /**
@@ -82,7 +81,6 @@ public class ClusteringFeature implements CFInterface {
   @Override
   public void addToStatistics(CFInterface other) {
     addToStatistics((ClusteringFeature) other);
-
   }
 
   // @Override
@@ -163,5 +161,47 @@ public class ClusteringFeature implements CFInterface {
   @Override
   public int getWeight() {
     return n;
+  }
+
+  @Override
+  public double squaredCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - v.doubleValue(d);
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double squaredCenterDistance(CFInterface other) {
+    double[] omean = ((ClusteringFeature) other).mean;
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - omean[d];
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - v.doubleValue(d);
+      sum += Math.abs(delta);
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(CFInterface other) {
+    double[] omean = ((ClusteringFeature) other).mean;
+    double sum = 0;
+    for(int d = 0, dim = mean.length; d < dim; d++) {
+      final double delta = mean[d] - omean[d];
+      sum += Math.abs(delta);
+    }
+    return sum;
   }
 }

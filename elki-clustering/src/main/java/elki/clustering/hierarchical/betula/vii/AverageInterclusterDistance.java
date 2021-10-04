@@ -50,28 +50,12 @@ public class AverageInterclusterDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf) {
-    final int dim = nv.getDimensionality();
-    assert dim == cf.getDimensionality();
-    double sum = 0;
-    for(int d = 0; d < dim; d++) {
-      final double delta = cf.centroid(d) - nv.doubleValue(d);
-      sum += delta * delta;
-    }
-    sum += cf.ssd / cf.n;
-    return sum > 0 ? sum : 0;
+    return cf.sumdev() / cf.n + cf.squaredCenterDistance(nv);
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final int dim = cf1.getDimensionality();
-    assert dim == cf2.getDimensionality();
-    double sum = 0;
-    for(int d = 0; d < dim; d++) {
-      final double delta = cf1.centroid(d) - cf2.centroid(d);
-      sum += delta * delta;
-    }
-    sum += cf1.ssd / cf1.n + cf2.ssd / cf2.n;
-    return sum > 0 ? sum : 0;
+    return cf1.sumdev() / cf1.n + cf2.sumdev() / cf2.n + cf1.squaredCenterDistance(cf2);
   }
 
   /**

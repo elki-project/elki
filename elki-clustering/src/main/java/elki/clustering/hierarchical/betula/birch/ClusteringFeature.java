@@ -60,10 +60,10 @@ public class ClusteringFeature implements CFInterface {
   @Override
   public void addToStatistics(NumberVector nv) {
     final int d = nv.getDimensionality();
-    assert (d == ls.length);
+    assert d == ls.length;
     this.n++;
     for(int i = 0; i < d; i++) {
-      double v = nv.doubleValue(i);
+      final double v = nv.doubleValue(i);
       ls[i] += v;
       ss += v * v;
     }
@@ -110,7 +110,7 @@ public class ClusteringFeature implements CFInterface {
   public double sumOfSquaresOfSums() {
     double sum = 0.;
     for(int i = 0; i < ls.length; i++) {
-      double v = ls[i];
+      final double v = ls[i];
       sum += v * v;
     }
     return sum;
@@ -131,7 +131,7 @@ public class ClusteringFeature implements CFInterface {
     final int dim = v.getDimensionality();
     double sum = 0;
     for(int d = 0; d < dim; d++) {
-      double x = v.doubleValue(d);
+      final double x = v.doubleValue(d);
       sum += x * x;
     }
     return sum;
@@ -139,13 +139,8 @@ public class ClusteringFeature implements CFInterface {
 
   @Override
   public double variance(int i) {
-    int dim = ls.length;
-    double v = (1. / n) * ss;
-    for(int d = 0; d < ls.length; d++) {
-      v -= (ls[d] / n) * (ls[d] / n);
-    }
-    double var = 1. / dim * v;
-    return var >= 0. ? var : 0.;
+    double v = variance();
+    return v >= 0. ? v / ls.length : 0.;
   }
 
   @Override
@@ -155,24 +150,70 @@ public class ClusteringFeature implements CFInterface {
 
   @Override
   public double variance() {
-    double v = (1. / n) * ss;
+    double v = ss / n;
     for(int d = 0; d < ls.length; d++) {
-      v -= (ls[d] / n) * (ls[d] / n);
+      final double s = ls[d] / n;
+      v -= s * s;
+    }
+    return v >= 0. ? v : 0;
+  }
+
+  @Override
+  public double sumdev() {
+    double v = ss;
+    for(int d = 0; d < ls.length; d++) {
+      final double s = ls[d];
+      v -= s * s / n;
     }
     return v;
   }
 
   @Override
-  public double sumdev() {
-    double v = (1. / n) * ss;
-    for(int d = 0; d < ls.length; d++) {
-      v -= (ls[d] / n) * (ls[d] / n);
-    }
-    return v * n;
+  public double[][] covariance() {
+    throw new IllegalStateException("This CF Model doesn't support this method.");
   }
 
   @Override
-  public double[][] covariance() {
-    throw new IllegalStateException("This CF Model doesn't support this method.");
+  public double squaredCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = ls.length; d < dim; d++) {
+      final double delta = ls[d] / n - v.doubleValue(d);
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double squaredCenterDistance(CFInterface other) {
+    double[] ols = ((ClusteringFeature) other).ls;
+    int on = other.getWeight();
+    double sum = 0;
+    for(int d = 0, dim = ls.length; d < dim; d++) {
+      final double delta = ls[d] / n - ols[d] / on;
+      sum += delta * delta;
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(NumberVector v) {
+    double sum = 0;
+    for(int d = 0, dim = ls.length; d < dim; d++) {
+      final double delta = ls[d] / n - v.doubleValue(d);
+      sum += Math.abs(delta);
+    }
+    return sum;
+  }
+
+  @Override
+  public double absoluteCenterDistance(CFInterface other) {
+    double[] ols = ((ClusteringFeature) other).ls;
+    int on = other.getWeight();
+    double sum = 0;
+    for(int d = 0, dim = ls.length; d < dim; d++) {
+      final double delta = ls[d] / n - ols[d] / on;
+      sum += Math.abs(delta);
+    }
+    return sum;
   }
 }

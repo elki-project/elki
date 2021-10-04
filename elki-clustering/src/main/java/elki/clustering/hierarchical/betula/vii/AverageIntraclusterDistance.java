@@ -52,32 +52,15 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf1) {
-    if(cf1.n <= 0) {
-      return 0.;
-    }
-    double sum = 0.;
-    for(int i = 0; i < nv.getDimensionality(); i++) {
-      final double delta = cf1.centroid(i) - nv.doubleValue(i);
-      sum += delta * delta;
-    }
-    final double n = cf1.n + 1.;
-    double diameter = n * cf1.ssd + cf1.n * sum;
-    return diameter > 0 ? (2 * diameter) / (n * cf1.n) : 0.;
+    return cf1.n <= 0 ? 0 : //
+        2 * ((cf1.n + 1) * cf1.sumdev() + cf1.n * cf1.squaredCenterDistance(nv)) / ((cf1.n + 1) * cf1.n);
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    double n12 = cf1.n + cf2.n;
-    if(n12 <= 0) {
-      return 0.;
-    }
-    double sum = 0.;
-    for(int i = 0; i < cf1.getDimensionality(); i++) {
-      double delta = cf1.centroid(i) - cf2.centroid(i);
-      sum += delta * delta;
-    }
-    double diameter = n12 * (cf1.ssd + cf2.ssd) + cf1.n * cf2.n * sum;
-    return diameter > 0 ? (2 * diameter) / (n12 * (n12 - 1.)) : 0.;
+    final double n12 = cf1.n + cf2.n;
+    return n12 <= 0 ? 0 : //
+        2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.n * cf2.n * cf1.squaredCenterDistance(cf2)) / (n12 * (n12 - 1));
   }
 
   @Override

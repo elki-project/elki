@@ -26,7 +26,6 @@ package elki.clustering.hierarchical.betula;
  * @author Andreas Lang
  * 
  * @param <L> CF Model
- * @param <N> TreeNode Model
  */
 public interface CFModel<L extends CFInterface> {
   /**

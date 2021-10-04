@@ -97,4 +97,36 @@ public interface CFInterface {
    * @return covariance
    */
   double[][] covariance();
+
+  /**
+   * Squared distance of the centers.
+   *
+   * @param v Vector
+   * @return sum of squared deviations from the center
+   */
+  double squaredCenterDistance(NumberVector v);
+
+  /**
+   * Squared distance of the centers.
+   *
+   * @param other Other clustering feature
+   * @return sum of squared deviations from the center
+   */
+  double squaredCenterDistance(CFInterface other);
+
+  /**
+   * Absolute distance of the centers.
+   *
+   * @param v Vector
+   * @return sum of squared deviations from the center
+   */
+  double absoluteCenterDistance(NumberVector v);
+
+  /**
+   * Absolute distance of the centers.
+   *
+   * @param other Other clustering feature
+   * @return sum of squared deviations from the center
+   */
+  double absoluteCenterDistance(CFInterface other);
 }

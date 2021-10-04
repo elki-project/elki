@@ -50,33 +50,15 @@ public class RadiusDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector nv, ClusteringFeature cf1) {
-    if(cf1.n <= 0) {
-      return 0.;
-    }
-    final int dim = cf1.ssd.length;
-    final double f1 = cf1.n / (cf1.n + 1.);
-    double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      final double delta = cf1.centroid(i) - nv.doubleValue(i);
-      sum += cf1.ssd[i][i] + f1 * delta * delta;
-    }
-    return sum > 0 ? sum / (cf1.n + 1.) : 0.;
+    return cf1.n <= 0 ? 0 : //
+        (cf1.n / (cf1.n + 1.) * cf1.squaredCenterDistance(nv) + cf1.sumdev()) / (cf1.n + 1.);
   }
 
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final double n1 = cf1.n, n2 = cf2.n, n12 = n1 + n2;
-    if(n12 <= 1) {
-      return 0.;
-    }
-    final double f12 = (n1 * n2) / n12;
-    final int dim = cf1.ssd.length;
-    double sum = 0.;
-    for(int i = 0; i < dim; i++) {
-      final double delta = cf1.centroid(i) - cf2.centroid(i);
-      sum += cf1.ssd[i][i] + cf2.ssd[i][i] + f12 * delta * delta;
-    }
-    return sum > 0 ? sum / n12 : 0.;
+    return n12 <= 0 ? 0 : //
+        (n1 * n2 / n12 * cf1.squaredCenterDistance(cf2) + cf1.sumdev() + cf2.sumdev()) / n12;
   }
 
   /**

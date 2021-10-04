@@ -51,26 +51,12 @@ public class CentroidEuclideanDistance implements BIRCHDistance {
 
   @Override
   public double squaredDistance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      final double delta = cf.centroid(i) - v.doubleValue(i);
-      sum += delta * delta;
-    }
-    return sum;
+    return cf.squaredCenterDistance(v);
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      final double delta = cf.centroid(i) - v.centroid(i);
-      sum += delta * delta;
-    }
-    return sum;
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    return cf1.squaredCenterDistance(cf2);
   }
 
   /**
