@@ -28,6 +28,7 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.Model;
+import elki.data.type.CombinedTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
@@ -41,7 +42,6 @@ import elki.math.linearalgebra.VMath;
 import elki.similarity.PrimitiveSimilarity;
 import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.svm.SVDD;
-import elki.svm.SVDD.RadiusAcceptor;
 import elki.svm.data.SimilarityQueryAdapter;
 import elki.svm.model.RegressionModel;
 import elki.utilities.datastructures.unionfind.UnionFind;
@@ -57,28 +57,46 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Support Vector Clustering works on SVDD, which tries to find the smallest
  * sphere enclosing all objects in kernel space.
- * SVC then checks if the line between two data points stay inside the sphere in
+ * SupportVectorClustering then checks if the line between two data points stay
+ * inside the sphere in
  * kernel space. Clusters are those points connected by enclosed lines.
- * 
  * <p>
- * Reference:
+ * References:
  * <p>
- * Asa Ben-Hur, David Horn, Hava T. Siegelmann, Vladimir Vapnik<br>
+ * A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik<br>
+ * A Support Vector Method for Clustering<br>
+ * Neural Information Processing Systems
+ * <p>
+ * A. Ben-Hur, H. T. Siegelmann, D. Horn, V. Vapnik<br>
+ * A Support Vector Clustering Method<br>
+ * International Conference on Pattern Recognition (ICPR)
+ * <p>
+ * A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik<br>
  * Support Vector Clustering<br>
  * Journal of Machine Learning Research 2 (2001)
  * 
  * @author Robert Gehde
- *
  */
-@Reference(authors = "Asa Ben-Hur, David Horn, Hava T. Siegelmann, Vladimir Vapnik", //
-    booktitle = "Journal of Machine Learning Research (2001)", //
-    url = "https://jmlr.csail.mit.edu/papers/v2/", //
-    title = "Support Vector Clustering")
-public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? extends Model>> {
+@Reference(authors = "A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik", //
+    title = "A Support Vector Method for Clustering", //
+    booktitle = "Neural Information Processing Systems", //
+    url = "https://proceedings.neurips.cc/paper/2000/hash/14cfdb59b5bda1fc245aadae15b1984a-Abstract.html", //
+    bibkey = "DBLP:conf/nips/Ben-HurHSV00")
+@Reference(authors = "A. Ben-Hur, H. T. Siegelmann, D. Horn, V. Vapnik", //
+    title = "A Support Vector Clustering Method", //
+    booktitle = "International Conference on Pattern Recognition (ICPR)", //
+    url = "https://doi.org/10.1109/ICPR.2000.906177", //
+    bibkey = "DBLP:conf/icpr/Ben-HurSHV00")
+@Reference(authors = "A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik", //
+    title = "Support Vector Clustering", //
+    booktitle = "Journal of Machine Learning Research", //
+    url = "http://jmlr.org/papers/v2/horn01a.html", //
+    bibkey = "DBLP:journals/jmlr/Ben-HurHSV01")
+public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<? extends Model>> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(SVC.class);
+  private static final Logging LOG = Logging.getLogger(SupportVectorClustering.class);
 
   /**
    * Kernel function.
@@ -97,18 +115,13 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
   int lsz = 21;
 
   /**
-   * Squared radius of model.
-   */
-  double r_square = Double.NaN;
-
-  /**
    * 
    * Constructor.
    *
    * @param kernel kernel to use
    * @param C C parameter
    */
-  public SVC(PrimitiveSimilarity<? super NumberVector> kernel, double C) {
+  public SupportVectorClustering(PrimitiveSimilarity<? super NumberVector> kernel, double C) {
     this.kernel = kernel;
     this.C = C;
   }
@@ -121,7 +134,7 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
    */
   public Clustering<Model> run(Relation<NumberVector> relation) {
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final StaticDBIDs sids = DBIDUtil.makeUnmodifiable(ids);
+    final StaticDBIDs sids = DBIDUtil.makeUnmodifiable(relation.getDBIDs());
 
     SimilarityQuery<NumberVector> sim = new QueryBuilder<>(relation, kernel).similarityQuery();
 
@@ -129,89 +142,65 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
       LOG.verbose("Training one-class SVM...");
     }
     SimilarityQueryAdapter adapter = new SimilarityQueryAdapter(sim, ids);
-    SVDD svm = new SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size(), this);
+    SVDD svm = new SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size());
     RegressionModel model = svm.train(adapter);
     LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.l));
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Outer loop", relation.size(), LOG) : null;
-
-    if(LOG.isVerbose()) {
-      LOG.verbose("Checking connectivity...");
-    }
-    
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Connectivity checks", sids.size(), LOG) : null;
+    final double r_square = model.r_square;
     assert r_square != Double.NaN : "Model not trained correctly!";
-    
-    if(prog != null) {
-      prog.setProcessed(0, LOG);
-    }
+
     UnionFind uf = UnionFindUtil.make(sids);
-    double fixed = calcfixedpart(model, ids, sim);
-    outer: for(DBIDIter iiter = sids.iter(); iiter.valid(); iiter.advance()) {
+    final double fixed = calcfixedpart(model, ids, sim);
+    for(DBIDIter iiter = sids.iter(); iiter.valid(); iiter.advance()) {
       NumberVector ivec = relation.get(iiter);
       // skip if start is already outside the sphere
-      if(!accept(ivec, model, fixed, ids, sim, r_square)) {
-        continue;
-      }
-      double[] start = ivec.toArray();
-      // check connection to other points
-      for(DBIDIter jiter = sids.iter(); jiter.valid(); jiter.advance()) {
-        // skip if already connected
-        if(uf.isConnected(iiter, jiter)) {
-          // go to next outer if equal (lower left triangle)
-          if(DBIDUtil.equal(iiter, jiter)) {
-            if(prog != null) {
-              prog.incrementProcessed(LOG);
+      if(accept(ivec, model, fixed, ids, sim, r_square)) {
+        double[] start = ivec.toArray();
+        // check connection to other points
+        for(DBIDIter jiter = sids.iter(); jiter.valid(); jiter.advance()) {
+          // skip if already connected
+          if(uf.isConnected(iiter, jiter)) {
+            // go to next outer if equal (lower left triangle)
+            if(DBIDUtil.equal(iiter, jiter)) {
+              break; // half matrix only
             }
-            // row is done, go to next
-            continue outer;
+            continue;
           }
-          continue;
-        }
 
-        // union the two points if they are connected
-        // (line stays inside circle in kernel space)
-        if(checkConnectivity(relation, start, jiter, model, fixed, ids, sim, r_square)) {
-          uf.union(iiter, jiter);
-        }
-      }
-      if(prog != null) {
-        prog.incrementProcessed(LOG);
-      }
-    }
-    if(prog != null) {
-      prog.setProcessed(relation.size(), LOG);
-    }
-
-    if(LOG.isVerbose()) {
-      LOG.verbose("Building clusters...");
-    }
-
-    // collect dbids
-    ArrayList<ArrayModifiableDBIDs> groups = new ArrayList<>();
-
-    // sort DBIDs into clusters
-    idloop: for(DBIDIter it = sids.iter(); it.valid(); it.advance()) {
-      for(ModifiableDBIDs modifiableDBIDs : groups) {
-        if(uf.isConnected(modifiableDBIDs.iter(), it)) {
-          modifiableDBIDs.add(it);
-          continue idloop;
+          // union the two points if they are connected
+          // (line stays inside circle in kernel space)
+          if(checkConnectivity(relation, start, jiter, model, fixed, ids, sim, r_square)) {
+            uf.union(iiter, jiter);
+          }
         }
       }
-      ArrayModifiableDBIDs temp = DBIDUtil.newArray();
-      temp.add(it);
-      groups.add(temp);
+      LOG.incrementProcessed(prog);
     }
+    LOG.ensureCompleted(prog);
+
+    ArrayList<ArrayModifiableDBIDs> groups = collectClusters(sids, uf);
     // create clustering
-    ArrayList<Cluster<Model>> clusters = new ArrayList<>();
-    for(ModifiableDBIDs modifiableDBIDs : groups) {
-      clusters.add(new Cluster<Model>(modifiableDBIDs));
+    ArrayList<Cluster<Model>> clusters = new ArrayList<>(groups.size());
+    ArrayModifiableDBIDs noise = null;
+    for(ArrayModifiableDBIDs modifiableDBIDs : groups) {
+      if(modifiableDBIDs.size() > 1) {
+        clusters.add(new Cluster<Model>(modifiableDBIDs));
+      }
+      else if(noise == null) {
+        noise = modifiableDBIDs;
+      }
+      else {
+        noise.addDBIDs(modifiableDBIDs);
+      }
     }
-    Clustering<Model> result = new Clustering<Model>(clusters);
-    return result;
+    if(noise != null) {
+      clusters.add(new Cluster<Model>(noise, true));
+    }
+    return new Clustering<Model>(clusters);
   }
 
   /**
-   * 
    * Checks if the connecting line between start and dest lies inside the kernel
    * space sphere.
    * 
@@ -221,7 +210,7 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
    * @param model model containing sphere
    * @param fixed fixed part of evaluation
    * @param ids ArrayDBIDs used to train model
-   * @param sim Similary Query used to train model
+   * @param sim Similarity Query used to train model
    * @param r_squared squared radius of trained model
    * @return true if connected, false if not
    */
@@ -229,17 +218,16 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
     NumberVector jvec = relation.get(destRef);
     double[] dest = jvec.toArray();
     double[] step = VMath.timesEquals(VMath.minus(dest, start), 1.0 / lsz);
-    NumberVector cur = new DoubleVector(dest);
-    if(!accept(cur, model, fixed, ids, sim, r_squared)) {
+    if(!accept(jvec, model, fixed, ids, sim, r_squared)) {
       return false;
     }
     // checking "backwards"
     for(int k = 0; k < lsz; k++) {
       // currently checking 19 points between + start + dest
-      cur = new DoubleVector(VMath.minusEquals(dest, step));
       // this might be numerically more stable (might need k adjustment)
       // cur = new DoubleVector(VMath.minusTimes(dest, step,k));
-      if(!accept(cur, model, fixed, ids, sim, r_squared/*r_square*/)) {
+      if(!accept(DoubleVector.wrap(VMath.minusEquals(dest, step)), //
+          model, fixed, ids, sim, r_squared)) {
         return false;
       }
     }
@@ -258,17 +246,13 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
    * @return true iff point is inside sphere
    */
   private boolean accept(NumberVector cur, RegressionModel model, double fixed, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim, double r_square) {
-    double eval = sim.similarity(cur, cur);
-
+    final double l = sim.similarity(cur, cur);
     double sum = 0;
     DBIDArrayIter iter = ids.iter();
     for(int i = 0; i < model.sv_indices.length; i++) {
-      iter.seek(model.sv_indices[i]);
-      sum += model.sv_coef[0][i] * sim.similarity(cur, iter);
+      sum += model.sv_coef[0][i] * sim.similarity(cur, iter.seek(model.sv_indices[i]));
     }
-    eval -= 2 * sum;
-    eval += fixed;
-    return eval <= r_square;
+    return l - 2 * sum + fixed <= r_square;
   }
 
   /**
@@ -285,21 +269,33 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
     for(int i = 0; i < model.sv_indices.length; i++) {
       iter.seek(model.sv_indices[i]);
       for(int j = 0; j < model.sv_indices.length; j++) {
-        iter.seek(model.sv_indices[j]);
-        eval += model.sv_coef[0][i] * model.sv_coef[0][j] * sim.similarity(iter, iter2);
+        eval += model.sv_coef[0][i] * model.sv_coef[0][j] * sim.similarity(iter, iter2.seek(model.sv_indices[j]));
       }
     }
     return eval;
   }
 
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  private ArrayList<ArrayModifiableDBIDs> collectClusters(final StaticDBIDs sids, UnionFind uf) {
+    // collect dbids
+    ArrayList<ArrayModifiableDBIDs> groups = new ArrayList<>();
+    // sort DBIDs into clusters
+    idloop: for(DBIDIter it = sids.iter(); it.valid(); it.advance()) {
+      for(ModifiableDBIDs modifiableDBIDs : groups) {
+        if(uf.isConnected(modifiableDBIDs.iter(), it)) {
+          modifiableDBIDs.add(it);
+          continue idloop;
+        }
+      }
+      ArrayModifiableDBIDs temp = DBIDUtil.newArray();
+      temp.add(it);
+      groups.add(temp);
+    }
+    return groups;
   }
 
   @Override
-  public void setRSquare(double r_square) {
-    this.r_square = r_square;
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(new CombinedTypeInformation(kernel.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -340,8 +336,8 @@ public class SVC implements RadiusAcceptor, ClusteringAlgorithm<Clustering<? ext
     }
 
     @Override
-    public SVC make() {
-      return new SVC(kernel, C);
+    public SupportVectorClustering make() {
+      return new SupportVectorClustering(kernel, C);
     }
   }
 }

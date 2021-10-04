@@ -19,19 +19,9 @@ public class SVDD extends AbstractSVR {
 
   private double C;
 
-  /**
-   * radius of trained sphere
-   */
-  private RadiusAcceptor target;
-
   public SVDD(double eps, boolean shrinking, double cache_size, double C) {
     super(eps, shrinking, cache_size);
     this.C = C;
-  }
-  public SVDD(double eps, boolean shrinking, double cache_size, double C,RadiusAcceptor target) {
-    super(eps, shrinking, cache_size);
-    this.C = C;
-    this.target = target;
   }
 
   @Override
@@ -86,9 +76,7 @@ public class SVDD extends AbstractSVR {
       si.alpha = alpha;
     }
 
-    if(target != null) {
-      target.setRSquare(r_square);
-    }
+    si.r_square = r_square;
     LOG.verbose("R^2 = " + r_square);
     if(C > 1) {
       LOG.verbose("Warning: Note that after C > 1, all models are the same.");

@@ -29,35 +29,32 @@ import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Tests for Support Vector Clustering ({@link SVC})
+ * Tests for Support Vector Clustering ({@link SupportVectorClustering})
  * 
  * @author Robert Gehde
- *
  */
-public class SVCTest extends AbstractClusterAlgorithmTest{
-
+public class SupportVectorClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSigma() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<?> result = new ELKIBuilder<>(SVC.class) //
-        .with(SVC.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
-        .with(SVC.Par.C_ID, 0.05) //
+    Clustering<?> result = new ELKIBuilder<>(SupportVectorClustering.class) //
+        .with(SupportVectorClustering.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
+        .with(SupportVectorClustering.Par.C_ID, 0.05) //
         .with(RadialBasisFunctionKernel.Par.SIGMA_ID, 0.1) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.944456);
-    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 2, 60, 106, 154 });
+    assertFMeasure(db, result, 0.945171);
+    assertClusterSizes(result, new int[] { 22, 57, 101, 150 });
   }
 
   @Test
   public void testGamma() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<?> result = new ELKIBuilder<>(SVC.class) //
-        .with(SVC.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
-        .with(SVC.Par.C_ID, 0.05) //
+    Clustering<?> result = new ELKIBuilder<>(SupportVectorClustering.class) //
+        .with(SupportVectorClustering.Par.KERNEL_ID, RadialBasisFunctionKernel.class) //
+        .with(SupportVectorClustering.Par.C_ID, 0.05) //
         .with(RadialBasisFunctionKernel.Par.GAMMA_ID, 50) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.944456);
-    assertClusterSizes(result, new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 2, 60, 106, 154 });
+    assertFMeasure(db, result, 0.945171);
+    assertClusterSizes(result, new int[] { 22, 57, 101, 150 });
   }
-
 }

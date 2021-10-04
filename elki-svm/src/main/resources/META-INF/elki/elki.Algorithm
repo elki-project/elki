@@ -1,2 +1,3 @@
+elki.clustering.svm.SupportVectorClustering
 elki.outlier.svm.OCSVM
 elki.outlier.svm.SVDD
