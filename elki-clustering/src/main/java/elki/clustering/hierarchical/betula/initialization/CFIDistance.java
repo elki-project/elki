@@ -24,35 +24,35 @@ import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 
 /**
- * Interface for distance Calculation on any of the betula clustering Features.
+ * Interface for distance calculation on any of the BETULA cluster features.
  *
  * @author Andreas Lang
  */
 public interface CFIDistance {
-    /**
-     * Distance of a vector to a clustering feature.
-     *
-     * @param v Vector
-     * @param cf Clustering Feature
-     * @return Distance
-     */
-    double squaredDistance(NumberVector v, CFInterface cf);
+  /**
+   * Distance of a vector to a clustering feature.
+   *
+   * @param v Vector
+   * @param cf Clustering Feature
+   * @return Distance
+   */
+  double squaredDistance(NumberVector v, CFInterface cf);
 
-    /**
-     * Distance of a vector to a clustering feature.
-     *
-     * @param v double Array
-     * @param cf Clustering Feature
-     * @return Distance
-     */
-    double squaredDistance(double[] v, CFInterface cf);
+  /**
+   * Distance of a vector to a clustering feature.
+   *
+   * @param v double Array
+   * @param cf Clustering Feature
+   * @return Distance
+   */
+  double squaredDistance(double[] v, CFInterface cf);
 
-    /**
-     * Distance between two clustering features.
-     *
-     * @param c1 First clustering feature
-     * @param c2 Second clustering feature
-     * @return Distance
-     */
-    double squaredDistance(CFInterface c1, CFInterface c2);
+  /**
+   * Distance between two clustering features.
+   *
+   * @param c1 First clustering feature
+   * @param c2 Second clustering feature
+   * @return Distance
+   */
+  double squaredDistance(CFInterface c1, CFInterface c2);
 }

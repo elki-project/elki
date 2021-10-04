@@ -23,6 +23,7 @@ package elki.clustering.hierarchical.betula.initialization;
 import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
@@ -62,7 +63,7 @@ public abstract class AbstractCFKMeansInitialization {
    * @param root Summary statistic of the tree.
    * @return
    */
-  public abstract double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k);
+  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k);
 
   /**
    * Extract the leaves of the tree.

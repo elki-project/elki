@@ -22,6 +22,7 @@
 package elki.clustering.hierarchical.betula.initialization;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFNode;
@@ -45,9 +46,8 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
     this.subInit = subInit;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
     if(tree.getLeaves() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
     }
@@ -65,7 +65,7 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
             break;
           }
           if(child instanceof CFNode) {
-            next.add((CFNode<CFInterface>) child);
+            next.add((CFNode<?>) child);
           }
           else {
             res.add(child);

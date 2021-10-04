@@ -20,7 +20,6 @@
  */
 package elki.clustering.hierarchical.betula;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.em.EMClusterModel;
@@ -34,18 +33,17 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Initializes selected EM Model
+ * Initializes selected EM Model.
  *
  * @author Andreas Lang
  */
-public abstract class AbstractEMInitializer<O, M extends MeanModel> {
+public abstract class AbstractEMInitializer<M extends MeanModel> {
   /**
    * Class to choose the initial means
    */
   protected AbstractCFKMeansInitialization initializer;
 
   /**
-   * 
    * Constructor.
    *
    * @param initializer k Means initialization algorithm.
@@ -62,21 +60,18 @@ public abstract class AbstractEMInitializer<O, M extends MeanModel> {
    * @param root Summary statistic of the tree.
    * @return Initial models
    */
-  public abstract List<? extends EMClusterModel<O, M>> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree);
+  public abstract List<? extends EMClusterModel<NumberVector, M>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree);
 
   /**
    * Parameterization class
    *
    * @author Andreas Lang
-   *
-   * @param <V> Vector type
    */
-  public abstract static class Par<V extends NumberVector> implements Parameterizer {
+  public abstract static class Par implements Parameterizer {
     /**
      * Parameter to specify the cluster center initialization.
      */
-    public static final OptionID INIT_ID = new OptionID("em.centers", //
-        "Method to choose the initial cluster centers.");
+    public static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
 
     /**
      * Initialization method

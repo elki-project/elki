@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMMultivariateInitializer extends AbstractEMInitializer<NumberVector, EMModel> {
+public class EMMultivariateInitializer extends AbstractEMInitializer<EMModel> {
   /**
    * Constructor.
    *
@@ -49,7 +49,7 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<NumberVecto
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree) {
+  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree) {
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     double[][] covmat = tree.root.covariance().clone();
@@ -62,7 +62,12 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<NumberVecto
     return models;
   }
 
-  public static class Par<V extends NumberVector> extends AbstractEMInitializer.Par<V> {
+  /**
+   * Parameterization class
+   * 
+   * @author Andreas Lang
+   */
+  public static class Par extends AbstractEMInitializer.Par {
     @Override
     public EMMultivariateInitializer make() {
       return new EMMultivariateInitializer(initializer);

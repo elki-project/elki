@@ -20,13 +20,12 @@
  */
 package elki.clustering.hierarchical.betula.initialization;
 
-import elki.clustering.kmeans.initialization.RandomlyChosen;
-
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
+import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.utilities.random.RandomFactory;
 
 /**
@@ -37,12 +36,17 @@ import elki.utilities.random.RandomFactory;
  * @author Andreas Lang
  */
 public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
+  /**
+   * Constructor.
+   *
+   * @param rf Random generator
+   */
   public CFRandomlyChosen(RandomFactory rf) {
     super(rf);
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
     final int leaves = cfs.size();
     if(leaves < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + leaves + " < k objects.");
@@ -50,17 +54,15 @@ public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
     Random rnd = rf.getSingleThreadedRandom();
     int d = cfs.get(0).getDimensionality();
     double[][] means = new double[k][d];
-    int remaining = leaves;
-    for(int i = 0; i < leaves && k > 0; i++) {
+    for(int i = 0, c = 0; i < leaves && k > 0; i++) {
       final CFInterface cfsi = cfs.get(i);
       double prob = rnd.nextDouble();
-      if(prob < ((double) k / remaining)) {
-        int c = --k;
+      if(prob < ((double) k / (leaves - i))) {
+        double[] mean = means[c++];
         for(int j = 0; j < d; j++) {
-          means[c][j] = cfsi.centroid(j);
+          mean[j] = cfsi.centroid(j);
         }
       }
-      remaining--;
     }
     return means;
   }

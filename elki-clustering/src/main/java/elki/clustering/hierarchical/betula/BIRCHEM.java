@@ -117,7 +117,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
   /**
    * Maximum number of iterations.
    */
-  AbstractEMInitializer<NumberVector, M> initializer;
+  AbstractEMInitializer<M> initializer;
 
   /**
    * Constructor.
@@ -127,7 +127,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param maxiter Maximum number of iterations
    * @param initialization Initialization method
    */
-  public BIRCHEM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<NumberVector, M> initialization) {
+  public BIRCHEM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<M> initialization) {
     super();
     this.cffactory = cffactory;
     this.k = k;
@@ -390,12 +390,12 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
     /**
      * initialization method
      */
-    protected AbstractEMInitializer<NumberVector, M> initialization;
+    protected AbstractEMInitializer<M> initialization;
 
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
-      new ObjectParameter<AbstractEMInitializer<NumberVector, M>>(INIT_ID, AbstractEMInitializer.class) //
+      new ObjectParameter<AbstractEMInitializer<M>>(INIT_ID, AbstractEMInitializer.class) //
           .grab(config, x -> initialization = x);
       new IntParameter(AbstractKMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

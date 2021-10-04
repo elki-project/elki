@@ -23,6 +23,7 @@ package elki.clustering.hierarchical.betula.initialization;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
@@ -44,44 +45,40 @@ import net.jafama.FastMath;
  * @author Andreas Lang
  */
 public class CFKppTree extends AbstractCFKMeansInitialization {
+  /**
+   * Distance function to use for initial means
+   */
+  CFIDistance dist = null;
+
+  /**
+   * Choose the first center based on variance contribution.
+   */
+  boolean firstVar = false;
+
   int maxdepth = -1;
 
-  CFIDistance dist;
-
-  boolean first_var;
-
-  public CFKppTree(RandomFactory rf, CFIDistance dist, int maxdepth, boolean first_var) {
+  public CFKppTree(RandomFactory rf, CFIDistance dist, int maxdepth, boolean firstVar) {
     super(rf);
     this.dist = dist;
     this.maxdepth = maxdepth;
-    this.first_var = first_var;
+    this.firstVar = firstVar;
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
-    if(maxdepth == 0) {
-      maxdepth = FastMath.log2(k) / FastMath.log2(tree.getCapacity()) + 1;
-    }
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
     if(tree.getLeaves() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
     }
+    maxdepth = maxdepth > 0 ? maxdepth : FastMath.log2(k) / FastMath.log2(tree.getCapacity()) + 1;
     Random rnd = rf.getSingleThreadedRandom();
-    ArrayList<CFInterface> ccs = new ArrayList<>(k);
-    if(first_var) {
-      ccs.set(0, chooseFirstNode(tree.getRoot(), cfs, rnd));
-    }
-    else {
-      // TODO: use weights for choosing the initial center!
-      ccs.set(0, (CFInterface) cfs.get(rnd.nextInt(cfs.size())));
-    }
+    List<CFInterface> ccs = new ArrayList<>(k);
+    ccs.add(firstVar ? chooseFirstNode(tree.getRoot(), cfs, rnd) :
+    // TODO: use weights for choosing the initial center!
+        (CFInterface) cfs.get(rnd.nextInt(cfs.size())));
     for(int m = 1; m < k; m++) {
       CFInterface next = tree.getRoot();
-      int depth = maxdepth;
-      while(next instanceof CFNode && depth != 0) {
-        depth--;
-        @SuppressWarnings("unchecked")
-        CFNode<CFInterface> current = (CFNode<CFInterface>) next;
-        next = chooseNextNode(current, ccs, m, rnd);
+      for(int depth = maxdepth; next instanceof CFNode && depth > 0; --depth) {
+        next = chooseNextNode((CFNode<?>) next, ccs, m, rnd);
       }
       ccs.add(next);
     }
@@ -98,7 +95,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     return means;
   }
 
-  private CFInterface chooseFirstNode(CFInterface center, ArrayList<? extends CFInterface> cfs, Random rnd) {
+  private CFInterface chooseFirstNode(CFInterface center, List<? extends CFInterface> cfs, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[cfs.size()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
@@ -127,7 +124,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     }
   }
 
-  private CFInterface chooseNextNode(CFNode<?> current, ArrayList<? extends CFInterface> ccs, int m, Random rnd) {
+  private CFInterface chooseNextNode(CFNode<?> current, List<? extends CFInterface> ccs, int m, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[current.capacity()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
@@ -165,35 +162,46 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
    * @author Andreas Lang
    */
   public static class Par extends AbstractCFKMeansInitialization.Par {
-    public static final OptionID DEPTH_ID = new OptionID("kmpp.depth", //
-        "maximum depth for intitialization");
+    /**
+     * Depth of the trunk based stragegy.
+     */
+    public static final OptionID DEPTH_ID = new OptionID("kmpp.depth", "maximum depth for intitialization");
 
     /**
      * k Means distance.
      */
-    public static final OptionID KMPlusPlus_ID = new OptionID("kmeans.distance", "Distance to use for kmeans++ criterion");
+    public static final OptionID KMPP_DISTANCE_ID = CFKMeansPlusPlus.Par.KMPP_DISTANCE_ID;
 
-    public static final OptionID KMPFirst_ID = new OptionID("kmpp.first_var", "Chooose first dependent on Var");
+    /**
+     * Choose the first center based on variance contribution.
+     */
+    public static final OptionID FIRST_VARIANCE_ID = CFKMeansPlusPlus.Par.FIRST_VARIANCE_ID;
+
+    /**
+     * Distance function to use for initial means
+     */
+    CFIDistance dist = null;
+
+    /**
+     * Choose the first center based on variance contribution.
+     */
+    boolean firstVar = false;
 
     int depth = -1;
-
-    CFIDistance dist;
-
-    boolean first_var = false;
 
     @Override
     public void configure(Parameterization config) {
       new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
-      new ObjectParameter<CFIDistance>(KMPlusPlus_ID, CFIDistance.class, VarDist.class)//
+      new ObjectParameter<CFIDistance>(KMPP_DISTANCE_ID, CFIDistance.class, VarDistance.class)//
           .grab(config, x -> dist = x);
-      new Flag(KMPFirst_ID).grab(config, x -> first_var = x);
+      new Flag(FIRST_VARIANCE_ID).grab(config, x -> firstVar = x);
       new IntParameter(DEPTH_ID, -1)//
           .grab(config, x -> depth = x);
     }
 
     @Override
     public CFKppTree make() {
-      return new CFKppTree(rnd, dist, depth, first_var);
+      return new CFKppTree(rnd, dist, depth, firstVar);
     }
   }
 }

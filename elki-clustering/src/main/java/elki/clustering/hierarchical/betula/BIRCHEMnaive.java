@@ -118,7 +118,7 @@ public class BIRCHEMnaive<M extends MeanModel> implements ClusteringAlgorithm<Cl
   /**
    * Maximum number of iterations.
    */
-  AbstractEMInitializer<NumberVector, M> initializer;
+  AbstractEMInitializer<M> initializer;
 
   /**
    * Constructor.
@@ -128,7 +128,7 @@ public class BIRCHEMnaive<M extends MeanModel> implements ClusteringAlgorithm<Cl
    * @param maxiter Maximum number of iterations
    * @param initialization Initialization method
    */
-  public BIRCHEMnaive(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<NumberVector, M> initialization, double prior) {
+  public BIRCHEMnaive(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<M> initialization, double prior) {
     super();
     this.cffactory = cffactory;
     this.k = k;
@@ -407,12 +407,12 @@ public class BIRCHEMnaive<M extends MeanModel> implements ClusteringAlgorithm<Cl
     /**
      * initialization method
      */
-    protected AbstractEMInitializer<NumberVector, M> initialization;
+    protected AbstractEMInitializer<M> initialization;
 
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
-      new ObjectParameter<AbstractEMInitializer<NumberVector, M>>(INIT_ID, AbstractEMInitializer.class) //
+      new ObjectParameter<AbstractEMInitializer<M>>(INIT_ID, AbstractEMInitializer.class) //
           .grab(config, x -> initialization = x);
       new IntParameter(AbstractKMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //

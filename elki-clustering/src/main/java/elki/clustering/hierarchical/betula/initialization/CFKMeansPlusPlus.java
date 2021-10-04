@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.initialization;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
@@ -50,48 +50,48 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    */
   protected CFIDistance distance;
 
-  boolean first_var;
+  /**
+   * Choose the first center based on variance contribution.
+   */
+  protected boolean firstVar;
 
   /**
    * Constructor.
    *
-   * @param rnd Random generator.
+   * @param rf Random generator
+   * @param dist Distance function
+   * @param firstVar Choose first based on variance
    */
-  public CFKMeansPlusPlus(RandomFactory rf, CFIDistance dist, boolean first_var) {
+  public CFKMeansPlusPlus(RandomFactory rf, CFIDistance dist, boolean firstVar) {
     super(rf);
     this.distance = dist;
-    this.first_var = first_var;
+    this.firstVar = firstVar;
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, ArrayList<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
     return run(tree, cfs, k);
   }
 
   /**
    * Perform k-means++ initialization.
    *
-   * @param x Input vectors.
+   * @param tree CFTree
+   * @param cf cluster features to choose from (should be an array list for
+   *        performance reasons)
    * @param k K
    * @return Initial cluster centers
    */
-  public double[][] run(CFTree<?> tree, ArrayList<? extends CFInterface> cf, int k) {
+  public double[][] run(CFTree<?> tree, List<? extends CFInterface> cf, int k) {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
-    CFInterface first;
-    if(!first_var) {
-      first = cf.get(rnd.nextInt(cf.size()));
-    }
-    else {
-      first = sampleFirst(tree.getRoot(), cf, rnd);
-    }
-    int d = first.getDimensionality();
-    double[] mean = new double[d];
+    CFInterface first = firstVar ? sampleFirst(tree.getRoot(), cf, rnd) : cf.get(rnd.nextInt(cf.size()));
+    final int d = first.getDimensionality();
+    double[] mean = means[0] = new double[d];
     for(int i = 0; i < d; i++) {
       mean[i] = first.centroid(i);
     }
-    means[0] = mean;
-    double weightsum = initialWeights(first, cf, distance);
+    double weightsum = initialWeights(first, cf);
     for(int m = 1; m < k; m++) {
       if(weightsum > Double.MAX_VALUE) {
         throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
@@ -110,15 +110,14 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
       }
       CFInterface cfi = cf.get(i);
       // Add new mean:
-      mean = new double[d];
+      mean = means[m] = new double[d];
       for(int j = 0; j < mean.length; j++) {
         mean[j] = cfi.centroid(j);
       }
-      means[m] = mean;
       if(m < k) {
         // Update weights:
         weights[i] = 0.;
-        weightsum = updateWeights(cfi, cf, distance);
+        weightsum = updateWeights(cfi, cf);
       }
     }
     return means;
@@ -128,10 +127,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * Initialize the weight list.
    * 
    * @param first Id of first mean.
-   * @param x Input data.
+   * @param cf Cluster features
    * @return Sum of weights
    */
-  private double initialWeights(CFInterface first, ArrayList<? extends CFInterface> cf, CFIDistance distance) {
+  private double initialWeights(CFInterface first, List<? extends CFInterface> cf) {
     final int e = cf.size();
     double weightsum = 0.;
     weights = new double[e];
@@ -145,9 +144,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * Update the weight list.
    *
    * @param latest Latest center
+   * @param cf Cluster features
    * @return Weight sum
    */
-  private double updateWeights(CFInterface latest, ArrayList<? extends CFInterface> cf, CFIDistance distance) {
+  private double updateWeights(CFInterface latest, List<? extends CFInterface> cf) {
     double weightsum = 0.;
     for(int i = 0, e = cf.size(); i < e; i++) {
       double weight = weights[i];
@@ -160,28 +160,34 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
     return weightsum;
   }
 
-  private CFInterface sampleFirst(CFInterface root, ArrayList<? extends CFInterface> cfs, Random rnd) {
+  /**
+   * Sample the first cluster center.
+   *
+   * @param root Root node of the tree
+   * @param cfs Cluster features to sample from
+   * @param rnd Random generator
+   * @return Selected cluster feature
+   */
+  private CFInterface sampleFirst(CFInterface root, List<? extends CFInterface> cfs, Random rnd) {
     final int e = cfs.size();
     double weightsum = 0;
     double[] tmpWeight = new double[e];
     for(int i = 0; i < e; i++) {
-      double weight;
-      weight = distance.squaredDistance(root, cfs.get(i));
+      double weight = distance.squaredDistance(root, cfs.get(i));
       tmpWeight[i] = weight;
       weightsum += weight;
     }
     while(true) {
       double r = rnd.nextDouble() * weightsum;
-      int i = 0;
-      while(i < e) {
+      for(int i = 0; i < e; i++) {
         if((r -= tmpWeight[i]) <= 0) {
           return cfs.get(i);
         }
-        i++;
       }
       weightsum -= r; // Decrease
     }
   }
+
   /**
    * Parameterization class.
    * 
@@ -191,28 +197,34 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
     /**
      * k Means distance.
      */
-    public static final OptionID KMPlusPlus_ID = new OptionID("kmeans.distance", "Distance to use for kmeans++ criterion");
+    public static final OptionID KMPP_DISTANCE_ID = new OptionID("kmeans.distance", "Distance to use for kmeans++ criterion");
 
-    public static final OptionID KMPFirst_ID = new OptionID("kmpp.first_var", "Chooose first dependent on Var");
+    /**
+     * Choose the first center based on variance contribution.
+     */
+    public static final OptionID FIRST_VARIANCE_ID = new OptionID("kmpp.first_var", "Chooose first dependent on variance.");
 
     /**
      * Distance function to use for initial means
      */
     CFIDistance dist = null;
 
-    boolean first_var = false;
+    /**
+     * Choose the first center based on variance contribution.
+     */
+    boolean firstVar = false;
 
     @Override
     public void configure(Parameterization config) {
       new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
-      new ObjectParameter<CFIDistance>(KMPlusPlus_ID, CFIDistance.class, EuclideanDist.class)//
+      new ObjectParameter<CFIDistance>(KMPP_DISTANCE_ID, CFIDistance.class, EuclideanDistance.class)//
           .grab(config, x -> dist = x);
-      new Flag(KMPFirst_ID).grab(config, x -> first_var = x);
+      new Flag(FIRST_VARIANCE_ID).grab(config, x -> firstVar = x);
     }
 
     @Override
     public CFKMeansPlusPlus make() {
-      return new CFKMeansPlusPlus(rnd, dist, first_var);
+      return new CFKMeansPlusPlus(rnd, dist, firstVar);
     }
   }
 }

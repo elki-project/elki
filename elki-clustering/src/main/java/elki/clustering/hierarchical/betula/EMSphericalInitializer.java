@@ -25,7 +25,6 @@ import java.util.List;
 
 import elki.clustering.em.SphericalGaussianModel;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
-import elki.data.NumberVector;
 import elki.data.model.EMModel;
 
 import net.jafama.FastMath;
@@ -35,7 +34,7 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMSphericalInitializer extends AbstractEMInitializer<NumberVector, EMModel> {
+public class EMSphericalInitializer extends AbstractEMInitializer<EMModel> {
   /**
    * Constructor.
    *
@@ -46,7 +45,7 @@ public class EMSphericalInitializer extends AbstractEMInitializer<NumberVector, 
   }
 
   @Override
-  public List<SphericalGaussianModel> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree) {
+  public List<SphericalGaussianModel> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree) {
     final int dim = cfs.get(0).getDimensionality();
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
@@ -63,7 +62,12 @@ public class EMSphericalInitializer extends AbstractEMInitializer<NumberVector, 
     return models;
   }
 
-  public static class Par<V extends NumberVector> extends AbstractEMInitializer.Par<V> {
+  /**
+   * Parameterization class
+   * 
+   * @author Andreas Lang
+   */
+  public static class Par extends AbstractEMInitializer.Par {
     @Override
     public EMSphericalInitializer make() {
       return new EMSphericalInitializer(initializer);

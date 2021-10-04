@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMDiagonalInitializer extends AbstractEMInitializer<NumberVector, EMModel> {
+public class EMDiagonalInitializer extends AbstractEMInitializer<EMModel> {
   /**
    * Constructor.
    *
@@ -47,7 +47,7 @@ public class EMDiagonalInitializer extends AbstractEMInitializer<NumberVector, E
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(ArrayList<? extends CFInterface> cfs, int k, CFTree<?> tree) {
+  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree) {
     final int dim = cfs.get(0).getDimensionality();
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
@@ -64,7 +64,12 @@ public class EMDiagonalInitializer extends AbstractEMInitializer<NumberVector, E
     return models;
   }
 
-  public static class Par<V extends NumberVector> extends AbstractEMInitializer.Par<V> {
+  /**
+   * Parameterization class
+   *
+   * @author Andreas Lang
+   */
+  public static class Par extends AbstractEMInitializer.Par {
     @Override
     public EMDiagonalInitializer make() {
       return new EMDiagonalInitializer(initializer);
