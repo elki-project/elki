@@ -20,8 +20,11 @@
  */
 package elki.clustering.hierarchical.betula.birch;
 
+import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
@@ -40,22 +43,27 @@ import elki.utilities.optionhandling.Parameterizer;
  * @since 0.7.5
  */
 @Alias({ "D3" })
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
     url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
     bibkey = "tr/wisc/Zhang97")
-public class AverageIntraclusterDistance implements BIRCHDistance {
+public class BIRCHAverageIntraclusterDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final AverageIntraclusterDistance STATIC = new AverageIntraclusterDistance();
+  public static final BIRCHAverageIntraclusterDistance STATIC = new BIRCHAverageIntraclusterDistance();
 
   @Override
-  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+  public double squaredDistance(NumberVector v, CFInterface ocf) {
+    if(!(ocf instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf = (ClusteringFeature) ocf;
     final int dim = v.getDimensionality();
     assert dim == cf.getDimensionality();
-    final double div1 = 1. / (1 + cf.n), div2 = 1. / cf.n;
+    final double div1 = 1. / (1 + cf.getWeight()), div2 = 1. / cf.getWeight();
     double sum = (cf.sumOfSumOfSquares() + ClusteringFeature.sumOfSquares(v)) * div2;
     for(int d = 0; d < dim; d++) {
       double x = cf.ls[d] + v.doubleValue(d);
@@ -65,10 +73,15 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+  public double squaredDistance(CFInterface ocf1, CFInterface ocf2) {
+    if(!(ocf1 instanceof ClusteringFeature) || !(ocf2 instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf1 = (ClusteringFeature) ocf1;
+    ClusteringFeature cf2 = (ClusteringFeature) ocf2;
     final int dim = cf1.getDimensionality();
     assert dim == cf2.getDimensionality();
-    final int n12 = cf1.n + cf2.n;
+    final int n12 = cf1.getWeight() + cf2.getWeight();
     final double div1 = 1. / n12, div2 = 1. / (n12 - 1);
     double sum = (cf1.sumOfSumOfSquares() + cf2.sumOfSumOfSquares()) * div2;
     for(int d = 0; d < dim; d++) {
@@ -85,7 +98,7 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
    */
   public static class Par implements Parameterizer {
     @Override
-    public AverageIntraclusterDistance make() {
+    public BIRCHAverageIntraclusterDistance make() {
       return STATIC;
     }
   }

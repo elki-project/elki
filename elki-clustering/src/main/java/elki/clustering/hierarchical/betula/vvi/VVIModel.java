@@ -20,8 +20,10 @@
  */
 package elki.clustering.hierarchical.betula.vvi;
 
-import elki.clustering.hierarchical.betula.CFDistance;
 import elki.clustering.hierarchical.betula.CFModel;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
+import elki.clustering.hierarchical.betula.distance.RadiusDistance;
+import elki.clustering.hierarchical.betula.distance.VarianceIncreaseDistance;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -37,12 +39,12 @@ public final class VVIModel implements CFModel<ClusteringFeature> {
   /**
    * BIRCH distance function to use
    */
-  BIRCHDistance dist;
+  CFDistance dist;
 
   /**
    * BIRCH distance function to use for point absorption
    */
-  BIRCHDistance abs;
+  CFDistance abs;
 
   /**
    * Constructor.
@@ -50,7 +52,7 @@ public final class VVIModel implements CFModel<ClusteringFeature> {
    * @param dist Distance Function
    * @param abs Absorption Criteria
    */
-  public VVIModel(BIRCHDistance dist, BIRCHDistance abs) {
+  public VVIModel(CFDistance dist, CFDistance abs) {
     this.dist = dist;
     this.abs = abs;
   }
@@ -84,18 +86,18 @@ public final class VVIModel implements CFModel<ClusteringFeature> {
     /**
      * BIRCH distance function to use
      */
-    BIRCHDistance dist;
+    CFDistance dist;
 
     /**
      * BIRCH distance function to use for point absorption
      */
-    BIRCHDistance abs;
+    CFDistance abs;
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<BIRCHDistance>(DISTANCE_ID, BIRCHDistance.class, VarianceIncreaseDistance.class) //
+      new ObjectParameter<CFDistance>(DISTANCE_ID, CFDistance.class, VarianceIncreaseDistance.class) //
           .grab(config, x -> dist = x);
-      new ObjectParameter<BIRCHDistance>(ABSORPTION_ID, BIRCHDistance.class, RadiusDistance.class) //
+      new ObjectParameter<CFDistance>(ABSORPTION_ID, CFDistance.class, RadiusDistance.class) //
           .grab(config, x -> abs = x);
     }
 
@@ -106,12 +108,12 @@ public final class VVIModel implements CFModel<ClusteringFeature> {
   }
 
   @Override
-  public CFDistance<ClusteringFeature> distance() {
+  public CFDistance distance() {
     return dist;
   }
 
   @Override
-  public CFDistance<ClusteringFeature> absorption() {
+  public CFDistance absorption() {
     return abs;
   }
 }

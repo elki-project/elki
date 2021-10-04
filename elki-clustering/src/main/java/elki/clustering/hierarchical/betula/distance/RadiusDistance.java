@@ -18,8 +18,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vvi;
+package elki.clustering.hierarchical.betula.distance;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -30,35 +31,39 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * References:
  * <p>
- * T. Zhang, R. Ramakrishnan, M. Livny<br>
- * BIRCH: An Efficient Data Clustering Method for Very Large Databases<br>
- * Proc. 1996 ACM SIGMOD International Conference on Management of Data
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
  *
  * @author Andreas Lang
+ * @author Erich Schubert
  */
 @Alias("R")
-@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
-    title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
-    booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/233269.233324", //
-    bibkey = "DBLP:conf/sigmod/ZhangRL96")
-public class RadiusDistance implements BIRCHDistance {
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class RadiusDistance implements CFDistance {
   /**
    * Static instance.
    */
   public static final RadiusDistance STATIC = new RadiusDistance();
 
   @Override
-  public double squaredDistance(NumberVector nv, ClusteringFeature cf1) {
-    return cf1.n <= 0 ? 0 : //
-        (cf1.n / (cf1.n + 1.) * cf1.squaredCenterDistance(nv) + cf1.sumdev()) / (cf1.n + 1.);
+  public double squaredDistance(NumberVector nv, CFInterface cf1) {
+    return cf1.getWeight() <= 0 ? 0 : //
+        (cf1.getWeight() / (cf1.getWeight() + 1.) * cf1.squaredCenterDistance(nv) + cf1.sumdev()) / (cf1.getWeight() + 1.);
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final double n1 = cf1.n, n2 = cf2.n, n12 = n1 + n2;
+  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+    final double n1 = cf1.getWeight(), n2 = cf2.getWeight(), n12 = n1 + n2;
     return n12 <= 0 ? 0 : //
         (n1 * n2 / n12 * cf1.squaredCenterDistance(cf2) + cf1.sumdev() + cf2.sumdev()) / n12;
+  }
+
+  @Override
+  public double matSelfInit(CFInterface cf) {
+    return cf.sumdev() / cf.getWeight();
   }
 
   /**

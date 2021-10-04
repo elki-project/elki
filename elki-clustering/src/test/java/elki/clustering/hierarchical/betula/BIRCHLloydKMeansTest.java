@@ -23,12 +23,12 @@ package elki.clustering.hierarchical.betula;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.betula.vii.CentroidEuclideanDistance;
 import elki.clustering.hierarchical.betula.vii.VIIModel;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
+import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 
 /**

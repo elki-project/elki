@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2019
+ * Copyright (C) 2020
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -18,55 +18,54 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.birch;
+package elki.clustering.hierarchical.betula.distance;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Centroid Euclidean distance.
+ * Variance increase distance.
  * <p>
  * Reference:
  * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br>
- * T. Zhang<br>
- * Doctoral Dissertation, 1997.
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
  *
+ * @author Andreas Lang
  * @author Erich Schubert
- * @since 0.7.5
  */
-@Alias({ "D0" })
-@Reference(authors = "T. Zhang", //
-    title = "Data Clustering for Very Large Datasets Plus Applications", //
-    booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
-    bibkey = "tr/wisc/Zhang97")
-public class CentroidEuclideanDistance implements BIRCHDistance {
+@Alias({ "D4" })
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class VarianceIncreaseDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final CentroidEuclideanDistance STATIC = new CentroidEuclideanDistance();
+  public static final VarianceIncreaseDistance STATIC = new VarianceIncreaseDistance();
 
   @Override
-  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
-    return cf.squaredCenterDistance(v);
+  public double squaredDistance(NumberVector nv, CFInterface cf) {
+    return cf.squaredCenterDistance(nv) * cf.getWeight() / (cf.getWeight() + 1);
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    return cf1.squaredCenterDistance(cf2);
+  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+    return cf1.squaredCenterDistance(cf2) * cf1.getWeight() * cf2.getWeight() / (cf1.getWeight() + cf2.getWeight());
   }
 
   /**
    * Parameterization class.
    *
-   * @author Erich Schubert
+   * @author Andreas Lang
    */
   public static class Par implements Parameterizer {
     @Override
-    public CentroidEuclideanDistance make() {
+    public VarianceIncreaseDistance make() {
       return STATIC;
     }
   }

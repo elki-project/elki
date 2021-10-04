@@ -18,44 +18,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vii;
+package elki.clustering.hierarchical.betula.distance;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Variance increase distance.
+ * Average intercluster distance.
  * <p>
  * Reference:
- * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br>
- * T. Zhang<br>
- * Doctoral Dissertation, 1997.
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
  *
  * @author Andreas Lang
+ * @author Erich Schubert
  */
-@Alias({ "D4" })
-@Reference(authors = "T. Zhang", //
-    title = "Data Clustering for Very Large Datasets Plus Applications", //
-    booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
-    bibkey = "tr/wisc/Zhang97")
-public class VarianceIncreaseDistance implements BIRCHDistance {
+@Alias({ "D2" })
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class AverageInterclusterDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final VarianceIncreaseDistance STATIC = new VarianceIncreaseDistance();
+  public static final AverageInterclusterDistance STATIC = new AverageInterclusterDistance();
 
   @Override
-  public double squaredDistance(NumberVector nv, ClusteringFeature cf) {
-    return cf.squaredCenterDistance(nv) * cf.n / (cf.n + 1);
+  public double squaredDistance(NumberVector nv, CFInterface cf) {
+    return cf.sumdev() / cf.getWeight() + cf.squaredCenterDistance(nv);
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    return cf1.squaredCenterDistance(cf2) * cf1.n * cf2.n / (cf1.n + cf2.n);
+  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+    return cf1.sumdev() / cf1.getWeight() + cf2.sumdev() / cf2.getWeight() + cf1.squaredCenterDistance(cf2);
   }
 
   /**
@@ -65,7 +64,7 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
    */
   public static class Par implements Parameterizer {
     @Override
-    public VarianceIncreaseDistance make() {
+    public AverageInterclusterDistance make() {
       return STATIC;
     }
   }

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2020
+ * Copyright (C) 2019
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -18,25 +18,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vvv;
+package elki.clustering.hierarchical.betula.distance;
 
-import elki.clustering.hierarchical.betula.CFDistance;
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 
 /**
  * Distance function for BIRCH clustering.
- *
- * For performance we (usually) use squared distances.
- *
- * The exception to this rule is Manhattan.
+ * <p>
+ * For performance we (usually, except Manhattan) use squared distances.
  *
  * @author Erich Schubert
- * @since 0.7.5
  *
  * @assoc - - - ClusteringFeature
  * @assoc - - - NumberVector
  */
-public interface BIRCHDistance extends CFDistance<ClusteringFeature> {
+public interface CFDistance {
   /**
    * Distance of a vector to a clustering feature.
    *
@@ -44,7 +41,7 @@ public interface BIRCHDistance extends CFDistance<ClusteringFeature> {
    * @param cf Clustering Feature
    * @return Distance
    */
-  double squaredDistance(NumberVector v, ClusteringFeature cf);
+  double squaredDistance(NumberVector v, CFInterface cf);
 
   /**
    * Distance between two clustering features.
@@ -53,5 +50,16 @@ public interface BIRCHDistance extends CFDistance<ClusteringFeature> {
    * @param c2 Second clustering feature
    * @return Distance
    */
-  double squaredDistance(ClusteringFeature c1, ClusteringFeature c2);
+  double squaredDistance(CFInterface c1, CFInterface c2);
+
+  /**
+   * Initialization for self measure for new Combinatorial clustering Methods
+   * (Podani 1989)
+   * 
+   * @param cf Clustering Feature
+   * @return internal measure
+   */
+  default double matSelfInit(CFInterface cf) {
+    return 0;
+  }
 }

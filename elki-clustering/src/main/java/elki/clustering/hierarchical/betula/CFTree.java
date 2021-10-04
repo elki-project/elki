@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.clustering.hierarchical.betula.vvi.VVIModel;
 import elki.data.NumberVector;
 import elki.database.ids.ArrayModifiableDBIDs;
@@ -161,12 +162,12 @@ public class CFTree<L extends CFInterface> {
   /**
    * Cluster distance
    */
-  CFDistance<L> dist;
+  CFDistance dist;
 
   /**
    * Absorption criterion
    */
-  CFDistance<L> abs;
+  CFDistance abs;
 
   /**
    * Constructor.

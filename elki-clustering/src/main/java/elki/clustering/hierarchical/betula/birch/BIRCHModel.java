@@ -20,8 +20,8 @@
  */
 package elki.clustering.hierarchical.betula.birch;
 
-import elki.clustering.hierarchical.betula.CFDistance;
 import elki.clustering.hierarchical.betula.CFModel;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -33,85 +33,84 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Andreas Lang
  */
 public final class BIRCHModel implements CFModel<ClusteringFeature> {
+  /**
+   * BIRCH distance function to use
+   */
+  CFDistance dist;
+
+  /**
+   * BIRCH distance function to use for point absorption
+   */
+  CFDistance abs;
+
+  /**
+   * Constructor.
+   *
+   * @param dist Distance Function
+   * @param abs Absorption Criteria
+   */
+  public BIRCHModel(CFDistance dist, CFDistance abs) {
+    this.dist = dist;
+    this.abs = abs;
+  }
+
+  @Override
+  public ClusteringFeature make(int d) {
+    return new ClusteringFeature(d);
+  }
+
+  @Override
+  public TreeNode treeNode(int d, int capacity) {
+    return new TreeNode(d, capacity);
+  }
+
+  @Override
+  public CFDistance distance() {
+    return dist;
+  }
+
+  @Override
+  public CFDistance absorption() {
+    return abs;
+  }
+
+  /**
+   * Parameterization class for CF Models.
+   *
+   * @author Andreas Lang
+   */
+  public static class Par implements Parameterizer {
+    /**
+     * Distance function parameter.
+     */
+    public static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
+
+    /**
+     * Absorption parameter.
+     */
+    public static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
 
     /**
      * BIRCH distance function to use
      */
-    BIRCHDistance dist;
+    CFDistance dist;
 
     /**
      * BIRCH distance function to use for point absorption
      */
-    BIRCHDistance abs;
+    CFDistance abs;
 
-    /**
-     * Constructor.
-     *
-     * @param dist Distance Function
-     * @param abs Absorption Criteria
-     */
-    public BIRCHModel(BIRCHDistance dist, BIRCHDistance abs) {
-        this.dist = dist;
-        this.abs = abs;
+    @Override
+    public void configure(Parameterization config) {
+      new ObjectParameter<CFDistance>(DISTANCE_ID, CFDistance.class, BIRCHVarianceIncreaseDistance.class) //
+          .grab(config, x -> dist = x);
+      new ObjectParameter<CFDistance>(ABSORPTION_ID, CFDistance.class, BIRCHRadiusDistance.class) //
+          .grab(config, x -> abs = x);
     }
 
     @Override
-    public ClusteringFeature make(int d) {
-        return new ClusteringFeature(d);
+    public BIRCHModel make() {
+      return new BIRCHModel(dist, abs);
     }
-
-    @Override
-    public TreeNode treeNode(int d, int capacity) {
-        return new TreeNode(d, capacity);
-    }
-
-    /**
-     * Parameterization class for CF Models.
-     *
-     * @author Andreas Lang
-     */
-    public static class Par implements Parameterizer {
-        /**
-         * Distance function parameter.
-         */
-        public static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
-
-        /**
-         * Absorption parameter.
-         */
-        public static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
-
-        /**
-         * BIRCH distance function to use
-         */
-        BIRCHDistance dist;
-
-        /**
-         * BIRCH distance function to use for point absorption
-         */
-        BIRCHDistance abs;
-
-        @Override
-        public void configure(Parameterization config) {
-            new ObjectParameter<BIRCHDistance>(DISTANCE_ID, BIRCHDistance.class, VarianceIncreaseDistance.class) //
-                    .grab(config, x -> dist = x);
-            new ObjectParameter<BIRCHDistance>(ABSORPTION_ID, BIRCHDistance.class, RadiusDistance.class) //
-                    .grab(config, x -> abs = x);
-        }
-
-        @Override
-        public BIRCHModel make() {
-            return new BIRCHModel(dist, abs);
-        }
-    }
-
-    @Override
-    public CFDistance<ClusteringFeature> distance() {
-        return dist;
-    }
-
-    @Override
-    public CFDistance<ClusteringFeature> absorption() {
-        return abs;
-    }
+  }
 }

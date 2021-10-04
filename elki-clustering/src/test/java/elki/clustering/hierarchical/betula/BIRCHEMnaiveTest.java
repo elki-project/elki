@@ -23,18 +23,18 @@ package elki.clustering.hierarchical.betula;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.betula.vii.CentroidEuclideanDistance;
-import elki.clustering.hierarchical.betula.vvv.RadiusDistance;
+import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
+import elki.clustering.hierarchical.betula.distance.RadiusDistance;
+import elki.clustering.hierarchical.betula.distance.VarianceIncreaseDistance;
+import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
+import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
 import elki.clustering.hierarchical.betula.vii.VIIModel;
-import elki.clustering.hierarchical.betula.vvi.VarianceIncreaseDistance;
-import elki.clustering.hierarchical.betula.vvv.VVVModel;
 import elki.clustering.hierarchical.betula.vvi.VVIModel;
+import elki.clustering.hierarchical.betula.vvv.VVVModel;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
-import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
-import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
 
 /**
  * Regression test for BIRCH clustering with GMM.

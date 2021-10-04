@@ -20,6 +20,8 @@
  */
 package elki.clustering.hierarchical.betula;
 
+import elki.clustering.hierarchical.betula.distance.CFDistance;
+
 /**
  * Interface for CFModel
  * 
@@ -50,12 +52,12 @@ public interface CFModel<L extends CFInterface> {
    * 
    * @return distance Function
    */
-  CFDistance<L> distance();
+  CFDistance distance();
 
   /**
    * The selected absorption Criteria
    * 
    * @return distance Function
    */
-  CFDistance<L> absorption();
+  CFDistance absorption();
 }

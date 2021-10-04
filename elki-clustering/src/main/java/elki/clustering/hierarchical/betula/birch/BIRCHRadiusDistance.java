@@ -20,8 +20,11 @@
  */
 package elki.clustering.hierarchical.betula.birch;
 
+import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
@@ -38,26 +41,31 @@ import elki.utilities.optionhandling.Parameterizer;
  * @since 0.7.5
  */
 @Alias("R")
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "https://doi.org/10.1145/233269.233324", //
     bibkey = "DBLP:conf/sigmod/ZhangRL96")
-public class RadiusDistance implements BIRCHDistance {
+public class BIRCHRadiusDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final RadiusDistance STATIC = new RadiusDistance();
+  public static final BIRCHRadiusDistance STATIC = new BIRCHRadiusDistance();
 
   @Override
-  public double squaredDistance(NumberVector n, ClusteringFeature f1) {
-    if(f1.n <= 0) {
+  public double squaredDistance(NumberVector n, CFInterface ocf) {
+    if(!(ocf instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf = (ClusteringFeature) ocf;
+    if(cf.getWeight() <= 0) {
       return 0.;
     }
-    final int dim = f1.ls.length;
-    final double div = 1. / (f1.n + 1);
+    final int dim = cf.ls.length;
+    final double div = 1. / (cf.getWeight() + 1);
     // Sum_d sum_i squares
-    double sum = f1.sumOfSumOfSquares();
+    double sum = cf.sumOfSumOfSquares();
     for(int d = 0; d < dim; d++) {
       double v = n.doubleValue(d);
       sum += v * v;
@@ -65,23 +73,28 @@ public class RadiusDistance implements BIRCHDistance {
     sum *= div;
     // Sum_d square sum_i
     for(int d = 0; d < dim; d++) {
-      double v = (f1.ls[d] + n.doubleValue(d)) * div;
+      double v = (cf.ls[d] + n.doubleValue(d)) * div;
       sum -= v * v;
     }
     return sum > 0 ? sum : 0;
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature f1, ClusteringFeature f2) {
-    final int n12 = f1.n + f2.n;
+  public double squaredDistance(CFInterface ocf1, CFInterface ocf2) {
+    if(!(ocf1 instanceof ClusteringFeature) || !(ocf2 instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf1 = (ClusteringFeature) ocf1;
+    ClusteringFeature cf2 = (ClusteringFeature) ocf2;
+    final int n12 = cf1.getWeight() + cf2.getWeight();
     if(n12 <= 1) {
       return 0.;
     }
-    final int dim = f1.ls.length;
+    final int dim = cf1.ls.length;
     final double div = 1. / n12;
-    double sum = (f1.sumOfSumOfSquares() + f2.sumOfSumOfSquares()) * div;
+    double sum = (cf1.sumOfSumOfSquares() + cf2.sumOfSumOfSquares()) * div;
     for(int i = 0; i < dim; i++) {
-      double v = (f1.ls[i] + f2.ls[i]) * div;
+      double v = (cf1.ls[i] + cf2.ls[i]) * div;
       sum -= v * v;
     }
     return sum > 0 ? sum : 0;
@@ -94,7 +107,7 @@ public class RadiusDistance implements BIRCHDistance {
    */
   public static class Par implements Parameterizer {
     @Override
-    public RadiusDistance make() {
+    public BIRCHRadiusDistance make() {
       return STATIC;
     }
   }

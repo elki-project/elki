@@ -20,13 +20,16 @@
  */
 package elki.clustering.hierarchical.betula.birch;
 
+import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Variance increase distance.
+ * Average intercluster distance.
  * <p>
  * Reference:
  * <p>
@@ -37,56 +40,52 @@ import elki.utilities.optionhandling.Parameterizer;
  * @author Erich Schubert
  * @since 0.7.5
  */
-@Alias({ "D4" })
+@Alias({ "D2" })
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
     url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
     bibkey = "tr/wisc/Zhang97")
-public class VarianceIncreaseDistance implements BIRCHDistance {
+public class BIRCHAverageInterclusterDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final VarianceIncreaseDistance STATIC = new VarianceIncreaseDistance();
+  public static final BIRCHAverageInterclusterDistance STATIC = new BIRCHAverageInterclusterDistance();
 
   @Override
-  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+  public double squaredDistance(NumberVector v, CFInterface ocf) {
+    if(!(ocf instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf = (ClusteringFeature) ocf;
     final int dim = v.getDimensionality();
     assert dim == cf.getDimensionality();
-    final int n2 = cf.n, n3 = 1 + n2;
-    final double div2 = 1. / n2, div3 = 1. / n3;
-    double dot1 = 0., dot2 = 0., dot3 = 0.;
+    // Dot product:
+    double sum = 0;
     for(int d = 0; d < dim; d++) {
-      double x1 = v.doubleValue(d), x2 = cf.ls[d];
-      double x3 = (x1 + x2) * div3;
-      x2 *= div2;
-      // x1 *= div1;
-      dot1 += x1 * x1;
-      dot2 += x2 * x2;
-      dot3 += x3 * x3;
+      sum += v.doubleValue(d) * cf.ls[d];
     }
-    double sum = /* 1 * */ dot1 + n2 * dot2 - n3 * dot3;
-    return sum > 0 ? sum : 0;
+    sum = /* 1. * */ cf.sumdev() + cf.getWeight() * ClusteringFeature.sumOfSquares(v) - 2 * sum;
+    return sum > 0 ? sum / cf.getWeight() : 0;
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+  public double squaredDistance(CFInterface ocf1, CFInterface ocf2) {
+    if(!(ocf1 instanceof ClusteringFeature) || !(ocf2 instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf1 = (ClusteringFeature) ocf1;
+    ClusteringFeature cf2 = (ClusteringFeature) ocf2;
     final int dim = cf1.getDimensionality();
     assert dim == cf2.getDimensionality();
-    final int n1 = cf1.n, n2 = cf2.n, n3 = n1 + n2;
-    final double div1 = 1. / n1, div2 = 1. / n2, div3 = 1. / n3;
-    double dot1 = 0., dot2 = 0., dot3 = 0.;
+    // Dot product:
+    double sum = 0;
     for(int d = 0; d < dim; d++) {
-      double x1 = cf1.ls[d], x2 = cf2.ls[d];
-      double x3 = (x1 + x2) * div3;
-      x2 *= div2;
-      x1 *= div1;
-      dot1 += x1 * x1;
-      dot2 += x2 * x2;
-      dot3 += x3 * x3;
+      sum += cf1.ls[d] * cf2.ls[d];
     }
-    double sum = n1 * dot1 + n2 * dot2 - n3 * dot3;
-    return sum > 0 ? sum : 0;
+    sum = cf2.getWeight() * cf1.sumOfSumOfSquares() + cf1.getWeight() * cf2.sumOfSumOfSquares() - 2 * sum;
+    return sum > 0 ? sum / (cf1.getWeight() * (long) cf2.getWeight()) : 0;
   }
 
   /**
@@ -96,7 +95,7 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
    */
   public static class Par implements Parameterizer {
     @Override
-    public VarianceIncreaseDistance make() {
+    public BIRCHAverageInterclusterDistance make() {
       return STATIC;
     }
   }

@@ -23,10 +23,10 @@ package elki.clustering.hierarchical.betula;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.betula.vii.AverageInterclusterDistance;
-import elki.clustering.hierarchical.betula.vii.AverageIntraclusterDistance;
-import elki.clustering.hierarchical.betula.vii.CentroidEuclideanDistance;
-import elki.clustering.hierarchical.betula.vii.CentroidManhattanDistance;
+import elki.clustering.hierarchical.betula.distance.AverageInterclusterDistance;
+import elki.clustering.hierarchical.betula.distance.AverageIntraclusterDistance;
+import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
+import elki.clustering.hierarchical.betula.distance.CentroidManhattanDistance;
 import elki.clustering.hierarchical.betula.vii.VIIModel;
 import elki.data.Clustering;
 import elki.database.Database;

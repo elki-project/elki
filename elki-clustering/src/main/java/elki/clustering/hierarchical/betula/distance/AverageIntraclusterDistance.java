@@ -18,8 +18,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vvv;
+package elki.clustering.hierarchical.betula.distance;
 
+import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -30,37 +31,39 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * Reference:
  * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br>
- * T. Zhang<br>
- * Doctoral Dissertation, 1997.
- * <p>
- * Note: this distance did not work well in the original work, apparently.
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
  *
  * @author Andreas Lang
+ * @author Erich Schubert
  */
 @Alias({ "D3" })
-@Reference(authors = "T. Zhang", //
-    title = "Data Clustering for Very Large Datasets Plus Applications", //
-    booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
-    bibkey = "tr/wisc/Zhang97")
-public class AverageIntraclusterDistance implements BIRCHDistance {
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class AverageIntraclusterDistance implements CFDistance {
   /**
    * Static instance.
    */
   public static final AverageIntraclusterDistance STATIC = new AverageIntraclusterDistance();
 
   @Override
-  public double squaredDistance(NumberVector nv, ClusteringFeature cf1) {
-    return cf1.n <= 0 ? 0 : //
-        2 * ((cf1.n + 1) * cf1.sumdev() + cf1.n * cf1.squaredCenterDistance(nv)) / ((cf1.n + 1) * cf1.n);
+  public double squaredDistance(NumberVector nv, CFInterface cf1) {
+    return cf1.getWeight() <= 0 ? 0 : //
+        2 * ((cf1.getWeight() + 1) * cf1.sumdev() + cf1.getWeight() * cf1.squaredCenterDistance(nv)) / ((cf1.getWeight() + 1) * cf1.getWeight());
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final double n12 = cf1.n + cf2.n;
+  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+    final double n12 = cf1.getWeight() + cf2.getWeight();
     return n12 <= 0 ? 0 : //
-        2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.n * cf2.n * cf1.squaredCenterDistance(cf2)) / (n12 * (n12 - 1));
+        2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.getWeight() * cf2.getWeight() * cf1.squaredCenterDistance(cf2)) / (n12 * (n12 - 1));
+  }
+
+  @Override
+  public double matSelfInit(CFInterface cf) {
+    return 2 * cf.sumdev() / (cf.getWeight() - 1);
   }
 
   /**

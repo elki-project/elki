@@ -20,13 +20,16 @@
  */
 package elki.clustering.hierarchical.betula.birch;
 
+import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.distance.CFDistance;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Average intercluster distance.
+ * Variance increase distance.
  * <p>
  * Reference:
  * <p>
@@ -37,42 +40,66 @@ import elki.utilities.optionhandling.Parameterizer;
  * @author Erich Schubert
  * @since 0.7.5
  */
-@Alias({ "D2" })
+@Alias({ "D4" })
+@Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang", //
     title = "Data Clustering for Very Large Datasets Plus Applications", //
     booktitle = "University of Wisconsin Madison, Technical Report #1355", //
     url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf", //
     bibkey = "tr/wisc/Zhang97")
-public class AverageInterclusterDistance implements BIRCHDistance {
+public class BIRCHVarianceIncreaseDistance implements CFDistance {
   /**
    * Static instance.
    */
-  public static final AverageInterclusterDistance STATIC = new AverageInterclusterDistance();
+  public static final BIRCHVarianceIncreaseDistance STATIC = new BIRCHVarianceIncreaseDistance();
 
   @Override
-  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+  public double squaredDistance(NumberVector v, CFInterface ocf) {
+    if(!(ocf instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf = (ClusteringFeature) ocf;
     final int dim = v.getDimensionality();
     assert dim == cf.getDimensionality();
-    // Dot product:
-    double sum = 0;
+    final int n2 = cf.getWeight(), n3 = 1 + n2;
+    final double div2 = 1. / n2, div3 = 1. / n3;
+    double dot1 = 0., dot2 = 0., dot3 = 0.;
     for(int d = 0; d < dim; d++) {
-      sum += v.doubleValue(d) * cf.ls[d];
+      double x1 = v.doubleValue(d), x2 = cf.ls[d];
+      double x3 = (x1 + x2) * div3;
+      x2 *= div2;
+      // x1 *= div1;
+      dot1 += x1 * x1;
+      dot2 += x2 * x2;
+      dot3 += x3 * x3;
     }
-    sum = /* 1. * */ cf.sumOfSumOfSquares() + cf.n * ClusteringFeature.sumOfSquares(v) - 2 * sum;
-    return sum > 0 ? sum / cf.n : 0;
+    double sum = /* 1 * */ dot1 + n2 * dot2 - n3 * dot3;
+    return sum > 0 ? sum : 0;
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+  public double squaredDistance(CFInterface ocf1, CFInterface ocf2) {
+    if(!(ocf1 instanceof ClusteringFeature) || !(ocf2 instanceof ClusteringFeature)) {
+      throw new IllegalStateException("This distance only supports BIRCH clustering features.");
+    }
+    ClusteringFeature cf1 = (ClusteringFeature) ocf1;
+    ClusteringFeature cf2 = (ClusteringFeature) ocf2;
     final int dim = cf1.getDimensionality();
     assert dim == cf2.getDimensionality();
-    // Dot product:
-    double sum = 0;
+    final int n1 = cf1.getWeight(), n2 = cf2.getWeight(), n3 = n1 + n2;
+    final double div1 = 1. / n1, div2 = 1. / n2, div3 = 1. / n3;
+    double dot1 = 0., dot2 = 0., dot3 = 0.;
     for(int d = 0; d < dim; d++) {
-      sum += cf1.ls[d] * cf2.ls[d];
+      double x1 = cf1.ls[d], x2 = cf2.ls[d];
+      double x3 = (x1 + x2) * div3;
+      x2 *= div2;
+      x1 *= div1;
+      dot1 += x1 * x1;
+      dot2 += x2 * x2;
+      dot3 += x3 * x3;
     }
-    sum = cf2.n * cf1.sumOfSumOfSquares() + cf1.n * cf2.sumOfSumOfSquares() - 2 * sum;
-    return sum > 0 ? sum / (cf1.n * (long) cf2.n) : 0;
+    double sum = n1 * dot1 + n2 * dot2 - n3 * dot3;
+    return sum > 0 ? sum : 0;
   }
 
   /**
@@ -82,7 +109,7 @@ public class AverageInterclusterDistance implements BIRCHDistance {
    */
   public static class Par implements Parameterizer {
     @Override
-    public AverageInterclusterDistance make() {
+    public BIRCHVarianceIncreaseDistance make() {
       return STATIC;
     }
   }
