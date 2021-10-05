@@ -18,17 +18,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
-import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
-import elki.index.tree.betula.CFTree;
-import elki.index.tree.betula.CFTree.LeafIterator;
-import elki.index.tree.betula.features.AsClusterFeature;
-import elki.index.tree.betula.features.ClusterFeature;
-
-import java.util.ArrayList;
 import java.util.List;
 
+import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.features.AsClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -62,23 +59,9 @@ public abstract class AbstractCFKMeansInitialization {
    * @param cfs List of clustering features
    * @param k Number of clusters.
    * @param root Summary statistic of the tree.
-   * @return
+   * @return initial cluster means
    */
   public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k);
-
-  /**
-   * Extract the leaves of the tree.
-   *
-   * @param tree Tree
-   * @return Leaves
-   */
-  public static <L extends ClusterFeature> ArrayList<L> flattenTree(CFTree<L> tree) {
-    ArrayList<L> cfs = new ArrayList<>(tree.getLeaves());
-    for(LeafIterator<L> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
-      cfs.add(iter.get());
-    }
-    return cfs;
-  }
 
   /**
    * Parameterization class.
@@ -89,7 +72,7 @@ public abstract class AbstractCFKMeansInitialization {
     /**
      * Parameter to specify the random generator seed.
      */
-    public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
+    public static final OptionID SEED_ID = AbstractKMeans.SEED_ID;
 
     /**
      * Random generator

@@ -28,6 +28,8 @@ import elki.clustering.em.models.BetulaDiagonalGaussianModelFactory;
 import elki.clustering.em.models.BetulaMultivariateGaussianModelFactory;
 import elki.clustering.em.models.BetulaSphericalGaussianModelFactory;
 import elki.clustering.kmeans.AbstractKMeans;
+import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
+import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.index.tree.betula.CFTree;
@@ -37,8 +39,6 @@ import elki.index.tree.betula.distance.VarianceIncreaseDistance;
 import elki.index.tree.betula.features.VIIFeature;
 import elki.index.tree.betula.features.VVIFeature;
 import elki.index.tree.betula.features.VVVFeature;
-import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
-import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
 import elki.utilities.ELKIBuilder;
 
 /**

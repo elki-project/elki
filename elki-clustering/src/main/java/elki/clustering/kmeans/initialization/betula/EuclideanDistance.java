@@ -18,9 +18,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
-import elki.data.NumberVector;
 import elki.index.tree.betula.features.ClusterFeature;
 
 /**
@@ -30,33 +29,9 @@ import elki.index.tree.betula.features.ClusterFeature;
  */
 public class EuclideanDistance implements CFIDistance {
   @Override
-  public double squaredDistance(NumberVector v, ClusterFeature cf) {
-    final int d = v.getDimensionality();
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v.doubleValue(i);
-      sum += dx * dx;
-    }
-    return sum;
-  }
-
-  @Override
-  public double squaredDistance(double[] v, ClusterFeature cf) {
-    final int d = v.length;
-    assert d == cf.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v[i];
-      sum += dx * dx;
-    }
-    return sum;
-  }
-
-  @Override
   public double squaredDistance(ClusterFeature c1, ClusterFeature c2) {
     final int d = c1.getDimensionality();
-    assert (d == c2.getDimensionality());
+    assert d == c2.getDimensionality();
     double sum = 0.;
     for(int i = 0; i < d; i++) {
       double dx = c1.centroid(i) - c2.centroid(i);

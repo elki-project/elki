@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
 import java.util.List;
 import java.util.Random;
@@ -53,16 +53,12 @@ public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + leaves + " < k objects.");
     }
     Random rnd = rf.getSingleThreadedRandom();
-    int d = cfs.get(0).getCF().getDimensionality();
-    double[][] means = new double[k][d];
-    for(int i = 0, c = 0; i < leaves && k > 0; i++) {
+    double[][] means = new double[k][];
+    for(int i = 0, c = 0; i < leaves && c < k; i++) {
       final ClusterFeature cfsi = cfs.get(i).getCF();
       double prob = rnd.nextDouble();
       if(prob < ((double) k / (leaves - i))) {
-        double[] mean = means[c++];
-        for(int j = 0; j < d; j++) {
-          mean[j] = cfsi.centroid(j);
-        }
+        means[c++] = cfsi.toArray();
       }
     }
     return means;

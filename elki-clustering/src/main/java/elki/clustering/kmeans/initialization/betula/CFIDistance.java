@@ -18,9 +18,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
-import elki.data.NumberVector;
 import elki.index.tree.betula.features.ClusterFeature;
 
 /**
@@ -29,24 +28,6 @@ import elki.index.tree.betula.features.ClusterFeature;
  * @author Andreas Lang
  */
 public interface CFIDistance {
-  /**
-   * Distance of a vector to a clustering feature.
-   *
-   * @param v Vector
-   * @param cf Clustering Feature
-   * @return Distance
-   */
-  double squaredDistance(NumberVector v, ClusterFeature cf);
-
-  /**
-   * Distance of a vector to a clustering feature.
-   *
-   * @param v double Array
-   * @param cf Clustering Feature
-   * @return Distance
-   */
-  double squaredDistance(double[] v, ClusterFeature cf);
-
   /**
    * Distance between two clustering features.
    *

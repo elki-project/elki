@@ -25,6 +25,8 @@ import static elki.math.linearalgebra.VMath.timesEquals;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
+import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -37,8 +39,6 @@ import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
-import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
-import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
@@ -119,7 +119,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
    */
   public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
-    ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
+    ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
 
     int[] assignment = new int[cfs.size()], weights = new int[k];
     Arrays.fill(assignment, -1);

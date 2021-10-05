@@ -19,7 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +31,6 @@ import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
-import elki.utilities.random.RandomFactory;
 
 /**
  * Initialize K-means by choosing k distant existing subtrees.
@@ -42,15 +40,15 @@ import elki.utilities.random.RandomFactory;
 public class CFTreeInit extends AbstractCFKMeansInitialization {
   AbstractCFKMeansInitialization subInit;
 
-  public CFTreeInit(RandomFactory rf, AbstractCFKMeansInitialization subInit) {
-    super(rf);
+  public CFTreeInit(AbstractCFKMeansInitialization subInit) {
+    super(null);
     this.subInit = subInit;
   }
 
   @Override
   public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
-    if(tree.getLeaves() < k) {
-      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
+    if(tree.numLeaves() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.numLeaves() + " < k objects.");
     }
     ArrayList<CFNode<?>> next = new ArrayList<>();
     ArrayList<ClusterFeature> res = new ArrayList<>(k);
@@ -99,14 +97,14 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
 
     @Override
     public void configure(Parameterization config) {
-      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+      // we do not want random seeds: super.configure(config);
       new ObjectParameter<AbstractCFKMeansInitialization>(TIKMPlusPlus_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
           .grab(config, x -> initializer = x);
     }
 
     @Override
     public CFTreeInit make() {
-      return new CFTreeInit(rnd, initializer);
+      return new CFTreeInit(initializer);
     }
   }
 }

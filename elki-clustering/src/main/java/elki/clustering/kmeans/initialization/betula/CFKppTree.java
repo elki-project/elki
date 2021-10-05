@@ -19,7 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 import net.jafama.FastMath;
@@ -67,8 +66,8 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
 
   @Override
   public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
-    if(tree.getLeaves() < k) {
-      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
+    if(tree.numLeaves() < k) {
+      throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.numLeaves() + " < k objects.");
     }
     maxdepth = maxdepth > 0 ? maxdepth : FastMath.log2(k) / FastMath.log2(tree.getCapacity()) + 1;
     Random rnd = rf.getSingleThreadedRandom();
@@ -192,7 +191,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
 
     @Override
     public void configure(Parameterization config) {
-      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+      super.configure(config);
       new ObjectParameter<CFIDistance>(KMPP_DISTANCE_ID, CFIDistance.class, VarDistance.class)//
           .grab(config, x -> dist = x);
       new Flag(FIRST_VARIANCE_ID).grab(config, x -> firstVar = x);

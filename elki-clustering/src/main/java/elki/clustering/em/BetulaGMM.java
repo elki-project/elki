@@ -48,7 +48,6 @@ import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
-import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
@@ -175,7 +174,7 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
 
     // Store clustering features:
     Duration modeltime = LOG.newDuration(getClass().getName() + ".modeltime").begin();
-    ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
+    ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
     // Initialize EM Model
     List<? extends BetulaClusterModel> models = initializer.buildInitialModels(cfs, k, tree);
     Map<ClusterFeature, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());

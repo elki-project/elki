@@ -572,6 +572,19 @@ public class CFTree<L extends ClusterFeature> {
   }
 
   /**
+   * Extract the leaves of the tree.
+   *
+   * @return Leaves
+   */
+  public ArrayList<L> getLeaves() {
+    ArrayList<L> cfs = new ArrayList<>(leaves);
+    for(LeafIterator<L> iter = leafIterator(); iter.valid(); iter.advance()) {
+      cfs.add(iter.get());
+    }
+    return cfs;
+  }
+
+  /**
    * Iterator over leaf nodes.
    *
    * @author Erich Schubert
@@ -667,7 +680,7 @@ public class CFTree<L extends ClusterFeature> {
    * 
    * @return number of leaves
    */
-  public int getLeaves() {
+  public int numLeaves() {
     return leaves;
   }
 

@@ -1,5 +1,5 @@
 /**
- * Distance functions for BETULA and BIRCH.
+ * Different variants of Betula and BIRCH cluster features.
  */
 /*
  This file is part of ELKI:
@@ -21,4 +21,4 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.distance;
+package elki.index.tree.betula.features;

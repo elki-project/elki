@@ -111,7 +111,7 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
-    Map<ClusterFeature, DBIDs> idmap = new Reference2ObjectOpenHashMap<>(tree.getLeaves());
+    Map<ClusterFeature, DBIDs> idmap = new Reference2ObjectOpenHashMap<>(tree.numLeaves());
     if(storeIds) {
       for(LeafIterator<?> it = tree.leafIterator(); it.valid(); it.advance()) {
         idmap.put(it.get(), tree.getDBIDs(it.get()));

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula.initialization;
+package elki.clustering.kmeans.initialization.betula;
 
 import java.util.List;
 import java.util.Random;
@@ -31,21 +31,16 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * K-Means++-like initialization for BIRCH k-means; this cannot be used to
- * initialize regular k-means, use {@link KMeansPlusPlus} instead.
+ * K-Means++-like initialization for BETULA k-means, treating the clustering
+ * features as a flat list; this cannot be used to initialize regular k-means,
+ * use {@link KMeansPlusPlus} instead.
  *
  * @author Andreas Lang
  */
 public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
-  /**
-   * Weights
-   */
-  protected double[] weights;
-
   /**
    * Distance function
    */
@@ -87,12 +82,9 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
     ClusterFeature first = firstVar ? sampleFirst(tree.getRoot().getCF(), cf, rnd) : cf.get(rnd.nextInt(cf.size())).getCF();
-    final int d = first.getDimensionality();
-    double[] mean = means[0] = new double[d];
-    for(int i = 0; i < d; i++) {
-      mean[i] = first.centroid(i);
-    }
-    double weightsum = initialWeights(first, cf);
+    means[0] = first.toArray();
+    double[] weights = new double[cf.size()];
+    double weightsum = initialWeights(first, cf, weights);
     for(int m = 1; m < k; m++) {
       if(weightsum > Double.MAX_VALUE) {
         throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
@@ -110,15 +102,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
         continue; // Retry
       }
       ClusterFeature cfi = cf.get(i).getCF();
-      // Add new mean:
-      mean = means[m] = new double[d];
-      for(int j = 0; j < mean.length; j++) {
-        mean[j] = cfi.centroid(j);
-      }
+      means[m] = cfi.toArray();
       if(m < k) {
-        // Update weights:
-        weights[i] = 0.;
-        weightsum = updateWeights(cfi, cf);
+        weights[i] = 0.; // disable
+        weightsum = updateWeights(cfi, cf, weights);
       }
     }
     return means;
@@ -128,15 +115,15 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * Initialize the weight list.
    * 
    * @param first Id of first mean.
-   * @param cf Cluster features
+   * @param cfs Cluster features
+   * @param weights Weights output
    * @return Sum of weights
    */
-  private double initialWeights(ClusterFeature first, List<? extends AsClusterFeature> cf) {
-    final int e = cf.size();
+  private double initialWeights(ClusterFeature first, List<? extends AsClusterFeature> cfs, double[] weights) {
     double weightsum = 0.;
-    weights = new double[e];
-    for(int i = 0; i < e; i++) {
-      weightsum += weights[i] = distance.squaredDistance(first, cf.get(i).getCF());
+    int i = 0;
+    for(AsClusterFeature cf : cfs) {
+      weightsum += weights[i++] = distance.squaredDistance(first, cf.getCF());
     }
     return weightsum;
   }
@@ -146,16 +133,18 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    *
    * @param latest Latest center
    * @param cf Cluster features
+   * @param weights Weights
    * @return Weight sum
    */
-  private double updateWeights(ClusterFeature latest, List<? extends AsClusterFeature> cf) {
+  private double updateWeights(ClusterFeature latest, List<? extends AsClusterFeature> cfs, double[] weights) {
     double weightsum = 0.;
-    for(int i = 0, e = cf.size(); i < e; i++) {
-      double weight = weights[i];
+    int i = -1; // incremented below
+    for(AsClusterFeature cf : cfs) {
+      double weight = weights[++i];
       if(weight <= 0.) {
         continue; // Duplicate, or already chosen.
       }
-      double newweight = distance.squaredDistance(latest, cf.get(i).getCF());
+      double newweight = distance.squaredDistance(latest, cf.getCF());
       weightsum += newweight < weight ? (weights[i] = newweight) : weight;
     }
     return weightsum;
@@ -170,22 +159,22 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @return Selected cluster feature
    */
   private ClusterFeature sampleFirst(ClusterFeature root, List<? extends AsClusterFeature> cfs, Random rnd) {
-    final int e = cfs.size();
     double weightsum = 0;
-    double[] tmpWeight = new double[e];
-    for(int i = 0; i < e; i++) {
-      double weight = distance.squaredDistance(root, cfs.get(i).getCF());
-      tmpWeight[i] = weight;
-      weightsum += weight;
+    double[] tmpWeight = new double[cfs.size()];
+    {
+      int i = 0;
+      for(AsClusterFeature cf : cfs) {
+        weightsum += tmpWeight[i++] = distance.squaredDistance(root, cf.getCF());
+      }
     }
     while(true) {
       double r = rnd.nextDouble() * weightsum;
-      for(int i = 0; i < e; i++) {
+      for(int i = 0; i < tmpWeight.length; i++) {
         if((r -= tmpWeight[i]) <= 0) {
           return cfs.get(i).getCF();
         }
       }
-      weightsum -= r; // Decrease
+      weightsum -= r; // Shouldn't happen. Decrease and retry
     }
   }
 
@@ -217,7 +206,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
 
     @Override
     public void configure(Parameterization config) {
-      new RandomParameter(SEED_ID).grab(config, x -> rnd = x);
+      super.configure(config);
       new ObjectParameter<CFIDistance>(KMPP_DISTANCE_ID, CFIDistance.class, EuclideanDistance.class)//
           .grab(config, x -> dist = x);
       new Flag(FIRST_VARIANCE_ID).grab(config, x -> firstVar = x);

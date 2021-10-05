@@ -23,10 +23,10 @@ package elki.clustering.em.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
+import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
-import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
-import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;

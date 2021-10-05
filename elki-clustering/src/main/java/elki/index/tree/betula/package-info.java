@@ -1,13 +1,11 @@
 /**
- * BIRCH clustering.
- *
- * @opt include .*elki.clustering.ClusteringAlgorithm
+ * BETULA clustering by aggregating the data into cluster features.
  */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2018
+ Copyright (C) 2021
  ELKI Development Team
 
  This program is free software: you can redistribute it and/or modify
