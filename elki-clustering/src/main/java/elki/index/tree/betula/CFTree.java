@@ -406,7 +406,7 @@ public class CFTree<L extends ClusterFeature> {
     else if(node.add(newchild)) {
       return null;
     }
-    return split(node, (L) newchild);
+    return split(node, newchild);
   }
 
   /**
