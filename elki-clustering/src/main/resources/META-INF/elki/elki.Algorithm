@@ -8,6 +8,8 @@ elki.clustering.dbscan.GriDBSCAN
 elki.clustering.dbscan.LSDBC
 elki.clustering.em.EM
 elki.clustering.em.KDTreeEM
+elki.clustering.em.BetulaGMM
+elki.clustering.em.BetulaGMMWeighted
 elki.clustering.hierarchical.extraction.ClustersWithNoiseExtraction
 elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction

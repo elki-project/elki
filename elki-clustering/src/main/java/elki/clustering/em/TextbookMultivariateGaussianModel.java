@@ -22,9 +22,9 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
 
@@ -229,12 +229,12 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
   }
 
   @Override
-  public double estimateLogDensity(CFInterface clusteringFeature) {
+  public double estimateLogDensity(ClusterFeature clusteringFeature) {
     throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 
   @Override
-  public void updateE(CFInterface clusteringFeature, double prob) {
+  public void updateE(ClusterFeature clusteringFeature, double prob) {
     throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
   /**

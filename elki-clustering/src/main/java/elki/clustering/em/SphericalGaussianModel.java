@@ -23,9 +23,9 @@ package elki.clustering.em;
 import static elki.math.linearalgebra.VMath.identity;
 import static elki.math.linearalgebra.VMath.timesEquals;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 
 import net.jafama.FastMath;
@@ -203,7 +203,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   }
 
   @Override
-  public double estimateLogDensity(CFInterface cf) {
+  public double estimateLogDensity(ClusterFeature cf) {
     final int dim = mean.length;
     double v = 0;
     for(int i = 0; i < dim; i++) {
@@ -220,7 +220,7 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   }
 
   @Override
-  public void updateE(CFInterface cf, double wei) {
+  public void updateE(ClusterFeature cf, double wei) {
     assert (cf.getDimensionality() == mean.length);
     final double nwsum = wsum + wei;
     // Compute new means

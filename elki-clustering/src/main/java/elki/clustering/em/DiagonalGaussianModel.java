@@ -24,9 +24,9 @@ import static elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 import net.jafama.FastMath;
 
@@ -222,7 +222,7 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
   }
 
   @Override
-  public double estimateLogDensity(CFInterface cf) {
+  public double estimateLogDensity(ClusterFeature cf) {
     double[] v = variances.clone();
     for(int i = 0; i < mean.length; i++) {
       v[i] += cf.variance(i);
@@ -242,7 +242,7 @@ public class DiagonalGaussianModel implements EMClusterModel<NumberVector, EMMod
   }
 
   @Override
-  public void updateE(CFInterface cf, double wei) {
+  public void updateE(ClusterFeature cf, double wei) {
     assert (cf.getDimensionality() == mean.length);
     final double nwsum = wsum + wei;
     // Compute new means

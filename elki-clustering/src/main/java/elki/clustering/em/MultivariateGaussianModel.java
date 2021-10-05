@@ -22,9 +22,9 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
@@ -273,7 +273,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   }
 
   @Override
-  public double estimateLogDensity(CFInterface cf) {
+  public double estimateLogDensity(ClusterFeature cf) {
     double[][] combinedCov = cf.covariance();
     double[] delta = new double[mean.length];
     double cw = cf.getWeight() + wsum;
@@ -289,7 +289,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   }
 
   @Override
-  public void updateE(CFInterface cf, double wei) {
+  public void updateE(ClusterFeature cf, double wei) {
     assert cf.getDimensionality() == mean.length;
     assert wei >= 0 && wei < Double.POSITIVE_INFINITY : wei;
     if(wei < Double.MIN_NORMAL) {

@@ -22,9 +22,9 @@ package elki.clustering.em;
 
 import static elki.math.linearalgebra.VMath.*;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 
 import net.jafama.FastMath;
@@ -199,12 +199,12 @@ public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVect
   }
 
   @Override
-  public double estimateLogDensity(CFInterface cf) {
+  public double estimateLogDensity(ClusterFeature cf) {
     throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 
   @Override
-  public void updateE(CFInterface cf, double wei) {
+  public void updateE(ClusterFeature cf, double wei) {
     throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 }

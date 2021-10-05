@@ -377,7 +377,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param x Input
    * @return Result
    */
-  protected static double logSumExp(double[] x) {
+  public static double logSumExp(double[] x) {
     double max = x[0];
     for(int i = 1; i < x.length; i++) {
       final double v = x[i];
