@@ -133,6 +133,8 @@ public class Solver {
     public double upper_bound_p, upper_bound_n;
 
     public double[] alpha;
+    
+    public double r_square; // Only SVDD
   }
 
   void swap_index(int i, int j) {

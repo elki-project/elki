@@ -22,12 +22,20 @@ package elki.datasource.filter.normalization.instancewise;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import elki.data.DoubleVector;
+import elki.data.SparseFloatVector;
 import elki.data.type.TypeUtil;
 import elki.datasource.AbstractDataSourceTest;
+import elki.datasource.InputStreamDatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
+import elki.datasource.parser.Parser;
+import elki.datasource.parser.TermFrequencyParser;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -37,9 +45,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class LengthNormalizationTest extends AbstractDataSourceTest {
-  /**
-   * Test with default parameters.
-   */
   @Test
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
@@ -56,6 +61,29 @@ public class LengthNormalizationTest extends AbstractDataSourceTest {
         len += v * v;
       }
       assertEquals("Vector length is not 1", 1., len, 1e-15);
+    }
+  }
+
+  @Test
+  public void sparse() throws IOException {
+    String filename = UNITTEST + "parsertest.tf";
+    LengthNormalization<DoubleVector> filter = new ELKIBuilder<>(LengthNormalization.class).build();
+    Parser parser = new ELKIBuilder<>(TermFrequencyParser.class)//
+        .build();
+    MultipleObjectsBundle bundle;
+    try (InputStream is = open(filename);
+        InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, Arrays.asList(filter), parser)) {
+      bundle = dbc.loadData();
+    }
+    // Verify that the length of each row vector is 1.
+    for(int row = 0; row < bundle.dataLength(); row++) {
+      SparseFloatVector d = get(bundle, row, 0, SparseFloatVector.class);
+      double len = 0.0;
+      for(int j = d.iter(); d.iterValid(j); j = d.iterAdvance(j)) {
+        final double v = d.iterDoubleValue(j);
+        len += v * v;
+      }
+      assertEquals("Vector length is not 1", 1., len, 1e-7);
     }
   }
 }

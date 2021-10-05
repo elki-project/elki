@@ -19,6 +19,7 @@ elki.clustering.hierarchical.NNChain
 elki.clustering.hierarchical.AGNES HAC SAHN
 elki.clustering.hierarchical.CLINK Defays
 elki.clustering.hierarchical.SLINKHDBSCANLinearMemory
+elki.clustering.hierarchical.HACAM
 elki.clustering.hierarchical.HDBSCANLinearMemory
 elki.clustering.hierarchical.MedoidLinkage
 elki.clustering.hierarchical.MiniMaxAnderberg

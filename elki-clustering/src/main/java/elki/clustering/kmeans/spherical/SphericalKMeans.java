@@ -38,7 +38,6 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.CosineDistance;
 import elki.logging.Logging;
-import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -84,7 +83,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
   public Clustering<KMeansModel> run(Relation<V> relation) {
     Instance instance = new Instance(relation, initialMeans(relation));
     instance.run(maxiter);
-    return instance.buildResult(true, relation);
+    return instance.buildResult();
   }
 
   @Override
@@ -137,22 +136,23 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       }
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector fv = relation.get(iditer);
-        double maxSim = similarity(fv, means[0]);
+        double maxSim = VectorUtil.dot(fv, means[0]);
+        ++diststat;
         int maxIndex = 0;
         for(int i = 1; i < k; i++) {
-          double sim = similarity(fv, means[i]);
+          double sim = VectorUtil.dot(fv, means[i]);
+          ++diststat;
           if(sim > maxSim) {
             maxIndex = i;
             maxSim = sim;
           }
         }
-        varsum[maxIndex] += (1 - maxSim);
+        varsum[maxIndex] += 2 * (1 - maxSim);
         clusters.get(maxIndex).add(iditer);
         if(assignment.putInt(iditer, maxIndex) != maxIndex) {
           ++changed;
         }
       }
-      VMath.timesEquals(varsum, MathUtil.SQRT2);
       return changed;
     }
 
@@ -205,6 +205,21 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
       ++diststat;
       final double s = VectorUtil.dot(x, y);
       return s < 1 ? Math.sqrt(2 - 2 * s) : 0;
+    }
+
+    @Override
+    protected void recomputeVariance(Relation<? extends NumberVector> relation) {
+      Arrays.fill(varsum, 0.);
+      for(int i = 0; i < clusters.size(); i++) {
+        DBIDs ids = clusters.get(i);
+        double ssum = 0;
+        double[] mean = means[i];
+        for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+          ssum += Math.min(1, VectorUtil.dot(relation.get(it), mean));
+          ++diststat;
+        }
+        varsum[i] = 2 * (ids.size() - ssum);
+      }
     }
 
     @Override

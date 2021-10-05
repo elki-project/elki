@@ -24,8 +24,7 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.LloydKMeans;
-import elki.clustering.kmeans.initialization.SphericalKMeansPlusPlus;
+import elki.clustering.kmeans.SingleAssignmentKMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;
@@ -41,45 +40,32 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  *
  * @author Erich Schubert
  */
-public class SphericalKMeansTest extends AbstractClusterAlgorithmTest {
+public class SphericalSingleAssignmentKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSphericalKMeans() {
-    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
-    Clustering<?> result = new ELKIBuilder<SphericalKMeans<DoubleVector>>(SphericalKMeans.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 6) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8625509);
-    assertClusterSizes(result, new int[] { 131, 200, 200, 203, 266 });
-    // Results should be similar to:
-    result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
-        .with(KMeans.DISTANCE_FUNCTION_ID, SqrtCosineDistance.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.864004);
-    assertClusterSizes(result, new int[] { 132, 200, 200, 202, 266 });
-    // Results should be similar to:
-    result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
-        .with(KMeans.DISTANCE_FUNCTION_ID, CosineDistance.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.864004);
-    assertClusterSizes(result, new int[] { 132, 200, 200, 202, 266 });
-  }
-
-  @Test
-  public void testSphericalKMeansPlusPlus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000, new ListParameterization() //
         .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, LengthNormalization.class));
-    Clustering<?> result = new ELKIBuilder<SphericalKMeans<DoubleVector>>(SphericalKMeans.class) //
+    Clustering<?> result = new ELKIBuilder<SphericalSingleAssignmentKMeans<DoubleVector>>(SphericalSingleAssignmentKMeans.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .with(SphericalKMeansPlusPlus.Par.ALPHA_ID, 1) //
-        .with(KMeans.INIT_ID, SphericalKMeansPlusPlus.class) //
+        .with(KMeans.SEED_ID, 1) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.8637358);
-    assertClusterSizes(result, new int[] { 149, 198, 200, 205, 248 });
+    assertFMeasure(db, result, 0.862175);
+    assertClusterSizes(result, new int[] { 128, 198, 200, 202, 272 });
+    // Results should be similar to:
+    result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
+        .with(KMeans.DISTANCE_FUNCTION_ID, SqrtCosineDistance.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 1) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.862175);
+    assertClusterSizes(result, new int[] { 128, 198, 200, 202, 272 });
+    // Results should be similar to:
+    result = new ELKIBuilder<SingleAssignmentKMeans<DoubleVector>>(SingleAssignmentKMeans.class) //
+        .with(KMeans.DISTANCE_FUNCTION_ID, CosineDistance.class) //
+        .with(KMeans.K_ID, 5) //
+        .with(KMeans.SEED_ID, 1) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.862175);
+    assertClusterSizes(result, new int[] { 128, 198, 200, 202, 272 });
   }
 }

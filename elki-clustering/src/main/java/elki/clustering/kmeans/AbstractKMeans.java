@@ -136,7 +136,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
    * @return Means
    */
   protected double[][] initialMeans(Relation<V> relation) {
-    Duration inittime = getLogger().newDuration(initializer.getClass() + ".time").begin();
+    Duration inittime = getLogger().newDuration(initializer.getClass().getName() + ".time").begin();
     double[][] means = initializer.chooseInitialMeans(relation, k, distance);
     getLogger().statistics(inittime.end());
     return means;
@@ -565,14 +565,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       final Logging log = getLogger();
       IndefiniteProgress prog = log.isVerbose() ? new IndefiniteProgress("Iteration") : null;
       int iteration = 0;
-      while(iteration < maxiter) {
+      while(++iteration <= maxiter) {
         Duration duration = log.newDuration(key + "." + iteration + ".time").begin();
         long prevdiststat = diststat;
         log.incrementProcessed(prog);
-        int changed = iterate(++iteration);
-        if(changed == 0) {
-          break;
-        }
+        int changed = iterate(iteration);
         if(log.isStatistics()) {
           log.statistics(duration.end());
           log.statistics(new LongStatistic(key + "." + iteration + ".reassignments", Math.abs(changed)));
@@ -583,6 +580,9 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
           if(s > 0) {
             log.statistics(new DoubleStatistic(key + "." + iteration + ".variance-sum", s));
           }
+        }
+        if(changed <= 0) {
+          break;
         }
       }
       log.setCompleted(prog);
@@ -602,10 +602,16 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      * 
      * @param dst Output means
      * @param sums Input sums
+     * @param prev Previous means, to handle empty clusters
      */
-    protected void meansFromSums(double[][] dst, double[][] sums) {
+    protected void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
       for(int i = 0; i < k; i++) {
-        VMath.overwriteTimes(dst[i], sums[i], 1. / clusters.get(i).size());
+        final int size = clusters.get(i).size();
+        if(size == 0) {
+          System.arraycopy(prev[i], 0, dst[i], 0, prev[i].length);
+          continue;
+        }
+        VMath.overwriteTimes(dst[i], sums[i], 1. / size);
       }
     }
 
@@ -714,29 +720,27 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     /**
      * Maximum distance moved.
      * <p>
-     * Used by Hamerly, Elkan (not using the maximum).
+     * Used by Hamerly, Elkan, and derived classes.
      *
      * @param means Old means
      * @param newmeans New means
      * @param dists Distances moved (output)
-     * @return Maximum distance moved
      */
-    protected double movedDistance(double[][] means, double[][] newmeans, double[] dists) {
+    protected void movedDistance(double[][] means, double[][] newmeans, double[] dists) {
       assert newmeans.length == means.length && dists.length == means.length;
-      double max = 0.;
       for(int i = 0; i < means.length; i++) {
-        double d = dists[i] = sqrtdistance(means[i], newmeans[i]);
-        max = (d > max) ? d : max;
+        dists[i] = sqrtdistance(means[i], newmeans[i]);
       }
-      return max;
     }
 
     /**
      * Build a standard k-means result, with known cluster variance sums.
+     * <p>
+     * Note: this expects the <tt>varsum</tt> field to be correct!
      *
      * @return Clustering result
      */
-    protected Clustering<KMeansModel> buildResult() {
+    public Clustering<KMeansModel> buildResult() {
       Clustering<KMeansModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Means Clustering");
       for(int i = 0; i < clusters.size(); i++) {
@@ -744,7 +748,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
         if(ids.isEmpty()) {
           getLogger().warning("K-Means produced an empty cluster - bad initialization?");
         }
-        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum[i])));
+        result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], varsum != null ? varsum[i] : Double.NaN)));
       }
       return result;
     }
@@ -759,45 +763,36 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      */
     public Clustering<KMeansModel> buildResult(boolean varstat, Relation<? extends NumberVector> relation) {
       Logging log = getLogger();
-      Clustering<KMeansModel> result = new Clustering<>();
-      Metadata.of(result).setLongName("k-Means Clustering");
-      if(relation.size() <= 0) {
-        return result;
-      }
-      if(!varstat) {
-        for(int i = 0; i < clusters.size(); i++) {
-          DBIDs ids = clusters.get(i);
-          if(ids.isEmpty()) {
-            continue;
-          }
-          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(means[i], Double.NaN)));
-        }
+      if(varstat) {
+        long beforestat = diststat;
+        log.statistics(new LongStatistic(key + ".distance-computations.main", diststat));
+        recomputeVariance(relation);
+        log.statistics(new DoubleStatistic(key + ".variance-sum", sum(varsum)));
+        log.statistics(new LongStatistic(key + ".variance.distance-computations", diststat - beforestat));
       }
       else {
-        long beforestat = diststat;
-        double totalvariance = 0.;
-        for(int i = 0; i < clusters.size(); i++) {
-          DBIDs ids = clusters.get(i);
-          if(ids.isEmpty()) {
-            continue;
-          }
-          double vsum = 0;
-          double[] mean = means[i];
-          for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-            vsum += distance(relation.get(it), mean);
-          }
-          totalvariance += vsum;
-          result.addToplevelCluster(new Cluster<>(ids, new KMeansModel(mean, vsum)));
-        }
-        if(log.isStatistics()) {
-          log.statistics(new DoubleStatistic(key + ".variance-sum", totalvariance));
-          log.statistics(new LongStatistic(key + ".variance.distance-computations", diststat - beforestat));
-        }
+        Arrays.fill(varsum, Double.NaN); // Do not use below
       }
-      if(log.isStatistics()) {
-        log.statistics(new LongStatistic(key + ".distance-computations", diststat));
-      }
+      Clustering<KMeansModel> result = buildResult();
+      log.statistics(new LongStatistic(key + ".distance-computations", diststat));
       return result;
+    }
+
+    /**
+     * Recompute the cluster variances.
+     *
+     * @param relation Data relation
+     */
+    protected void recomputeVariance(Relation<? extends NumberVector> relation) {
+      Arrays.fill(varsum, 0);
+      for(int i = 0; i < clusters.size(); i++) {
+        double[] mean = means[i];
+        double vsum = 0;
+        for(DBIDIter it = clusters.get(i).iter(); it.valid(); it.advance()) {
+          vsum += distance(relation.get(it), mean);
+        }
+        varsum[i] = vsum;
+      }
     }
 
     /**

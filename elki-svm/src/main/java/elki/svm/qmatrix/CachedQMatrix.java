@@ -198,7 +198,7 @@ public final class CachedQMatrix implements QMatrix {
       }
 
       size -= len - (hdata != null ? hdata.length : 0);
-      float[] new_data = hdata != null ? Arrays.copyOf(hdata, hlen) : new float[len];
+      float[] new_data = hdata != null ? Arrays.copyOf(hdata, len) : new float[len];
       for(int j = hlen; j < len; ++j) {
         new_data[j] = (float) inner.similarity(h, j);
       }
