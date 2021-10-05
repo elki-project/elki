@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.distance;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -49,12 +49,12 @@ public class CentroidEuclideanDistance implements CFDistance {
   public static final CentroidEuclideanDistance STATIC = new CentroidEuclideanDistance();
 
   @Override
-  public double squaredDistance(NumberVector v, CFInterface cf) {
+  public double squaredDistance(NumberVector v, ClusterFeature cf) {
     return cf.squaredCenterDistance(v);
   }
 
   @Override
-  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+  public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
     return cf1.squaredCenterDistance(cf2);
   }
 

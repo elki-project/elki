@@ -25,6 +25,7 @@ import static elki.math.linearalgebra.VMath.diagonal;
 import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -99,10 +100,10 @@ public class BIRCHLeafClusteringM implements ClusteringAlgorithm<Clustering<Mean
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
-    Map<CFInterface, ArrayModifiableDBIDs> idmap = tree.idmap;
+    Map<ClusterFeature, ArrayModifiableDBIDs> idmap = tree.idmap;
     Clustering<MeanModel> result = new Clustering<>();
-    for(Map.Entry<CFInterface, ArrayModifiableDBIDs> ent : idmap.entrySet()) {
-      CFInterface leaf = ent.getKey();
+    for(Map.Entry<ClusterFeature, ArrayModifiableDBIDs> ent : idmap.entrySet()) {
+      ClusterFeature leaf = ent.getKey();
       double[] center = new double[dim];
       double[] variance = new double[dim];
       for(int i = 0; i < dim; i++) {

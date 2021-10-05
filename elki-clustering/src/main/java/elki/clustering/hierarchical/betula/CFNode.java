@@ -20,6 +20,9 @@
  */
 package elki.clustering.hierarchical.betula;
 
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
+
 /**
  * Interface for TreeNode
  * 
@@ -27,7 +30,7 @@ package elki.clustering.hierarchical.betula;
  * 
  * @param <L> Cluster feature type
  */
-public class CFNode<L extends CFInterface> implements HasCF {
+public class CFNode<L extends ClusterFeature> implements AsClusterFeature {
   /**
    * Cluster feature
    */
@@ -60,7 +63,7 @@ public class CFNode<L extends CFInterface> implements HasCF {
    * @param i Index
    * @param cf Clustering Feature
    */
-  public void setChild(int i, HasCF cf) {
+  public void setChild(int i, AsClusterFeature cf) {
     children[i] = cf;
   }
 
@@ -70,8 +73,8 @@ public class CFNode<L extends CFInterface> implements HasCF {
    * @param i Index
    * @return CF
    */
-  public HasCF getChild(int i) {
-    return (HasCF) children[i];
+  public AsClusterFeature getChild(int i) {
+    return (AsClusterFeature) children[i];
   }
 
   /**
@@ -80,7 +83,7 @@ public class CFNode<L extends CFInterface> implements HasCF {
    * @param node Subtree
    * @return success
    */
-  public boolean add(HasCF node) {
+  public boolean add(AsClusterFeature node) {
     for(int i = 0; i < children.length; i++) {
       if(children[i] == null) {
         children[i] = node;
@@ -97,7 +100,7 @@ public class CFNode<L extends CFInterface> implements HasCF {
    * @param i Index
    * @param node Tree node
    */
-  public void add(int i, HasCF node) {
+  public void add(int i, AsClusterFeature node) {
     children[i] = node;
     cf.addToStatistics(node.getCF());
   }

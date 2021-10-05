@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
 import elki.clustering.kmeans.AbstractKMeans;
@@ -137,7 +138,7 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    */
   public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
-    ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
+    ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
 
     int[] assignment = new int[tree.leaves], weights = new int[k];
     Arrays.fill(assignment, -1);
@@ -186,7 +187,7 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    * @param weights Cluster weight output
    * @return Cluster means
    */
-  private double[][] kmeans(ArrayList<? extends CFInterface> cfs, int[] assignment, int[] weights, CFTree<?> tree) {
+  private double[][] kmeans(ArrayList<? extends ClusterFeature> cfs, int[] assignment, int[] weights, CFTree<?> tree) {
     double[][] means = initialization.chooseInitialMeans(tree, cfs, k);
     for(int i = 1; i <= maxiter || maxiter < 0; i++) {
       means = i == 1 ? means : means(assignment, means, cfs, weights);
@@ -215,12 +216,12 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    * @param weights Cluster weights
    * @return Means of clusters.
    */
-  private double[][] means(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
+  private double[][] means(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
     Arrays.fill(weights, 0);
     double[][] newMeans = new double[k][];
     for(int i = 0; i < assignment.length; i++) {
       int c = assignment[i];
-      final CFInterface cf = cfs.get(i);
+      final ClusterFeature cf = cfs.get(i);
       int d = cf.getDimensionality();
       int n = cf.getWeight();
       if(newMeans[c] == null) {
@@ -255,11 +256,11 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    * @param weights Cluster weights (output)
    * @return Number of reassigned elements
    */
-  private int assignToNearestCluster(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
+  private int assignToNearestCluster(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
     Arrays.fill(weights, 0);
     int changed = 0;
     for(int i = 0; i < cfs.size(); i++) {
-      CFInterface cfsi = cfs.get(i);
+      ClusterFeature cfsi = cfs.get(i);
       double[] mean = new double[cfsi.getDimensionality()];
       for(int j = 0; j < mean.length; j++) {
         mean[j] = cfsi.centroid(j);
@@ -325,10 +326,10 @@ public class BIRCHLloydKMeans<M extends MeanModel> implements ClusteringAlgorith
    * @param weights Cluster weights
    * @return Per-cluster variances
    */
-  private double[] calculateVariances(int[] assignment, double[][] means, ArrayList<? extends CFInterface> cfs, int[] weights) {
+  private double[] calculateVariances(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
     double[] ss = new double[k];
     for(int i = 0; i < assignment.length; i++) {
-      CFInterface cfsi = cfs.get(i);
+      ClusterFeature cfsi = cfs.get(i);
       for(int d = 0; d < means[0].length; d++) {
         double dx = cfsi.centroid(d) - means[assignment[i]][d];
         ss[assignment[i]] += cfsi.getWeight() * cfsi.variance(d) + cfsi.getWeight() * dx * dx;

@@ -23,6 +23,7 @@ package elki.clustering.hierarchical.betula;
 import java.util.List;
 
 import elki.clustering.em.EMClusterModel;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
 import elki.data.NumberVector;
@@ -60,7 +61,7 @@ public abstract class AbstractEMInitializer<M extends MeanModel> {
    * @param root Summary statistic of the tree.
    * @return Initial models
    */
-  public abstract List<? extends EMClusterModel<NumberVector, M>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree);
+  public abstract List<? extends EMClusterModel<NumberVector, M>> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree);
 
   /**
    * Parameterization class

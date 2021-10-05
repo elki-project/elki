@@ -1,6 +1,6 @@
 package elki.clustering.hierarchical.betula.initialization;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 
 /**
@@ -10,7 +10,7 @@ import elki.data.NumberVector;
  */
 public class ND2 implements CFIDistance {
   @Override
-  public double squaredDistance(NumberVector clusterCenter, CFInterface candidate) {
+  public double squaredDistance(NumberVector clusterCenter, ClusterFeature candidate) {
     final int dim = clusterCenter.getDimensionality();
     assert (dim == candidate.getDimensionality());
     double sum = 0;
@@ -24,7 +24,7 @@ public class ND2 implements CFIDistance {
   }
 
   @Override
-  public double squaredDistance(double[] clusterCenter, CFInterface candidate) {
+  public double squaredDistance(double[] clusterCenter, ClusterFeature candidate) {
     final int dim = clusterCenter.length;
     assert (dim == candidate.getDimensionality());
     double sum = 0;
@@ -38,7 +38,7 @@ public class ND2 implements CFIDistance {
   }
 
   @Override
-  public double squaredDistance(CFInterface clusterCenter, CFInterface candidate) {
+  public double squaredDistance(ClusterFeature clusterCenter, ClusterFeature candidate) {
     final int dim = clusterCenter.getDimensionality();
     assert (dim == candidate.getDimensionality());
     double div1 = 1. / clusterCenter.getWeight();

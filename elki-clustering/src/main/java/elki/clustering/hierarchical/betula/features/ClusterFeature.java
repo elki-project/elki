@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula;
+package elki.clustering.hierarchical.betula.features;
 
 import elki.data.NumberVector;
 
@@ -27,7 +27,7 @@ import elki.data.NumberVector;
  * 
  * @author Andreas Lang
  */
-public interface CFInterface extends HasCF {
+public interface ClusterFeature extends AsClusterFeature {
   /**
    * Add NumberVector to CF
    * 
@@ -40,7 +40,7 @@ public interface CFInterface extends HasCF {
    * 
    * @param other other CF
    */
-  void addToStatistics(CFInterface other);
+  void addToStatistics(ClusterFeature other);
 
   /**
    * Resets all statistics of CF
@@ -112,7 +112,7 @@ public interface CFInterface extends HasCF {
    * @param other Other clustering feature
    * @return sum of squared deviations from the center
    */
-  double squaredCenterDistance(CFInterface other);
+  double squaredCenterDistance(ClusterFeature other);
 
   /**
    * Absolute distance of the centers.
@@ -128,10 +128,27 @@ public interface CFInterface extends HasCF {
    * @param other Other clustering feature
    * @return sum of squared deviations from the center
    */
-  double absoluteCenterDistance(CFInterface other);
+  double absoluteCenterDistance(ClusterFeature other);
 
   @Override
-  default CFInterface getCF() {
+  default ClusterFeature getCF() {
     return this;
+  }
+
+  /**
+   * Cluster feature factory
+   *
+   * @author Erich Schubert
+   * 
+   * @param <F> feature type
+   */
+  static interface Factory<F extends ClusterFeature> {
+    /**
+     * Make a new clustering feature of the given dimensionality.
+     * 
+     * @param dim Dimensionality
+     * @return Clustering feature
+     */
+    F make(int dim);
   }
 }

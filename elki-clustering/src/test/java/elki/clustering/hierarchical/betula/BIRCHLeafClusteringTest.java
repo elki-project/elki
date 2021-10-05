@@ -27,7 +27,7 @@ import elki.clustering.hierarchical.betula.distance.AverageInterclusterDistance;
 import elki.clustering.hierarchical.betula.distance.AverageIntraclusterDistance;
 import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
 import elki.clustering.hierarchical.betula.distance.CentroidManhattanDistance;
-import elki.clustering.hierarchical.betula.vii.VIIModel;
+import elki.clustering.hierarchical.betula.features.VIIFeature;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -44,7 +44,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testRadius() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.86190);
@@ -55,8 +55,8 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testEuclideanDistance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.93866);
@@ -67,9 +67,9 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testCentroidEuclidean() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageInterclusterDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, AverageInterclusterDistance.class)//
+        .with(CFTree.Factory.Par.DISTANCE_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.93909);
@@ -80,9 +80,9 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testCentroidManhattan() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, CentroidManhattanDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.DISTANCE_ID, CentroidManhattanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.92236);
@@ -93,9 +93,9 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testAverageIntercluster() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, AverageInterclusterDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.DISTANCE_ID, AverageInterclusterDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.86062);
@@ -106,9 +106,9 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testAverageIntracluster() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
-        .with(VIIModel.Par.DISTANCE_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.DISTANCE_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.820235);
@@ -119,8 +119,8 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   public void testOverflowing() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);

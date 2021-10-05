@@ -23,13 +23,13 @@ package elki.clustering.hierarchical.betula;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
-import elki.clustering.hierarchical.betula.vii.VIIModel;
+import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
+import elki.clustering.hierarchical.betula.features.VIIFeature;
+import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
-import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
-import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 
 /**
  * Regression test for BIRCH clustering with k-means.
@@ -41,8 +41,8 @@ public class BIRCHLloydKMeansTest extends AbstractClusterAlgorithmTest {
   public void testEuclideanDistance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHLloydKMeans.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //

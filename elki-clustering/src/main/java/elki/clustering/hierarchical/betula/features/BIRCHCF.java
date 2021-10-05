@@ -18,20 +18,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.birch;
+package elki.clustering.hierarchical.betula.features;
 
 import java.util.Arrays;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
 import elki.math.linearalgebra.VMath;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Clustering Feature of BIRCH, only for comparison
  * 
  * @author Erich Schubert
  */
-public class ClusteringFeature implements CFInterface {
+public class BIRCHCF implements ClusterFeature {
   /**
    * Number of objects
    */
@@ -52,7 +52,7 @@ public class ClusteringFeature implements CFInterface {
    *
    * @param dimensionality Dimensionality
    */
-  public ClusteringFeature(int dimensionality) {
+  public BIRCHCF(int dimensionality) {
     this.n = 0;
     this.ls = new double[dimensionality];
   }
@@ -70,12 +70,12 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public void addToStatistics(CFInterface other) {
-    addToStatistics((ClusteringFeature) other);
+  public void addToStatistics(ClusterFeature other) {
+    addToStatistics((BIRCHCF) other);
   }
 
   // @Override
-  public void addToStatistics(ClusteringFeature other) {
+  public void addToStatistics(BIRCHCF other) {
     n += other.n;
     VMath.plusEquals(ls, other.ls);
     ss += other.ss;
@@ -137,6 +137,16 @@ public class ClusteringFeature implements CFInterface {
     return sum;
   }
 
+  /**
+   * Get the linear sum of component i.
+   * 
+   * @param i Component
+   * @return linear sum
+   */
+  public double ls(int i) {
+    return ls[i];
+  }
+
   @Override
   public double variance(int i) {
     double v = variance();
@@ -184,8 +194,8 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double squaredCenterDistance(CFInterface other) {
-    double[] ols = ((ClusteringFeature) other).ls;
+  public double squaredCenterDistance(ClusterFeature other) {
+    double[] ols = ((BIRCHCF) other).ls;
     int on = other.getWeight();
     double sum = 0;
     for(int d = 0, dim = ls.length; d < dim; d++) {
@@ -206,8 +216,8 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double absoluteCenterDistance(CFInterface other) {
-    double[] ols = ((ClusteringFeature) other).ls;
+  public double absoluteCenterDistance(ClusterFeature other) {
+    double[] ols = ((BIRCHCF) other).ls;
     int on = other.getWeight();
     double sum = 0;
     for(int d = 0, dim = ls.length; d < dim; d++) {
@@ -215,5 +225,34 @@ public class ClusteringFeature implements CFInterface {
       sum += Math.abs(delta);
     }
     return sum;
+  }
+
+  /**
+   * Factory for making cluster features.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory implements ClusterFeature.Factory<BIRCHCF> {
+    /**
+     * Static instance.
+     */
+    public static final Factory STATIC = new Factory();
+
+    @Override
+    public BIRCHCF make(int dim) {
+      return new BIRCHCF(dim);
+    }
+
+    /**
+     * Parameterization class.
+     *
+     * @author Erich Schubert
+     */
+    public static class Par implements Parameterizer {
+      @Override
+      public Factory make() {
+        return STATIC;
+      }
+    }
   }
 }

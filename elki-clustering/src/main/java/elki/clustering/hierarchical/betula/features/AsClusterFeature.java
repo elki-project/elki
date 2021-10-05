@@ -18,18 +18,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula;
+package elki.clustering.hierarchical.betula.features;
 
 /**
- * Get the clustering feature representation.
+ * Get the clustering feature representation. For cluster features, this is the
+ * identity, and for {@link elki.clustering.hierarchical.betula.CFNode}s it
+ * returns the cluster feature of the node.
  *
  * @author Erich Schubert
  */
-public interface HasCF {
+public interface AsClusterFeature {
   /**
    * Get as clustering feature.
    *
    * @return Clustering feature
    */
-  CFInterface getCF();
+  ClusterFeature getCF();
 }

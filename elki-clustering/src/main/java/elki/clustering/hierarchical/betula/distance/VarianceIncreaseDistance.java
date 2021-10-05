@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.distance;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -49,12 +49,12 @@ public class VarianceIncreaseDistance implements CFDistance {
   public static final VarianceIncreaseDistance STATIC = new VarianceIncreaseDistance();
 
   @Override
-  public double squaredDistance(NumberVector nv, CFInterface cf) {
+  public double squaredDistance(NumberVector nv, ClusterFeature cf) {
     return cf.squaredCenterDistance(nv) * cf.getWeight() / (cf.getWeight() + 1);
   }
 
   @Override
-  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+  public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
     return cf1.squaredCenterDistance(cf2) * cf1.getWeight() * cf2.getWeight() / (cf1.getWeight() + cf2.getWeight());
   }
 

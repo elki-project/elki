@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vii;
+package elki.clustering.hierarchical.betula.features;
 
 import java.util.Arrays;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
  * Clustering Feature of stable BIRCH with a single variance per cluster
@@ -31,7 +31,7 @@ import elki.data.NumberVector;
  * 
  * @author Andreas Lang
  */
-public class ClusteringFeature implements CFInterface {
+public class VIIFeature implements ClusterFeature {
   /**
    * Number of objects
    */
@@ -52,7 +52,7 @@ public class ClusteringFeature implements CFInterface {
    *
    * @param dimensionality Dimensionality
    */
-  public ClusteringFeature(int dimensionality) {
+  public VIIFeature(int dimensionality) {
     this.n = 0;
     this.mean = new double[dimensionality];
   }
@@ -79,12 +79,12 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public void addToStatistics(CFInterface other) {
-    addToStatistics((ClusteringFeature) other);
+  public void addToStatistics(ClusterFeature other) {
+    addToStatistics((VIIFeature) other);
   }
 
   // @Override
-  public void addToStatistics(ClusteringFeature other) {
+  public void addToStatistics(VIIFeature other) {
     if(this.n == 0) {
       for(int i = 0; i < mean.length; i++) {
         mean[i] = other.mean[i];
@@ -168,8 +168,8 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double squaredCenterDistance(CFInterface other) {
-    double[] omean = ((ClusteringFeature) other).mean;
+  public double squaredCenterDistance(ClusterFeature other) {
+    double[] omean = ((VIIFeature) other).mean;
     double sum = 0;
     for(int d = 0, dim = mean.length; d < dim; d++) {
       final double delta = mean[d] - omean[d];
@@ -189,13 +189,42 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double absoluteCenterDistance(CFInterface other) {
-    double[] omean = ((ClusteringFeature) other).mean;
+  public double absoluteCenterDistance(ClusterFeature other) {
+    double[] omean = ((VIIFeature) other).mean;
     double sum = 0;
     for(int d = 0, dim = mean.length; d < dim; d++) {
       final double delta = mean[d] - omean[d];
       sum += Math.abs(delta);
     }
     return sum;
+  }
+
+  /**
+   * Factory for making cluster features.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory implements ClusterFeature.Factory<VIIFeature> {
+    /**
+     * Static instance.
+     */
+    public static final Factory STATIC = new Factory();
+
+    @Override
+    public VIIFeature make(int dim) {
+      return new VIIFeature(dim);
+    }
+
+    /**
+     * Parameterization class.
+     *
+     * @author Erich Schubert
+     */
+    public static class Par implements Parameterizer {
+      @Override
+      public Factory make() {
+        return STATIC;
+      }
+    }
   }
 }

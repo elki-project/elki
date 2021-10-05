@@ -25,6 +25,7 @@ import static elki.math.linearalgebra.VMath.diagonal;
 import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -106,9 +107,9 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
     // The CFTree does not store points. We have to reassign them (and the
     // quality is better than if we used the initial assignment, because centers
     // move in particular in the beginning, so we always had many outliers.
-    Map<CFInterface, ModifiableDBIDs> idmap = new Reference2ObjectOpenHashMap<CFInterface, ModifiableDBIDs>(tree.leaves);
+    Map<ClusterFeature, ModifiableDBIDs> idmap = new Reference2ObjectOpenHashMap<ClusterFeature, ModifiableDBIDs>(tree.leaves);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      CFInterface cf = tree.findLeaf(relation.get(iter));
+      ClusterFeature cf = tree.findLeaf(relation.get(iter));
       ModifiableDBIDs ids = idmap.get(cf);
       if(ids == null) {
         idmap.put(cf, ids = DBIDUtil.newArray(cf.getWeight()));
@@ -116,8 +117,8 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
       ids.add(iter);
     }
     Clustering<MeanModel> result = new Clustering<>();
-    for(Map.Entry<CFInterface, ModifiableDBIDs> ent : idmap.entrySet()) {
-      CFInterface leaf = ent.getKey();
+    for(Map.Entry<ClusterFeature, ModifiableDBIDs> ent : idmap.entrySet()) {
+      ClusterFeature leaf = ent.getKey();
       double[] center = new double[dim];
       double[] variance = new double[dim];
       for(int i = 0; i < dim; i++) {

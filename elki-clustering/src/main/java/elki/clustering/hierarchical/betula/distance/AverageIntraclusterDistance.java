@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.distance;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -49,20 +49,20 @@ public class AverageIntraclusterDistance implements CFDistance {
   public static final AverageIntraclusterDistance STATIC = new AverageIntraclusterDistance();
 
   @Override
-  public double squaredDistance(NumberVector nv, CFInterface cf1) {
+  public double squaredDistance(NumberVector nv, ClusterFeature cf1) {
     return cf1.getWeight() <= 0 ? 0 : //
         2 * ((cf1.getWeight() + 1) * cf1.sumdev() + cf1.getWeight() * cf1.squaredCenterDistance(nv)) / ((cf1.getWeight() + 1) * cf1.getWeight());
   }
 
   @Override
-  public double squaredDistance(CFInterface cf1, CFInterface cf2) {
+  public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
     final double n12 = cf1.getWeight() + cf2.getWeight();
     return n12 <= 0 ? 0 : //
         2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.getWeight() * cf2.getWeight() * cf1.squaredCenterDistance(cf2)) / (n12 * (n12 - 1));
   }
 
   @Override
-  public double matSelfInit(CFInterface cf) {
+  public double matSelfInit(ClusterFeature cf) {
     return 2 * cf.sumdev() / (cf.getWeight() - 1);
   }
 

@@ -26,11 +26,11 @@ import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance;
 import elki.clustering.hierarchical.betula.distance.RadiusDistance;
 import elki.clustering.hierarchical.betula.distance.VarianceIncreaseDistance;
+import elki.clustering.hierarchical.betula.features.VIIFeature;
+import elki.clustering.hierarchical.betula.features.VVIFeature;
+import elki.clustering.hierarchical.betula.features.VVVFeature;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.hierarchical.betula.initialization.CFKMeansPlusPlus;
-import elki.clustering.hierarchical.betula.vii.VIIModel;
-import elki.clustering.hierarchical.betula.vvi.VVIModel;
-import elki.clustering.hierarchical.betula.vvv.VVVModel;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
@@ -46,8 +46,8 @@ public class BIRCHEMnaiveTest extends AbstractClusterAlgorithmTest {
   public void testSpherical() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHEMnaive.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VIIModel.class)//
-        .with(VIIModel.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BIRCHEMnaive.Par.DELTA_ID, 1e-7)//
@@ -63,8 +63,8 @@ public class BIRCHEMnaiveTest extends AbstractClusterAlgorithmTest {
   public void testDiagonal() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHEMnaive.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VVIModel.class)//
-        .with(VVIModel.Par.ABSORPTION_ID, VarianceIncreaseDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VVIFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, VarianceIncreaseDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BIRCHEMnaive.Par.DELTA_ID, 1e-7)//
@@ -80,8 +80,8 @@ public class BIRCHEMnaiveTest extends AbstractClusterAlgorithmTest {
   public void testMultivariate() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BIRCHEMnaive.class) //
-        .with(CFTree.Factory.Par.MODEL_ID, VVVModel.class)//
-        .with(VVVModel.Par.ABSORPTION_ID, RadiusDistance.class)//
+        .with(CFTree.Factory.Par.FEATURES_ID, VVVFeature.Factory.class)//
+        .with(CFTree.Factory.Par.ABSORPTION_ID, RadiusDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BIRCHEMnaive.Par.DELTA_ID, 1e-7)//
@@ -92,5 +92,4 @@ public class BIRCHEMnaiveTest extends AbstractClusterAlgorithmTest {
     assertFMeasure(db, clustering, 0.84929430390);
     assertClusterSizes(clustering, new int[] { 99, 101, 211, 227 });
   }
-
 }

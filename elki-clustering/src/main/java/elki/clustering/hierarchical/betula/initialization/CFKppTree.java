@@ -26,10 +26,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFNode;
 import elki.clustering.hierarchical.betula.CFTree;
-import elki.clustering.hierarchical.betula.HasCF;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -66,18 +66,18 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
     if(tree.getLeaves() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
     }
     maxdepth = maxdepth > 0 ? maxdepth : FastMath.log2(k) / FastMath.log2(tree.getCapacity()) + 1;
     Random rnd = rf.getSingleThreadedRandom();
-    List<CFInterface> ccs = new ArrayList<>(k);
+    List<ClusterFeature> ccs = new ArrayList<>(k);
     ccs.add(firstVar ? chooseFirstNode(tree.getRoot().getCF(), cfs, rnd) :
     // TODO: use weights for choosing the initial center!
         cfs.get(rnd.nextInt(cfs.size())).getCF());
     for(int m = 1; m < k; m++) {
-      CFInterface next = tree.getRoot().getCF();
+      ClusterFeature next = tree.getRoot().getCF();
       for(int depth = maxdepth; next instanceof CFNode && depth > 0; --depth) {
         next = chooseNextNode((CFNode<?>) next, ccs, m, rnd);
       }
@@ -87,7 +87,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     final int d = ccs.get(0).getDimensionality();
     double[][] means = new double[k][d];
     for(int i = 0; i < k; i++) {
-      final CFInterface ccsi = ccs.get(i);
+      final ClusterFeature ccsi = ccs.get(i);
       double[] mean = means[i];
       for(int j = 0; j < d; j++) {
         mean[j] = ccsi.centroid(j);
@@ -96,13 +96,13 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     return means;
   }
 
-  private CFInterface chooseFirstNode(CFInterface center, List<? extends HasCF> cfs, Random rnd) {
+  private ClusterFeature chooseFirstNode(ClusterFeature center, List<? extends AsClusterFeature> cfs, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[cfs.size()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
     int i = 0;
     while(true) {
-      final CFInterface child = cfs.get(i).getCF();
+      final ClusterFeature child = cfs.get(i).getCF();
       if(child == null) {
         break;
       }
@@ -125,13 +125,13 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     }
   }
 
-  private CFInterface chooseNextNode(CFNode<?> current, List<? extends HasCF> ccs, int m, Random rnd) {
+  private ClusterFeature chooseNextNode(CFNode<?> current, List<? extends AsClusterFeature> ccs, int m, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[current.capacity()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
     int i = 0;
     while(true) {
-      final CFInterface child = current.getChild(i).getCF();
+      final ClusterFeature child = current.getChild(i).getCF();
       if(child == null) {
         break;
       }

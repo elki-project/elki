@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.initialization;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 
 /**
@@ -36,7 +36,7 @@ public interface CFIDistance {
    * @param cf Clustering Feature
    * @return Distance
    */
-  double squaredDistance(NumberVector v, CFInterface cf);
+  double squaredDistance(NumberVector v, ClusterFeature cf);
 
   /**
    * Distance of a vector to a clustering feature.
@@ -45,7 +45,7 @@ public interface CFIDistance {
    * @param cf Clustering Feature
    * @return Distance
    */
-  double squaredDistance(double[] v, CFInterface cf);
+  double squaredDistance(double[] v, ClusterFeature cf);
 
   /**
    * Distance between two clustering features.
@@ -54,5 +54,5 @@ public interface CFIDistance {
    * @param c2 Second clustering feature
    * @return Distance
    */
-  double squaredDistance(CFInterface c1, CFInterface c2);
+  double squaredDistance(ClusterFeature c1, ClusterFeature c2);
 }

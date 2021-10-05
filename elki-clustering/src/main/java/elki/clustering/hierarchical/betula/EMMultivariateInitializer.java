@@ -27,6 +27,7 @@ import java.util.List;
 
 import elki.clustering.em.EMClusterModel;
 import elki.clustering.em.MultivariateGaussianModel;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
@@ -49,7 +50,7 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<EMModel> {
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree) {
+  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree) {
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     double[][] covmat = tree.root.getCF().covariance().clone();

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.logging.Logging;
@@ -50,7 +51,7 @@ public class CFHierarchyBuilder {
   /**
    * Clustering Features
    */
-  protected CFInterface[] cfs;
+  protected ClusterFeature[] cfs;
 
   /**
    * parent ids
@@ -75,7 +76,7 @@ public class CFHierarchyBuilder {
    * @param ids IDs
    * @param isSquared Flag to indicate squared distances
    */
-  public CFHierarchyBuilder(CFInterface[] cfs) {
+  public CFHierarchyBuilder(ClusterFeature[] cfs) {
     super();
     this.cfs = cfs;
     parent = new int[cfs.length];
@@ -173,7 +174,7 @@ public class CFHierarchyBuilder {
    *
    * @return Completed result
    */
-  public PointerHierarchyResult complete(ArrayList<CFInterface> tcf, DBIDs ids, Map<CFInterface, ArrayModifiableDBIDs> idmap) {
+  public PointerHierarchyResult complete(ArrayList<ClusterFeature> tcf, DBIDs ids, Map<ClusterFeature, ArrayModifiableDBIDs> idmap) {
     if(mergecount != cfs.length - 1) {
       LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (cfs.length - 1));
     }

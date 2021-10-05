@@ -21,6 +21,7 @@
 package elki.clustering.hierarchical.betula;
 
 import elki.clustering.hierarchical.betula.distance.CFDistance;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 
 /**
  * Interface for CFModel
@@ -29,7 +30,7 @@ import elki.clustering.hierarchical.betula.distance.CFDistance;
  * 
  * @param <L> CF Model
  */
-public interface CFModel<L extends CFInterface> {
+public interface CFModel<L extends ClusterFeature> {
   /**
    * Creates a CF of the corresponding Model.
    * 

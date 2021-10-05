@@ -18,20 +18,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula.vvv;
+package elki.clustering.hierarchical.betula.features;
 
 import java.util.Arrays;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.data.NumberVector;
+import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Clustering Feature of stable BIRCH with covariance instead of variance
+ * Clustering Feature of stable BIRCH with variance per dimension
  * 
  * @author Andreas Lang
- * 
  */
-public class ClusteringFeature implements CFInterface {
+public class VVIFeature implements ClusterFeature {
   /**
    * Number of objects
    */
@@ -45,16 +44,16 @@ public class ClusteringFeature implements CFInterface {
   /**
    * Sum of Squared Deviations.
    */
-  double[][] ssd;
+  double[] ssd;
 
   /**
    * Constructor.
    *
    * @param dimensionality Dimensionality
    */
-  public ClusteringFeature(int dimensionality) {
+  public VVIFeature(int dimensionality) {
     this.n = 0;
-    this.ssd = new double[dimensionality][dimensionality];
+    this.ssd = new double[dimensionality];
     this.mean = new double[dimensionality];
   }
 
@@ -64,76 +63,50 @@ public class ClusteringFeature implements CFInterface {
     assert (d == ssd.length);
     if(n == 0) {
       for(int i = 0; i < d; i++) {
-        for(int j = 0; j < d; j++) {
-          ssd[i][j] = 0.;
-        }
+        ssd[i] = 0.;
         mean[i] = nv.doubleValue(i);
       }
       n++;
       return;
     }
-    double[] nmea = new double[d];
-    double f = 1. / (n + 1.);
     for(int i = 0; i < d; i++) {
-      double vi = nv.doubleValue(i);
-      double delta = vi - mean[i];
-      nmea[i] = mean[i] + delta * f;
-      for(int j = 0; j <= i; j++) {
-        ssd[i][j] += delta * (nv.doubleValue(j) - nmea[j]);
-      }
-    }
-    for(int i = 0; i < d; i++) {
-      for(int j = 0; j < i; j++) {
-        ssd[j][i] = ssd[i][j];
-      }
+      double v = nv.doubleValue(i);
+      double delta = v - mean[i];
+      double newmean = mean[i] += delta / (double) (n + 1.);
+      ssd[i] += delta * (v - newmean);
     }
     n++;
-    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
-  public void addToStatistics(CFInterface other) {
-    addToStatistics((ClusteringFeature) other);
-
+  public void addToStatistics(ClusterFeature other) {
+    addToStatistics((VVIFeature) other);
   }
 
   // @Override
-  public void addToStatistics(ClusteringFeature other) {
+  public void addToStatistics(VVIFeature other) {
     if(this.n == 0) {
       for(int i = 0; i < ssd.length; i++) {
-        for(int j = 0; j < ssd.length; j++) {
-          ssd[i][j] = other.ssd[i][j];
-        }
+        ssd[i] = other.ssd[i];
         mean[i] = other.mean[i];
       }
       this.n = other.n;
       return;
     }
     assert (this.n > 0 && other.n > 0);
-    double[] nmea = new double[mean.length];
     double factor = other.n / (double) (n + other.n);
     for(int i = 0; i < ssd.length; i++) {
       double delta = other.mean[i] - mean[i];
-      nmea[i] = mean[i] + delta * factor;
-      for(int j = 0; j <= i; j++) {
-        ssd[i][j] += other.ssd[i][j] + other.n * (delta * (other.mean[j] - nmea[j]));
-      }
-    }
-    for(int i = 0; i < ssd.length; i++) {
-      for(int j = 0; j < i; j++) {
-        ssd[j][i] = ssd[i][j];
-      }
+      double newmean = mean[i] += delta * factor;
+      ssd[i] += other.ssd[i] + other.n * (delta * (other.mean[i] - newmean));
     }
     this.n += other.n;
-    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
   public void resetStatistics() {
     n = 0;
-    for(int i = 0; i < ssd.length; i++) {
-      Arrays.fill(ssd[i], 0.);
-    }
+    Arrays.fill(ssd, 0.);
     Arrays.fill(mean, 0.);
   }
 
@@ -146,7 +119,7 @@ public class ClusteringFeature implements CFInterface {
   public double variance() {
     double var = 0.;
     for(int i = 0; i < ssd.length; i++) {
-      var += ssd[i][i];
+      var += ssd[i];
     }
     return var / n;
   }
@@ -155,32 +128,34 @@ public class ClusteringFeature implements CFInterface {
   public double sumdev() {
     double var = 0.;
     for(int i = 0; i < ssd.length; i++) {
-      var += ssd[i][i];
+      var += ssd[i];
     }
     return var;
   }
 
   @Override
   public double variance(int d) {
-    double var = ssd[d][d] / n;
+    double var = ssd[d] / n;
     return var >= 0. ? var : 0.;
   }
 
   @Override
   public double[][] covariance() {
-    double[][] cov = new double[mean.length][mean.length];
-    final double f = 1. / n;
-    for(int i = 0; i < mean.length; i++) {
-      for(int j = 0; j < mean.length; j++) {
-        cov[i][j] = ssd[i][j] * f;
-      }
-    }
-    return cov;
+    throw new IllegalStateException("This CF Model doesn't support this method.");
+  }
+
+  /**
+   * Sum of Squared Deviations.
+   *
+   * @return Sum of Squared Deviations.
+   */
+  public double sumOfSquaredDev(int i) {
+    return ssd[i];
   }
 
   @Override
   public int getDimensionality() {
-    return mean.length;
+    return ssd.length;
   }
 
   @Override
@@ -199,8 +174,8 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double squaredCenterDistance(CFInterface other) {
-    double[] omean = ((ClusteringFeature) other).mean;
+  public double squaredCenterDistance(ClusterFeature other) {
+    double[] omean = ((VVIFeature) other).mean;
     double sum = 0;
     for(int d = 0, dim = mean.length; d < dim; d++) {
       final double delta = mean[d] - omean[d];
@@ -220,13 +195,42 @@ public class ClusteringFeature implements CFInterface {
   }
 
   @Override
-  public double absoluteCenterDistance(CFInterface other) {
-    double[] omean = ((ClusteringFeature) other).mean;
+  public double absoluteCenterDistance(ClusterFeature other) {
+    double[] omean = ((VVIFeature) other).mean;
     double sum = 0;
     for(int d = 0, dim = mean.length; d < dim; d++) {
       final double delta = mean[d] - omean[d];
       sum += Math.abs(delta);
     }
     return sum;
+  }
+
+  /**
+   * Factory for making cluster features.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory implements ClusterFeature.Factory<VVIFeature> {
+    /**
+     * Static instance.
+     */
+    public static final Factory STATIC = new Factory();
+
+    @Override
+    public VVIFeature make(int dim) {
+      return new VVIFeature(dim);
+    }
+
+    /**
+     * Parameterization class.
+     *
+     * @author Erich Schubert
+     */
+    public static class Par implements Parameterizer {
+      @Override
+      public Factory make() {
+        return STATIC;
+      }
+    }
   }
 }

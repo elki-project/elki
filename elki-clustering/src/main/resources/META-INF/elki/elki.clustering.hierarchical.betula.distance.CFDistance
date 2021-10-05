@@ -1,10 +1,10 @@
-elki.clustering.hierarchical.betula.distance.AverageInterclusterDistance
-elki.clustering.hierarchical.betula.distance.AverageIntraclusterDistance
-elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance
-elki.clustering.hierarchical.betula.distance.CentroidManhattanDistance
-elki.clustering.hierarchical.betula.distance.RadiusDistance
-elki.clustering.hierarchical.betula.distance.VarianceIncreaseDistance
-elki.clustering.hierarchical.betula.birch.BIRCHAverageInterclusterDistance
-elki.clustering.hierarchical.betula.birch.BIRCHAverageIntraclusterDistance
-elki.clustering.hierarchical.betula.birch.BIRCHRadiusDistance
-elki.clustering.hierarchical.betula.birch.BIRCHVarianceIncreaseDistance
+elki.clustering.hierarchical.betula.distance.AverageInterclusterDistance D2
+elki.clustering.hierarchical.betula.distance.AverageIntraclusterDistance D3
+elki.clustering.hierarchical.betula.distance.CentroidEuclideanDistance D0
+elki.clustering.hierarchical.betula.distance.CentroidManhattanDistance D1
+elki.clustering.hierarchical.betula.distance.RadiusDistance R
+elki.clustering.hierarchical.betula.distance.VarianceIncreaseDistance D4
+elki.clustering.hierarchical.betula.distance.BIRCHAverageInterclusterDistance
+elki.clustering.hierarchical.betula.distance.BIRCHAverageIntraclusterDistance
+elki.clustering.hierarchical.betula.distance.BIRCHRadiusDistance
+elki.clustering.hierarchical.betula.distance.BIRCHVarianceIncreaseDistance

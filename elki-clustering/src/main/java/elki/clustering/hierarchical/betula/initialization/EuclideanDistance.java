@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.initialization;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 
 /**
@@ -30,7 +30,7 @@ import elki.data.NumberVector;
  */
 public class EuclideanDistance implements CFIDistance {
   @Override
-  public double squaredDistance(NumberVector v, CFInterface cf) {
+  public double squaredDistance(NumberVector v, ClusterFeature cf) {
     final int d = v.getDimensionality();
     assert d == cf.getDimensionality();
     double sum = 0.;
@@ -42,7 +42,7 @@ public class EuclideanDistance implements CFIDistance {
   }
 
   @Override
-  public double squaredDistance(double[] v, CFInterface cf) {
+  public double squaredDistance(double[] v, ClusterFeature cf) {
     final int d = v.length;
     assert d == cf.getDimensionality();
     double sum = 0.;
@@ -54,7 +54,7 @@ public class EuclideanDistance implements CFIDistance {
   }
 
   @Override
-  public double squaredDistance(CFInterface c1, CFInterface c2) {
+  public double squaredDistance(ClusterFeature c1, ClusterFeature c2) {
     final int d = c1.getDimensionality();
     assert (d == c2.getDimensionality());
     double sum = 0.;

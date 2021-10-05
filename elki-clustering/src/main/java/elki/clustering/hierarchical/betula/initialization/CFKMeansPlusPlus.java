@@ -23,9 +23,9 @@ package elki.clustering.hierarchical.betula.initialization;
 import java.util.List;
 import java.util.Random;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
-import elki.clustering.hierarchical.betula.HasCF;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
 import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -70,7 +70,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
     return run(tree, cfs, k);
   }
 
@@ -83,10 +83,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param k K
    * @return Initial cluster centers
    */
-  public double[][] run(CFTree<?> tree, List<? extends HasCF> cf, int k) {
+  public double[][] run(CFTree<?> tree, List<? extends AsClusterFeature> cf, int k) {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
-    CFInterface first = firstVar ? sampleFirst(tree.getRoot().getCF(), cf, rnd) : cf.get(rnd.nextInt(cf.size())).getCF();
+    ClusterFeature first = firstVar ? sampleFirst(tree.getRoot().getCF(), cf, rnd) : cf.get(rnd.nextInt(cf.size())).getCF();
     final int d = first.getDimensionality();
     double[] mean = means[0] = new double[d];
     for(int i = 0; i < d; i++) {
@@ -109,7 +109,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
         weightsum -= r; // Decrease
         continue; // Retry
       }
-      CFInterface cfi = cf.get(i).getCF();
+      ClusterFeature cfi = cf.get(i).getCF();
       // Add new mean:
       mean = means[m] = new double[d];
       for(int j = 0; j < mean.length; j++) {
@@ -131,7 +131,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param cf Cluster features
    * @return Sum of weights
    */
-  private double initialWeights(CFInterface first, List<? extends HasCF> cf) {
+  private double initialWeights(ClusterFeature first, List<? extends AsClusterFeature> cf) {
     final int e = cf.size();
     double weightsum = 0.;
     weights = new double[e];
@@ -148,7 +148,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param cf Cluster features
    * @return Weight sum
    */
-  private double updateWeights(CFInterface latest, List<? extends HasCF> cf) {
+  private double updateWeights(ClusterFeature latest, List<? extends AsClusterFeature> cf) {
     double weightsum = 0.;
     for(int i = 0, e = cf.size(); i < e; i++) {
       double weight = weights[i];
@@ -169,7 +169,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param rnd Random generator
    * @return Selected cluster feature
    */
-  private CFInterface sampleFirst(CFInterface root, List<? extends HasCF> cfs, Random rnd) {
+  private ClusterFeature sampleFirst(ClusterFeature root, List<? extends AsClusterFeature> cfs, Random rnd) {
     final int e = cfs.size();
     double weightsum = 0;
     double[] tmpWeight = new double[e];

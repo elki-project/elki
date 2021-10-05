@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-import elki.clustering.hierarchical.betula.distance.CFDistance;
-import elki.clustering.hierarchical.betula.vvi.VVIModel;
+import elki.clustering.hierarchical.betula.distance.*;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
+import elki.clustering.hierarchical.betula.features.BIRCHCF;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.VIIFeature;
 import elki.data.NumberVector;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -95,11 +95,26 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
     booktitle = "Data Min. Knowl. Discovery", //
     url = "https://doi.org/10.1023/A:1009783824328", //
     bibkey = "DBLP:journals/datamine/ZhangRL97")
-public class CFTree<L extends CFInterface> {
+public class CFTree<L extends ClusterFeature> {
   /**
    * Class logger.
    */
   public static final Logging LOG = Logging.getLogger(CFTree.class);
+
+  /**
+   * Cluster feature factory
+   */
+  ClusterFeature.Factory<L> factory;
+
+  /**
+   * Cluster distance
+   */
+  CFDistance dist;
+
+  /**
+   * Absorption criterion
+   */
+  CFDistance abs;
 
   /**
    * Threshold update strategy.
@@ -122,7 +137,7 @@ public class CFTree<L extends CFInterface> {
   /**
    * Threshold heuristic strategy.
    */
-  protected Threshold tCriterium;
+  Threshold tCriterium;
 
   /**
    * Squared maximum radius threshold of a clustering feature.
@@ -145,77 +160,81 @@ public class CFTree<L extends CFInterface> {
   int leaves;
 
   /**
-   * data relation
+   * Maximum number of leaves allowed
    */
-  Relation<? extends NumberVector> relation;
+  int maxleaves;
+
+  /**
+   * Number of tree rebuilds
+   */
+  int rebuildstat;
 
   /**
    * Stored leaf entry to dbid relation
    */
-  protected Map<CFInterface, ArrayModifiableDBIDs> idmap;
-
-  /**
-   * Cluster feature model
-   */
-  CFModel<L> cfModel;
-
-  /**
-   * Cluster distance
-   */
-  CFDistance dist;
-
-  /**
-   * Absorption criterion
-   */
-  CFDistance abs;
+  Map<ClusterFeature, ArrayModifiableDBIDs> idmap;
 
   /**
    * Constructor.
    *
-   * @param threshold Threshold
-   * @param capacity Capacity
+   * @param factory Cluster feature factory
+   * @param dist Distance function to choose nearest
+   * @param abs Absorption criterion
+   * @param threshold Distance threshold
+   * @param capacity Maximum number of leaves
+   * @param tCriterium threshold adjustment rule
+   * @param maxleaves Maximum number of leaves
+   * @param storeIds Store object ids
    */
-  public CFTree(CFModel<L> cfModel, Relation<? extends NumberVector> relation, double threshold, int capacity, Threshold tCriterium) {
+  public CFTree(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int capacity, Threshold tCriterium, int maxleaves, boolean storeIds) {
     super();
-    this.relation = relation;
+    this.factory = factory;
+    this.dist = dist;
+    this.abs = abs;
     this.thresholdsq = threshold * threshold;
     this.capacity = capacity;
     this.tCriterium = tCriterium;
-    this.cfModel = cfModel;
-    this.dist = cfModel.distance();
-    this.abs = cfModel.absorption();
+    this.maxleaves = maxleaves;
+    this.idmap = storeIds ? new Reference2ObjectOpenHashMap<ClusterFeature, ArrayModifiableDBIDs>(maxleaves) : null;
   }
 
   /**
    * Insert a data point into the tree.
    *
    * @param nv Object data
+   * @param dbid Object id
    */
-  public void insert(DBIDIter dbid) {
+  public void insert(NumberVector nv, DBIDRef dbid) {
     // No root created yet:
     if(root == null) {
-      NumberVector nv = relation.get(dbid);
       final int dim = nv.getDimensionality();
-      L leaf = cfModel.make(dim);
+      L leaf = factory.make(dim);
       if(idmap != null) {
         ArrayModifiableDBIDs list = DBIDUtil.newArray();
         list.add(dbid);
         idmap.put(leaf, list);
       }
       leaf.addToStatistics(nv);
-      root = new CFNode<>(cfModel.make(dim), capacity);
+      root = new CFNode<>(factory.make(dim), capacity);
       root.add(0, leaf);
       ++leaves;
       return;
     }
-    CFNode<L> other = insert(root, dbid);
+    CFNode<L> other = insert(root, nv, dbid);
     // Handle root overflow:
     if(other != null) {
       final int dim = other.getCF().getDimensionality();
-      CFNode<L> newnode = new CFNode<>(cfModel.make(dim), capacity);
+      CFNode<L> newnode = new CFNode<>(factory.make(dim), capacity);
       newnode.add(0, root);
       newnode.add(1, other);
       root = newnode;
+    }
+    if(leaves > maxleaves) {
+      if(LOG.isVerbose()) {
+        LOG.verbose("Compacting CF-tree.");
+      }
+      rebuildstat++;
+      rebuildTree();
     }
   }
 
@@ -260,14 +279,14 @@ public class CFTree<L extends CFInterface> {
 
     leaves = 0;
     // Make a new root node:
-    root = new CFNode<>(cfModel.make(dim), capacity);
+    root = new CFNode<>(factory.make(dim), capacity);
     root.add(0, cfs.get(order[cfs.size() - 1]));
     ++leaves;
     for(int i = cfs.size() - 2; i >= 0; i--) {
       CFNode<L> other = insert(root, cfs.get(order[i]));
       // Handle root overflow:
       if(other != null) {
-        CFNode<L> newnode = new CFNode<>(cfModel.make(dim), capacity);
+        CFNode<L> newnode = new CFNode<>(factory.make(dim), capacity);
         newnode.add(0, root);
         newnode.add(1, other);
         root = newnode;
@@ -291,7 +310,7 @@ public class CFTree<L extends CFInterface> {
       }
       return;
     }
-    assert current.getChild(0) instanceof CFInterface : "Node is neither child nor inner?";
+    assert current.getChild(0) instanceof ClusterFeature : "Node is neither child nor inner?";
     if(current.getChild(1) == null) {
       thresholds[offset++] = Double.POSITIVE_INFINITY;
       cfs.add((L) current.getChild(0));
@@ -301,7 +320,7 @@ public class CFTree<L extends CFInterface> {
     Arrays.fill(best, Double.POSITIVE_INFINITY);
     int[] besti = new int[capacity];
     for(int i = 0; i < capacity; i++) {
-      HasCF ci = current.getChild(i);
+      AsClusterFeature ci = current.getChild(i);
       if(ci == null) {
         break;
       }
@@ -333,19 +352,17 @@ public class CFTree<L extends CFInterface> {
    *
    * @param node Current node
    * @param nv Object data
+   * @param dbid Object id
    * @return New sibling, if the node was split.
    */
   @SuppressWarnings("unchecked")
-  private CFNode<L> insert(CFNode<L> node, DBIDIter dbid) {
-    NumberVector nv = relation.get(dbid);
-    // Find closest child:
-    assert (node.getChild(0) != null) : "Unexpected empty node!";
-
+  private CFNode<L> insert(CFNode<L> node, NumberVector nv, DBIDRef dbid) {
+    assert node.getChild(0) != null : "Unexpected empty node!";
     // Find the best child:
-    HasCF best = node.getChild(0);
+    AsClusterFeature best = node.getChild(0);
     double bestd = dist.squaredDistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
-      HasCF cf = node.getChild(i);
+      AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
@@ -367,7 +384,7 @@ public class CFTree<L extends CFInterface> {
         node.getCF().addToStatistics(nv);
         return null;
       }
-      L bestl = cfModel.make(nv.getDimensionality());
+      L bestl = factory.make(nv.getDimensionality());
       if(idmap != null) {
         ArrayModifiableDBIDs list = DBIDUtil.newArray();
         list.add(dbid);
@@ -381,7 +398,7 @@ public class CFTree<L extends CFInterface> {
       return split(node, bestl);
     }
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
-    CFNode<L> newchild = insert((CFNode<L>) best, dbid);
+    CFNode<L> newchild = insert((CFNode<L>) best, nv, dbid);
     if(newchild == null) {
       node.getCF().addToStatistics(best.getCF());
       return null;
@@ -424,10 +441,10 @@ public class CFTree<L extends CFInterface> {
     assert (node.getChild(0) != null) : "Unexpected empty node!";
 
     // Find the best child:
-    HasCF best = node.getChild(0);
+    AsClusterFeature best = node.getChild(0);
     double bestd = dist.squaredDistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
-      HasCF cf = node.getChild(i);
+      AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
@@ -447,16 +464,16 @@ public class CFTree<L extends CFInterface> {
    * @param newchild Additional child
    * @return New sibling of {@code node}
    */
-  private CFNode<L> split(CFNode<L> node, HasCF newchild) {
+  private CFNode<L> split(CFNode<L> node, AsClusterFeature newchild) {
     assert (node.getChild(capacity - 1) != null) : "Node to split is not empty!";
-    CFNode<L> newn = new CFNode<>(cfModel.make(node.getCF().getDimensionality()), capacity);
+    CFNode<L> newn = new CFNode<>(factory.make(node.getCF().getDimensionality()), capacity);
     final int size = capacity + 1;
     // Find farthest pair:
     int m1 = -1, m2 = -1;
     double maxd = Double.NEGATIVE_INFINITY;
     double[][] dists = new double[size][size];
     for(int i = 0; i < capacity; i++) {
-      CFInterface ci = node.getChild(i).getCF();
+      ClusterFeature ci = node.getChild(i).getCF();
       for(int j = i + 1; j < capacity; j++) {
         double d = dists[i][j] = dists[j][i] = dist.squaredDistance(ci, node.getChild(j).getCF());
         if(d > maxd) {
@@ -509,15 +526,15 @@ public class CFTree<L extends CFInterface> {
    * @return New sibling, if the node was split.
    */
   @SuppressWarnings("unchecked")
-  private CFNode<L> insert(CFNode<L> node, HasCF nleaf) {
+  private CFNode<L> insert(CFNode<L> node, AsClusterFeature nleaf) {
     // Find closest child:
     assert (node.getChild(0) != null) : "Unexpected empty node!";
 
     // Find the best child:
-    HasCF best = node.getChild(0);
+    AsClusterFeature best = node.getChild(0);
     double bestd = dist.squaredDistance(best.getCF(), nleaf.getCF());
     for(int i = 1; i < capacity; i++) {
-      HasCF cf = node.getChild(i);
+      AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
@@ -571,7 +588,7 @@ public class CFTree<L extends CFInterface> {
    *
    * @author Erich Schubert
    */
-  public static class LeafIterator<L extends CFInterface> implements Iter {
+  public static class LeafIterator<L extends ClusterFeature> implements Iter {
     /**
      * Queue of open ends.
      */
@@ -620,7 +637,7 @@ public class CFTree<L extends CFInterface> {
         }
         CFNode<L> node = (CFNode<L>) f;
         for(int i = 0; i < node.capacity(); i++) {
-          HasCF c = node.getChild(i);
+          AsClusterFeature c = node.getChild(i);
           if(c == null) {
             break;
           }
@@ -639,7 +656,7 @@ public class CFTree<L extends CFInterface> {
    * @param d Depth
    * @return Output buffer
    */
-  protected static StringBuilder printDebug(StringBuilder buf, CFInterface n, int d) {
+  protected static StringBuilder printDebug(StringBuilder buf, ClusterFeature n, int d) {
     FormatUtil.appendSpace(buf, d).append(n.getWeight());
     for(int i = 0; i < n.getDimensionality(); i++) {
       buf.append(' ').append(n.centroid(i));
@@ -648,7 +665,7 @@ public class CFTree<L extends CFInterface> {
     if(n instanceof CFNode) {
       final CFNode<?> node = (CFNode<?>) n;
       for(int i = 0; i < node.capacity(); i++) {
-        HasCF c = node.getChild(i);
+        AsClusterFeature c = node.getChild(i);
         if(c != null) {
           printDebug(buf, c.getCF(), d + 1);
         }
@@ -657,18 +674,38 @@ public class CFTree<L extends CFInterface> {
     return buf;
   }
 
+  public int getLeaves() {
+    return leaves;
+  }
+
+  public CFNode<L> getRoot() {
+    return root;
+  }
+
+  public int getCapacity() {
+    return capacity;
+  }
+
   /**
    * CF-Tree Factory.
    *
    * @author Erich Schubert
    */
-  public static class Factory<L extends CFInterface> {
+  public static class Factory<L extends ClusterFeature> {
     /**
-     * Number of tree rebuilds
+     * Cluster feature factory
      */
-    long rebuildstat;
+    ClusterFeature.Factory<L> factory;
 
-    CFModel<L> cfModel;
+    /**
+     * BIRCH distance function to use
+     */
+    CFDistance dist;
+
+    /**
+     * BIRCH distance function to use for point absorption
+     */
+    CFDistance abs;
 
     /**
      * Cluster merge threshold.
@@ -688,17 +725,23 @@ public class CFTree<L extends CFInterface> {
     /**
      * Threshold heuristic strategy.
      */
-    protected Threshold tCriterium = Threshold.MEAN;
+    Threshold tCriterium;
 
     /**
      * Constructor.
      *
+     * @param factory Cluster feature factory
+     * @param dist Distance function to choose nearest
+     * @param abs Absorption criterion
      * @param threshold Distance threshold
-     * @param branchingFactor Maximum branching factor.
+     * @param branchingFactor Maximum branching factor
      * @param maxleaves Maximum number of leaves
+     * @param tCriterium threshold adjustment rule
      */
-    public Factory(CFModel<L> cfModel, double threshold, int branchingFactor, double maxleaves, Threshold tCriterium) {
-      this.cfModel = cfModel;
+    public Factory(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int branchingFactor, double maxleaves, Threshold tCriterium) {
+      this.factory = factory;
+      this.dist = dist;
+      this.abs = abs;
       this.threshold = threshold;
       this.branchingFactor = branchingFactor;
       this.maxleaves = maxleaves;
@@ -713,28 +756,18 @@ public class CFTree<L extends CFInterface> {
      * @return New tree
      */
     public CFTree<L> newTree(DBIDs ids, Relation<? extends NumberVector> relation, boolean storeIds) {
-      rebuildstat = 0;
-      Duration buildtime = LOG.newDuration(getClass().getName().replace("$Factory", ".buildtime")).begin();
-      CFTree<L> tree = new CFTree<L>(cfModel, relation, threshold, branchingFactor, tCriterium);
-      final double max = maxleaves <= 1 ? maxleaves * ids.size() : maxleaves;
-      if(storeIds) {
-        tree.idmap = new Reference2ObjectOpenHashMap<CFInterface, ArrayModifiableDBIDs>((int) maxleaves);
-      }
+      final String prefix = CFTree.class.getName();
+      Duration buildtime = LOG.newDuration(prefix + ".buildtime").begin();
+      final int max = (int) (maxleaves <= 1 ? maxleaves * ids.size() : maxleaves);
+      CFTree<L> tree = new CFTree<>(factory, dist, abs, threshold, branchingFactor, tCriterium, max, storeIds);
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        tree.insert(it);
-        if(tree.leaves > max) {
-          if(LOG.isVerbose()) {
-            LOG.verbose("Compacting CF-tree.");
-          }
-          rebuildstat++;
-          tree.rebuildTree();
-        }
+        tree.insert(relation.get(it), it);
         LOG.incrementProcessed(prog);
       }
       LOG.statistics(buildtime.end());
-      LOG.statistics(new LongStatistic(getClass().getName().replace("$Factory", ".rebuilds"), rebuildstat));
-      LOG.statistics(new LongStatistic(getClass().getName().replace("$Factory", ".leaves"), tree.leaves));
+      LOG.statistics(new LongStatistic(prefix + ".rebuilds", tree.rebuildstat));
+      LOG.statistics(new LongStatistic(prefix + ".leaves", tree.leaves));
       LOG.ensureCompleted(prog);
       return tree;
     }
@@ -743,22 +776,33 @@ public class CFTree<L extends CFInterface> {
      * Parameterization class for CFTrees.
      *
      * @author Andreas Lang
+     * @author Erich Schubert
      */
-    public static class Par<L extends CFInterface> implements Parameterizer {
+    public static class Par<L extends ClusterFeature> implements Parameterizer {
       /**
-       * Option ID for threshold heuristic.
+       * Cluster features parameter.
        */
-      public static final OptionID SPLIT_ID = new OptionID("cftree.Threshold.heuristic", "Threshold heuristic to use (mean or median).");
+      public static final OptionID FEATURES_ID = new OptionID("cftree.features", "Cluster features to use.");
 
       /**
-       * Model parameter.
+       * Distance function parameter.
        */
-      public static final OptionID MODEL_ID = new OptionID("cftree.model", "CF Model.");
+      public static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
+
+      /**
+       * Absorption parameter.
+       */
+      public static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
 
       /**
        * Distance threshold.
        */
       public static final OptionID THRESHOLD_ID = new OptionID("cftree.threshold", "Threshold for adding points to existing nodes in the CF-Tree.");
+
+      /**
+       * Option ID for threshold heuristic.
+       */
+      public static final OptionID SPLIT_ID = new OptionID("cftree.threshold.heuristic", "Threshold heuristic to use (mean or median).");
 
       /**
        * Branching factor.
@@ -769,6 +813,21 @@ public class CFTree<L extends CFInterface> {
        * Maximum number of leaves.
        */
       public static final OptionID MAXLEAVES_ID = new OptionID("cftree.maxleaves", "Maximum number of leaves (if less than 1, the values is assumed to be relative)");
+
+      /**
+       * Cluster feature factory
+       */
+      ClusterFeature.Factory<L> factory;
+
+      /**
+       * BIRCH distance function to use
+       */
+      CFDistance dist;
+
+      /**
+       * BIRCH distance function to use for point absorption
+       */
+      CFDistance abs;
 
       /**
        * Cluster merge threshold.
@@ -786,24 +845,24 @@ public class CFTree<L extends CFInterface> {
       double maxleaves;
 
       /**
-       * CF Model that is used
-       */
-      CFModel<L> cfModel;
-
-      /**
        * Threshold heuristic strategy.
        */
-      protected Threshold tCriterium;
+      Threshold tCriterium;
 
       @Override
       public void configure(Parameterization config) {
-        new ObjectParameter<CFModel<L>>(MODEL_ID, CFModel.class, VVIModel.class) //
-            .grab(config, x -> cfModel = x);
+        new ObjectParameter<ClusterFeature.Factory<L>>(FEATURES_ID, ClusterFeature.Factory.class, VIIFeature.Factory.class) //
+            .grab(config, x -> factory = x);
+        boolean isbirch = factory != null && factory.getClass() == BIRCHCF.Factory.class;
+        new ObjectParameter<CFDistance>(DISTANCE_ID, CFDistance.class, isbirch ? BIRCHVarianceIncreaseDistance.class : VarianceIncreaseDistance.class) //
+            .grab(config, x -> dist = x);
+        new ObjectParameter<CFDistance>(ABSORPTION_ID, CFDistance.class, isbirch ? BIRCHRadiusDistance.class : RadiusDistance.class) //
+            .grab(config, x -> abs = x);
         new EnumParameter<Threshold>(SPLIT_ID, Threshold.class, Threshold.MEAN) //
             .grab(config, x -> tCriterium = x);
         new DoubleParameter(THRESHOLD_ID) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
             .setOptional(true) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
             .grab(config, x -> threshold = x);
         new IntParameter(BRANCHING_ID) //
             .addConstraint(new GreaterEqualConstraint(2)) //
@@ -817,20 +876,8 @@ public class CFTree<L extends CFInterface> {
 
       @Override
       public CFTree.Factory<L> make() {
-        return new CFTree.Factory<L>(cfModel, threshold, branchingFactor, maxleaves, tCriterium);
+        return new CFTree.Factory<L>(factory, dist, abs, threshold, branchingFactor, maxleaves, tCriterium);
       }
     }
-  }
-
-  public int getLeaves() {
-    return leaves;
-  }
-
-  public CFNode<L> getRoot() {
-    return root;
-  }
-
-  public int getCapacity() {
-    return capacity;
   }
 }

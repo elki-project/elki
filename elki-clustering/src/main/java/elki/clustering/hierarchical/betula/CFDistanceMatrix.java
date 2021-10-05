@@ -1,12 +1,13 @@
 package elki.clustering.hierarchical.betula;
 
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.utilities.exceptions.AbortException;
 
 public class CFDistanceMatrix {
 
     int size;
 
-    CFInterface[] cfs;
+    ClusterFeature[] cfs;
 
     double[] matrix;
 
@@ -15,7 +16,7 @@ public class CFDistanceMatrix {
      *
      * @param ids Database ids.
      */
-    public CFDistanceMatrix(CFInterface[] cfs) {
+    public CFDistanceMatrix(ClusterFeature[] cfs) {
         size = cfs.length;
         if(size > 0x10000) {
             throw new AbortException("This implementation does not scale to data sets larger than " + //

@@ -24,10 +24,10 @@ package elki.clustering.hierarchical.betula.initialization;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFNode;
 import elki.clustering.hierarchical.betula.CFTree;
-import elki.clustering.hierarchical.betula.HasCF;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -48,12 +48,12 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
     if(tree.getLeaves() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
     }
     ArrayList<CFNode<?>> next = new ArrayList<>();
-    ArrayList<CFInterface> res = new ArrayList<>(k);
+    ArrayList<ClusterFeature> res = new ArrayList<>(k);
     next.add(tree.getRoot());
     do {
       ArrayList<CFNode<?>> current = next;
@@ -61,7 +61,7 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
       while(current.size() > 0) {
         CFNode<?> node = current.remove(0);
         for(int i = 0; i < node.capacity(); i++) {
-          HasCF child = node.getChild(i);
+          AsClusterFeature child = node.getChild(i);
           if(child == null) {
             break;
           }
@@ -69,7 +69,7 @@ public class CFTreeInit extends AbstractCFKMeansInitialization {
             next.add((CFNode<?>) child);
           }
           else {
-            res.add((CFInterface) child);
+            res.add((ClusterFeature) child);
           }
         }
       }

@@ -25,7 +25,6 @@ import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -33,7 +32,8 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 import elki.clustering.hierarchical.betula.CFTree.LeafIterator;
-import elki.clustering.hierarchical.betula.HasCF;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
+import elki.clustering.hierarchical.betula.features.AsClusterFeature;
 
 /**
  * Abstract base class for CF k-means initializations. For regular k-means use
@@ -64,7 +64,7 @@ public abstract class AbstractCFKMeansInitialization {
    * @param root Summary statistic of the tree.
    * @return
    */
-  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k);
+  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k);
 
   /**
    * Extract the leaves of the tree.
@@ -72,7 +72,7 @@ public abstract class AbstractCFKMeansInitialization {
    * @param tree Tree
    * @return Leaves
    */
-  public static <L extends CFInterface> ArrayList<L> flattenTree(CFTree<L> tree) {
+  public static <L extends ClusterFeature> ArrayList<L> flattenTree(CFTree<L> tree) {
     ArrayList<L> cfs = new ArrayList<>(tree.getLeaves());
     for(LeafIterator<L> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
       cfs.add(iter.get());

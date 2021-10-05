@@ -28,6 +28,7 @@ import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.em.EMClusterModel;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.clustering.hierarchical.betula.initialization.AbstractCFKMeansInitialization;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
@@ -157,10 +158,10 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
 
     // Store clustering features:
     Duration modeltime = LOG.newDuration(getClass().getName().replace("BIRCHEM", "BIRCHEM.modeltime")).begin();
-    ArrayList<? extends CFInterface> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
+    ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
     // Initialize EM Model
     List<? extends EMClusterModel<NumberVector, M>> models = initializer.buildInitialModels(cfs, k, tree);
-    Map<CFInterface, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());
+    Map<ClusterFeature, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());
     double loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
     LOG.statistics(likestat.setDouble(loglikelihood));
@@ -231,12 +232,12 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public double assignProbabilitiesToInstances(ArrayList<? extends CFInterface> cfs, List<? extends EMClusterModel<NumberVector, M>> models, Map<CFInterface, double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends EMClusterModel<NumberVector, M>> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
     int n = 0;
     for(int i = 0; i < cfs.size(); i++) {
-      CFInterface cfsi = cfs.get(i);
+      ClusterFeature cfsi = cfs.get(i);
       double[] probs = new double[k];
       for(int j = 0; j < k; j++) {
         double v = models.get(j).estimateLogDensity(cfsi);
@@ -294,7 +295,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
    */
-  public void recomputeCovarianceMatrices(ArrayList<? extends CFInterface> cfs, Map<CFInterface, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
+  public void recomputeCovarianceMatrices(ArrayList<? extends ClusterFeature> cfs, Map<ClusterFeature, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
     final int k = models.size();
     boolean needsTwoPass = false;
     for(EMClusterModel<NumberVector, M> m : models) {
@@ -307,7 +308,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
     }
     double[] wsum = new double[k];
     for(int i = 0; i < cfs.size(); i++) {
-      CFInterface cfsi = cfs.get(i);
+      ClusterFeature cfsi = cfs.get(i);
       double[] clusterProbabilities = probClusterIGivenX.get(cfsi);
       for(int j = 0; j < clusterProbabilities.length; j++) {
         final double prob = clusterProbabilities[j];

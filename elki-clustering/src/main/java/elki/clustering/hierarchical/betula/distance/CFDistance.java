@@ -20,7 +20,7 @@
  */
 package elki.clustering.hierarchical.betula.distance;
 
-import elki.clustering.hierarchical.betula.CFInterface;
+import elki.clustering.hierarchical.betula.features.ClusterFeature;
 import elki.data.NumberVector;
 
 /**
@@ -41,7 +41,7 @@ public interface CFDistance {
    * @param cf Clustering Feature
    * @return Distance
    */
-  double squaredDistance(NumberVector v, CFInterface cf);
+  double squaredDistance(NumberVector v, ClusterFeature cf);
 
   /**
    * Distance between two clustering features.
@@ -50,7 +50,7 @@ public interface CFDistance {
    * @param c2 Second clustering feature
    * @return Distance
    */
-  double squaredDistance(CFInterface c1, CFInterface c2);
+  double squaredDistance(ClusterFeature c1, ClusterFeature c2);
 
   /**
    * Initialization for self measure for new Combinatorial clustering Methods
@@ -59,7 +59,7 @@ public interface CFDistance {
    * @param cf Clustering Feature
    * @return internal measure
    */
-  default double matSelfInit(CFInterface cf) {
+  default double matSelfInit(ClusterFeature cf) {
     return 0;
   }
 }
