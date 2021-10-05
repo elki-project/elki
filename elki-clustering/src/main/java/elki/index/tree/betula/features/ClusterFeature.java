@@ -27,7 +27,7 @@ import elki.data.NumberVector;
  * 
  * @author Andreas Lang
  */
-public interface ClusterFeature extends AsClusterFeature {
+public interface ClusterFeature extends AsClusterFeature, NumberVector {
   /**
    * Add NumberVector to CF
    * 
@@ -69,6 +69,16 @@ public interface ClusterFeature extends AsClusterFeature {
    */
   double centroid(int d);
 
+  @Override
+  default double doubleValue(int dimension) {
+    return centroid(dimension);
+  }
+
+  @Override
+  default long longValue(int dimension) {
+    return (long) centroid(dimension);
+  }
+
   /**
    * Returns the total variance.
    * 
@@ -97,38 +107,6 @@ public interface ClusterFeature extends AsClusterFeature {
    * @return covariance
    */
   double[][] covariance();
-
-  /**
-   * Squared distance of the centers.
-   *
-   * @param v Vector
-   * @return sum of squared deviations from the center
-   */
-  double squaredCenterDistance(NumberVector v);
-
-  /**
-   * Squared distance of the centers.
-   *
-   * @param other Other clustering feature
-   * @return sum of squared deviations from the center
-   */
-  double squaredCenterDistance(ClusterFeature other);
-
-  /**
-   * Absolute distance of the centers.
-   *
-   * @param v Vector
-   * @return sum of squared deviations from the center
-   */
-  double absoluteCenterDistance(NumberVector v);
-
-  /**
-   * Absolute distance of the centers.
-   *
-   * @param other Other clustering feature
-   * @return sum of squared deviations from the center
-   */
-  double absoluteCenterDistance(ClusterFeature other);
 
   @Override
   default ClusterFeature getCF() {

@@ -21,6 +21,7 @@
 package elki.index.tree.betula.distance;
 
 import elki.data.NumberVector;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -51,14 +52,14 @@ public class AverageIntraclusterDistance implements CFDistance {
   @Override
   public double squaredDistance(NumberVector nv, ClusterFeature cf1) {
     return cf1.getWeight() <= 0 ? 0 : //
-        2 * ((cf1.getWeight() + 1) * cf1.sumdev() + cf1.getWeight() * cf1.squaredCenterDistance(nv)) / ((cf1.getWeight() + 1) * cf1.getWeight());
+        2 * ((cf1.getWeight() + 1) * cf1.sumdev() + cf1.getWeight() * SquaredEuclideanDistance.STATIC.distance(cf1, nv)) / ((cf1.getWeight() + 1) * cf1.getWeight());
   }
 
   @Override
   public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
     final double n12 = cf1.getWeight() + cf2.getWeight();
     return n12 <= 0 ? 0 : //
-        2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.getWeight() * cf2.getWeight() * cf1.squaredCenterDistance(cf2)) / (n12 * (n12 - 1));
+        2 * (n12 * (cf1.sumdev() + cf2.sumdev()) + cf1.getWeight() * cf2.getWeight() * SquaredEuclideanDistance.STATIC.distance(cf1, cf2)) / (n12 * (n12 - 1));
   }
 
   @Override

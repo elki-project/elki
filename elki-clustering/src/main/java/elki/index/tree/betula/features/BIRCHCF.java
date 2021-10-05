@@ -185,47 +185,8 @@ public class BIRCHCF implements ClusterFeature {
   }
 
   @Override
-  public double squaredCenterDistance(NumberVector v) {
-    double sum = 0;
-    for(int d = 0, dim = ls.length; d < dim; d++) {
-      final double delta = ls[d] / n - v.doubleValue(d);
-      sum += delta * delta;
-    }
-    return sum;
-  }
-
-  @Override
-  public double squaredCenterDistance(ClusterFeature other) {
-    double[] ols = ((BIRCHCF) other).ls;
-    int on = other.getWeight();
-    double sum = 0;
-    for(int d = 0, dim = ls.length; d < dim; d++) {
-      final double delta = ls[d] / n - ols[d] / on;
-      sum += delta * delta;
-    }
-    return sum;
-  }
-
-  @Override
-  public double absoluteCenterDistance(NumberVector v) {
-    double sum = 0;
-    for(int d = 0, dim = ls.length; d < dim; d++) {
-      final double delta = ls[d] / n - v.doubleValue(d);
-      sum += Math.abs(delta);
-    }
-    return sum;
-  }
-
-  @Override
-  public double absoluteCenterDistance(ClusterFeature other) {
-    double[] ols = ((BIRCHCF) other).ls;
-    int on = other.getWeight();
-    double sum = 0;
-    for(int d = 0, dim = ls.length; d < dim; d++) {
-      final double delta = ls[d] / n - ols[d] / on;
-      sum += Math.abs(delta);
-    }
-    return sum;
+  public double[] toArray() {
+    return VMath.times(ls, 1. / n);
   }
 
   /**

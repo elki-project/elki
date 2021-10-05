@@ -674,16 +674,41 @@ public class CFTree<L extends ClusterFeature> {
     return buf;
   }
 
+  /**
+   * Get the number of leaves in the tree.
+   * 
+   * @return number of leaves
+   */
   public int getLeaves() {
     return leaves;
   }
 
+  /**
+   * Get the trees root node.
+   *
+   * @return root node
+   */
   public CFNode<L> getRoot() {
     return root;
   }
 
+  /**
+   * Get the tree capacity
+   * 
+   * @return tree capacity
+   */
   public int getCapacity() {
     return capacity;
+  }
+
+  /**
+   * Get the DBIDs of a cluster feature (if stored).
+   * 
+   * @param cf Cluster feature
+   * @return Object ids
+   */
+  public DBIDs getDBIDs(ClusterFeature cf) {
+    return idmap.get(cf);
   }
 
   /**

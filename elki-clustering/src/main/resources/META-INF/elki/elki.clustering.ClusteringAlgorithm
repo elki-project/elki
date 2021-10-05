@@ -20,6 +20,7 @@ elki.clustering.hierarchical.birch.BIRCHLeafClustering
 elki.clustering.kcenter.GreedyKCenter
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans
+elki.clustering.kmeans.BetulaLloydKMeans
 elki.clustering.kmeans.BisectingKMeans
 elki.clustering.kmeans.ElkanKMeans
 elki.clustering.kmeans.ExponionKMeans

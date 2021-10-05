@@ -21,6 +21,7 @@
 package elki.index.tree.betula.distance;
 
 import elki.data.NumberVector;
+import elki.distance.minkowski.ManhattanDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -50,12 +51,12 @@ public class CentroidManhattanDistance implements CFDistance {
 
   @Override
   public double squaredDistance(NumberVector v, ClusterFeature cf) {
-    return cf.absoluteCenterDistance(v);
+    return ManhattanDistance.STATIC.distance(cf, v);
   }
 
   @Override
   public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
-    return cf1.absoluteCenterDistance(cf2);
+    return ManhattanDistance.STATIC.distance(cf1, cf2);
   }
 
   /**

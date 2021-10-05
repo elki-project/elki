@@ -165,45 +165,8 @@ public class VVIFeature implements ClusterFeature {
   }
 
   @Override
-  public double squaredCenterDistance(NumberVector v) {
-    double sum = 0;
-    for(int d = 0, dim = mean.length; d < dim; d++) {
-      final double delta = mean[d] - v.doubleValue(d);
-      sum += delta * delta;
-    }
-    return sum;
-  }
-
-  @Override
-  public double squaredCenterDistance(ClusterFeature other) {
-    double[] omean = ((VVIFeature) other).mean;
-    double sum = 0;
-    for(int d = 0, dim = mean.length; d < dim; d++) {
-      final double delta = mean[d] - omean[d];
-      sum += delta * delta;
-    }
-    return sum;
-  }
-
-  @Override
-  public double absoluteCenterDistance(NumberVector v) {
-    double sum = 0;
-    for(int d = 0, dim = mean.length; d < dim; d++) {
-      final double delta = mean[d] - v.doubleValue(d);
-      sum += Math.abs(delta);
-    }
-    return sum;
-  }
-
-  @Override
-  public double absoluteCenterDistance(ClusterFeature other) {
-    double[] omean = ((VVIFeature) other).mean;
-    double sum = 0;
-    for(int d = 0, dim = mean.length; d < dim; d++) {
-      final double delta = mean[d] - omean[d];
-      sum += Math.abs(delta);
-    }
-    return sum;
+  public double[] toArray() {
+    return mean.clone();
   }
 
   /**

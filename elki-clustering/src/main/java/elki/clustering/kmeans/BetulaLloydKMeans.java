@@ -18,26 +18,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula;
+package elki.clustering.kmeans;
 
 import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
+import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.data.model.MeanModel;
-import elki.data.type.TypeInformation;
-import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
 import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
@@ -48,10 +46,8 @@ import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.Parameterizer;
-import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -60,34 +56,22 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * References:
  * <p>
- * T. Zhang, R. Ramakrishnan, M. Livny<br>
- * BIRCH: An Efficient Data Clustering Method for Very Large Databases
- * Proc. 1996 ACM SIGMOD International Conference on Management of Data
- * <p>
- * T. Zhang, R. Ramakrishnan, M. Livny<br>
- * BIRCH: A New Data Clustering Algorithm and Its Applications
- * Data. Min. Knowl. Discovery
- *
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
+ * 
  * @author Erich Schubert
- * @since 0.7.5
  *
  * @depend - - - CFTree
  */
-@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
-    title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
-    booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/233269.233324", //
-    bibkey = "DBLP:conf/sigmod/ZhangRL96")
-@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
-    title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
-    booktitle = "Data Min. Knowl. Discovery", //
-    url = "https://doi.org/10.1023/A:1009783824328", //
-    bibkey = "DBLP:journals/datamine/ZhangRL97")
-public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(BIRCHKMsimple.class);
+  private static final Logging LOG = Logging.getLogger(BetulaLloydKMeans.class);
 
   /**
    * CFTree factory.
@@ -95,39 +79,36 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
   CFTree.Factory<?> cffactory;
 
   /**
-   * Number of cluster centers to initialize.
-   */
-  int k;
-
-  /**
-   * Maximum number of iterations.
-   */
-  int maxiter;
-
-  /**
    * k-means++ initialization
    */
   AbstractCFKMeansInitialization initialization;
 
   /**
+   * Store ids
+   */
+  boolean storeIds = false;
+
+  /**
+   * Ignore weight
+   */
+  boolean ignoreWeight = false;
+
+  /**
    * Constructor.
    *
-   * @param cffactory CFTree factory
    * @param k Number of clusters
    * @param maxiter Maximum number of iterations
+   * @param cffactory CFTree factory
    * @param initialization Initialization method for k-means
+   * @param storeIds Store IDs to avoid reassignment cost
+   * @param ignoreWeight Ignore the leaf weights
    */
-  public BIRCHKMsimple(CFTree.Factory<?> cffactory, int k, int maxiter, AbstractCFKMeansInitialization initialization) {
-    super();
+  public BetulaLloydKMeans(int k, int maxiter, CFTree.Factory<?> cffactory, AbstractCFKMeansInitialization initialization, boolean storeIds, boolean ignoreWeight) {
+    super(k, maxiter, null);
     this.cffactory = cffactory;
-    this.k = k;
-    this.maxiter = maxiter;
     this.initialization = initialization;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    this.storeIds = storeIds;
+    this.ignoreWeight = ignoreWeight;
   }
 
   /**
@@ -137,38 +118,45 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @return Clustering
    */
   public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
-    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, false);
-
-    // For efficiency, we also need the mean of each CF:
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
     ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
 
-    int[] assignment = new int[tree.leaves], weights = new int[k];
+    int[] assignment = new int[cfs.size()], weights = new int[k];
     Arrays.fill(assignment, -1);
     double[][] means = kmeans(cfs, assignment, weights, tree);
-
-    // The CFTree does not store points. We have to reassign them; but rather
-    // than assigning them to n > k cluster features, we just assign them to the
-    // nearest CF, we assign them to the means directly (there currently is no
-    // API that would allow a user to get the means only, and no cluster
-    // assignment for each point).
-    double[] varsum = new double[k];
     ModifiableDBIDs[] ids = new ModifiableDBIDs[k];
     for(int i = 0; i < k; i++) {
       ids[i] = DBIDUtil.newArray(weights[i]);
     }
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      NumberVector fv = relation.get(iter);
-      double mindist = distance(fv, means[0]);
-      int minIndex = 0;
-      for(int i = 1; i < k; i++) {
-        double dist = distance(fv, means[i]);
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
+    double[] varsum = new double[k];
+    if(storeIds) {
+      for(int i = 0; i < assignment.length; i++) {
+        ClusterFeature cfsi = cfs.get(i);
+        final double[] mean = means[assignment[i]];
+        double s = cfsi.sumdev();
+        for(int d = 0; d < means[0].length; d++) {
+          final double dx = cfsi.centroid(d) - mean[d];
+          s += cfsi.getWeight() * dx * dx;
         }
+        varsum[assignment[i]] += s;
+        ids[assignment[i]].addDBIDs(tree.getDBIDs(cfsi));
       }
-      varsum[minIndex] += mindist;
-      ids[minIndex].add(iter);
+    }
+    else {
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        NumberVector fv = relation.get(iter);
+        double mindist = SquaredEuclideanDistance.STATIC.distance(fv, DoubleVector.wrap(means[0]));
+        int minIndex = 0;
+        for(int i = 1; i < k; i++) {
+          double dist = SquaredEuclideanDistance.STATIC.distance(fv, DoubleVector.wrap(means[i]));
+          if(dist < mindist) {
+            minIndex = i;
+            mindist = dist;
+          }
+        }
+        varsum[minIndex] += mindist;
+        ids[minIndex].add(iter);
+      }
     }
     LOG.statistics(new DoubleStatistic(getClass().getName() + ".variance-sum", VMath.sum(varsum)));
     Clustering<KMeansModel> result = new Clustering<>();
@@ -215,7 +203,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param assignment Cluster assignment
    * @param means Means of clusters
    * @param cfs Clustering features
-   *        * @param cfwmeans Cluster feature weighted means
+   * @param weights Cluster weights
    * @return Means of clusters.
    */
   private double[][] means(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
@@ -225,7 +213,7 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
       int c = assignment[i];
       final ClusterFeature cf = cfs.get(i);
       int d = cf.getDimensionality();
-      int n = 1;// cf.getWeight();
+      int n = cf.getWeight();
       if(newMeans[c] == null) {
         newMeans[c] = new double[d];
         for(int j = 0; j < d; j++) {
@@ -267,10 +255,10 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
       for(int j = 0; j < mean.length; j++) {
         mean[j] = cfsi.centroid(j);
       }
-      double mindist = distance(mean, means[0]);
+      double mindist = SquaredEuclideanDistance.STATIC.distance(mean, means[0]);
       int minIndex = 0;
       for(int j = 1; j < k; j++) {
-        double dist = distance(mean, means[j]);
+        double dist = SquaredEuclideanDistance.STATIC.distance(mean, means[j]);
         if(dist < mindist) {
           minIndex = j;
           mindist = dist;
@@ -280,41 +268,9 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
         changed++;
         assignment[i] = minIndex;
       }
-      weights[minIndex] += cfsi.getWeight();
+      weights[minIndex] += ignoreWeight ? 1 : cfsi.getWeight();
     }
     return changed;
-  }
-
-  /**
-   * Compute a distance.
-   *
-   * @param x First object
-   * @param y Second object
-   * @return Distance
-   */
-  protected double distance(NumberVector x, double[] y) {
-    double v = 0;
-    for(int i = 0; i < y.length; i++) {
-      double d = x.doubleValue(i) - y[i];
-      v += d * d;
-    }
-    return v;
-  }
-
-  /**
-   * Compute a distance.
-   *
-   * @param x First object
-   * @param y Second object
-   * @return Distance
-   */
-  protected double distance(double[] x, double[] y) {
-    double v = 0;
-    for(int i = 0; i < x.length; i++) {
-      double d = x[i] - y[i];
-      v += d * d;
-    }
-    return v;
   }
 
   /**
@@ -328,17 +284,24 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    * @param weights Cluster weights
    * @return Per-cluster variances
    */
-  private double[] calculateVariances(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
+  protected double[] calculateVariances(int[] assignment, double[][] means, ArrayList<? extends ClusterFeature> cfs, int[] weights) {
     double[] ss = new double[k];
     for(int i = 0; i < assignment.length; i++) {
       ClusterFeature cfsi = cfs.get(i);
+      final double[] mean = means[assignment[i]];
+      double s = ignoreWeight ? cfsi.sumdev() / cfsi.getWeight() : cfsi.sumdev();
       for(int d = 0; d < means[0].length; d++) {
-        double dx = cfsi.centroid(d) - means[assignment[i]][d];
-        ss[assignment[i]] += cfsi.getWeight() * cfsi.variance(d) + cfsi.getWeight() * dx * dx;
-        // TODO check if cfs[i].variance is sufficient
+        final double dx = cfsi.centroid(d) - mean[d];
+        s += (ignoreWeight ? 1 : cfsi.getWeight()) * dx * dx;
       }
+      ss[assignment[i]] += s;
     }
     return ss;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 
   /**
@@ -346,12 +309,16 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
    *
    * @author Andreas Lang
    */
-  public static class Par<M extends MeanModel> implements Parameterizer {
+  public static class Par extends AbstractKMeans.Par<NumberVector> {
     /**
-     * Parameter to specify the cluster center initialization.
+     * Option to store ids rather than reassigning.
      */
-    public static final OptionID INIT_ID = new OptionID("em.centers", //
-        "Method to choose the initial cluster centers.");
+    public static final OptionID STORE_IDS_ID = new OptionID("betula.store", "Store IDs when building the tree, and use when assigning to leaves.");
+
+    /**
+     * Ignore cluster weights (naive approach)
+     */
+    public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulakm.naive", "Treat leaves as single points, not weighted points.");
 
     /**
      * CFTree factory.
@@ -359,36 +326,34 @@ public class BIRCHKMsimple<M extends MeanModel> implements ClusteringAlgorithm<C
     CFTree.Factory<?> cffactory;
 
     /**
-     * k Parameter.
-     */
-    protected int k;
-
-    /**
-     * Maximum number of iterations.
-     */
-    protected int maxiter;
-
-    /**
      * initialization method
      */
-    protected AbstractCFKMeansInitialization initialization;
+    AbstractCFKMeansInitialization initialization;
+
+    /**
+     * Store ids
+     */
+    boolean storeIds = false;
+
+    /**
+     * Ignore weight
+     */
+    boolean ignoreWeight = false;
 
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
-      new IntParameter(AbstractKMeans.K_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-          .grab(config, x -> k = x);
-      new IntParameter(AbstractKMeans.MAXITER_ID, -1)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
-          .grab(config, x -> maxiter = x);
-      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+      super.getParameterK(config);
+      super.getParameterMaxIter(config);
+      new ObjectParameter<AbstractCFKMeansInitialization>(AbstractKMeans.INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
           .grab(config, x -> initialization = x);
+      new Flag(STORE_IDS_ID).grab(config, x -> storeIds = x);
+      new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);
     }
 
     @Override
-    public BIRCHKMsimple<M> make() {
-      return new BIRCHKMsimple<M>(cffactory, k, maxiter, initialization);
+    public BetulaLloydKMeans make() {
+      return new BetulaLloydKMeans(k, maxiter, cffactory, initialization, storeIds, ignoreWeight);
     }
   }
 }

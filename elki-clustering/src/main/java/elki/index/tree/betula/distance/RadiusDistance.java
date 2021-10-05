@@ -21,6 +21,7 @@
 package elki.index.tree.betula.distance;
 
 import elki.data.NumberVector;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
@@ -51,14 +52,14 @@ public class RadiusDistance implements CFDistance {
   @Override
   public double squaredDistance(NumberVector nv, ClusterFeature cf1) {
     return cf1.getWeight() <= 0 ? 0 : //
-        (cf1.getWeight() / (cf1.getWeight() + 1.) * cf1.squaredCenterDistance(nv) + cf1.sumdev()) / (cf1.getWeight() + 1.);
+        (cf1.getWeight() / (cf1.getWeight() + 1.) * SquaredEuclideanDistance.STATIC.distance(cf1, nv) + cf1.sumdev()) / (cf1.getWeight() + 1.);
   }
 
   @Override
   public double squaredDistance(ClusterFeature cf1, ClusterFeature cf2) {
     final double n1 = cf1.getWeight(), n2 = cf2.getWeight(), n12 = n1 + n2;
     return n12 <= 0 ? 0 : //
-        (n1 * n2 / n12 * cf1.squaredCenterDistance(cf2) + cf1.sumdev() + cf2.sumdev()) / n12;
+        (n1 * n2 / n12 * SquaredEuclideanDistance.STATIC.distance(cf1, cf2) + cf1.sumdev() + cf2.sumdev()) / n12;
   }
 
   @Override
