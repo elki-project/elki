@@ -76,6 +76,7 @@ public class SVDD extends AbstractSVR {
       si.alpha = alpha;
     }
 
+    si.r_square = r_square;
     LOG.verbose("R^2 = " + r_square);
     if(C > 1) {
       LOG.verbose("Warning: Note that after C > 1, all models are the same.");
@@ -84,6 +85,10 @@ public class SVDD extends AbstractSVR {
       LOG.verbose("Warning: R^* = 0 for C <= 1/#instances.");
     }
     return si;
+  }
+
+  public interface RadiusAcceptor{
+    void setRSquare(double r_square);
   }
 
   @Override

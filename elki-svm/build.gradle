@@ -1,6 +1,8 @@
 description = 'ELKI - Support Vector Machines'
 dependencies {
-  api project(':elki-outlier')
   api project(':elki-classification')
+  api project(':elki-clustering')
+  api project(':elki-outlier')
+  testFixturesApi(testFixtures(project(path: ':elki-clustering')))
   testFixturesApi(testFixtures(project(path: ':elki-outlier')))
 }

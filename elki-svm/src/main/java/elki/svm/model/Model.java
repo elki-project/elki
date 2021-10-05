@@ -35,4 +35,6 @@ public class Model {
   public int[] sv_indices; // sv_indices[0,...,nSV-1] are values in
   // [0,...,num_traning_data-1] to indicate SVs in
   // the training set
+  
+  public double r_square; // For SVDD
 };
