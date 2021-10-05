@@ -18,13 +18,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula;
+package elki.clustering;
 
 import static elki.math.linearalgebra.VMath.diagonal;
 
 import java.util.Map;
 
-import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.em.BetulaGMM;
+import elki.clustering.kmeans.BetulaLloydKMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -34,60 +35,66 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.CFTree.LeafIterator;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.result.Metadata;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.Flag;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 /**
- * BIRCH-based clustering algorithm that simply treats the leafs of the CFTree
- * as clusters.
+ * BETULA-based clustering algorithm that simply treats the leafs of the CFTree
+ * as clusters. As this usually are smaller parts than actual clusters, we call
+ * this a preclustering, as it is primarily useful as a data simplification
+ * prior to, e.g., clustering. For actual clustering methods based on the
+ * leaves,
+ * please use {@link BetulaGMM} and {@link BetulaLloydKMeans}.
  * <p>
  * References:
  * <p>
- * T. Zhang, R. Ramakrishnan, M. Livny<br>
- * BIRCH: An Efficient Data Clustering Method for Very Large Databases
- * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  * <p>
- * T. Zhang, R. Ramakrishnan, M. Livny<br>
- * BIRCH: A New Data Clustering Algorithm and Its Applications
- * Data. Min. Knowl. Discovery
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems (under review)
  *
  * @author Erich Schubert
- * @since 0.7.5
  *
  * @depend - - - CFTree
  */
-@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
-    title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
-    booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
-    url = "https://doi.org/10.1145/233269.233324", //
-    bibkey = "DBLP:conf/sigmod/ZhangRL96")
-@Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //
-    title = "BIRCH: A New Data Clustering Algorithm and Its Applications", //
-    booktitle = "Data Min. Knowl. Discovery", //
-    url = "https://doi.org/10.1023/A:1009783824328", //
-    bibkey = "DBLP:journals/datamine/ZhangRL97")
-public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<MeanModel>> {
+@Priority(Priority.SUPPLEMENTARY)
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems (under review)")
+public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * CFTree factory.
    */
   CFTree.Factory<?> cffactory;
 
   /**
+   * Store ids
+   */
+  boolean storeIds = false;
+
+  /**
    * Constructor.
    *
    * @param cffactory CFTree Factory
    */
-  public BIRCHLeafClusteringMM(CFTree.Factory<?> cffactory) {
+  public BetulaLeafPreClustering(CFTree.Factory<?> cffactory, boolean storeIds) {
     super();
     this.cffactory = cffactory;
+    this.storeIds = storeIds;
   }
 
   @Override
@@ -103,31 +110,38 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
    */
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, true);
-    // The CFTree does not store points. We have to reassign them (and the
-    // quality is better than if we used the initial assignment, because centers
-    // move in particular in the beginning, so we always had many outliers.
-    Map<ClusterFeature, ModifiableDBIDs> idmap = new Reference2ObjectOpenHashMap<ClusterFeature, ModifiableDBIDs>(tree.leaves);
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      ClusterFeature cf = tree.findLeaf(relation.get(iter));
-      ModifiableDBIDs ids = idmap.get(cf);
-      if(ids == null) {
-        idmap.put(cf, ids = DBIDUtil.newArray(cf.getWeight()));
+    CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
+    Map<ClusterFeature, DBIDs> idmap = new Reference2ObjectOpenHashMap<>(tree.getLeaves());
+    if(storeIds) {
+      for(LeafIterator<?> it = tree.leafIterator(); it.valid(); it.advance()) {
+        idmap.put(it.get(), tree.getDBIDs(it.get()));
       }
-      ids.add(iter);
+    }
+    else {
+      // The CFTree did not store point ids.
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        ClusterFeature cf = tree.findLeaf(relation.get(iter));
+        ModifiableDBIDs ids = (ModifiableDBIDs) idmap.get(cf);
+        if(ids == null) {
+          idmap.put(cf, ids = DBIDUtil.newArray(cf.getWeight()));
+        }
+        ids.add(iter);
+      }
     }
     Clustering<MeanModel> result = new Clustering<>();
-    for(Map.Entry<ClusterFeature, ModifiableDBIDs> ent : idmap.entrySet()) {
+    for(Map.Entry<ClusterFeature, DBIDs> ent : idmap.entrySet()) {
       ClusterFeature leaf = ent.getKey();
       double[] center = new double[dim];
-      double[] variance = new double[dim];
       for(int i = 0; i < dim; i++) {
         center[i] = leaf.centroid(i);
+      }
+      double[] variance = new double[dim];
+      for(int i = 0; i < dim; i++) {
         variance[i] = leaf.variance(i);
       }
       result.addToplevelCluster(new Cluster<>(ent.getValue(), new EMModel(center, diagonal(variance))));
     }
-    Metadata.of(result).setLongName("BIRCH Clustering");
+    Metadata.of(result).setLongName("BETULA Leaf Nodes");
     return result;
   }
 
@@ -138,18 +152,29 @@ public class BIRCHLeafClusteringMM implements ClusteringAlgorithm<Clustering<Mea
    */
   public static class Par implements Parameterizer {
     /**
+     * Option to store ids rather than reassigning.
+     */
+    public static final OptionID STORE_IDS_ID = new OptionID("betula.storeids", "Store IDs when building the tree, and use when assigning to leaves.");
+
+    /**
      * CFTree factory.
      */
     CFTree.Factory<?> cffactory;
 
+    /**
+     * Store ids
+     */
+    boolean storeIds = false;
+
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
+      new Flag(STORE_IDS_ID).grab(config, x -> storeIds = x);
     }
 
     @Override
-    public BIRCHLeafClusteringMM make() {
-      return new BIRCHLeafClusteringMM(cffactory);
+    public BetulaLeafPreClustering make() {
+      return new BetulaLeafPreClustering(cffactory, storeIds);
     }
   }
 }

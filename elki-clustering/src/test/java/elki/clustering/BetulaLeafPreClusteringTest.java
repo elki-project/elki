@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2021
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,14 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.hierarchical.betula;
+package elki.clustering;
 
 import org.junit.Test;
 
-import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.data.Clustering;
 import elki.database.Database;
-import elki.index.tree.betula.BIRCHLeafClustering;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.distance.AverageInterclusterDistance;
 import elki.index.tree.betula.distance.AverageIntraclusterDistance;
@@ -35,17 +33,15 @@ import elki.index.tree.betula.features.VIIFeature;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Regression test for BIRCH clustering.
+ * Regression test for Betula clustering.
  *
- * @author Erich Schubert
- *
+ * @author Andreas Lang
  */
-public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
-
+public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testRadius() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
@@ -56,7 +52,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testEuclideanDistance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
@@ -68,7 +64,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCentroidEuclidean() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, AverageInterclusterDistance.class)//
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidEuclideanDistance.class)//
@@ -81,7 +77,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCentroidManhattan() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidManhattanDistance.class)//
@@ -94,7 +90,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testAverageIntercluster() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.DISTANCE_ID, AverageInterclusterDistance.class)//
@@ -107,7 +103,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testAverageIntracluster() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.DISTANCE_ID, AverageIntraclusterDistance.class)//
@@ -120,7 +116,7 @@ public class BIRCHLeafClusteringTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testOverflowing() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<?> clustering = new ELKIBuilder<>(BIRCHLeafClustering.class) //
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLeafPreClustering.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.ABSORPTION_ID, AverageIntraclusterDistance.class)//
         .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching

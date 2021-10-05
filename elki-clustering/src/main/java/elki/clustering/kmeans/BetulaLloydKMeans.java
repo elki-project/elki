@@ -313,7 +313,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     /**
      * Option to store ids rather than reassigning.
      */
-    public static final OptionID STORE_IDS_ID = new OptionID("betula.store", "Store IDs when building the tree, and use when assigning to leaves.");
+    public static final OptionID STORE_IDS_ID = new OptionID("betula.storeids", "Store IDs when building the tree, and use when assigning to leaves.");
 
     /**
      * Ignore cluster weights (naive approach)
