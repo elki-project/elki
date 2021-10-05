@@ -392,10 +392,7 @@ public class CFTree<L extends ClusterFeature> {
       }
       bestl.addToStatistics(nv);
       ++leaves;
-      if(node.add(bestl)) {
-        return null;
-      }
-      return split(node, bestl);
+      return node.add(bestl) ? null : split(node, bestl);
     }
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
     CFNode<L> newchild = insert((CFNode<L>) best, nv, dbid);
@@ -403,10 +400,7 @@ public class CFTree<L extends ClusterFeature> {
       node.getCF().addToStatistics(best.getCF());
       return null;
     }
-    else if(node.add(newchild)) {
-      return null;
-    }
-    return split(node, newchild);
+    return node.add(newchild) ? null : split(node, newchild);
   }
 
   /**
@@ -557,10 +551,7 @@ public class CFTree<L extends ClusterFeature> {
         return null;
       }
       ++leaves; // We have to add this entry
-      if(node.add(nleaf)) {
-        return null;
-      }
-      return split(node, nleaf);
+      return node.add(nleaf) ? null : split(node, nleaf);
     }
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
     CFNode<L> newchild = insert((CFNode<L>) best, nleaf);
@@ -568,10 +559,7 @@ public class CFTree<L extends ClusterFeature> {
       node.getCF().addToStatistics(nleaf.getCF()); // Update statistics upwards
       return null;
     }
-    if(node.add(newchild)) {
-      return null;
-    }
-    return split(node, newchild);
+    return node.add(newchild) ? null : split(node, newchild);
   }
 
   /**
