@@ -1,6 +1,8 @@
 elki.clustering.kmeans.initialization.RandomlyChosen
 elki.clustering.kmeans.initialization.FirstK
 elki.clustering.kmeans.initialization.KMeansPlusPlus
+elki.clustering.kmeans.initialization.AFKMC2
+elki.clustering.kmeans.initialization.KMC2
 elki.clustering.kmeans.initialization.SampleKMeans
 elki.clustering.kmeans.initialization.FarthestPoints
 elki.clustering.kmeans.initialization.FarthestSumPoints
@@ -8,6 +10,8 @@ elki.clustering.kmeans.initialization.Ostrovsky
 elki.clustering.kmeans.initialization.RandomUniformGenerated
 elki.clustering.kmeans.initialization.RandomNormalGenerated
 elki.clustering.kmeans.initialization.Predefined
+elki.clustering.kmeans.initialization.SparseKMeansPlusPlus
+elki.clustering.kmeans.initialization.SparseAFKMC2
 elki.clustering.kmedoids.initialization.BUILD
 elki.clustering.kmedoids.initialization.LAB
 elki.clustering.kmedoids.initialization.ParkJun

@@ -98,8 +98,8 @@ public abstract class AbstractSVR extends AbstractSingleSVM {
     }
     model.nr_class = 2;
     model.sv_coef = new double[1][];
-    model.rho = new double[1];
-    model.rho[0] = si.rho;
+    model.rho = new double[] { si.rho };
+    model.r_square = si.r_square;
 
     int nSV = 0;
     for(int i = 0; i < x.size(); i++) {

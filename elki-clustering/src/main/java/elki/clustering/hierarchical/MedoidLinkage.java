@@ -42,8 +42,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 /**
  * Medoid linkage uses the distance of medoids as criterion. The implementation
  * is a simplified version of AGNES, as we do not have to update a distance
- * matrix.
- * This approach was invented at least twice.
+ * matrix. This approach was invented at least twice. An approach more
+ * consistent with the ideas of optimum medoids is found in {@link HACAM}, which
+ * uses the loss of the resulting medoid <i>after</i> merging instead.
  * <p>
  * References:
  * <p>
