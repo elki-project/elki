@@ -29,6 +29,7 @@ import java.util.Random;
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFNode;
 import elki.clustering.hierarchical.betula.CFTree;
+import elki.clustering.hierarchical.betula.HasCF;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -65,18 +66,18 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
     if(tree.getLeaves() < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + tree.getLeaves() + " < k objects.");
     }
     maxdepth = maxdepth > 0 ? maxdepth : FastMath.log2(k) / FastMath.log2(tree.getCapacity()) + 1;
     Random rnd = rf.getSingleThreadedRandom();
     List<CFInterface> ccs = new ArrayList<>(k);
-    ccs.add(firstVar ? chooseFirstNode(tree.getRoot(), cfs, rnd) :
+    ccs.add(firstVar ? chooseFirstNode(tree.getRoot().getCF(), cfs, rnd) :
     // TODO: use weights for choosing the initial center!
-        (CFInterface) cfs.get(rnd.nextInt(cfs.size())));
+        cfs.get(rnd.nextInt(cfs.size())).getCF());
     for(int m = 1; m < k; m++) {
-      CFInterface next = tree.getRoot();
+      CFInterface next = tree.getRoot().getCF();
       for(int depth = maxdepth; next instanceof CFNode && depth > 0; --depth) {
         next = chooseNextNode((CFNode<?>) next, ccs, m, rnd);
       }
@@ -95,13 +96,13 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
     return means;
   }
 
-  private CFInterface chooseFirstNode(CFInterface center, List<? extends CFInterface> cfs, Random rnd) {
+  private CFInterface chooseFirstNode(CFInterface center, List<? extends HasCF> cfs, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[cfs.size()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
     int i = 0;
     while(true) {
-      final CFInterface child = cfs.get(i);
+      final CFInterface child = cfs.get(i).getCF();
       if(child == null) {
         break;
       }
@@ -117,26 +118,26 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
       double r = rnd.nextDouble() * weightsum;
       for(int j = 0; j < i; j++) {
         if((r -= weights[j]) <= 0) {
-          return cfs.get(j);
+          return cfs.get(j).getCF();
         }
       }
       weightsum -= r; // Decrease
     }
   }
 
-  private CFInterface chooseNextNode(CFNode<?> current, List<? extends CFInterface> ccs, int m, Random rnd) {
+  private CFInterface chooseNextNode(CFNode<?> current, List<? extends HasCF> ccs, int m, Random rnd) {
     double weightsum = 0;
     double[] weights = new double[current.capacity()];
     Arrays.fill(weights, Double.POSITIVE_INFINITY);
     int i = 0;
     while(true) {
-      final CFInterface child = current.getChild(i);
+      final CFInterface child = current.getChild(i).getCF();
       if(child == null) {
         break;
       }
       double weight = 0;
       for(int j = 0; j < m; j++) {
-        weight = dist.squaredDistance(ccs.get(j), child);
+        weight = dist.squaredDistance(ccs.get(j).getCF(), child);
         if(weight < weights[i]) {
           weights[i] = weight;
         }
@@ -149,7 +150,7 @@ public class CFKppTree extends AbstractCFKMeansInitialization {
       double r = rnd.nextDouble() * weightsum;
       for(int j = 0; j < i; j++) {
         if((r -= weights[j]) <= 0) {
-          return current.getChild(j);
+          return current.getChild(j).getCF();
         }
       }
       weightsum -= r; // Decrease

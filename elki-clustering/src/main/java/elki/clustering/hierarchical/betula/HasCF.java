@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2020
+ * Copyright (C) 2021
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -20,44 +20,16 @@
  */
 package elki.clustering.hierarchical.betula;
 
-import elki.clustering.hierarchical.betula.distance.CFDistance;
-
 /**
- * Interface for CFModel
- * 
- * @author Andreas Lang
- * 
- * @param <L> CF Model
+ * Get the clustering feature representation.
+ *
+ * @author Erich Schubert
  */
-public interface CFModel<L extends CFInterface> {
+public interface HasCF {
   /**
-   * Creates a CF of the corresponding Model.
-   * 
-   * @param d Dimensionality
-   * @return new CF
+   * Get as clustering feature.
+   *
+   * @return Clustering feature
    */
-  L make(int d);
-
-  /**
-   * Creates a TreeNode of the corresponding Model.
-   * 
-   * @param d Dimensionality
-   * @param capacity Fanout
-   * @return
-   */
-  //CFNode<L> treeNode(int d, int capacity);
-
-  /**
-   * The selected distance Function
-   * 
-   * @return distance Function
-   */
-  CFDistance distance();
-
-  /**
-   * The selected absorption Criteria
-   * 
-   * @return distance Function
-   */
-  CFDistance absorption();
+  CFInterface getCF();
 }

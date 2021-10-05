@@ -33,6 +33,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 import elki.clustering.hierarchical.betula.CFTree.LeafIterator;
+import elki.clustering.hierarchical.betula.HasCF;
 
 /**
  * Abstract base class for CF k-means initializations. For regular k-means use
@@ -63,7 +64,7 @@ public abstract class AbstractCFKMeansInitialization {
    * @param root Summary statistic of the tree.
    * @return
    */
-  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k);
+  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k);
 
   /**
    * Extract the leaves of the tree.

@@ -25,6 +25,7 @@ import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
+import elki.clustering.hierarchical.betula.HasCF;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.utilities.random.RandomFactory;
 
@@ -46,16 +47,16 @@ public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
     final int leaves = cfs.size();
     if(leaves < k) {
       throw new IllegalArgumentException("Cannot choose k=" + k + " means from N=" + leaves + " < k objects.");
     }
     Random rnd = rf.getSingleThreadedRandom();
-    int d = cfs.get(0).getDimensionality();
+    int d = cfs.get(0).getCF().getDimensionality();
     double[][] means = new double[k][d];
     for(int i = 0, c = 0; i < leaves && k > 0; i++) {
-      final CFInterface cfsi = cfs.get(i);
+      final CFInterface cfsi = cfs.get(i).getCF();
       double prob = rnd.nextDouble();
       if(prob < ((double) k / (leaves - i))) {
         double[] mean = means[c++];

@@ -62,11 +62,6 @@ public final class VVIModel implements CFModel<ClusteringFeature> {
     return new ClusteringFeature(d);
   }
 
-  @Override
-  public TreeNode treeNode(int d, int capacity) {
-    return new TreeNode(d, capacity);
-  }
-
   /**
    * Parameterization class for CFTrees.
    *

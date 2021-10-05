@@ -27,7 +27,7 @@ import elki.data.NumberVector;
  * 
  * @author Andreas Lang
  */
-public interface CFInterface {
+public interface CFInterface extends HasCF {
   /**
    * Add NumberVector to CF
    * 
@@ -129,4 +129,9 @@ public interface CFInterface {
    * @return sum of squared deviations from the center
    */
   double absoluteCenterDistance(CFInterface other);
+
+  @Override
+  default CFInterface getCF() {
+    return this;
+  }
 }

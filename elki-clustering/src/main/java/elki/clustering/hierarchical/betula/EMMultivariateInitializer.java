@@ -52,7 +52,7 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<EMModel> {
   public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends CFInterface> cfs, int k, CFTree<?> tree) {
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
-    double[][] covmat = tree.root.covariance().clone();
+    double[][] covmat = tree.root.getCF().covariance().clone();
     timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
 
     List<MultivariateGaussianModel> models = new ArrayList<>(k);

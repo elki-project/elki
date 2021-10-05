@@ -25,6 +25,7 @@ import java.util.Random;
 
 import elki.clustering.hierarchical.betula.CFInterface;
 import elki.clustering.hierarchical.betula.CFTree;
+import elki.clustering.hierarchical.betula.HasCF;
 import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -69,7 +70,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends CFInterface> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends HasCF> cfs, int k) {
     return run(tree, cfs, k);
   }
 
@@ -82,10 +83,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param k K
    * @return Initial cluster centers
    */
-  public double[][] run(CFTree<?> tree, List<? extends CFInterface> cf, int k) {
+  public double[][] run(CFTree<?> tree, List<? extends HasCF> cf, int k) {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
-    CFInterface first = firstVar ? sampleFirst(tree.getRoot(), cf, rnd) : cf.get(rnd.nextInt(cf.size()));
+    CFInterface first = firstVar ? sampleFirst(tree.getRoot().getCF(), cf, rnd) : cf.get(rnd.nextInt(cf.size())).getCF();
     final int d = first.getDimensionality();
     double[] mean = means[0] = new double[d];
     for(int i = 0; i < d; i++) {
@@ -108,7 +109,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
         weightsum -= r; // Decrease
         continue; // Retry
       }
-      CFInterface cfi = cf.get(i);
+      CFInterface cfi = cf.get(i).getCF();
       // Add new mean:
       mean = means[m] = new double[d];
       for(int j = 0; j < mean.length; j++) {
@@ -130,12 +131,12 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param cf Cluster features
    * @return Sum of weights
    */
-  private double initialWeights(CFInterface first, List<? extends CFInterface> cf) {
+  private double initialWeights(CFInterface first, List<? extends HasCF> cf) {
     final int e = cf.size();
     double weightsum = 0.;
     weights = new double[e];
     for(int i = 0; i < e; i++) {
-      weightsum += weights[i] = distance.squaredDistance(first, cf.get(i));
+      weightsum += weights[i] = distance.squaredDistance(first, cf.get(i).getCF());
     }
     return weightsum;
   }
@@ -147,14 +148,14 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param cf Cluster features
    * @return Weight sum
    */
-  private double updateWeights(CFInterface latest, List<? extends CFInterface> cf) {
+  private double updateWeights(CFInterface latest, List<? extends HasCF> cf) {
     double weightsum = 0.;
     for(int i = 0, e = cf.size(); i < e; i++) {
       double weight = weights[i];
       if(weight <= 0.) {
         continue; // Duplicate, or already chosen.
       }
-      double newweight = distance.squaredDistance(latest, cf.get(i));
+      double newweight = distance.squaredDistance(latest, cf.get(i).getCF());
       weightsum += newweight < weight ? (weights[i] = newweight) : weight;
     }
     return weightsum;
@@ -168,12 +169,12 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * @param rnd Random generator
    * @return Selected cluster feature
    */
-  private CFInterface sampleFirst(CFInterface root, List<? extends CFInterface> cfs, Random rnd) {
+  private CFInterface sampleFirst(CFInterface root, List<? extends HasCF> cfs, Random rnd) {
     final int e = cfs.size();
     double weightsum = 0;
     double[] tmpWeight = new double[e];
     for(int i = 0; i < e; i++) {
-      double weight = distance.squaredDistance(root, cfs.get(i));
+      double weight = distance.squaredDistance(root, cfs.get(i).getCF());
       tmpWeight[i] = weight;
       weightsum += weight;
     }
@@ -181,7 +182,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
       double r = rnd.nextDouble() * weightsum;
       for(int i = 0; i < e; i++) {
         if((r -= tmpWeight[i]) <= 0) {
-          return cfs.get(i);
+          return cfs.get(i).getCF();
         }
       }
       weightsum -= r; // Decrease

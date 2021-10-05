@@ -60,11 +60,6 @@ public final class BIRCHModel implements CFModel<ClusteringFeature> {
   }
 
   @Override
-  public TreeNode treeNode(int d, int capacity) {
-    return new TreeNode(d, capacity);
-  }
-
-  @Override
   public CFDistance distance() {
     return dist;
   }

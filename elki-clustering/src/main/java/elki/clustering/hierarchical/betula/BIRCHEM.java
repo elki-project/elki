@@ -170,7 +170,7 @@ public class BIRCHEM<M extends MeanModel> implements ClusteringAlgorithm<Cluster
     double bestloglikelihood = Double.NEGATIVE_INFINITY;// loglikelihood
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
-      recomputeCovarianceMatrices(cfs, probClusterIGivenX, models, prior, tree.root.getWeight());
+      recomputeCovarianceMatrices(cfs, probClusterIGivenX, models, prior, tree.root.getCF().getWeight());
       // reassign probabilities
       loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
 

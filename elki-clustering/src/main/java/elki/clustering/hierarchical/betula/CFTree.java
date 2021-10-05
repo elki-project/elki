@@ -203,19 +203,18 @@ public class CFTree<L extends CFInterface> {
         idmap.put(leaf, list);
       }
       leaf.addToStatistics(nv);
-      root = cfModel.treeNode(dim, capacity);
-      root.setChild(0, leaf);
-      root.addToStatistics(nv);
+      root = new CFNode<>(cfModel.make(dim), capacity);
+      root.add(0, leaf);
       ++leaves;
       return;
     }
     CFNode<L> other = insert(root, dbid);
     // Handle root overflow:
     if(other != null) {
-      final int dim = other.getDimensionality();
-      CFNode<L> newnode = cfModel.treeNode(dim, capacity);
-      newnode.addToStatistics(0, root);
-      newnode.addToStatistics(1, other);
+      final int dim = other.getCF().getDimensionality();
+      CFNode<L> newnode = new CFNode<>(cfModel.make(dim), capacity);
+      newnode.add(0, root);
+      newnode.add(1, other);
       root = newnode;
     }
   }
@@ -224,7 +223,7 @@ public class CFTree<L extends CFInterface> {
    * Rebuild the CFTree to condense it to approximately half the size.
    */
   protected void rebuildTree() {
-    final int dim = root.getDimensionality();
+    final int dim = root.getCF().getDimensionality();
     int oldLeaves = leaves;
     ArrayList<L> cfs = new ArrayList<>(leaves);
     double[] thresholds = new double[leaves];
@@ -261,17 +260,16 @@ public class CFTree<L extends CFInterface> {
 
     leaves = 0;
     // Make a new root node:
-    root = cfModel.treeNode(dim, capacity);
-    L first = cfs.get(order[cfs.size() - 1]);
-    root.addToStatistics(0, first);
+    root = new CFNode<>(cfModel.make(dim), capacity);
+    root.add(0, cfs.get(order[cfs.size() - 1]));
     ++leaves;
     for(int i = cfs.size() - 2; i >= 0; i--) {
       CFNode<L> other = insert(root, cfs.get(order[i]));
       // Handle root overflow:
       if(other != null) {
-        CFNode<L> newnode = cfModel.treeNode(dim, capacity);
-        newnode.addToStatistics(0, root);
-        newnode.addToStatistics(1, other);
+        CFNode<L> newnode = new CFNode<>(cfModel.make(dim), capacity);
+        newnode.add(0, root);
+        newnode.add(1, other);
         root = newnode;
       }
     }
@@ -284,50 +282,49 @@ public class CFTree<L extends CFInterface> {
   @SuppressWarnings("unchecked")
   private void estimateThreshold(CFNode<L> current, ArrayList<L> cfs, double[] thresholds) {
     int offset = cfs.size();
-    if(!(current.getChild(0) instanceof CFNode)) {
-      if(current.getChild(1) == null) {
-        thresholds[offset++] = Double.POSITIVE_INFINITY;
-        cfs.add(current.getChild(0));
-        return;
-      }
-      double[] best = new double[capacity]; // Cache.
-      Arrays.fill(best, Double.POSITIVE_INFINITY);
-      int[] besti = new int[capacity];
-      for(int i = 0; i < capacity; i++) {
-        L ci = current.getChild(i);
-        if(ci == null) {
-          break;
-        }
-        double bi = best[i];
-        int bestii = besti[i];
-        for(int j = i + 1; j < capacity; j++) {
-          if(current.getChild(j) == null) {
-            break;
-          }
-          // double dist = absorption.squaredCriterion(ci, children[j]);
-          double d = dist.squaredDistance(ci, current.getChild(j));
-          if(d < bi) {
-            bi = d;
-            bestii = j;
-          }
-          if(d < best[j]) {
-            best[j] = d;
-            besti[j] = i;
-          }
-        }
-        double t = abs.squaredDistance(ci, current.getChild(bestii));
-        thresholds[offset++] = t;
-        cfs.add(ci);
-      }
-    }
-    else {
-      assert (current.getChild(0) instanceof CFNode) : "Node is neither child nor inner?";
+    if(current.getChild(0) instanceof CFNode) {
       for(int i = 0; i < capacity; i++) {
         if(current.getChild(i) == null) {
           break;
         }
         estimateThreshold((CFNode<L>) current.getChild(i), cfs, thresholds);
       }
+      return;
+    }
+    assert current.getChild(0) instanceof CFInterface : "Node is neither child nor inner?";
+    if(current.getChild(1) == null) {
+      thresholds[offset++] = Double.POSITIVE_INFINITY;
+      cfs.add((L) current.getChild(0));
+      return;
+    }
+    double[] best = new double[capacity]; // Cache.
+    Arrays.fill(best, Double.POSITIVE_INFINITY);
+    int[] besti = new int[capacity];
+    for(int i = 0; i < capacity; i++) {
+      HasCF ci = current.getChild(i);
+      if(ci == null) {
+        break;
+      }
+      double bi = best[i];
+      int bestii = besti[i];
+      for(int j = i + 1; j < capacity; j++) {
+        if(current.getChild(j) == null) {
+          break;
+        }
+        // double dist = absorption.squaredCriterion(ci, children[j]);
+        double d = dist.squaredDistance(ci.getCF(), current.getChild(j).getCF());
+        if(d < bi) {
+          bi = d;
+          bestii = j;
+        }
+        if(d < best[j]) {
+          best[j] = d;
+          besti[j] = i;
+        }
+      }
+      double t = abs.squaredDistance(ci.getCF(), current.getChild(bestii).getCF());
+      thresholds[offset++] = t;
+      cfs.add((L) ci);
     }
   }
 
@@ -345,14 +342,14 @@ public class CFTree<L extends CFInterface> {
     assert (node.getChild(0) != null) : "Unexpected empty node!";
 
     // Find the best child:
-    L best = node.getChild(0);
-    double bestd = dist.squaredDistance(nv, best);
+    HasCF best = node.getChild(0);
+    double bestd = dist.squaredDistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
-      L cf = node.getChild(i);
+      HasCF cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(nv, cf);
+      double d2 = dist.squaredDistance(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -362,32 +359,34 @@ public class CFTree<L extends CFInterface> {
     // Leaf node:
     if(!(best instanceof CFNode)) {
       // Threshold constraint satisfied?
-      if(abs.squaredDistance(nv, best) <= thresholdsq) {
-        best.addToStatistics(nv);
+      if(abs.squaredDistance(nv, best.getCF()) <= thresholdsq) {
+        best.getCF().addToStatistics(nv);
         if(idmap != null) {
-          idmap.get(best).add(dbid);
+          idmap.get((L) best).add(dbid);
         }
-        node.addToStatistics(nv);
+        node.getCF().addToStatistics(nv);
         return null;
       }
-      best = cfModel.make(nv.getDimensionality());
+      L bestl = cfModel.make(nv.getDimensionality());
       if(idmap != null) {
         ArrayModifiableDBIDs list = DBIDUtil.newArray();
         list.add(dbid);
-        idmap.put(best, list);
+        idmap.put(bestl, list);
       }
-      best.addToStatistics(nv);
+      bestl.addToStatistics(nv);
       ++leaves;
-      if(node.addCF(best)) {
-        node.addToStatistics(nv); // Update statistics
+      if(node.add(bestl)) {
         return null;
       }
-      return split(node, best);
+      return split(node, bestl);
     }
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
     CFNode<L> newchild = insert((CFNode<L>) best, dbid);
-    if(newchild == null || node.addCF(newchild)) {
-      node.addToStatistics(nv); // Update statistics
+    if(newchild == null) {
+      node.getCF().addToStatistics(best.getCF());
+      return null;
+    }
+    else if(node.add(newchild)) {
       return null;
     }
     return split(node, (L) newchild);
@@ -425,20 +424,20 @@ public class CFTree<L extends CFInterface> {
     assert (node.getChild(0) != null) : "Unexpected empty node!";
 
     // Find the best child:
-    L best = node.getChild(0);
-    double bestd = dist.squaredDistance(nv, best);
+    HasCF best = node.getChild(0);
+    double bestd = dist.squaredDistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
-      L cf = node.getChild(i);
+      HasCF cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(nv, cf);
+      double d2 = dist.squaredDistance(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
       }
     }
-    return (best instanceof CFNode) ? findLeaf((CFNode<L>) best, nv) : best;
+    return (best instanceof CFNode) ? findLeaf((CFNode<L>) best, nv) : (L) best;
   }
 
   /**
@@ -448,25 +447,25 @@ public class CFTree<L extends CFInterface> {
    * @param newchild Additional child
    * @return New sibling of {@code node}
    */
-  private CFNode<L> split(CFNode<L> node, L newchild) {
+  private CFNode<L> split(CFNode<L> node, HasCF newchild) {
     assert (node.getChild(capacity - 1) != null) : "Node to split is not empty!";
-    CFNode<L> newn = cfModel.treeNode(node.getDimensionality(), capacity);
+    CFNode<L> newn = new CFNode<>(cfModel.make(node.getCF().getDimensionality()), capacity);
     final int size = capacity + 1;
     // Find farthest pair:
     int m1 = -1, m2 = -1;
     double maxd = Double.NEGATIVE_INFINITY;
     double[][] dists = new double[size][size];
     for(int i = 0; i < capacity; i++) {
-      L ci = node.getChild(i);
+      CFInterface ci = node.getChild(i).getCF();
       for(int j = i + 1; j < capacity; j++) {
-        double d = dists[i][j] = dists[j][i] = dist.squaredDistance(ci, node.getChild(j));
+        double d = dists[i][j] = dists[j][i] = dist.squaredDistance(ci, node.getChild(j).getCF());
         if(d > maxd) {
           maxd = d;
           m1 = i;
           m2 = j;
         }
       }
-      double d = dists[i][capacity] = dists[capacity][i] = dist.squaredDistance(ci, newchild);
+      double d = dists[i][capacity] = dists[capacity][i] = dist.squaredDistance(ci, newchild.getCF());
       if(d > maxd) {
         maxd = d;
         m1 = i;
@@ -474,33 +473,30 @@ public class CFTree<L extends CFInterface> {
       }
     }
     // Reset node statistics:
-    node.resetStatistics();
-    newn.resetStatistics();
+    node.getCF().resetStatistics();
+    newn.getCF().resetStatistics();
     // Redistribute entries:
     int si = 0, sj = 0; // Output positions.
     double[] d1s = dists[m1], d2s = dists[m2];
     for(int i = 0; i < capacity; i++) {
       double d1 = d1s[i], d2 = d2s[i];
       if(i == m1 || i != m2 && (d1 < d2 || (d1 == d2 && si <= sj))) {
-        node.addToStatistics(si++, node.getChild(i));
+        node.add(si++, node.getChild(i));
       }
       else {
-        newn.addToStatistics(sj++, node.getChild(i));
+        newn.add(sj++, node.getChild(i));
       }
     }
     // Now also assign the new child:
     double d1 = d1s[capacity], d2 = d2s[capacity];
     if(capacity != m2 && (d1 < d2 || (d1 == d2 && si <= sj))) {
-      node.addToStatistics(si++, newchild);
+      node.add(si++, newchild);
     }
     else {
-      newn.addToStatistics(sj++, newchild);
+      newn.add(sj++, newchild);
     }
     for(int j = si; j < capacity; j++) {
-      node.setChild(j, null);
-    }
-    for(int j = sj; j < capacity; j++) {
-      assert (newn.getChild(j) == null);
+      node.setChild(j, (L) null);
     }
     return newn;
   }
@@ -513,19 +509,19 @@ public class CFTree<L extends CFInterface> {
    * @return New sibling, if the node was split.
    */
   @SuppressWarnings("unchecked")
-  private CFNode<L> insert(CFNode<L> node, L nleaf) {
+  private CFNode<L> insert(CFNode<L> node, HasCF nleaf) {
     // Find closest child:
     assert (node.getChild(0) != null) : "Unexpected empty node!";
 
     // Find the best child:
-    L best = node.getChild(0);
-    double bestd = dist.squaredDistance(best, nleaf);
+    HasCF best = node.getChild(0);
+    double bestd = dist.squaredDistance(best.getCF(), nleaf.getCF());
     for(int i = 1; i < capacity; i++) {
-      L cf = node.getChild(i);
+      HasCF cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(cf, nleaf);
+      double d2 = dist.squaredDistance(cf.getCF(), nleaf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -535,28 +531,30 @@ public class CFTree<L extends CFInterface> {
     assert (best != nleaf);
     if(!(best instanceof CFNode)) {
       // Threshold constraint satisfied?
-      if(abs.squaredDistance(best, nleaf) <= thresholdsq) {
-        best.addToStatistics(nleaf);
+      if(abs.squaredDistance(best.getCF(), nleaf.getCF()) <= thresholdsq) {
+        best.getCF().addToStatistics(nleaf.getCF());
         if(idmap != null) {
           idmap.get(best).addDBIDs(idmap.remove(nleaf));
         }
-        node.addToStatistics(nleaf);
+        node.getCF().addToStatistics(nleaf.getCF());
         return null;
       }
       ++leaves; // We have to add this entry
-      if(node.addCF(nleaf)) {
-        node.addToStatistics(nleaf); // Update statistics
+      if(node.add(nleaf)) {
         return null;
       }
       return split(node, nleaf);
     }
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
     CFNode<L> newchild = insert((CFNode<L>) best, nleaf);
-    if(newchild == null || node.addCF(newchild)) {
-      node.addToStatistics(nleaf); // Update statistics
+    if(newchild == null) {
+      node.getCF().addToStatistics(nleaf.getCF()); // Update statistics upwards
       return null;
     }
-    return split(node, (L) newchild);
+    if(node.add(newchild)) {
+      return null;
+    }
+    return split(node, newchild);
   }
 
   /**
@@ -621,8 +619,8 @@ public class CFTree<L extends CFInterface> {
           break;
         }
         CFNode<L> node = (CFNode<L>) f;
-        for (int i = 0; i < node.capacity(); i++) {
-          L c = node.getChild(i);
+        for(int i = 0; i < node.capacity(); i++) {
+          HasCF c = node.getChild(i);
           if(c == null) {
             break;
           }
@@ -650,9 +648,9 @@ public class CFTree<L extends CFInterface> {
     if(n instanceof CFNode) {
       final CFNode<?> node = (CFNode<?>) n;
       for(int i = 0; i < node.capacity(); i++) {
-        CFInterface c = node.getChild(i);
+        HasCF c = node.getChild(i);
         if(c != null) {
-          printDebug(buf, c, d + 1);
+          printDebug(buf, c.getCF(), d + 1);
         }
       }
     }

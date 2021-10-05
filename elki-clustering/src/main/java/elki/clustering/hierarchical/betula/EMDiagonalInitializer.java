@@ -54,7 +54,7 @@ public class EMDiagonalInitializer extends AbstractEMInitializer<EMModel> {
     double[] variances = new double[dim];
     final double f = FastMath.pow(k, -2. / variances.length);
     for(int d = 0; d < dim; d++) {
-      variances[d] = tree.root.variance(d) * f;
+      variances[d] = tree.root.getCF().variance(d) * f;
     }
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);

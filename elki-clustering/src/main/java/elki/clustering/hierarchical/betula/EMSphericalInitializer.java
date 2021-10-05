@@ -51,7 +51,7 @@ public class EMSphericalInitializer extends AbstractEMInitializer<EMModel> {
     assert (initialMeans.length == k);
     double varsum = 0.;
     for(int d = 0; d < dim; d++) {
-      varsum += tree.root.variance(d);
+      varsum += tree.root.getCF().variance(d);
     }
     varsum *= FastMath.pow(k, -2. / dim); // Initial variance estimate
 
