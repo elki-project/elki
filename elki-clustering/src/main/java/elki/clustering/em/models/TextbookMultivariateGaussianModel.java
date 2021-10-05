@@ -18,15 +18,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import static elki.math.linearalgebra.VMath.*;
 
+import elki.clustering.em.KDTreeEM;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
+import elki.math.linearalgebra.ConstrainedQuadraticProblemSolver;
 
 import net.jafama.FastMath;
 
@@ -228,15 +229,6 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
     return new EMModel(mean, covariance);
   }
 
-  @Override
-  public double estimateLogDensity(ClusterFeature clusteringFeature) {
-    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
-  }
-
-  @Override
-  public void updateE(ClusterFeature clusteringFeature, double prob) {
-    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
-  }
   /**
    * Copy the parameters of another model.
    *
@@ -252,5 +244,33 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
     chol = other.chol;
     weight = other.weight;
     wsum = other.wsum;
+  }
+
+  /**
+   * Compute the weight of a Gaussian with respect to a bounding box.
+   * 
+   * @param min Bounding box min <b>will be modified</b>
+   * @param max Bounding box max <b>will be modified</b>
+   * @param solver Quadratic solver
+   * @param ipiPow scaling constant
+   * @param minpnt result array for argmin
+   * @param maxpnt result array for argmax
+   * @param ret Return array
+   */
+  public void calculateModelLimits(double[] min, double[] max, ConstrainedQuadraticProblemSolver solver, double ipiPow, double[] minpnt, double[] maxpnt, double[] ret) {
+    minusEquals(min, mean);
+    minusEquals(max, mean);
+    // invert and ensure symmetric (array is cloned in inverse)
+    double[][] covInv = inverse(covariance);
+    double icovdetsqrt = FastMath.exp(-1 * MultivariateGaussianModel.getHalfLogDeterminant(chol));
+
+    // maximizes Mahalanobis dist
+    double mahalanobisSQDmax = 2 * solver.solve(covInv, null, 0, min, max, maxpnt);
+    // minimizes Mahalanobis dist (invert covinv and result)
+    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), null, 0, min, max, minpnt);
+
+    final double f = ipiPow * icovdetsqrt;
+    ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
+    ret[1] = FastMath.exp(mahalanobisSQDmin * -.5) * f;
   }
 }

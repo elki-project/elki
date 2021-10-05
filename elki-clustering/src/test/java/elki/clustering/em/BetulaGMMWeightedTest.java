@@ -23,10 +23,14 @@ package elki.clustering.em;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.em.models.BetulaClusterModelFactory;
+import elki.clustering.em.models.BetulaDiagonalGaussianModelFactory;
+import elki.clustering.em.models.BetulaMultivariateGaussianModelFactory;
+import elki.clustering.em.models.BetulaSphericalGaussianModelFactory;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
-import elki.index.tree.betula.*;
+import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.distance.CentroidEuclideanDistance;
 import elki.index.tree.betula.distance.RadiusDistance;
 import elki.index.tree.betula.distance.VarianceIncreaseDistance;
@@ -52,8 +56,8 @@ public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMMWeighted.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMMWeighted.Par.INIT_ID, EMSphericalInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMMWeighted.Par.INIT_ID, BetulaSphericalGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.865976561);
@@ -69,8 +73,8 @@ public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMMWeighted.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMMWeighted.Par.INIT_ID, EMDiagonalInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMMWeighted.Par.INIT_ID, BetulaDiagonalGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.8416016383);
@@ -86,12 +90,11 @@ public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMMWeighted.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMMWeighted.Par.INIT_ID, EMMultivariateInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMMWeighted.Par.INIT_ID, BetulaMultivariateGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.84929430390);
     assertClusterSizes(clustering, new int[] { 99, 101, 211, 227 });
   }
-
 }

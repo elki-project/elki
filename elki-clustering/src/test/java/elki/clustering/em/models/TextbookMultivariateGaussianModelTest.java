@@ -18,11 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.em.EM;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;

@@ -18,15 +18,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula;
+package elki.clustering.em.models;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.clustering.em.SphericalGaussianModel;
-import elki.data.model.EMModel;
+import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
+import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -35,14 +38,19 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMSphericalInitializer extends AbstractEMInitializer<EMModel> {
+public class BetulaSphericalGaussianModelFactory implements BetulaClusterModelFactory<SphericalGaussianModel> {
+  /**
+   * Class to choose the initial means
+   */
+  protected AbstractCFKMeansInitialization initializer;
+
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
-  public EMSphericalInitializer(AbstractCFKMeansInitialization initializer) {
-    super(initializer);
+  public BetulaSphericalGaussianModelFactory(AbstractCFKMeansInitialization initializer) {
+    this.initializer = initializer;
   }
 
   @Override
@@ -50,12 +58,8 @@ public class EMSphericalInitializer extends AbstractEMInitializer<EMModel> {
     final int dim = cfs.get(0).getDimensionality();
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
-    double varsum = 0.;
-    for(int d = 0; d < dim; d++) {
-      varsum += tree.root.getCF().variance(d);
-    }
-    varsum *= FastMath.pow(k, -2. / dim); // Initial variance estimate
-
+    // Initial variance estimate:
+    double varsum = tree.getRoot().getCF().sumdev() * FastMath.pow(k, -2. / dim);
     List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
       models.add(new SphericalGaussianModel(1. / k, nv, varsum));
@@ -68,10 +72,21 @@ public class EMSphericalInitializer extends AbstractEMInitializer<EMModel> {
    * 
    * @author Andreas Lang
    */
-  public static class Par extends AbstractEMInitializer.Par {
+  public static class Par implements Parameterizer {
+    /**
+     * Initialization method
+     */
+    protected AbstractCFKMeansInitialization initializer;
+
     @Override
-    public EMSphericalInitializer make() {
-      return new EMSphericalInitializer(initializer);
+    public void configure(Parameterization config) {
+      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+          .grab(config, x -> initializer = x);
+    }
+
+    @Override
+    public BetulaSphericalGaussianModelFactory make() {
+      return new BetulaSphericalGaussianModelFactory(initializer);
     }
   }
 }

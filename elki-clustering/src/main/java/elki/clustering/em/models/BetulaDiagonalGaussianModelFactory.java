@@ -18,17 +18,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula;
+package elki.clustering.em.models;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.clustering.em.DiagonalGaussianModel;
-import elki.clustering.em.EMClusterModel;
-import elki.data.NumberVector;
-import elki.data.model.EMModel;
+import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
+import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -37,25 +38,30 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMDiagonalInitializer extends AbstractEMInitializer<EMModel> {
+public class BetulaDiagonalGaussianModelFactory implements BetulaClusterModelFactory<DiagonalGaussianModel> {
+  /**
+   * Class to choose the initial means
+   */
+  protected AbstractCFKMeansInitialization initializer;
+
   /**
    * Constructor.
    *
    * @param initializer Class for choosing the inital seeds.
    */
-  public EMDiagonalInitializer(AbstractCFKMeansInitialization initializer) {
-    super(initializer);
+  public BetulaDiagonalGaussianModelFactory(AbstractCFKMeansInitialization initializer) {
+    this.initializer = initializer;
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree) {
+  public List<DiagonalGaussianModel> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree) {
     final int dim = cfs.get(0).getDimensionality();
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     double[] variances = new double[dim];
     final double f = FastMath.pow(k, -2. / variances.length);
     for(int d = 0; d < dim; d++) {
-      variances[d] = tree.root.getCF().variance(d) * f;
+      variances[d] = tree.getRoot().getCF().variance(d) * f;
     }
 
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
@@ -70,10 +76,21 @@ public class EMDiagonalInitializer extends AbstractEMInitializer<EMModel> {
    *
    * @author Andreas Lang
    */
-  public static class Par extends AbstractEMInitializer.Par {
+  public static class Par implements Parameterizer {
+    /**
+     * Initialization method
+     */
+    protected AbstractCFKMeansInitialization initializer;
+
     @Override
-    public EMDiagonalInitializer make() {
-      return new EMDiagonalInitializer(initializer);
+    public void configure(Parameterization config) {
+      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+          .grab(config, x -> initializer = x);
+    }
+
+    @Override
+    public BetulaDiagonalGaussianModelFactory make() {
+      return new BetulaDiagonalGaussianModelFactory(initializer);
     }
   }
 }

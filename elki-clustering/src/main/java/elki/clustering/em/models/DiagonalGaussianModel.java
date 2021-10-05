@@ -18,25 +18,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
-import static elki.math.linearalgebra.VMath.identity;
-import static elki.math.linearalgebra.VMath.timesEquals;
+import static elki.math.linearalgebra.VMath.*;
+
+import java.util.Arrays;
 
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
-
 import net.jafama.FastMath;
 
 /**
- * Simple spherical Gaussian cluster (scaled identity matrixes).
+ * Simpler model for a single Gaussian cluster, without covariances.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
+public class DiagonalGaussianModel implements BetulaClusterModel {
   /**
    * Constant to avoid zero values.
    */
@@ -48,9 +48,9 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   double[] mean;
 
   /**
-   * Single variances for all dimensions.
+   * Per-dimension variances.
    */
-  double variance;
+  double[] variances;
 
   /**
    * Temporary storage, to avoid reallocations.
@@ -68,9 +68,9 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   double weight, wsum;
 
   /**
-   * Prior variance.
+   * Diagonal prior variances.
    */
-  double priorvar;
+  double[] priordiag;
 
   /**
    * Constructor.
@@ -78,8 +78,8 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
    * @param weight Cluster weight
    * @param mean Initial mean
    */
-  public SphericalGaussianModel(double weight, double[] mean) {
-    this(weight, mean, 1.);
+  public DiagonalGaussianModel(double weight, double[] mean) {
+    this(weight, mean, null);
   }
 
   /**
@@ -87,23 +87,36 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
    * 
    * @param weight Cluster weight
    * @param mean Initial mean
-   * @param var Initial variance
+   * @param vars Initial variances
    */
-  public SphericalGaussianModel(double weight, double[] mean, double var) {
+  public DiagonalGaussianModel(double weight, double[] mean, double[] vars) {
     this.weight = weight;
+    final int dim = mean.length;
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
     this.logNormDet = FastMath.log(weight) - .5 * logNorm;
-    this.nmea = new double[mean.length];
-    this.variance = var > 0 ? var : SINGULARITY_CHEAT;
-    this.priorvar = this.variance;
+    this.nmea = new double[dim];
+    if(vars == null) {
+      Arrays.fill(this.variances = new double[dim], 1.);
+    }
+    else {
+      this.variances = new double[dim];
+      for(int i = 0; i < dim; i++) {
+        this.variances[i] = MathUtil.max(vars[i], SINGULARITY_CHEAT);
+      }
+      this.priordiag = vars;
+    }
+    for(int i = 0; i < variances.length; i++) {
+      variances[i] = Math.max(variances[i], SINGULARITY_CHEAT);
+    }
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
     wsum = 0.;
-    variance = 0.;
+    clear(mean);
+    clear(variances);
   }
 
   @Override
@@ -117,15 +130,14 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
     final double f = wei / nwsum; // Do division only once
     // Compute new means
     for(int i = 0; i < mean.length; i++) {
-      final double delta = vec.doubleValue(i) - mean[i];
-      nmea[i] = mean[i] + delta * f;
+      nmea[i] = mean[i] + (vec.doubleValue(i) - mean[i]) * f;
     }
     // Update variances
     for(int i = 0; i < mean.length; i++) {
       // We DO want to use the new mean once and the old mean once!
       // It does not matter which one is which.
-      double vi = vec.doubleValue(i);
-      variance += (vi - nmea[i]) * (vi - mean[i]) * wei;
+      final double vi = vec.doubleValue(i);
+      variances[i] += (vi - nmea[i]) * (vi - mean[i]) * wei;
     }
     // Use new values.
     wsum = nwsum;
@@ -134,21 +146,27 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
 
   @Override
   public void finalizeEStep(double weight, double prior) {
-    final int dim = mean.length;
+    final int dim = variances.length;
     this.weight = weight;
-    if(prior > 0 && priorvar > 0) { // MAP
-      double nu = dim + 2.; // Popular default.
-      variance = variance / dim + prior * priorvar;
-      variance /= (wsum + prior * (nu + dim + 2));
+    double logDet = 0.;
+    if(prior > 0 && priordiag != null) { // MAP
+      final double nu = dim + 2.; // Popular default.
+      final double f2 = 1. / (wsum + prior * (nu + dim + 2));
+      for(int i = 0; i < dim; i++) {
+        final double v = variances[i] + prior * priordiag[i];
+        logDet += FastMath.log(variances[i] = v > 0 ? v * f2 : SINGULARITY_CHEAT);
+      }
     }
-    else if(wsum > 0.) { // MLE
-      variance /= dim * wsum; // variance sum -> average variance
-    } // else: variance must be 0
-    // Note: for dim dimenions, we have dim times the variance
-    double logDet = dim * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
+    else { // MLE
+      final double f = wsum > 0 ? 1. / wsum : 1;
+      for(int i = 0; i < dim; i++) {
+        final double v = variances[i];
+        logDet += FastMath.log(variances[i] = v > 0 ? v * f : SINGULARITY_CHEAT);
+      }
+    }
     logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
-    if(prior > 0 && priorvar == 0) {
-      priorvar = variance;
+    if(prior > 0 && priordiag == null) {
+      priordiag = copy(variances);
     }
   }
 
@@ -160,9 +178,9 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
    */
   public double mahalanobisDistance(double[] vec) {
     double agg = 0.;
-    for(int i = 0; i < vec.length; i++) {
-      double diff = vec[i] - mean[i];
-      agg += diff / variance * diff;
+    for(int i = 0; i < mean.length; i++) {
+      final double diff = vec[i] - mean[i], v = variances[i];
+      agg += diff / v * diff;
     }
     return agg;
   }
@@ -176,8 +194,8 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
   public double mahalanobisDistance(NumberVector vec) {
     double agg = 0.;
     for(int i = 0; i < mean.length; i++) {
-      double diff = vec.doubleValue(i) - mean[i];
-      agg += diff / variance * diff;
+      final double diff = vec.doubleValue(i) - mean[i], v = variances[i];
+      agg += diff / v * diff;
     }
     return agg;
   }
@@ -199,43 +217,35 @@ public class SphericalGaussianModel implements EMClusterModel<NumberVector, EMMo
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
+    return new EMModel(mean, diagonal(variances));
   }
 
   @Override
   public double estimateLogDensity(ClusterFeature cf) {
-    final int dim = mean.length;
-    double v = 0;
-    for(int i = 0; i < dim; i++) {
-      v += cf.variance(i);
+    double agg = logNorm;
+    for(int i = 0; i < mean.length; i++) {
+      final double diff = cf.centroid(i) - mean[i];
+      agg += diff / (variances[i] + cf.variance(i)) * diff;
     }
-    v = v / dim + variance;
-    double agg = 0.;
-    for(int i = 0; i < dim; i++) {
-      double diff = cf.centroid(i) - mean[i];
-      agg += diff / v * diff;
+    for(int i = 0; i < mean.length; i++) {
+      agg += FastMath.log(variances[i] + cf.variance(i));
     }
-    double cLogNormDet = -.5 * (logNorm + FastMath.log(v) * dim);
-    return -.5 * agg + cLogNormDet;
+    return -.5 * agg;
   }
 
   @Override
   public void updateE(ClusterFeature cf, double wei) {
-    assert (cf.getDimensionality() == mean.length);
+    assert cf.getDimensionality() == mean.length;
     final double nwsum = wsum + wei;
     // Compute new means
     for(int i = 0; i < mean.length; i++) {
-      final double delta = cf.centroid(i) - mean[i];
-      final double rval = delta * wei / nwsum;
-      nmea[i] = mean[i] + rval;
+      nmea[i] = mean[i] + (cf.centroid(i) - mean[i]) * wei / nwsum;
     }
     // Update variances
-    double ovar = variance / mean.length;
-    variance = 0;
     for(int i = 0; i < mean.length; i++) {
-      double vi = cf.centroid(i);
-      double delta = wei * (vi - nmea[i]) * (vi - mean[i]);
-      variance += ovar + wei * cf.variance(i) + delta; // variance contains SSE
+      final double vi = cf.centroid(i);
+      // variances contains SSE
+      variances[i] += wei * cf.variance(i) + (vi - nmea[i]) * (vi - mean[i]) * wei;
     }
     // Use new values.
     wsum = nwsum;

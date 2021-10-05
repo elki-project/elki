@@ -18,10 +18,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import elki.data.model.Model;
-import elki.index.tree.betula.features.ClusterFeature;
 
 /**
  * Models usable in EM clustering.
@@ -112,20 +111,4 @@ public interface EMClusterModel<O, M extends Model> {
    * @param weight Cluster weight
    */
   void setWeight(double weight);
-
-  /**
-   * Estimate the log likelihood of a clustering feature.
-   * 
-   * @param cf ClusteringFeature
-   * @return log likelihood
-   */
-  double estimateLogDensity(ClusterFeature cf);
-
-  /**
-   * Process one clustering feature in the E step.
-   * 
-   * @param cf Clustering feature to process.
-   * @param prob weight of the clustering feature.
-   */
-  void updateE(ClusterFeature cf, double prob);
 }

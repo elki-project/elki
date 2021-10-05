@@ -18,37 +18,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import java.util.List;
 
-import elki.data.model.Model;
-import elki.database.relation.Relation;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 
 /**
  * Factory for initializing the EM models.
  *
+ * @author Andreas Lang
  * @author Erich Schubert
- * @since 0.7.0
  *
- * @navassoc - creates - EMClusterModel
+ * @navassoc - creates - BetulaClusterModel
  *
- * @param <O> Input object type
  * @param <M> Cluster model type
  */
-public interface EMClusterModelFactory<O, M extends Model> {
+public interface BetulaClusterModelFactory<M extends BetulaClusterModel> {
   /**
-   * Build the initial models
-   *
-   * @param relation Relation
-   * @param k Number of clusters
+   * Build the initial models.
+   * 
+   * @param cfs List of clustering features
+   * @param k Number of clusters.
+   * @param tree CF tree
    * @return Initial models
    */
-  List<? extends EMClusterModel<O, M>> buildInitialModels(Relation<? extends O> relation, int k);
+  List<M> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree);
 
   /**
    * Parameter to specify the cluster center initialization.
    */
-  static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
+  public static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
 }

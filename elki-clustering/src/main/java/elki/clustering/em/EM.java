@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.em.models.EMClusterModel;
+import elki.clustering.em.models.EMClusterModelFactory;
+import elki.clustering.em.models.MultivariateGaussianModelFactory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MeanModel;

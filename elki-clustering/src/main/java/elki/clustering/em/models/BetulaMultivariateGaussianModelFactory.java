@@ -18,19 +18,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.index.tree.betula;
+package elki.clustering.em.models;
 
 import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import elki.clustering.em.EMClusterModel;
-import elki.clustering.em.MultivariateGaussianModel;
-import elki.data.NumberVector;
-import elki.data.model.EMModel;
+import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
+import elki.index.tree.betula.initialization.CFKMeansPlusPlus;
+import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import net.jafama.FastMath;
 
@@ -39,21 +40,26 @@ import net.jafama.FastMath;
  * 
  * @author Andreas Lang
  */
-public class EMMultivariateInitializer extends AbstractEMInitializer<EMModel> {
+public class BetulaMultivariateGaussianModelFactory implements BetulaClusterModelFactory<MultivariateGaussianModel> {
+  /**
+   * Class to choose the initial means
+   */
+  protected AbstractCFKMeansInitialization initializer;
+
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
-  public EMMultivariateInitializer(AbstractCFKMeansInitialization initializer) {
-    super(initializer);
+  public BetulaMultivariateGaussianModelFactory(AbstractCFKMeansInitialization initializer) {
+    this.initializer = initializer;
   }
 
   @Override
-  public List<? extends EMClusterModel<NumberVector, EMModel>> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree) {
+  public List<MultivariateGaussianModel> buildInitialModels(List<? extends ClusterFeature> cfs, int k, CFTree<?> tree) {
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
-    double[][] covmat = tree.root.getCF().covariance().clone();
+    double[][] covmat = tree.getRoot().getCF().covariance().clone();
     timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
 
     List<MultivariateGaussianModel> models = new ArrayList<>(k);
@@ -68,10 +74,21 @@ public class EMMultivariateInitializer extends AbstractEMInitializer<EMModel> {
    * 
    * @author Andreas Lang
    */
-  public static class Par extends AbstractEMInitializer.Par {
+  public static class Par implements Parameterizer {
+    /**
+     * Initialization method
+     */
+    protected AbstractCFKMeansInitialization initializer;
+
     @Override
-    public EMMultivariateInitializer make() {
-      return new EMMultivariateInitializer(initializer);
+    public void configure(Parameterization config) {
+      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+          .grab(config, x -> initializer = x);
+    }
+
+    @Override
+    public BetulaMultivariateGaussianModelFactory make() {
+      return new BetulaMultivariateGaussianModelFactory(initializer);
     }
   }
 }

@@ -27,13 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.em.models.BetulaClusterModel;
+import elki.clustering.em.models.BetulaClusterModelFactory;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.NumberVector;
-import elki.data.model.MeanModel;
+import elki.data.model.EMModel;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -45,7 +46,6 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.MaterializedRelation;
 import elki.database.relation.Relation;
-import elki.index.tree.betula.AbstractEMInitializer;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.initialization.AbstractCFKMeansInitialization;
@@ -83,7 +83,7 @@ import net.jafama.FastMath;
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
     booktitle = "Information Systems (under review)")
-public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clustering<MeanModel>> {
+public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
   /**
    * Class logger.
    */
@@ -132,7 +132,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
   /**
    * Maximum number of iterations.
    */
-  AbstractEMInitializer<M> initializer;
+  BetulaClusterModelFactory<?> initializer;
 
   /**
    * Constructor.
@@ -144,7 +144,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * @param initialization Initialization method
    * @param prior MAP prior
    */
-  public BetulaGMM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<M> initialization, double prior) {
+  public BetulaGMM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, BetulaClusterModelFactory<?> initialization, double prior) {
     super();
     this.cffactory = cffactory;
     this.delta = delta;
@@ -166,7 +166,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * @param relation Input data
    * @return Clustering
    */
-  public Clustering<M> run(Relation<NumberVector> relation) {
+  public Clustering<EMModel> run(Relation<NumberVector> relation) {
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
@@ -177,7 +177,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
     Duration modeltime = LOG.newDuration(getClass().getName() + ".modeltime").begin();
     ArrayList<? extends ClusterFeature> cfs = AbstractCFKMeansInitialization.flattenTree(tree);
     // Initialize EM Model
-    List<? extends EMClusterModel<NumberVector, M>> models = initializer.buildInitialModels(cfs, k, tree);
+    List<? extends BetulaClusterModel> models = initializer.buildInitialModels(cfs, k, tree);
     Map<ClusterFeature, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());
     double loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
@@ -218,7 +218,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       hardClusters.get(argmax(finalClusterIGivenX.get(iditer))).add(iditer);
     }
-    Clustering<M> result = new Clustering<>();
+    Clustering<EMModel> result = new Clustering<>();
     Metadata.of(result).setLongName("EM Clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
@@ -246,21 +246,15 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends EMClusterModel<NumberVector, M>> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends BetulaClusterModel> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
     final int k = models.size();
-    final int d = cfs.get(0).getDimensionality();
     double emSum = 0.;
     int n = 0;
     for(int i = 0; i < cfs.size(); i++) {
       ClusterFeature cfsi = cfs.get(i);
       double[] probs = new double[k];
-      double[] mean = new double[d];
-      for(int l = 0; l < d; l++) {
-        mean[l] = cfsi.centroid(l);
-      }
-      NumberVector nv = new DoubleVector(mean);
       for(int j = 0; j < k; j++) {
-        double v = models.get(j).estimateLogDensity(nv);
+        final double v = models.get(j).estimateLogDensity((NumberVector) cfsi);
         probs[j] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
       }
       final double logP = EM.logSumExp(probs);
@@ -286,10 +280,9 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
    */
-  public double assignProbabilitiesToInstances(Relation<? extends NumberVector> relation, List<? extends EMClusterModel<NumberVector, M>> models, WritableDataStore<double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(Relation<? extends NumberVector> relation, List<? extends BetulaClusterModel> models, WritableDataStore<double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
-
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       NumberVector vec = relation.get(iditer);
       double[] probs = new double[k];
@@ -315,10 +308,10 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
    */
-  public void recomputeCovarianceMatrices(ArrayList<? extends ClusterFeature> cfs, Map<ClusterFeature, double[]> probClusterIGivenX, List<? extends EMClusterModel<NumberVector, M>> models, double prior, int n) {
+  public void recomputeCovarianceMatrices(ArrayList<? extends ClusterFeature> cfs, Map<ClusterFeature, double[]> probClusterIGivenX, List<? extends BetulaClusterModel> models, double prior, int n) {
     final int k = models.size();
     boolean needsTwoPass = false;
-    for(EMClusterModel<NumberVector, M> m : models) {
+    for(BetulaClusterModel m : models) {
       m.beginEStep();
       needsTwoPass |= m.needsTwoPass();
     }
@@ -350,7 +343,7 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
    * 
    * @author Andreas Lang
    */
-  public static class Par<M extends MeanModel> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
      * Parameter to specify the EM cluster models to use.
      */
@@ -400,12 +393,12 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
     /**
      * initialization method
      */
-    protected AbstractEMInitializer<M> initialization;
+    protected BetulaClusterModelFactory<?> initialization;
 
     @Override
     public void configure(Parameterization config) {
       cffactory = config.tryInstantiate(CFTree.Factory.class);
-      new ObjectParameter<AbstractEMInitializer<M>>(INIT_ID, AbstractEMInitializer.class) //
+      new ObjectParameter<BetulaClusterModelFactory<?>>(INIT_ID, BetulaClusterModelFactory.class) //
           .grab(config, x -> initialization = x);
       new IntParameter(AbstractKMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
@@ -424,8 +417,8 @@ public class BetulaGMM<M extends MeanModel> implements ClusteringAlgorithm<Clust
     }
 
     @Override
-    public BetulaGMM<M> make() {
-      return new BetulaGMM<M>(cffactory, delta, k, maxiter, soft, initialization, prior);
+    public BetulaGMM make() {
+      return new BetulaGMM(cffactory, delta, k, maxiter, soft, initialization, prior);
     }
   }
 }

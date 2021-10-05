@@ -18,9 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
-
-import static elki.math.linearalgebra.VMath.timesEquals;
+package elki.clustering.em.models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,7 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.math.linearalgebra.CovarianceMatrix;
+import elki.math.MeanVariance;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -39,18 +37,17 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Factory for EM with multivariate Gaussian models (with covariance; also known
- * as Gaussian Mixture Modeling, GMM).
+ * Factory for EM with multivariate gaussian models using a single variance.
  * <p>
- * These models have individual covariance matrixes, so this corresponds to the
- * {@code 'VVV'} model in Mclust (R).
+ * These models have a single variances, no covariance, so this corresponds to
+ * the {@code 'VII'} model in Mclust (R).
  *
  * @author Erich Schubert
- * @since 0.7.5
+ * @since 0.7.0
  *
- * @has - - - TwoPassMultivariateGaussianModel
+ * @has - - - SphericalGaussianModel
  */
-public class TwoPassMultivariateGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
+public class TextbookSphericalGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
   /**
    * Class to choose the initial means
    */
@@ -59,24 +56,28 @@ public class TwoPassMultivariateGaussianModelFactory implements EMClusterModelFa
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the initial seeds.
+   * @param initializer Class for choosing the inital seeds.
    */
-  public TwoPassMultivariateGaussianModelFactory(KMeansInitialization initializer) {
+  public TextbookSphericalGaussianModelFactory(KMeansInitialization initializer) {
     super();
     this.initializer = initializer;
   }
 
   @Override
-  public List<TwoPassMultivariateGaussianModel> buildInitialModels(Relation<? extends NumberVector> relation, int k) {
+  public List<TextbookSphericalGaussianModel> buildInitialModels(Relation<? extends NumberVector> relation, int k) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, SquaredEuclideanDistance.STATIC);
     assert initialMeans.length == k;
-    // Compute the global covariance matrix for better starting conditions:
-    double[][] covmat = CovarianceMatrix.make(relation).destroyToPopulationMatrix();
-    timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
+    MeanVariance[] mvs = MeanVariance.of(relation);
+    double varsum = 0.;
+    for(int d = 0; d < mvs.length; d++) {
+      varsum += mvs[d].getPopulationVariance();
+    }
+    varsum /= mvs.length;
+    varsum *= FastMath.pow(k, -2. / mvs.length); // Initial variance estimate
 
-    List<TwoPassMultivariateGaussianModel> models = new ArrayList<>(k);
+    List<TextbookSphericalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new TwoPassMultivariateGaussianModel(1. / k, nv, covmat));
+      models.add(new TextbookSphericalGaussianModel(1. / k, nv, varsum));
     }
     return models;
   }
@@ -101,8 +102,8 @@ public class TwoPassMultivariateGaussianModelFactory implements EMClusterModelFa
     }
 
     @Override
-    public TwoPassMultivariateGaussianModelFactory make() {
-      return new TwoPassMultivariateGaussianModelFactory(initializer);
+    public TextbookSphericalGaussianModelFactory make() {
+      return new TextbookSphericalGaussianModelFactory(initializer);
     }
   }
 }

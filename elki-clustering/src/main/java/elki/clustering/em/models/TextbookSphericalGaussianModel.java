@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import static elki.math.linearalgebra.VMath.*;
 
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 
 import net.jafama.FastMath;
@@ -196,15 +195,5 @@ public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVect
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
-  }
-
-  @Override
-  public double estimateLogDensity(ClusterFeature cf) {
-    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
-  }
-
-  @Override
-  public void updateE(ClusterFeature cf, double wei) {
-    throw new IllegalStateException("Textbook-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 }

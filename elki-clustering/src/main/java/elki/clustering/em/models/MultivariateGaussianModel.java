@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import static elki.math.linearalgebra.VMath.*;
 
@@ -36,7 +36,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class MultivariateGaussianModel implements EMClusterModel<NumberVector, EMModel> {
+public class MultivariateGaussianModel implements BetulaClusterModel {
   /**
    * Class logger.
    */
@@ -130,8 +130,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
     final double f = wei / nwsum; // Do division only once
     // Compute new means
     for(int i = 0; i < dim; i++) {
-      final double delta = vec.doubleValue(i) - mean[i];
-      nmea[i] = mean[i] + delta * f;
+      nmea[i] = mean[i] + (vec.doubleValue(i) - mean[i]) * f;
     }
     // Update covariance matrix
     for(int i = 0; i < dim; i++) {
@@ -157,10 +156,10 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
     this.weight = weight;
     double f = wsum > Double.MIN_NORMAL && wsum < Double.POSITIVE_INFINITY ? 1. / wsum : 1.;
     if(prior > 0 && priormatrix != null) { // MAP
-      double nu = dim + 2.; // Popular default.
-      double f2 = 1. / (wsum + prior * (nu + dim + 2));
+      final double nu = dim + 2.; // Popular default.
+      final double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
-        double[] row_i = covariance[i], pri_i = priormatrix[i];
+        final double[] row_i = covariance[i], pri_i = priormatrix[i];
         for(int j = 0; j < i; j++) { // Restore symmetry & scale
           covariance[j][i] = row_i[j] = (row_i[j] + prior * pri_i[j]) * f2;
         }
@@ -169,7 +168,7 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
     }
     else { // MLE
       for(int i = 0; i < dim; i++) {
-        double[] row_i = covariance[i];
+        final double[] row_i = covariance[i];
         for(int j = 0; j < i; j++) { // Restore symmetry & scale
           covariance[j][i] = row_i[j] *= f;
         }
@@ -275,16 +274,17 @@ public class MultivariateGaussianModel implements EMClusterModel<NumberVector, E
   @Override
   public double estimateLogDensity(ClusterFeature cf) {
     double[][] combinedCov = cf.covariance();
-    double[] delta = new double[mean.length];
-    double cw = cf.getWeight() + wsum;
+    double[] delta = mean.clone();
     for(int i = 0; i < mean.length; i++) {
-      delta[i] = mean[i] - cf.centroid(i);
+      delta[i] -= cf.centroid(i);
+    }
+    for(int i = 0; i < covariance.length; i++) {
       for(int j = 0; j <= i; j++) {
         combinedCov[j][i] = combinedCov[i][j] += covariance[i][j];
       }
     }
     CholeskyDecomposition cchol = updateCholesky(combinedCov, chol);
-    double clogNormDet = FastMath.log(cw) - 0.5 * logNorm - getHalfLogDeterminant(cchol);
+    double clogNormDet = FastMath.log(cf.getWeight() + wsum) - 0.5 * logNorm - getHalfLogDeterminant(cchol);
     return -0.5 * squareSum(chol.solveLInplace(delta)) + clogNormDet;
   }
 

@@ -18,13 +18,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
 
 import static elki.math.linearalgebra.VMath.*;
 
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
-import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
 
@@ -230,15 +229,5 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
   @Override
   public EMModel finalizeCluster() {
     return new EMModel(mean, covariance);
-  }
-
-  @Override
-  public double estimateLogDensity(ClusterFeature clusteringFeature) {
-    throw new IllegalStateException("Two-Pass-Multi-Variate-Gauss doesn't work with BETULA.");
-  }
-
-  @Override
-  public void updateE(ClusterFeature clusteringFeature, double prob) {
-    throw new IllegalStateException("Two-Pass-Multi-Variate-Gauss doesn't work with BETULA.");
   }
 }

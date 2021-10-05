@@ -1,0 +1,3 @@
+elki.clustering.em.models.BetulaDiagonalGaussianModelFactory
+elki.clustering.em.models.BetulaMultivariateGaussianModelFactory
+elki.clustering.em.models.BetulaSphericalGaussianModelFactory

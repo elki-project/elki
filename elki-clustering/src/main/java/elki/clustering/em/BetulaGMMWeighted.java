@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import elki.data.NumberVector;
-import elki.data.model.MeanModel;
-import elki.index.tree.betula.AbstractEMInitializer;
+import elki.clustering.em.models.BetulaClusterModel;
+import elki.clustering.em.models.BetulaClusterModelFactory;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.Priority;
@@ -54,7 +53,7 @@ import net.jafama.FastMath;
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
     booktitle = "Information Systems (under review)")
-public class BetulaGMMWeighted<M extends MeanModel> extends BetulaGMM<M> {
+public class BetulaGMMWeighted extends BetulaGMM {
   /**
    * Constructor.
    *
@@ -64,12 +63,12 @@ public class BetulaGMMWeighted<M extends MeanModel> extends BetulaGMM<M> {
    * @param initialization Initialization method
    * @param prior MAP prior
    */
-  public BetulaGMMWeighted(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, AbstractEMInitializer<M> initialization, double prior) {
+  public BetulaGMMWeighted(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, BetulaClusterModelFactory<?> initialization, double prior) {
     super(cffactory, delta, k, maxiter, soft, initialization, prior);
   }
 
   @Override
-  public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends EMClusterModel<NumberVector, M>> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
+  public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends BetulaClusterModel> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
     final int k = models.size();
     double emSum = 0.;
     int n = 0;
@@ -77,7 +76,7 @@ public class BetulaGMMWeighted<M extends MeanModel> extends BetulaGMM<M> {
       ClusterFeature cfsi = cfs.get(i);
       double[] probs = new double[k];
       for(int j = 0; j < k; j++) {
-        double v = models.get(j).estimateLogDensity(cfsi);
+        final double v = models.get(j).estimateLogDensity(cfsi);
         probs[j] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
       }
       final double logP = EM.logSumExp(probs);
@@ -96,10 +95,10 @@ public class BetulaGMMWeighted<M extends MeanModel> extends BetulaGMM<M> {
    * 
    * @author Andreas Lang
    */
-  public static class Par<M extends MeanModel> extends BetulaGMM.Par<M> {
+  public static class Par extends BetulaGMM.Par {
     @Override
-    public BetulaGMMWeighted<M> make() {
-      return new BetulaGMMWeighted<M>(cffactory, delta, k, maxiter, soft, initialization, prior);
+    public BetulaGMMWeighted make() {
+      return new BetulaGMMWeighted(cffactory, delta, k, maxiter, soft, initialization, prior);
     }
   }
 }

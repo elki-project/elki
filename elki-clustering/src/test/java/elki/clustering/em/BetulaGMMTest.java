@@ -23,6 +23,7 @@ package elki.clustering.em;
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
+import elki.clustering.em.models.*;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.data.Clustering;
 import elki.database.Database;
@@ -52,8 +53,8 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMM.Par.INIT_ID, EMSphericalInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMM.Par.INIT_ID, BetulaSphericalGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.95991444);
@@ -69,8 +70,8 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMM.Par.INIT_ID, EMDiagonalInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMM.Par.INIT_ID, BetulaDiagonalGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.8861344829);
@@ -86,8 +87,8 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
-        .with(BetulaGMM.Par.INIT_ID, EMMultivariateInitializer.class)//
-        .with(AbstractEMInitializer.Par.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaGMM.Par.INIT_ID, BetulaMultivariateGaussianModelFactory.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.84929430390);

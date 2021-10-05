@@ -18,7 +18,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.em;
+package elki.clustering.em.models;
+
+import static elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
-import elki.math.MeanVariance;
+import elki.math.linearalgebra.CovarianceMatrix;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -37,17 +39,22 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import net.jafama.FastMath;
 
 /**
- * Factory for EM with multivariate gaussian models using diagonal matrixes.
+ * Factory for EM with multivariate Gaussian model, using the textbook
+ * algorithm. There is no reason to use this in practice, it is only useful to
+ * study the reliability of the textbook approach.
  * <p>
- * These models have individual variances, but no covariance, so this
- * corresponds to the {@code 'VVI'} model in Mclust (R).
+ * "Textbook" refers to the E[XY]-E[X]E[Y] equation for covariance, that is
+ * numerically not reliable with floating point math, but popular in textbooks.
+ * <p>
+ * Again, do not use this. Always prefer
+ * {@link MultivariateGaussianModelFactory}.
  *
  * @author Erich Schubert
- * @since 0.7.0
+ * @since 0.7.5
  *
- * @has - - - DiagonalGaussianModel
+ * @has - - - TextbookMultivariateGaussianModel
  */
-public class DiagonalGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
+public class TextbookMultivariateGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
   /**
    * Class to choose the initial means
    */
@@ -58,26 +65,22 @@ public class DiagonalGaussianModelFactory implements EMClusterModelFactory<Numbe
    *
    * @param initializer Class for choosing the initial seeds.
    */
-  public DiagonalGaussianModelFactory(KMeansInitialization initializer) {
+  public TextbookMultivariateGaussianModelFactory(KMeansInitialization initializer) {
     super();
     this.initializer = initializer;
   }
 
   @Override
-  public List<DiagonalGaussianModel> buildInitialModels(Relation<? extends NumberVector> relation, int k) {
+  public List<TextbookMultivariateGaussianModel> buildInitialModels(Relation<? extends NumberVector> relation, int k) {
     double[][] initialMeans = initializer.chooseInitialMeans(relation, k, SquaredEuclideanDistance.STATIC);
-    assert (initialMeans.length == k);
-    MeanVariance[] mvs = MeanVariance.of(relation);
-    double[] variances = new double[mvs.length];
-    final double f = FastMath.pow(k, -2. / variances.length);
-    for(int d = 0; d < mvs.length; d++) {
-      final double v = mvs[d].getPopulationVariance();
-      variances[d] = v > 0 ? v * f : 1e-10;
-    }
+    assert initialMeans.length == k;
+    // Compute the global covariance matrix for better starting conditions:
+    double[][] covmat = CovarianceMatrix.make(relation).destroyToPopulationMatrix();
+    timesEquals(covmat, FastMath.pow(k, -2. / covmat.length));
 
-    List<DiagonalGaussianModel> models = new ArrayList<>(k);
+    List<TextbookMultivariateGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new DiagonalGaussianModel(1. / k, nv, variances));
+      models.add(new TextbookMultivariateGaussianModel(1. / k, nv, covmat));
     }
     return models;
   }
@@ -102,8 +105,8 @@ public class DiagonalGaussianModelFactory implements EMClusterModelFactory<Numbe
     }
 
     @Override
-    public DiagonalGaussianModelFactory make() {
-      return new DiagonalGaussianModelFactory(initializer);
+    public TextbookMultivariateGaussianModelFactory make() {
+      return new TextbookMultivariateGaussianModelFactory(initializer);
     }
   }
 }
