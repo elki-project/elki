@@ -397,10 +397,14 @@ public class CFTree<L extends ClusterFeature> {
     assert (best instanceof CFNode) : "Node is neither child nor inner?";
     CFNode<L> newchild = insert((CFNode<L>) best, nv, dbid);
     if(newchild == null) {
-      node.getCF().addToStatistics(best.getCF());
+      node.getCF().addToStatistics(nv);
       return null;
     }
-    return node.add(newchild) ? null : split(node, newchild);
+    if(node.setChild(newchild)) {
+      node.getCF().addToStatistics(nv);
+      return null;
+    }
+    return split(node, newchild);
   }
 
   /**
