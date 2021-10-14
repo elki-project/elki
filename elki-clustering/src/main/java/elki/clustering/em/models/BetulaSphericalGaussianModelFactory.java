@@ -59,10 +59,10 @@ public class BetulaSphericalGaussianModelFactory implements BetulaClusterModelFa
     double[][] initialMeans = initializer.chooseInitialMeans(tree, cfs, k);
     assert (initialMeans.length == k);
     // Initial variance estimate:
-    double varsum = tree.getRoot().getCF().sumdev() * FastMath.pow(k, -2. / dim);
+    double variance = tree.getRoot().getCF().variance() * FastMath.pow(k, -2. / dim);
     List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new SphericalGaussianModel(1. / k, nv, varsum));
+      models.add(new SphericalGaussianModel(1. / k, nv, variance));
     }
     return models;
   }
