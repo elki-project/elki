@@ -563,7 +563,11 @@ public class CFTree<L extends ClusterFeature> {
       node.getCF().addToStatistics(nleaf.getCF()); // Update statistics upwards
       return null;
     }
-    return node.add(newchild) ? null : split(node, newchild);
+    if(node.setChild(newchild)) {
+      node.getCF().addToStatistics(nleaf.getCF());
+      return null;
+    }
+    return split(node, newchild);
   }
 
   /**
