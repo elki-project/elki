@@ -37,19 +37,35 @@ import elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class CFKMeansPlusPlusTest extends AbstractClusterAlgorithmTest {
+public class CFKPlusPlusTreeTest extends AbstractClusterAlgorithmTest {
   @Test
   public void test() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BetulaLloydKMeans.class) //
-        .with(BetulaLloydKMeans.INIT_ID, CFKMeansPlusPlus.class) //
+        .with(BetulaLloydKMeans.INIT_ID, CFKPlusPlusTree.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.84932);
-    assertClusterSizes(clustering, new int[] { 98, 102, 211, 227 });
+    assertFMeasure(db, clustering, 0.9038);
+    assertClusterSizes(clustering, new int[] { 92, 142, 200, 204 });
+  }
+
+  @Test
+  public void testFirstUniform() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(BetulaLloydKMeans.class) //
+        .with(BetulaLloydKMeans.INIT_ID, CFKPlusPlusTree.class) //
+        .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class) //
+        .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class) //
+        .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
+        .with(AbstractKMeans.K_ID, 4) //
+        .with(CFKPlusPlusTree.Par.FIRST_UNIFORM_ID) //
+        .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.88996);
+    assertClusterSizes(clustering, new int[] { 107, 127, 200, 204 });
   }
 }

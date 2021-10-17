@@ -26,7 +26,7 @@ import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.em.models.*;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
-import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
+import elki.clustering.kmeans.initialization.betula.CFKPlusPlusLeaves;
 import elki.data.Clustering;
 import elki.database.Database;
 import elki.index.tree.betula.*;
@@ -54,7 +54,7 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
         .with(BetulaGMM.Par.INIT_ID, BetulaSphericalGaussianModelFactory.class)//
-        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKPlusPlusLeaves.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.95991444);
@@ -71,7 +71,7 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
         .with(BetulaGMM.Par.INIT_ID, BetulaDiagonalGaussianModelFactory.class)//
-        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKPlusPlusLeaves.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.8861344829);
@@ -88,7 +88,7 @@ public class BetulaGMMTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(BetulaGMM.Par.DELTA_ID, 1e-7)//
         .with(BetulaGMM.Par.INIT_ID, BetulaMultivariateGaussianModelFactory.class)//
-        .with(BetulaClusterModelFactory.INIT_ID, CFKMeansPlusPlus.class)//
+        .with(BetulaClusterModelFactory.INIT_ID, CFKPlusPlusLeaves.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.84929430390);

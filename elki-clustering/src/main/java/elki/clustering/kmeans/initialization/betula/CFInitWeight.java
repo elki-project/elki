@@ -23,20 +23,17 @@ package elki.clustering.kmeans.initialization.betula;
 import elki.index.tree.betula.features.ClusterFeature;
 
 /**
- * Calculates the Euclidean distance on any of the BETULA clustering Features.
+ * Initialization weight function for k-means initialization with BETULA.
  *
  * @author Andreas Lang
  */
-public class EuclideanDistance implements CFIDistance {
-  @Override
-  public double squaredDistance(ClusterFeature c1, ClusterFeature c2) {
-    final int d = c1.getDimensionality();
-    assert d == c2.getDimensionality();
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = c1.centroid(i) - c2.centroid(i);
-      sum += dx * dx;
-    }
-    return sum;
-  }
+public interface CFInitWeight {
+  /**
+   * Distance between two clustering features.
+   *
+   * @param exist Previously chosen clustering feature
+   * @param cand Candidate clustering feature
+   * @return Weight
+   */
+  double squaredWeight(ClusterFeature exist, ClusterFeature cand);
 }

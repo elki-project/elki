@@ -25,7 +25,7 @@ import java.util.List;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.AbstractKMeansInitialization;
 import elki.index.tree.betula.CFTree;
-import elki.index.tree.betula.features.AsClusterFeature;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,12 +56,13 @@ public abstract class AbstractCFKMeansInitialization {
   /**
    * Build the initial models.
    * 
-   * @param cfs List of clustering features
+   * @param tree CF tree
+   * @param cfs Cluster features of the tree (may be ignored for tree-based
+   *        initializations, should be an array list for efficiency)
    * @param k Number of clusters.
-   * @param root Summary statistic of the tree.
    * @return initial cluster means
    */
-  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k);
+  public abstract double[][] chooseInitialMeans(CFTree<?> tree, List<? extends ClusterFeature> cfs, int k);
 
   /**
    * Parameterization class.

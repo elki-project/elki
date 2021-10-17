@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
-import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
+import elki.clustering.kmeans.initialization.betula.CFKPlusPlusLeaves;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.utilities.optionhandling.Parameterizer;
@@ -84,7 +84,7 @@ public class BetulaDiagonalGaussianModelFactory implements BetulaClusterModelFac
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+      new ObjectParameter<AbstractCFKMeansInitialization>(INIT_ID, AbstractCFKMeansInitialization.class, CFKPlusPlusLeaves.class) //
           .grab(config, x -> initializer = x);
     }
 

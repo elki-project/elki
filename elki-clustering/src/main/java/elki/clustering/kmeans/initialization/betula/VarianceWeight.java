@@ -20,23 +20,27 @@
  */
 package elki.clustering.kmeans.initialization.betula;
 
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.utilities.documentation.Reference;
 
 /**
- * Variance-based distance on any of the BETULA clustering Features.
+ * Variance-based weighting scheme for k-means clustering with BETULA.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  *
  * @author Andreas Lang
  */
-public class VarDistance implements CFIDistance {
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems")
+public class VarianceWeight implements CFInitWeight {
   @Override
-  public double squaredDistance(ClusterFeature clusterCenter, ClusterFeature candidate) {
-    final int d = clusterCenter.getDimensionality();
-    assert d == candidate.getDimensionality();
-    double sum = candidate.sumdev();
-    for(int i = 0; i < d; i++) {
-      double dx = candidate.centroid(i) - clusterCenter.centroid(i);
-      sum += candidate.getWeight() * dx * dx;
-    }
-    return sum;
+  public double squaredWeight(ClusterFeature existing, ClusterFeature candidate) {
+    return candidate.sumdev() + candidate.getWeight() * SquaredEuclideanDistance.STATIC.distance(existing, candidate);
   }
 }

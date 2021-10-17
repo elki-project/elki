@@ -33,7 +33,8 @@ import elki.utilities.random.RandomFactory;
 /**
  * Initialize K-means by randomly choosing k existing elements as initial
  * cluster centers for Clustering Features. For normal k-means use
- * {@link RandomlyChosen}.
+ * {@link RandomlyChosen}. This version uses the number of points in each
+ * cluster feature for weighting.
  * <p>
  * References:
  * <p>
@@ -46,13 +47,13 @@ import elki.utilities.random.RandomFactory;
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
     booktitle = "Information Systems")
-public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
+public class CFWeightedRandomlyChosen extends AbstractCFKMeansInitialization {
   /**
    * Constructor.
    *
    * @param rf Random generator
    */
-  public CFRandomlyChosen(RandomFactory rf) {
+  public CFWeightedRandomlyChosen(RandomFactory rf) {
     super(rf);
   }
 
@@ -64,11 +65,16 @@ public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
     }
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
+    int weightsum = tree.getRoot().getCF().getWeight();
     ArrayList<ClusterFeature> cpy = new ArrayList<>(cfs);
-    // Partial Fisher-Yates shuffle.
     for(int i = 0; i < k; i++) {
-      final int off = rnd.nextInt(cpy.size() - i);
+      int weightpos = rnd.nextInt(weightsum);
+      int off = 0;
+      while((weightpos -= cpy.get(off).getWeight()) >= 0) {
+        off++;
+      }
       means[i] = cpy.get(off).toArray();
+      weightsum -= cpy.get(off).getWeight();
       cpy.set(off, cpy.get(cpy.size() - i - 1));
     }
     return means;
@@ -81,8 +87,8 @@ public class CFRandomlyChosen extends AbstractCFKMeansInitialization {
    */
   public static class Par extends AbstractCFKMeansInitialization.Par {
     @Override
-    public CFRandomlyChosen make() {
-      return new CFRandomlyChosen(rnd);
+    public CFWeightedRandomlyChosen make() {
+      return new CFWeightedRandomlyChosen(rnd);
     }
   }
 }

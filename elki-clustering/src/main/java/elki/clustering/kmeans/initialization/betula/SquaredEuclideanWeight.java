@@ -21,19 +21,25 @@
 package elki.clustering.kmeans.initialization.betula;
 
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.utilities.documentation.Reference;
 
 /**
- * Interface for distance calculation on any of the BETULA cluster features.
+ * Use the squared Euclidean distance only for distance measurement.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  *
  * @author Andreas Lang
  */
-public interface CFIDistance {
-  /**
-   * Distance between two clustering features.
-   *
-   * @param c1 First clustering feature
-   * @param c2 Second clustering feature
-   * @return Distance
-   */
-  double squaredDistance(ClusterFeature c1, ClusterFeature c2);
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems")
+public class SquaredEuclideanWeight implements CFInitWeight {
+  @Override
+  public double squaredWeight(ClusterFeature c1, ClusterFeature c2) {
+    return elki.distance.minkowski.SquaredEuclideanDistance.STATIC.distance(c1, c2);
+  }
 }

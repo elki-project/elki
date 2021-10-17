@@ -37,19 +37,19 @@ import elki.utilities.ELKIBuilder;
  *
  * @author Erich Schubert
  */
-public class CFKppTreeTest extends AbstractClusterAlgorithmTest {
+public class CFWeightedRandomlyChosenTest extends AbstractClusterAlgorithmTest {
   @Test
   public void test() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(BetulaLloydKMeans.class) //
-        .with(BetulaLloydKMeans.INIT_ID, CFKppTree.class) //
+        .with(BetulaLloydKMeans.INIT_ID, CFWeightedRandomlyChosen.class) //
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class) //
         .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class) //
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 50) //
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.9366253);
-    assertClusterSizes(clustering, new int[] { 71, 176, 191, 200});
+    assertFMeasure(db, clustering, 0.854839);
+    assertClusterSizes(clustering, new int[] { 76, 124, 211, 227 });
   }
 }

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitialization;
-import elki.clustering.kmeans.initialization.betula.CFKMeansPlusPlus;
+import elki.clustering.kmeans.initialization.betula.CFKPlusPlusLeaves;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -345,7 +345,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       cffactory = config.tryInstantiate(CFTree.Factory.class);
       super.getParameterK(config);
       super.getParameterMaxIter(config);
-      new ObjectParameter<AbstractCFKMeansInitialization>(AbstractKMeans.INIT_ID, AbstractCFKMeansInitialization.class, CFKMeansPlusPlus.class) //
+      new ObjectParameter<AbstractCFKMeansInitialization>(AbstractKMeans.INIT_ID, AbstractCFKMeansInitialization.class, CFKPlusPlusLeaves.class) //
           .grab(config, x -> initialization = x);
       new Flag(STORE_IDS_ID).grab(config, x -> storeIds = x);
       new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);

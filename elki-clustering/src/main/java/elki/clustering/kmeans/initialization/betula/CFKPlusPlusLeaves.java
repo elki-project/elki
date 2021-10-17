@@ -27,6 +27,8 @@ import elki.clustering.kmeans.initialization.KMeansPlusPlus;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.AsClusterFeature;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.utilities.Alias;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -34,38 +36,48 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * K-Means++-like initialization for BETULA k-means, treating the clustering
- * features as a flat list; this cannot be used to initialize regular k-means,
- * use {@link KMeansPlusPlus} instead.
+ * K-Means++-like initialization for BETULA k-means, treating the leaf
+ * clustering features as a flat list, and called "leaves" in the publication.
+ * To initialize regular k-means, use {@link KMeansPlusPlus} instead.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  *
  * @author Andreas Lang
  */
-public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
+@Alias("leaves")
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems")
+public class CFKPlusPlusLeaves extends AbstractCFKMeansInitialization {
   /**
    * Distance function
    */
-  protected CFIDistance distance;
+  protected CFInitWeight distance;
 
   /**
-   * Choose the first center based on variance contribution.
+   * Choose the first center uniformly from the leaves.
    */
-  protected boolean firstVar;
+  protected boolean firstUniform;
 
   /**
    * Constructor.
-   *
-   * @param rf Random generator
-   * @param dist Distance function
-   * @param firstVar Choose first based on variance
+   * 
+   * @param dist distance function
+   * @param firstUniform choose the first center uniformly from leaves
+   * @param rf random generator
    */
-  public CFKMeansPlusPlus(RandomFactory rf, CFIDistance dist, boolean firstVar) {
+  public CFKPlusPlusLeaves(CFInitWeight dist, boolean firstUniform, RandomFactory rf) {
     super(rf);
     this.distance = dist;
-    this.firstVar = firstVar;
+    this.firstUniform = firstUniform;
   }
 
   @Override
-  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends AsClusterFeature> cfs, int k) {
+  public double[][] chooseInitialMeans(CFTree<?> tree, List<? extends ClusterFeature> cfs, int k) {
     return run(tree, cfs, k);
   }
 
@@ -73,42 +85,69 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
    * Perform k-means++ initialization.
    *
    * @param tree CFTree
-   * @param cf cluster features to choose from (should be an array list for
-   *        performance reasons)
+   * @param cfs Cluster features
    * @param k K
    * @return Initial cluster centers
    */
-  public double[][] run(CFTree<?> tree, List<? extends AsClusterFeature> cf, int k) {
+  public double[][] run(CFTree<?> tree, List<? extends ClusterFeature> cfs, int k) {
     Random rnd = rf.getSingleThreadedRandom();
     double[][] means = new double[k][];
-    ClusterFeature first = firstVar ? sampleFirst(tree.getRoot().getCF(), cf, rnd) : cf.get(rnd.nextInt(cf.size())).getCF();
+    ClusterFeature first = firstUniform ? cfs.get(rnd.nextInt(cfs.size())).getCF() : sampleFirst(tree.getRoot().getCF(), cfs, rnd);
     means[0] = first.toArray();
-    double[] weights = new double[cf.size()];
-    double weightsum = initialWeights(first, cf, weights);
+    double[] weights = new double[cfs.size()];
+    double weightsum = initialWeights(first, cfs, weights);
     for(int m = 1; m < k; m++) {
       if(weightsum > Double.MAX_VALUE) {
         throw new IllegalStateException("Could not choose a reasonable mean - too many data points, too large distance sum?");
       }
       double r = rnd.nextDouble() * weightsum;
       int i = 0;
-      while(i < cf.size()) {
+      while(i < cfs.size()) {
         if((r -= weights[i]) <= 0) {
           break;
         }
         i++;
       }
-      if(i >= cf.size()) { // Rare case, but happens due to floating math
+      if(i >= cfs.size()) { // Rare case, but happens due to floating math
         weightsum -= r; // Decrease
         continue; // Retry
       }
-      ClusterFeature cfi = cf.get(i).getCF();
+      ClusterFeature cfi = cfs.get(i).getCF();
       means[m] = cfi.toArray();
       if(m < k) {
         weights[i] = 0.; // disable
-        weightsum = updateWeights(cfi, cf, weights);
+        weightsum = updateWeights(cfi, cfs, weights);
       }
     }
     return means;
+  }
+
+  /**
+   * Sample the first cluster center.
+   *
+   * @param root Root node of the tree
+   * @param cfs Cluster features to sample from
+   * @param rnd Random generator
+   * @return Selected cluster feature
+   */
+  private ClusterFeature sampleFirst(ClusterFeature root, List<? extends AsClusterFeature> cfs, Random rnd) {
+    double weightsum = 0;
+    double[] tmpWeight = new double[cfs.size()];
+    {
+      int i = 0;
+      for(AsClusterFeature cf : cfs) {
+        weightsum += tmpWeight[i++] = distance.squaredWeight(root, cf.getCF());
+      }
+    }
+    while(true) {
+      double r = rnd.nextDouble() * weightsum;
+      for(int i = 0; i < tmpWeight.length; i++) {
+        if((r -= tmpWeight[i]) <= 0) {
+          return cfs.get(i).getCF();
+        }
+      }
+      weightsum -= r; // Shouldn't happen. Decrease and retry
+    }
   }
 
   /**
@@ -123,7 +162,7 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
     double weightsum = 0.;
     int i = 0;
     for(AsClusterFeature cf : cfs) {
-      weightsum += weights[i++] = distance.squaredDistance(first, cf.getCF());
+      weightsum += weights[i++] = distance.squaredWeight(first, cf.getCF());
     }
     return weightsum;
   }
@@ -144,38 +183,10 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
       if(weight <= 0.) {
         continue; // Duplicate, or already chosen.
       }
-      double newweight = distance.squaredDistance(latest, cf.getCF());
+      double newweight = distance.squaredWeight(latest, cf.getCF());
       weightsum += newweight < weight ? (weights[i] = newweight) : weight;
     }
     return weightsum;
-  }
-
-  /**
-   * Sample the first cluster center.
-   *
-   * @param root Root node of the tree
-   * @param cfs Cluster features to sample from
-   * @param rnd Random generator
-   * @return Selected cluster feature
-   */
-  private ClusterFeature sampleFirst(ClusterFeature root, List<? extends AsClusterFeature> cfs, Random rnd) {
-    double weightsum = 0;
-    double[] tmpWeight = new double[cfs.size()];
-    {
-      int i = 0;
-      for(AsClusterFeature cf : cfs) {
-        weightsum += tmpWeight[i++] = distance.squaredDistance(root, cf.getCF());
-      }
-    }
-    while(true) {
-      double r = rnd.nextDouble() * weightsum;
-      for(int i = 0; i < tmpWeight.length; i++) {
-        if((r -= tmpWeight[i]) <= 0) {
-          return cfs.get(i).getCF();
-        }
-      }
-      weightsum -= r; // Shouldn't happen. Decrease and retry
-    }
   }
 
   /**
@@ -192,29 +203,29 @@ public class CFKMeansPlusPlus extends AbstractCFKMeansInitialization {
     /**
      * Choose the first center based on variance contribution.
      */
-    public static final OptionID FIRST_VARIANCE_ID = new OptionID("kmpp.first_var", "Chooose first dependent on variance.");
+    public static final OptionID FIRST_UNIFORM_ID = new OptionID("kmpp.first-uniform", "Choose the first center uniformly from the cluster features.");
 
     /**
      * Distance function to use for initial means
      */
-    CFIDistance dist = null;
+    CFInitWeight dist = null;
 
     /**
      * Choose the first center based on variance contribution.
      */
-    boolean firstVar = false;
+    boolean firstUniform = false;
 
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<CFIDistance>(KMPP_DISTANCE_ID, CFIDistance.class, EuclideanDistance.class)//
+      new ObjectParameter<CFInitWeight>(KMPP_DISTANCE_ID, CFInitWeight.class, SquaredEuclideanWeight.class)//
           .grab(config, x -> dist = x);
-      new Flag(FIRST_VARIANCE_ID).grab(config, x -> firstVar = x);
+      new Flag(FIRST_UNIFORM_ID).grab(config, x -> firstUniform = x);
     }
 
     @Override
-    public CFKMeansPlusPlus make() {
-      return new CFKMeansPlusPlus(rnd, dist, firstVar);
+    public CFKPlusPlusLeaves make() {
+      return new CFKPlusPlusLeaves(dist, firstUniform, rnd);
     }
   }
 }
