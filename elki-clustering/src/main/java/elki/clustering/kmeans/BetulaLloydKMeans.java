@@ -29,18 +29,17 @@ import elki.clustering.kmeans.initialization.betula.AbstractCFKMeansInitializati
 import elki.clustering.kmeans.initialization.betula.CFKPlusPlusLeaves;
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
-import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
@@ -94,6 +93,11 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
   boolean ignoreWeight = false;
 
   /**
+   * Number of distance caclulations
+   */
+  long diststat = 0;
+
+  /**
    * Constructor.
    *
    * @param k Number of clusters
@@ -121,9 +125,11 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
     ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
 
+    Duration modeltime = LOG.newDuration(getClass().getName() + ".modeltime").begin();
     int[] assignment = new int[cfs.size()], weights = new int[k];
     Arrays.fill(assignment, -1);
     double[][] means = kmeans(cfs, assignment, weights, tree);
+    LOG.statistics(modeltime.end());
     ModifiableDBIDs[] ids = new ModifiableDBIDs[k];
     for(int i = 0; i < k; i++) {
       ids[i] = DBIDUtil.newArray(weights[i]);
@@ -145,10 +151,10 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     else {
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         NumberVector fv = relation.get(iter);
-        double mindist = SquaredEuclideanDistance.STATIC.distance(fv, DoubleVector.wrap(means[0]));
+        double mindist = distance(fv, means[0]);
         int minIndex = 0;
         for(int i = 1; i < k; i++) {
-          double dist = SquaredEuclideanDistance.STATIC.distance(fv, DoubleVector.wrap(means[i]));
+          double dist = distance(fv, means[i]);
           if(dist < mindist) {
             minIndex = i;
             mindist = dist;
@@ -158,6 +164,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
         ids[minIndex].add(iter);
       }
     }
+    LOG.statistics(new LongStatistic(getClass().getName() + ".distance-computations", diststat));
     LOG.statistics(new DoubleStatistic(getClass().getName() + ".variance-sum", VMath.sum(varsum)));
     Clustering<KMeansModel> result = new Clustering<>();
     for(int i = 0; i < ids.length; i++) {
@@ -180,6 +187,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
   private double[][] kmeans(ArrayList<? extends ClusterFeature> cfs, int[] assignment, int[] weights, CFTree<?> tree) {
     double[][] means = initialization.chooseInitialMeans(tree, cfs, k);
     for(int i = 1; i <= maxiter || maxiter < 0; i++) {
+      long prevdiststat = diststat;
       means = i == 1 ? means : means(assignment, means, cfs, weights);
       if(i > 1 && LOG.isStatistics()) {
         // This function is only correct after updating the means:
@@ -189,6 +197,9 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       int changed = assignToNearestCluster(assignment, means, cfs, weights);
       if(LOG.isStatistics()) {
         LOG.statistics(new LongStatistic(getClass().getName() + "." + i + ".reassigned", changed));
+        if(diststat > prevdiststat) {
+          LOG.statistics(new LongStatistic(getClass().getName() + "." + i + ".distance-computations", diststat - prevdiststat));
+        }
       }
       if(changed == 0) {
         break;
@@ -255,10 +266,10 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       for(int j = 0; j < mean.length; j++) {
         mean[j] = cfsi.centroid(j);
       }
-      double mindist = SquaredEuclideanDistance.STATIC.distance(mean, means[0]);
+      double mindist = distance(mean, means[0]);
       int minIndex = 0;
       for(int j = 1; j < k; j++) {
-        double dist = SquaredEuclideanDistance.STATIC.distance(mean, means[j]);
+        double dist = distance(mean, means[j]);
         if(dist < mindist) {
           minIndex = j;
           mindist = dist;
@@ -297,6 +308,42 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       ss[assignment[i]] += s;
     }
     return ss;
+  }
+
+  /**
+   * Updates statistics and calculates distance between two Objects based on
+   * selected criteria.
+   * 
+   * @param x Point x
+   * @param y Point y
+   * @return distance
+   */
+  private double distance(NumberVector x, double[] y) {
+    ++diststat;
+    double v = 0;
+    for(int i = 0; i < y.length; i++) {
+      double d = x.doubleValue(i) - y[i];
+      v += d * d;
+    }
+    return v;
+  }
+
+  /**
+   * Updates statistics and calculates distance between two Objects based on
+   * selected criteria.
+   * 
+   * @param x Point x
+   * @param y Point y
+   * @return distance
+   */
+  private double distance(double[] x, double[] y) {
+    ++diststat;
+    double v = 0;
+    for(int i = 0; i < x.length; i++) {
+      double d = x[i] - y[i];
+      v += d * d;
+    }
+    return v;
   }
 
   @Override

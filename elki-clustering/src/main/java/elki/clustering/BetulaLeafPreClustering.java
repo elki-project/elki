@@ -42,6 +42,8 @@ import elki.database.relation.RelationUtil;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.CFTree.LeafIterator;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.logging.Logging;
+import elki.logging.statistics.DoubleStatistic;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -80,6 +82,11 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
    * CFTree factory.
    */
   CFTree.Factory<?> cffactory;
+
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(BetulaLeafPreClustering.class);
 
   /**
    * Store ids
@@ -141,6 +148,14 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
       }
       result.addToplevelCluster(new Cluster<>(ent.getValue(), new EMModel(center, diagonal(variance))));
     }
+    DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".varsum");
+    double varsum = 0.;
+    LeafIterator<?> iter = tree.leafIterator();
+    while(iter.valid()) {
+      varsum += iter.get().sumdev();
+      iter.advance();
+    }
+    LOG.statistics(varstat.setDouble(varsum));
     Metadata.of(result).setLongName("BETULA Leaf Nodes");
     return result;
   }

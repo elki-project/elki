@@ -34,6 +34,7 @@ import elki.index.tree.betula.features.ClusterFeature;
 import elki.index.tree.betula.features.VIIFeature;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
@@ -168,6 +169,16 @@ public class CFTree<L extends ClusterFeature> {
    * Number of tree rebuilds
    */
   int rebuildstat;
+
+  /**
+   * Number of distance calculations
+   */
+  long diststat = 0;
+
+  /**
+   * Number ob absorption calculations
+   */
+  long absstat = 0;
 
   /**
    * Stored leaf entry to dbid relation
@@ -331,7 +342,7 @@ public class CFTree<L extends ClusterFeature> {
           break;
         }
         // double dist = absorption.squaredCriterion(ci, children[j]);
-        double d = dist.squaredDistance(ci.getCF(), current.getChild(j).getCF());
+        double d = distance(ci.getCF(), current.getChild(j).getCF());
         if(d < bi) {
           bi = d;
           bestii = j;
@@ -341,7 +352,7 @@ public class CFTree<L extends ClusterFeature> {
           besti[j] = i;
         }
       }
-      double t = abs.squaredDistance(ci.getCF(), current.getChild(bestii).getCF());
+      double t = absorption(ci.getCF(), current.getChild(bestii).getCF());
       thresholds[offset++] = t;
       cfs.add((L) ci);
     }
@@ -360,13 +371,13 @@ public class CFTree<L extends ClusterFeature> {
     assert node.getChild(0) != null : "Unexpected empty node!";
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = dist.squaredDistance(nv, best.getCF());
+    double bestd = distance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(nv, cf.getCF());
+      double d2 = absorption(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -440,13 +451,13 @@ public class CFTree<L extends ClusterFeature> {
 
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = dist.squaredDistance(nv, best.getCF());
+    double bestd = distance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(nv, cf.getCF());
+      double d2 = distance(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -473,14 +484,14 @@ public class CFTree<L extends ClusterFeature> {
     for(int i = 0; i < capacity; i++) {
       ClusterFeature ci = node.getChild(i).getCF();
       for(int j = i + 1; j < capacity; j++) {
-        double d = dists[i][j] = dists[j][i] = dist.squaredDistance(ci, node.getChild(j).getCF());
+        double d = dists[i][j] = dists[j][i] = distance(ci, node.getChild(j).getCF());
         if(d > maxd) {
           maxd = d;
           m1 = i;
           m2 = j;
         }
       }
-      double d = dists[i][capacity] = dists[capacity][i] = dist.squaredDistance(ci, newchild.getCF());
+      double d = dists[i][capacity] = dists[capacity][i] = distance(ci, newchild.getCF());
       if(d > maxd) {
         maxd = d;
         m1 = i;
@@ -530,13 +541,13 @@ public class CFTree<L extends ClusterFeature> {
 
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = dist.squaredDistance(best.getCF(), nleaf.getCF());
+    double bestd = distance(best.getCF(), nleaf.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = dist.squaredDistance(cf.getCF(), nleaf.getCF());
+      double d2 = distance(cf.getCF(), nleaf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -684,6 +695,62 @@ public class CFTree<L extends ClusterFeature> {
   }
 
   /**
+   * Updates statistics and calculates distance between two Cluster Features
+   * based on
+   * selected criteria.
+   * 
+   * @param cf1 First Cluster Feature
+   * @param cf2 Second Cluster Feature
+   * @return Distance
+   */
+  private double distance(ClusterFeature cf1, ClusterFeature cf2) {
+    ++diststat;
+    return dist.squaredDistance(cf1, cf2);
+
+  }
+
+  /**
+   * * Updates statistics and calculates distance between a Number Vector and a
+   * Cluster Feature based on selected criteria.
+   * 
+   * @param nv Number Vector
+   * @param cf Cluster Feature
+   * @return Distance
+   */
+  private double distance(NumberVector nv, ClusterFeature cf) {
+    ++diststat;
+    return dist.squaredDistance(nv, cf);
+
+  }
+
+  /**
+   * Updates statistics and calculates distance between two Cluster Features
+   * based on
+   * selected criteria.
+   * 
+   * @param cf1 First Cluster Feature
+   * @param cf2 Second Cluster Feature
+   * @return Distance
+   */
+  private double absorption(ClusterFeature cf1, ClusterFeature cf2) {
+    ++absstat;
+    return abs.squaredDistance(cf1.getCF(), cf2.getCF());
+  }
+
+  /**
+   * * Updates statistics and calculates distance between a Number Vector and a
+   * Cluster Feature based on selected criteria.
+   * 
+   * @param nv Number Vector
+   * @param cf Cluster Feature
+   * @return Distance
+   */
+  private double absorption(NumberVector nv, ClusterFeature cf) {
+    ++absstat;
+    return abs.squaredDistance(nv, cf);
+  }
+
+  /**
    * Get the number of leaves in the tree.
    * 
    * @return number of leaves
@@ -802,6 +869,9 @@ public class CFTree<L extends ClusterFeature> {
       LOG.statistics(buildtime.end());
       LOG.statistics(new LongStatistic(prefix + ".rebuilds", tree.rebuildstat));
       LOG.statistics(new LongStatistic(prefix + ".leaves", tree.leaves));
+      LOG.statistics(new LongStatistic(prefix + ".distance-calculations", tree.diststat));
+      LOG.statistics(new LongStatistic(prefix + ".absorption-calculations", tree.absstat));
+      LOG.statistics(new DoubleStatistic(prefix + ".threshold", Math.sqrt(tree.thresholdsq)));
       LOG.ensureCompleted(prog);
       return tree;
     }
