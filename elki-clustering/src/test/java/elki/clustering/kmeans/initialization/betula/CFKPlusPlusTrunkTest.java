@@ -49,7 +49,7 @@ public class CFKPlusPlusTrunkTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.8711233);
-    assertClusterSizes(clustering, new int[] { 101, 128, 200, 209 });
+    assertFMeasure(db, clustering, 0.87854);
+    assertClusterSizes(clustering, new int[] { 115, 116, 200, 207 });
   }
 }

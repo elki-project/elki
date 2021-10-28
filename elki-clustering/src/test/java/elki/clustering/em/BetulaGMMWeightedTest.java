@@ -60,8 +60,8 @@ public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
         .with(BetulaClusterModelFactory.INIT_ID, CFKPlusPlusLeaves.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.865976561);
-    assertClusterSizes(clustering, new int[] { 100, 117, 200, 221 });
+    assertFMeasure(db, clustering, 0.8489938);
+    assertClusterSizes(clustering, new int[] { 97, 103, 214, 224 });
   }
 
   @Test
@@ -94,7 +94,7 @@ public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
         .with(BetulaClusterModelFactory.INIT_ID, CFKPlusPlusLeaves.class)//
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.84929430390);
-    assertClusterSizes(clustering, new int[] { 99, 101, 211, 227 });
+    assertFMeasure(db, clustering, 0.885518);
+    assertClusterSizes(clustering, new int[] { 117, 119, 200, 202 });
   }
 }

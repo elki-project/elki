@@ -47,8 +47,8 @@ public class BetulaLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86656);
-    assertClusterSizes(clustering, new int[] { 85, 127, 203, 223 });
+    assertFMeasure(db, clustering, 0.849381);
+    assertClusterSizes(clustering, new int[] { 95, 105, 212, 226 });
   }
 
   @Test
@@ -62,8 +62,8 @@ public class BetulaLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86826);
-    assertClusterSizes(clustering, new int[] { 87, 127, 203, 221 });
+    assertFMeasure(db, clustering, 0.85034);
+    assertClusterSizes(clustering, new int[] { 87, 113, 217, 221 });
   }
 
   @Test
@@ -77,8 +77,8 @@ public class BetulaLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86656);
-    assertClusterSizes(clustering, new int[] { 85, 127, 203, 223 });
+    assertFMeasure(db, clustering, 0.849381);
+    assertClusterSizes(clustering, new int[] { 95, 105, 212, 226 });
   }
 
   @Test
@@ -93,7 +93,7 @@ public class BetulaLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86826);
-    assertClusterSizes(clustering, new int[] { 87, 127, 203, 221 });
+    assertFMeasure(db, clustering, 0.85034);
+    assertClusterSizes(clustering, new int[] { 87, 113, 217, 221 });
   }
 }

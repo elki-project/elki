@@ -49,7 +49,7 @@ public class CFKPlusPlusLeavesTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.866562);
-    assertClusterSizes(clustering, new int[] { 85, 127, 203, 223 });
+    assertFMeasure(db, clustering, 0.84938);
+    assertClusterSizes(clustering, new int[] { 95, 105, 212, 226 });
   }
 }
