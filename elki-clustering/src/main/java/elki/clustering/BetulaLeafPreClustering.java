@@ -79,14 +79,14 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
     booktitle = "Information Systems (under review)")
 public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
-   * CFTree factory.
-   */
-  CFTree.Factory<?> cffactory;
-
-  /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(BetulaLeafPreClustering.class);
+
+  /**
+   * CFTree factory.
+   */
+  CFTree.Factory<?> cffactory;
 
   /**
    * Store ids
@@ -138,10 +138,7 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
     Clustering<MeanModel> result = new Clustering<>();
     for(Map.Entry<ClusterFeature, DBIDs> ent : idmap.entrySet()) {
       ClusterFeature leaf = ent.getKey();
-      double[] center = new double[dim];
-      for(int i = 0; i < dim; i++) {
-        center[i] = leaf.centroid(i);
-      }
+      double[] center = leaf.toArray();
       double[] variance = new double[dim];
       for(int i = 0; i < dim; i++) {
         variance[i] = leaf.variance(i);
@@ -150,10 +147,8 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
     }
     DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".varsum");
     double varsum = 0.;
-    LeafIterator<?> iter = tree.leafIterator();
-    while(iter.valid()) {
+    for(LeafIterator<?> iter = tree.leafIterator(); iter.valid(); iter.advance()) {
       varsum += iter.get().sumdev();
-      iter.advance();
     }
     LOG.statistics(varstat.setDouble(varsum));
     Metadata.of(result).setLongName("BETULA Leaf Nodes");

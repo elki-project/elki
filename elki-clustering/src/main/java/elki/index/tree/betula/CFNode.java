@@ -91,12 +91,7 @@ public class CFNode<L extends ClusterFeature> implements AsClusterFeature {
    * @return CF
    */
   public AsClusterFeature getChild(int i) {
-    if(i < children.length) {
-    return (AsClusterFeature) children[i];
-  }
-  else {
-    return null;
-  }
+    return i < children.length ? (AsClusterFeature) children[i] : null;
   }
 
   /**

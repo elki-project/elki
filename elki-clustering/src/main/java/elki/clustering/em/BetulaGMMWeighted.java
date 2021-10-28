@@ -45,14 +45,14 @@ import net.jafama.FastMath;
  * <p>
  * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
- * Information Systems (under review)
+ * Information Systems
  * 
  * @author Andreas Lang
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems (under review)")
+    booktitle = "Information Systems")
 public class BetulaGMMWeighted extends BetulaGMM {
   /**
    * Constructor.

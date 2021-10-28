@@ -57,7 +57,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
- * Information Systems (under review)
+ * Information Systems
  * 
  * @author Erich Schubert
  *
@@ -65,7 +65,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems (under review)")
+    booktitle = "Information Systems")
 public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel> {
   /**
    * Class logger.
@@ -313,6 +313,9 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
   /**
    * Updates statistics and calculates distance between two Objects based on
    * selected criteria.
+   * <p>
+   * Note: specializing this rather than calling SquaredEuclideanDistance was
+   * much faster, as we can avoid wrapping the array.
    * 
    * @param x Point x
    * @param y Point y
@@ -322,7 +325,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     ++diststat;
     double v = 0;
     for(int i = 0; i < y.length; i++) {
-      double d = x.doubleValue(i) - y[i];
+      final double d = x.doubleValue(i) - y[i];
       v += d * d;
     }
     return v;
@@ -340,7 +343,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     ++diststat;
     double v = 0;
     for(int i = 0; i < x.length; i++) {
-      double d = x[i] - y[i];
+      final double d = x[i] - y[i];
       v += d * d;
     }
     return v;

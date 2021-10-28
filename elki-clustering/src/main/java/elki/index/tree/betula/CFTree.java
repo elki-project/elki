@@ -341,8 +341,8 @@ public class CFTree<L extends ClusterFeature> {
         if(current.getChild(j) == null) {
           break;
         }
-        // double dist = absorption.squaredCriterion(ci, children[j]);
-        double d = distance(ci.getCF(), current.getChild(j).getCF());
+        // use distance for selecting the candidate, not absorption!
+        final double d = sqdistance(ci.getCF(), current.getChild(j).getCF());
         if(d < bi) {
           bi = d;
           bestii = j;
@@ -352,8 +352,8 @@ public class CFTree<L extends ClusterFeature> {
           besti[j] = i;
         }
       }
-      double t = absorption(ci.getCF(), current.getChild(bestii).getCF());
-      thresholds[offset++] = t;
+      // use absorption, not distance, for thresholds
+      thresholds[offset++] = sqabsorption(ci.getCF(), current.getChild(bestii).getCF());
       cfs.add((L) ci);
     }
   }
@@ -371,13 +371,13 @@ public class CFTree<L extends ClusterFeature> {
     assert node.getChild(0) != null : "Unexpected empty node!";
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = distance(nv, best.getCF());
+    double bestd = sqdistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = absorption(nv, cf.getCF());
+      final double d2 = sqabsorption(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -451,13 +451,13 @@ public class CFTree<L extends ClusterFeature> {
 
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = distance(nv, best.getCF());
+    double bestd = sqdistance(nv, best.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = distance(nv, cf.getCF());
+      double d2 = sqdistance(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -484,14 +484,14 @@ public class CFTree<L extends ClusterFeature> {
     for(int i = 0; i < capacity; i++) {
       ClusterFeature ci = node.getChild(i).getCF();
       for(int j = i + 1; j < capacity; j++) {
-        double d = dists[i][j] = dists[j][i] = distance(ci, node.getChild(j).getCF());
+        double d = dists[i][j] = dists[j][i] = sqdistance(ci, node.getChild(j).getCF());
         if(d > maxd) {
           maxd = d;
           m1 = i;
           m2 = j;
         }
       }
-      double d = dists[i][capacity] = dists[capacity][i] = distance(ci, newchild.getCF());
+      double d = dists[i][capacity] = dists[capacity][i] = sqdistance(ci, newchild.getCF());
       if(d > maxd) {
         maxd = d;
         m1 = i;
@@ -541,13 +541,13 @@ public class CFTree<L extends ClusterFeature> {
 
     // Find the best child:
     AsClusterFeature best = node.getChild(0);
-    double bestd = distance(best.getCF(), nleaf.getCF());
+    double bestd = sqdistance(best.getCF(), nleaf.getCF());
     for(int i = 1; i < capacity; i++) {
       AsClusterFeature cf = node.getChild(i);
       if(cf == null) {
         break;
       }
-      double d2 = distance(cf.getCF(), nleaf.getCF());
+      double d2 = sqdistance(cf.getCF(), nleaf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -696,28 +696,27 @@ public class CFTree<L extends ClusterFeature> {
 
   /**
    * Updates statistics and calculates distance between two Cluster Features
-   * based on
-   * selected criteria.
+   * based on selected criteria.
    * 
    * @param cf1 First Cluster Feature
    * @param cf2 Second Cluster Feature
    * @return Distance
    */
-  private double distance(ClusterFeature cf1, ClusterFeature cf2) {
+  private double sqdistance(ClusterFeature cf1, ClusterFeature cf2) {
     ++diststat;
     return dist.squaredDistance(cf1, cf2);
 
   }
 
   /**
-   * * Updates statistics and calculates distance between a Number Vector and a
+   * Updates statistics and calculates distance between a Number Vector and a
    * Cluster Feature based on selected criteria.
    * 
    * @param nv Number Vector
    * @param cf Cluster Feature
    * @return Distance
    */
-  private double distance(NumberVector nv, ClusterFeature cf) {
+  private double sqdistance(NumberVector nv, ClusterFeature cf) {
     ++diststat;
     return dist.squaredDistance(nv, cf);
 
@@ -725,27 +724,26 @@ public class CFTree<L extends ClusterFeature> {
 
   /**
    * Updates statistics and calculates distance between two Cluster Features
-   * based on
-   * selected criteria.
+   * based on selected criteria.
    * 
    * @param cf1 First Cluster Feature
    * @param cf2 Second Cluster Feature
    * @return Distance
    */
-  private double absorption(ClusterFeature cf1, ClusterFeature cf2) {
+  private double sqabsorption(ClusterFeature cf1, ClusterFeature cf2) {
     ++absstat;
     return abs.squaredDistance(cf1.getCF(), cf2.getCF());
   }
 
   /**
-   * * Updates statistics and calculates distance between a Number Vector and a
+   * Updates statistics and calculates distance between a Number Vector and a
    * Cluster Feature based on selected criteria.
    * 
    * @param nv Number Vector
    * @param cf Cluster Feature
    * @return Distance
    */
-  private double absorption(NumberVector nv, ClusterFeature cf) {
+  private double sqabsorption(NumberVector nv, ClusterFeature cf) {
     ++absstat;
     return abs.squaredDistance(nv, cf);
   }

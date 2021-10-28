@@ -34,7 +34,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
- * Information Systems (under review)
+ * Information Systems
  *
  * @author Andreas Lang
  * @author Erich Schubert
@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.Parameterizer;
 @Alias({ "D4" })
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems (under review)")
+    booktitle = "Information Systems")
 public class VarianceIncreaseDistance implements CFDistance {
   /**
    * Static instance.
