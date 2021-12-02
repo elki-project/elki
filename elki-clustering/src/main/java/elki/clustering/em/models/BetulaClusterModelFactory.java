@@ -24,10 +24,17 @@ import java.util.List;
 
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 
 /**
  * Factory for initializing the EM models.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  *
  * @author Andreas Lang
  * @author Erich Schubert
@@ -36,6 +43,11 @@ import elki.utilities.optionhandling.OptionID;
  *
  * @param <M> Cluster model type
  */
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public interface BetulaClusterModelFactory<M extends BetulaClusterModel> {
   /**
    * Build the initial models.

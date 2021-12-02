@@ -33,6 +33,10 @@ import elki.utilities.optionhandling.Parameterizer;
  * Reference:
  * <p>
  * Andreas Lang and Erich Schubert<br>
+ * BETULA: Numerically Stable CF-Trees for BIRCH Clustering<br>
+ * Int. Conf on Similarity Search and Applications 2020
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
  * Information Systems
  *
@@ -41,8 +45,15 @@ import elki.utilities.optionhandling.Parameterizer;
  */
 @Alias({ "D1" })
 @Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Numerically Stable CF-Trees for BIRCH Clustering", //
+    booktitle = "Int. Conf on Similarity Search and Applications", //
+    url = "https://doi.org/10.1007/978-3-030-60936-8_22", //
+    bibkey = "DBLP:conf/sisap/LangS20")
+@Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems")
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public class CentroidManhattanDistance implements CFDistance {
   /**
    * Static instance.

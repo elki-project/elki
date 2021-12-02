@@ -59,15 +59,13 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
  * as clusters. As this usually are smaller parts than actual clusters, we call
  * this a preclustering, as it is primarily useful as a data simplification
  * prior to, e.g., clustering. For actual clustering methods based on the
- * leaves,
- * please use {@link BetulaGMM} and {@link BetulaLloydKMeans}.
+ * leaves, please use {@link BetulaGMM} and {@link BetulaLloydKMeans}.
  * <p>
  * References:
  * <p>
- * <p>
  * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
- * Information Systems (under review)
+ * Information Systems
  *
  * @author Erich Schubert
  *
@@ -76,7 +74,9 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems (under review)")
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.

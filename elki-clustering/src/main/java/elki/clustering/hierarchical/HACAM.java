@@ -66,6 +66,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 @Reference(authors = "Erich Schubert", //
     title = "HACAM: Hierarchical Agglomerative Clustering Around Medoids - and its Limitations", //
     booktitle = "Proc. Conf. \"Lernen, Wissen, Daten, Analysen\", LWDA", //
+    url = "http://ceur-ws.org/Vol-2993/paper-19.pdf", //
     bibkey = "DBLP:conf/lwa/Schubert21")
 public class HACAM<O> implements HierarchicalClusteringAlgorithm {
   /**

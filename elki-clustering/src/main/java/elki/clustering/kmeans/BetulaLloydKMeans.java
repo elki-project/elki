@@ -50,8 +50,8 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * BIRCH-based clustering algorithm that simply treats the leafs of the CFTree
- * as clusters.
+ * BIRCH/BETULA-based clustering algorithm that simply treats the leafs of the
+ * CFTree as clusters.
  * <p>
  * References:
  * <p>
@@ -65,7 +65,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems")
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel> {
   /**
    * Class logger.

@@ -52,7 +52,9 @@ import net.jafama.FastMath;
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
-    booktitle = "Information Systems")
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public class BetulaGMMWeighted extends BetulaGMM {
   /**
    * Constructor.

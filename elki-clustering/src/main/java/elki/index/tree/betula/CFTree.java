@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 /**
- * Partial implementation of the CFTree as used by BIRCH.
+ * Partial implementation of the CFTree as used by BIRCH and BETULA.
  * <p>
  * Important differences:
  * <ol>
@@ -79,6 +79,14 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
  * T. Zhang, R. Ramakrishnan, M. Livny<br>
  * BIRCH: A New Data Clustering Algorithm and Its Applications<br>
  * Data Min. Knowl. Discovery
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Numerically Stable CF-Trees for BIRCH Clustering<br>
+ * Int. Conf on Similarity Search and Applications 2020
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  *
  * @author Erich Schubert
  * @author Andreas Lang
@@ -96,6 +104,16 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
     booktitle = "Data Min. Knowl. Discovery", //
     url = "https://doi.org/10.1023/A:1009783824328", //
     bibkey = "DBLP:journals/datamine/ZhangRL97")
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Numerically Stable CF-Trees for BIRCH Clustering", //
+    booktitle = "Int. Conf on Similarity Search and Applications", //
+    url = "https://doi.org/10.1007/978-3-030-60936-8_22", //
+    bibkey = "DBLP:conf/sisap/LangS20")
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public class CFTree<L extends ClusterFeature> {
   /**
    * Class logger.

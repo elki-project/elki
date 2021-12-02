@@ -23,12 +23,24 @@ package elki.clustering.em.models;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.utilities.documentation.Reference;
 
 /**
  * Models usable in Betula EM clustering.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
  * 
  * @author Erich Schubert
  */
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS21")
 public interface BetulaClusterModel extends EMClusterModel<NumberVector, EMModel> {
   /**
    * Estimate the log likelihood of a clustering feature.
