@@ -24,14 +24,11 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.LloydKMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.datasource.AbstractDatabaseConnection;
 import elki.datasource.filter.normalization.instancewise.LengthNormalization;
-import elki.distance.CosineDistance;
-import elki.distance.SqrtCosineDistance;
 import elki.utilities.ELKIBuilder;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -44,33 +41,10 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  */
 public class SphericalHamerlyKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testSphericalHamerlyKMeans() {
+  public void testSphericalHamerlyKMeans2() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000, new ListParameterization() //
         .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, LengthNormalization.class));
     Clustering<?> result = new ELKIBuilder<SphericalHamerlyKMeans<DoubleVector>>(SphericalHamerlyKMeans.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8637358);
-    assertClusterSizes(result, new int[] { 149, 198, 200, 205, 248 });
-    // Results should be identical to:
-    result = new ELKIBuilder<SphericalKMeans<DoubleVector>>(SphericalKMeans.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8637358);
-    assertClusterSizes(result, new int[] { 149, 198, 200, 205, 248 });
-    // Results should be similar to:
-    result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
-        .with(KMeans.DISTANCE_FUNCTION_ID, SqrtCosineDistance.class) //
-        .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
-        .build().autorun(db);
-    assertFMeasure(db, result, 0.8637358);
-    assertClusterSizes(result, new int[] { 149, 198, 200, 205, 248 });
-    // Results should be similar to:
-    result = new ELKIBuilder<LloydKMeans<DoubleVector>>(LloydKMeans.class) //
-        .with(KMeans.DISTANCE_FUNCTION_ID, CosineDistance.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build().autorun(db);

@@ -31,25 +31,43 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
+import elki.utilities.Priority;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * A spherical k-Means algorithm based on Hamerly's fast k-means by exploiting
- * the triangle inequality.
+ * the triangle inequality in the corresponding Euclidean space.
+ * <p>
+ * Please prefer {@link SphericalHamerlyKMeans}, which uses a tighter bound
+ * based on Cosines instead.
  * <p>
  * FIXME: currently requires the vectors to be L2 normalized beforehand
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Andreas Lang, Gloria Feher<br>
+ * Accelerating Spherical k-Means<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
+ * @author Alexander Voß
  * @author Erich Schubert
  *
  * @navassoc - - - KMeansModel
  *
  * @param <V> vector datatype
  */
-public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends SphericalKMeans<V> {
+@Priority(Priority.SUPPLEMENTARY)
+@Reference(authors = "Erich Schubert, Andreas Lang, Gloria Feher", //
+    title = "Accelerating Spherical k-Means", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_17", //
+    bibkey = "DBLP:conf/sisap/SchubertLF21")
+public class EuclideanSphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMeans<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(SphericalSimplifiedHamerlyKMeans3.class);
+  private static final Logging LOG = Logging.getLogger(EuclideanSphericalHamerlyKMeans.class);
 
   /**
    * Flag whether to compute the final variance statistic.
@@ -64,7 +82,7 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public SphericalSimplifiedHamerlyKMeans3(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+  public EuclideanSphericalHamerlyKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(k, maxiter, initializer);
     this.varstat = varstat;
   }
@@ -78,7 +96,8 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
 
   /**
    * Inner instance, storing state for a single data set.
-   *
+   * 
+   * @author Alexander Voß
    * @author Erich Schubert
    */
   protected static class Instance extends SphericalKMeans.Instance {
@@ -93,19 +112,19 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
     double[][] newmeans;
 
     /**
-     * Similarity lower bound.
+     * Upper bounds
      */
-    WritableDoubleDataStore lsim;
+    WritableDoubleDataStore upper;
 
     /**
-     * Similarity upper bound.
+     * Lower bounds
      */
-    WritableDoubleDataStore usim;
+    WritableDoubleDataStore lower;
 
     /**
-     * Cluster self-similarity.
+     * Separation of means / distance moved.
      */
-    double[] csim;
+    double[] sep;
 
     /**
      * Constructor.
@@ -115,12 +134,12 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
      */
     public Instance(Relation<? extends NumberVector> relation, double[][] means) {
       super(relation, means);
-      lsim = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
-      usim = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 2.);
+      upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
+      lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       final int dim = RelationUtil.maxDimensionality(relation);
       sums = new double[k][dim];
       newmeans = new double[k][dim];
-      csim = new double[k];
+      sep = new double[k];
     }
 
     @Override
@@ -129,8 +148,8 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
         return initialAssignToNearestCluster();
       }
       meansFromSums(newmeans, sums, means);
-      movedSimilarity(means, newmeans, csim);
-      updateBounds(csim);
+      movedDistance(means, newmeans, sep);
+      updateBounds(sep);
       copyMeans(newmeans, means);
       return assignToNearestCluster();
     }
@@ -145,9 +164,16 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to the second closest center
-        double max1 = similarity(fv, means[0]), max2 = -1;
+        double max1 = similarity(fv, means[0]);
+        double max2 = k > 1 ? similarity(fv, means[1]) : max1;
         int maxIndex = 0;
-        for(int j = 1; j < k; j++) {
+        if(max2 > max1) {
+          double tmp = max1;
+          max1 = max2;
+          max2 = tmp;
+          maxIndex = 1;
+        }
+        for(int j = 2; j < k; j++) {
           double sim = similarity(fv, means[j]);
           if(sim > max1) {
             maxIndex = j;
@@ -162,8 +188,8 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
         clusters.get(maxIndex).add(it);
         assignment.putInt(it, maxIndex);
         plusEquals(sums[maxIndex], fv);
-        lsim.putDouble(it, max1);
-        usim.putDouble(it, max2);
+        upper.putDouble(it, Math.sqrt(2 - 2 * max1));
+        lower.putDouble(it, Math.sqrt(2 - 2 * max2));
       }
       return relation.size();
     }
@@ -173,29 +199,31 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
-        double ls = lsim.doubleValue(it);
-        final double us = usim.doubleValue(it);
-        if(ls >= us) {
+        // Compute the current bound:
+        final double l = lower.doubleValue(it);
+        double u = upper.doubleValue(it);
+        if(u <= l) {
           continue;
         }
-        // Update the lower similarity bound
+        // Update the upper bound
         NumberVector fv = relation.get(it);
-        lsim.putDouble(it, ls = similarity(fv, means[orig]));
-        if(ls >= us) {
+        final double curSim = similarity(fv, means[orig]);
+        upper.putDouble(it, u = Math.sqrt(2 - 2 * curSim));
+        if(u <= l) {
           continue;
         }
         // Find closest center, and distance to the second closest center
-        double max2 = Double.NEGATIVE_INFINITY;
+        double max1 = curSim, max2 = Double.NEGATIVE_INFINITY;
         int cur = orig;
         for(int i = 0; i < k; i++) {
           if(i == orig) {
             continue;
           }
           double sim = similarity(fv, means[i]);
-          if(sim > ls) {
+          if(sim > max1) {
             cur = i;
-            max2 = ls;
-            ls = sim;
+            max2 = max1;
+            max1 = sim;
           }
           else if(sim > max2) {
             max2 = sim;
@@ -208,9 +236,9 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
           assignment.putInt(it, cur);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          lsim.putDouble(it, ls); // Remember bound.
+          upper.putDouble(it, max1 == curSim ? u : Math.sqrt(2 - 2 * max1));
         }
-        usim.putDouble(it, max2); // Remember bound.
+        lower.putDouble(it, max2 == curSim ? u : Math.sqrt(2 - 2 * max2));
       }
       return changed;
     }
@@ -218,53 +246,27 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
     /**
      * Update the bounds for k-means.
      *
-     * @param msim Similarity movement of centers
+     * @param move Movement of centers
      */
-    protected void updateBounds(double[] msim) {
-      // Find the minimum and second smallest similarity.
-      int least = 0; // , most = 0;
-      double delta = msim[0], delta2 = 1;
-      // double tau = delta, tau2 = -1;
-      for(int i = 1; i < msim.length; i++) {
-        final double m = msim[i];
-        if(m < delta) {
+    protected void updateBounds(double[] move) {
+      // Find the maximum and second largest movement.
+      int most = 0;
+      double delta = move[0], delta2 = 0;
+      for(int i = 1; i < move.length; i++) {
+        final double m = move[i];
+        if(m > delta) {
           delta2 = delta;
           delta = m;
-          least = i;
-        }
-        else if(m < delta2) {
-          delta2 = m;
-        }
-        /*if(m > tau) {
-          tau2 = tau;
-          tau = m;
           most = i;
         }
-        else if(m > tau2) {
-          tau2 = m;
-        }*/
+        else if(m > delta2) {
+          delta2 = m;
+        }
       }
-      delta = 1 - delta * delta;
-      delta2 = 1 - delta2 * delta2;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        final int ai = assignment.intValue(it);
-        final double v2 = msim[ai];
-        if(v2 < 1) {
-          final double v1 = Math.min(1, lsim.doubleValue(it));
-          // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
-          // should be equivalent: v1*v2 - Math.sqrt((1 - v1*v1) * (1 - v2*v2))
-          // less tight but cheaper: v1 * v2 + vmin * vmin - 1
-          lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
-        }
-        final double w2 = least == ai ? delta2 : delta;
-        if(w2 > 0) {
-          double w1 = Math.min(1, usim.doubleValue(it));
-          // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
-          // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
-          // less tight but cheaper: (w1 * w2 - wmin * wmin + 1)
-          // double w2p = most == ai ? tau2 : tau;
-          usim.putDouble(it, w1 + Math.sqrt((1 - w1 * w1) * w2));
-        }
+        final int a = assignment.intValue(it);
+        upper.increment(it, move[a]);
+        lower.increment(it, a == most ? -delta2 : -delta);
       }
     }
 
@@ -282,7 +284,7 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
   /**
    * Parameterization class.
    *
-   * @author Erich Schubert
+   * @author Alexander Voß
    */
   public static class Par<V extends NumberVector> extends SphericalKMeans.Par<V> {
     @Override
@@ -292,8 +294,8 @@ public class SphericalSimplifiedHamerlyKMeans3<V extends NumberVector> extends S
     }
 
     @Override
-    public SphericalSimplifiedHamerlyKMeans3<V> make() {
-      return new SphericalSimplifiedHamerlyKMeans3<>(k, maxiter, initializer, varstat);
+    public EuclideanSphericalHamerlyKMeans<V> make() {
+      return new EuclideanSphericalHamerlyKMeans<>(k, maxiter, initializer, varstat);
     }
   }
 }

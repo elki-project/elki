@@ -39,12 +39,12 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  *
  * @author Erich Schubert
  */
-public class SphericalElkanKMeans2Test extends AbstractClusterAlgorithmTest {
+public class EuclideanSphericalSimplifiedElkanKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testSphericalElkanKMeans2() {
+  public void testSphericalSimplifiedElkanKMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000, new ListParameterization() //
         .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, LengthNormalization.class));
-    Clustering<?> result = new ELKIBuilder<SphericalElkanKMeans2<DoubleVector>>(SphericalElkanKMeans2.class) //
+    Clustering<?> result = new ELKIBuilder<EuclideanSphericalSimplifiedElkanKMeans<DoubleVector>>(EuclideanSphericalSimplifiedElkanKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
         .build().autorun(db);

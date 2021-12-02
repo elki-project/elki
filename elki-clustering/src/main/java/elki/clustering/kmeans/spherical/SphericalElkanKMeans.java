@@ -20,6 +20,8 @@
  */
 package elki.clustering.kmeans.spherical;
 
+import java.util.Arrays;
+
 import elki.clustering.kmeans.HamerlyKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
@@ -28,6 +30,7 @@ import elki.data.model.KMeansModel;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
+import elki.utilities.documentation.Reference;
 
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
@@ -37,6 +40,17 @@ import elki.logging.Logging;
  * See {@link HamerlyKMeans} for a close variant that only uses O(n*2)
  * additional memory for bounds.
  * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Andreas Lang, Gloria Feher<br>
+ * Accelerating Spherical k-Means<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
+ * <p>
+ * The underlying triangle inequality used for pruning is introduced in:
+ * <p>
+ * Erich Schubert<br>
+ * A Triangle Inequality for Cosine Similarity<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
  * @author Erich Schubert
  *
@@ -44,6 +58,16 @@ import elki.logging.Logging;
  *
  * @param <V> vector datatype
  */
+@Reference(authors = "Erich Schubert, Andreas Lang, Gloria Feher", //
+    title = "Accelerating Spherical k-Means", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_17", //
+    bibkey = "DBLP:conf/sisap/SchubertLF21")
+@Reference(authors = "Erich Schubert", //
+    title = "A Triangle Inequality for Cosine Similarity", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_3", //
+    bibkey = "DBLP:conf/sisap/Schubert21")
 public class SphericalElkanKMeans<V extends NumberVector> extends SphericalSimplifiedElkanKMeans<V> {
   /**
    * The logger for this class.
@@ -76,9 +100,9 @@ public class SphericalElkanKMeans<V extends NumberVector> extends SphericalSimpl
    */
   protected static class Instance extends SphericalSimplifiedElkanKMeans.Instance {
     /**
-     * Cluster center distances
+     * Cluster center similarities
      */
-    double[][] cdist = new double[k][k];
+    double[][] ccsim = new double[k][k];
 
     /**
      * Constructor.
@@ -88,73 +112,104 @@ public class SphericalElkanKMeans<V extends NumberVector> extends SphericalSimpl
      */
     public Instance(Relation<? extends NumberVector> relation, double[][] means) {
       super(relation, means);
-      cdist = new double[k][k];
+      ccsim = new double[k][k];
     }
 
     @Override
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
-      initialSeperation(cdist);
+      initialSeparation(ccsim);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
-        double[] l = lower.get(it);
+        double[] us = usim.get(it);
         // Check all (other) means:
-        double best = l[0] = sqrtdistance(fv, means[0]);
-        int minIndex = 0;
+        double best = us[0] = similarity(fv, means[0]);
+        int maxIndex = 0;
         for(int j = 1; j < k; j++) {
-          if(best > cdist[minIndex][j]) {
-            double dist = l[j] = sqrtdistance(fv, means[j]);
-            if(dist < best) {
-              minIndex = j;
-              best = dist;
+          if(best < ccsim[maxIndex][j]) {
+            double sim = us[j] = similarity(fv, means[j]);
+            if(sim > best) {
+              maxIndex = j;
+              best = sim;
             }
           }
+          else {
+            us[j] = 2.; // Use a bound below - we don't know minIndex yet.
+          }
         }
+        // We may have skipped some (not the first) distance computations above
+        // In these cases, we initialize with an upper bound based on ccsim
         for(int j = 1; j < k; j++) {
-          if(l[j] == 0. && j != minIndex) {
-            l[j] = 2 * cdist[minIndex][j] - best;
+          if(us[j] == 2.) {
+            // note: cc=sqrt((sim+1)/2), hence sim=cc^2*2-1
+            double cc = ccsim[maxIndex][j], simcc = cc * cc * 2 - 1;
+            us[j] = best * simcc + Math.sqrt((1 - best * best) * (1 - simcc * simcc));
           }
         }
         // Assign to nearest cluster.
-        clusters.get(minIndex).add(it);
-        assignment.putInt(it, minIndex);
-        plusEquals(sums[minIndex], fv);
-        upper.putDouble(it, best);
+        clusters.get(maxIndex).add(it);
+        assignment.putInt(it, maxIndex);
+        plusEquals(sums[maxIndex], fv);
+        lsim.putDouble(it, best);
       }
       return relation.size();
     }
 
+    /**
+     * Recompute the separation of cluster means.
+     * <p>
+     * Used by Elkan's variant and Exponion.
+     *
+     * @param csim Output array of similarity
+     * @param ccsim Output square root of Center-to-Center similarities
+     */
+    protected void recomputeSeperation(double[] csim, double[][] ccsim) {
+      final int k = means.length;
+      assert csim.length == k;
+      Arrays.fill(csim, 0.);
+      for(int i = 1; i < k; i++) {
+        double[] mi = means[i];
+        for(int j = 0; j < i; j++) {
+          double s = similarity(mi, means[j]);
+          double sqrtsim = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
+          ccsim[i][j] = ccsim[j][i] = sqrtsim;
+          csim[i] = (sqrtsim > csim[i]) ? sqrtsim : csim[i];
+          csim[j] = (sqrtsim > csim[j]) ? sqrtsim : csim[j];
+        }
+      }
+    }
+
     @Override
     protected int assignToNearestCluster() {
-      recomputeSeperation(sep, cdist); // #1
+      recomputeSeperation(csim, ccsim); // #1
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
-        double u = upper.doubleValue(it);
+        double ls = lsim.doubleValue(it);
         // Upper bound check (#2):
-        if(u <= sep[orig]) {
+        if(ls >= csim[orig]) {
           continue;
         }
-        boolean recompute_u = true; // Elkan's r(x)
+        boolean recompute_ls = true; // Elkan's r(x)
         NumberVector fv = relation.get(it);
-        double[] l = lower.get(it);
+        double[] us = usim.get(it);
         // Check all (other) means:
         int cur = orig;
         for(int j = 0; j < k; j++) {
-          if(orig == j || u <= l[j] || u <= cdist[cur][j]) {
+          if(orig == j || ls >= us[j] || ls >= ccsim[cur][j]) {
             continue; // Condition #3 i-iii not satisfied
           }
-          if(recompute_u) { // Need to update bound? #3a
-            upper.putDouble(it, u = sqrtdistance(fv, means[cur]));
-            recompute_u = false; // Once only
-            if(u <= l[j] || u <= cdist[cur][j]) { // #3b
+          if(recompute_ls) { // Need to update bound? #3a
+            lsim.putDouble(it, ls = similarity(fv, means[cur]));
+            recompute_ls = false; // Once only
+            if(ls >= us[j] || ls >= ccsim[cur][j]) { // #3b
               continue;
             }
           }
-          double dist = l[j] = sqrtdistance(fv, means[j]);
-          if(dist < u) {
+          double sim = us[j] = similarity(fv, means[j]);
+          if(sim > ls) {
             cur = j;
-            u = dist;
+            ls = sim;
           }
         }
         // Object has to be reassigned.
@@ -164,7 +219,7 @@ public class SphericalElkanKMeans<V extends NumberVector> extends SphericalSimpl
           assignment.putInt(it, cur);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, u); // Remember bound.
+          lsim.putDouble(it, ls); // Remember bound.
         }
       }
       return changed;

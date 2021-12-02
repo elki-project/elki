@@ -20,6 +20,8 @@
  */
 package elki.clustering.kmeans.spherical;
 
+import java.util.Arrays;
+
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -32,7 +34,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
-import elki.math.linearalgebra.VMath;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -40,14 +42,35 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * the triangle inequality.
  * <p>
  * FIXME: currently requires the vectors to be L2 normalized beforehand
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Andreas Lang, Gloria Feher<br>
+ * Accelerating Spherical k-Means<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
+ * <p>
+ * The underlying triangle inequality used for pruning is introduced in:
+ * <p>
+ * Erich Schubert<br>
+ * A Triangle Inequality for Cosine Similarity<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
- * @author Alexander Voß
  * @author Erich Schubert
  *
  * @navassoc - - - KMeansModel
  *
  * @param <V> vector datatype
  */
+@Reference(authors = "Erich Schubert, Andreas Lang, Gloria Feher", //
+    title = "Accelerating Spherical k-Means", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_17", //
+    bibkey = "DBLP:conf/sisap/SchubertLF21")
+@Reference(authors = "Erich Schubert", //
+    title = "A Triangle Inequality for Cosine Similarity", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_3", //
+    bibkey = "DBLP:conf/sisap/Schubert21")
 public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends SphericalKMeans<V> {
   /**
    * The logger for this class.
@@ -81,8 +104,7 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
 
   /**
    * Inner instance, storing state for a single data set.
-   * 
-   * @author Alexander Voß
+   *
    * @author Erich Schubert
    */
   protected static class Instance extends SphericalKMeans.Instance {
@@ -97,19 +119,19 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
     double[][] newmeans;
 
     /**
-     * Upper bounds
+     * Similarity lower bound.
      */
-    WritableDoubleDataStore upper;
+    WritableDoubleDataStore lsim;
 
     /**
-     * Lower bounds
+     * Similarity upper bound.
      */
-    WritableDataStore<double[]> lower;
+    WritableDataStore<double[]> usim;
 
     /**
-     * Cluster separation
+     * Cluster self-similarity.
      */
-    double[] sep;
+    double[] csim;
 
     /**
      * Constructor.
@@ -119,15 +141,17 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
      */
     public Instance(Relation<? extends NumberVector> relation, double[][] means) {
       super(relation, means);
-      upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
-      lower = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, double[].class);
+      lsim = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
+      usim = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, double[].class);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        lower.put(it, new double[k]); // Filled with 0.
+        final double[] a = new double[k];
+        Arrays.fill(a, 2);
+        usim.put(it, a);
       }
       final int dim = RelationUtil.maxDimensionality(relation);
       sums = new double[k][dim];
       newmeans = new double[k][dim];
-      sep = new double[k];
+      csim = new double[k];
     }
 
     @Override
@@ -136,8 +160,8 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
         return initialAssignToNearestCluster();
       }
       meansFromSums(newmeans, sums, means);
-      movedDistance(means, newmeans, sep);
-      updateBounds(sep);
+      movedSimilarity(means, newmeans, csim);
+      updateBounds(csim);
       copyMeans(newmeans, means);
       return assignToNearestCluster();
     }
@@ -151,22 +175,22 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
       assert k == means.length;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
-        double[] l = lower.get(it);
+        double[] us = usim.get(it);
         // Check all (other) means:
-        double best = l[0] = sqrtdistance(fv, means[0]);
-        int minIndex = 0;
+        double best = us[0] = similarity(fv, means[0]);
+        int maxIndex = 0;
         for(int j = 1; j < k; j++) {
-          double dist = l[j] = sqrtdistance(fv, means[j]);
-          if(dist < best) {
-            minIndex = j;
-            best = dist;
+          double sim = us[j] = similarity(fv, means[j]);
+          if(sim > best) {
+            maxIndex = j;
+            best = sim;
           }
         }
         // Assign to nearest cluster.
-        clusters.get(minIndex).add(it);
-        assignment.putInt(it, minIndex);
-        plusEquals(sums[minIndex], fv);
-        upper.putDouble(it, best);
+        clusters.get(maxIndex).add(it);
+        assignment.putInt(it, maxIndex);
+        plusEquals(sums[maxIndex], fv);
+        lsim.putDouble(it, best);
       }
       return relation.size();
     }
@@ -176,27 +200,27 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
-        double u = upper.doubleValue(it);
-        boolean recompute_u = true; // Elkan's r(x)
+        double ls = lsim.doubleValue(it);
+        boolean recompute_ls = true; // Elkan's r(x)
         NumberVector fv = relation.get(it);
-        double[] l = lower.get(it);
+        double[] us = usim.get(it);
         // Check all (other) means:
         int cur = orig;
         for(int j = 0; j < k; j++) {
-          if(orig == j || u <= l[j]) {
+          if(orig == j || ls >= us[j]) {
             continue; // Condition #3 i-iii not satisfied
           }
-          if(recompute_u) { // Need to update bound? #3a
-            upper.putDouble(it, u = sqrtdistance(fv, means[cur]));
-            recompute_u = false; // Once only
-            if(u <= l[j]) { // #3b
+          if(recompute_ls) { // Need to update bound? #3a
+            lsim.putDouble(it, ls = similarity(fv, means[cur]));
+            recompute_ls = false; // Once only
+            if(ls >= us[j]) { // #3b
               continue;
             }
           }
-          double dist = l[j] = sqrtdistance(fv, means[j]);
-          if(dist < u) {
+          double sim = us[j] = similarity(fv, means[j]);
+          if(sim > ls) {
             cur = j;
-            u = dist;
+            ls = sim;
           }
         }
         // Object has to be reassigned.
@@ -206,7 +230,7 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
           assignment.putInt(it, cur);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
-          upper.putDouble(it, u); // Remember bound.
+          lsim.putDouble(it, ls); // Remember bound.
         }
       }
       return changed;
@@ -215,12 +239,24 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
     /**
      * Update the bounds for k-means.
      *
-     * @param move Movement of centers
+     * @param msim Similarity of moved centers
      */
-    protected void updateBounds(double[] move) {
+    protected void updateBounds(double[] msim) {
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        upper.increment(it, move[assignment.intValue(it)]);
-        VMath.minusEquals(lower.get(it), move);
+        final int ai = assignment.intValue(it);
+        final double v1 = Math.min(1, lsim.doubleValue(it)), v2 = msim[ai];
+        // tightest: FastMath.cos(FastMath.acos(v1) + FastMath.acos(v2))
+        // should be equivalent: v1*v2 - Math.sqrt((1 - v1*v1) * (1 - v2*v2))
+        // less tight but cheaper: v1 * v2 + vmin * vmin - 1
+        lsim.putDouble(it, v1 * v2 - Math.sqrt((1 - v1 * v1) * (1 - v2 * v2)));
+        double[] us = usim.get(it);
+        for(int i = 0; i < us.length; i++) {
+          final double w1 = Math.min(1, us[i]), w2 = msim[i];
+          // tightest: FastMath.cos(FastMath.acos(w1) - FastMath.acos(w2))
+          // should be equivalent: w1*w2 + Math.sqrt((1 - w1*w1) * (1 - w2*w2)))
+          // less tight but cheaper: (w1 * w2 - wmin * wmin + 1)
+          us[i] = w1 * w2 + Math.sqrt((1 - w1 * w1) * (1 - w2 * w2));
+        }
       }
     }
 
@@ -238,7 +274,7 @@ public class SphericalSimplifiedElkanKMeans<V extends NumberVector> extends Sphe
   /**
    * Parameterization class.
    *
-   * @author Alexander Voß
+   * @author Erich Schubert
    */
   public static class Par<V extends NumberVector> extends SphericalKMeans.Par<V> {
     @Override

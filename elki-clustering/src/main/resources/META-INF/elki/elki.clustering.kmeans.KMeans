@@ -25,3 +25,8 @@ elki.clustering.kmeans.spherical.SphericalKMeans
 elki.clustering.kmeans.spherical.SphericalElkanKMeans
 elki.clustering.kmeans.spherical.SphericalHamerlyKMeans
 elki.clustering.kmeans.spherical.SphericalSimplifiedElkanKMeans
+elki.clustering.kmeans.spherical.SphericalSimplifiedHamerlyKMeans
+elki.clustering.kmeans.spherical.SphericalSingleAssignmentKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalElkanKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalHamerlyKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalSimplifiedElkanKMeans

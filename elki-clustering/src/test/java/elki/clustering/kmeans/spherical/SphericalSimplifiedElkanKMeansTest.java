@@ -41,7 +41,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  */
 public class SphericalSimplifiedElkanKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testSphericalSimplifiedElkanKMeans() {
+  public void testSphericalSimplifiedElkanKMeans2() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000, new ListParameterization() //
         .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, LengthNormalization.class));
     Clustering<?> result = new ELKIBuilder<SphericalSimplifiedElkanKMeans<DoubleVector>>(SphericalSimplifiedElkanKMeans.class) //

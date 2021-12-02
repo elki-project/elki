@@ -20,8 +20,6 @@
  */
 package elki.clustering.kmeans.spherical;
 
-import java.util.Arrays;
-
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -33,6 +31,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.logging.Logging;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -40,6 +39,18 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * the triangle inequality.
  * <p>
  * FIXME: currently requires the vectors to be L2 normalized beforehand
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert, Andreas Lang, Gloria Feher<br>
+ * Accelerating Spherical k-Means<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
+ * <p>
+ * The underlying triangle inequality used for pruning is introduced in:
+ * <p>
+ * Erich Schubert<br>
+ * A Triangle Inequality for Cosine Similarity<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
  * @author Erich Schubert
  *
@@ -47,11 +58,21 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @param <V> vector datatype
  */
-public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKMeans<V> {
+@Reference(authors = "Erich Schubert, Andreas Lang, Gloria Feher", //
+    title = "Accelerating Spherical k-Means", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_17", //
+    bibkey = "DBLP:conf/sisap/SchubertLF21")
+@Reference(authors = "Erich Schubert", //
+    title = "A Triangle Inequality for Cosine Similarity", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2021", //
+    url = "https://doi.org/10.1007/978-3-030-89657-7_3", //
+    bibkey = "DBLP:conf/sisap/Schubert21")
+public class SphericalSimplifiedHamerlyKMeans<V extends NumberVector> extends SphericalKMeans<V> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(SphericalHamerlyKMeans3.class);
+  private static final Logging LOG = Logging.getLogger(SphericalSimplifiedHamerlyKMeans.class);
 
   /**
    * Flag whether to compute the final variance statistic.
@@ -66,7 +87,7 @@ public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKM
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public SphericalHamerlyKMeans3(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+  public SphericalSimplifiedHamerlyKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
     super(k, maxiter, initializer);
     this.varstat = varstat;
   }
@@ -144,24 +165,20 @@ public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKM
      */
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
-      double[][] ccsim = new double[k][k];
-      initialSeparation(ccsim);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to the second closest center
         double max1 = similarity(fv, means[0]), max2 = -1;
         int maxIndex = 0;
         for(int j = 1; j < k; j++) {
-          if(max2 < ccsim[maxIndex][j]) {
-            double sim = similarity(fv, means[j]);
-            if(sim > max1) {
-              maxIndex = j;
-              max2 = max1;
-              max1 = sim;
-            }
-            else if(sim > max2) {
-              max2 = sim;
-            }
+          double sim = similarity(fv, means[j]);
+          if(sim > max1) {
+            maxIndex = j;
+            max2 = max1;
+            max1 = sim;
+          }
+          else if(sim > max2) {
+            max2 = sim;
           }
         }
         // Assign to nearest cluster.
@@ -174,37 +191,14 @@ public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKM
       return relation.size();
     }
 
-    /**
-     * Recompute the separation of cluster means.
-     * <p>
-     * Used by Hamerly.
-     *
-     * @param sep Output array of separation
-     */
-    protected void recomputeSeperation(double[] csim) {
-      final int k = means.length;
-      assert csim.length == k;
-      Arrays.fill(csim, 0.);
-      for(int i = 1; i < k; i++) {
-        double[] mi = means[i];
-        for(int j = 0; j < i; j++) {
-          double s = similarity(mi, means[j]);
-          double sqrtsim = s > -1 ? Math.sqrt((s + 1) * 0.5) : 0;
-          csim[i] = (sqrtsim > csim[i]) ? sqrtsim : csim[i];
-          csim[j] = (sqrtsim > csim[j]) ? sqrtsim : csim[j];
-        }
-      }
-    }
-
     @Override
     protected int assignToNearestCluster() {
-      recomputeSeperation(csim);
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
         double ls = lsim.doubleValue(it);
         final double us = usim.doubleValue(it);
-        if(ls >= us || ls >= csim[orig]) {
+        if(ls >= us) {
           continue;
         }
         // Update the lower similarity bound
@@ -321,8 +315,8 @@ public class SphericalHamerlyKMeans3<V extends NumberVector> extends SphericalKM
     }
 
     @Override
-    public SphericalHamerlyKMeans3<V> make() {
-      return new SphericalHamerlyKMeans3<>(k, maxiter, initializer, varstat);
+    public SphericalSimplifiedHamerlyKMeans<V> make() {
+      return new SphericalSimplifiedHamerlyKMeans<>(k, maxiter, initializer, varstat);
     }
   }
 }
