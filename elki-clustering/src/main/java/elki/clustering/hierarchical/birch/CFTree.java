@@ -100,7 +100,7 @@ public class CFTree {
   BIRCHAbsorptionCriterion absorption;
 
   /**
-   * Squared maximum radius threshold of a clusterin feature.
+   * Squared maximum radius threshold of a clustering feature.
    */
   double thresholdsq;
 

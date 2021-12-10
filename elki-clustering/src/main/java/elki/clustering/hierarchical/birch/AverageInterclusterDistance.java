@@ -65,7 +65,7 @@ public class AverageInterclusterDistance implements BIRCHDistance {
   @Override
   public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
     final int dim = cf1.getDimensionality();
-    assert (dim == cf2.getDimensionality());
+    assert dim == cf2.getDimensionality();
     // Dot product:
     double sum = 0;
     for(int d = 0; d < dim; d++) {

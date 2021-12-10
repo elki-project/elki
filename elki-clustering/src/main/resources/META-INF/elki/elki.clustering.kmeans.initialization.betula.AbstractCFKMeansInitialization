@@ -1,0 +1,5 @@
+elki.clustering.kmeans.initialization.betula.CFKPlusPlusLeaves leaves
+elki.clustering.kmeans.initialization.betula.CFKPlusPlusTree tree
+elki.clustering.kmeans.initialization.betula.CFKPlusPlusTrunk trunk
+elki.clustering.kmeans.initialization.betula.CFRandomlyChosen
+elki.clustering.kmeans.initialization.betula.CFWeightedRandomlyChosen

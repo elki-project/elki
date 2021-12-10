@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import elki.clustering.em.EM;
-import elki.clustering.em.EMClusterModel;
-import elki.clustering.em.MultivariateGaussianModel;
+import elki.clustering.em.models.EMClusterModel;
+import elki.clustering.em.models.MultivariateGaussianModel;
 import elki.data.*;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.model.SubspaceModel;

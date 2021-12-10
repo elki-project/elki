@@ -1,0 +1,3 @@
+elki.clustering.kmeans.initialization.betula.InterclusterWeight
+elki.clustering.kmeans.initialization.betula.SquaredEuclideanWeight
+elki.clustering.kmeans.initialization.betula.VarianceWeight
