@@ -31,6 +31,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
+import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
@@ -70,6 +71,11 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 public class GLOSH implements OutlierAlgorithm {
 
   /**
+   * The logger for this class.
+   */
+  private static final Logging LOG = Logging.getLogger(GLOSH.class);
+
+  /**
    * Inner algorithm.
    */
   private HDBSCANHierarchyExtraction hdbscanExtraction;
@@ -107,7 +113,7 @@ public class GLOSH implements OutlierAlgorithm {
         // Theoretical minimum and maximum: no variance to infinite variance
         0, Double.POSITIVE_INFINITY);
 
-    DoubleRelation scoreres = new MaterializedDoubleRelation("GLOSH scores", relation.getDBIDs(), scores);
+    DoubleRelation scoreres = new MaterializedDoubleRelation("GLOSH score", relation.getDBIDs(), scores);
     OutlierResult result = new OutlierResult(meta, scoreres);
     // TODO: How can I print the grouping without losing the computation of the
     // OutlierRankingEvaluation metrics?
@@ -133,8 +139,17 @@ public class GLOSH implements OutlierAlgorithm {
 
     @Override
     public void configure(Parameterization config) {
-      Class<HDBSCANHierarchyExtraction> cls = ClassGenericsUtil.uglyCastIntoSubclass(HDBSCANHierarchyExtraction.class);
-      hdbscanExtraction = config.tryInstantiate(cls);
+      try {
+        hdbscanExtraction = ClassGenericsUtil.tryInstantiate(HDBSCANHierarchyExtraction.class, HDBSCANHierarchyExtraction.class, config);
+      }
+      catch(Throwable e) {
+        if(LOG.isDebugging()) {
+          LOG.exception("Error instantiating HDBSCANHierarchyExtraction ", e.getCause());
+        }
+        else {
+          LOG.warning("Error instantiating HDBSCANHierarchyExtraction : " + e.getMessage());
+        }
+      }
     }
 
     @Override

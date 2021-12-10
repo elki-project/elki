@@ -263,19 +263,22 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
             nclus = oclus.grow(dist, cclus, clead);
             {
               int Ci = DBIDUtil.asInteger(olead);
-              if(cclus == null)
+              if(cclus == null) {
                 glosh_scores.put(clead, 1. - (epsilonmax_ci.get(Ci) / dist));
+              }
             }
           }
           else if(!cSpurious && cclus != null) {
             nclus = cclus.grow(dist, oclus, olead);
             {
               int Ci = DBIDUtil.asInteger(olead);
-              if(!epsilonmax_ci.containsKey(Ci))
+              if(!epsilonmax_ci.containsKey(Ci)) {
                 epsilonmax_ci.put(Ci, epsilonmax_ci.get(DBIDUtil.asInteger(clead)));
+              }
 
-              if(oclus == null)
+              if(oclus == null) {
                 glosh_scores.put(olead, 1. - (epsilonmax_ci.get(Ci) / dist));
+              }
             }
           }
           // Then recycle, but reset
@@ -283,19 +286,22 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
             nclus = oclus.grow(dist, cclus, clead).resetAggregate();
             {
               int Ci = DBIDUtil.asInteger(olead);
-              if(cclus == null)
+              if(cclus == null) {
                 glosh_scores.put(clead, 1. - (epsilonmax_ci.get(Ci) / dist));
+              }
             }
           }
           else if(cclus != null) {
             nclus = cclus.grow(dist, oclus, olead).resetAggregate();
             {
               int Ci = DBIDUtil.asInteger(olead);
-              if(!epsilonmax_ci.containsKey(Ci))
+              if(!epsilonmax_ci.containsKey(Ci)) {
                 epsilonmax_ci.put(Ci, epsilonmax_ci.get(DBIDUtil.asInteger(clead)));
+              }
 
-              if(oclus == null)
+              if(oclus == null) {
                 glosh_scores.put(olead, 1. - (epsilonmax_ci.get(Ci) / dist));
+              }
             }
           }
           // Last option: a new 2-element cluster.
