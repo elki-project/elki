@@ -1,6 +1,7 @@
+elki.clustering.affinitypropagation.AffinityPropagation
+elki.clustering.BetulaLeafPreClustering
 elki.clustering.CanopyPreClustering
 elki.clustering.CFSFDP
-elki.clustering.affinitypropagation.AffinityPropagation
 elki.clustering.dbscan.DBSCAN
 elki.clustering.dbscan.GeneralizedDBSCAN
 elki.clustering.dbscan.parallel.ParallelGeneralizedDBSCAN
@@ -8,6 +9,8 @@ elki.clustering.dbscan.GriDBSCAN
 elki.clustering.dbscan.LSDBC
 elki.clustering.em.EM
 elki.clustering.em.KDTreeEM
+elki.clustering.em.BetulaGMM
+elki.clustering.em.BetulaGMMWeighted
 elki.clustering.hierarchical.extraction.ClustersWithNoiseExtraction
 elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 elki.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
@@ -31,6 +34,7 @@ elki.clustering.hierarchical.birch.BIRCHLeafClustering
 elki.clustering.kcenter.GreedyKCenter
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans
+elki.clustering.kmeans.BetulaLloydKMeans
 elki.clustering.kmeans.BisectingKMeans
 elki.clustering.kmeans.ElkanKMeans
 elki.clustering.kmeans.ExponionKMeans
@@ -53,6 +57,14 @@ elki.clustering.kmeans.XMeans
 elki.clustering.kmeans.FuzzyCMeans
 elki.clustering.kmeans.parallel.ParallelLloydKMeans
 elki.clustering.kmeans.spherical.SphericalKMeans
+elki.clustering.kmeans.spherical.SphericalElkanKMeans
+elki.clustering.kmeans.spherical.SphericalHamerlyKMeans
+elki.clustering.kmeans.spherical.SphericalSimplifiedElkanKMeans
+elki.clustering.kmeans.spherical.SphericalSimplifiedHamerlyKMeans
+elki.clustering.kmeans.spherical.SphericalSingleAssignmentKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalElkanKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalHamerlyKMeans
+elki.clustering.kmeans.spherical.EuclideanSphericalSimplifiedElkanKMeans
 elki.clustering.kmedoids.FasterPAM
 elki.clustering.kmedoids.FastPAM
 elki.clustering.kmedoids.FastPAM1

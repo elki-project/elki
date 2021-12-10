@@ -1,0 +1,10 @@
+elki.index.tree.betula.distance.AverageInterclusterDistance D2
+elki.index.tree.betula.distance.AverageIntraclusterDistance D3
+elki.index.tree.betula.distance.CentroidEuclideanDistance D0
+elki.index.tree.betula.distance.CentroidManhattanDistance D1
+elki.index.tree.betula.distance.RadiusDistance R
+elki.index.tree.betula.distance.VarianceIncreaseDistance D4
+elki.index.tree.betula.distance.BIRCHAverageInterclusterDistance
+elki.index.tree.betula.distance.BIRCHAverageIntraclusterDistance
+elki.index.tree.betula.distance.BIRCHRadiusDistance
+elki.index.tree.betula.distance.BIRCHVarianceIncreaseDistance

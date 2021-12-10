@@ -1,0 +1,6 @@
+elki.clustering.em.models.MultivariateGaussianModelFactory
+elki.clustering.em.models.DiagonalGaussianModelFactory
+elki.clustering.em.models.SphericalGaussianModelFactory
+elki.clustering.em.models.TwoPassMultivariateGaussianModelFactory
+elki.clustering.em.models.TextbookMultivariateGaussianModelFactory
+elki.clustering.em.models.TextbookSphericalGaussianModelFactory

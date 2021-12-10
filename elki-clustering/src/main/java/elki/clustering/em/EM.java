@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.em.models.EMClusterModel;
+import elki.clustering.em.models.EMClusterModelFactory;
+import elki.clustering.em.models.MultivariateGaussianModelFactory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MeanModel;
@@ -243,7 +246,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
-    double bestloglikelihood = loglikelihood; // For detecting instabilities.
+    double bestloglikelihood = Double.NEGATIVE_INFINITY;//loglikelihood; // For detecting instabilities.
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
@@ -377,7 +380,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param x Input
    * @return Result
    */
-  protected static double logSumExp(double[] x) {
+  public static double logSumExp(double[] x) {
     double max = x[0];
     for(int i = 1; i < x.length; i++) {
       final double v = x[i];

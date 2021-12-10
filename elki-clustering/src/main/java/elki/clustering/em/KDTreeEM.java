@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.em.models.TextbookMultivariateGaussianModel;
+import elki.clustering.em.models.TextbookMultivariateGaussianModelFactory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -374,7 +376,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
       maxMinWeight = wmin > maxMinWeight ? wmin : maxMinWeight;
       // calculate maximum weight estimation
       wmaxs[i] = MathUtil.clamp((weight * limits[i][1]) / wmaxDenom, 0, 1);
-      double minPossibleWeight = newmodels.get(i).weight + wmin * size;
+      double minPossibleWeight = newmodels.get(i).getWeight() + wmin * size;
       // calculate the maximum possible error in this node
       double maximumError = size * (wmaxs[i] - wmin);
       // pruning check, if error to big for this model, don't prune
@@ -411,21 +413,9 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * @param ret Return array
    */
   private void calculateModelLimits(KDTree node, TextbookMultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret) {
-    double[] min = minusEquals(minus(node.midpoint, model.mean), node.halfwidth);
-    double[] max = plusTimes(min, node.halfwidth, 2);
-
-    // invert and ensure symmetric (array is cloned in inverse)
-    double[][] covInv = inverse(model.covariance);
-    double icovdetsqrt = FastMath.exp(-1 * MultivariateGaussianModel.getHalfLogDeterminant(model.chol));
-
-    // maximizes Mahalanobis dist
-    double mahalanobisSQDmax = 2 * solver.solve(covInv, null, 0, min, max, maxpnt);
-    // minimizes Mahalanobis dist (invert covinv and result)
-    double mahalanobisSQDmin = -2 * solver.solve(timesEquals(covInv, -1.0), null, 0, min, max, minpnt);
-
-    final double f = ipiPow * icovdetsqrt;
-    ret[0] = FastMath.exp(mahalanobisSQDmax * -.5) * f;
-    ret[1] = FastMath.exp(mahalanobisSQDmin * -.5) * f;
+    double[] min = minus(node.midpoint, node.halfwidth); // will be modified!
+    double[] max = plusTimes(min, node.halfwidth, 2); // will be modified!
+    model.calculateModelLimits(min, max, solver, ipiPow, minpnt, maxpnt, ret);
   }
 
   /**
