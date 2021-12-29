@@ -55,19 +55,19 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * <p>
  * Reference:
  * <p>
- * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
- * Density-Based Clustering Based on Hierarchical Density Estimates<br>
- * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
+ * R. J. G. B. Campello, D. Moulavi, Arthur Zimek, J. Sander<br>
+ * Hierarchical Density Estimates for Data Clustering, Visualization, and Outlier Detection<br>
+ * ACM Transaction on Knowledge Discovery from Data (TKDD)
  * 
  * @author Braulio V.S. Vinces (ELKIfication)
  */
 @Title("GLOSH: Global-Local Outlier Scores from Hierarchies")
 @Description("The GLOSH outlier score assigned is based on a sound statistical interpretation from the HDBSCAN hierarchy.")
-@Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
-    title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-    booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
-    url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
-    bibkey = "DBLP:conf/pakdd/CampelloMS13")
+@Reference(authors = "R. J. G. B. Campello, D. Moulavi, Arthur Zimek, J. Sander", //
+    title = "Hierarchical Density Estimates for Data Clustering, Visualization, and Outlier Detection", //
+    booktitle = "ACM Transaction on Knowledge Discovery from Data (TKDD)", //
+    url = "https://doi.org/10.1145/2733381", //
+    bibkey = "DBLP:journals/tkdd/CampelloMZS15")
 public class GLOSH implements OutlierAlgorithm {
 
   /**
