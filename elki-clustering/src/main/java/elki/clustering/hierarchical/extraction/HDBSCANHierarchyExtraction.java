@@ -50,8 +50,6 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import it.unimi.dsi.fastutil.ints.Int2DoubleLinkedOpenHashMap;
-
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
  * <p>
@@ -195,9 +193,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       ArrayModifiableDBIDs noise = DBIDUtil.newArray();
       ArrayList<TempCluster> toplevel = new ArrayList<>();
 
-      // Store epsilon_max of each cluster Ci
-      Int2DoubleLinkedOpenHashMap epsilonmax_ci = new Int2DoubleLinkedOpenHashMap();
-      WritableDoubleDataStore glosh_scores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+      WritableDoubleDataStore epsilonMaxCi = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1.);
+      WritableDoubleDataStore gloshScores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
 
       DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
       // Perform one join at a time, in increasing order
@@ -243,77 +240,59 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
           oclus = oclus != null ? oclus : new TempCluster(odist, olead);
           nclus = new TempCluster(dist, oclus, cclus);
-          {
-            int oCi = DBIDUtil.asInteger(olead);
-            int cCi = DBIDUtil.asInteger(clead);
-            if(epsilonmax_ci.get(oCi) == 0.) { // Singleton cluster.
-              glosh_scores.put(olead, 0.);
-            }
-            if(epsilonmax_ci.get(cCi) == 0.) { // Singleton cluster.
-              glosh_scores.put(clead, 0.);
-            }
-            epsilonmax_ci.put(oCi, //
-                epsilonmax_ci.get(cCi) < epsilonmax_ci.get(oCi) ? //
-                    epsilonmax_ci.get(cCi) : epsilonmax_ci.get(oCi));
+          if(epsilonMaxCi.doubleValue(olead) == 0.) { // Singleton cluster.
+            gloshScores.put(olead, 0.);
           }
+          if(epsilonMaxCi.doubleValue(clead) == 0.) { // Singleton cluster.
+            gloshScores.put(clead, 0.);
+          }
+          epsilonMaxCi.put(olead, //
+              epsilonMaxCi.doubleValue(clead) < epsilonMaxCi.doubleValue(olead) ? //
+                  epsilonMaxCi.doubleValue(clead) : epsilonMaxCi.doubleValue(olead));
         }
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
             nclus = oclus.grow(dist, cclus, clead);
-            {
-              int Ci = DBIDUtil.asInteger(olead);
-              if(cclus == null) {
-                glosh_scores.put(clead, 1. - (epsilonmax_ci.get(Ci) / dist));
-              }
+            if(cclus == null) {
+              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           else if(!cSpurious && cclus != null) {
             nclus = cclus.grow(dist, oclus, olead);
-            {
-              int Ci = DBIDUtil.asInteger(olead);
-              if(!epsilonmax_ci.containsKey(Ci)) {
-                epsilonmax_ci.put(Ci, epsilonmax_ci.get(DBIDUtil.asInteger(clead)));
-              }
+            if(epsilonMaxCi.doubleValue(olead) == -1.) {
+              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
+            }
 
-              if(oclus == null) {
-                glosh_scores.put(olead, 1. - (epsilonmax_ci.get(Ci) / dist));
-              }
+            if(oclus == null) {
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           // Then recycle, but reset
           else if(oclus != null) {
             nclus = oclus.grow(dist, cclus, clead).resetAggregate();
-            {
-              int Ci = DBIDUtil.asInteger(olead);
-              if(cclus == null) {
-                glosh_scores.put(clead, 1. - (epsilonmax_ci.get(Ci) / dist));
-              }
+            if(cclus == null) {
+              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           else if(cclus != null) {
             nclus = cclus.grow(dist, oclus, olead).resetAggregate();
-            {
-              int Ci = DBIDUtil.asInteger(olead);
-              if(!epsilonmax_ci.containsKey(Ci)) {
-                epsilonmax_ci.put(Ci, epsilonmax_ci.get(DBIDUtil.asInteger(clead)));
-              }
+            if(epsilonMaxCi.doubleValue(olead) == -1.) {
+              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
+            }
 
-              if(oclus == null) {
-                glosh_scores.put(olead, 1. - (epsilonmax_ci.get(Ci) / dist));
-              }
+            if(oclus == null) {
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           // Last option: a new 2-element cluster.
           else {
             nclus = new TempCluster(dist, clead, olead);
-            {
-              glosh_scores.put(clead, 1. - (dist / dist));
-              glosh_scores.put(olead, 1. - (dist / dist));
+            gloshScores.put(clead, 0.);
+            gloshScores.put(olead, 0.);
 
-              int Ci = DBIDUtil.asInteger(olead);
-              epsilonmax_ci.put(Ci, dist);
-            }
+            epsilonMaxCi.put(olead, dist);
           }
         }
         assert (nclus != null);
@@ -335,7 +314,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       }
 
       // Store GLOSH scores
-      Metadata.hierarchyOf(dendrogram).addChild(glosh_scores);
+      Metadata.hierarchyOf(dendrogram).addChild(gloshScores);
 
       return dendrogram;
     }

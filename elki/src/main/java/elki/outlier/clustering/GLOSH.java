@@ -56,7 +56,8 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, Arthur Zimek, J. Sander<br>
- * Hierarchical Density Estimates for Data Clustering, Visualization, and Outlier Detection<br>
+ * Hierarchical Density Estimates for Data Clustering, Visualization, and
+ * Outlier Detection<br>
  * ACM Transaction on Knowledge Discovery from Data (TKDD)
  * 
  * @author Braulio V.S. Vinces (ELKIfication)
@@ -115,8 +116,7 @@ public class GLOSH implements OutlierAlgorithm {
 
     DoubleRelation scoreres = new MaterializedDoubleRelation("GLOSH score", relation.getDBIDs(), scores);
     OutlierResult result = new OutlierResult(meta, scoreres);
-    // TODO: How can I print the grouping without losing the computation of the
-    // OutlierRankingEvaluation metrics?
+    // TODO
     // Metadata.hierarchyOf(result).addChild(hdbscanresult);
     return result;
   }
