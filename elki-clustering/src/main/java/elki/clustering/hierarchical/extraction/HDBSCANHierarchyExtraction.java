@@ -42,8 +42,8 @@ import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -193,6 +193,9 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       ArrayModifiableDBIDs noise = DBIDUtil.newArray();
       ArrayList<TempCluster> toplevel = new ArrayList<>();
 
+      WritableDoubleDataStore epsilonMaxCi = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1.);
+      WritableDoubleDataStore gloshScores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+
       DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
       // Perform one join at a time, in increasing order
       for(DBIDArrayIter clead = order.iter(); clead.valid(); clead.advance()) {
@@ -237,25 +240,59 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
           oclus = oclus != null ? oclus : new TempCluster(odist, olead);
           nclus = new TempCluster(dist, oclus, cclus);
+          if(epsilonMaxCi.doubleValue(olead) == 0.) { // Singleton cluster.
+            gloshScores.put(olead, 0.);
+          }
+          if(epsilonMaxCi.doubleValue(clead) == 0.) { // Singleton cluster.
+            gloshScores.put(clead, 0.);
+          }
+          epsilonMaxCi.put(olead, //
+              epsilonMaxCi.doubleValue(clead) < epsilonMaxCi.doubleValue(olead) ? //
+                  epsilonMaxCi.doubleValue(clead) : epsilonMaxCi.doubleValue(olead));
         }
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
             nclus = oclus.grow(dist, cclus, clead);
+            if(cclus == null) {
+              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+            }
           }
           else if(!cSpurious && cclus != null) {
             nclus = cclus.grow(dist, oclus, olead);
+            if(epsilonMaxCi.doubleValue(olead) == -1.) {
+              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
+            }
+
+            if(oclus == null) {
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+            }
           }
           // Then recycle, but reset
           else if(oclus != null) {
             nclus = oclus.grow(dist, cclus, clead).resetAggregate();
+            if(cclus == null) {
+              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+            }
           }
           else if(cclus != null) {
             nclus = cclus.grow(dist, oclus, olead).resetAggregate();
+            if(epsilonMaxCi.doubleValue(olead) == -1.) {
+              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
+            }
+
+            if(oclus == null) {
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
+            }
           }
           // Last option: a new 2-element cluster.
           else {
             nclus = new TempCluster(dist, clead, olead);
+            gloshScores.put(clead, 0.);
+            gloshScores.put(olead, 0.);
+
+            epsilonMaxCi.put(olead, dist);
           }
         }
         assert (nclus != null);
@@ -275,6 +312,10 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       for(TempCluster clus : toplevel) {
         finalizeCluster(clus, dendrogram, nclus, false);
       }
+
+      // Store GLOSH scores
+      Metadata.hierarchyOf(dendrogram).addChild(gloshScores);
+
       return dendrogram;
     }
 
