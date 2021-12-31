@@ -21,6 +21,7 @@
 package elki.clustering.hierarchical.extraction;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import elki.Algorithm;
@@ -31,14 +32,19 @@ import elki.clustering.hierarchical.PointerHierarchyResult;
 import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
 import elki.data.Cluster;
 import elki.data.Clustering;
+import elki.data.NumberVector;
 import elki.data.model.DendrogramModel;
 import elki.data.model.PrototypeDendrogramModel;
 import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
+import elki.database.relation.Relation;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.PearsonCorrelation;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
@@ -116,7 +122,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   @Override
   public Clustering<DendrogramModel> autorun(Database database) {
-    return run(algorithm.autorun(database));
+    Relation<? extends NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    return runOther(algorithm.autorun(database), relation);
   }
 
   /**
@@ -131,12 +138,20 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     return result;
   }
 
+  public Clustering<DendrogramModel> runOther(PointerHierarchyResult pointerresult, Relation<? extends NumberVector> relation) {
+    Clustering<DendrogramModel> result = new Instance(pointerresult, relation).run();
+    Metadata.hierarchyOf(result).addChild(pointerresult);
+    return result;
+  }
+
   /**
    * Instance for a single data set.
    * 
    * @author Erich Schubert
    */
   protected class Instance {
+    protected Relation<? extends NumberVector> relation;
+
     /**
      * Unordered IDs
      */
@@ -177,6 +192,17 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       }
     }
 
+    public Instance(PointerHierarchyResult pointerresult, Relation<? extends NumberVector> relation) {
+      this.ids = pointerresult.topologicalSort();
+      this.pi = pointerresult.getParentStore();
+      this.lambda = pointerresult.getParentDistanceStore();
+      this.pointerresult = pointerresult;
+      if(pointerresult instanceof PointerDensityHierarchyResult) {
+        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
+      }
+      this.relation = relation;
+    }
+
     /**
      * Extract all clusters from the pi-lambda-representation.
      *
@@ -195,6 +221,13 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
       WritableDoubleDataStore epsilonMaxCi = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1.);
       WritableDoubleDataStore gloshScores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
+
+      int size, matrixSize;
+      size = matrixSize = this.relation.size();
+      matrixSize *= (matrixSize - 1);
+      matrixSize /= 2;
+      double[] copheneticMatrix = new double[matrixSize];
+      Arrays.fill(copheneticMatrix, -1.);
 
       DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
       // Perform one join at a time, in increasing order
@@ -236,6 +269,26 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
         final TempCluster nclus; // Resulting cluster.
         if(!oSpurious && !cSpurious) {
+          {
+            ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+            membersOClus.addDBIDs(oclus.members);
+            for(TempCluster child : oclus.children) {
+              collectChildrens(membersOClus, child);
+            }
+            
+            ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+            membersCClus.addDBIDs(cclus.members);
+            for(TempCluster child : cclus.children) {
+              collectChildrens(membersCClus, child);
+            }
+            
+            for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+              for(DBIDMIter innerIt = membersCClus.iter(); innerIt.valid(); innerIt.advance()) {
+                int position = position(it, innerIt, size);
+                copheneticMatrix[position] = dist;
+              }
+            }
+          }
           // Full merge: both not spurious, new parent.
           cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
           oclus = oclus != null ? oclus : new TempCluster(odist, olead);
@@ -253,12 +306,55 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
+            {
+              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+              membersOClus.addDBIDs(oclus.members);
+              for(TempCluster child : oclus.children) {
+                collectChildrens(membersOClus, child);
+              }
+              if(cclus == null) {
+                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+                  int position = position(clead, it, size);
+                  copheneticMatrix[position] = dist;
+                }
+              }
+              else {
+                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+                    int position = position(it, innerIt, size);
+                    copheneticMatrix[position] = dist;
+                  }
+                }
+              }
+            }
+
             nclus = oclus.grow(dist, cclus, clead);
             if(cclus == null) {
               gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           else if(!cSpurious && cclus != null) {
+            {
+              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+              membersCClus.addDBIDs(cclus.members);
+              for(TempCluster child : cclus.children) {
+                collectChildrens(membersCClus, child);
+              }
+              if(oclus == null) {
+                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+                  int position = position(olead, it, size);
+                  copheneticMatrix[position] = dist;
+                }
+              } else {
+                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+                  for(DBIDMIter innerIt = oclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+                    int position = position(it, innerIt, size);
+                    copheneticMatrix[position] = dist;
+                  }
+                }
+              }
+            }
+            
             nclus = cclus.grow(dist, oclus, olead);
             if(epsilonMaxCi.doubleValue(olead) == -1.) {
               epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
@@ -270,12 +366,48 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           }
           // Then recycle, but reset
           else if(oclus != null) {
+            {
+              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+              membersOClus.addDBIDs(oclus.members);
+              for(TempCluster child : oclus.children) {
+                collectChildrens(membersOClus, child);
+              }
+              if(cclus == null) {
+                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+                  int position = position(clead, it, size);
+                  copheneticMatrix[position] = dist;
+                }
+              }
+              else {
+                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+                    int position = position(it, innerIt, size);
+                    copheneticMatrix[position] = dist;
+                  }
+                }
+              }
+            }
+            
             nclus = oclus.grow(dist, cclus, clead).resetAggregate();
             if(cclus == null) {
               gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           else if(cclus != null) {
+            {
+              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+              membersCClus.addDBIDs(cclus.members);
+              for(TempCluster child : cclus.children) {
+                collectChildrens(membersCClus, child);
+              }
+              if(oclus == null) {
+                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+                  int position = position(olead, it, size);
+                  copheneticMatrix[position] = dist;
+                }
+              }
+            }
+            
             nclus = cclus.grow(dist, oclus, olead).resetAggregate();
             if(epsilonMaxCi.doubleValue(olead) == -1.) {
               epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
@@ -288,6 +420,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           }
           // Last option: a new 2-element cluster.
           else {
+            {
+              int position = position(clead, olead, size);
+              copheneticMatrix[position] = dist;
+            }
+            
             nclus = new TempCluster(dist, clead, olead);
             gloshScores.put(clead, 0.);
             gloshScores.put(olead, 0.);
@@ -313,10 +450,62 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         finalizeCluster(clus, dendrogram, nclus, false);
       }
 
+      {
+        computeCCC(copheneticMatrix);
+      }
+
       // Store GLOSH scores
       Metadata.hierarchyOf(dendrogram).addChild(gloshScores);
 
       return dendrogram;
+    }
+
+    private void collectChildrens(ModifiableDBIDs members, TempCluster cur) {
+      members.addDBIDs(cur.members);
+      for(TempCluster child : cur.children) {
+        collectChildrens(members, child);
+      }
+    }
+
+    private int position(DBIDRef a, DBIDRef b, int size) {
+      int i, j;
+      if(DBIDUtil.compare(a, b) < 0) {
+        i = DBIDUtil.asInteger(a);
+        j = DBIDUtil.asInteger(b);
+      }
+      else {
+        i = DBIDUtil.asInteger(b);
+        j = DBIDUtil.asInteger(a);
+      }
+      j = j - i;
+      i -= 1;
+      i = (i * (size - 1)) - (i * (i - 1) / 2);
+      i += j;
+      return i - 1; // zero-based
+    }
+
+    private void computeCCC(double[] copheneticMatrix) {
+      int size, matrixSize;
+      size = matrixSize = this.relation.size();
+      matrixSize *= (matrixSize - 1);
+      matrixSize /= 2;
+
+      double[] distanceMatrix = new double[matrixSize];
+      DBIDArrayIter iter = DBIDUtil.newArray(relation.getDBIDs()).iter();
+      DBIDArrayIter innerIter = DBIDUtil.newArray(relation.getDBIDs()).iter();
+      int position = 0;
+      for(; iter.getOffset() < size - 1; iter.advance()) {
+        NumberVector first = relation.get(iter);
+        for(innerIter.seek(iter.getOffset() + 1); innerIter.valid(); innerIter.advance()) {
+          NumberVector second = relation.get(innerIter);
+          distanceMatrix[position++] = EuclideanDistance.STATIC.distance(first, second);
+        }
+      }
+      PearsonCorrelation corr = new PearsonCorrelation();
+      for(int i=0; i<matrixSize; i++) {
+        corr.put(distanceMatrix[i], copheneticMatrix[i]);
+      }
+      System.out.println("cophenetic correlation coefficient: " + corr.getCorrelation());
     }
 
     /**
