@@ -134,14 +134,10 @@ public class LOBPCG {
     ax = timesEqualsFirst(ax, eig);
 
     // build index set
-    long[] indices = new long[m / 64 + 1];
+    long[] indices = BitsUtil.ones(m);
     int cursize = m;
-    for(int i = 0; i < m; i++) {
-      BitsUtil.setI(indices, i);
-    }
     // flags for resizing r,gramA/B
-    boolean reinitR = true;
-    boolean reinitGram = true;
+    boolean reinitR = true, reinitGram = true;
     // iterate up to maxit times
     for(int i = 0; i < maxiterations; i++) {
       // compute the residuals
@@ -150,12 +146,14 @@ public class LOBPCG {
       // vectors for which the norm has become smaller than the tolerance.
       // If J, then becomes empty; exit loop.
       for(int j = BitsUtil.nextSetBit(indices, 0); j != -1; j = BitsUtil.nextSetBit(indices, j + 1)) {
-        double[] wj = VMath.getCol(w, j);
-        if(BitsUtil.get(indices, j) && VMath.dot(wj, wj) < threshold) {
-          BitsUtil.clearI(indices, j);
-          cursize--;
-          reinitR = true;
-          reinitGram = true;
+        if(BitsUtil.get(indices, j)) {
+          // FIXME: unnötige Kopie, dot-produkt direkt berechnen:
+          double[] wj = VMath.getCol(w, j);
+          if(VMath.dot(wj, wj) < threshold) {
+            BitsUtil.clearI(indices, j);
+            cursize--;
+            reinitR = reinitGram = true;
+          }
         }
       }
       if(cursize == 0) {
@@ -400,7 +398,8 @@ public class LOBPCG {
     final int rowdim = a.length;
     double[] acol = new double[rowdim];
 
-    for(int i = BitsUtil.nextSetBit(indices, 0), i2 = 0; i != -1; i = BitsUtil.nextSetBit(indices, i + 1), i2++) {
+    for(int i = BitsUtil.nextSetBit(indices, 0),
+        i2 = 0; i != -1; i = BitsUtil.nextSetBit(indices, i + 1), i2++) {
       for(int j = 0; j < rowdim; j++) {
         acol[j] = a[j][i];
       }
@@ -437,7 +436,8 @@ public class LOBPCG {
     double[] aline = new double[rowdim2];
     for(int i = 0; i < rowdim1; i++) {
       // copy important part of first row
-      for(int j = BitsUtil.nextSetBit(indices, 0), j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
+      for(int j = BitsUtil.nextSetBit(indices, 0),
+          j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
         aline[j2] = a1[i][j];
       }
       for(int j = BitsUtil.nextSetBit(indices, 0), j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
@@ -511,14 +511,14 @@ public class LOBPCG {
 
   /**
    * calculates a2 = a1_j * cw + a2_j *cp and saves it into a2.
-   * Note that a2 is overwritten completly in this function
+   * Note that a2 is overwritten completely in this function
    * 
    * @param a1 reduced, filled sparsely (j columns filled)
    * @param cw reduced, filled sparsely (j rows filled)
    * @param a2 reduced, filled sparsely (j columns filled)
    * @param cp reduced, filled sparsely (j rows filled)
    * @param indices indicates the filled columns/rows
-   * @return completly filled a2
+   * @return completely filled a2
    */
   protected static double[][] reducedTimesPlusReducedTimesEqualsSecond(double[][] a1, double[][] cw, double[][] a2, double[][] cp, long[] indices) {
     final int rowdim1 = a1.length;
@@ -559,7 +559,7 @@ public class LOBPCG {
         for(int k = 0; k < rowdim3; k++) {
           res += a2[i][k] * ccol[k];
         }
-        a1[i][j] = a1[i][j] - res;
+        a1[i][j] -= res;
       }
     }
     return a1;
@@ -646,8 +646,7 @@ public class LOBPCG {
         for(int k = 0; k < rowdim1; k++) {
           res += acol[k] * a2[k][j];
         }
-        target[i2][j2] = res;
-        target[j2][i2] = res;
+        target[i2][j2] = target[j2][i2] = res;
       }
     }
     return target;
@@ -675,8 +674,7 @@ public class LOBPCG {
         for(int k = 0; k < rowdim1; k++) {
           res += acol[k] * w[k][j];
         }
-        target[i2][j2] = res;
-        target[j2][i2] = res;
+        target[i2][j2] = target[j2][i2] = res;
       }
     }
     return target;
