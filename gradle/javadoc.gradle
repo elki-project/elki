@@ -107,6 +107,7 @@ subprojects {
       exclude "overview.html"
     }
     inputs.files fileTree("$rootDir/elki/src/main/javadoc")
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
     into "$project.buildDir/docs/javadoc"
   }
   javadoc.dependsOn copyDocResources
