@@ -89,6 +89,7 @@ subprojects {
     into "$project.buildDir/docs/javadoc"
   }
   javadoc.finalizedBy copyDocResources
+  javadocJar.dependsOn copyDocResources
   // Additional documentation: parameters
   task documentParameters(type: JavaExec, dependsOn: classes) {
     description "Generate parameter documentation"
