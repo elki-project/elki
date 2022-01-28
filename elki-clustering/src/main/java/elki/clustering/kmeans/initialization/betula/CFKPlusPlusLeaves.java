@@ -173,7 +173,7 @@ public class CFKPlusPlusLeaves extends AbstractCFKMeansInitialization {
    * Update the weight list.
    *
    * @param latest Latest center
-   * @param cf Cluster features
+   * @param cfs Cluster features
    * @param weights Weights
    * @return Weight sum
    */

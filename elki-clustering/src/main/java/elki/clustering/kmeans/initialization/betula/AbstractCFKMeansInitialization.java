@@ -47,7 +47,7 @@ public abstract class AbstractCFKMeansInitialization {
   /**
    * Constructor.
    * 
-   * @param rnd Random number generator.
+   * @param rf Random number generator
    */
   public AbstractCFKMeansInitialization(RandomFactory rf) {
     this.rf = rf;

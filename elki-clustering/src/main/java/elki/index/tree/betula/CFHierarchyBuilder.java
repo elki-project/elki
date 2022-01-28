@@ -33,7 +33,6 @@ import elki.logging.Logging;
  * Class to help building a pointer hierarchy on CFs.
  *
  * @author Andreas Lang
- *
  * 
  * @has - - - PointerHierarchyResult
  */
@@ -54,7 +53,7 @@ public class CFHierarchyBuilder {
   protected ClusterFeature[] cfs;
 
   /**
-   * parent ids
+   * Parent ids
    */
   protected int[] parent;
 
@@ -63,6 +62,9 @@ public class CFHierarchyBuilder {
    */
   protected int[] order;
 
+  /**
+   * Cluster sizes
+   */
   protected int[] csize;
 
   /**
@@ -73,8 +75,7 @@ public class CFHierarchyBuilder {
   /**
    * Constructor.
    *
-   * @param ids IDs
-   * @param isSquared Flag to indicate squared distances
+   * @param cfs Cluster features
    */
   public CFHierarchyBuilder(ClusterFeature[] cfs) {
     super();
@@ -186,7 +187,8 @@ public class CFHierarchyBuilder {
     DBIDVar[] reps = new DBIDVar[cfs.length];
     for(int i = 0; i < tcf.size(); i++) {
       ArrayModifiableDBIDs mids = idmap.get(tcf.get(i));
-      double distance = tcf.get(i).variance(); // TODO solution based on linkage?
+      double distance = tcf.get(i).variance(); // TODO solution based on
+                                               // linkage?
       DBIDArrayMIter iter = mids.iter();
       DBIDVar rep = DBIDUtil.newVar();
       rep.set(iter);

@@ -67,7 +67,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * <p>
  * Eugênio F. Cabral and Robson L.F. Cordeiro<br>
  * Fast and Scalable Outlier Detection with Sorted Hypercubes<br>
- * Proc. 29th ACM Int. Conf. on Information & Knowledge Management (CIKM'20)
+ * Proc. 29th ACM Int. Conf. on Information and Knowledge Management (CIKM'20)
  * 
  * @author Cabral, Eugênio F. (Original Code)
  * @author Braulio V.S. Vinces (ELKIfication)

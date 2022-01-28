@@ -64,7 +64,7 @@ public class ConstrainedQuadraticProblemSolver {
    * @param c c coefficient of the function
    * @param min Lower constraints
    * @param max Upper constraints
-   * @param arrayCache ArrayCache object
+   * @param argmaxPoint point with the maximum
    */
   public double solve(double[][] a, double[] b, double c, double[] min, double[] max, double[] argmaxPoint) {
     DimensionState[] dimStates = cache[min.length - 1].dimStates;
@@ -74,7 +74,7 @@ public class ConstrainedQuadraticProblemSolver {
 
   /**
    * Find the first dimension where the partial derivative wrt. that dimension
-   * is nonnegative or nonpositive. If the derivative is nonnegative (lo >=0) it
+   * is nonnegative or nonpositive. If the derivative is nonnegative (lo &geq;0) it
    * will be driven to the upper limit and vice versa.
    * <p>
    * This does NOT mean that the non-found dimensions are not driven to a limit.
@@ -106,10 +106,11 @@ public class ConstrainedQuadraticProblemSolver {
    * function in the bounding box.
    * The function is of the form \( 0.5 A x^2 + b x + c \).
    * 
-   * @param ak gradient/slope
-   * @param bk y axis crossing
+   * @param a gradient/slope
+   * @param b y axis crossing
    * @param min Lower constraints
    * @param max Upper constraints
+   * @param dim dimension of interest
    * @param buf Return buffer
    */
   private void calculateLinearDerivativeLimits(double[][] a, double[] b, double[] min, double[] max, int dim, double[] buf) {

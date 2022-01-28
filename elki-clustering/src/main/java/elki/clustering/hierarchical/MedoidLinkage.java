@@ -176,10 +176,8 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Execute the cluster merge.
    * 
-   * @param dist merging distance
-   * @param leads cluster leads array
-   * @param ix first lead iterator
-   * @param iy second lead iterator
+   * @param end valid size
+   * @param mat matrix storage
    * @param mx first medoid iterator
    * @param my second medoid iterator
    * @param builder Result builder

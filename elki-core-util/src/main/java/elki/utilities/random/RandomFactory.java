@@ -120,7 +120,7 @@ public class RandomFactory {
   /**
    * MurmurHash3 mixing function.
    * 
-   * @param h input
+   * @param k input
    * @return Output
    */
   public static long murmurMix64(long k) {

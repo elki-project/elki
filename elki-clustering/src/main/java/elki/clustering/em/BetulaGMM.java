@@ -242,7 +242,7 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * Computed as the sum of the logarithms of the prior probability of each
    * instance.
    * 
-   * @param relation the database used for assignment to instances
+   * @param cfs the cluster features to evaluate
    * @param models Cluster models
    * @param probClusterIGivenX Output storage for cluster probabilities
    * @return the expectation value of the current mixture of distributions
@@ -304,10 +304,11 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
   /**
    * Recompute the covariance matrixes.
    * 
-   * @param relation Vector data
+   * @param cfs Cluster features to evaluate
    * @param probClusterIGivenX Object probabilities
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
+   * @param n data set size
    */
   public void recomputeCovarianceMatrices(ArrayList<? extends ClusterFeature> cfs, Map<ClusterFeature, double[]> probClusterIGivenX, List<? extends BetulaClusterModel> models, double prior, int n) {
     final int k = models.size();

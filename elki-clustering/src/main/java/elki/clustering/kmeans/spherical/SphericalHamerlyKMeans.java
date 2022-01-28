@@ -202,7 +202,7 @@ public class SphericalHamerlyKMeans<V extends NumberVector> extends SphericalKMe
      * <p>
      * Used by Hamerly.
      *
-     * @param sep Output array of separation
+     * @param csim Output array of separation
      */
     protected void recomputeSeperation(double[] csim) {
       final int k = means.length;
