@@ -11,7 +11,7 @@ task dependencyPlot { doLast {
     // External dependencies, nodes:
     if (includeExternal)
       projs.collectMany {
-        Project p -> p.configurations.compile.allDependencies }.findAll {
+        Project p -> p.configurations.compileClasspath.allDependencies }.findAll {
         !(it instanceof ProjectDependency) }.unique().sort().each { dep ->
         def n = "${dep.group}:${dep.name}"
         out.println "\"${n}\" [label=\"${dep.group}\\n${dep.name}\",color=blue,fontcolor=blue];"

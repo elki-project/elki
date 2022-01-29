@@ -18,7 +18,7 @@ dependencies {
   project.parent.subprojects.findAll { !bundleExclude.contains(it.path) }.each {
     api it
     doc files(it.sourceSets.main.java.srcDirs)
-    testRuntimeOnly files(it.sourceSets.main.java.outputDir)
+    testRuntimeOnly files(it.sourceSets.main.java.destinationDirectory)
   }
   testImplementation project(':elki-docutil')
   testImplementation(testFixtures(project(path: ':elki-test-core')))

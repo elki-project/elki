@@ -97,7 +97,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/parameters-byclass.html"
-    main = 'elki.application.internal.DocumentParameters'
+    mainClass = 'elki.application.internal.DocumentParameters'
     args "$project.buildDir/docs/javadoc/parameters-byclass.html"
     args "$project.buildDir/docs/javadoc/parameters-byopt.html"
   }
@@ -109,7 +109,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/references.html"
-    main = 'elki.application.internal.DocumentReferences'
+    mainClass = 'elki.application.internal.DocumentReferences'
     args "$project.buildDir/docs/javadoc/references.html"
     args "$project.buildDir/docs/references.md"
   }
