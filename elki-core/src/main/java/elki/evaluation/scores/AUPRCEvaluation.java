@@ -135,7 +135,10 @@ public class AUPRCEvaluation implements ScoreEvaluation {
         ++rank;
         adapter.advance();
       } // Loop while tied:
-      while(adapter.valid() && adapter.tiedToPrevious() || pos == prevpos);
+      while(adapter.valid() && adapter.tiedToPrevious());
+      if (pos == prevpos) {
+        continue;
+      }
       final int newpos = pos - prevpos, ties = rank - prevrank;
       // Interpolation based on Davis and Goadrich
       // Starting point for curve that may otherwise be undefined:
