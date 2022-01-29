@@ -27,11 +27,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -93,6 +89,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   public ClassListParameterConfigurator(ClassListParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
+    textfield.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     textfield.setToolTipText(param.getOptionID().getDescription());
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());
@@ -117,30 +114,26 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     renderer.setFolderIcon(packageIcon);
 
     // setup panel
-    {
-      panel = new JPanel();
-      panel.setLayout(new BorderLayout());
-      panel.add(textfield, BorderLayout.CENTER);
-      panel.add(button, BorderLayout.EAST);
+    panel = new JPanel();
+    panel.setLayout(new BorderLayout());
+    panel.add(textfield, BorderLayout.CENTER);
+    panel.add(button, BorderLayout.EAST);
 
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.HORIZONTAL;
-      constraints.weightx = 1.0;
-      parent.add(panel, constraints);
-      finishGridRow();
-    }
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weightx = 1.0;
+    parent.add(panel, constraints);
+    finishGridRow();
 
     // Child options
-    {
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.gridwidth = GridBagConstraints.REMAINDER;
-      constraints.fill = GridBagConstraints.HORIZONTAL;
-      constraints.weightx = 1.0;
-      constraints.insets = new Insets(0, 10, 0, 0);
-      child = new ConfiguratorPanel();
-      child.addChangeListener(this);
-      parent.add(child, constraints);
-    }
+    constraints = new GridBagConstraints();
+    constraints.gridwidth = GridBagConstraints.REMAINDER;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weightx = 1.0;
+    constraints.insets = new Insets(0, 10, 0, 0);
+    child = new ConfiguratorPanel();
+    child.addChangeListener(this);
+    parent.add(child, constraints);
 
     textfield.addActionListener(this);
   }

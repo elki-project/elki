@@ -281,6 +281,12 @@ public class ParameterTable extends JTable {
       panel.setLayout(new BorderLayout());
       panel.add(comboBox, BorderLayout.CENTER);
       comboBox.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      if(comboBox.getRenderer() instanceof JComponent) {
+        ((JComponent) comboBox.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+      }
+      if(comboBox.getEditor().getEditorComponent() instanceof JComponent) {
+        ((JComponent) comboBox.getEditor().getEditorComponent()).setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      }
     }
 
     @Override

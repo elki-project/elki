@@ -24,6 +24,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
@@ -33,7 +34,7 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * Panel to configure EnumParameters by offering a dropdown to choose from.
- * 
+ * <p>
  * TODO: offer radio buttons when just a few choices are available?
  * 
  * @author Erich Schubert
@@ -46,17 +47,17 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
 
   public EnumParameterConfigurator(EnumParameter<?> cp, JComponent parent) {
     super(cp, parent);
-    // Input field
-    {
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.HORIZONTAL;
-      constraints.weightx = 1.0;
-      value = new JComboBox<>();
-      value.setToolTipText(param.getOptionID().getDescription());
-      value.setPrototypeDisplayValue(cp.getPossibleValues().iterator().next());
-      parent.add(value, constraints);
-      finishGridRow();
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weightx = 1.0;
+    value = new JComboBox<>();
+    if(value.getRenderer() instanceof JComponent) {
+      ((JComponent) value.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
     }
+    value.setToolTipText(param.getOptionID().getDescription());
+    value.setPrototypeDisplayValue(cp.getPossibleValues().iterator().next());
+    parent.add(value, constraints);
+    finishGridRow();
 
     if(!param.tookDefaultValue() && param.isDefined()) {
       value.addItem(param.getValueAsString());
@@ -82,21 +83,14 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
   public void actionPerformed(ActionEvent e) {
     if(e.getSource() == value) {
       fireValueChanged();
+      return;
     }
-    else {
-      LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
-    }
+    LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
   }
 
   @Override
   public String getUserInput() {
     String val = (String) value.getSelectedItem();
-    if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
-      return null;
-    }
-    if(DynamicParameters.STRING_OPTIONAL.equals(val)) {
-      return null;
-    }
-    return val;
+    return val.startsWith(DynamicParameters.STRING_USE_DEFAULT) || DynamicParameters.STRING_OPTIONAL.equals(val) ? null : val;
   }
 }

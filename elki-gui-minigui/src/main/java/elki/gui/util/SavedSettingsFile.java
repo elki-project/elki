@@ -22,6 +22,7 @@ package elki.gui.util;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -82,10 +83,10 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Read the current file
    *
-   * @throws FileNotFoundException thrown when file not found
+   * @throws NoSuchFileException thrown when file not found
    * @throws IOException thrown on IO errors
    */
-  public void load() throws FileNotFoundException, IOException {
+  public void load() throws NoSuchFileException, IOException {
     try (BufferedReader is = Files.newBufferedReader(file)) {
       String line;
       ArrayList<String> buf = null;

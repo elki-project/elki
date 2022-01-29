@@ -218,6 +218,13 @@ public class MiniGUI extends AbstractApplication {
   private void setupAppChooser() {
     // Configurator to choose the main application
     appCombo = new JComboBox<>();
+    appCombo.setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+    if(appCombo.getRenderer() instanceof JComponent) {
+      ((JComponent) appCombo.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+    }
+    if(appCombo.getEditor().getEditorComponent() instanceof JComponent) {
+      ((JComponent) appCombo.getEditor().getEditorComponent()).setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+    }
     for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(AbstractApplication.class)) {
       String nam = clz.getCanonicalName();
       if(nam == null || clz.getCanonicalName().contains("GUI")) {
@@ -282,6 +289,13 @@ public class MiniGUI extends AbstractApplication {
     savedCombo = new JComboBox<>(savedSettingsModel);
     savedCombo.setEditable(true);
     savedCombo.setSelectedItem("[Saved Settings]");
+    savedCombo.setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+    if(savedCombo.getRenderer() instanceof JComponent) {
+      ((JComponent) savedCombo.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+    }
+    if(savedCombo.getEditor().getEditorComponent() instanceof JComponent) {
+      ((JComponent) savedCombo.getEditor().getEditorComponent()).setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+    }
     buttonPanel.add(savedCombo);
 
     // button to load settings
@@ -348,6 +362,7 @@ public class MiniGUI extends AbstractApplication {
    */
   private void setupCommandLine() {
     commandLine = new JTextField();
+    commandLine.setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
     commandLine.setEditable(false); // TODO: Make editable, and parse?
     // Add the output pane to the bottom
     GridBagConstraints constraints = new GridBagConstraints();

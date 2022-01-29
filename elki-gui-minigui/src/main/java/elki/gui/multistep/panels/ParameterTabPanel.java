@@ -159,10 +159,8 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       // Add the scroll pane to this panel.
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 0;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
+      constraints.gridx = constraints.gridy = 0;
+      constraints.weightx = constraints.weighty = 1;
       constraints.anchor = GridBagConstraints.NORTH;
       add(scrollPane, constraints);
     }
@@ -176,7 +174,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     ListParameterization config = new ListParameterization();
     parameterTable.appendParameters(config);
     setParameters(config);
-    if(config.getErrors().size() > 0) {
+    if(!config.getErrors().isEmpty()) {
       reportErrors(config);
     }
     config.clearErrors();
@@ -193,18 +191,14 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     configureStep(track);
 
     // update parameter table
-    {
-      parameterTable.setEnabled(false);
-
-      parameterTable.clear();
-      for(TrackedParameter pair : track.getAllParameters()) {
-        parameterTable.addParameter(pair.getOwner(), pair.getParameter(), track);
-      }
-      // parameters.updateFromTrackParameters(track);
-
-      parameterTable.revalidate();
-      parameterTable.setEnabled(true);
+    parameterTable.setEnabled(false);
+    parameterTable.clear();
+    for(TrackedParameter pair : track.getAllParameters()) {
+      parameterTable.addParameter(pair.getOwner(), pair.getParameter(), track);
     }
+    // parameters.updateFromTrackParameters(track);
+    parameterTable.revalidate();
+    parameterTable.setEnabled(true);
 
     // Update status and notify observers
     updateStatus();
