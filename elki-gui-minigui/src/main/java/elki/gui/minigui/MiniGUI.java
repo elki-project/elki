@@ -75,7 +75,7 @@ public class MiniGUI extends AbstractApplication {
   /**
    * Newline used in output.
    */
-  public static final String NEWLINE = System.getProperty("line.separator");
+  private static final String NEWLINE = System.getProperty("line.separator");
 
   /**
    * ELKI logger for the GUI.
@@ -85,7 +85,7 @@ public class MiniGUI extends AbstractApplication {
   /**
    * Quit action, for mnemonics.
    */
-  protected static final String ACTION_QUIT = "quit";
+  private static final String ACTION_QUIT = "quit";
 
   /**
    * The frame
@@ -192,9 +192,10 @@ public class MiniGUI extends AbstractApplication {
       LOG.exception(e);
     }
 
-    panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
-    panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
-    panel.getActionMap().put(ACTION_QUIT, new AbstractAction() {
+    JRootPane rootpane = frame.getRootPane();
+    rootpane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
+    rootpane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
+    rootpane.getActionMap().put(ACTION_QUIT, new AbstractAction() {
       /**
        * Serial version
        */
@@ -222,17 +223,10 @@ public class MiniGUI extends AbstractApplication {
       if(nam == null || clz.getCanonicalName().contains("GUI")) {
         continue;
       }
-      if(nam.startsWith(APP_PREFIX)) {
-        nam = nam.substring(APP_PREFIX.length());
-      }
-      appCombo.addItem(nam);
+      appCombo.addItem(strip_prefix(nam));
     }
     appCombo.setEditable(true);
-    String sel = maincls.getCanonicalName();
-    if(sel.startsWith(APP_PREFIX)) {
-      sel = sel.substring(APP_PREFIX.length());
-    }
-    appCombo.setSelectedItem(sel);
+    appCombo.setSelectedItem(strip_prefix(maincls.getCanonicalName()));
     appCombo.addActionListener((e) -> {
       if("comboBoxChanged".equals(e.getActionCommand())) {
         Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
@@ -248,8 +242,7 @@ public class MiniGUI extends AbstractApplication {
 
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.fill = GridBagConstraints.BOTH;
-    constraints.gridx = 0;
-    constraints.gridy = 0;
+    constraints.gridx = constraints.gridy = 0;
     constraints.weightx = 1;
     constraints.weighty = .01;
     panel.add(appCombo, constraints);
@@ -274,8 +267,7 @@ public class MiniGUI extends AbstractApplication {
     constraints.fill = GridBagConstraints.BOTH;
     constraints.gridx = 0;
     constraints.gridy = 1;
-    constraints.weightx = 1;
-    constraints.weighty = 1;
+    constraints.weightx = constraints.weighty = 1;
     panel.add(scrollPane, constraints);
   }
 
@@ -283,10 +275,8 @@ public class MiniGUI extends AbstractApplication {
    * Create the load and save buttons.
    */
   private void setupLoadSaveButtons() {
-    // Button panel
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-
     // Combo box for saved settings
     savedSettingsModel = new SettingsComboboxModel(store);
     savedCombo = new JComboBox<>(savedSettingsModel);
@@ -308,13 +298,11 @@ public class MiniGUI extends AbstractApplication {
     JButton saveButton = new JButton("Save");
     saveButton.setMnemonic(KeyEvent.VK_S);
     saveButton.addActionListener((e) -> {
-      String key = savedSettingsModel.getSelectedItem();
-      // Stop editing the table.
-      parameterTable.editCellAt(-1, -1);
+      parameterTable.editCellAt(-1, -1); // stop editing
       ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
       list.add(maincls.getCanonicalName());
       parameters.serializeParameters(list);
-      store.put(key, list);
+      store.put(savedSettingsModel.getSelectedItem(), list);
       try {
         store.save();
       }
@@ -328,8 +316,7 @@ public class MiniGUI extends AbstractApplication {
     JButton removeButton = new JButton("Remove");
     removeButton.setMnemonic(KeyEvent.VK_E);
     removeButton.addActionListener((e) -> {
-      String key = savedSettingsModel.getSelectedItem();
-      store.remove(key);
+      store.remove(savedSettingsModel.getSelectedItem());
       try {
         store.save();
       }
@@ -360,10 +347,8 @@ public class MiniGUI extends AbstractApplication {
    * Setup command line field
    */
   private void setupCommandLine() {
-    // setup text output area
     commandLine = new JTextField();
-    commandLine.setEditable(false); // FIXME: Make editable!
-
+    commandLine.setEditable(false); // TODO: Make editable, and parse?
     // Add the output pane to the bottom
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.fill = GridBagConstraints.BOTH;
@@ -378,9 +363,7 @@ public class MiniGUI extends AbstractApplication {
    * Setup logging area
    */
   private void setupLoggingArea() {
-    // setup text output area
     outputArea = new LogPanel();
-
     // Create the scroll pane and add the table to it.
     JScrollPane outputPane = new JScrollPane(outputArea);
     outputPane.setPreferredSize(new Dimension(800, 400));
@@ -390,8 +373,7 @@ public class MiniGUI extends AbstractApplication {
     constraints.fill = GridBagConstraints.BOTH;
     constraints.gridx = 0;
     constraints.gridy = 4;
-    constraints.weightx = 1;
-    constraints.weighty = 1;
+    constraints.weightx = constraints.weighty = 1;
     panel.add(outputPane, constraints);
   }
 
@@ -400,7 +382,7 @@ public class MiniGUI extends AbstractApplication {
    */
   protected void updateParameterTable() {
     parameterTable.setEnabled(false);
-    ArrayList<String> list = new ArrayList<String>(parameters.size() * 2 + 1);
+    ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
     list.add(maincls.getCanonicalName());
     parameters.serializeParameters(list);
     doSetParameters(list);
@@ -429,8 +411,7 @@ public class MiniGUI extends AbstractApplication {
     track.tryInstantiate(LoggingStep.class);
     track.tryInstantiate(maincls);
     config.logUnusedParameters();
-    // config.logAndClearReportedErrors();
-    final boolean hasErrors = (config.getErrors().size() > 0);
+    final boolean hasErrors = config.getErrors().size() > 0;
     if(hasErrors && !params.isEmpty()) {
       reportErrors(config);
     }
@@ -438,10 +419,7 @@ public class MiniGUI extends AbstractApplication {
 
     List<String> remainingParameters = config.getRemainingParameters();
 
-    String mainnam = maincls.getCanonicalName();
-    if(mainnam.startsWith(APP_PREFIX)) {
-      mainnam = mainnam.substring(APP_PREFIX.length());
-    }
+    String mainnam = strip_prefix(maincls.getCanonicalName());
     commandLine.setText(format(mainnam, params));
 
     // update table:
@@ -467,13 +445,23 @@ public class MiniGUI extends AbstractApplication {
   }
 
   /**
+   * Strip the APP_PREFIX prefix.
+   * 
+   * @param nam class name to strip the prefix from
+   * @return Stripped name
+   */
+  private String strip_prefix(String nam) {
+    return nam.startsWith(APP_PREFIX) ? nam.substring(APP_PREFIX.length()) : nam;
+  }
+
+  /**
    * Format objects to a command line.
    *
    * @param params Parameters to format (Strings, or list of strings)
    * @return Formatted string
    */
   private String format(Object... params) {
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(params.length * 15);
     for(Object p : params) {
       if(p instanceof String) {
         formatTo(buf, (String) p);
@@ -646,28 +634,28 @@ public class MiniGUI extends AbstractApplication {
   public static void main(final String[] args) {
     // Detect the common problem of an incomplete class path:
     try {
-      Class<?> clz = Thread.currentThread().getContextClassLoader().loadClass("elki.database.ids.DBIDUtil");
-      clz.getMethod("newHashSet").invoke(null);
+      Thread.currentThread().getContextClassLoader().loadClass("elki.database.ids.DBIDUtil") //
+          .getMethod("newHashSet").invoke(null);
     }
     catch(ReflectiveOperationException e) {
-      StringBuilder msg = new StringBuilder(500).append("Your Java class path is incomplete.\n");
+      StringBuilder msg = new StringBuilder(500).append("Your Java class path is incomplete.").append(NEWLINE);
       if(e.getCause() != null) {
         for(Throwable t = e.getCause(); t != null; t = t.getCause()) {
-          msg.append(t.toString()).append('\n');
+          msg.append(t.toString()).append(NEWLINE);
         }
       }
       else {
-        msg.append(e.toString()).append('\n');
+        msg.append(e.toString()).append(NEWLINE);
       }
-      msg.append("Make sure you have all the required jars on the classpath.\nOn the home page, you can find a 'elki-bundle' which should include everything.");
+      msg.append("Make sure you have all the required jars on the classpath.").append(NEWLINE) //
+          .append("On the home page, you can find a 'elki-bundle' which should include everything.");
       JOptionPane.showMessageDialog(null, msg, "ClassPath incomplete", JOptionPane.ERROR_MESSAGE);
       return;
     }
     // Detect the broken Ubuntu jAyatana hack;
     String toolopt = System.getenv("JAVA_TOOL_OPTION");
     if(toolopt != null && toolopt.indexOf("jayatana") >= 0) {
-      String msg = "The Ubuntu JAyatana 'global menu support' hack is known to cause problems with many Java applications.\nPlease unset JAVA_TOOL_OPTION.";
-      JOptionPane.showMessageDialog(null, msg, "Incompatible with JAyatana", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, "The Ubuntu JAyatana 'global menu support' hack is known to cause problems with many Java applications." + NEWLINE + "Please unset JAVA_TOOL_OPTION.", "Incompatible with JAyatana", JOptionPane.ERROR_MESSAGE);
       return;
     }
     GUIUtil.logUncaughtExceptions(LOG);
@@ -692,26 +680,16 @@ public class MiniGUI extends AbstractApplication {
               }
             }
             if(params.remove("-minigui.last")) {
-              javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                  gui.loadLatest();
-                }
-              });
+              javax.swing.SwingUtilities.invokeLater(() -> gui.loadLatest());
             }
             if(params.remove("-minigui.autorun")) {
-              javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                  gui.startTask();
-                }
-              });
+              javax.swing.SwingUtilities.invokeLater(() -> gui.startTask());
             }
           }
           gui.doSetParameters(params);
         }
         catch(Exception | Error e) {
-          // Restore error handler, as the GUI is likely broken.
+          // Restore console error handler, as the GUI is likely broken.
           LoggingConfiguration.replaceDefaultHandler(new CLISmartHandler());
           LOG.exception(e);
         }
