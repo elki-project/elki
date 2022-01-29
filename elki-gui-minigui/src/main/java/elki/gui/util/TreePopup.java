@@ -352,12 +352,12 @@ public class TreePopup extends JPopupMenu {
     @Override
     public void keyPressed(KeyEvent e) {
       if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiers()));
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiersEx()));
         e.consume();
         return;
       }
       if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_CANCELED, e.getWhen(), e.getModifiers()));
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_CANCELED, e.getWhen(), e.getModifiersEx()));
       }
     }
 
@@ -371,7 +371,7 @@ public class TreePopup extends JPopupMenu {
     @Override
     public void mouseClicked(MouseEvent e) {
       if(e.getButton() == MouseEvent.BUTTON1) {
-        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiers()));
+        fireActionPerformed(new ActionEvent(TreePopup.this, ActionEvent.ACTION_PERFORMED, ACTION_SELECTED, e.getWhen(), e.getModifiersEx()));
       }
       // ignore
     }

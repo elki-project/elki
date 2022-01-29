@@ -783,7 +783,7 @@ public class ParameterTable extends JTable {
         Object binding = map.get(ks);
         Action action = (binding == null) ? null : am.get(binding);
         if(action != null) {
-          return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiers());
+          return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiersEx());
         }
       }
       return false;

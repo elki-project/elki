@@ -181,7 +181,7 @@ public class CheckParameterizables {
       if(Parameterizer.class.isAssignableFrom(inner)) {
         try {
           Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
-          pcls.newInstance();
+          pcls.getDeclaredConstructor().newInstance();
           if(checkParameterizer(cls, pcls)) {
             if(state == State.INSTANTIABLE) {
               LOG.warning("More than one parameterization method in class " + cls.getName());

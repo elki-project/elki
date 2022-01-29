@@ -42,7 +42,7 @@ import elki.utilities.ELKIBuilder;
 public class SortTileRecursiveBulkSplitTest extends AbstractIndexStructureTest {
   @Test
   public void testSortTileRecursiveBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SortTileRecursiveBulkSplit.class) //
         .build();

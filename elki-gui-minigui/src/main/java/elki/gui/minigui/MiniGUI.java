@@ -20,11 +20,9 @@
  */
 package elki.gui.minigui;
 
-import java.awt.Dimension;
-import java.awt.Event;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -194,14 +192,8 @@ public class MiniGUI extends AbstractApplication {
       LOG.exception(e);
     }
 
-    {
-      KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK);
-      panel.getInputMap().put(key, ACTION_QUIT);
-    }
-    {
-      KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_W, Event.CTRL_MASK);
-      panel.getInputMap().put(key, ACTION_QUIT);
-    }
+    panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
+    panel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
     panel.getActionMap().put(ACTION_QUIT, new AbstractAction() {
       /**
        * Serial version

@@ -42,7 +42,7 @@ import elki.utilities.ELKIBuilder;
 public class FarReinsertTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeAngTanLinearSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(LimitedReinsertOverflowTreatment.Par.REINSERT_STRATEGY_ID, FarReinsert.class) //
         .build();

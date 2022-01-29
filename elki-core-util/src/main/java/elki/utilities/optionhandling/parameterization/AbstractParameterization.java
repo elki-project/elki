@@ -92,19 +92,4 @@ public abstract class AbstractParameterization implements Parameterization {
       throw new AbortException(numerror + " errors occurred during parameterization.");
     }
   }
-
-  /**
-   * Upon destruction, report any errors that weren't handled yet.
-   * 
-   * @throws Throwable Errors
-   */
-  @Override
-  protected void finalize() throws Throwable {
-    final int numerror = getErrors().size();
-    if(numerror > 0) {
-      LOG.warning("There were unhandled errors in the class parameterization. Was the API used correctly?");
-      logAndClearReportedErrors();
-    }
-    super.finalize();
-  }
 }

@@ -50,7 +50,7 @@ public class SpatialSortBulkSplitTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testZCurveSpatialSortBulkSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.BULK_SPLIT_ID, SpatialSortBulkSplit.class) //
         .with(SpatialSortBulkSplit.Par.SORTER_ID, ZCurveSpatialSorter.class) //

@@ -21,6 +21,7 @@
 package elki.persistent;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -214,24 +215,22 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
     try {
       ByteArrayInputStream bais = new ByteArrayInputStream(array);
       ObjectInputStream ois = new ObjectInputStream(bais);
-      int type = ois.readInt();
+      final int type = ois.readInt();
       if(type == EMPTY_PAGE) {
         return null;
       }
-      else if(type == FILLED_PAGE) {
-        P page;
-        try {
-          page = pageclass.newInstance();
-          page.readExternal(ois);
-        }
-        catch(InstantiationException | IllegalAccessException
-            | ClassNotFoundException e) {
-          throw new AbortException("Error instanciating an index page", e);
-        }
+      else if(type != FILLED_PAGE) {
+        throw new IllegalArgumentException("Unknown type: " + type);
+      }
+      try {
+        P page = pageclass.getDeclaredConstructor().newInstance();
+        page.readExternal(ois);
         return page;
       }
-      else {
-        throw new IllegalArgumentException("Unknown type: " + type);
+      catch(InstantiationException | IllegalAccessException
+          | ClassNotFoundException | NoSuchMethodException
+          | InvocationTargetException e) {
+        throw new AbortException("Error instanciating an index page", e);
       }
     }
     catch(IOException e) {
