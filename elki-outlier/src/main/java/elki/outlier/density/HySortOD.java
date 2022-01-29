@@ -231,6 +231,11 @@ public class HySortOD implements OutlierAlgorithm {
     public boolean equals(Object obj) {
       return obj != null && getClass() == obj.getClass() && Arrays.equals(coords, ((Hypercube) obj).coords);
     }
+    
+    @Override
+    public int hashCode() {
+      return Arrays.hashCode(coords) ^ instances.hashCode();
+    }
 
     @Override
     public String toString() {

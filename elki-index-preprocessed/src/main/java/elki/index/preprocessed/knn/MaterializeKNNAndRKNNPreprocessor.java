@@ -50,7 +50,7 @@ import elki.utilities.documentation.Title;
  * @since 0.4.0
  *
  * @param <O> the type of database objects the preprocessor can be applied to
- * @param the type of distance the used distance function will return
+ *        the type of distance the used distance function will return
  */
 @Title("Materialize kNN and RkNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors and the reverse k nearest neighbors of objects of a database.")
@@ -304,7 +304,6 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
    * @author Elke Achtert
    *
    * @param <O> The object type
-   * @param The distance type
    */
   public static class Factory<O> extends MaterializeKNNPreprocessor.Factory<O> {
     /**

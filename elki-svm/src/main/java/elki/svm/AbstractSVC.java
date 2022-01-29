@@ -305,14 +305,14 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
           fval = newf;
           break;
         }
-        stepsize = stepsize * .5;
+        stepsize *= .5;
       }
 
       if(stepsize < MIN_STEP) {
         getLogger().info("Line search fails in two-class probability estimates");
         break;
       }
-      if(iter >= MAX_ITER) {
+      if(iter == MAX_ITER - 1) {
         getLogger().info("Reaching maximal iterations in two-class probability estimates");
         break; // redundant
       }

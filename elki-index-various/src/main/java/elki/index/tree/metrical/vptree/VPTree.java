@@ -463,10 +463,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         }
       }
       else {
-        if(rc != null && rc.lowBound <= x + tau && x - tau <= rc.highBound) {
+        if(rc.lowBound <= x + tau && x - tau <= rc.highBound) {
           tau = vpKNNSearch(knns, rc);
         }
-        if(lc != null && lc.lowBound <= x + tau && x - tau <= lc.highBound) {
+        if(lc.lowBound <= x + tau && x - tau <= lc.highBound) {
           tau = vpKNNSearch(knns, lc);
         }
       }

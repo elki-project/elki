@@ -47,7 +47,6 @@ import elki.database.relation.Relation;
 import elki.distance.CosineDistance;
 import elki.distance.NumberVectorDistance;
 import elki.distance.PrimitiveDistance;
-import elki.distance.SqrtCosineDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
@@ -862,7 +861,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
       new ObjectParameter<NumberVectorDistance<? super V>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, PrimitiveDistance.class, SquaredEuclideanDistance.class) //
           .grab(config, x -> {
             this.distance = x;
-            if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance || x instanceof CosineDistance || x instanceof SqrtCosineDistance) {
+            if(x instanceof SquaredEuclideanDistance || x instanceof EuclideanDistance || x instanceof CosineDistance /* including sqrt cosine */) {
               return;
             }
             else if(needsMetric() && !x.isMetric()) {
