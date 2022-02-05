@@ -42,6 +42,7 @@ import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.filter.FixedDBIDsFilter;
 import elki.distance.CosineDistance;
 import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -238,6 +239,73 @@ public abstract class AbstractIndexStructureTest {
       }
       assertNeighbors(rangeq2.getRange(second, eps2), shouldd2, shouldc2);
     }
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   */
+  protected static void assertExactSqEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
+    assertExactSqEuclidean(factory, expectKNNQuery, expectRangeQuery, false);
+  }
+
+  /**
+   * Test helper
+   * 
+   * @param factory Index factory
+   * @param expectKNNQuery expected knn query class
+   * @param expectRangeQuery expected range query class
+   * @param dbidonly test DBID queries only
+   */
+  protected static void assertExactSqEuclidean(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery, boolean dbidonly) {
+    // Use a fixed DBID - historically, we used 1 indexed - to reduce random
+    // variation in results due to different hash codes everywhere.
+    ListParameterization inputparams = new ListParameterization() //
+        .addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, new FixedDBIDsFilter(0));
+    if(factory != null) {
+      inputparams.addParameter(StaticArrayDatabase.Par.INDEX_ID, factory);
+    }
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
+    Relation<DoubleVector> relation = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    QueryBuilder<DoubleVector> qb = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC).cheapOnly();
+    DistanceQuery<DoubleVector> dist = qb.distanceQuery();
+    DBIDRef second = relation.iterDBIDs().advance();
+
+    if(expectKNNQuery != null) {
+      KNNSearcher<DoubleVector> knnq = qb.kNNByObject(k);
+      KNNSearcher<DBIDRef> knnq2 = qb.kNNByDBID(k);
+      assertClass(expectKNNQuery, knnq, knnq2);
+      if(!dbidonly) {
+        assertNeighbors(relation, dist, knnq.getKNN(DoubleVector.wrap(querypoint), k), squared(shouldd), shouldc);
+      }
+      assertNeighbors(knnq2.getKNN(second, k), squared(shouldd2), shouldc2);
+    }
+    if(expectRangeQuery != null) {
+      RangeSearcher<DoubleVector> rangeq = qb.rangeByObject(eps * eps);
+      RangeSearcher<DBIDRef> rangeq2 = qb.rangeByDBID(eps2 * eps2);
+      assertClass(expectRangeQuery, rangeq, rangeq2);
+      if(!dbidonly) {
+        assertNeighbors(relation, dist, rangeq.getRange(DoubleVector.wrap(querypoint), eps * eps), squared(shouldd), shouldc);
+      }
+      assertNeighbors(rangeq2.getRange(second, eps2 * eps2), squared(shouldd2), shouldc2);
+    }
+  }
+
+  /**
+   * Squared values.
+   *
+   * @param d
+   * @return
+   */
+  private static double[] squared(double[] d) {
+    double[] d2 = new double[d.length];
+    for(int i = 0; i < d.length; i++) {
+      d2[i] = d[i] * d[i];
+    }
+    return d2;
   }
 
   /**

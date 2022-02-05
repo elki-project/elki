@@ -32,9 +32,7 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
 import elki.distance.PrimitiveDistance;
-import elki.distance.minkowski.LPNormDistance;
-import elki.distance.minkowski.SparseLPNormDistance;
-import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.distance.minkowski.*;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
@@ -63,6 +61,12 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * J. L. Bentley<br>
  * Multidimensional binary search trees used for associative searching<br>
  * Communications of the ACM 18(9)
+ * <p>
+ * The search uses an improved search strategy published by:
+ * <p>
+ * S. Arya and D. M. Mount<br>
+ * Algorithms for fast vector quantization<br>
+ * Proc. DCC '93: Data Compression Conference
  * <p>
  * TODO: add support for weighted Minkowski distances.
  *
@@ -219,22 +223,38 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
-    // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
-        || df instanceof SparseLPNormDistance) {
-      return new KDTreeKNNSearcher((PrimitiveDistance<? super O>) df);
+    if(df instanceof SquaredEuclideanDistance) {
+      return new KDTreeKNNSearcher(PartialSquaredEuclideanDistance.STATIC);
     }
+    if(df instanceof EuclideanDistance) {
+      return new KDTreeKNNSearcher(PartialEuclideanDistance.STATIC);
+    }
+    if(df instanceof ManhattanDistance) {
+      return new KDTreeKNNSearcher(PartialManhattanDistance.STATIC);
+    }
+    if(df instanceof LPNormDistance) {
+      return new KDTreeKNNSearcher(new PartialLPNormDistance((LPNormDistance) df));
+    }
+    // TODO: if we know this works for other distance functions, add them, too!
     return null;
   }
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
-    // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
-        || df instanceof SparseLPNormDistance) {
-      return new KDTreeRangeSearcher((PrimitiveDistance<? super O>) df);
+    if(df instanceof SquaredEuclideanDistance) {
+      return new KDTreeRangeSearcher(PartialSquaredEuclideanDistance.STATIC);
     }
+    if(df instanceof EuclideanDistance) {
+      return new KDTreeRangeSearcher(PartialEuclideanDistance.STATIC);
+    }
+    if(df instanceof ManhattanDistance) {
+      return new KDTreeRangeSearcher(PartialManhattanDistance.STATIC);
+    }
+    if(df instanceof LPNormDistance) {
+      return new KDTreeRangeSearcher(new PartialLPNormDistance((LPNormDistance) df));
+    }
+    // TODO: if we know this works for other distance functions, add them, too!
     return null;
   }
 
@@ -251,21 +271,32 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
 
   /**
    * kNN query for the k-d-tree.
+   * <p>
+   * Reference:
+   * <p>
+   * S. Arya and D. M. Mount<br>
+   * Algorithms for fast vector quantization<br>
+   * Proc. DCC '93: Data Compression Conference
    *
    * @author Erich Schubert
    */
+  @Reference(authors = "S. Arya and D. M. Mount", //
+      title = "Algorithms for fast vector quantization", //
+      booktitle = "Proc. DCC '93: Data Compression Conference", //
+      url = "https://doi.org/10.1109/DCC.1993.253111", //
+      bibkey = "doi:10.1109/DCC.1993.253111")
   public class KDTreeKNNSearcher implements KNNSearcher<O> {
     /**
      * Distance to use.
      */
-    private PrimitiveDistance<? super O> distance;
+    private PartialDistance<? super O> distance;
 
     /**
      * Constructor.
      *
      * @param distance Distance to use
      */
-    public KDTreeKNNSearcher(PrimitiveDistance<? super O> distance) {
+    public KDTreeKNNSearcher(PartialDistance<? super O> distance) {
       super();
       this.distance = distance;
     }
@@ -273,7 +304,8 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
     @Override
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
-      kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), Double.POSITIVE_INFINITY);
+      double[] bounds = new double[dims];
+      kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), bounds, 0, Double.POSITIVE_INFINITY);
       return knns.toKNNList();
     }
 
@@ -286,10 +318,12 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
      * @param query Query object
      * @param knns kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
+     * @param bounds current bounds
+     * @param rawdist Raw distance to current rectangle (usually squared)
      * @param maxdist Current upper bound of kNN distance.
      * @return New upper bound of kNN distance.
      */
-    private double kdKNNSearch(int left, int right, int axis, O query, KNNHeap knns, DoubleDBIDListIter iter, double maxdist) {
+    private double kdKNNSearch(int left, int right, int axis, O query, KNNHeap knns, DoubleDBIDListIter iter, double[] bounds, double rawdist, double maxdist) {
       if(right - left <= leafsize) {
         for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
@@ -297,8 +331,11 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
           countDistanceComputation();
           if(dist <= maxdist) {
             knns.insert(dist, iter);
+            maxdist = knns.getKNNDistance();
+            if(distance.compareRawRegular(rawdist, maxdist)) {
+              break;
+            }
           }
-          maxdist = knns.getKNNDistance();
         }
         return maxdist;
       }
@@ -308,69 +345,69 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
       // Distance to axis:
       final double delta = iter.seek(middle).doubleValue() - query.doubleValue(axis);
       assert (iter.doubleValue() == relation.get(iter).doubleValue(axis)) : "Tree inconsistent " + left + " < " + middle + " < " + right + ": " + iter.doubleValue() + " != " + relation.get(iter).doubleValue(axis) + " " + relation.get(iter);
-      final boolean onleft = (delta >= 0);
-      final boolean onright = (delta <= 0);
 
       // Next axis:
       final int next = next(axis);
 
+      final double prevdelta = bounds[axis];
+      final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
       // Exact match chance (delta == 0)!
-      // process first, then descend both sides.
-      if(onleft && onright) {
-        O split = relation.get(iter.seek(middle));
+      // process split object first, then descend both sides.
+      if(delta == 0.0) {
+        double dist = distance.distance(query, relation.get(iter.seek(middle)));
         countObjectAccess();
-        double dist = distance.distance(query, split);
         countDistanceComputation();
         if(dist <= maxdist) {
-          assert (iter.getOffset() == middle);
-          knns.insert(dist, iter /* .seek(middle) */);
+          assert iter.getOffset() == middle;
+          knns.insert(dist, iter /* actually: iter.seek(middle) */);
           maxdist = knns.getKNNDistance();
         }
+        bounds[axis] = 0; // delta
         if(left < middle) {
-          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, maxdist);
+          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, mindist, maxdist);
         }
         if(middle + 1 < right) {
-          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, maxdist);
+          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, mindist, maxdist);
+        }
+        bounds[axis] = prevdelta; // restore
+      }
+      else if(delta > 0) { // left first
+        if(left < middle) {
+          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, rawdist, maxdist);
+        }
+        // Look at splitting element (unless already above):
+        if(distance.compareRawRegular(mindist, maxdist)) {
+          double dist = distance.distance(query, relation.get(iter.seek(middle)));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= maxdist) {
+            knns.insert(dist, iter.seek(middle));
+            maxdist = knns.getKNNDistance();
+          }
+          if(middle + 1 < right) {
+            bounds[axis] = delta;
+            maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, mindist, maxdist);
+            bounds[axis] = prevdelta; // restore
+          }
         }
       }
-      else {
-        final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
-        if(onleft) {
-          if(left < middle) {
-            maxdist = kdKNNSearch(left, middle, next, query, knns, iter, maxdist);
-          }
-          // Look at splitting element (unless already above):
-          if(mindist <= maxdist) {
-            O split = relation.get(iter.seek(middle));
-            countObjectAccess();
-            double dist = distance.distance(query, split);
-            countDistanceComputation();
-            if(dist <= maxdist) {
-              knns.insert(dist, iter);
-              maxdist = knns.getKNNDistance();
-            }
-          }
-          if(middle + 1 < right && mindist <= maxdist) {
-            maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, maxdist);
-          }
+      else { // delta > 0, right first
+        if(middle + 1 < right) {
+          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, rawdist, maxdist);
         }
-        else { // onright
-          if(middle + 1 < right) {
-            maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, maxdist);
+        // Look at splitting element (unless already above):
+        if(distance.compareRawRegular(mindist, maxdist)) {
+          double dist = distance.distance(query, relation.get(iter.seek(middle)));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= maxdist) {
+            knns.insert(dist, iter.seek(middle));
+            maxdist = knns.getKNNDistance();
           }
-          // Look at splitting element (unless already above):
-          if(mindist <= maxdist) {
-            O split = relation.get(iter.seek(middle));
-            countObjectAccess();
-            double dist = distance.distance(query, split);
-            countDistanceComputation();
-            if(dist <= maxdist) {
-              knns.insert(dist, iter);
-              maxdist = knns.getKNNDistance();
-            }
-          }
-          if(left < middle && mindist <= maxdist) {
-            maxdist = kdKNNSearch(left, middle, next, query, knns, iter, maxdist);
+          if(left < middle) {
+            bounds[axis] = delta;
+            maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, mindist, maxdist);
+            bounds[axis] = prevdelta; // restore
           }
         }
       }
@@ -380,28 +417,40 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
 
   /**
    * Range query for the k-d-tree.
+   * <p>
+   * Reference:
+   * <p>
+   * S. Arya and D. M. Mount<br>
+   * Algorithms for fast vector quantization<br>
+   * Proc. DCC '93: Data Compression Conference
    *
    * @author Erich Schubert
    */
+  @Reference(authors = "S. Arya and D. M. Mount", //
+      title = "Algorithms for fast vector quantization", //
+      booktitle = "Proc. DCC '93: Data Compression Conference", //
+      url = "https://doi.org/10.1109/DCC.1993.253111", //
+      bibkey = "doi:10.1109/DCC.1993.253111")
   public class KDTreeRangeSearcher implements RangeSearcher<O> {
     /**
      * Distance to use.
      */
-    private PrimitiveDistance<? super O> distance;
+    private PartialDistance<? super O> distance;
 
     /**
      * Constructor.
      *
      * @param distance Distance to use
      */
-    public KDTreeRangeSearcher(PrimitiveDistance<? super O> distance) {
+    public KDTreeRangeSearcher(PartialDistance<? super O> distance) {
       super();
       this.distance = distance;
     }
 
     @Override
     public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
-      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), range);
+      double[] bounds = new double[dims];
+      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), bounds, 0, range);
       return result;
     }
 
@@ -414,9 +463,10 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
      * @param query Query object
      * @param res kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
+     * @param rawdist Raw distance to current rectangle (usually squared)
      * @param radius Query radius
      */
-    private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DoubleDBIDListIter iter, double radius) {
+    private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DoubleDBIDListIter iter, double[] bounds, double rawdist, double radius) {
       if(right - left <= leafsize) {
         for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
@@ -433,29 +483,52 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
 
       // Distance to axis:
       final double delta = iter.seek(middle).doubleValue() - query.doubleValue(axis);
-      final boolean onleft = (delta >= 0), onright = (delta <= 0);
-      final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
-      final boolean close = (mindist <= radius);
+      final double prevdelta = bounds[axis];
+      final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
+      final boolean close = distance.compareRawRegular(mindist, radius);
 
       // Next axis:
       final int next = next(axis);
 
       // Current object:
       if(close) {
-        O split = relation.get(iter.seek(middle));
+        double dist = distance.distance(query, relation.get(iter.seek(middle)));
         countObjectAccess();
-        double dist = distance.distance(query, split);
         countDistanceComputation();
         if(dist <= radius) {
           assert (iter.getOffset() == middle);
           res.add(dist, iter /* .seek(middle) */);
         }
       }
-      if(left < middle && (onleft || close)) {
-        kdRangeSearch(left, middle, next, query, res, iter, radius);
+      if(delta == 0) {
+        bounds[axis] = 0.; // delta is 0
+        if(left < middle) {
+          kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
+        }
+        if(middle + 1 < right) {
+          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
+        }
+        bounds[axis] = prevdelta; // restore
       }
-      if(middle + 1 < right && (onright || close)) {
-        kdRangeSearch(middle + 1, right, next, query, res, iter, radius);
+      else if(delta > 0) {
+        if(left < middle) {
+          kdRangeSearch(left, middle, next, query, res, iter, bounds, rawdist, radius);
+        }
+        if(middle + 1 < right && close) {
+          bounds[axis] = delta;
+          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
+          bounds[axis] = prevdelta; // restore
+        }
+      }
+      else {
+        if(left < middle && close) {
+          bounds[axis] = delta;
+          kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
+          bounds[axis] = prevdelta; // restore
+        }
+        if(middle + 1 < right) {
+          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, rawdist, radius);
+        }
       }
     }
   }
