@@ -123,11 +123,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     //
     Constructor<? extends Index> kdIndex = null;
     try {
-      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.SmallMemoryKDTree");
-      kdIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, int.class);
+      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.MemoryKDTree");
+      kdIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class);
     }
     catch(ClassNotFoundException e) {
-      LOG.verbose("SmallMemoryKDTree is not available, and cannot be automatically used for optimization.");
+      LOG.verbose("MemoryKDTree is not available, and cannot be automatically used for optimization.");
     }
     catch(NoSuchMethodException | SecurityException e) {
       LOG.exception(e);
@@ -364,7 +364,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, 5);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
       return idx;

@@ -126,6 +126,15 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
   protected final Counter distcalc;
 
   /**
+   * Constructor with defaults (used by EmpiricalQueryOptimizer).
+   *
+   * @param relation Relation to index
+   */
+  public MemoryKDTree(Relation<O> relation) {
+    this(relation, BoundedMidpointSplit.STATIC, 10);
+  }
+
+  /**
    * Constructor.
    *
    * @param relation Relation to index
