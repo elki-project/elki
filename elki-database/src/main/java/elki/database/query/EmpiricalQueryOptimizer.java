@@ -151,51 +151,37 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
+    KNNIndex<O> idx = null;
+    // Try adding a preprocessor if requested:
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
+    }
+    if(idx == null) { // cover tree is cheap and fast
+      idx = makeCoverTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) { // try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
-      // Precomputation can be useful additionally!
-      if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-        return idx.kNNByObject(distanceQuery, maxk, flags);
-      }
-    }
-    // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-      return null;
-    }
-    long freeMemory = getFreeMemory();
-    final long msize = maxk * 12L * relation.size();
-    if(msize > 0.8 * freeMemory) {
-      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
-      return null;
-    }
-    try {
-      idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
-      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
-      idx.initialize();
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
-        Metadata.hierarchyOf(relation).addWeakChild(idx);
-      }
       return idx.kNNByObject(distanceQuery, maxk, flags);
-    }
-    catch(InstantiationException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
-      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    KNNIndex<O> idx = null;
+    // Try adding a preprocessor if requested:
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
+    }
+    if(idx == null) { // cover tree is cheap and fast
+      idx = makeCoverTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
@@ -206,33 +192,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
-      // Precomputation can be useful additionally!
-      if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-        return idx.kNNByDBID(distanceQuery, maxk, flags);
-      }
-    }
-    // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-      return null;
-    }
-    long freeMemory = getFreeMemory();
-    final long msize = maxk * 12L * relation.size();
-    if(msize > 0.8 * freeMemory) {
-      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
-      return null;
-    }
-    try {
-      idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
-      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
-      idx.initialize();
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
-        Metadata.hierarchyOf(relation).addWeakChild(idx);
-      }
       return idx.kNNByDBID(distanceQuery, maxk, flags);
-    }
-    catch(InstantiationException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
-      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }
@@ -372,6 +332,43 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     catch(InstantiationException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       LOG.exception("Automatic k-d-tree creation failed.", e);
+    }
+    return null;
+  }
+
+  /**
+   * Make a knn preprocessor.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param maxk Maximum k
+   * @param flags Optimizer flags
+   * @return knn preprocessor
+   */
+  @SuppressWarnings("unchecked")
+  private <O> KNNIndex<O> makeKnnPreprocessor(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(knnIndex == null) {
+      return null;
+    }
+    long freeMemory = getFreeMemory();
+    final long msize = maxk * 12L * relation.size();
+    if(msize > 0.8 * freeMemory) {
+      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
+      return null;
+    }
+    try {
+      KNNIndex<O> idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
+      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
+      idx.initialize();
+      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+        Metadata.hierarchyOf(relation).addWeakChild(idx);
+      }
+      return idx;
+    }
+    catch(InstantiationException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }
