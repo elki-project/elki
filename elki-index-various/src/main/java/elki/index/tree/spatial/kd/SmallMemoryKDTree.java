@@ -38,6 +38,7 @@ import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
+import elki.utilities.Priority;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -54,7 +55,8 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * <p>
  * It needs about 3 times as much memory as {@link MinimalisticMemoryKDTree} but
  * it is also considerably faster because it does not need to lookup this value
- * from the vectors.
+ * from the vectors. {@link MemoryKDTree} needs even more memory, but uses much
+ * better splits and hence is usually the best choice.
  * <p>
  * Reference:
  * <p>
@@ -83,6 +85,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Communications of the ACM 18(9)", //
     url = "https://doi.org/10.1145/361002.361007", //
     bibkey = "DBLP:journals/cacm/Bentley75")
+@Priority(Priority.SUPPLEMENTARY - 1)
 public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriorityIndex<O> {
   /**
    * Class logger
@@ -304,8 +307,7 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
     @Override
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
-      double[] bounds = new double[dims];
-      kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), bounds, 0, Double.POSITIVE_INFINITY);
+      kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), new double[dims], 0, Double.POSITIVE_INFINITY);
       return knns.toKNNList();
     }
 
@@ -341,16 +343,11 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
       }
       // Look at current node:
       final int middle = (left + right) >>> 1;
-
       // Distance to axis:
       final double delta = iter.seek(middle).doubleValue() - query.doubleValue(axis);
       assert (iter.doubleValue() == relation.get(iter).doubleValue(axis)) : "Tree inconsistent " + left + " < " + middle + " < " + right + ": " + iter.doubleValue() + " != " + relation.get(iter).doubleValue(axis) + " " + relation.get(iter);
-
-      // Next axis:
       final int next = next(axis);
 
-      final double prevdelta = bounds[axis];
-      final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
       // Exact match chance (delta == 0)!
       // process split object first, then descend both sides.
       if(delta == 0.0) {
@@ -362,20 +359,20 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
           knns.insert(dist, iter /* actually: iter.seek(middle) */);
           maxdist = knns.getKNNDistance();
         }
-        bounds[axis] = 0; // delta
         if(left < middle) {
-          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, mindist, maxdist);
+          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, rawdist, maxdist);
         }
         if(middle + 1 < right) {
-          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, mindist, maxdist);
+          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, rawdist, maxdist);
         }
-        bounds[axis] = prevdelta; // restore
       }
       else if(delta > 0) { // left first
         if(left < middle) {
           maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, rawdist, maxdist);
         }
         // Look at splitting element (unless already above):
+        final double prevdelta = bounds[axis];
+        final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, maxdist)) {
           double dist = distance.distance(query, relation.get(iter.seek(middle)));
           countObjectAccess();
@@ -396,6 +393,8 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
           maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, rawdist, maxdist);
         }
         // Look at splitting element (unless already above):
+        final double prevdelta = bounds[axis];
+        final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, maxdist)) {
           double dist = distance.distance(query, relation.get(iter.seek(middle)));
           countObjectAccess();
@@ -449,8 +448,7 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
 
     @Override
     public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
-      double[] bounds = new double[dims];
-      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), bounds, 0, range);
+      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), new double[dims], 0, range);
       return result;
     }
 
@@ -480,18 +478,12 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
       }
       // Look at current node:
       final int middle = (left + right) >>> 1;
-
       // Distance to axis:
       final double delta = iter.seek(middle).doubleValue() - query.doubleValue(axis);
-      final double prevdelta = bounds[axis];
-      final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
-      final boolean close = distance.compareRawRegular(mindist, radius);
-
-      // Next axis:
       final int next = next(axis);
 
-      // Current object:
-      if(close) {
+      if(delta == 0) {
+        // Current object:
         double dist = distance.distance(query, relation.get(iter.seek(middle)));
         countObjectAccess();
         countDistanceComputation();
@@ -499,35 +491,53 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
           assert (iter.getOffset() == middle);
           res.add(dist, iter /* .seek(middle) */);
         }
-      }
-      if(delta == 0) {
-        bounds[axis] = 0.; // delta is 0
         if(left < middle) {
-          kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
+          kdRangeSearch(left, middle, next, query, res, iter, bounds, rawdist, radius);
         }
         if(middle + 1 < right) {
-          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
+          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, rawdist, radius);
         }
-        bounds[axis] = prevdelta; // restore
       }
       else if(delta > 0) {
         if(left < middle) {
           kdRangeSearch(left, middle, next, query, res, iter, bounds, rawdist, radius);
         }
-        if(middle + 1 < right && close) {
-          bounds[axis] = delta;
-          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
-          bounds[axis] = prevdelta; // restore
+        final double prevdelta = bounds[axis];
+        final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
+        if(distance.compareRawRegular(mindist, radius)) {
+          // Current object:
+          double dist = distance.distance(query, relation.get(iter.seek(middle)));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= radius) {
+            res.add(dist, iter.seek(middle));
+          }
+          if(middle + 1 < right) {
+            bounds[axis] = delta;
+            kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
+            bounds[axis] = prevdelta; // restore
+          }
         }
       }
       else {
-        if(left < middle && close) {
-          bounds[axis] = delta;
-          kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
-          bounds[axis] = prevdelta; // restore
-        }
         if(middle + 1 < right) {
           kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, rawdist, radius);
+        }
+        final double prevdelta = bounds[axis];
+        final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
+        if(distance.compareRawRegular(mindist, radius)) {
+          // Current object:
+          double dist = distance.distance(query, relation.get(iter.seek(middle)));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= radius) {
+            res.add(dist, iter.seek(middle));
+          }
+          if(left < middle) {
+            bounds[axis] = delta;
+            kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
+            bounds[axis] = prevdelta; // restore
+          }
         }
       }
     }
@@ -731,7 +741,7 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
    *
    * @param <O> Vector type
    */
-  @Alias({ "smallkd", "kd" })
+  @Alias({ "smallkd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O> {
     /**
      * Maximum size of leaf nodes.

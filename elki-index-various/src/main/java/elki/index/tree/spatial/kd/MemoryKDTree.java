@@ -22,7 +22,6 @@ package elki.index.tree.spatial.kd;
 
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
-import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
@@ -37,10 +36,11 @@ import elki.distance.PrimitiveDistance;
 import elki.distance.minkowski.*;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
+import elki.index.tree.spatial.kd.split.BoundedMidpointSplit;
+import elki.index.tree.spatial.kd.split.SplitStrategy;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
 import elki.utilities.Alias;
-import elki.utilities.Priority;
 import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -48,25 +48,16 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
+import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Simple implementation of a static in-memory K-D-tree. Does not support
- * dynamic updates or anything, but also is very simple and memory efficient:
- * all it uses is one {@link ArrayModifiableDBIDs} to sort the data in a
- * serialized tree.
+ * Implementation of a static in-memory K-D-tree.
  * <p>
  * Reference:
  * <p>
  * J. L. Bentley<br>
  * Multidimensional binary search trees used for associative searching<br>
  * Communications of the ACM 18(9)
- * <p>
- * The version {@link SmallMemoryKDTree} uses 3x more memory, but is
- * considerably faster because it keeps a local copy of the attribute values,
- * thus reducing the number of accesses to the relation substantially. In
- * particular, this reduces construction time. {@link MemoryKDTree} needs even
- * more memory, but uses much better splits and hence is usually the best
- * choice.
  * <p>
  * The search uses an improved search strategy published by:
  * <p>
@@ -77,7 +68,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * TODO: add support for weighted Minkowski distances.
  *
  * @author Erich Schubert
- * @since 0.6.0
  *
  * @has - - - KDTreeKNNSearcher
  * @has - - - KDTreeRangeSearcher
@@ -89,12 +79,11 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Communications of the ACM 18(9)", //
     url = "https://doi.org/10.1145/361002.361007", //
     bibkey = "DBLP:journals/cacm/Bentley75")
-@Priority(Priority.SUPPLEMENTARY - 1)
-public class MinimalisticMemoryKDTree<O extends NumberVector> implements DistancePriorityIndex<O> {
+public class MemoryKDTree<O extends NumberVector> implements DistancePriorityIndex<O> {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(MinimalisticMemoryKDTree.class);
+  private static final Logging LOG = Logging.getLogger(MemoryKDTree.class);
 
   /**
    * The representation we are bound to.
@@ -102,19 +91,29 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
   protected final Relation<O> relation;
 
   /**
-   * The actual "tree" as a sorted array.
+   * Split stragegy
    */
-  protected ArrayModifiableDBIDs sorted = null;
-
-  /**
-   * The number of dimensions.
-   */
-  protected int dims = -1;
+  protected SplitStrategy split;
 
   /**
    * Maximum size of leaf nodes.
    */
   protected int leafsize;
+
+  /**
+   * The actual "tree" as a sorted array.
+   */
+  protected ArrayDBIDs sorted = null;
+
+  /**
+   * Root node
+   */
+  protected KDNode root;
+
+  /**
+   * The number of dimensions.
+   */
+  protected int dims = -1;
 
   /**
    * Counter for comparisons.
@@ -130,10 +129,12 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
    * Constructor.
    *
    * @param relation Relation to index
+   * @param split Split strategy
    * @param leafsize Maximum size of leaf nodes
    */
-  public MinimalisticMemoryKDTree(Relation<O> relation, int leafsize) {
+  public MemoryKDTree(Relation<O> relation, SplitStrategy split, int leafsize) {
     this.relation = relation;
+    this.split = split;
     this.leafsize = leafsize;
     assert (leafsize >= 1);
     if(LOG.isStatistics()) {
@@ -149,80 +150,117 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
 
   @Override
   public void initialize() {
-    sorted = DBIDUtil.newArray(relation.getDBIDs());
     dims = RelationUtil.dimensionality(relation);
-    final VectorUtil.SortDBIDsBySingleDimension comp;
-    if(objaccess != null) {
-      comp = new CountSortAccesses(objaccess, relation);
-    }
-    else {
-      comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
-    }
-    buildTree(0, sorted.size(), 0, comp);
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+    root = buildTree(0, ids.size(), ids, ids.iter(), new VectorUtil.SortDBIDsBySingleDimension(relation));
+    sorted = ids;
   }
 
   /**
-   * Class to count object accesses during construction.
+   * Build the k-d tree.
+   *
+   * @param left interval start
+   * @param right interval end
+   * @param sorted object ids
+   * @param iter iterator on the ids
+   * @param comp comparator on the values
+   * @return root node
+   */
+  public KDNode buildTree(int left, int right, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, VectorUtil.SortDBIDsBySingleDimension comp) {
+    if(right - left <= leafsize) {
+      return new KDNode(left, right);
+    }
+    SplitStrategy.Info s = split.findSplit(relation, dims, sorted, iter, left, right, comp);
+    if(s == null || s.pos >= right) {
+      return new KDNode(left, right);
+    }
+    KDNode node = new KDNode(left, right, s.dim, s.val, buildTree(left, s.pos, sorted, iter, comp), buildTree(s.pos, right, sorted, iter, comp));
+    assert assertSplitConsistent(left, s.pos, right, s.dim, s.val, iter);
+    return node;
+  }
+
+  /**
+   * KD tree node.
    *
    * @author Erich Schubert
    */
-  private static class CountSortAccesses extends VectorUtil.SortDBIDsBySingleDimension {
+  public static class KDNode {
     /**
-     * Counter for comparisons.
+     * Splitting threshold
      */
-    final Counter objaccess;
+    double split;
+
+    /**
+     * Split dimension
+     */
+    int dim;
+
+    /**
+     * Left child node
+     */
+    KDNode leftChild;
+
+    /**
+     * Right child node
+     */
+    KDNode rightChild;
+
+    /**
+     * First index of child nodes.
+     */
+    int start;
+
+    /**
+     * End index of child nodes (exclusive).
+     */
+    int end;
 
     /**
      * Constructor.
      *
-     * @param objaccess Object access counter.
-     * @param data Data relation
+     * @param start Start index of subtree range
+     * @param end End index of subtree range
      */
-    public CountSortAccesses(Counter objaccess, Relation<? extends NumberVector> data) {
-      super(data);
-      this.objaccess = objaccess;
+    public KDNode(int start, int end) {
+      this(start, end, -1, Double.NaN, null, null);
     }
 
-    @Override
-    public int compare(DBIDRef id1, DBIDRef id2) {
-      objaccess.increment(2);
-      return super.compare(id1, id2);
-    }
-  }
-
-  /**
-   * Recursively build the tree by partial sorting. O(n log n) complexity.
-   * Apparently there exists a variant in only O(n log log n)? Please
-   * contribute!
-   *
-   * @param left Interval minimum
-   * @param right Interval maximum
-   * @param axis Current splitting axis
-   * @param comp Comparator
-   */
-  private void buildTree(int left, int right, int axis, SortDBIDsBySingleDimension comp) {
-    int middle = (left + right) >>> 1;
-    comp.setDimension(axis);
-    QuickSelectDBIDs.quickSelect(sorted, comp, left, right, middle);
-
-    final int next = next(axis);
-    if(left + leafsize < middle) {
-      buildTree(left, middle, next, comp);
-    }
-    ++middle;
-    if(middle + leafsize < right) {
-      buildTree(middle, right, next, comp);
+    /**
+     * Constructor.
+     *
+     * @param start Start index of subtree range
+     * @param end End index of subtree range
+     * @param dim Split dimension
+     * @param split Split value
+     * @param leftChild Left child
+     * @param rightChild Right child
+     */
+    public KDNode(int start, int end, int dim, double split, KDNode leftChild, KDNode rightChild) {
+      this.start = start;
+      this.end = end;
+      this.dim = dim;
+      this.split = split;
+      this.leftChild = leftChild;
+      this.rightChild = rightChild;
     }
   }
 
   /**
-   * Next axis.
+   * Assert that the generated split is consistent.
    *
-   * @param axis Current axis
-   * @return Next axis
+   * @param left Interval start
+   * @param right Interval end
+   * @param s Split information
+   * @param iter Iterator
    */
-  private int next(int axis) {
-    return ++axis == dims ? 0 : axis;
+  private boolean assertSplitConsistent(int left, int pos, int right, int dim, double val, DBIDArrayMIter iter) {
+    for(iter.seek(left); iter.getOffset() < pos; iter.advance()) {
+      assert relation.get(iter).doubleValue(dim) <= val : relation.get(iter).doubleValue(dim) + " > " + val + " at " + iter.getOffset() + "<" + pos;
+    }
+    for(iter.seek(pos); iter.getOffset() < right; iter.advance()) {
+      assert relation.get(iter).doubleValue(dim) >= val : relation.get(iter).doubleValue(dim) + " < " + val + " at " + iter.getOffset() + ">=" + pos;
+    }
+    return true;
   }
 
   @Override
@@ -273,7 +311,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
   }
 
   @Override
-  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxradius, int flags) {
+  public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     Distance<? super O> df = distanceQuery.getDistance();
     if(df instanceof SquaredEuclideanDistance) {
       return new KDTreeRangeSearcher(PartialSquaredEuclideanDistance.STATIC);
@@ -337,16 +375,14 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
     @Override
     public KNNList getKNN(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
-      kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), new double[dims], 0, Double.POSITIVE_INFINITY);
+      kdKNNSearch(root, obj, knns, sorted.iter(), new double[dims], 0, Double.POSITIVE_INFINITY);
       return knns.toKNNList();
     }
 
     /**
      * Perform a kNN search on the k-d-tree.
      *
-     * @param left Subtree begin
-     * @param right Subtree end (exclusive)
-     * @param axis Current splitting axis
+     * @param node Current node
      * @param query Query object
      * @param knns kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
@@ -355,10 +391,13 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
      * @param maxdist Current upper bound of kNN distance.
      * @return New upper bound of kNN distance.
      */
-    private double kdKNNSearch(int left, int right, int axis, O query, KNNHeap knns, DBIDArrayIter iter, double[] bounds, double rawdist, double maxdist) {
-      if(right - left <= leafsize) {
-        for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
+    private double kdKNNSearch(KDNode node, O query, KNNHeap knns, DBIDArrayIter iter, double[] bounds, double rawdist, double maxdist) {
+      final int axis = node.dim;
+      if(axis == -1) { // leaf
+        assert node.leftChild == null && node.rightChild == null;
+        for(iter.seek(node.start); iter.getOffset() < node.end; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
+          // assert distance.compareRawRegular(rawdist, dist);
           countObjectAccess();
           countDistanceComputation();
           if(dist <= maxdist) {
@@ -371,71 +410,31 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
         }
         return maxdist;
       }
-      // Look at current node:
-      final int middle = (left + right) >>> 1;
-      O split = relation.get(iter.seek(middle));
-      countObjectAccess();
-      // Distance to current axis:
-      final double delta = split.doubleValue(axis) - query.doubleValue(axis);
-      final int next = next(axis);
-
-      // Exact match chance (delta == 0)!
-      // process split object first, then descend both sides.
+      assert node.leftChild != null && node.rightChild != null;
+      // Distance to axis:
+      final double delta = node.split - query.doubleValue(axis);
       if(delta == 0.0) {
-        double dist = distance.distance(query, split);
-        countDistanceComputation();
-        if(dist <= maxdist) {
-          assert iter.getOffset() == middle;
-          knns.insert(dist, iter /* actually: iter.seek(middle) */);
-          maxdist = knns.getKNNDistance();
-        }
-        if(left < middle) {
-          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, rawdist, maxdist);
-        }
-        if(middle + 1 < right) {
-          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, rawdist, maxdist);
-        }
+        maxdist = kdKNNSearch(node.leftChild, query, knns, iter, bounds, rawdist, maxdist);
+        maxdist = kdKNNSearch(node.rightChild, query, knns, iter, bounds, rawdist, maxdist);
       }
-      else if(delta > 0) {
-        if(left < middle) {
-          maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, rawdist, maxdist);
-        }
-        // Look at splitting element (unless already above):
+      else if(delta > 0) { // left first
+        maxdist = kdKNNSearch(node.leftChild, query, knns, iter, bounds, rawdist, maxdist);
         final double prevdelta = bounds[axis];
         final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, maxdist)) {
-          double dist = distance.distance(query, split);
-          countDistanceComputation();
-          if(dist <= maxdist) {
-            knns.insert(dist, iter.seek(middle));
-            maxdist = knns.getKNNDistance();
-          }
-          if(middle + 1 < right) {
-            bounds[axis] = delta;
-            maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, mindist, maxdist);
-            bounds[axis] = prevdelta; // restore
-          }
+          bounds[axis] = delta;
+          maxdist = kdKNNSearch(node.rightChild, query, knns, iter, bounds, mindist, maxdist);
+          bounds[axis] = prevdelta; // restore
         }
       }
-      else { // delta > 0
-        if(middle + 1 < right) {
-          maxdist = kdKNNSearch(middle + 1, right, next, query, knns, iter, bounds, rawdist, maxdist);
-        }
-        // Look at splitting element (unless already above):
+      else { // delta < 0, right first
+        maxdist = kdKNNSearch(node.rightChild, query, knns, iter, bounds, rawdist, maxdist);
         final double prevdelta = bounds[axis];
         final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, maxdist)) {
-          double dist = distance.distance(query, split);
-          countDistanceComputation();
-          if(dist <= maxdist) {
-            knns.insert(dist, iter.seek(middle));
-            maxdist = knns.getKNNDistance();
-          }
-          if(left < middle) {
-            bounds[axis] = delta;
-            maxdist = kdKNNSearch(left, middle, next, query, knns, iter, bounds, mindist, maxdist);
-            bounds[axis] = prevdelta; // restore
-          }
+          bounds[axis] = delta;
+          maxdist = kdKNNSearch(node.leftChild, query, knns, iter, bounds, mindist, maxdist);
+          bounds[axis] = prevdelta; // restore
         }
       }
       return maxdist;
@@ -476,26 +475,27 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
 
     @Override
     public ModifiableDoubleDBIDList getRange(O obj, double range, ModifiableDoubleDBIDList result) {
-      kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), new double[dims], 0, range);
+      double[] bounds = new double[dims];
+      kdRangeSearch(root, obj, result, sorted.iter(), bounds, 0, range);
       return result;
     }
 
     /**
      * Perform a range search on the k-d-tree.
      *
-     * @param left Subtree begin
-     * @param right Subtree end (exclusive)
-     * @param axis Current splitting axis
+     * @param node Current node
      * @param query Query object
      * @param res kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
      * @param rawdist Raw distance to current rectangle (usually squared)
      * @param radius Query radius
      */
-    private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double[] bounds, double rawdist, double radius) {
-      if(right - left <= leafsize) {
-        for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
+    private void kdRangeSearch(KDNode node, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double[] bounds, double rawdist, double radius) {
+      final int axis = node.dim;
+      if(axis == -1) {
+        for(iter.seek(node.start); iter.getOffset() < node.end; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
+          // assert distance.compareRawRegular(rawdist, dist);
           countObjectAccess();
           countDistanceComputation();
           if(dist <= radius) {
@@ -504,69 +504,31 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
         }
         return;
       }
-      // Look at current node:
-      final int middle = (left + right) >>> 1;
-      O split = relation.get(iter.seek(middle));
-      countObjectAccess();
-
       // Distance to axis:
-      final double delta = split.doubleValue(axis) - query.doubleValue(axis);
-      final int next = next(axis);
-
+      final double delta = node.split - query.doubleValue(axis);
       if(delta == 0) {
-        // Current object:
-        double dist = distance.distance(query, split);
-        countDistanceComputation();
-        if(dist <= radius) {
-          assert (iter.getOffset() == middle);
-          res.add(dist, iter /* .seek(middle) */);
-        }
-        if(left < middle) {
-          kdRangeSearch(left, middle, next, query, res, iter, bounds, rawdist, radius);
-        }
-        if(middle + 1 < right) {
-          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, rawdist, radius);
-        }
+        kdRangeSearch(node.leftChild, query, res, iter, bounds, rawdist, radius);
+        kdRangeSearch(node.rightChild, query, res, iter, bounds, rawdist, radius);
       }
       else if(delta > 0) {
-        if(left < middle) {
-          kdRangeSearch(left, middle, next, query, res, iter, bounds, rawdist, radius);
-        }
+        kdRangeSearch(node.leftChild, query, res, iter, bounds, rawdist, radius);
         final double prevdelta = bounds[axis];
         final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, radius)) {
-          // Current object:
-          double dist = distance.distance(query, split);
-          countDistanceComputation();
-          if(dist <= radius) {
-            res.add(dist, iter.seek(middle));
-          }
-          if(middle + 1 < right) {
-            bounds[axis] = delta;
-            kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, mindist, radius);
-            bounds[axis] = prevdelta; // restore
-          }
+          bounds[axis] = delta;
+          kdRangeSearch(node.rightChild, query, res, iter, bounds, mindist, radius);
+          bounds[axis] = prevdelta; // restore
         }
       }
       else {
-        if(middle + 1 < right) {
-          kdRangeSearch(middle + 1, right, next, query, res, iter, bounds, rawdist, radius);
-        }
         final double prevdelta = bounds[axis];
         final double mindist = distance.combineRaw(rawdist, delta, prevdelta);
         if(distance.compareRawRegular(mindist, radius)) {
-          // Current object:
-          double dist = distance.distance(query, split);
-          countDistanceComputation();
-          if(dist <= radius) {
-            res.add(dist, iter.seek(middle));
-          }
-          if(left < middle) {
-            bounds[axis] = delta;
-            kdRangeSearch(left, middle, next, query, res, iter, bounds, mindist, radius);
-            bounds[axis] = prevdelta; // restore
-          }
+          bounds[axis] = delta;
+          kdRangeSearch(node.leftChild, query, res, iter, bounds, mindist, radius);
+          bounds[axis] = prevdelta; // restore
         }
+        kdRangeSearch(node.rightChild, query, res, iter, bounds, rawdist, radius);
       }
     }
   }
@@ -583,33 +545,19 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
     double mindist;
 
     /**
-     * Interval begin
+     * Current node
      */
-    int left;
-
-    /**
-     * Interval end
-     */
-    int right;
-
-    /**
-     * Next splitting axis
-     */
-    int axis;
+    KDNode node;
 
     /**
      * Constructor.
      *
      * @param mindist Minimum distance
-     * @param left Interval begin
-     * @param right Interval end (exclusive)
-     * @param axis Next axis
+     * @param node Tree node
      */
-    public PrioritySearchBranch(double mindist, int left, int right, int axis) {
+    public PrioritySearchBranch(double mindist, KDNode node) {
       this.mindist = mindist;
-      this.left = left;
-      this.right = right;
-      this.axis = axis;
+      this.node = node;
     }
 
     @Override
@@ -675,56 +623,52 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
       this.threshold = Double.POSITIVE_INFINITY;
       this.pos = Integer.MIN_VALUE;
       this.heap.clear();
-      this.heap.add(new PrioritySearchBranch(0, 0, sorted.size(), 0));
+      this.heap.add(new PrioritySearchBranch(0, root));
       return advance();
     }
 
     @Override
     public PrioritySearcher<O> advance() {
-      // Iteration within current leaf:
-      if(cur != null && cur.right - cur.left <= leafsize) {
-        assert pos >= cur.left;
-        if(++pos < cur.right) {
+      while(true) {
+        // Iteration within current leaf:
+        if(cur != null && cur.node.dim == -1) {
+          assert pos >= cur.node.start;
+          if(++pos < cur.node.end) {
+            return this;
+          }
+          assert pos == cur.node.end;
+        }
+        if(heap.isEmpty()) {
+          cur = null;
+          pos = Integer.MIN_VALUE;
           return this;
         }
-        assert pos == cur.right;
-      }
-      if(heap.isEmpty()) {
-        cur = null;
-        pos = Integer.MIN_VALUE;
-        return this;
-      }
-      // Get next
-      cur = heap.poll();
-      if(cur.mindist > threshold) {
-        cur = null;
-        pos = Integer.MIN_VALUE;
-        return this;
-      }
-      // Leaf:
-      if(cur.right - cur.left <= leafsize) {
-        pos = cur.left;
-        return this;
-      }
-      pos = (cur.left + cur.right) >>> 1; // middle element
-      O split = relation.get(iter.seek(pos));
-      countObjectAccess();
+        // Get next
+        cur = heap.poll();
+        if(cur.mindist > threshold) {
+          cur = null;
+          pos = Integer.MIN_VALUE;
+          return this;
+        }
+        final int axis = cur.node.dim;
+        // Reached leaf:
+        if(axis == -1) {
+          pos = cur.node.start;
+          return this;
+        }
+        // Distance to axis:
+        final double delta = cur.node.split - query.doubleValue(axis);
+        final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
 
-      // Distance to axis:
-      final double delta = split.doubleValue(cur.axis) - query.doubleValue(cur.axis);
-      final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
-
-      // Next axis:
-      final int next = next(cur.axis);
-      final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-      if(cur.left < pos && ldist <= threshold) {
-        heap.add(new PrioritySearchBranch(ldist, cur.left, pos, next));
+        final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+        if(ldist <= threshold) {
+          heap.add(new PrioritySearchBranch(ldist, cur.node.leftChild));
+        }
+        final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
+        if(rdist <= threshold) {
+          heap.add(new PrioritySearchBranch(rdist, cur.node.rightChild));
+        }
       }
-      final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-      if(pos + 1 < cur.right && rdist <= threshold) {
-        heap.add(new PrioritySearchBranch(rdist, pos + 1, cur.right, next));
-      }
-      return this;
     }
 
     @Override
@@ -768,12 +712,17 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
    * @author Erich Schubert
    *
    * @stereotype factory
-   * @has - - - MinimalisticMemoryKDTree
+   * @has - - - SmallMemoryKDTree
    *
    * @param <O> Vector type
    */
-  @Alias({ "minikd" })
+  @Alias({ "kd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O> {
+    /**
+     * Split stragegy
+     */
+    SplitStrategy split;
+
     /**
      * Maximum size of leaf nodes.
      */
@@ -781,24 +730,19 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
 
     /**
      * Constructor.
-     */
-    public Factory() {
-      this(1);
-    }
-
-    /**
-     * Constructor.
      *
+     * @param split Split strategy
      * @param leafsize Maximum size of leaf nodes.
      */
-    public Factory(int leafsize) {
+    public Factory(SplitStrategy split, int leafsize) {
       super();
+      this.split = split;
       this.leafsize = leafsize;
     }
 
     @Override
-    public MinimalisticMemoryKDTree<O> instantiate(Relation<O> relation) {
-      return new MinimalisticMemoryKDTree<>(relation, leafsize);
+    public MemoryKDTree<O> instantiate(Relation<O> relation) {
+      return new MemoryKDTree<>(relation, split, leafsize);
     }
 
     @Override
@@ -815,7 +759,17 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
       /**
        * Option for setting the maximum leaf size.
        */
-      public static final OptionID LEAFSIZE_P = new OptionID("kd.leafsize", "Maximum leaf size for the k-d-tree. Nodes will be split until their size is smaller than this threshold.");
+      public static final OptionID SPLIT_P = new OptionID("kd.split", "Split strategy for the k-d-tree.");
+
+      /**
+       * Option for setting the maximum leaf size.
+       */
+      public static final OptionID LEAFSIZE_P = MinimalisticMemoryKDTree.Factory.Par.LEAFSIZE_P;
+
+      /**
+       * Split stragegy
+       */
+      SplitStrategy split;
 
       /**
        * Maximum size of leaf nodes.
@@ -824,14 +778,16 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
 
       @Override
       public void configure(Parameterization config) {
-        new IntParameter(LEAFSIZE_P, 1) //
+        new ObjectParameter<SplitStrategy>(SPLIT_P, SplitStrategy.class, BoundedMidpointSplit.class) //
+            .grab(config, x -> split = x);
+        new IntParameter(LEAFSIZE_P, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> leafsize = x);
       }
 
       @Override
       public Factory<O> make() {
-        return new Factory<>(leafsize);
+        return new Factory<>(split, leafsize);
       }
     }
   }
