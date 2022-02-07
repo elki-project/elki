@@ -73,6 +73,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   private final Constructor<? extends Index> coverIndex;
 
   /**
+   * vp tree index class.
+   */
+  private final Constructor<? extends Index> vpIndex;
+
+  /**
    * k-d-tree index class.
    */
   private final Constructor<? extends Index> kdIndex;
@@ -121,6 +126,19 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
     this.coverIndex = coverIndex;
     //
+    Constructor<? extends Index> vpIndex = null;
+    try {
+      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.metrical.vptree.VPTree");
+      vpIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, Distance.class);
+    }
+    catch(ClassNotFoundException e) {
+      LOG.verbose("VPTree is not available, and cannot be automatically used for optimization.");
+    }
+    catch(NoSuchMethodException | SecurityException e) {
+      LOG.exception(e);
+    }
+    this.vpIndex = vpIndex;
+    //
     Constructor<? extends Index> kdIndex = null;
     try {
       Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.MemoryKDTree");
@@ -157,6 +175,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
     }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // cover tree is cheap and fast
       idx = makeCoverTree(relation, distanceQuery.getDistance());
     }
@@ -179,6 +200,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
     }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // cover tree is cheap and fast
       idx = makeCoverTree(relation, distanceQuery.getDistance());
     }
@@ -199,7 +223,13 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = null;
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
@@ -214,7 +244,13 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = null;
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
@@ -232,7 +268,13 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    DistancePriorityIndex<O> idx = null;
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
@@ -247,7 +289,13 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    DistancePriorityIndex<O> idx = null;
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance());
+    }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance());
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance());
     }
@@ -303,6 +351,26 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       @SuppressWarnings("unchecked")
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance);
       LOG.verbose("Optimizer: automatically adding a cover tree index.");
+      idx.initialize();
+      return idx;
+    }
+    catch(InstantiationException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      LOG.exception("Automatic cover tree creation failed.", e);
+    }
+    return null;
+  }
+
+  private <O> DistancePriorityIndex<O> makeVPTree(Relation<? extends O> relation, Distance<? super O> distance) {
+    // TODO: make sure there is no such VP tree already!
+    if(vpIndex == null || !distance.isMetric()) {
+      return null;
+    }
+    // TODO: auto-tune parameters based on dimensionality or sample?
+    try {
+      @SuppressWarnings("unchecked")
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) vpIndex.newInstance(relation, distance);
+      LOG.verbose("Optimizer: automatically adding a VP tree index.");
       idx.initialize();
       return idx;
     }
