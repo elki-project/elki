@@ -22,6 +22,7 @@ package elki.index.tree.spatial.kd;
 
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
+import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
@@ -161,13 +162,54 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
   public void initialize() {
     dims = RelationUtil.dimensionality(relation);
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
-    root = buildTree(0, ids.size(), ids, ids.iter(), new VectorUtil.SortDBIDsBySingleDimension(relation));
+    // to count object accesses:
+    Relation<O> rel = LOG.isStatistics() ? new CountingRelation() : relation;
+    root = buildTree(rel, 0, ids.size(), ids, ids.iter(), new VectorUtil.SortDBIDsBySingleDimension(rel));
     sorted = ids;
+  }
+
+  /**
+   * Proxy to count accesses.
+   *
+   * @author Erich Schubert
+   */
+  private class CountingRelation implements Relation<O> {
+    @Override
+    public O get(DBIDRef id) {
+      countObjectAccess();
+      return relation.get(id);
+    }
+
+    @Override
+    public SimpleTypeInformation<O> getDataTypeInformation() {
+      return relation.getDataTypeInformation();
+    }
+
+    @Override
+    public DBIDs getDBIDs() {
+      return relation.getDBIDs();
+    }
+
+    @Override
+    public DBIDIter iterDBIDs() {
+      return relation.iterDBIDs();
+    }
+
+    @Override
+    public int size() {
+      return relation.size();
+    }
+
+    @Override
+    public String getLongName() {
+      return relation.getLongName();
+    }
   }
 
   /**
    * Build the k-d tree.
    *
+   * @param relation Relation
    * @param left interval start
    * @param right interval end
    * @param sorted object ids
@@ -175,7 +217,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    * @param comp comparator on the values
    * @return root node
    */
-  public KDNode buildTree(int left, int right, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, VectorUtil.SortDBIDsBySingleDimension comp) {
+  public KDNode buildTree(Relation<? extends NumberVector> relation, int left, int right, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, VectorUtil.SortDBIDsBySingleDimension comp) {
     if(right - left <= leafsize) {
       return new KDNode(left, right);
     }
@@ -183,7 +225,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     if(s == null || s.pos >= right) {
       return new KDNode(left, right);
     }
-    KDNode node = new KDNode(left, right, s.dim, s.val, buildTree(left, s.pos, sorted, iter, comp), buildTree(s.pos, right, sorted, iter, comp));
+    KDNode node = new KDNode(left, right, s.dim, s.val, buildTree(relation, left, s.pos, sorted, iter, comp), buildTree(relation, s.pos, right, sorted, iter, comp));
     assert assertSplitConsistent(left, s.pos, right, s.dim, s.val, iter);
     return node;
   }
@@ -412,9 +454,6 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
           if(dist <= maxdist) {
             knns.insert(dist, iter);
             maxdist = knns.getKNNDistance();
-            if(distance.compareRawRegular(rawdist, maxdist)) {
-              break;
-            }
           }
         }
         return maxdist;
