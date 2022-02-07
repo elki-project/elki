@@ -27,6 +27,7 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -344,6 +345,9 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      return null; // Precomputed only requested
+    }
     Distance<? super O> df = distanceQuery.getDistance();
     if(df instanceof SquaredEuclideanDistance) {
       return new KDTreeKNNSearcher(PartialSquaredEuclideanDistance.STATIC);
@@ -363,6 +367,9 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      return null; // Precomputed only requested
+    }
     Distance<? super O> df = distanceQuery.getDistance();
     if(df instanceof SquaredEuclideanDistance) {
       return new KDTreeRangeSearcher(PartialSquaredEuclideanDistance.STATIC);
@@ -382,6 +389,9 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      return null; // Precomputed only requested
+    }
     Distance<? super O> df = distanceQuery.getDistance();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
