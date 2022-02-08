@@ -38,7 +38,7 @@ public class MemoryKDTreeTest extends AbstractIndexStructureTest {
   public void testMemoryKDTree() {
     MemoryKDTree.Factory<?> factory = new ELKIBuilder<>(MemoryKDTree.Factory.class) //
         .with(MemoryKDTree.Factory.Par.SPLIT_P, MedianSplit.class) //
-        .with(MemoryKDTree.Factory.Par.LEAFSIZE_P, 10) //
+        .with(MemoryKDTree.Factory.Par.LEAFSIZE_P, 2) //
         .build();
     assertExactSqEuclidean(factory, MemoryKDTree.KDTreeKNNSearcher.class, MemoryKDTree.KDTreeRangeSearcher.class);
     assertExactEuclidean(factory, MemoryKDTree.KDTreeKNNSearcher.class, MemoryKDTree.KDTreeRangeSearcher.class);

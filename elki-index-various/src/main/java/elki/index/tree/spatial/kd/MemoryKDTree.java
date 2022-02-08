@@ -51,6 +51,7 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.pairs.IntIntPair;
 
 /**
  * Implementation of a static in-memory K-D-tree.
@@ -108,9 +109,9 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
   protected ArrayDBIDs sorted = null;
 
   /**
-   * Root node
+   * Root node (KDNode or IntIntPair)
    */
-  protected KDNode root;
+  protected Object root;
 
   /**
    * The number of dimensions.
@@ -219,15 +220,15 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    * @param comp comparator on the values
    * @return root node
    */
-  public KDNode buildTree(Relation<? extends NumberVector> relation, int left, int right, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, VectorUtil.SortDBIDsBySingleDimension comp) {
+  public Object buildTree(Relation<? extends NumberVector> relation, int left, int right, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, VectorUtil.SortDBIDsBySingleDimension comp) {
     if(right - left <= leafsize) {
-      return new KDNode(left, right);
+      return new IntIntPair(left, right);
     }
     SplitStrategy.Info s = split.findSplit(relation, dims, sorted, iter, left, right, comp);
     if(s == null || s.pos >= right) {
-      return new KDNode(left, right);
+      return new IntIntPair(left, right);
     }
-    KDNode node = new KDNode(left, right, s.dim, s.val, buildTree(relation, left, s.pos, sorted, iter, comp), buildTree(relation, s.pos, right, sorted, iter, comp));
+    KDNode node = new KDNode(s.dim, s.val, buildTree(relation, left, s.pos, sorted, iter, comp), buildTree(relation, s.pos, right, sorted, iter, comp));
     assert assertSplitConsistent(left, s.pos, right, s.dim, s.val, iter);
     return node;
   }
@@ -251,46 +252,22 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Left child node
      */
-    KDNode leftChild;
+    Object leftChild;
 
     /**
      * Right child node
      */
-    KDNode rightChild;
-
-    /**
-     * First index of child nodes.
-     */
-    int start;
-
-    /**
-     * End index of child nodes (exclusive).
-     */
-    int end;
+    Object rightChild;
 
     /**
      * Constructor.
      *
-     * @param start Start index of subtree range
-     * @param end End index of subtree range
-     */
-    public KDNode(int start, int end) {
-      this(start, end, -1, Double.NaN, null, null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param start Start index of subtree range
-     * @param end End index of subtree range
      * @param dim Split dimension
      * @param split Split value
      * @param leftChild Left child
      * @param rightChild Right child
      */
-    public KDNode(int start, int end, int dim, double split, KDNode leftChild, KDNode rightChild) {
-      this.start = start;
-      this.end = end;
+    public KDNode(int dim, double split, Object leftChild, Object rightChild) {
       this.dim = dim;
       this.split = split;
       this.leftChild = leftChild;
@@ -444,7 +421,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Perform a kNN search on the k-d-tree.
      *
-     * @param node Current node
+     * @param cur Current node
      * @param query Query object
      * @param knns kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
@@ -453,11 +430,10 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
      * @param maxdist Current upper bound of kNN distance.
      * @return New upper bound of kNN distance.
      */
-    private double kdKNNSearch(KDNode node, O query, KNNHeap knns, DBIDArrayIter iter, double[] bounds, double rawdist, double maxdist) {
-      final int axis = node.dim;
-      if(axis == -1) { // leaf
-        assert node.leftChild == null && node.rightChild == null;
-        for(iter.seek(node.start); iter.getOffset() < node.end; iter.advance()) {
+    private double kdKNNSearch(Object cur, O query, KNNHeap knns, DBIDArrayIter iter, double[] bounds, double rawdist, double maxdist) {
+      if(cur.getClass() == IntIntPair.class) { // leaf
+        int start = ((IntIntPair) cur).first, end = ((IntIntPair) cur).second;
+        for(iter.seek(start); iter.getOffset() < end; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
           // assert distance.compareRawRegular(rawdist, dist);
           countObjectAccess();
@@ -469,6 +445,8 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
         }
         return maxdist;
       }
+      KDNode node = (KDNode) cur;
+      final int axis = node.dim;
       assert node.leftChild != null && node.rightChild != null;
       // Distance to axis:
       final double delta = node.split - query.doubleValue(axis);
@@ -542,17 +520,17 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Perform a range search on the k-d-tree.
      *
-     * @param node Current node
+     * @param cur Current node
      * @param query Query object
      * @param res kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
      * @param rawdist Raw distance to current rectangle (usually squared)
      * @param radius Query radius
      */
-    private void kdRangeSearch(KDNode node, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double[] bounds, double rawdist, double radius) {
-      final int axis = node.dim;
-      if(axis == -1) {
-        for(iter.seek(node.start); iter.getOffset() < node.end; iter.advance()) {
+    private void kdRangeSearch(Object cur, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double[] bounds, double rawdist, double radius) {
+      if(cur.getClass() == IntIntPair.class) { // leaf
+        int start = ((IntIntPair) cur).first, end = ((IntIntPair) cur).second;
+        for(iter.seek(start); iter.getOffset() < end; iter.advance()) {
           double dist = distance.distance(query, relation.get(iter));
           // assert distance.compareRawRegular(rawdist, dist);
           countObjectAccess();
@@ -563,6 +541,8 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
         }
         return;
       }
+      KDNode node = (KDNode) cur;
+      final int axis = node.dim;
       // Distance to axis:
       final double delta = node.split - query.doubleValue(axis);
       if(delta == 0) {
@@ -606,7 +586,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Current node
      */
-    KDNode node;
+    Object node;
 
     /**
      * Constructor.
@@ -614,7 +594,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
      * @param mindist Minimum distance
      * @param node Tree node
      */
-    public PrioritySearchBranch(double mindist, KDNode node) {
+    public PrioritySearchBranch(double mindist, Object node) {
       this.mindist = mindist;
       this.node = node;
     }
@@ -681,6 +661,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
       this.query = query;
       this.threshold = Double.POSITIVE_INFINITY;
       this.pos = Integer.MIN_VALUE;
+      this.cur = null;
       this.heap.clear();
       this.heap.add(new PrioritySearchBranch(0, root));
       return advance();
@@ -690,12 +671,12 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     public PrioritySearcher<O> advance() {
       while(true) {
         // Iteration within current leaf:
-        if(cur != null && cur.node.dim == -1) {
-          assert pos >= cur.node.start;
-          if(++pos < cur.node.end) {
+        if(cur != null && cur.node.getClass() == IntIntPair.class) {
+          assert pos >= ((IntIntPair) cur.node).first : "pos: " + pos + " " + cur.toString();
+          if(++pos < ((IntIntPair) cur.node).second) {
             return this;
           }
-          assert pos == cur.node.end;
+          assert pos == ((IntIntPair) cur.node).second;
         }
         if(heap.isEmpty()) {
           cur = null;
@@ -709,23 +690,24 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
           pos = Integer.MIN_VALUE;
           return this;
         }
-        final int axis = cur.node.dim;
         // Reached leaf:
-        if(axis == -1) {
-          pos = cur.node.start;
+        if(cur.node.getClass() == IntIntPair.class) {
+          pos = ((IntIntPair) cur.node).first;
           return this;
         }
+        KDNode node = (KDNode) cur.node;
+        final int axis = node.dim;
         // Distance to axis:
-        final double delta = cur.node.split - query.doubleValue(axis);
+        final double delta = node.split - query.doubleValue(axis);
         final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
 
         final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
         if(ldist <= threshold) {
-          heap.add(new PrioritySearchBranch(ldist, cur.node.leftChild));
+          heap.add(new PrioritySearchBranch(ldist, node.leftChild));
         }
         final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
         if(rdist <= threshold) {
-          heap.add(new PrioritySearchBranch(rdist, cur.node.rightChild));
+          heap.add(new PrioritySearchBranch(rdist, node.rightChild));
         }
       }
     }
