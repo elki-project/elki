@@ -128,12 +128,13 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
   protected final Counter distcalc;
 
   /**
-   * Constructor with defaults (used by EmpiricalQueryOptimizer).
+   * Constructor with default split (used by EmpiricalQueryOptimizer).
    *
    * @param relation Relation to index
+   * @param leafsize Leaf size
    */
-  public MemoryKDTree(Relation<O> relation) {
-    this(relation, BoundedMidpointSplit.STATIC, 10);
+  public MemoryKDTree(Relation<O> relation, int leafsize) {
+    this(relation, BoundedMidpointSplit.STATIC, leafsize);
   }
 
   /**
@@ -838,7 +839,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
       public void configure(Parameterization config) {
         new ObjectParameter<SplitStrategy>(SPLIT_P, SplitStrategy.class, BoundedMidpointSplit.class) //
             .grab(config, x -> split = x);
-        new IntParameter(LEAFSIZE_P, 10) //
+        new IntParameter(LEAFSIZE_P, 2) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> leafsize = x);
       }

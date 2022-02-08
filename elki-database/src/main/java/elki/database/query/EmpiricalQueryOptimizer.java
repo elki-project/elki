@@ -142,7 +142,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     Constructor<? extends Index> kdIndex = null;
     try {
       Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.MemoryKDTree");
-      kdIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class);
+      kdIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, int.class);
     }
     catch(ClassNotFoundException e) {
       LOG.verbose("MemoryKDTree is not available, and cannot be automatically used for optimization.");
@@ -175,14 +175,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
     }
+    if(idx == null) { // try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 2 /* better for kNN */);
+    }
     if(idx == null) { // VP tree is cheap and fast
       idx = makeVPTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) { // cover tree is cheap and fast
       idx = makeCoverTree(relation, distanceQuery.getDistance());
-    }
-    if(idx == null) { // try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
@@ -200,14 +200,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
     }
+    if(idx == null) { // Try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 2 /* better for kNN */);
+    }
     if(idx == null) { // VP tree is cheap and fast
       idx = makeVPTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) { // cover tree is cheap and fast
       idx = makeCoverTree(relation, distanceQuery.getDistance());
-    }
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && (relation.getDBIDs() instanceof DBIDRange)) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
@@ -231,7 +231,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       makeCoverTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* better for DBSCAN */);
     }
     if(idx == null) {
       return null;
@@ -251,8 +251,8 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if(idx == null) {
       makeCoverTree(relation, distanceQuery.getDistance());
     }
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+    if(idx == null) { // Try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* better for DBSCAN */);
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
@@ -276,7 +276,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
     }
     if(idx == null) {
       return null;
@@ -297,7 +297,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance());
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
@@ -381,18 +381,18 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
-  private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance) {
+  private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance, int k) {
     // TODO: make sure there is no such k-d-tree already!
     TypeInformation type = relation.getDataTypeInformation();
     if(kdIndex == null // not available
         || !TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type) //
         || !(distance instanceof LPNormDistance || distance instanceof SquaredEuclideanDistance) //
-        || ((FieldTypeInformation) type).getDimensionality() > 20) {
+        || ((FieldTypeInformation) type).getDimensionality() > 30) {
       return null;
     }
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, k > 0 ? k : 0);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
       return idx;

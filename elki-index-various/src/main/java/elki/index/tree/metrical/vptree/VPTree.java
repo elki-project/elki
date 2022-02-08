@@ -129,7 +129,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @param distance distance function for tree construction
    */
   public VPTree(Relation<O> relation, Distance<? super O> distance) {
-    this(relation, distance, RandomFactory.DEFAULT, 10, 5);
+    this(relation, distance, RandomFactory.DEFAULT, 10, 8);
   }
 
   /**
@@ -965,7 +965,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         new IntParameter(SAMPLE_SIZE_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.sampleSize = x);
-        new IntParameter(TRUNCATE_ID, 5) //
+        new IntParameter(TRUNCATE_ID, 8) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.truncate = x);
         new RandomParameter(SEED_ID).grab(config, x -> random = x);
