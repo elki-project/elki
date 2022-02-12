@@ -132,7 +132,7 @@ public class PrioritySearchBenchmark<O> extends AbstractDistanceBasedApplication
       logIndexStatistics(database);
       hash = run(priQuery, dur, mv, mvdist);
     }
-    LOG.statistics(dur);
+    LOG.statistics(dur.end());
     if(dur instanceof MillisTimeDuration) {
       LOG.statistics(new StringStatistic(key + ".duration.avg", dur.getDuration() / mv.getCount() * 1000. + " ns"));
     }

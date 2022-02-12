@@ -41,9 +41,7 @@ import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
 import elki.logging.progress.FiniteProgress;
-import elki.logging.statistics.DoubleStatistic;
-import elki.logging.statistics.Duration;
-import elki.logging.statistics.LongStatistic;
+import elki.logging.statistics.*;
 import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
@@ -188,6 +186,10 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       // Get a query radius relation:
       Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
       hash = run(rangeQuery, relation, qrad, dur, mv);
+    }
+    LOG.statistics(dur.end());
+    if(dur instanceof MillisTimeDuration) {
+      LOG.statistics(new StringStatistic(key + ".duration.avg", dur.getDuration() / mv.getCount() * 1000. + " ns"));
     }
     LOG.statistics(new DoubleStatistic(key + ".results.mean", mv.getMean()));
     LOG.statistics(new DoubleStatistic(key + ".results.std", mv.getPopulationStddev()));
@@ -335,7 +337,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    */
   public static void main(String[] args) {
     LoggingConfiguration.setDefaultLevel(Level.STATISTICS);
-    runCLIApplication(KNNBenchmark.class, args);
+    runCLIApplication(RangeQueryBenchmark.class, args);
   }
 
   /**
