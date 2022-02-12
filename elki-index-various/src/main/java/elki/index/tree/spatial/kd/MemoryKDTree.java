@@ -34,8 +34,10 @@ import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.Distance;
-import elki.distance.PrimitiveDistance;
-import elki.distance.minkowski.*;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.LPNormDistance;
+import elki.distance.minkowski.ManhattanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.index.tree.spatial.kd.split.BoundedMidpointSplit;
@@ -372,11 +374,19 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
       return null; // Precomputed only requested
     }
     Distance<? super O> df = distanceQuery.getDistance();
-    // TODO: if we know this works for other distance functions, add them, too!
-    if(df instanceof LPNormDistance || df instanceof SquaredEuclideanDistance //
-        || df instanceof SparseLPNormDistance) {
-      return new KDTreePrioritySearcher((PrimitiveDistance<? super O>) df);
+    if(df instanceof SquaredEuclideanDistance) {
+      return new KDTreePrioritySearcher(PartialSquaredEuclideanDistance.STATIC);
     }
+    if(df instanceof EuclideanDistance) {
+      return new KDTreePrioritySearcher(PartialEuclideanDistance.STATIC);
+    }
+    if(df instanceof ManhattanDistance) {
+      return new KDTreePrioritySearcher(PartialManhattanDistance.STATIC);
+    }
+    if(df instanceof LPNormDistance) {
+      return new KDTreePrioritySearcher(new PartialLPNormDistance((LPNormDistance) df));
+    }
+    // TODO: if we know this works for other distance functions, add them, too!
     return null;
   }
 
@@ -580,9 +590,14 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    */
   private static class PrioritySearchBranch implements Comparable<PrioritySearchBranch> {
     /**
-     * Minimum distance
+     * Minimum distance ("raw", e.g., squared)
      */
-    double mindist;
+    double rawdist;
+
+    /**
+     * Current bounds
+     */
+    double[] bounds;
 
     /**
      * Current node
@@ -592,17 +607,19 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Constructor.
      *
-     * @param mindist Minimum distance
+     * @param rawdist Minimum raw distance (e.g., squared)
+     * @param bounds Current bounds
      * @param node Tree node
      */
-    public PrioritySearchBranch(double mindist, Object node) {
-      this.mindist = mindist;
+    public PrioritySearchBranch(double rawdist, double[] bounds, Object node) {
+      this.rawdist = rawdist;
+      this.bounds = bounds;
       this.node = node;
     }
 
     @Override
     public int compareTo(PrioritySearchBranch o) {
-      return Double.compare(this.mindist, o.mindist);
+      return Double.compare(this.rawdist, o.rawdist);
     }
   }
 
@@ -615,7 +632,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     /**
      * Distance to use.
      */
-    private PrimitiveDistance<? super O> distance;
+    private PartialDistance<? super O> distance;
 
     /**
      * Min heap for searching.
@@ -652,7 +669,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
      *
      * @param distance Distance to use
      */
-    public KDTreePrioritySearcher(PrimitiveDistance<? super O> distance) {
+    public KDTreePrioritySearcher(PartialDistance<? super O> distance) {
       super();
       this.distance = distance;
     }
@@ -664,7 +681,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
       this.pos = Integer.MIN_VALUE;
       this.cur = null;
       this.heap.clear();
-      this.heap.add(new PrioritySearchBranch(0, root));
+      this.heap.add(new PrioritySearchBranch(0, new double[dims], root));
       return advance();
     }
 
@@ -686,7 +703,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
         }
         // Get next
         cur = heap.poll();
-        if(cur.mindist > threshold) {
+        if(!distance.compareRawRegular(cur.rawdist, threshold)) {
           cur = null;
           pos = Integer.MIN_VALUE;
           return this;
@@ -698,17 +715,26 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
         }
         KDNode node = (KDNode) cur.node;
         final int axis = node.dim;
-        // Distance to axis:
         final double delta = node.split - query.doubleValue(axis);
-        final double mindist = distance instanceof SquaredEuclideanDistance ? delta * delta : Math.abs(delta);
-
-        final double ldist = delta < 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-        if(ldist <= threshold) {
-          heap.add(new PrioritySearchBranch(ldist, node.leftChild));
+        if(delta == 0) {
+          heap.add(new PrioritySearchBranch(cur.rawdist, cur.bounds, node.leftChild));
+          heap.add(new PrioritySearchBranch(cur.rawdist, cur.bounds, node.rightChild));
         }
-        final double rdist = delta > 0 ? Math.max(mindist, cur.mindist) : cur.mindist;
-        if(rdist <= threshold) {
-          heap.add(new PrioritySearchBranch(rdist, node.rightChild));
+        else if(delta > 0) {
+          // Left branch is closer
+          double mindist = distance.combineRaw(cur.rawdist, delta, cur.bounds[axis]);
+          double[] newbounds = cur.bounds.clone();
+          newbounds[axis] = delta;
+          heap.add(new PrioritySearchBranch(cur.rawdist, cur.bounds, node.leftChild));
+          heap.add(new PrioritySearchBranch(mindist, newbounds, node.rightChild));
+        }
+        else {
+          // Right branch is closer
+          double mindist = distance.combineRaw(cur.rawdist, delta, cur.bounds[axis]);
+          double[] newbounds = cur.bounds.clone();
+          newbounds[axis] = delta;
+          heap.add(new PrioritySearchBranch(cur.rawdist, cur.bounds, node.rightChild));
+          heap.add(new PrioritySearchBranch(mindist, newbounds, node.leftChild));
         }
       }
     }
@@ -720,12 +746,12 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
     @Override
     public double getLowerBound() {
-      return cur.mindist;
+      return distance.transformOut(cur.rawdist);
     }
 
     @Override
     public double allLowerBound() {
-      return cur.mindist;
+      return distance.transformOut(cur.rawdist);
     }
 
     @Override
@@ -742,7 +768,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
     @Override
     public PrioritySearcher<O> decreaseCutoff(double threshold) {
-      assert threshold <= this.threshold : "Thresholds must only decreasee.";
+      assert threshold <= this.threshold : "Thresholds must never increase: " + threshold + " > " + this.threshold;
       this.threshold = threshold;
       return this;
     }

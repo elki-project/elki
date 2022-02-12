@@ -231,6 +231,15 @@ public class LPNormDistance implements SpatialPrimitiveDistance<NumberVector>, N
     return p;
   }
 
+  /**
+   * Get the functions 1/p parameter.
+   * 
+   * @return 1/p
+   */
+  public double getInvP() {
+    return invp;
+  }
+
   @Override
   public boolean equals(Object obj) {
     return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //

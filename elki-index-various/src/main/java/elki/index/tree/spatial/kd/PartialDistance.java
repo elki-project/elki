@@ -53,4 +53,12 @@ public interface PartialDistance<O> {
    * @return Distance
    */
   double distance(O a, O b);
+
+  /**
+   * Transform a raw distance to an output (external) distance.
+   * 
+   * @param rawdist Raw distance
+   * @return External distance
+   */
+  double transformOut(double rawdist);
 }

@@ -56,4 +56,9 @@ public class PartialManhattanDistance implements PartialDistance<NumberVector> {
   public double distance(NumberVector a, NumberVector b) {
     return ManhattanDistance.STATIC.distance(a, b);
   }
+
+  @Override
+  public double transformOut(double rawdist) {
+    return rawdist;
+  }
 }

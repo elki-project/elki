@@ -56,4 +56,9 @@ public class PartialEuclideanDistance implements PartialDistance<NumberVector> {
   public double distance(NumberVector a, NumberVector b) {
     return EuclideanDistance.STATIC.distance(a, b);
   }
+
+  @Override
+  public double transformOut(double rawdist) {
+    return Math.sqrt(rawdist);
+  }
 }

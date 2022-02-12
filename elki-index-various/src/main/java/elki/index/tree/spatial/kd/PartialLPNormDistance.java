@@ -57,4 +57,9 @@ public class PartialLPNormDistance implements PartialDistance<NumberVector> {
   public double distance(NumberVector a, NumberVector b) {
     return dist.distance(a, b);
   }
+
+  @Override
+  public double transformOut(double rawdist) {
+    return Math.pow(rawdist, dist.getInvP());
+  }
 }
