@@ -20,7 +20,7 @@
  */
 package elki.index.tree.spatial.kd.split;
 
-import static elki.math.linearalgebra.VMath.argmax;
+import java.util.Arrays;
 
 import elki.data.NumberVector;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -31,53 +31,51 @@ import elki.database.relation.Relation;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Bounded variance splitting.
- *
+ * Split by the best reduction in sum-of-squares, but only considering one
+ * dimension at a time.
+ * 
  * @author Erich Schubert
  */
-public class BoundedVarianceSplit implements SplitStrategy {
+public class LeastOneDimSSQSplit implements SplitStrategy {
   /**
    * Static instance.
    */
-  public static final BoundedVarianceSplit STATIC = new BoundedVarianceSplit();
+  public static final LeastOneDimSSQSplit STATIC = new LeastOneDimSSQSplit();
 
   @Override
   public Info findSplit(Relation<? extends NumberVector> relation, int dims, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, int left, int right, SortDBIDsBySingleDimension comp) {
-    double[] sumvar = Util.sumvar(relation, dims, iter, left, right);
-    final int dim = argmax(sumvar, dims, sumvar.length) - dims;
-    double mid = sumvar[dim] / (right - left);
-    int l = left, r = right - 1;
-    while(true) {
-      while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
-        ++l;
+    int bestdim = 0, bestpos = (right - left) >>> 1;
+    double bestscore = Double.NEGATIVE_INFINITY;
+    double[] buf = new double[right - left];
+    for(int dim = 0; dim < dims; dim++) {
+      double sum = 0.;
+      for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
+        sum += buf[iter.getOffset() - left] = relation.get(iter).doubleValue(dim);
       }
-      while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
-        --r;
+      // sort the objects by the chosen attribute:
+      Arrays.sort(buf);
+      // Minimizing the SSQs is the same as maximizing the weighted distance
+      // between the centers.
+      double s1 = buf[0];
+      int i = 1, j = right - left - 1;
+      while(j >= 1) {
+        s1 += buf[i];
+        double v2 = s1 / ++i - (sum - s1) / --j;
+        double score = v2 * v2 * i * j;
+        if(score > bestscore) {
+          bestscore = score;
+          bestdim = dim;
+          bestpos = i;
+        }
       }
-      if(l >= r) {
-        break;
-      }
-      sorted.swap(l++, r--);
     }
-    assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
-    ++r;
-    if(r == right) { // Duplicate points!
+    if(bestscore == 0) { // All duplicate.
       return null;
     }
-    // if too unbalanced, fall back to a quantile:
-    final int q = (right - left) >>> 3;
-    if(left + q > r) {
-      comp.setDimension(dim);
-      QuickSelectDBIDs.quickSelect(sorted, comp, r, right, r = left + q);
-      mid = relation.get(iter.seek(r)).doubleValue(dim);
-    }
-    else if(right - q < r) {
-      comp.setDimension(dim);
-      QuickSelectDBIDs.quickSelect(sorted, comp, left, r, r = right - q);
-      mid = relation.get(iter.seek(r)).doubleValue(dim);
-    }
-    assert left < r && r < right : "Useless split selected: " + left + " < " + r + " < " + right;
-    return new Info(dim, r, mid);
+    bestpos += left;
+    comp.setDimension(bestdim);
+    QuickSelectDBIDs.quickSelect(sorted, comp, left, right, bestpos);
+    return new Info(bestdim, bestpos, relation.get(iter.seek(bestpos)).doubleValue(bestdim));
   }
 
   /**
@@ -87,7 +85,7 @@ public class BoundedVarianceSplit implements SplitStrategy {
    */
   public static class Par implements Parameterizer {
     @Override
-    public BoundedVarianceSplit make() {
+    public LeastOneDimSSQSplit make() {
       return STATIC;
     }
   }

@@ -29,15 +29,15 @@ import elki.index.tree.spatial.kd.MemoryKDTree;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Unit test for the {@link BoundedVarianceSplit}.
+ * Unit test for the {@link LeastOneDimSSQSplit}.
  *
  * @author Erich Schubert
  */
-public class BoundedVarianceSplitTest extends AbstractIndexStructureTest {
+public class LeastOneDimSSQSplitTest extends AbstractIndexStructureTest {
   @Test
   public void testMemoryKDTree() {
     MemoryKDTree.Factory<?> factory = new ELKIBuilder<>(MemoryKDTree.Factory.class) //
-        .with(MemoryKDTree.Factory.Par.SPLIT_P, BoundedVarianceSplit.class) //
+        .with(MemoryKDTree.Factory.Par.SPLIT_P, LeastOneDimSSQSplit.class) //
         .with(MemoryKDTree.Factory.Par.LEAFSIZE_P, 1) //
         .build();
     assertExactSqEuclidean(factory, MemoryKDTree.KDTreeKNNSearcher.class, MemoryKDTree.KDTreeRangeSearcher.class);

@@ -132,7 +132,7 @@ public interface SplitStrategy {
      * @param iter Iterator
      * @param left Interval start
      * @param right Interval end
-     * @return Array containing sums and variances.
+     * @return Array containing sums and variances
      */
     static double[] sumvar(Relation<? extends NumberVector> relation, int dims, DBIDArrayMIter iter, int left, int right) {
       double[] sumvar = new double[dims << 1];
@@ -140,10 +140,11 @@ public interface SplitStrategy {
       for(int d = 0; d < dims; d++) { // Simply copy the first
         sumvar[d] = vec1.doubleValue(d);
       }
-      for(int i = left + 1, j = 2; i < right; i++, j++) {
+      for(int i = left + 1, j = 1; i < right; i++, j++) {
         NumberVector vec = relation.get(iter.seek(i));
-        double f = 1. / (j * (j - 1));
+        double f = 1. / (j * (j + 1));
         for(int d = 0, d2 = dims; d < dims; d++, d2++) {
+          // using Youngs and Cramer incremental variance
           final double v = vec.doubleValue(d);
           final double tmp = j * v - sumvar[d];
           sumvar[d] += v;
@@ -171,6 +172,38 @@ public interface SplitStrategy {
         }
       }
       return dim;
+    }
+
+    /**
+     * Pivot an interval.
+     * 
+     * @param relation Data relation
+     * @param sorted Sorted list of entries
+     * @param iter List iterator
+     * @param dim Dimension
+     * @param left Left range of the list
+     * @param right Right end of the list range
+     * @param mid Value to pivot to
+     * @return Pivot position
+     */
+    static int pivot(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, final int dim, int left, int right, double mid) {
+      int l = left, r = right - 1;
+      while(true) {
+        while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
+          ++l;
+        }
+        while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
+          --r;
+        }
+        if(l >= r) {
+          break;
+        }
+        sorted.swap(l++, r--);
+      }
+      assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
+      ++r; // exclusive
+      assert r == right || relation.get(iter.seek(r)).doubleValue(dim) >= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not at least " + mid;
+      return r;
     }
   }
 }

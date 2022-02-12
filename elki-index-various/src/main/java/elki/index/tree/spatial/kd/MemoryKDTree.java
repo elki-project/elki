@@ -228,6 +228,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
     if(s == null || s.pos >= right) {
       return new IntIntPair(left, right);
     }
+    assert left < s.pos && s.pos < right;
     KDNode node = new KDNode(s.dim, s.val, buildTree(relation, left, s.pos, sorted, iter, comp), buildTree(relation, s.pos, right, sorted, iter, comp));
     assert assertSplitConsistent(left, s.pos, right, s.dim, s.val, iter);
     return node;

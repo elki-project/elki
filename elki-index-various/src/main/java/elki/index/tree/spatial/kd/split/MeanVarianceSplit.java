@@ -20,34 +20,48 @@
  */
 package elki.index.tree.spatial.kd.split;
 
+import static elki.math.linearalgebra.VMath.argmax;
+
 import elki.data.NumberVector;
 import elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDArrayMIter;
 import elki.database.relation.Relation;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Classic midpoint split, halfway on the axis of largest extend.
+ * Split on the median of the axis with the largest variance.
+ * <p>
+ * Reference:
+ * <p>
+ * S. M. Omohundro<br>
+ * Efficient Algorithms with Neural Network Behaviour<br>
+ * Journal of Complex Systems 1(2)
  * 
  * @author Erich Schubert
  */
-public class MidpointSplit implements SplitStrategy {
+@Reference(authors = "S. M. Omohundro", //
+    title = "Efficient Algorithms with Neural Network Behaviour", //
+    booktitle = "Journal of Complex Systems 1(2)", //
+    url = "https://www.complex-systems.com/abstracts/v01_i02_a04/", //
+    bibkey = "journals/jcs/Omohundro87")
+public class MeanVarianceSplit implements SplitStrategy {
   /**
    * Static instance.
    */
-  public static final MidpointSplit STATIC = new MidpointSplit();
+  public static final MeanVarianceSplit STATIC = new MeanVarianceSplit();
 
   @Override
   public Info findSplit(Relation<? extends NumberVector> relation, int dims, ArrayModifiableDBIDs sorted, DBIDArrayMIter iter, int left, int right, SortDBIDsBySingleDimension comp) {
-    double[] minmax = Util.minmaxRange(dims, relation, iter, left, right);
-    final int dim = Util.argmaxdiff(minmax);
-    double mid = 0.5 * (minmax[dims + dim] + minmax[dim]);
-    int r = Util.pivot(relation, sorted, iter, dim, left, right, mid);
-    if(r == right) { // Duplicate points!
+    double[] sumvar = Util.sumvar(relation, dims, iter, left, right);
+    int bestdim = argmax(sumvar, dims, sumvar.length) - dims;
+    if(sumvar[bestdim + dims] == 0) { // All duplicate.
       return null;
     }
-    return new Info(dim, r, mid);
+    final double mean = sumvar[bestdim] / (right - left);
+    int r = Util.pivot(relation, sorted, iter, bestdim, left, right, mean);
+    return new Info(bestdim, r, mean);
   }
 
   /**
@@ -57,7 +71,7 @@ public class MidpointSplit implements SplitStrategy {
    */
   public static class Par implements Parameterizer {
     @Override
-    public MidpointSplit make() {
+    public MeanVarianceSplit make() {
       return STATIC;
     }
   }

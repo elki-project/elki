@@ -44,26 +44,12 @@ public class BoundedMidpointSplit implements SplitStrategy {
     double[] minmax = Util.minmaxRange(dims, relation, iter, left, right);
     final int dim = Util.argmaxdiff(minmax);
     double mid = 0.5 * (minmax[dims + dim] + minmax[dim]);
-    int l = left, r = right - 1;
-    while(true) {
-      while(l <= r && relation.get(iter.seek(l)).doubleValue(dim) <= mid) {
-        ++l;
-      }
-      while(l <= r && relation.get(iter.seek(r)).doubleValue(dim) >= mid) {
-        --r;
-      }
-      if(l >= r) {
-        break;
-      }
-      sorted.swap(l++, r--);
-    }
-    assert relation.get(iter.seek(r)).doubleValue(dim) <= mid : relation.get(iter.seek(r)).doubleValue(dim) + " not less than " + mid;
-    ++r;
+    int r = Util.pivot(relation, sorted, iter, dim, left, right, mid);
     if(r == right) { // Duplicate points!
       return null;
     }
     // if too unbalanced, fall back to a quantile:
-    final int q = (right - left) >>> 3;
+    final int q = (right - left) >>> 4;
     if(left + q > r) {
       comp.setDimension(dim);
       QuickSelectDBIDs.quickSelect(sorted, comp, r, right, r = left + q);
