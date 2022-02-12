@@ -1,6 +1,7 @@
 elki.application.KDDCLIApplication cli kddtask
 elki.application.benchmark.KNNBenchmark
 elki.application.benchmark.RangeQueryBenchmark
+elki.application.benchmark.PrioritySearchBenchmark
 elki.application.benchmark.ValidateApproximativeKNNIndex
 elki.application.experiments.EvaluateIntrinsicDimensionalityEstimators
 elki.application.greedyensemble.ComputeKNNOutlierScores
