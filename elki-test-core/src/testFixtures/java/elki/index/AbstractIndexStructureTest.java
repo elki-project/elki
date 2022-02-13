@@ -445,9 +445,9 @@ public abstract class AbstractIndexStructureTest {
           assertFalse("All lower bound decreased", alllb < minall);
           minall = alllb;
           assertFalse("All lower bound incorrect", lb < alllb);
-          assertFalse("All lower bound incorrect", exact < alllb);
-          assertFalse("Lower bound incorrect", exact < lb);
-          assertFalse("Upper bound incorrect", exact > ub);
+          assertFalse("All lower bound incorrect", exact < alllb * 0.9999999999999999);
+          assertFalse("Lower bound incorrect", exact < lb * 0.9999999999999999);
+          assertFalse("Upper bound incorrect", exact * 0.9999999999999999 > ub);
           assertFalse("Lower tolerance incorrect", exact < approx - atol);
           assertFalse("Upper tolerance incorrect", exact > approx + atol);
         }
@@ -480,8 +480,8 @@ public abstract class AbstractIndexStructureTest {
         double ub = prioq2.getUpperBound(); // May be NaN
         double exact = prioq2.computeExactDistance();
         ids.add(exact, prioq2);
-        assertFalse("Lower bound incorrect", exact < lb);
-        assertFalse("Upper bound incorrect", exact > ub);
+        assertFalse("Lower bound incorrect", exact < lb * 0.9999999999999999);
+        assertFalse("Upper bound incorrect", exact * 0.9999999999999999 > ub);
         assertFalse("Lower tolerance incorrect", exact < approx - atol);
         assertFalse("Upper tolerance incorrect", exact > approx + atol);
       }
