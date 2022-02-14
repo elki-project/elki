@@ -127,9 +127,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    *
    * @param relation data for tree construction
    * @param distance distance function for tree construction
+   * @param leafsize Leaf size and sample size (simpler parameterization)
    */
-  public VPTree(Relation<O> relation, Distance<? super O> distance) {
-    this(relation, distance, RandomFactory.DEFAULT, 10, 8);
+  public VPTree(Relation<O> relation, Distance<? super O> distance, int leafsize) {
+    this(relation, distance, RandomFactory.DEFAULT, leafsize, leafsize);
   }
 
   /**

@@ -41,6 +41,7 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.index.tree.spatial.kd.split.BoundedMidpointSplit;
+import elki.index.tree.spatial.kd.split.LeastOneDimSSQSplit;
 import elki.index.tree.spatial.kd.split.SplitStrategy;
 import elki.logging.Logging;
 import elki.logging.statistics.Counter;
@@ -137,7 +138,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    * @param leafsize Leaf size
    */
   public MemoryKDTree(Relation<O> relation, int leafsize) {
-    this(relation, BoundedMidpointSplit.STATIC, leafsize);
+    this(relation, LeastOneDimSSQSplit.STATIC, leafsize);
   }
 
   /**
