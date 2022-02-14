@@ -246,7 +246,7 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
         fval += (t[i] - 1) * fApB + FastMath.log1p(FastMath.exp(fApB));
       }
     }
-    for(int iter = 0; iter < MAX_ITER; iter++) {
+    for(int iter = 0; /* below: iter < MAX_ITER */; iter++) {
       // Update Gradient and Hessian (use H' = H + sigma I)
       // numerically ensures strict PD
       double h11 = SIGMA, h22 = SIGMA, h21 = 0.;

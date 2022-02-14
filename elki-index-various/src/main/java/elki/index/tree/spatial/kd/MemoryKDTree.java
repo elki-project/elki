@@ -283,8 +283,10 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    * Assert that the generated split is consistent.
    *
    * @param left Interval start
+   * @param pos Split position
    * @param right Interval end
-   * @param s Split information
+   * @param dim Split dimension
+   * @param val Split threshold
    * @param iter Iterator
    */
   private boolean assertSplitConsistent(int left, int pos, int right, int dim, double val, DBIDArrayMIter iter) {

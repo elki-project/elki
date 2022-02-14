@@ -102,7 +102,10 @@ public class CheckELKIServices {
             Enumeration<JarEntry> entries = jar.entries();
             while(entries.hasMoreElements()) {
               String prop = entries.nextElement().getName();
-              if(prop.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
+              if(prop.contains("..")) {
+                LOG.warning("Jar file contains illegal file name: " + prop);
+              }
+              else if(prop.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
                 props.add(prop.substring(ELKIServiceLoader.RESOURCE_PREFIX.length()));
               }
               else if(prop.startsWith(ELKIServiceLoader.FILENAME_PREFIX)) {
@@ -199,7 +202,7 @@ public class CheckELKIServices {
         Path folder = Paths.get(update, ELKIServiceLoader.FILENAME_PREFIX);
         Files.createDirectories(folder);
         Path out = folder.resolve(prop);
-        if(!out.startsWith(folder)) {
+        if(!out.startsWith(folder) || prop.contains("..")) {
           throw new IllegalStateException("Insecure path: " + out.toString());
         }
         try (
