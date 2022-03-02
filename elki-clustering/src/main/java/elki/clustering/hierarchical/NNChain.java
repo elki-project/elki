@@ -22,14 +22,16 @@ package elki.clustering.hierarchical;
 
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
+import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDs;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 
@@ -77,21 +79,21 @@ public class NNChain<O> extends AGNES<O> {
   }
 
   @Override
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     MatrixParadigm mat = new MatrixParadigm(ids);
+    int[] newidx = MathUtil.sequence(0, ids.size());
 
     // Compute the initial (lower triangular) distance matrix.
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
-
-    nnChainCore(mat, builder);
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
+    nnChainCore(mat, builder, newidx);
     return builder.complete();
   }
 
@@ -101,13 +103,14 @@ public class NNChain<O> extends AGNES<O> {
    * 
    * @param mat Matrix view
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    */
-  private void nnChainCore(MatrixParadigm mat, PointerHierarchyBuilder builder) {
+  private void nnChainCore(MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx) {
     final DBIDArrayIter ix = mat.ix;
     final double[] distances = mat.matrix;
     final int size = mat.size;
-    // The maximum chain size = number of ids + 1
-    IntegerArray chain = new IntegerArray(size + 1);
+    // The maximum chain size = number of ids + 1, but usually much less is enough
+    IntegerArray chain = new IntegerArray(size >> 2);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
@@ -117,8 +120,8 @@ public class NNChain<O> extends AGNES<O> {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = findUnlinked(0, end, ix, builder);
-        b = findUnlinked(a + 1, end, ix, builder);
+        a = findUnlinked(0, end, ix, builder, newidx);
+        b = findUnlinked(a + 1, end, ix, builder, newidx);
         chain.clear();
         chain.add(a);
       }
@@ -129,7 +132,7 @@ public class NNChain<O> extends AGNES<O> {
         b = chain.get(lastIndex - 3);
         a = chain.get(lastIndex - 4);
         // Ensure we had a loop at the end:
-        assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
+        assert chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b;
         // if c < b, then we merged b -> c, otherwise c -> b
         b = c < b ? c : b;
         // Cut the tail:
@@ -141,7 +144,7 @@ public class NNChain<O> extends AGNES<O> {
         int c = b;
         final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
+          if(i != b && newidx[i] >= 0) {
             double dist = distances[ta + i];
             if(dist < minDist) {
               minDist = dist;
@@ -150,7 +153,7 @@ public class NNChain<O> extends AGNES<O> {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
+          if(i != b && newidx[i] >= 0) {
             double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
@@ -158,10 +161,8 @@ public class NNChain<O> extends AGNES<O> {
             }
           }
         }
-
         b = a;
         a = c;
-
         chain.add(a);
       }
       while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
@@ -172,10 +173,10 @@ public class NNChain<O> extends AGNES<O> {
         a = b;
         b = tmp;
       }
-      assert (minDist == mat.get(a, b));
-      assert (b < a);
-      merge(size, mat, builder, minDist, a, b);
-      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
+      assert minDist == mat.get(a, b);
+      assert b < a;
+      merge(size, mat, builder, newidx, minDist, a, b);
+      end = AGNES.shrinkActiveSet(newidx, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -188,11 +189,12 @@ public class NNChain<O> extends AGNES<O> {
    * @param end End position
    * @param ix Iterator to translate into DBIDs
    * @param builder Linkage information
+   * @param newidx cluster indexes currently in the matrix
    * @return Position
    */
-  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyBuilder builder) {
+  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, ClusterMergeHistoryBuilder builder, int[] newidx) {
     while(pos < end) {
-      if(!builder.isLinked(ix.seek(pos))) {
+      if(newidx[pos] >= 0) {
         return pos;
       }
       ++pos;

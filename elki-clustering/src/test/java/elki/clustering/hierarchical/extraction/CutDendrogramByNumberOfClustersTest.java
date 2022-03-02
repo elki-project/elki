@@ -56,6 +56,21 @@ public class CutDendrogramByNumberOfClustersTest extends AbstractClusterAlgorith
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.9474250948);
+    // With simplification, fewer 0-clusters:
+    assertClusterSizes(clustering, new int[] { 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
+  }
+
+  @Test
+  public void testSLINKNoSimplify() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 10) //
+        .with(CutDendrogramByNumberOfClusters.Par.HIERARCHICAL_ID) //
+        .with(CutDendrogramByNumberOfClusters.Par.NOSIMPLIFY_ID) //
+        .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.9474250948);
+    // Without simplification, 5 additional 0-clusters:
     assertClusterSizes(clustering, new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 3, 62, 104, 154 });
   }
 }

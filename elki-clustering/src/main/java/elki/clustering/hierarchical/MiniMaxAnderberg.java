@@ -31,6 +31,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -92,21 +93,21 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
     // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
 
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(size));
     DBIDArrayMIter protiter = prots.iter();
-
     MiniMax.initializeMatrices(mat, prots, dq);
+    int[] newidx = MathUtil.sequence(0, size);
 
     // Arrays used for caching:
     double[] bestd = new double[size];
@@ -115,14 +116,13 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    DBIDArrayIter ix = mat.ix;
     for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(ix, builder, end, //
-          findMerge(end, mat, protiter, builder, clusters, bestd, besti, dq));
+      end = AGNES.shrinkActiveSet(newidx, end, //
+          findMerge(end, mat, protiter, builder, newidx, clusters, bestd, besti, dq));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    return builder.complete();
+    return (ClusterPrototypeMergeHistory) builder.complete();
   }
 
   /**
@@ -132,13 +132,14 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param mat matrix view
    * @param prots the prototypes of merges between clusters
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters the current clustering
    * @param bestd the distances to the nearest neighboring cluster
    * @param besti the nearest neighboring cluster
    * @param dq the range query
    * @return x, for shrinking the active set.
    */
-  protected int findMerge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
+  protected int findMerge(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
@@ -156,7 +157,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
       }
     }
     assert 0 <= y && y < x;
-    merge(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
+    merge(size, mat, prots, builder, newidx, clusters, dq, bestd, besti, x, y);
     return x;
   }
 
@@ -167,6 +168,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param mat Matrix paradigm
    * @param prots the prototypes of merges between clusters
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters the current clustering
    * @param dq the range query
    * @param bestd the distances to the nearest neighboring cluster
@@ -174,7 +176,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param x first cluster to merge, with {@code x > y}
    * @param y second cluster to merge, with {@code y < x}
    */
-  protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
@@ -200,9 +202,13 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     clusters.put(y, cy);
 
     // parent of x is set to y
-    builder.strictAdd(ix, distances[offset], iy, prots.seek(offset));
-    besti[x] = -1; // Deactivate x in cache:
-    updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
+    final int xx = newidx[x], yy = newidx[y];
+    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+    int zz = builder.strictAdd(xx, distances[offset], yy, prots.seek(offset));
+    assert builder.getSize(zz) == sizex + sizey;
+    newidx[y] = zz;
+    newidx[x] = besti[x] = -1; // Deactivate removed cluster.
+    updateMatrices(size, mat, prots, builder, newidx, clusters, dq, bestd, besti, x, y);
     if(y > 0) {
       Anderberg.findBest(distances, bestd, besti, y);
     }
@@ -216,6 +222,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param mat matrix view
    * @param prots the prototypes of merges between clusters
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters the current clustering
    * @param dq the range query
    * @param bestd the distances to the nearest neighboring cluster
@@ -223,7 +230,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param x first cluster to merge, with {@code x > y}
    * @param y second cluster to merge, with {@code y < x}
    */
-  private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     final DBIDArrayIter ix = mat.ix, iy = mat.iy;
     final double[] distances = mat.matrix;
     // c is the new cluster.
@@ -235,7 +242,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     final int yoffset = MatrixParadigm.triangleSize(y);
     for(; b < a; b++) {
       // Skip entry if already merged
-      if(builder.isLinked(iy.seek(b))) {
+      if(newidx[b] < 0) {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
@@ -248,7 +255,7 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
     iy.seek(b);
     for(; a < size; a++) {
       // Skip entry if already merged
-      if(builder.isLinked(ix.seek(a))) {
+      if(newidx[a] < 0) {
         continue;
       }
       MiniMax.updateEntry(mat, prots, clusters, dq, a, b);

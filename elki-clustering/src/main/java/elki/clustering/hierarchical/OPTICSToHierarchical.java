@@ -38,9 +38,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Convert a OPTICS ClusterOrder to a hierarchical clustering.
  * <p>
  * While this is not a literal implementation of below reference due to the
- * more compact SLINK-based representation currently used in ELKI instead of the
- * object-oriented tree used originally, the basic idea of converting OPTICS
- * plots into dendrograms is given by Sander et al.
+ * hierarchy representation currently used in ELKI instead of the
+ * object-oriented tree used in the publication, the basic idea of converting
+ * OPTICS plots into dendrograms is given by Sander et al.
  * <p>
  * TODO: this currently does not use the additional predecessor information that
  * should prove useful to disambiguate some cases.
@@ -74,22 +74,20 @@ public class OPTICSToHierarchical implements HierarchicalClusteringAlgorithm {
   }
 
   @Override
-  public PointerHierarchyResult autorun(Database database) {
+  public ClusterMergeHistory autorun(Database database) {
     ClusterOrder in = inner.autorun(database);
     ArrayDBIDs ids = in.getDBIDs();
-    DBIDArrayIter it = ids.iter(), it2 = ids.iter();
 
-    // size-1 merges.
     int[] ord = MathUtil.sequence(1, ids.size());
     double[] d = new double[ord.length];
-    for(it.seek(1); it.valid(); it.advance()) {
+    for(DBIDArrayIter it = ids.iter().seek(1); it.valid(); it.advance()) {
       d[it.getOffset() - 1] = in.getReachability(it);
     }
     DoubleIntegerArrayQuickSort.sort(d, ord, d.length);
 
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, false);
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, false);
     for(int i = 0; i < ord.length; i++) {
-      builder.add(it.seek(ord[i] - 1), d[i], it2.seek(ord[i]));
+      builder.add(ord[i] - 1, d[i], ord[i]);
     }
     return builder.complete();
   }

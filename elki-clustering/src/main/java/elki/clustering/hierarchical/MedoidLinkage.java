@@ -32,6 +32,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -101,33 +102,33 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
+  public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
     // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
 
     // FIXME: use an Instance, instead of passing so many variables on the stack
     // Allocate working space:
     MatrixParadigm mat = new MatrixParadigm(ids);
     AGNES.initializeDistanceMatrix(mat, dq, SingleLinkage.STATIC);
+    int[] newidx = MathUtil.sequence(0, size);
     // Current medoids:
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(ids);
     DBIDArrayMIter mi = medoids.iter(), mj = medoids.iter();
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Medoid linkage clustering", size - 1, LOG) : null;
-    DBIDArrayIter ix = mat.ix;
     for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(ix, builder, end, //
-          findMerge(end, mat, mi, mj, builder, clusters, dq));
+      end = AGNES.shrinkActiveSet(newidx, end, //
+          findMerge(end, mat, mi, mj, builder, newidx, clusters, dq));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    return (PointerPrototypeHierarchyResult) builder.complete();
+    return (ClusterPrototypeMergeHistory) builder.complete();
   }
 
   /**
@@ -136,26 +137,26 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
    * @param mx first medoid iterator
    * @param my second medoid iterator
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters the current clustering
    * @param dq the range query
    * @return x, for shrinking the working set.
    */
-  protected int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq) {
-    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
+  protected int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq) {
     final double[] distances = mat.matrix;
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
 
     for(int dx = 0; dx < end; dx++) {
       // Skip if object is already linked
-      if(builder.isLinked(ix.seek(dx))) {
+      if(newidx[dx] < 0) {
         continue;
       }
       final int xoffset = MatrixParadigm.triangleSize(dx);
 
       for(int dy = 0; dy < dx; dy++) {
         // Skip if object is already linked
-        if(builder.isLinked(iy.seek(dy))) {
+        if(newidx[dy] < 0) {
           continue;
         }
 
@@ -167,9 +168,9 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
         }
       }
     }
-
-    assert (y < x);
-    merge(end, mat, mx, my, builder, clusters, dq, x, y);
+    assert x >= 0 && y >= 0;
+    assert y < x; // We could swap otherwise, but this shouldn't arise.
+    merge(end, mat, mx, my, builder, newidx, clusters, dq, x, y);
     return x;
   }
 
@@ -181,12 +182,13 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
    * @param mx first medoid iterator
    * @param my second medoid iterator
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters the current clustering
    * @param dq the range query
    * @param x first cluster to merge, with {@code x > y}
    * @param y second cluster to merge, with {@code y < x}
    */
-  protected void merge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
+  protected void merge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
     assert (y < x);
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
@@ -211,8 +213,13 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
     // New cluster medoid
     findMedoid(dq, cy, my.seek(y));
     // parent of x is set to y
-    builder.strictAdd(ix.seek(x), distances[offset], iy.seek(y), my);
-    updateMatrix(dq, end, mat, builder, x, y, mx, my);
+    final int xx = newidx[x], yy = newidx[y];
+    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+    int zz = builder.strictAdd(xx, distances[offset], yy, my);
+    assert builder.getSize(zz) == sizex + sizey;
+    newidx[y] = zz;
+    newidx[x] = -1; // deactivate
+    updateMatrix(dq, end, mat, builder, newidx, x, y, mx, my);
   }
 
   /**
@@ -256,30 +263,30 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
    * @param end Active set size
    * @param mat Matrix view
    * @param builder Hierarchy builder (to get cluster sizes)
+   * @param newidx cluster indexes currently in the matrix
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void updateMatrix(DistanceQuery<?> dq, int end, MatrixParadigm mat, PointerHierarchyBuilder builder, int x, int y, DBIDArrayIter mi, DBIDArrayIter mj) {
+  protected void updateMatrix(DistanceQuery<?> dq, int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx, int x, int y, DBIDArrayIter mi, DBIDArrayIter mj) {
     // Update distance matrix. Note: y < x
     final int ybase = MatrixParadigm.triangleSize(y);
     double[] scratch = mat.matrix;
-    DBIDArrayIter ij = mat.ix;
 
     // Write to (y, j), with j < y
     int j = 0;
     mi.seek(y);
     for(; j < y; j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
-      assert (j < y); // Otherwise, ybase + j is the wrong position!
+      assert j < y; // Otherwise, ybase + j is the wrong position!
       scratch[ybase + j] = dq.distance(mi, mj.seek(j));
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
     int jbase = MatrixParadigm.triangleSize(j);
     for(; j < x; jbase += j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
       scratch[jbase + y] = dq.distance(mi, mj.seek(j));
@@ -287,7 +294,7 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
     for(; j < end; jbase += j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
       scratch[jbase + y] = dq.distance(mi, mj.seek(j));

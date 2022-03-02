@@ -26,16 +26,16 @@ import java.util.Collection;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerDensityHierarchyResult;
-import elki.clustering.hierarchical.PointerHierarchyResult;
-import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
+import elki.clustering.hierarchical.ClusterDensityMergeHistory;
+import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.clustering.hierarchical.ClusterPrototypeMergeHistory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.data.model.PrototypeDendrogramModel;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.datastore.*;
+import elki.database.datastore.DoubleDataStore;
 import elki.database.ids.*;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
@@ -49,6 +49,9 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
  * <p>
@@ -60,7 +63,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
  * Density-Based Clustering Based on Hierarchical Density Estimates<br>
  * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
- * F
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -110,12 +112,12 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
   /**
    * Process an existing result.
    * 
-   * @param pointerresult Existing result in pointer representation.
+   * @param merges Existing result in pointer representation.
    * @return Clustering
    */
-  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
-    Clustering<DendrogramModel> result = new Instance(pointerresult).run();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
+  public Clustering<DendrogramModel> run(ClusterMergeHistory merges) {
+    Clustering<DendrogramModel> result = new Instance(merges).run();
+    Metadata.hierarchyOf(result).addChild(merges);
     return result;
   }
 
@@ -126,19 +128,9 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    */
   protected class Instance {
     /**
-     * Unordered IDs
+     * The hierarchical result to process.
      */
-    protected ArrayDBIDs ids;
-
-    /**
-     * Parent pointer
-     */
-    protected DBIDDataStore pi;
-
-    /**
-     * Merge distance
-     */
-    protected DoubleDataStore lambda;
+    protected ClusterMergeHistory merges;
 
     /**
      * Core distances (if available, may be {@code null}).
@@ -146,22 +138,14 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
     protected DoubleDataStore coredist = null;
 
     /**
-     * The hierarchical result to process.
-     */
-    protected PointerHierarchyResult pointerresult;
-
-    /**
      * Constructor.
      *
-     * @param pointerresult Hierarchical result
+     * @param merges Hierarchical result
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      this.ids = pointerresult.topologicalSort();
-      this.pi = pointerresult.getParentStore();
-      this.lambda = pointerresult.getParentDistanceStore();
-      this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyResult) {
-        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
+    public Instance(ClusterMergeHistory merges) {
+      this.merges = merges;
+      if(merges instanceof ClusterDensityMergeHistory) {
+        this.coredist = ((ClusterDensityMergeHistory) merges).getCoreDistanceStore();
       }
     }
 
@@ -171,116 +155,78 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      * @return Hierarchical clustering
      */
     public Clustering<DendrogramModel> run() {
-      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
-
-      // Sort DBIDs by lambda, to process merges in increasing order.
-      ArrayDBIDs order = pointerresult.topologicalSort();
-
-      WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
-
-      ArrayModifiableDBIDs noise = DBIDUtil.newArray();
-      ArrayList<Cluster<DendrogramModel>> toplevel = new ArrayList<>();
+      Int2ObjectMap<TempCluster> cluster_map = new Int2ObjectOpenHashMap<>(merges.size() >> 1);
+      DBIDVar tmp = DBIDUtil.newVar();
+      final int n = merges.size();
 
       final Clustering<DendrogramModel> dendrogram = new Clustering<>();
-      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
-
-      DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", merges.numMerges(), LOG) : null;
       // Perform one join at a time, in increasing order
-      for(DBIDArrayIter it = order.iter(); it.valid(); it.advance()) {
-        final double dist = lambda.doubleValue(it); // Join distance
-        final boolean cIsCore = (coredist == null) || dist >= coredist.doubleValue(it);
-
+      for(int i = 0, m = merges.numMerges(); i < m; i++) {
+        final double dist = merges.getMergeHeight(i); // Join distance
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
         // Original cluster (may be null):
-        TempCluster cclus = cluster_map.get(it);
-        final boolean cNotSpurious = cclus != null ? cclus.isNotSpurious(minClSize) : (minClSize <= 1 && cIsCore);
-
-        // Successor cluster:
-        pi.assignVar(it, succ); // succ = pi(it)
-        // If we don't have a (different) successor, we are at the root level.
-        if(DBIDUtil.equal(it, succ)) {
-          // TODO: is this the proper handling?
-          if(cclus != null) {
-            if(cclus.isNotSpurious(minClSize)) {
-              toplevel.add(toCluster(cclus, dendrogram, it));
-            }
-            else {
-              noise.addDBIDs(cclus.newids);
-            }
-            cluster_map.put(it, null);
-          }
-          else if(minClSize <= 1 && cIsCore) { // Non-spurious singleton
-            toplevel.add(makeCluster(it, dist, null));
-          }
-          else { // Spurious singleton
-            noise.add(it);
-          }
-          LOG.incrementProcessed(progress);
-          continue; // top level cluster.
-        }
+        TempCluster aclus = cluster_map.remove(a);
+        final boolean aIsCore = coredist == null || a >= n || dist >= coredist.doubleValue(merges.assignVar(a, tmp));
+        final boolean aNotSpurious = aclus != null ? aclus.isNotSpurious(minClSize) : (minClSize <= 1 && aIsCore);
         // Other cluster (cluster of successor)
-        TempCluster oclus = cluster_map.get(succ);
-        final boolean oIsCore = (coredist == null || dist <= coredist.doubleValue(succ));
-        final boolean oNotSpurious = oclus != null ? oclus.isNotSpurious(minClSize) : (minClSize <= 1 && oIsCore);
+        TempCluster bclus = cluster_map.remove(b);
+        final boolean bIsCore = coredist == null || b >= n || dist <= coredist.doubleValue(merges.assignVar(b, tmp));
+        final boolean bNotSpurious = bclus != null ? bclus.isNotSpurious(minClSize) : (minClSize <= 1 && bIsCore);
+        final TempCluster nclus; // Resulting cluster.
         // Both exist already, and are not spurious: full merge.
-        if(oclus != null && cclus != null) {
-          if(oNotSpurious && cNotSpurious) {
-            // Finalize both children:
-            oclus.addChild(toCluster(oclus, dendrogram, it));
-            oclus.addChild(toCluster(cclus, dendrogram, it));
-            assert (oclus.children.size() == 2);
-            oclus.depth = dist; // Update height
+        if(bclus != null && aclus != null) {
+          if(bNotSpurious && aNotSpurious) {
+            // Finalize both children, reuse bclus
+            bclus.addChild(toCluster(bclus, dendrogram));
+            bclus.addChild(toCluster(aclus, dendrogram));
+            assert bclus.children.size() == 2;
+            nclus = bclus; // recycle
           }
-          else if(cNotSpurious) {
-            // Fully merge oclus into cclus
-            cclus.addDBIDs(oclus.newids);
-            assert (oclus.children.isEmpty());
-            cclus.depth = dist; // Update height
-            cluster_map.put(succ, cclus);
+          else if(aNotSpurious) {
+            // Merge bclus into aclus
+            aclus.addDBIDs(bclus.newids);
+            assert bclus.children.isEmpty();
+            nclus = aclus;
           }
           else {
-            // Fully merge cclus into oclus
-            oclus.addDBIDs(cclus.newids);
-            assert (cclus.children.isEmpty());
-            oclus.depth = dist; // Update height
+            // Merge aclus into bclus
+            bclus.addDBIDs(aclus.newids);
+            assert aclus.children.isEmpty();
+            nclus = bclus;
           }
+          nclus.depth = dist; // Update height
         }
-        else if(cclus != null) { // Current exists
-          if(cNotSpurious && oNotSpurious) {
-            cclus.addChild(toCluster(cclus, dendrogram, it));
+        else if(aclus != null) { // Only A exists
+          if(aNotSpurious && bNotSpurious) {
+            aclus.addChild(toCluster(aclus, dendrogram));
           }
-          addSingleton(cclus, succ, dist, oNotSpurious);
-          cluster_map.put(succ, cclus);
+          addSingleton(aclus, b, merges.assignVar(b, tmp), dist, bNotSpurious);
+          nclus = aclus;
         }
-        else if(oclus != null) { // Other exists
-          if(cNotSpurious && oNotSpurious) {
-            oclus.addChild(toCluster(oclus, dendrogram, it));
+        else if(bclus != null) { // Only B exists
+          if(aNotSpurious && bNotSpurious) {
+            bclus.addChild(toCluster(bclus, dendrogram));
           }
-          addSingleton(oclus, it, dist, cNotSpurious);
+          addSingleton(bclus, a, merges.assignVar(a, tmp), dist, aNotSpurious);
+          nclus = bclus;
         }
-        else { // Both null, make new
-          oclus = new TempCluster(dist);
-          addSingleton(oclus, it, dist, cNotSpurious);
-          addSingleton(oclus, succ, dist, oNotSpurious);
-          cluster_map.put(succ, oclus);
+        else { // Both null, make new cluster
+          nclus = new TempCluster(i + n, dist);
+          addSingleton(nclus, a, merges.assignVar(a, tmp), dist, aNotSpurious);
+          addSingleton(nclus, b, merges.assignVar(b, tmp), dist, bNotSpurious);
         }
-        cluster_map.put(it, null);
+        assert nclus != null;
+        cluster_map.put(i + n, nclus);
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);
 
       // Add root structure to dendrogram:
-      if(noise.size() > 0) {
-        Cluster<DendrogramModel> nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
-        dendrogram.addToplevelCluster(nclus);
-        for(Cluster<DendrogramModel> clus : toplevel) {
-          dendrogram.addChildCluster(nclus, clus);
-        }
+      for(TempCluster clus : cluster_map.values()) {
+        dendrogram.addToplevelCluster(toCluster(clus, dendrogram));
       }
-      else {
-        for(Cluster<DendrogramModel> clus : toplevel) {
-          dendrogram.addToplevelCluster(clus);
-        }
-      }
+      Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       return dendrogram;
     }
 
@@ -292,12 +238,12 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      * @param dist Distance
      * @param asCluster Add as cluster (or only as id)
      */
-    private void addSingleton(TempCluster clus, DBIDRef id, double dist, boolean asCluster) {
+    private void addSingleton(TempCluster clus, int id, DBIDRef it, double dist, boolean asCluster) {
       if(asCluster) {
-        clus.addChild(makeCluster(id, dist, null));
+        clus.addChild(makeCluster(id, dist, DBIDUtil.deref(it)));
       }
       else {
-        clus.add(id); // Add current object
+        clus.add(it); // Add current object
       }
       clus.depth = dist; // Update height
     }
@@ -307,11 +253,10 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      *
      * @param temp Current temporary cluster
      * @param clustering Parent clustering
-     * @param lead Leading object
      * @return Cluster
      */
-    protected Cluster<DendrogramModel> toCluster(TempCluster temp, Clustering<DendrogramModel> clustering, DBIDRef lead) {
-      Cluster<DendrogramModel> cluster = makeCluster(lead, temp.depth, DBIDUtil.newArray(temp.newids));
+    protected Cluster<DendrogramModel> toCluster(TempCluster temp, Clustering<DendrogramModel> clustering) {
+      Cluster<DendrogramModel> cluster = makeCluster(temp.seq, temp.depth, DBIDUtil.newArray(temp.newids));
       for(Cluster<DendrogramModel> child : temp.children) {
         clustering.addChildCluster(cluster, child);
       }
@@ -323,35 +268,31 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
     /**
      * Make the cluster for the given object
      *
+     * @param seq Cluster sequence number
      * @param lead Leading object
      * @param depth Linkage depth
      * @param members Member objects
      * @return Cluster
      */
-    protected Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members) {
-      final String name;
-      if(members == null || members.size() == 1 && members.contains(lead)) {
-        name = "obj_" + DBIDUtil.toString(lead);
-        if(members == null) {
-          ArrayModifiableDBIDs m = DBIDUtil.newArray(1);
-          m.add(lead);
-          members = m;
-        }
+    protected Cluster<DendrogramModel> makeCluster(int seq, double depth, DBIDs members) {
+      final String name; // TODO: how useful are these names after all?
+      members = members != null ? members : DBIDUtil.EMPTYDBIDS;
+      if(members.size() == 1) {
+        name = "obj_" + DBIDUtil.toString(members.iter());
       }
-      else if(members.size() == 0) {
-        name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
+      else if(members.isEmpty()) { // non-trivial merge cluster
+        name = "mrg_" + depth;
       }
       else if(depth < Double.POSITIVE_INFINITY) {
-        name = "clu_" + DBIDUtil.toString(lead) + "_" + depth;
+        name = "clu_" + depth;
       }
       else {
-        // Complete data set only?
-        name = "top_" + DBIDUtil.toString(lead);
+        name = "top";
       }
 
       DendrogramModel model;
-      if(!members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyResult) {
-        model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyResult) pointerresult).findPrototype(members));
+      if(members != null && !members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
+        model = new PrototypeDendrogramModel(depth, ((ClusterPrototypeMergeHistory) merges).prototype(seq));
       }
       else {
         model = new DendrogramModel(depth);
@@ -366,6 +307,11 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * @author Erich Schubert
    */
   private static class TempCluster {
+    /**
+     * Merge id of the cluster for prototype identification.
+     */
+    protected int seq;
+
     /**
      * New ids, not yet in child clusters.
      */
@@ -384,9 +330,11 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
     /**
      * Constructor.
      *
+     * @param seq Cluster generation sequence
      * @param depth Depth
      */
-    public TempCluster(double depth) {
+    public TempCluster(int seq, double depth) {
+      this.seq = seq;
       this.depth = depth;
     }
 

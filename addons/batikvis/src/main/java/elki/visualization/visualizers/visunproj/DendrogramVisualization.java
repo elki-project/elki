@@ -23,12 +23,9 @@ package elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.clustering.hierarchical.PointerHierarchyResult;
-import elki.database.datastore.DBIDDataStore;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.DoubleDataStore;
-import elki.database.datastore.IntegerDataStore;
-import elki.database.ids.*;
+import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
 import elki.logging.LoggingUtil;
 import elki.math.scales.LinearScale;
 import elki.utilities.optionhandling.OptionID;
@@ -125,7 +122,7 @@ public class DendrogramVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    VisualizationTree.findNewResults(context, start).filter(PointerHierarchyResult.class).forEach(pi -> {
+    VisualizationTree.findNewResults(context, start).filter(ClusterMergeHistory.class).forEach(pi -> {
       final VisualizationTask task = new VisualizationTask(this, NAME, pi, null) //
           .level(VisualizationTask.LEVEL_STATIC) //
           .with(UpdateFlag.ON_STYLEPOLICY);
@@ -224,35 +221,24 @@ public class DendrogramVisualization implements VisFactory {
     @Override
     public void fullRedraw() {
       layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-
       StyleLibrary style = context.getStyleLibrary();
       StylingPolicy spol = context.getStylingPolicy();
 
-      PointerHierarchyResult p = task.getResult();
+      ClusterMergeHistory p = task.getResult();
       final boolean squared = p.isSquared();
+      int[] pos = p.getPositions();
 
-      DBIDs ids = p.getDBIDs();
-      DBIDDataStore par = p.getParentStore();
-      DoubleDataStore pdi = p.getParentDistanceStore();
-      IntegerDataStore pos = p.getPositions();
-      DBIDVar pa = DBIDUtil.newVar();
-
-      final int size = ids.size();
+      final int size = p.size(), m = p.numMerges();
       double linew = StyleLibrary.SCALE * .1 / FastMath.log1p(size);
-      double width = StyleLibrary.SCALE,
-          height = width / getWidth() * getHeight();
+      double width = StyleLibrary.SCALE;
+      double height = width / getWidth() * getHeight();
       double xscale = width / size, xoff = xscale * .5;
       double maxh = Double.MIN_NORMAL;
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
-          continue; // Root
-        }
-        double v = pdi.doubleValue(it);
-        if(v == Double.POSITIVE_INFINITY) {
-          continue;
-        }
-        maxh = v > maxh ? v : maxh;
+      for(int i = 0, n = p.numMerges(); i < n; i++) {
+        double v = p.getMergeHeight(i);
+        maxh = (v < Double.POSITIVE_INFINITY && v > maxh) ? v : maxh;
       }
+      // TODO: add a SqrtScale!
       LinearScale yscale = new LinearScale(0, squared ? Math.sqrt(maxh) : maxh);
       // Y projection function
       Double2DoubleFunction proy = squared ? //
@@ -278,16 +264,12 @@ public class DendrogramVisualization implements VisFactory {
       }
 
       // Initial positions:
-      Positions coord = style2 == PositionStyle.HALF_POS ? new HalfPosPositions(size) //
-          : new HalfWidthPositions(size);
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        final int off = pos.intValue(it);
-        coord.set(off, off * xscale + xoff, height);
+      Positions coord = style2 == PositionStyle.HALF_POS ? //
+          new HalfPosPositions(size + m) : new HalfWidthPositions(size + m);
+      for(int i = 0; i < size; i++) {
+        coord.set(i, pos[i] * xscale + xoff, height);
       }
-      // Draw ascending by distance
-      ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-      order.sort(new DataStoreUtil.AscendingByDoubleDataStoreAndId(pdi));
-
+      // Draw in merge order
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
         setupCSS(svgp, cspol, linew);
@@ -296,53 +278,53 @@ public class DendrogramVisualization implements VisFactory {
         for(int i = 0; i < paths.length; i++) {
           paths[i] = new SVGPath();
         }
-        for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
-          par.assignVar(it, pa); // Get parent.
-          double h = pdi.doubleValue(it);
-          final int o1 = pos.intValue(it), p1 = cspol.getStyleForDBID(it);
-          double x1 = coord.getX(o1), y1 = coord.getY(o1);
-          if(DBIDUtil.equal(it, pa)) {
-            double y = proy.applyAsDouble(h);
-            if(Double.isFinite(y)) {
-              paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y);
-            }
-            continue; // Root
-          }
-          final int o2 = pos.intValue(pa), p2 = cspol.getStyleForDBID(pa);
-          double x2 = coord.getX(o2), y2 = coord.getY(o2),
-              y3 = proy.applyAsDouble(h), x3 = coord.combine(o1, o2, y3);
-          if(!Double.isFinite(x1) || !Double.isFinite(y1) || !Double.isFinite(x2) || !Double.isFinite(y2) || !Double.isFinite(x3) || !Double.isFinite(y3)) {
+        // Cluster color of each point/cluster:
+        int[] pcol = new int[size + m];
+        DBIDVar tmp = DBIDUtil.newVar();
+        for(int i = 0; i < size; i++) {
+          pcol[i] = cspol.getStyleForDBID(p.assignVar(i, tmp));
+        }
+        for(int i = 0; i < m; i++) {
+          int a = p.getMergeA(i), b = p.getMergeB(i);
+          double h = p.getMergeHeight(i);
+          int pa = pcol[a], pb = pcol[b];
+          double xa = coord.getX(a), ya = coord.getY(a);
+          double xb = coord.getX(b), yb = coord.getY(b);
+          double yc = proy.applyAsDouble(h);
+          double xc = coord.combine(a, b, yc, i + size);
+          pcol[i + size] = pa == pb ? pa : mins - 1;
+          if(!Double.isFinite(xa) || !Double.isFinite(ya) || !Double.isFinite(xa) || !Double.isFinite(ya) || !Double.isFinite(xa) || !Double.isFinite(ya)) {
             LoggingUtil.warning("Infinite or NaN values in dendrogram.");
             continue;
           }
           switch(DendrogramVisualization.this.style){
           case RECTANGULAR:
-            if(p1 == p2) {
-              paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+            if(pa == pb) {
+              paths[pa - mins + 1].moveTo(xa, ya).verticalLineTo(yc).horizontalLineTo(xb).verticalLineTo(yb);
             }
             else {
-              paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).verticalLineTo(y3);
-              paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).verticalLineTo(y3);
-              paths[0].moveTo(x1, y3).horizontalLineTo(x2);
+              paths[ya == height ? pa - mins + 1 : 0].moveTo(xa, ya).verticalLineTo(yc);
+              paths[yb == height ? pb - mins + 1 : 0].moveTo(xb, yb).verticalLineTo(yc);
+              paths[0].moveTo(xa, yc).horizontalLineTo(xb);
             }
             break;
           case TRIANGULAR_MAX:
-            double miny = Math.min(y1, y2);
-            if(p1 == p2) {
-              paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(miny).drawTo(x3, y3).drawTo(x2, miny).verticalLineTo(y2);
+            double miny = Math.min(ya, yb);
+            if(pa == pb) {
+              paths[pa - mins + 1].moveTo(xa, ya).verticalLineTo(miny).drawTo(xc, yc).drawTo(xb, miny).verticalLineTo(yb);
             }
             else {
-              paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).verticalLineTo(miny).drawTo(x3, y3);
-              paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).verticalLineTo(miny).drawTo(x3, y3);
+              paths[ya == height ? pa - mins + 1 : 0].moveTo(xa, ya).verticalLineTo(miny).drawTo(xc, yc);
+              paths[yb == height ? pb - mins + 1 : 0].moveTo(xb, yb).verticalLineTo(miny).drawTo(xc, yc);
             }
             break;
           case TRIANGULAR:
-            if(p1 == p2) {
-              paths[p1 - mins + 1].moveTo(x1, y1).drawTo(x3, y3).drawTo(x2, y2);
+            if(pa == pb) {
+              paths[pa - mins + 1].moveTo(xa, ya).drawTo(xc, yc).drawTo(xb, yb);
             }
             else {
-              paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).drawTo(x3, y3);
-              paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).drawTo(x3, y3);
+              paths[ya == height ? pa - mins + 1 : 0].moveTo(xa, ya).drawTo(xc, yc);
+              paths[yb == height ? pb - mins + 1 : 0].moveTo(xb, yb).drawTo(xc, yc);
             }
             break;
           }
@@ -359,30 +341,23 @@ public class DendrogramVisualization implements VisFactory {
         setupCSS(svgp, linew);
         SVGPath dendrogram = new SVGPath();
 
-        for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
-          double h = pdi.doubleValue(it);
-          final int o1 = pos.intValue(it);
-          double x1 = coord.getX(o1), y1 = coord.getY(o1);
-          if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
-            double y = proy.applyAsDouble(h);
-            if(Double.isFinite(y)) {
-              dendrogram.moveTo(x1, y1).verticalLineTo(y);
-            }
-            continue; // Root
-          }
-          final int o2 = pos.intValue(pa);
-          double x2 = coord.getX(o2), y2 = coord.getY(o2),
-              y3 = proy.applyAsDouble(h), x3 = coord.combine(o1, o2, y3);
+        for(int i = 0; i < m; i++) {
+          int a = p.getMergeA(i), b = p.getMergeB(i);
+          double h = p.getMergeHeight(i);
+          double xa = coord.getX(a), ya = coord.getY(a);
+          double xb = coord.getX(b), yb = coord.getY(b);
+          double yc = proy.applyAsDouble(h);
+          double xc = coord.combine(a, b, yc, i + size);
           switch(DendrogramVisualization.this.style){
           case RECTANGULAR:
-            dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+            dendrogram.moveTo(xa, ya).verticalLineTo(yc).horizontalLineTo(xb).verticalLineTo(yb);
             break;
           case TRIANGULAR_MAX:
-            double miny = Math.min(y1, y2);
-            dendrogram.moveTo(x1, y1).verticalLineTo(miny).drawTo(x3, y3).drawTo(x2, miny).verticalLineTo(y2);
+            double miny = Math.min(ya, yb);
+            dendrogram.moveTo(xa, ya).verticalLineTo(miny).drawTo(xc, yc).drawTo(xb, miny).verticalLineTo(yb);
             break;
           case TRIANGULAR:
-            dendrogram.moveTo(x1, y1).drawTo(x3, y3).drawTo(x2, y2);
+            dendrogram.moveTo(xa, ya).drawTo(xc, yc).drawTo(xb, yb);
             break;
           }
         }
@@ -481,13 +456,14 @@ public class DendrogramVisualization implements VisFactory {
 
     /**
      * Combine two objects, and return the new X coordinate.
-     *
+     * 
      * @param o1 First object
      * @param o2 Second object
      * @param y3 Merge Y coordinate
+     * @param o3 Resulting cluster number
      * @return New X coordinate
      */
-    double combine(int o1, int o2, double y3);
+    double combine(int o1, int o2, double y3, int o3);
   }
 
   /**
@@ -502,40 +478,36 @@ public class DendrogramVisualization implements VisFactory {
     final double[] xy;
 
     /**
-     * Size
-     */
-    final int l;
-
-    /**
      * Constructor.
      *
      * @param size Size
      */
     private HalfPosPositions(int size) {
-      this.l = size;
       this.xy = new double[size << 1];
     }
 
     @Override
     public void set(int off, double d, double height) {
+      off <<= 1;
       xy[off] = d;
-      xy[off + l] = height;
+      xy[off + 1] = height;
     }
 
     @Override
     public double getX(int o) {
-      return xy[o];
+      return xy[o << 1];
     }
 
     @Override
     public double getY(int o) {
-      return xy[o + l];
+      return xy[(o << 1) + 1];
     }
 
     @Override
-    public double combine(int o1, int o2, double y3) {
-      xy[o1 + l] = xy[o2 + l] = y3;
-      return (xy[o1] = xy[o2] = 0.5 * (xy[o1] + xy[o2]));
+    public double combine(int o1, int o2, double y3, int o3) {
+      o3 <<= 1;
+      xy[o3 + 1] = y3;
+      return xy[o3] = 0.5 * (xy[o1 << 1] + xy[o2 << 1]);
     }
   }
 
@@ -551,42 +523,40 @@ public class DendrogramVisualization implements VisFactory {
     final double[] xxy;
 
     /**
-     * Size
-     */
-    final int l, l2;
-
-    /**
      * Constructor.
      *
      * @param size Size
      */
     private HalfWidthPositions(int size) {
-      this.l = size;
-      this.l2 = size << 1;
       this.xxy = new double[size * 3];
     }
 
     @Override
     public void set(int off, double d, double height) {
-      xxy[off] = xxy[off + l] = 0.5 * d;
-      xxy[off + l2] = height;
+      off *= 3;
+      xxy[off] = xxy[off + 1] = 0.5 * d;
+      xxy[off + 2] = height;
     }
 
     @Override
     public double getX(int o) {
-      return xxy[o] + xxy[o + l];
+      o *= 3;
+      return xxy[o] + xxy[o + 1];
     }
 
     @Override
     public double getY(int o) {
-      return xxy[o + l2];
+      return xxy[o * 3 + 2];
     }
 
     @Override
-    public double combine(int o1, int o2, double y3) {
-      xxy[o1 + l2] = xxy[o2 + l2] = y3;
-      return (xxy[o1] = xxy[o2] = Math.min(xxy[o1], xxy[o2])) //
-          + (xxy[o1 + l] = xxy[o2 + l] = Math.max(xxy[o1 + l], xxy[o2 + l]));
+    public double combine(int o1, int o2, double y3, int o3) {
+      o1 *= 3;
+      o2 *= 3;
+      o3 *= 3;
+      xxy[o3 + 2] = y3;
+      return (xxy[o3] = Math.min(xxy[o1], xxy[o2])) //
+          + (xxy[o3 + 1] = Math.max(xxy[o1 + 1], xxy[o2 + 1]));
     }
   }
 

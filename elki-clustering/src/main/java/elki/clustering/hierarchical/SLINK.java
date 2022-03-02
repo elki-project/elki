@@ -23,10 +23,7 @@ package elki.clustering.hierarchical;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -48,6 +45,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
  * <p>
+ * For ELKI 0.8.0, this was rewritten to no longer use the original "pointer"
+ * output format, but instead generate an easier to use merge history now.
+ * <p>
  * This is probably the fastest exact single-link algorithm currently in use.
  * <p>
  * Reference:
@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.6.0
  *
  * @composed - implicitly - SingleLinkageMethod
- * @navassoc - generates - PointerHierarchyResult
+ * @navassoc - generates - ClusterMergeHistory
  *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
@@ -106,7 +106,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
    *
    * @param relation Data relation to use
    */
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     final Logging log = getLogger(); // To allow CLINK logger override
     DBIDs ids = relation.getDBIDs();
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -149,7 +149,45 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
 
     log.ensureCompleted(progress);
     m.destroy();
-    return new PointerHierarchyResult(ids, pi, lambda, distance.isSquared());
+    return convertOutput(new ClusterMergeHistoryBuilder(aids, distance.isSquared()), aids, pi, lambda).complete();
+  }
+
+  /**
+   * Convert a SLINK pointer representation to a cluster merge history.
+   *
+   * @param builder Builder
+   * @param oids original DBIDs
+   * @param pi Parent pointer
+   * @param lambda Parent distance
+   * @return Builder
+   */
+  protected static ClusterMergeHistoryBuilder convertOutput(ClusterMergeHistoryBuilder builder, ArrayDBIDs oids, DBIDDataStore pi, DoubleDataStore lambda) {
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(oids);
+    ids.sort(new DataStoreUtil.AscendingByDoubleDataStoreAndId(lambda));
+    DBIDVar p = DBIDUtil.newVar();
+    if(oids instanceof DBIDRange) { // simple case, can use offsets
+      DBIDRange range = (DBIDRange) oids;
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        double d = lambda.doubleValue(it);
+        if(!DBIDUtil.equal(it, pi.assignVar(it, p))) {
+          builder.add(range.getOffset(it), d, range.getOffset(p));
+        }
+      }
+    }
+    else { // need an index to map back to integer offsets
+      WritableIntegerDataStore idx = DataStoreFactory.FACTORY.makeIntegerStorage(oids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+      for(DBIDArrayIter it = oids.iter(); it.valid(); it.advance()) {
+        idx.putInt(it, it.getOffset());
+      }
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+        double d = lambda.doubleValue(it);
+        if(!DBIDUtil.equal(it, pi.assignVar(it, p))) {
+          builder.add(idx.intValue(it), d, idx.intValue(p));
+        }
+      }
+      idx.destroy();
+    }
+    return builder;
   }
 
   /**

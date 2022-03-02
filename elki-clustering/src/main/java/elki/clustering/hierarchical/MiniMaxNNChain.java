@@ -31,6 +31,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -102,22 +103,21 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Data relation
    * @return Clustering result
    */
-  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
+  public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
     // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
     Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(ids.size());
 
     MatrixParadigm mat = new MatrixParadigm(ids);
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(ids.size()));
+    int[] newidx = MathUtil.sequence(0, ids.size());
 
     MiniMax.initializeMatrices(mat, prots, dq);
-
-    nnChainCore(mat, prots.iter(), dq, builder, clusters);
-
-    return (PointerPrototypeHierarchyResult) builder.complete();
+    nnChainCore(mat, prots.iter(), dq, builder, newidx, clusters);
+    return (ClusterPrototypeMergeHistory) builder.complete();
   }
 
   /**
@@ -128,9 +128,10 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param prots computed prototypes
    * @param dq distance query of the data set
    * @param builder Result builder
+   * @param newidx cluster indexes currently in the matrix
    * @param clusters current clusters
    */
-  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
     final DBIDArrayIter ix = mat.ix;
     final double[] distances = mat.matrix;
     final int size = mat.size;
@@ -145,8 +146,8 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = NNChain.findUnlinked(0, end, ix, builder);
-        b = NNChain.findUnlinked(a + 1, end, ix, builder);
+        a = NNChain.findUnlinked(0, end, ix, builder, newidx);
+        b = NNChain.findUnlinked(a + 1, end, ix, builder, newidx);
         chain.clear();
         chain.add(a);
       }
@@ -169,7 +170,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
         int c = b;
         final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
+          if(i != b && newidx[i] >= 0) {
             double dist = distances[ta + i];
             if(dist < minDist) {
               minDist = dist;
@@ -178,7 +179,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
+          if(i != b && newidx[i] >= 0) {
             double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
@@ -202,8 +203,8 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
       }
       assert (minDist == mat.get(a, b));
       assert (b < a);
-      MiniMax.merge(size, mat, prots, builder, clusters, dq, a, b);
-      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
+      MiniMax.merge(size, mat, prots, builder, newidx, clusters, dq, a, b);
+      end = AGNES.shrinkActiveSet(newidx, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);

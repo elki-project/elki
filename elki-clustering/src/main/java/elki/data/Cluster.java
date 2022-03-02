@@ -281,7 +281,7 @@ public class Cluster<M extends Model> implements TextWriteable {
   /** {@inheritDoc} */
   @Override
   public String toString() {
-    return "Cluster(size=" + size() + ",model=" //
+    return "Cluster(name=" + getName() + ",size=" + size() + ",model=" //
         + (model == null ? "null" : model.toString()) //
         + (noise ? ",noise" : "") + ")";
   }

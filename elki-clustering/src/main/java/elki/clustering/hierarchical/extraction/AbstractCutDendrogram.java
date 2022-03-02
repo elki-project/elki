@@ -25,24 +25,14 @@ import java.util.ArrayList;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyResult;
-import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
+import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.clustering.hierarchical.ClusterPrototypeMergeHistory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.data.model.PrototypeDendrogramModel;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.datastore.DBIDDataStore;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.DoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
@@ -50,12 +40,14 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
-import elki.utilities.datastructures.arraylike.DoubleArray;
-import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 /**
  * Abstract base class for extracting clusters from dendrograms.
@@ -80,15 +72,23 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
   protected final HierarchicalClusteringAlgorithm algorithm;
 
   /**
+   * Produce a simpler result by adding single points directly into the merge
+   * cluster.
+   */
+  protected final boolean simplify;
+
+  /**
    * Constructor.
    *
    * @param algorithm Algorithm
    * @param hierarchical Extract hierarchical result
+   * @param simplify Simplify by putting single points into merge clusters
    */
-  public AbstractCutDendrogram(HierarchicalClusteringAlgorithm algorithm, boolean hierarchical) {
+  public AbstractCutDendrogram(HierarchicalClusteringAlgorithm algorithm, boolean hierarchical, boolean simplify) {
     super();
     this.algorithm = algorithm;
     this.hierarchical = hierarchical;
+    this.simplify = simplify;
   }
 
   /**
@@ -108,7 +108,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    * @param pointerresult Hierarchical result in pointer representation.
    * @return Clustering
    */
-  public abstract Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult);
+  public abstract Clustering<DendrogramModel> run(ClusterMergeHistory pointerresult);
 
   /**
    * Instance for a single data set.
@@ -117,55 +117,32 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
    */
   public abstract class Instance {
     /**
-     * Unordered IDs
-     */
-    protected ArrayDBIDs ids;
-
-    /**
-     * Parent pointer
-     */
-    protected DBIDDataStore pi;
-
-    /**
-     * Merge distance
-     */
-    protected DoubleDataStore lambda;
-
-    /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyResult pointerresult;
+    protected ClusterMergeHistory merges;
 
     /**
      * Map clusters to integer cluster numbers.
      */
-    protected WritableIntegerDataStore cluster_map;
+    protected Int2IntOpenHashMap leafMap;
 
     /**
-     * Storage for cluster contents
+     * Topmost merge of each leaf.
      */
-    protected ArrayList<ModifiableDBIDs> cluster_dbids;
+    protected IntegerArray leafTop;
 
     /**
-     * Cluster distances
+     * Collected cluster members
      */
-    protected DoubleArray clusterHeight;
-
-    /**
-     * Cluster lead objects
-     */
-    protected ArrayModifiableDBIDs cluster_leads;
+    protected ArrayList<ModifiableDBIDs> clusterMembers;
 
     /**
      * Constructor.
      *
      * @param pointerresult Hierarchical result
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      this.ids = pointerresult.topologicalSort();
-      this.pi = pointerresult.getParentStore();
-      this.lambda = pointerresult.getParentDistanceStore();
-      this.pointerresult = pointerresult;
+    public Instance(ClusterMergeHistory merges) {
+      this.merges = merges;
     }
 
     /**
@@ -175,23 +152,20 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      */
     public Clustering<DendrogramModel> extractClusters() {
       final Logging log = getLogger();
-      // Sort DBIDs topologically.
-      DBIDArrayIter it = pointerresult.topologicalSort().iter();
-
-      final int split = findSplit(it);
+      final int split = findSplit();
 
       // Extract the child clusters
-      FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), log) : null;
+      FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Extracting clusters", merges.numMerges(), log) : null;
       // Initialize data structures:
-      final int expcnum = ids.size() - split;
-      cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
-      cluster_dbids = new ArrayList<>(expcnum + 10);
-      clusterHeight = new DoubleArray(expcnum + 10);
-      cluster_leads = DBIDUtil.newArray(expcnum + 10);
+      final int expcnum = merges.size() - split + 1;
+      leafMap = new Int2IntOpenHashMap(merges.size());
+      leafMap.defaultReturnValue(-1);
+      clusterMembers = new ArrayList<>(expcnum);
+      leafTop = new IntegerArray(expcnum);
 
-      buildLeafClusters(it, split, progress);
+      buildLeafClusters(split, progress);
       Clustering<DendrogramModel> dendrogram = hierarchical ? //
-          buildHierarchical(it, split, progress) : buildFlat(it, split, progress);
+          buildHierarchical(split, progress) : buildFlat(split, progress);
       log.ensureCompleted(progress);
       return dendrogram;
     }
@@ -200,43 +174,41 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      * Prepare the leaf clusters by executing the first (size - 1 - split)
      * merges.
      * 
-     * @param it Iterator
      * @param split Splitting point
      * @param progress Progress for logging (may be {@code null})
      */
-    private void buildLeafClusters(DBIDArrayIter it, final int split, FiniteProgress progress) {
+    private void buildLeafClusters(int split, FiniteProgress progress) {
       final Logging log = getLogger();
-      DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
-      // Go backwards on the lower part.
-      for(it.seek(split - 1); it.valid(); it.retract()) {
-        double dist = lambda.doubleValue(it); // Distance to successor
-        pi.assignVar(it, succ); // succ = pi(it)
-        int clusterid = cluster_map.intValue(succ);
-        // Successor cluster has already been created:
-        if(clusterid >= 0) {
-          cluster_dbids.get(clusterid).add(it);
-          cluster_map.putInt(it, clusterid);
-          // Update distance to maximum encountered:
-          if(clusterHeight.get(clusterid) < dist) {
-            clusterHeight.set(clusterid, dist);
-          }
+      final DBIDVar tmp = DBIDUtil.newVar();
+      final int n = merges.size();
+      // Process merges backwards, starting at the split point (less
+      // allocations). We build a map (merge number -> cluster number), and add
+      // singleton objects to their clusters.
+      for(int i = split - 1; i >= 0; --i) {
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
+        int c = leafMap.remove(i + n); // no longer needed
+        ModifiableDBIDs ci = null;
+        if(c < 0) { // not yet created
+          c = clusterMembers.size(); // next index
+          ci = DBIDUtil.newArray();
+          clusterMembers.add(ci);
+          leafTop.add(i);
         }
         else {
-          // Need to start a new cluster:
-          clusterid = cluster_dbids.size(); // next cluster number.
-          ModifiableDBIDs cids = DBIDUtil.newArray();
-          // Add element and successor as initial members:
-          cids.add(succ);
-          cluster_map.putInt(succ, clusterid);
-          cids.add(it);
-          cluster_map.putInt(it, clusterid);
-          // Store new cluster.
-          cluster_dbids.add(cids);
-          cluster_leads.add(succ);
-          clusterHeight.add(dist);
+          ci = clusterMembers.get(c);
         }
-
-        // Decrement counter
+        if(b < n) { // b is singleton, add
+          ci.add(merges.assignVar(b, tmp));
+        }
+        else { // ca = c
+          leafMap.put(b, c);
+        }
+        if(a < n) { // a is singleton, add
+          ci.add(merges.assignVar(a, tmp));
+        }
+        else { // ca = c
+          leafMap.put(a, c);
+        }
         log.incrementProcessed(progress);
       }
     }
@@ -244,176 +216,174 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     /**
      * Build a flat clustering.
      * 
-     * @param it Ordered iterator
      * @param split Splitting point
      * @param progress Progress for logging (may be {@code null})
      * @return Clustering
      */
-    private Clustering<DendrogramModel> buildFlat(DBIDArrayIter it, final int split, FiniteProgress progress) {
+    private Clustering<DendrogramModel> buildFlat(int split, FiniteProgress progress) {
       final Logging log = getLogger();
+      final int n = merges.size();
       Clustering<DendrogramModel> dendrogram = new Clustering<>();
       Metadata.of(dendrogram).setLongName("Flattened Hierarchical Clustering");
       // Convert initial clusters to cluster objects
-      {
-        int i = 0;
-        for(DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
-          dendrogram.addToplevelCluster(makeCluster(it2, clusterHeight.get(i), cluster_dbids.get(i)));
-        }
-        clusterHeight = null; // Invalidate
+      for(int i = 0; i < leafTop.size; i++) {
+        dendrogram.addToplevelCluster(makeCluster(leafTop.get(i) + n, clusterMembers.get(i)));
       }
-      cluster_dbids = null; // Invalidate
-      // Process the upper part, bottom-up.
-      for(it.seek(split); it.valid(); it.advance()) {
-        int clusterid = cluster_map.intValue(it);
-        if(clusterid < 0) {
-          dendrogram.addToplevelCluster(makeCluster(it, Double.NaN, DBIDUtil.deref(it)));
+      // Make one-element clusters for singletons at the top, if necessary:
+      DBIDVar tmp = DBIDUtil.newVar();
+      for(int i = split, m = merges.numMerges(); i < m; i++) {
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
+        if(a < m) {
+          dendrogram.addToplevelCluster(makeCluster(a, DBIDUtil.deref(merges.assignVar(a, tmp))));
+        }
+        if(b < m) {
+          dendrogram.addToplevelCluster(makeCluster(b, DBIDUtil.deref(merges.assignVar(b, tmp))));
         }
         log.incrementProcessed(progress);
       }
-      cluster_map = null; // Invalidate
       return dendrogram;
     }
 
     /**
      * Build a hierarchical clustering.
      * 
-     * @param it Iterator
      * @param split Splitting point
      * @param progress Progress for logging (may be {@code null})
      * @return Clustering
      */
-    private Clustering<DendrogramModel> buildHierarchical(DBIDArrayIter it, int split, FiniteProgress progress) {
-      final int expcnum = ids.size() - split;
+    private Clustering<DendrogramModel> buildHierarchical(int split, FiniteProgress progress) {
       final Logging log = getLogger();
       final Clustering<DendrogramModel> dendrogram = new Clustering<>();
       Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       Cluster<DendrogramModel> root = null;
-      ArrayList<Cluster<DendrogramModel>> clusters = new ArrayList<>(expcnum);
+      final int n = merges.size();
+      ArrayList<Cluster<DendrogramModel>> clusters = new ArrayList<>(n - split);
       // Convert initial clusters to cluster objects
-      {
-        int i = 0;
-        for(DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
-          clusters.add(makeCluster(it2, clusterHeight.get(i), cluster_dbids.get(i)));
-        }
-        clusterHeight = null; // Invalidate
-        cluster_dbids = null; // Invalidate
+      Int2IntOpenHashMap cmap = new Int2IntOpenHashMap(leafTop.size() << 1);
+      cmap.defaultReturnValue(-1);
+      for(int i = 0; i < leafTop.size; i++) {
+        final int id = leafTop.get(i);
+        clusters.add(makeCluster(id + n, clusterMembers.get(i)));
+        cmap.put(id + n, i);
       }
       // Process the upper part, bottom-up.
-      DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
-      for(it.seek(split); it.valid(); it.advance()) {
-        int clusterid = cluster_map.intValue(it);
-        // The current cluster led by the current element:
-        final Cluster<DendrogramModel> clus;
-        if(clusterid >= 0) {
-          clus = clusters.get(clusterid);
-        }
-        else {
-          clus = makeCluster(it, Double.NaN, DBIDUtil.deref(it));
-        }
-        // The successor to join:
-        pi.assignVar(it, succ); // succ = pi(it)
-        if(DBIDUtil.equal(it, succ)) {
-          assert (root == null);
-          root = clus;
-          log.incrementProcessed(progress);
-          continue;
-        }
-        // Parent cluster:
-        int parentid = cluster_map.intValue(succ);
-        double depth = lambda.doubleValue(it);
-        // Parent cluster exists - merge as a new cluster:
-        if(parentid >= 0) {
-          final Cluster<DendrogramModel> pclus = clusters.get(parentid);
-          if(pclus.getModel().getDistance() == depth) {
-            if(clus == null) {
-              ((ModifiableDBIDs) pclus.getIDs()).add(it);
+      DBIDVar tmp = DBIDUtil.newVar();
+      for(int i = split, m = merges.numMerges(); i < m; i++) {
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
+        final double depth = merges.getMergeHeight(i);
+        final int ca = a < n ? -1 : cmap.remove(a);
+        final Cluster<DendrogramModel> clu; // Cluster resulting from this merge
+        if(ca >= 0) {
+          Cluster<DendrogramModel> cla = clusters.get(ca);
+          if(cla.getModel().getDistance() == depth) {
+            if(b < n) { // single object at same height, simplify
+              if(simplify) {
+                cmap.put(i + n, ca);
+                ((ModifiableDBIDs) (clu = cla).getIDs()).add(merges.assignVar(b, tmp));
+              }
+              else {
+                cmap.put(i + n, clusters.size() + 1);
+                clusters.add(clu = makeCluster(i + n, DBIDUtil.EMPTYDBIDS));
+                dendrogram.addChildCluster(clu, cla);
+                dendrogram.addChildCluster(clu, makeCluster(b, DBIDUtil.newArray(merges.assignVar(b, tmp))));
+              }
             }
-            else {
-              dendrogram.addChildCluster(pclus, clus);
+            else { // additional cluster at same height, add as child
+              cmap.put(i + n, ca);
+              dendrogram.addChildCluster(clu = cla, clusters.get(cmap.remove(b)));
             }
+          }
+          else { // new height, need merge cluster
+            ModifiableDBIDs ci = DBIDUtil.newArray(b < n ? 1 : 0);
+            if(b < n) { // add singleton to merge cluster directly:
+              ci.add(merges.assignVar(b, tmp));
+            }
+            cmap.put(i + n, clusters.size());
+            clusters.add(clu = makeCluster(i + n, ci));
+            dendrogram.addChildCluster(clu, cla);
+            if(b >= n) {
+              dendrogram.addChildCluster(clu, clusters.get(cmap.remove(b)));
+            }
+          }
+        }
+        else { // a single object
+          if(b < n) { // two single objects
+            ModifiableDBIDs ci = DBIDUtil.newArray(2);
+            ci.add(merges.assignVar(a, tmp));
+            ci.add(merges.assignVar(b, tmp));
+            cmap.put(i + n, clusters.size());
+            clusters.add(clu = makeCluster(i + n, ci));
           }
           else {
-            // Merge at new depth:
-            ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 1 : 0);
-            if(clus == null) {
-              cids.add(it);
+            final int cb = cmap.get(b);
+            Cluster<DendrogramModel> clb = clusters.get(cb);
+            if(clb.getModel().getDistance() == depth) {
+              ((ModifiableDBIDs) (clu = clb).getIDs()).add(merges.assignVar(a, tmp));
+              cmap.put(i + n, cb);
             }
-            Cluster<DendrogramModel> npclus = makeCluster(succ, depth, cids);
-            if(clus != null) {
-              dendrogram.addChildCluster(npclus, clus);
+            else { // new height, need merge cluster
+              assert clb != null;
+              cmap.put(i + n, clusters.size());
+              if(!simplify) {
+                clusters.add(clu = makeCluster(i + n, DBIDUtil.EMPTYDBIDS));
+                dendrogram.addChildCluster(clu, makeCluster(a, DBIDUtil.newArray(merges.assignVar(a, tmp))));
+              }
+              else {
+                clusters.add(clu = makeCluster(i + n, DBIDUtil.newArray(merges.assignVar(a, tmp))));
+              }
+              dendrogram.addChildCluster(clu, clb);
             }
-            dendrogram.addChildCluster(npclus, pclus);
-            // Replace existing parent cluster: new depth
-            clusters.set(parentid, npclus);
           }
         }
-        else {
-          // Merge with parent at this depth:
-          final Cluster<DendrogramModel> pclus;
-          // Create a new, one-element cluster for parent, and a merged cluster
-          // above it.
-          pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
-          dendrogram.addChildCluster(pclus, makeCluster(succ, Double.NaN, DBIDUtil.deref(succ)));
-          if(clus != null) {
-            dendrogram.addChildCluster(pclus, clus);
-          }
-          // Store cluster:
-          parentid = clusters.size();
-          clusters.add(pclus); // Remember parent cluster
-          cluster_map.putInt(succ, parentid); // Reference
-        }
-
+        root = clu;
         // Decrement counter
         log.incrementProcessed(progress);
       }
-      assert (root != null);
-      cluster_map = null; // Invalidate
-      // attach root
       dendrogram.addToplevelCluster(root);
       return dendrogram;
     }
 
     /**
-     * Find the splitting point in the ordered DBIDs list.
+     * Find the splitting point in the merge history.
      *
-     * @param it Iterator on this list (reused)
      * @return Splitting point
      */
-    protected abstract int findSplit(DBIDArrayIter it);
+    protected abstract int findSplit();
 
     /**
      * Make the cluster for the given object
      *
-     * @param lead Leading object
+     * @param seq Cluster sequence number
      * @param depth Linkage depth
      * @param members Member objects
      * @return Cluster
      */
-    protected Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members) {
-      final String name;
-      if(members == null || (members.size() == 1 && members.contains(lead))) {
-        name = "obj_" + DBIDUtil.toString(lead);
+    protected Cluster<DendrogramModel> makeCluster(int seq, DBIDs members) {
+      double depth = seq >= merges.size() ? merges.getMergeHeight(seq - merges.size()) : Double.NaN;
+      final String name; // TODO: how useful are these names after all?
+      if(members.size() == 1) {
+        name = "obj_" + DBIDUtil.toString(members.iter());
       }
-      else if(members.size() == 0) {
-        name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
+      else if(members.isEmpty()) { // non-trivial merge cluster
+        name = "mrg_" + depth;
       }
       else if(depth < Double.POSITIVE_INFINITY) {
-        name = "clu_" + DBIDUtil.toString(lead) + "_" + depth;
+        name = "clu_" + depth;
       }
       else {
-        // Complete data set only?
-        name = "top_" + DBIDUtil.toString(lead);
+        name = "top";
       }
 
       DendrogramModel model;
-      if(members != null && !members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyResult) {
-        model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyResult) pointerresult).findPrototype(members));
+      if(members != null && !members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
+        model = new PrototypeDendrogramModel(depth, ((ClusterPrototypeMergeHistory) merges).prototype(seq));
       }
       else {
         model = new DendrogramModel(depth);
       }
       return new Cluster<>(name, members, model);
     }
+
   }
 
   @Override
@@ -435,6 +405,11 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     public static final OptionID HIERARCHICAL_ID = new OptionID("hierarchical.hierarchy", "Generate a truncated hierarchical clustering result (or strict partitions).");
 
     /**
+     * Disable the simplification that puts points into merge clusters.
+     */
+    public static final OptionID NOSIMPLIFY_ID = new OptionID("hierarchical.nosimplify", "Do not put single points directly into merge clusters.");
+
+    /**
      * Flag to generate a hierarchical result.
      */
     boolean hierarchical = false;
@@ -444,11 +419,20 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      */
     HierarchicalClusteringAlgorithm algorithm;
 
+    /**
+     * Produce a simpler result by adding single points directly into the merge
+     * cluster.
+     */
+    boolean simplify;
+
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<HierarchicalClusteringAlgorithm>(Algorithm.Utils.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
           .grab(config, x -> algorithm = x);
       new Flag(HIERARCHICAL_ID).grab(config, x -> hierarchical = x);
+      if(hierarchical) {
+        new Flag(NOSIMPLIFY_ID).grab(config, x -> simplify = !x);
+      }
     }
   }
 }

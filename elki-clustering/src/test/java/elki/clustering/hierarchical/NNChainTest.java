@@ -38,11 +38,6 @@ import elki.utilities.ELKIBuilder;
  */
 public class NNChainTest extends AbstractClusterAlgorithmTest {
   // TODO: add more data sets.
-
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testSingleLink() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -55,10 +50,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 9, 200, 429 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testWard() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -71,10 +62,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testGroupAverage() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -87,10 +74,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testWeightedAverage() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -103,10 +86,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testCompleteLink() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -119,10 +98,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testCentroid() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -135,10 +110,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMedian() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -151,10 +122,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMinimumVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -167,10 +134,6 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testBetaVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);

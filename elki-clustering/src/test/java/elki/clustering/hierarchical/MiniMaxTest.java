@@ -37,11 +37,6 @@ import elki.utilities.ELKIBuilder;
  */
 public class MiniMaxTest extends AbstractClusterAlgorithmTest {
   // TODO: add more data sets.
-
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMiniMax() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -53,10 +48,6 @@ public class MiniMaxTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMiniMax2() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);

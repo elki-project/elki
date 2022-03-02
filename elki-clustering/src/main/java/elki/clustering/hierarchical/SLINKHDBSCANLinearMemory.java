@@ -61,7 +61,7 @@ import elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @has - - - PointerDensityHierarchyResult
+ * @has - - - ClusterMergeHistory
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, J. Sander", //
     title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
@@ -78,7 +78,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
    * Constructor.
    *
    * @param distance Distance function
-   * @param minPts Minimum number of points for density
+   * @param minPts Minimum number of points for coredists
    */
   public SLINKHDBSCANLinearMemory(Distance<? super O> distance, int minPts) {
     super(distance, minPts);
@@ -95,7 +95,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerDensityHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     final DistanceQuery<O> distQ = qb.distanceQuery();
     final KNNSearcher<DBIDRef> knnQ = qb.kNNByDBID(minPts);
@@ -128,8 +128,8 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
-
-    return new PointerDensityHierarchyResult(ids, pi, lambda, distQ.getDistance().isSquared(), coredists);
+    return SLINK.convertOutput(new ClusterMergeHistoryBuilder(ids, distance.isSquared()), ids, pi, lambda) //
+        .complete(coredists);
   }
 
   /**
@@ -146,9 +146,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
     double coreP = coredists.doubleValue(id);
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       // M(i) = dist(i, n+1)
-      double coreQ = coredists.doubleValue(it);
-      double dist = MathUtil.max(coreP, coreQ, distQuery.distance(id, it));
-      m.putDouble(it, dist);
+      m.putDouble(it, MathUtil.max(coreP, coredists.doubleValue(it), distQuery.distance(id, it)));
     }
   }
 
@@ -166,8 +164,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
     DBIDVar p_i = DBIDUtil.newVar();
     // for i = 1..n
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
-      double l_i = lambda.doubleValue(it);
-      double m_i = m.doubleValue(it);
+      double l_i = lambda.doubleValue(it), m_i = m.doubleValue(it);
       pi.assignVar(it, p_i); // p_i = pi(it)
       double mp_i = m.doubleValue(p_i);
 
@@ -177,10 +174,8 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
         if(l_i < mp_i) {
           m.putDouble(p_i, l_i);
         }
-
         // L(i) = M(i)
         lambda.putDouble(it, m_i);
-
         // P(i) = n+1;
         pi.put(it, id);
       }
@@ -208,7 +203,6 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
       double l_i = lambda.doubleValue(it);
       pi.assignVar(it, p_i); // p_i = pi(it)
       double lp_i = lambda.doubleValue(p_i);
-
       // if L(i) >= L(P(i))
       if(l_i >= lp_i) {
         // P(i) = n+1

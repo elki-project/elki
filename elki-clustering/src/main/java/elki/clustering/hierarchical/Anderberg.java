@@ -29,9 +29,9 @@ import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
+import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -40,6 +40,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -70,7 +71,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.0
  *
  * @composed - - - LinkageMethod
- * @composed - - - PointerHierarchyBuilder
+ * @composed - - - ClusterMergeHistoryBuilder
  *
  * @param <O> Object type
  */
@@ -113,17 +114,18 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     MatrixParadigm mat = new MatrixParadigm(ids);
     final int size = ids.size();
 
     // Position counter - must agree with computeOffset!
     AGNES.initializeDistanceMatrix(mat, dq, linkage);
+    int[] newidx = MathUtil.sequence(0, size);
 
     // Arrays used for caching:
     double[] bestd = new double[size];
@@ -131,18 +133,16 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     initializeNNCache(mat.matrix, bestd, besti);
 
     // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    DBIDArrayIter ix = mat.ix;
     for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(ix, builder, end, //
-          findMerge(end, mat, bestd, besti, builder));
+      end = AGNES.shrinkActiveSet(newidx, end, //
+          findMerge(end, mat, bestd, besti, builder, newidx));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-
     return builder.complete();
   }
 
@@ -158,8 +158,8 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
     besti[0] = Integer.MAX_VALUE; // invalid, but not deactivated
-    int p = 0;
-    for(int x = 1; x < size; x++) {
+    for(int x = 1, p = 0; x < size; x++) {
+      assert p == MatrixParadigm.triangleSize(x);
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
       for(int y = 0; y < x; y++) {
@@ -173,7 +173,6 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       bestd[x] = bestdx;
       besti[x] = bestix;
     }
-    assert p == MatrixParadigm.triangleSize(size);
   }
 
   /**
@@ -186,9 +185,10 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
+   * @param newidx cluster indexes currently in the matrix
    * @return x, for shrinking the working set.
    */
-  protected int findMerge(int size, MatrixParadigm mat, double[] bestd, int[] besti, PointerHierarchyBuilder builder) {
+  protected int findMerge(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
@@ -206,23 +206,24 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
       }
     }
     assert 0 <= y && y < x;
-    merge(size, mat, bestd, besti, builder, mindist, x, y);
+    merge(size, mat, bestd, besti, builder, newidx, mindist, x, y);
     return x;
   }
 
   /**
    * Execute the cluster merge.
    *
-   * @param size Data set size
+   * @param size data set size
    * @param mat Matrix paradigm
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
+   * @param newidx cluster indexes currently in the matrix
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int size, MatrixParadigm mat, double[] bestd, int[] besti, PointerHierarchyBuilder builder, double mindist, int x, int y) {
+  protected void merge(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
     // Avoid allocating memory, by reusing existing iterators:
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     if(LOG.isDebuggingFine()) {
@@ -230,13 +231,14 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     }
     // Perform merge in data structure: x -> y
     assert y < x;
+    final int xx = newidx[x], yy = newidx[y];
+    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
     // Since y < x, prefer keeping y, dropping x.
-    builder.strictAdd(ix, linkage.restore(mindist, distance.isSquared()), iy);
-    // Update cluster size for y:
-    final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
-    builder.setSize(iy, sizex + sizey);
-    besti[x] = -1; // Deactivate removed cluster.
-    updateMatrix(size, mat.matrix, iy, bestd, besti, builder, mindist, x, y, sizex, sizey);
+    int zz = builder.strictAdd(xx, linkage.restore(mindist, distance.isSquared()), yy);
+    assert builder.getSize(zz) == sizex + sizey;
+    newidx[y] = zz;
+    newidx[x] = besti[x] = -1; // Deactivate removed cluster.
+    updateMatrix(size, mat.matrix, iy, bestd, besti, builder, newidx, mindist, x, y, sizex, sizey);
     if(y > 0) {
       findBest(mat.matrix, bestd, besti, y);
     }
@@ -251,13 +253,14 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
+   * @param newidx cluster indexes currently in the matrix
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    * @param sizex Old size of first cluster, with {@code x > y}
    * @param sizey Old size of second cluster, with {@code y > x}
    */
-  protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, double[] bestd, int[] besti, PointerHierarchyBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
+  protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: miny < minx
     final int xbase = MatrixParadigm.triangleSize(x);
     final int ybase = MatrixParadigm.triangleSize(y);
@@ -265,10 +268,10 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     // Write to (y, j), with j < y
     int j = 0;
     for(; j < y; j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
+      final int sizej = builder.getSize(newidx[j]);
       final int yb = ybase + j;
       final double d = scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
       updateCache(scratch, bestd, besti, x, y, j, d);
@@ -277,10 +280,10 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     // Write to (j, y), with y < j < x
     int jbase = MatrixParadigm.triangleSize(j);
     for(; j < x; jbase += j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
+      final int sizej = builder.getSize(newidx[j]);
       final int jb = jbase + y;
       final double d = scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
       updateCache(scratch, bestd, besti, x, y, j, d);
@@ -288,10 +291,10 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
     for(; j < size; jbase += j++) {
-      if(builder.isLinked(ij.seek(j))) {
+      if(newidx[j] < 0) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
+      final int sizej = builder.getSize(newidx[j]);
       final int jb = jbase + y;
       final double d = scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], sizej, mindist);
       updateCache(scratch, bestd, besti, x, y, j, d);
