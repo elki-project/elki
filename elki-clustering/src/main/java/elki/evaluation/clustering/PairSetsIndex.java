@@ -70,8 +70,11 @@ public class PairSetsIndex {
     // convert to normalized costs for minimum matching:
     double[][] costs = new double[maxlen][maxlen];
     for(int i = 0; i < rowlen; i++) {
-      for(int j = 0; j < collen; j++) {
-        costs[i][j] = -cont[i][j] / (double) Math.max(cont[rowlen][j], cont[i][collen]);
+      final int rowsum = cont[i][collen];
+      if(rowsum > 0) {
+        for(int j = 0; j < collen; j++) {
+          costs[i][j] = cont[i][j] > 0 ? -cont[i][j] / (double) Math.max(cont[rowlen][j], rowsum) : 0;
+        }
       }
     }
     int[] chosen = new KuhnMunkresStern().run(costs);
