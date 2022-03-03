@@ -117,6 +117,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
 
     MiniMax.initializeMatrices(mat, prots, dq);
     nnChainCore(mat, prots.iter(), dq, builder, newidx, clusters);
+    builder.optimizeOrder();
     return (ClusterPrototypeMergeHistory) builder.complete();
   }
 

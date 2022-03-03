@@ -28,7 +28,9 @@ import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.HDBSCANLinearMemory;
 import elki.clustering.hierarchical.MiniMaxNNChain;
+import elki.clustering.hierarchical.NNChain;
 import elki.clustering.hierarchical.SLINK;
+import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.database.Database;
@@ -47,6 +49,18 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
     Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
         .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
         .with(Algorithm.Utils.ALGORITHM_ID, SLINK.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.696491);
+    assertClusterSizes(clustering, new int[] { 3, 5, 43, 55, 58, 62, 104 });
+  }
+
+  @Test
+  public void testNNChainResults() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<?> clustering = new ELKIBuilder<>(SimplifiedHierarchyExtraction.class) //
+        .with(SimplifiedHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 50) //
+        .with(Algorithm.Utils.ALGORITHM_ID, NNChain.class) //
+        .with(NNChain.Par.LINKAGE_ID, SingleLinkage.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.696491);
     assertClusterSizes(clustering, new int[] { 3, 5, 43, 55, 58, 62, 104 });
@@ -84,7 +98,8 @@ public class SimplifiedHierarchyExtractionTest extends AbstractClusterAlgorithmT
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 20) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.0182169); // minclustersize=1 is useless
-    // FIXME: investigate this: assertEquals(2 * 330 - 1, clustering.getAllClusters().size());
+    // FIXME: investigate this: assertEquals(2 * 330 - 1,
+    // clustering.getAllClusters().size());
   }
 
   @Test

@@ -58,6 +58,17 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
    * @param algorithm Algorithm to run
    * @param minclusters Minimum number of clusters
    * @param hierarchical Produce a hierarchical output
+   */
+  public CutDendrogramByNumberOfClusters(HierarchicalClusteringAlgorithm algorithm, int minclusters, boolean hierarchical) {
+    this(algorithm, minclusters, hierarchical, true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param algorithm Algorithm to run
+   * @param minclusters Minimum number of clusters
+   * @param hierarchical Produce a hierarchical output
    * @param simplify Simplify by putting single points into merge clusters
    */
   public CutDendrogramByNumberOfClusters(HierarchicalClusteringAlgorithm algorithm, int minclusters, boolean hierarchical, boolean simplify) {

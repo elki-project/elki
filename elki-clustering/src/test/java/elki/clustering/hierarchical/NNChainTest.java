@@ -31,7 +31,7 @@ import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Perform agglomerative hierarchical clustering, using the naive algorithm.
+ * Perform agglomerative hierarchical clustering, using the NN chain algorithm.
  *
  * @author Erich Schubert
  * @since 0.7.5

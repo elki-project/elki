@@ -30,7 +30,6 @@ import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -224,12 +223,6 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param y Second matrix position
    */
   protected void merge(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
-    // Avoid allocating memory, by reusing existing iterators:
-    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
-    if(LOG.isDebuggingFine()) {
-      LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
-    }
-    // Perform merge in data structure: x -> y
     assert y < x;
     final int xx = newidx[x], yy = newidx[y];
     final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
@@ -238,7 +231,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
     assert builder.getSize(zz) == sizex + sizey;
     newidx[y] = zz;
     newidx[x] = besti[x] = -1; // Deactivate removed cluster.
-    updateMatrix(size, mat.matrix, iy, bestd, besti, builder, newidx, mindist, x, y, sizex, sizey);
+    updateMatrix(size, mat.matrix, bestd, besti, builder, newidx, mindist, x, y, sizex, sizey);
     if(y > 0) {
       findBest(mat.matrix, bestd, besti, y);
     }
@@ -248,8 +241,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * Update the scratch distance matrix.
    *
    * @param size Data set size
-   * @param scratch Scratch matrix.
-   * @param ij Iterator to reuse
+   * @param scratch Scratch matrix
    * @param bestd Best distance
    * @param besti Index of best distance
    * @param builder Hierarchy builder
@@ -260,7 +252,7 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param sizex Old size of first cluster, with {@code x > y}
    * @param sizey Old size of second cluster, with {@code y > x}
    */
-  protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y, final int sizex, final int sizey) {
+  protected void updateMatrix(int size, double[] scratch, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y, final int sizex, final int sizey) {
     // Update distance matrix. Note: miny < minx
     final int xbase = MatrixParadigm.triangleSize(x);
     final int ybase = MatrixParadigm.triangleSize(y);

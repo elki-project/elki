@@ -205,17 +205,15 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
    * @param y second cluster to merge
    */
   protected static void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
-    assert (y < x);
+    assert y < x;
     final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
     final double[] distances = mat.matrix;
     int offset = MatrixParadigm.triangleSize(x) + y;
-
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + distances[offset]);
     }
 
     ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
-
     // Keep y
     if(cy == null) {
       cy = DBIDUtil.newHashSet();

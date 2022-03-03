@@ -94,6 +94,7 @@ public class NNChain<O> extends AGNES<O> {
     // Initialize space for result:
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
     nnChainCore(mat, builder, newidx);
+    builder.optimizeOrder();
     return builder.complete();
   }
 
@@ -109,7 +110,8 @@ public class NNChain<O> extends AGNES<O> {
     final DBIDArrayIter ix = mat.ix;
     final double[] distances = mat.matrix;
     final int size = mat.size;
-    // The maximum chain size = number of ids + 1, but usually much less is enough
+    // The maximum chain size = number of ids + 1, but usually much less is
+    // enough
     IntegerArray chain = new IntegerArray(size >> 2);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;

@@ -57,6 +57,17 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    * @param algorithm Algorithm to run
    * @param threshold Distance threshold
    * @param hierarchical Produce a hierarchical output
+   */
+  public CutDendrogramByHeight(HierarchicalClusteringAlgorithm algorithm, double threshold, boolean hierarchical) {
+    this(algorithm, threshold, hierarchical, true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param algorithm Algorithm to run
+   * @param threshold Distance threshold
+   * @param hierarchical Produce a hierarchical output
    * @param simplify Simplify by putting single points into merge clusters
    */
   public CutDendrogramByHeight(HierarchicalClusteringAlgorithm algorithm, double threshold, boolean hierarchical, boolean simplify) {

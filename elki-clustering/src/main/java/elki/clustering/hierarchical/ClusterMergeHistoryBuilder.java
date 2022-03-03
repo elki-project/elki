@@ -20,10 +20,13 @@
  */
 package elki.clustering.hierarchical;
 
+import java.util.Arrays;
+
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.logging.Logging;
 import elki.math.MathUtil;
+import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 
 /**
  * Class to help building a pointer hierarchy.
@@ -43,11 +46,6 @@ public class ClusterMergeHistoryBuilder {
    * The DBIDs in this result.
    */
   protected final ArrayDBIDs ids;
-
-  /**
-   * Track cluster merges
-   */
-  protected int[] clusterid;
 
   /**
    * Distance to the parent object.
@@ -94,7 +92,6 @@ public class ClusterMergeHistoryBuilder {
     super();
     this.ids = ids;
     final int n = ids.size();
-    this.clusterid = new int[(n << 1) - 1]; // N + (N-1)
     this.mergeDistance = new double[n - 1]; // n-1 merges
     this.csize = new int[n - 1]; // n-1 merges
     this.merges = new int[(n - 1) << 1]; // two values each merge
@@ -115,6 +112,7 @@ public class ClusterMergeHistoryBuilder {
    */
   public int add(int i, double dist, int j) {
     if(parent == null) {
+      assert mergecount == 0;
       parent = MathUtil.sequence(0, (ids.size() << 1) - 1);
     }
     int t = mergecount + ids.size(); // next
@@ -148,9 +146,10 @@ public class ClusterMergeHistoryBuilder {
    * @return
    */
   public int strictAdd(int source, double distance, int target) {
+    final int n = ids.size();
+    assert source < n + mergecount && target < n + mergecount;
     assert prototypes == null;
     assert source != target;
-    final int n = ids.size();
     int size = (source < n ? 1 : csize[source - n]) + (target < n ? 1 : csize[target - n]);
     mergeDistance[mergecount] = distance;
     csize[mergecount] = size;
@@ -173,6 +172,7 @@ public class ClusterMergeHistoryBuilder {
     if(mergecount == 0) {
       prototypes = DBIDUtil.newArray(n - 1);
     }
+    assert source < n + mergecount && target < n + mergecount;
     assert prototypes != null;
     assert source != target;
     int size = (source < n ? 1 : csize[source - n]) + (target < n ? 1 : csize[target - n]);
@@ -231,5 +231,127 @@ public class ClusterMergeHistoryBuilder {
     assert id > ids.size();
     assert csize[size - ids.size()] == size;
     csize[size - ids.size()] = size;
+  }
+
+  /**
+   * Find an optimized processing order, where merges are by ascending depth
+   * where possible (not guaranteed for non-reducible linkages).
+   * <p>
+   * E.g., (a,b,2), (c,d,1), (ab,cd,3) is a valid merge sequence, but not well
+   * ordered because the n largest splits do not come last.
+   * 
+   * @return reverse map to the optimized order, or {@code null} if well
+   *         ordered, in case you need to remap additional data structures.
+   */
+  public int[] optimizeOrder() {
+    if(checkMonotone()) {
+      return null; // No need to reorder
+    }
+    final int m = mergecount, n = ids.size();
+    double[] maxheight = mergeDistance.clone();
+    // Max height in the subtree:
+    for(int i = 0; i < m; i++) {
+      int a = merges[i << 1] - n, b = merges[(i << 1) + 1] - n;
+      double h = maxheight[i];
+      double ha = a >= 0 ? maxheight[a] : h, hb = b >= 0 ? maxheight[b] : h;
+      maxheight[i] = ha > hb ? (ha > h ? ha : h) : (hb > h ? hb : h);
+    }
+    int[] o1 = MathUtil.sequence(0, m);
+    // Sort by max height, merge height, merge number:
+    IntegerArrayQuickSort.sort(o1, (a, b) -> {
+      final double ha = maxheight[a], hb = maxheight[b];
+      if(ha < hb) {
+        return -1;
+      }
+      if(ha > hb) {
+        return 1;
+      }
+      final double da = mergeDistance[a], db = mergeDistance[b];
+      return da < db ? -1 : da > db ? +1 : (a > b ? -1 : +1);
+    });
+    // Now we need to ensure merges are consistent in their order
+    byte[] seen = new byte[m];
+    int[] order = new int[m];
+    int size = 0;
+    for(int it : o1) {
+      if(seen[it] > 0) {
+        continue;
+      }
+      size = addRecursive(order, size, seen, it, n);
+      seen[order[size++] = it] = 1;
+    }
+    assert size == m;
+    // Rewrite the result:
+    double[] md2 = new double[mergeDistance.length];
+    int[] csize2 = new int[csize.length];
+    int[] merges2 = new int[merges.length];
+    ArrayModifiableDBIDs prototypes2 = prototypes == null ? null : DBIDUtil.newArray(csize.length);
+    DBIDVar tmp = prototypes == null ? null : DBIDUtil.newVar();
+    int[] reverse = new int[m];
+    Arrays.fill(reverse, -1);
+    for(int i = 0; i < m; i++) {
+      final int oi = order[i];
+      final int a = merges[oi << 1], b = merges[(oi << 1) + 1];
+      reverse[oi] = i;
+      assert a < n || reverse[a - n] >= 0;
+      merges2[i << 1] = a < n ? a : reverse[a - n] + n;
+      assert b < n || reverse[b - n] >= 0;
+      merges2[(i << 1) + 1] = b < n ? b : reverse[b - n] + n;
+      md2[i] = mergeDistance[oi];
+      csize2[i] = csize[oi];
+      if(prototypes != null) {
+        prototypes2.add(prototypes2.assignVar(oi, tmp));
+      }
+    }
+    mergeDistance = md2;
+    csize = csize2;
+    merges = merges2;
+    parent = null;
+    prototypes = prototypes2;
+    return reverse;
+  }
+
+  /**
+   * Check if merge distances are monotone.
+   *
+   * @return boolean result
+   */
+  private boolean checkMonotone() {
+    double cur = mergeDistance.length > 0 ? mergeDistance[0] : Double.NaN;
+    for(int i = 1; i < mergeDistance.length; i++) {
+      double next = mergeDistance[i];
+      if(next < cur) {
+        return false; // not monotone
+      }
+      cur = next;
+    }
+    return true;
+  }
+
+  /**
+   * Recursively add merges (children first) to the order, to obtain a monotone
+   * ordering. As we processed entries with smaller distances first, this
+   * usually will not require much recursion, and subtrees with smaller height
+   * should already come first. Using the max height helps with inversions in
+   * irreducible linkages.
+   *
+   * @param order Output order
+   * @param size Current size
+   * @param seen Mask indicating processed entries
+   * @param it Current entry
+   * @param n Number of primary objects
+   * @return Size after additions
+   */
+  private int addRecursive(int[] order, int size, byte[] seen, int it, int n) {
+    int a = merges[it << 1] - n, b = merges[(it << 1) + 1] - n;
+    if(a >= 0 && seen[a] == 0) {
+      size = addRecursive(order, size, seen, a, n);
+      seen[order[size++] = a] = 1;
+    }
+    if(b >= 0 && seen[b] == 0) {
+      size = addRecursive(order, size, seen, b, n);
+      seen[order[size++] = b] = 1;
+    }
+    return size;
   }
 }

@@ -271,12 +271,6 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param y Second matrix position
    */
   protected void merge(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
-    // Avoid allocating memory, by reusing existing iterators:
-    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
-    if(LOG.isDebuggingFine()) {
-      LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
-    }
-    // Perform merge in data structure: x -> y
     assert y < x;
     final int xx = newidx[x], yy = newidx[y];
     final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
