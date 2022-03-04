@@ -23,7 +23,6 @@ package elki.clustering.hierarchical;
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
 import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -86,14 +85,13 @@ public class NNChain<O> extends AGNES<O> {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     MatrixParadigm mat = new MatrixParadigm(ids);
-    int[] newidx = MathUtil.sequence(0, ids.size());
 
     // Compute the initial (lower triangular) distance matrix.
     initializeDistanceMatrix(mat, dq, linkage);
 
     // Initialize space for result:
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
-    nnChainCore(mat, builder, newidx);
+    nnChainCore(mat, builder);
     builder.optimizeOrder();
     return builder.complete();
   }
@@ -104,15 +102,13 @@ public class NNChain<O> extends AGNES<O> {
    * 
    * @param mat Matrix view
    * @param builder Result builder
-   * @param newidx cluster indexes currently in the matrix
    */
-  private void nnChainCore(MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx) {
-    final DBIDArrayIter ix = mat.ix;
+  private void nnChainCore(MatrixParadigm mat, ClusterMergeHistoryBuilder builder) {
     final double[] distances = mat.matrix;
     final int size = mat.size;
-    // The maximum chain size = number of ids + 1, but usually much less is
-    // enough
+    // The maximum chain size = number of ids + 1, but usually much less
     IntegerArray chain = new IntegerArray(size >> 2);
+    int[] newidx = MathUtil.sequence(0, size);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
@@ -122,8 +118,8 @@ public class NNChain<O> extends AGNES<O> {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = findUnlinked(0, end, ix, builder, newidx);
-        b = findUnlinked(a + 1, end, ix, builder, newidx);
+        a = findUnlinked(0, end, builder, newidx);
+        b = findUnlinked(a + 1, end, builder, newidx);
         chain.clear();
         chain.add(a);
       }
@@ -178,7 +174,7 @@ public class NNChain<O> extends AGNES<O> {
       assert minDist == mat.get(a, b);
       assert b < a;
       merge(size, mat, builder, newidx, minDist, a, b);
-      end = AGNES.shrinkActiveSet(newidx, end, a); // Shrink working set
+      end = shrinkActiveSet(newidx, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -189,12 +185,11 @@ public class NNChain<O> extends AGNES<O> {
    *
    * @param pos Starting position
    * @param end End position
-   * @param ix Iterator to translate into DBIDs
    * @param builder Linkage information
    * @param newidx cluster indexes currently in the matrix
    * @return Position
    */
-  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, ClusterMergeHistoryBuilder builder, int[] newidx) {
+  public static int findUnlinked(int pos, int end, ClusterMergeHistoryBuilder builder, int[] newidx) {
     while(pos < end) {
       if(newidx[pos] >= 0) {
         return pos;

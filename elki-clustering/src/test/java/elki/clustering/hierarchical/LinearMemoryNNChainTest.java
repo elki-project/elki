@@ -32,52 +32,44 @@ import elki.data.Clustering;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
 
+/**
+ * Test the linear-memory version of NNChain
+ *
+ * @author Robert Gehde
+ */
 public class LinearMemoryNNChainTest extends AbstractClusterAlgorithmTest {
-
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testWard() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, LinearMemoryNNChain.class) //
-        .with(LinearMemoryNNChain.Par.GEOM_LINKAGE_ID, WardLinkage.class) //
+        .with(LinearMemoryNNChain.Par.LINKAGE_ID, WardLinkage.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.93866265);
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testCentroid() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, LinearMemoryNNChain.class) //
-        .with(LinearMemoryNNChain.Par.GEOM_LINKAGE_ID, CentroidLinkage.class) //
+        .with(LinearMemoryNNChain.Par.LINKAGE_ID, CentroidLinkage.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.93866265);
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   * 
-   * Note: The result differs from NNChainTest for Median Linkage!
-   */
+
+  // Note: The result differs from NNChainTest for Median Linkage!
   @Test
   public void testMedian() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, LinearMemoryNNChain.class) //
-        .with(LinearMemoryNNChain.Par.GEOM_LINKAGE_ID, MedianLinkage.class) //
+        .with(LinearMemoryNNChain.Par.LINKAGE_ID, MedianLinkage.class) //
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.9381678);
     assertClusterSizes(clustering, new int[] { 200, 217, 221 });

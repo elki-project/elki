@@ -26,27 +26,25 @@ import elki.data.NumberVector;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * NNchain clustering algorithm with linear Memory.
+ * NNchain clustering algorithm with linear memory, for particular linkages
+ * (that can be aggregated) and numerical vector data only.
  * <p>
  * Reference:
  * <p>
  * F. Murtagh<br>
  * Multidimensional Clustering Algorithms,1985<br>
  * http://www.multiresolutions.com/strule/MClA/
- * <p>
  *
  * @author Erich Schubert, Robert Gehde
  *
@@ -56,12 +54,15 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Multidimensional Clustering Algorithms", //
     title = "Multidimensional Clustering Algorithms", //
     url = "http://www.multiresolutions.com/strule/MClA/")
-public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
+public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(LinearMemoryNNChain.class);
 
+  /**
+   * Linkage method.
+   */
   private GeometricLinkage geometricLinkage;
 
   /**
@@ -75,18 +76,13 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
   }
 
   @Override
-  public PointerHierarchyResult run(Relation<O> relation) {
-    final DBIDs ids = relation.getDBIDs();
-
-    // create Array Iter for PointerHirarchyBuilder
+  public ClusterMergeHistory run(Relation<O> relation) {
     ArrayDBIDs aDBIDs = DBIDUtil.ensureArray(relation.getDBIDs());
-    DBIDArrayIter it = aDBIDs.iter();
-    DBIDArrayIter it2 = aDBIDs.iter();
+    DBIDArrayIter it = aDBIDs.iter(), it2 = aDBIDs.iter();
 
-    // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, true);
-
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(aDBIDs, distance.isSquared());
     nnChainCore(it, it2, builder, relation);
+    builder.optimizeOrder();
     return builder.complete();
   }
 
@@ -96,10 +92,11 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    * @param aIt2 Iterator to access relation objects
    * @param builder Result builder
    */
-  private void nnChainCore(DBIDArrayIter aIt, DBIDArrayIter aIt2, PointerHierarchyBuilder builder, Relation<O> rel) {
+  private void nnChainCore(DBIDArrayIter aIt, DBIDArrayIter aIt2, ClusterMergeHistoryBuilder builder, Relation<O> rel) {
     final int size = rel.size();
-    // The maximum chain size = number of ids + 1
-    IntegerArray chain = new IntegerArray(size + 1);
+    // The maximum chain size = number of ids + 1, but usually much less
+    IntegerArray chain = new IntegerArray(size << 1);
+    int[] newidx = MathUtil.sequence(0, size);
 
     // Instead of a DistanceMatrix we have a PointArray
     NumberVector[] clusters = new NumberVector[rel.size()];
@@ -112,8 +109,8 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
     for(int k = 1, end = size; k < size; k++) {
       int a = -1, b = -1;
       if(chain.size() <= 3) {
-        a = findUnlinked(0, end, aIt, builder);
-        b = findUnlinked(a + 1, end, aIt, builder);
+        a = findUnlinked(0, end, builder, newidx);
+        b = findUnlinked(a + 1, end, builder, newidx);
         chain.clear();
         chain.add(a);
       }
@@ -124,21 +121,21 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
         b = chain.get(lastIndex - 3);
         a = chain.get(lastIndex - 4);
         // Ensure we had a loop at the end:
-        assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
+        assert chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b;
         // if c < b, then we merged b -> c, otherwise c -> b
         b = c < b ? c : b;
         // Cut the tail:
         chain.size -= 3;
       }
       // For ties, always prefer the second-last element b:
-      final int bSize = builder.getSize(aIt.seek(b));
-      double minDist = geometricLinkage.distance(builder.getSize(aIt.seek(a)), bSize, clusters[a], clusters[b]);
+      final int bSize = builder.getSize(b);
+      double minDist = geometricLinkage.distance(builder.getSize(a), bSize, clusters[a], clusters[b]);
       do {
-        final int aSize = builder.getSize(aIt.seek(a));
+        final int aSize = builder.getSize(a);
         int c = b;
         for(int i = 0; i < a; i++) {
-          if(i != b && !builder.isLinked(aIt.seek(i))) {
-            double dist = geometricLinkage.distance(aSize, builder.getSize(aIt2.seek(i)), clusters[a], clusters[i]);
+          if(i != b && newidx[i] >= 0) {
+            double dist = geometricLinkage.distance(aSize, builder.getSize(i), clusters[a], clusters[i]);
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -146,15 +143,14 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && !builder.isLinked(aIt.seek(i))) {
-            double dist = geometricLinkage.distance(aSize, builder.getSize(aIt2.seek(i)), clusters[a], clusters[i]);
+          if(i != b && newidx[i] >= 0) {
+            double dist = geometricLinkage.distance(aSize, builder.getSize(i), clusters[a], clusters[i]);
             if(dist < minDist) {
               minDist = dist;
               c = i;
             }
           }
         }
-
         b = a;
         a = c;
         chain.add(a);
@@ -167,10 +163,10 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
         a = b;
         b = tmp;
       }
-      assert (minDist == geometricLinkage.distance(builder.getSize(aIt.seek(a)), builder.getSize(aIt2.seek(b)), clusters[a], clusters[b]));
-      assert (b < a);
-      merge(size, clusters, aIt.seek(a), aIt2.seek(b), builder, minDist, a, b);
-      end = AGNES.shrinkActiveSet(aIt, builder, end, a); // Shrink working set
+      assert minDist == geometricLinkage.distance(builder.getSize(a), builder.getSize(b), clusters[a], clusters[b]);
+      assert b < a;
+      merge(size, clusters, builder, newidx, minDist, a, b);
+      end = shrinkActiveSet(newidx, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -186,40 +182,18 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int end, NumberVector[] clusters, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyBuilder builder, double mindist, int x, int y) {
-    // Avoid allocating memory, by reusing existing iterators:
-    if(LOG.isDebuggingFine()) {
-      LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
-    }
-    // Perform merge in data structure: x -> y
-    assert (y < x);
-    // Since y < x, prefer keeping y, dropping x.
-    builder.strictAdd(ix, 2. * mindist, iy); // 2* because of linkage restore,
-                                             // idk if needed
+  protected void merge(int end, NumberVector[] clusters, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
+    assert y < x;
+    final int xx = newidx[x], yy = newidx[y];
+    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+    int zz = builder.strictAdd(xx, linkage.restore(mindist, distance.isSquared()), yy);
     // Update cluster size for y:
-    final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
-    builder.setSize(iy, sizex + sizey);
+    assert builder.getSize(zz) == sizex + sizey;
+    // Since y < x, prefer keeping y, dropping x.
+    newidx[y] = zz;
+    newidx[x] = -1; // deactivate
     // update the cluster center for y
     clusters[y] = geometricLinkage.merge(sizex, sizey, clusters[x], clusters[y]);
-  }
-
-  /**
-   * Find an unlinked object.
-   *
-   * @param pos Starting position
-   * @param end End position
-   * @param ix Iterator to translate into DBIDs
-   * @param builder Linkage information
-   * @return Position
-   */
-  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyBuilder builder) {
-    while(pos < end) {
-      if(!builder.isLinked(ix.seek(pos))) {
-        return pos;
-      }
-      ++pos;
-    }
-    return -1;
   }
 
   /**
@@ -231,12 +205,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
    *
    * @param <O> Object type
    */
-  public static class Par<O extends NumberVector> implements Parameterizer {
-    /**
-     * Option ID for geometric linkage parameter.
-     */
-    public static final OptionID GEOM_LINKAGE_ID = new OptionID("linearMemoryNNChain.geom_linkage", "Linkage method to use (can be WARD, UPGMC,WPGMC)");
-
+  public static class Par<O extends NumberVector> extends NNChain.Par<O> {
     /**
      * geometric linkage parameter.
      */
@@ -244,7 +213,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends AGNES<O> {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<GeometricLinkage>(GEOM_LINKAGE_ID, GeometricLinkage.class) //
+      new ObjectParameter<GeometricLinkage>(LINKAGE_ID, GeometricLinkage.class) //
           .setDefaultValue(WardLinkage.class) //
           .grab(config, x -> {
             geomLinkage = x;

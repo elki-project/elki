@@ -113,10 +113,9 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
 
     MatrixParadigm mat = new MatrixParadigm(ids);
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(ids.size()));
-    int[] newidx = MathUtil.sequence(0, ids.size());
 
     MiniMax.initializeMatrices(mat, prots, dq);
-    nnChainCore(mat, prots.iter(), dq, builder, newidx, clusters);
+    nnChainCore(mat, prots.iter(), dq, builder, clusters);
     builder.optimizeOrder();
     return (ClusterPrototypeMergeHistory) builder.complete();
   }
@@ -129,15 +128,14 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param prots computed prototypes
    * @param dq distance query of the data set
    * @param builder Result builder
-   * @param newidx cluster indexes currently in the matrix
    * @param clusters current clusters
    */
-  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, ClusterMergeHistoryBuilder builder, int[] newidx, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
-    final DBIDArrayIter ix = mat.ix;
+  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
     final double[] distances = mat.matrix;
     final int size = mat.size;
-    // The maximum chain size = number of ids + 1
-    IntegerArray chain = new IntegerArray(size + 1);
+    // The maximum chain size = number of ids + 1, but usually much less
+    IntegerArray chain = new IntegerArray(size << 1);
+    int[] newidx = MathUtil.sequence(0, size);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
@@ -147,8 +145,8 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = NNChain.findUnlinked(0, end, ix, builder, newidx);
-        b = NNChain.findUnlinked(a + 1, end, ix, builder, newidx);
+        a = NNChain.findUnlinked(0, end, builder, newidx);
+        b = NNChain.findUnlinked(a + 1, end, builder, newidx);
         chain.clear();
         chain.add(a);
       }
