@@ -38,7 +38,6 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.math.MathUtil;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -153,7 +152,6 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     // Compute the initial (lower triangular) distance matrix.
     MatrixParadigm mat = new MatrixParadigm(ids);
     initializeDistanceMatrix(mat, dq, linkage);
-    int[] newidx = MathUtil.sequence(0, size);
 
     // Initialize space for result:
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
@@ -162,8 +160,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
     // Use end to shrink the matrix virtually as the tailing objects disappear
     for(int i = 1, end = size; i < size; i++) {
-      end = shrinkActiveSet(newidx, end, //
-          findMerge(end, mat, builder, newidx));
+      end = shrinkActiveSet(mat.clustermap, end, findMerge(end, mat, builder));
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
@@ -175,14 +172,14 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * Shrink the active set: if the last x objects are all merged, we can reduce
    * the working size accordingly.
    * 
-   * @param newidx cluster indexes currently in the matrix
+   * @param clustermap Map to current clusters
    * @param end Current active set size
    * @param x Last merged object
    * @return New active set size
    */
-  protected static int shrinkActiveSet(int[] newidx, int end, int x) {
+  protected static int shrinkActiveSet(int[] clustermap, int end, int x) {
     if(x == end - 1) { // Can truncate active set.
-      while(newidx[--end - 1] < 0) {
+      while(clustermap[--end - 1] < 0) {
         // decrement happens in while condition already.
       }
     }
@@ -225,10 +222,9 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param end Active set size
    * @param mat Matrix storage
    * @param builder Pointer representation builder
-   * @param newidx cluster indexes currently in the matrix
    * @return the index that has disappeared, for shrinking the working set
    */
-  protected int findMerge(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx) {
+  protected int findMerge(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder) {
     assert end > 0;
     final double[] matrix = mat.matrix;
     double mindist = Double.POSITIVE_INFINITY;
@@ -236,13 +232,13 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     // Find minimum:
     for(int ox = 0, xbase = 0; ox < end; xbase += ox++) {
       // Skip if object has already joined a cluster:
-      if(newidx[ox] < 0) {
+      if(mat.clustermap[ox] < 0) {
         continue;
       }
       assert (xbase == MatrixParadigm.triangleSize(ox));
       for(int oy = 0; oy < ox; oy++) {
         // Skip if object has already joined a cluster:
-        if(newidx[oy] < 0) {
+        if(mat.clustermap[oy] < 0) {
           continue;
         }
         final double dist = matrix[xbase + oy];
@@ -255,7 +251,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     }
     assert x >= 0 && y >= 0;
     assert y < x; // We could swap otherwise, but this shouldn't arise.
-    merge(end, mat, builder, newidx, mindist, x, y);
+    merge(end, mat, builder, mindist, x, y);
     return x;
   }
 
@@ -265,21 +261,20 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param end Active set size
    * @param mat Matrix paradigm
    * @param builder Hierarchy builder
-   * @param newidx cluster indexes currently in the matrix
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
+  protected void merge(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, double mindist, int x, int y) {
     assert y < x;
-    final int xx = newidx[x], yy = newidx[y];
+    final int xx = mat.clustermap[x], yy = mat.clustermap[y];
     final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
     int zz = builder.strictAdd(xx, linkage.restore(mindist, distance.isSquared()), yy);
     assert builder.getSize(zz) == sizex + sizey;
     // Since y < x, prefer keeping y, dropping x.
-    newidx[y] = zz;
-    newidx[x] = -1; // deactivate
-    updateMatrix(end, mat, builder, newidx, mindist, x, y, sizex, sizey);
+    mat.clustermap[y] = zz;
+    mat.clustermap[x] = -1; // deactivate
+    updateMatrix(end, mat, builder, mindist, x, y, sizex, sizey);
   }
 
   /**
@@ -288,15 +283,13 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
    * @param end Active set size
    * @param mat Matrix view
    * @param builder Hierarchy builder (to get cluster sizes)
-   * @param newidx cluster indexes currently in the matrix
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    * @param sizex Old size of first cluster
    * @param sizey Old size of second cluster
    */
-  protected void updateMatrix(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y, final int sizex, final int sizey) {
-    // Update distance matrix. Note: y < x
+  protected void updateMatrix(int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
     final int xbase = MatrixParadigm.triangleSize(x);
     final int ybase = MatrixParadigm.triangleSize(y);
     double[] scratch = mat.matrix;
@@ -304,27 +297,27 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     // Write to (y, j), with j < y
     int j = 0;
     for(; j < y; j++) {
-      if(newidx[j] >= 0) {
+      if(mat.clustermap[j] >= 0) {
         assert j < y; // Otherwise, ybase + j is the wrong position!
         final int yb = ybase + j;
-        scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], builder.getSize(newidx[j]), mindist);
+        scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], builder.getSize(mat.clustermap[j]), mindist);
       }
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
     int jbase = MatrixParadigm.triangleSize(j);
     for(; j < x; jbase += j++) {
-      if(newidx[j] >= 0) {
+      if(mat.clustermap[j] >= 0) {
         final int jb = jbase + y;
-        scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], builder.getSize(newidx[j]), mindist);
+        scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], builder.getSize(mat.clustermap[j]), mindist);
       }
     }
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
     for(; j < end; jbase += j++) {
-      if(newidx[j] >= 0) {
+      if(mat.clustermap[j] >= 0) {
         final int jb = jbase + y;
-        scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], builder.getSize(newidx[j]), mindist);
+        scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], builder.getSize(mat.clustermap[j]), mindist);
       }
     }
   }

@@ -30,7 +30,6 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 
@@ -108,7 +107,6 @@ public class NNChain<O> extends AGNES<O> {
     final int size = mat.size;
     // The maximum chain size = number of ids + 1, but usually much less
     IntegerArray chain = new IntegerArray(size >> 2);
-    int[] newidx = MathUtil.sequence(0, size);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
@@ -118,8 +116,8 @@ public class NNChain<O> extends AGNES<O> {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = findUnlinked(0, end, builder, newidx);
-        b = findUnlinked(a + 1, end, builder, newidx);
+        a = findUnlinked(0, end, mat.clustermap);
+        b = findUnlinked(a + 1, end, mat.clustermap);
         chain.clear();
         chain.add(a);
       }
@@ -142,7 +140,7 @@ public class NNChain<O> extends AGNES<O> {
         int c = b;
         final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
-          if(i != b && newidx[i] >= 0) {
+          if(i != b && mat.clustermap[i] >= 0) {
             double dist = distances[ta + i];
             if(dist < minDist) {
               minDist = dist;
@@ -151,7 +149,7 @@ public class NNChain<O> extends AGNES<O> {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && newidx[i] >= 0) {
+          if(i != b && mat.clustermap[i] >= 0) {
             double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
@@ -173,8 +171,8 @@ public class NNChain<O> extends AGNES<O> {
       }
       assert minDist == mat.get(a, b);
       assert b < a;
-      merge(size, mat, builder, newidx, minDist, a, b);
-      end = shrinkActiveSet(newidx, end, a); // Shrink working set
+      merge(size, mat, builder, minDist, a, b);
+      end = shrinkActiveSet(mat.clustermap, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -185,13 +183,12 @@ public class NNChain<O> extends AGNES<O> {
    *
    * @param pos Starting position
    * @param end End position
-   * @param builder Linkage information
-   * @param newidx cluster indexes currently in the matrix
+   * @param clustermap Map of indexes to current clusters
    * @return Position
    */
-  public static int findUnlinked(int pos, int end, ClusterMergeHistoryBuilder builder, int[] newidx) {
+  public static int findUnlinked(int pos, int end, int[] clustermap) {
     while(pos < end) {
-      if(newidx[pos] >= 0) {
+      if(clustermap[pos] >= 0) {
         return pos;
       }
       ++pos;

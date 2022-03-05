@@ -20,10 +20,33 @@
  */
 package elki.clustering.hierarchical.linkage;
 
-import elki.data.NumberVector;
-
+/**
+ * Geometric linkages, in addition to the combination with
+ * Lance-Williams-Equations, these linkages can also be computed by aggregating
+ * data points (for vector data only).
+ * 
+ * @author Robert Gehde
+ */
 public interface GeometricLinkage extends Linkage {
-  public NumberVector merge(int sizex, int sizey, NumberVector x, NumberVector y);
+  /**
+   * Merge the aggregated vectors.
+   * 
+   * @param x Center of the first cluster
+   * @param sizex Weight of the first cluster
+   * @param y Center of the second cluster
+   * @param sizey Weight of the second cluster
+   * @return Combined vector
+   */
+  public double[] merge(double[] x, int sizex, double[] y, int sizey);
 
-  public double distance(int sizex, int sizey, NumberVector x, NumberVector y);
+  /**
+   * Distance of two aggregated clusters.
+   * 
+   * @param x Center of the first cluster
+   * @param sizex Weight of the first cluster
+   * @param y Center of the second cluster
+   * @param sizey Weight of the second cluster
+   * @return Distance
+   */
+  public double distance(double[] x, int sizex, double[] y, int sizey);
 }

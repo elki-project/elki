@@ -31,7 +31,6 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -135,7 +134,6 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
     final int size = mat.size;
     // The maximum chain size = number of ids + 1, but usually much less
     IntegerArray chain = new IntegerArray(size << 1);
-    int[] newidx = MathUtil.sequence(0, size);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
@@ -145,8 +143,8 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
-        a = NNChain.findUnlinked(0, end, builder, newidx);
-        b = NNChain.findUnlinked(a + 1, end, builder, newidx);
+        a = NNChain.findUnlinked(0, end, mat.clustermap);
+        b = NNChain.findUnlinked(a + 1, end, mat.clustermap);
         chain.clear();
         chain.add(a);
       }
@@ -169,7 +167,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
         int c = b;
         final int ta = MatrixParadigm.triangleSize(a);
         for(int i = 0; i < a; i++) {
-          if(i != b && newidx[i] >= 0) {
+          if(i != b && mat.clustermap[i] >= 0) {
             double dist = distances[ta + i];
             if(dist < minDist) {
               minDist = dist;
@@ -178,7 +176,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && newidx[i] >= 0) {
+          if(i != b && mat.clustermap[i] >= 0) {
             double dist = distances[MatrixParadigm.triangleSize(i) + a];
             if(dist < minDist) {
               minDist = dist;
@@ -202,8 +200,8 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
       }
       assert (minDist == mat.get(a, b));
       assert (b < a);
-      MiniMax.merge(size, mat, prots, builder, newidx, clusters, dq, a, b);
-      end = AGNES.shrinkActiveSet(newidx, end, a); // Shrink working set
+      MiniMax.merge(size, mat, prots, builder, clusters, dq, a, b);
+      end = AGNES.shrinkActiveSet(mat.clustermap, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);

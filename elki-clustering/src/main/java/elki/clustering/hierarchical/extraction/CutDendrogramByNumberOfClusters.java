@@ -92,7 +92,7 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
     /**
      * Constructor.
      *
-     * @param pointerresult Pointer result
+     * @param merges cluster merge history
      */
     public Instance(ClusterMergeHistory merges) {
       super(merges);

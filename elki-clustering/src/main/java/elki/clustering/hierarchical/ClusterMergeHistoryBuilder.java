@@ -224,7 +224,7 @@ public class ClusterMergeHistoryBuilder {
   /**
    * Set the cluster size of an object.
    *
-   * @param ids Object to set
+   * @param id Object to set
    * @param size Cluster size
    */
   public void setSize(int id, int size) {

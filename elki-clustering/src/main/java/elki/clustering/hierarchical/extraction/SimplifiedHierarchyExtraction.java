@@ -269,7 +269,6 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      * Make the cluster for the given object
      *
      * @param seq Cluster sequence number
-     * @param lead Leading object
      * @param depth Linkage depth
      * @param members Member objects
      * @return Cluster

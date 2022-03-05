@@ -68,7 +68,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
   /**
    * Constructor.
    *
-   * @param linkage Linkage option; currently unused, only ward
+   * @param geomlinkage Linkage option
    */
   public LinearMemoryNNChain(GeometricLinkage geomlinkage) {
     super(SquaredEuclideanDistance.STATIC, geomlinkage);
@@ -87,6 +87,7 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
   }
 
   /**
+   * Core function of NNChain.
    * 
    * @param aIt Iterator to access relation objects
    * @param aIt2 Iterator to access relation objects
@@ -96,21 +97,22 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
     final int size = rel.size();
     // The maximum chain size = number of ids + 1, but usually much less
     IntegerArray chain = new IntegerArray(size << 1);
-    int[] newidx = MathUtil.sequence(0, size);
+    int[] clustermap = MathUtil.sequence(0, size);
 
-    // Instead of a DistanceMatrix we have a PointArray
-    NumberVector[] clusters = new NumberVector[rel.size()];
+    // Instead of a distance matrix we have an array of points
+    double[][] clusters = new double[rel.size()][];
     int t = 0;
     for(aIt.seek(0); aIt.valid(); aIt.advance()) {
-      clusters[t++] = rel.get(aIt);
+      // TODO: can we avoid these copies with reasonable effort?
+      clusters[t++] = rel.get(aIt).toArray();
     }
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running LinearMemoryNNChain", size - 1, LOG) : null;
     for(int k = 1, end = size; k < size; k++) {
       int a = -1, b = -1;
       if(chain.size() <= 3) {
-        a = findUnlinked(0, end, builder, newidx);
-        b = findUnlinked(a + 1, end, builder, newidx);
+        a = findUnlinked(0, end, clustermap);
+        b = findUnlinked(a + 1, end, clustermap);
         chain.clear();
         chain.add(a);
       }
@@ -129,13 +131,13 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
       }
       // For ties, always prefer the second-last element b:
       final int bSize = builder.getSize(b);
-      double minDist = geometricLinkage.distance(builder.getSize(a), bSize, clusters[a], clusters[b]);
+      double minDist = geometricLinkage.distance(clusters[a], builder.getSize(a), clusters[b], bSize);
       do {
         final int aSize = builder.getSize(a);
         int c = b;
         for(int i = 0; i < a; i++) {
-          if(i != b && newidx[i] >= 0) {
-            double dist = geometricLinkage.distance(aSize, builder.getSize(i), clusters[a], clusters[i]);
+          if(i != b && clustermap[i] >= 0) {
+            double dist = geometricLinkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -143,8 +145,8 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
           }
         }
         for(int i = a + 1; i < size; i++) {
-          if(i != b && newidx[i] >= 0) {
-            double dist = geometricLinkage.distance(aSize, builder.getSize(i), clusters[a], clusters[i]);
+          if(i != b && clustermap[i] >= 0) {
+            double dist = geometricLinkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -163,10 +165,10 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
         a = b;
         b = tmp;
       }
-      assert minDist == geometricLinkage.distance(builder.getSize(a), builder.getSize(b), clusters[a], clusters[b]);
+      assert minDist == geometricLinkage.distance(clusters[a], builder.getSize(a), clusters[b], builder.getSize(b));
       assert b < a;
-      merge(size, clusters, builder, newidx, minDist, a, b);
-      end = shrinkActiveSet(newidx, end, a); // Shrink working set
+      merge(size, clusters, builder, clustermap, minDist, a, b);
+      end = shrinkActiveSet(clustermap, end, a); // Shrink working set
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
@@ -178,22 +180,23 @@ public class LinearMemoryNNChain<O extends NumberVector> extends NNChain<O> {
    * @param end Active set size
    * @param clusters Array of cluster centers
    * @param builder Hierarchy builder
+   * @param clustermap Cluster assignment
    * @param mindist Distance that was used for merging
    * @param x First matrix position
    * @param y Second matrix position
    */
-  protected void merge(int end, NumberVector[] clusters, ClusterMergeHistoryBuilder builder, int[] newidx, double mindist, int x, int y) {
+  protected void merge(int end, double[][] clusters, ClusterMergeHistoryBuilder builder, int[] clustermap, double mindist, int x, int y) {
     assert y < x;
-    final int xx = newidx[x], yy = newidx[y];
+    final int xx = clustermap[x], yy = clustermap[y];
     final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
     int zz = builder.strictAdd(xx, linkage.restore(mindist, distance.isSquared()), yy);
     // Update cluster size for y:
     assert builder.getSize(zz) == sizex + sizey;
     // Since y < x, prefer keeping y, dropping x.
-    newidx[y] = zz;
-    newidx[x] = -1; // deactivate
+    clustermap[y] = zz;
+    clustermap[x] = -1; // deactivate
     // update the cluster center for y
-    clusters[y] = geometricLinkage.merge(sizex, sizey, clusters[x], clusters[y]);
+    clusters[y] = geometricLinkage.merge(clusters[x], sizex, clusters[y], sizey);
   }
 
   /**

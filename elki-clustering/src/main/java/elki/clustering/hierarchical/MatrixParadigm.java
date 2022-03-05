@@ -25,6 +25,7 @@ import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
+import elki.math.MathUtil;
 import elki.utilities.exceptions.AbortException;
 
 /**
@@ -51,6 +52,11 @@ public class MatrixParadigm {
    * Distance matrix (<b>modifiable</b>).
    */
   public final double[] matrix;
+  
+  /**
+   * Mapping from positions to cluster numbers
+   */
+  public final int[] clustermap;
 
   /**
    * Number of rows/columns.
@@ -73,6 +79,7 @@ public class MatrixParadigm {
     ix = aids.iter();
     iy = aids.iter();
     matrix = new double[triangleSize(size)];
+    clustermap = MathUtil.sequence(0, size);
   }
 
   /**

@@ -139,7 +139,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     /**
      * Constructor.
      *
-     * @param pointerresult Hierarchical result
+     * @param merges Cluster merge history
      */
     public Instance(ClusterMergeHistory merges) {
       this.merges = merges;
@@ -354,7 +354,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      * Make the cluster for the given object
      *
      * @param seq Cluster sequence number
-     * @param depth Linkage depth
      * @param members Member objects
      * @return Cluster
      */
