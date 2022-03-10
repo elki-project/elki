@@ -20,7 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
@@ -31,14 +30,10 @@ import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
-import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -73,16 +68,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "arXiv preprint arXiv:1109.2378", //
     url = "https://arxiv.org/abs/1109.2378", //
     bibkey = "DBLP:journals/corr/abs-1109-2378")
-public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxNNChain<O> extends MiniMax<O> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
-
-  /**
-   * Distance function used.
-   */
-  protected Distance<? super O> distance;
 
   /**
    * Constructor.
@@ -90,8 +80,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param distance Distance function
    */
   public MiniMaxNNChain(Distance<? super O> distance) {
-    super();
-    this.distance = distance;
+    super(distance);
   }
 
   /**
@@ -226,18 +215,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    *
    * @param <O> Object type
    */
-  public static class Par<O> implements Parameterizer {
-    /**
-     * The distance function to use.
-     */
-    protected Distance<? super O> distance;
-
-    @Override
-    public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
-          .grab(config, x -> distance = x);
-    }
-
+  public static class Par<O> extends MiniMax.Par<O> {
     @Override
     public MiniMaxNNChain<O> make() {
       return new MiniMaxNNChain<>(distance);
