@@ -20,16 +20,11 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistanceQuery;
 import elki.math.MathUtil;
 import elki.utilities.exceptions.AbortException;
 
 /**
- * Shared code for algorithms that work on a strict matrix paradigm.
+ * Shared code for algorithms that work on a pairwise cluster distance matrix.
  * <p>
  * Note that this requires O(n²) memory (and often O(n³) runtime).
  * <p>
@@ -42,17 +37,12 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class MatrixParadigm {
-  /**
-   * Two iterators to reference to objects.
-   */
-  public final DBIDArrayIter ix, iy;
-
+public class ClusterDistanceMatrix {
   /**
    * Distance matrix (<b>modifiable</b>).
    */
   public final double[] matrix;
-  
+
   /**
    * Mapping from positions to cluster numbers
    */
@@ -66,18 +56,15 @@ public class MatrixParadigm {
   /**
    * Constructor.
    *
-   * @param ids Database ids.
+   * @param size Size
    */
-  public MatrixParadigm(DBIDs ids) {
-    size = ids.size();
+  public ClusterDistanceMatrix(int size) {
+    this.size = size;
     if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + //
           0x10000 // = 65535
           + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
     }
-    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
-    ix = aids.iter();
-    iy = aids.iter();
     matrix = new double[triangleSize(size)];
     clustermap = MathUtil.sequence(0, size);
   }
@@ -104,25 +91,5 @@ public class MatrixParadigm {
    */
   public double get(int x, int y) {
     return x == y ? 0 : x < y ? matrix[triangleSize(y) + x] : matrix[triangleSize(x) + y];
-  }
-
-  /**
-   * Initialize a distance matrix.
-   *
-   * @param dq Distance query
-   * @return this
-   */
-  public MatrixParadigm initializeWithDistances(DistanceQuery<?> dq) {
-    final DBIDArrayIter ix = this.ix, iy = this.iy;
-    final double[] matrix = this.matrix;
-    int pos = 0;
-    for(ix.seek(0); ix.valid(); ix.advance()) {
-      final int x = ix.getOffset();
-      assert pos == triangleSize(x);
-      for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
-        matrix[pos++] = dq.distance(ix, iy);
-      }
-    }
-    return this;
   }
 }

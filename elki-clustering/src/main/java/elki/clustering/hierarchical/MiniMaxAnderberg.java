@@ -95,166 +95,152 @@ public class MiniMaxAnderberg<O> implements HierarchicalClusteringAlgorithm {
   public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final int size = ids.size();
-
-    // Initialize space for result:
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
-    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
-
-    // Compute the initial (lower triangular) distance matrix.
-    MatrixParadigm mat = new MatrixParadigm(ids);
-    ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(size));
-    DBIDArrayMIter protiter = prots.iter();
-    MiniMax.initializeMatrices(mat, prots, dq);
-
-    // Arrays used for caching:
-    double[] bestd = new double[size];
-    int[] besti = new int[size];
-    Anderberg.initializeNNCache(mat.matrix, bestd, besti);
-
-    // Repeat until everything merged into 1 cluster
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(mat.clustermap, end, //
-          findMerge(end, mat, protiter, builder, clusters, bestd, besti, dq));
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
-    return (ClusterPrototypeMergeHistory) builder.complete();
+    ArrayModifiableDBIDs prots = DBIDUtil.newArray(ClusterDistanceMatrix.triangleSize(ids.size()));
+    ClusterDistanceMatrix mat = MiniMax.initializeMatrices(ids, prots, dq);
+    return new Instance().run(ids, mat, new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared()), dq, prots.iter());
   }
 
   /**
-   * Perform the next merge step.
+   * Main worker instance of MiniMax.
    * 
-   * @param size size of the data set
-   * @param mat matrix view
-   * @param prots the prototypes of merges between clusters
-   * @param builder Result builder
-   * @param clusters the current clustering
-   * @param bestd the distances to the nearest neighboring cluster
-   * @param besti the nearest neighboring cluster
-   * @param dq the range query
-   * @return x, for shrinking the active set.
+   * @author Erich Schubert
    */
-  protected int findMerge(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
-    double mindist = Double.POSITIVE_INFINITY;
-    int x = -1, y = -1;
-    // Find minimum:
-    for(int cx = 1; cx < size; cx++) {
-      // Skip if object has already joined a cluster:
-      final int cy = besti[cx];
-      if(cy < 0) {
-        continue;
+  public static class Instance extends MiniMax.Instance {
+    /**
+     * Cache: best distance
+     */
+    protected double[] bestd;
+
+    /**
+     * Cache: index of best distance
+     */
+    protected int[] besti;
+
+    @Override
+    public ClusterPrototypeMergeHistory run(ArrayDBIDs ids, ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder, DistanceQuery<?> dq, DBIDArrayMIter prots) {
+      final int size = mat.size;
+      this.mat = mat;
+      this.builder = builder;
+      this.end = size;
+      this.clusters = new Int2ObjectOpenHashMap<>(size);
+      this.protiter = prots;
+      this.dq = dq;
+      this.ix = ids.iter();
+      this.iy = ids.iter();
+
+      // Arrays used for caching:
+      this.bestd = new double[size];
+      this.besti = new int[size];
+      Anderberg.Instance.initializeNNCache(mat.matrix, bestd, besti);
+
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
+      for(int i = 1; i < size; i++) {
+        end = shrinkActiveSet(mat.clustermap, end, findMerge());
+        LOG.incrementProcessed(progress);
       }
-      final double dist = bestd[cx];
-      if(dist <= mindist) { // Prefer later on ==, to truncate more often.
-        mindist = dist;
-        x = cx;
-        y = cy;
+      LOG.ensureCompleted(progress);
+      return (ClusterPrototypeMergeHistory) builder.complete();
+    }
+
+    /**
+     * Perform the next merge step.
+     * 
+     * @return x, for shrinking the active set.
+     */
+    protected int findMerge() {
+      double mindist = Double.POSITIVE_INFINITY;
+      int x = -1, y = -1;
+      // Find minimum:
+      for(int cx = 1; cx < end; cx++) {
+        // Skip if object has already joined a cluster:
+        final int cy = besti[cx];
+        if(cy < 0) {
+          continue;
+        }
+        final double dist = bestd[cx];
+        if(dist <= mindist) { // Prefer later on ==, to truncate more often.
+          mindist = dist;
+          x = cx;
+          y = cy;
+        }
+      }
+      merge(x, y);
+      return x;
+    }
+
+    /**
+     * Execute the cluster merge
+     * 
+     * @param x first cluster to merge, with {@code x > y}
+     * @param y second cluster to merge, with {@code y < x}
+     */
+    protected void merge(int x, int y) {
+      assert x >= 0 && y >= 0;
+      assert y < x;
+      final double[] distances = mat.matrix;
+      final int offset = ClusterDistanceMatrix.triangleSize(x) + y;
+      ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
+      // Keep y
+      if(cy == null) {
+        cy = DBIDUtil.newHashSet();
+        cy.add(iy.seek(y));
+      }
+      if(cx == null) {
+        cy.add(ix.seek(x));
+      }
+      else {
+        cy.addDBIDs(cx);
+        clusters.remove(x);
+      }
+      clusters.put(y, cy);
+
+      // parent of x is set to y
+      final int xx = mat.clustermap[x], yy = mat.clustermap[y];
+      final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+      int zz = builder.strictAdd(xx, distances[offset], yy, protiter.seek(offset));
+      assert builder.getSize(zz) == sizex + sizey;
+      mat.clustermap[y] = zz;
+      mat.clustermap[x] = besti[x] = -1; // Deactivate removed cluster.
+      updateMatrices(x, y);
+      if(y > 0) {
+        Anderberg.Instance.findBest(distances, bestd, besti, y);
       }
     }
-    assert 0 <= y && y < x;
-    merge(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
-    return x;
-  }
 
-  /**
-   * Execute the cluster merge
-   *
-   * @param size size of data set
-   * @param mat Matrix paradigm
-   * @param prots the prototypes of merges between clusters
-   * @param builder Result builder
-   * @param clusters the current clustering
-   * @param dq the range query
-   * @param bestd the distances to the nearest neighboring cluster
-   * @param besti the nearest neighboring cluster
-   * @param x first cluster to merge, with {@code x > y}
-   * @param y second cluster to merge, with {@code y < x}
-   */
-  protected void merge(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
-    // Avoid allocating memory, by reusing existing iterators:
-    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
-    final double[] distances = mat.matrix;
-    int offset = MatrixParadigm.triangleSize(x) + y;
-    if(LOG.isDebuggingFine()) {
-      LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + distances[offset]);
-    }
-    // Perform merge in data structure: x -> y
-    assert y < x;
-    ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
-    // Keep y
-    if(cy == null) {
-      cy = DBIDUtil.newHashSet();
-      cy.add(iy);
-    }
-    if(cx == null) {
-      cy.add(ix);
-    }
-    else {
-      cy.addDBIDs(cx);
-      clusters.remove(x);
-    }
-    clusters.put(y, cy);
-
-    // parent of x is set to y
-    final int xx = mat.clustermap[x], yy = mat.clustermap[y];
-    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
-    int zz = builder.strictAdd(xx, distances[offset], yy, prots.seek(offset));
-    assert builder.getSize(zz) == sizex + sizey;
-    mat.clustermap[y] = zz;
-    mat.clustermap[x] = besti[x] = -1; // Deactivate removed cluster.
-    updateMatrices(size, mat, prots, builder, clusters, dq, bestd, besti, x, y);
-    if(y > 0) {
-      Anderberg.findBest(distances, bestd, besti, y);
-    }
-  }
-
-  /**
-   * Update the entries of the matrices that contain a distance to y, the newly
-   * merged cluster.
-   *
-   * @param size size of data set
-   * @param mat matrix view
-   * @param prots the prototypes of merges between clusters
-   * @param builder Result builder
-   * @param clusters the current clustering
-   * @param dq the range query
-   * @param bestd the distances to the nearest neighboring cluster
-   * @param besti the nearest neighboring cluster
-   * @param x first cluster to merge, with {@code x > y}
-   * @param y second cluster to merge, with {@code y < x}
-   */
-  private void updateMatrices(int size, MatrixParadigm mat, DBIDArrayMIter prots, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
-    final DBIDArrayIter ix = mat.ix, iy = mat.iy;
-    final double[] distances = mat.matrix;
-    // c is the new cluster.
-    // Update entries (at (a,b) with a > b) in the matrix where a = y or b = y
-
-    // Update entries at (y,b) with b < y
-    int a = y, b = 0;
-    ix.seek(a);
-    final int yoffset = MatrixParadigm.triangleSize(y);
-    for(; b < a; b++) {
-      // Skip entry if already merged
-      if(mat.clustermap[b] < 0) {
-        continue;
+    /**
+     * Update the entries of the matrices that contain a distance to y, the
+     * newly merged cluster.
+     *
+     * @param x first cluster to merge, with {@code x > y}
+     * @param y second cluster to merge, with {@code y < x}
+     */
+    private void updateMatrices(int x, int y) {
+      final double[] distances = mat.matrix;
+      // c is the new cluster.
+      // Update entries (at (a,b) with a > b) in the matrix where a = y or b = y
+      // Update entries at (y,b) with b < y
+      int a = y, b = 0;
+      final int yoffset = ClusterDistanceMatrix.triangleSize(y);
+      for(; b < a; b++) {
+        // Skip entry if already merged
+        if(mat.clustermap[b] < 0) {
+          continue;
+        }
+        updateEntry(a, b);
+        Anderberg.Instance.updateCache(distances, bestd, besti, x, y, b, distances[yoffset + b]);
       }
-      MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      Anderberg.updateCache(distances, bestd, besti, x, y, b, distances[yoffset + b]);
-    }
 
-    // Update entries at (a,y) with a > y
-    a = y + 1;
-    b = y;
-    iy.seek(b);
-    for(; a < size; a++) {
-      // Skip entry if already merged
-      if(mat.clustermap[a] < 0) {
-        continue;
+      // Update entries at (a,y) with a > y
+      a = y + 1;
+      b = y;
+      for(; a < end; a++) {
+        // Skip entry if already merged
+        if(mat.clustermap[a] < 0) {
+          continue;
+        }
+        updateEntry(a, b);
+        Anderberg.Instance.updateCache(distances, bestd, besti, x, y, a, distances[ClusterDistanceMatrix.triangleSize(a) + y]);
       }
-      MiniMax.updateEntry(mat, prots, clusters, dq, a, b);
-      Anderberg.updateCache(distances, bestd, besti, x, y, a, distances[MatrixParadigm.triangleSize(a) + y]);
     }
   }
 

@@ -23,7 +23,10 @@ package elki.clustering.hierarchical;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -91,11 +94,6 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
     this.distance = distance;
   }
 
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
-  }
-
   /**
    * Run the algorithm
    *
@@ -105,106 +103,118 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
   public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-
-    // Initialize space for result:
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
-    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(ids.size());
-
-    MatrixParadigm mat = new MatrixParadigm(ids);
-    ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(ids.size()));
-
-    MiniMax.initializeMatrices(mat, prots, dq);
-    nnChainCore(mat, prots.iter(), dq, builder, clusters);
-    builder.optimizeOrder();
-    return (ClusterPrototypeMergeHistory) builder.complete();
+    ArrayModifiableDBIDs prots = DBIDUtil.newArray(ClusterDistanceMatrix.triangleSize(ids.size()));
+    ClusterDistanceMatrix mat = MiniMax.initializeMatrices(ids, prots, dq);
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
+    return new Instance().run(ids, mat, builder, dq, prots.iter());
   }
 
   /**
-   * Uses NNChain as in "Modern hierarchical, agglomerative clustering
-   * algorithms" by Daniel Müllner
+   * Main worker instance of MiniMaxNNChain.
    * 
-   * @param mat distance matrix
-   * @param prots computed prototypes
-   * @param dq distance query of the data set
-   * @param builder Result builder
-   * @param clusters current clusters
+   * @author Erich Schubert
    */
-  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
-    final double[] distances = mat.matrix;
-    final int size = mat.size;
-    // The maximum chain size = number of ids + 1, but usually much less
-    IntegerArray chain = new IntegerArray(size << 1);
-
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
-    for(int k = 1, end = size; k < size; k++) {
-      int a = -1, b = -1;
-      if(chain.size() <= 3) {
-        // Accessing two arbitrary not yet merged elements could be optimized to
-        // work in O(1) like in Müllner;
-        // however this usually does not have a huge impact (empirically just
-        // about 1/5000 of total performance)
-        a = NNChain.findUnlinked(0, end, mat.clustermap);
-        b = NNChain.findUnlinked(a + 1, end, mat.clustermap);
-        chain.clear();
-        chain.add(a);
-      }
-      else {
-        // Chain is expected to look like (.... a, b, c, b) with b and c merged.
-        int lastIndex = chain.size;
-        int c = chain.get(lastIndex - 2);
-        b = chain.get(lastIndex - 3);
-        a = chain.get(lastIndex - 4);
-        // Ensure we had a loop at the end:
-        assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
-        // if c < b, then we merged b -> c, otherwise c -> b
-        b = c < b ? c : b;
-        // Cut the tail:
-        chain.size -= 3;
-      }
-      // For ties, always prefer the second-last element b:
-      double minDist = mat.get(a, b);
-      do {
-        int c = b;
-        final int ta = MatrixParadigm.triangleSize(a);
-        for(int i = 0; i < a; i++) {
-          if(i != b && mat.clustermap[i] >= 0) {
-            double dist = distances[ta + i];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-        for(int i = a + 1; i < size; i++) {
-          if(i != b && mat.clustermap[i] >= 0) {
-            double dist = distances[MatrixParadigm.triangleSize(i) + a];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-
-        b = a;
-        a = c;
-
-        chain.add(a);
-      }
-      while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
-
-      // We always merge the larger into the smaller index:
-      if(a < b) {
-        int tmp = a;
-        a = b;
-        b = tmp;
-      }
-      assert (minDist == mat.get(a, b));
-      assert (b < a);
-      MiniMax.merge(size, mat, prots, builder, clusters, dq, a, b);
-      end = AGNES.shrinkActiveSet(mat.clustermap, end, a); // Shrink working set
-      LOG.incrementProcessed(progress);
+  public static class Instance extends MiniMax.Instance {
+    @Override
+    public ClusterPrototypeMergeHistory run(ArrayDBIDs ids, ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder, DistanceQuery<?> dq, DBIDArrayMIter prots) {
+      final int size = mat.size;
+      this.mat = mat;
+      this.builder = builder;
+      this.end = size;
+      this.clusters = new Int2ObjectOpenHashMap<>(size);
+      this.protiter = prots;
+      this.dq = dq;
+      this.ix = ids.iter();
+      this.iy = ids.iter();
+      nnChainCore();
+      builder.optimizeOrder();
+      return (ClusterPrototypeMergeHistory) builder.complete();
     }
-    LOG.ensureCompleted(progress);
+
+    /**
+     * Uses NNChain as in "Modern hierarchical, agglomerative clustering
+     * algorithms" by Daniel Müllner
+     */
+    private void nnChainCore() {
+      final double[] distances = mat.matrix;
+      final int size = mat.size;
+      // The maximum chain size = number of ids + 1, but usually much less
+      IntegerArray chain = new IntegerArray(size << 1);
+
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
+      for(int k = 1, end = size; k < size; k++) {
+        int a = -1, b = -1;
+        if(chain.size() <= 3) {
+          // Accessing two arbitrary not yet merged elements could be optimized
+          // to work in O(1) like in Müllner; however this usually does not have
+          // a huge impact (empirically just about 1/5000 of total performance)
+          a = NNChain.Instance.findUnlinked(0, end, mat.clustermap);
+          b = NNChain.Instance.findUnlinked(a + 1, end, mat.clustermap);
+          chain.clear();
+          chain.add(a);
+        }
+        else {
+          // Chain is expected to look like (.... a, b, c, b) with b and c
+          // merged.
+          int lastIndex = chain.size;
+          int c = chain.get(lastIndex - 2);
+          b = chain.get(lastIndex - 3);
+          a = chain.get(lastIndex - 4);
+          // Ensure we had a loop at the end:
+          assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
+          // if c < b, then we merged b -> c, otherwise c -> b
+          b = c < b ? c : b;
+          // Cut the tail:
+          chain.size -= 3;
+        }
+        // For ties, always prefer the second-last element b:
+        double minDist = mat.get(a, b);
+        do {
+          int c = b;
+          final int ta = ClusterDistanceMatrix.triangleSize(a);
+          for(int i = 0; i < a; i++) {
+            if(i != b && mat.clustermap[i] >= 0) {
+              double dist = distances[ta + i];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+          for(int i = a + 1; i < size; i++) {
+            if(i != b && mat.clustermap[i] >= 0) {
+              double dist = distances[ClusterDistanceMatrix.triangleSize(i) + a];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+
+          b = a;
+          a = c;
+
+          chain.add(a);
+        }
+        while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
+
+        // We always merge the larger into the smaller index:
+        if(a < b) {
+          int tmp = a;
+          a = b;
+          b = tmp;
+        }
+        merge(a, b);
+        end = shrinkActiveSet(mat.clustermap, end, a); // shrink working set
+        LOG.incrementProcessed(progress);
+      }
+      LOG.ensureCompleted(progress);
+    }
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

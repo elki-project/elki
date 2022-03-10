@@ -78,21 +78,11 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Cluster Analysis for Applications", //
     bibkey = "books/academic/Anderberg73/Ch6")
 @Priority(Priority.RECOMMENDED)
-public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
+public class Anderberg<O> extends AGNES<O> {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(Anderberg.class);
-
-  /**
-   * Distance function used.
-   */
-  protected Distance<? super O> distance;
-
-  /**
-   * Current linkage method in use.
-   */
-  protected Linkage linkage = WardLinkage.STATIC;
 
   /**
    * Constructor.
@@ -101,243 +91,246 @@ public class Anderberg<O> implements HierarchicalClusteringAlgorithm {
    * @param linkage Linkage method
    */
   public Anderberg(Distance<? super O> distance, Linkage linkage) {
-    super();
-    this.distance = distance;
-    this.linkage = linkage;
+    super(distance, linkage);
   }
 
-  /**
-   * Run the algorithm
-   *
-   * @param relation Relation
-   * @return Clustering hierarchy
-   */
+  @Override
   public ClusterMergeHistory run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
-    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    MatrixParadigm mat = new MatrixParadigm(ids);
-    final int size = ids.size();
-
-    // Position counter - must agree with computeOffset!
-    AGNES.initializeDistanceMatrix(mat, dq, linkage);
-
-    // Arrays used for caching:
-    double[] bestd = new double[size];
-    int[] besti = new int[size];
-    initializeNNCache(mat.matrix, bestd, besti);
-
-    // Initialize space for result:
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
-
-    // Repeat until everything merged into 1 cluster
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
-    for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(mat.clustermap, end, //
-          findMerge(end, mat, bestd, besti, builder));
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
-    return builder.complete();
+    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
+    ClusterDistanceMatrix mat = AGNES.initializeDistanceMatrix(ids, dq, linkage);
+    return new Instance(linkage).run(mat, new ClusterMergeHistoryBuilder(ids, distance.isSquared()));
   }
 
   /**
-   * Initialize the NN cache.
+   * Main worker instance of Anderberg's algorithm.
    *
-   * @param scratch Scratch space
-   * @param bestd Best distance
-   * @param besti Best index
+   * @author Erich Schubert
    */
-  protected static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
-    final int size = bestd.length;
-    Arrays.fill(bestd, Double.POSITIVE_INFINITY);
-    Arrays.fill(besti, -1);
-    besti[0] = Integer.MAX_VALUE; // invalid, but not deactivated
-    for(int x = 1, p = 0; x < size; x++) {
-      assert p == MatrixParadigm.triangleSize(x);
-      double bestdx = Double.POSITIVE_INFINITY;
-      int bestix = -1;
-      for(int y = 0; y < x; y++) {
-        final double v = scratch[p++];
-        if(v < bestdx) {
-          bestdx = v;
-          bestix = y;
+  public static class Instance extends AGNES.Instance {
+    /**
+     * Cache: best distance
+     */
+    protected double[] bestd;
+
+    /**
+     * Cache: index of best distance
+     */
+    protected int[] besti;
+
+    /**
+     * Constructor.
+     *
+     * @param linkage Linkage method
+     */
+    public Instance(Linkage linkage) {
+      super(linkage);
+    }
+
+    @Override
+    public ClusterMergeHistory run(ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder) {
+      final int size = mat.size;
+      this.mat = mat;
+      this.builder = builder;
+      this.end = size;
+      this.bestd = new double[size];
+      this.besti = new int[size];
+      initializeNNCache(mat.matrix, bestd, besti);
+
+      // Repeat until everything merged into 1 cluster
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
+      for(int i = 1; i < size; i++) {
+        end = shrinkActiveSet(mat.clustermap, end, findMerge());
+        LOG.incrementProcessed(prog);
+      }
+      LOG.ensureCompleted(prog);
+      return builder.complete();
+    }
+
+    /**
+     * Initialize the NN cache.
+     *
+     * @param scratch Scratch space
+     * @param bestd Best distance
+     * @param besti Best index
+     */
+    protected static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
+      final int size = bestd.length;
+      Arrays.fill(bestd, Double.POSITIVE_INFINITY);
+      Arrays.fill(besti, -1);
+      besti[0] = Integer.MAX_VALUE; // invalid, but not deactivated
+      for(int x = 1, p = 0; x < size; x++) {
+        assert p == ClusterDistanceMatrix.triangleSize(x);
+        double bestdx = Double.POSITIVE_INFINITY;
+        int bestix = -1;
+        for(int y = 0; y < x; y++) {
+          final double v = scratch[p++];
+          if(v < bestdx) {
+            bestdx = v;
+            bestix = y;
+          }
+        }
+        assert 0 <= bestix && bestix < x;
+        bestd[x] = bestdx;
+        besti[x] = bestix;
+      }
+    }
+
+    /**
+     * Perform the next merge step.
+     * <p>
+     * Due to the cache, this is now O(n) each time, instead of O(n*n).
+     *
+     * @return x, for shrinking the working set.
+     */
+    protected int findMerge() {
+      double mindist = Double.POSITIVE_INFINITY;
+      int x = -1, y = -1;
+      // Find minimum:
+      for(int cx = 1; cx < end; cx++) {
+        // Skip if object has already joined a cluster:
+        final int cy = besti[cx];
+        if(cy < 0) {
+          continue;
+        }
+        final double dist = bestd[cx];
+        if(dist <= mindist) { // Prefer later on ==, to truncate more often.
+          mindist = dist;
+          x = cx;
+          y = cy;
         }
       }
-      assert 0 <= bestix && bestix < x;
-      bestd[x] = bestdx;
-      besti[x] = bestix;
+      merge(mindist, x, y);
+      return x;
     }
-  }
 
-  /**
-   * Perform the next merge step.
-   * <p>
-   * Due to the cache, this is now O(n) each time, instead of O(n*n).
-   *
-   * @param size Data set size
-   * @param mat Matrix paradigm
-   * @param bestd Best distance
-   * @param besti Index of best distance
-   * @param builder Hierarchy builder
-   * @return x, for shrinking the working set.
-   */
-  protected int findMerge(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder) {
-    double mindist = Double.POSITIVE_INFINITY;
-    int x = -1, y = -1;
-    // Find minimum:
-    for(int cx = 1; cx < size; cx++) {
-      // Skip if object has already joined a cluster:
-      final int cy = besti[cx];
-      if(cy < 0) {
-        continue;
-      }
-      final double dist = bestd[cx];
-      if(dist <= mindist) { // Prefer later on ==, to truncate more often.
-        mindist = dist;
-        x = cx;
-        y = cy;
+    /**
+     * Execute the cluster merge.
+     *
+     * @param mindist Distance that was used for merging
+     * @param x First matrix position
+     * @param y Second matrix position
+     */
+    protected void merge(double mindist, int x, int y) {
+      assert y < x;
+      final int xx = mat.clustermap[x], yy = mat.clustermap[y];
+      final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+      // Since y < x, prefer keeping y, dropping x.
+      int zz = builder.strictAdd(xx, linkage.restore(mindist, builder.isSquared), yy);
+      assert builder.getSize(zz) == sizex + sizey;
+      mat.clustermap[y] = zz;
+      mat.clustermap[x] = besti[x] = -1; // Deactivate removed cluster.
+      updateMatrix(mindist, x, y, sizex, sizey);
+      if(y > 0) {
+        findBest(mat.matrix, bestd, besti, y);
       }
     }
-    assert 0 <= y && y < x;
-    merge(size, mat, bestd, besti, builder, mindist, x, y);
-    return x;
-  }
 
-  /**
-   * Execute the cluster merge.
-   *
-   * @param size data set size
-   * @param mat Matrix paradigm
-   * @param bestd Best distance
-   * @param besti Index of best distance
-   * @param builder Hierarchy builder
-   * @param mindist Distance that was used for merging
-   * @param x First matrix position
-   * @param y Second matrix position
-   */
-  protected void merge(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, double mindist, int x, int y) {
-    assert y < x;
-    final int xx = mat.clustermap[x], yy = mat.clustermap[y];
-    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
-    // Since y < x, prefer keeping y, dropping x.
-    int zz = builder.strictAdd(xx, linkage.restore(mindist, distance.isSquared()), yy);
-    assert builder.getSize(zz) == sizex + sizey;
-    mat.clustermap[y] = zz;
-    mat.clustermap[x] = besti[x] = -1; // Deactivate removed cluster.
-    updateMatrix(size, mat, bestd, besti, builder, mindist, x, y, sizex, sizey);
-    if(y > 0) {
-      findBest(mat.matrix, bestd, besti, y);
-    }
-  }
+    /**
+     * Update the scratch distance matrix.
+     *
+     * @param mindist Distance that was used for merging
+     * @param x First matrix position
+     * @param y Second matrix position
+     * @param sizex Old size of first cluster, with {@code x > y}
+     * @param sizey Old size of second cluster, with {@code y > x}
+     */
+    protected void updateMatrix(double mindist, int x, int y, int sizex, int sizey) {
+      final int xbase = ClusterDistanceMatrix.triangleSize(x);
+      final int ybase = ClusterDistanceMatrix.triangleSize(y);
+      double[] scratch = mat.matrix;
 
-  /**
-   * Update the scratch distance matrix.
-   *
-   * @param size Data set size
-   * @param mat Matrix paradigm
-   * @param bestd Best distance
-   * @param besti Index of best distance
-   * @param builder Hierarchy builder
-   * @param mindist Distance that was used for merging
-   * @param x First matrix position
-   * @param y Second matrix position
-   * @param sizex Old size of first cluster, with {@code x > y}
-   * @param sizey Old size of second cluster, with {@code y > x}
-   */
-  protected void updateMatrix(int size, MatrixParadigm mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
-    final int xbase = MatrixParadigm.triangleSize(x);
-    final int ybase = MatrixParadigm.triangleSize(y);
-    double[] scratch = mat.matrix;
+      // Write to (y, j), with j < y
+      int j = 0;
+      for(; j < y; j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        final int sizej = builder.getSize(mat.clustermap[j]);
+        final int yb = ybase + j;
+        final double d = scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
+        updateCache(scratch, bestd, besti, x, y, j, d);
+      }
+      j++; // Skip y
+      // Write to (j, y), with y < j < x
+      int jbase = ClusterDistanceMatrix.triangleSize(j);
+      for(; j < x; jbase += j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        final int sizej = builder.getSize(mat.clustermap[j]);
+        final int jb = jbase + y;
+        final double d = scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
+        updateCache(scratch, bestd, besti, x, y, j, d);
+      }
+      jbase += j++; // Skip x
+      // Write to (j, y), with y < x < j
+      for(; j < end; jbase += j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        final int sizej = builder.getSize(mat.clustermap[j]);
+        final int jb = jbase + y;
+        final double d = scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], sizej, mindist);
+        updateCache(scratch, bestd, besti, x, y, j, d);
+      }
+    }
 
-    // Write to (y, j), with j < y
-    int j = 0;
-    for(; j < y; j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
+    /**
+     * Update the cache.
+     *
+     * @param scratch Scratch matrix
+     * @param bestd Best distance
+     * @param besti Best index
+     * @param x First cluster
+     * @param y Second cluster, {@code y < x}
+     * @param j Updated value d(y, j)
+     * @param d New distance
+     */
+    protected static void updateCache(double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
+      assert y < x;
+      // New best
+      if(y < j && d <= bestd[j]) {
+        bestd[j] = d;
+        besti[j] = y;
+        return;
       }
-      final int sizej = builder.getSize(mat.clustermap[j]);
-      final int yb = ybase + j;
-      final double d = scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
-      updateCache(scratch, bestd, besti, x, y, j, d);
-    }
-    j++; // Skip y
-    // Write to (j, y), with y < j < x
-    int jbase = MatrixParadigm.triangleSize(j);
-    for(; j < x; jbase += j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
+      // Needs slow update.
+      if(besti[j] == x || besti[j] == y) {
+        findBest(scratch, bestd, besti, j);
       }
-      final int sizej = builder.getSize(mat.clustermap[j]);
-      final int jb = jbase + y;
-      final double d = scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
-      updateCache(scratch, bestd, besti, x, y, j, d);
     }
-    jbase += j++; // Skip x
-    // Write to (j, y), with y < x < j
-    for(; j < size; jbase += j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
-      }
-      final int sizej = builder.getSize(mat.clustermap[j]);
-      final int jb = jbase + y;
-      final double d = scratch[jb] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jb], sizej, mindist);
-      updateCache(scratch, bestd, besti, x, y, j, d);
-    }
-  }
 
-  /**
-   * Update the cache.
-   *
-   * @param scratch Scratch matrix
-   * @param bestd Best distance
-   * @param besti Best index
-   * @param x First cluster
-   * @param y Second cluster, {@code y < x}
-   * @param j Updated value d(y, j)
-   * @param d New distance
-   */
-  protected static void updateCache(double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
-    assert y < x;
-    // New best
-    if(y < j && d <= bestd[j]) {
-      bestd[j] = d;
-      besti[j] = y;
-      return;
-    }
-    // Needs slow update.
-    if(besti[j] == x || besti[j] == y) {
-      findBest(scratch, bestd, besti, j);
-    }
-  }
-
-  /**
-   * Find the best in a row of the triangular matrix.
-   *
-   * @param scratch Scratch matrix
-   * @param bestd Best distances cache
-   * @param besti Best indexes cache
-   * @param j Row to update
-   */
-  protected static void findBest(double[] scratch, double[] bestd, int[] besti, int j) {
-    // The distance has increased, we may no longer be the best merge.
-    double bestdj = Double.POSITIVE_INFINITY;
-    int bestij = -1;
-    for(int i = 0, o = MatrixParadigm.triangleSize(j); i < j; i++, o++) {
-      if(besti[i] < 0) {
-        continue;
+    /**
+     * Find the best in a row of the triangular matrix.
+     *
+     * @param scratch Scratch matrix
+     * @param bestd Best distances cache
+     * @param besti Best indexes cache
+     * @param j Row to update
+     */
+    protected static void findBest(double[] scratch, double[] bestd, int[] besti, int j) {
+      // The distance has increased, we may no longer be the best merge.
+      double bestdj = Double.POSITIVE_INFINITY;
+      int bestij = -1;
+      for(int i = 0,
+          o = ClusterDistanceMatrix.triangleSize(j); i < j; i++, o++) {
+        if(besti[i] < 0) {
+          continue;
+        }
+        final double dist = scratch[o];
+        if(dist <= bestdj) {
+          bestdj = dist;
+          bestij = i;
+        }
       }
-      final double dist = scratch[o];
-      if(dist <= bestdj) {
-        bestdj = dist;
-        bestij = i;
-      }
+      assert bestij < j;
+      bestd[j] = bestdj;
+      besti[j] = bestij;
     }
-    assert bestij < j;
-    bestd[j] = bestdj;
-    besti[j] = bestij;
   }
 
   @Override

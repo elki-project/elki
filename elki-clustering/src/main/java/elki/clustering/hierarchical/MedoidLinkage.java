@@ -104,195 +104,225 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
   public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    final int size = ids.size();
-
-    // Initialize space for result:
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, dq.getDistance().isSquared());
-    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
-
-    // FIXME: use an Instance, instead of passing so many variables on the stack
-    // Allocate working space:
-    MatrixParadigm mat = new MatrixParadigm(ids);
-    AGNES.initializeDistanceMatrix(mat, dq, SingleLinkage.STATIC);
-    // Current medoids:
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(ids);
-    DBIDArrayMIter mi = medoids.iter(), mj = medoids.iter();
-
-    // Repeat until everything merged into 1 cluster
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Medoid linkage clustering", size - 1, LOG) : null;
-    for(int i = 1, end = size; i < size; i++) {
-      end = AGNES.shrinkActiveSet(mat.clustermap, end, //
-          findMerge(end, mat, mi, mj, builder, clusters, dq));
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
-    return (ClusterPrototypeMergeHistory) builder.complete();
+    ClusterDistanceMatrix mat = AGNES.initializeDistanceMatrix(ids, dq, SingleLinkage.STATIC);
+    return new Instance().run(ids, mat, new ClusterMergeHistoryBuilder(ids, distance.isSquared()), dq);
   }
 
   /**
-   * Perform the next merge step.
+   * Main worker instance of AGNES.
    * 
-   * @param mx first medoid iterator
-   * @param my second medoid iterator
-   * @param builder Result builder
-   * @param clusters the current clustering
-   * @param dq the range query
-   * @return x, for shrinking the working set.
+   * @author Erich Schubert
    */
-  protected int findMerge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq) {
-    final double[] distances = mat.matrix;
-    double mindist = Double.POSITIVE_INFINITY;
-    int x = -1, y = -1;
+  public static class Instance extends AGNES.Instance {
+    /**
+     * Cluster to members map
+     */
+    protected Int2ObjectOpenHashMap<ModifiableDBIDs> clusters;
 
-    for(int dx = 0; dx < end; dx++) {
-      // Skip if object is already linked
-      if(mat.clustermap[dx] < 0) {
-        continue;
+    /**
+     * Distance query
+     */
+    protected DistanceQuery<?> dq;
+
+    /**
+     * Iterators into medoid array.
+     */
+    protected DBIDArrayMIter mi, mj;
+
+    /**
+     * Iterators into the object ids.
+     */
+    protected DBIDArrayIter ix, iy;
+
+    /**
+     * Constructor.
+     */
+    public Instance() {
+      super(null /* medoid linkage */);
+    }
+
+    @Override
+    public ClusterMergeHistory run(ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder) {
+      throw new IllegalStateException("Need prototypes.");
+    }
+
+    /**
+     * Run medoid linkage
+     * 
+     * @param ids Object ids
+     * @param mat Distance matrix
+     * @param builder Result builder
+     * @param dq Distance query
+     * @return Cluster merge history
+     */
+    public ClusterPrototypeMergeHistory run(ArrayDBIDs ids, ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder, DistanceQuery<?> dq) {
+      final int size = mat.size;
+      this.mat = mat;
+      this.builder = builder;
+      this.end = size;
+      this.clusters = new Int2ObjectOpenHashMap<>(size);
+      this.ix = ids.iter();
+      this.iy = ids.iter();
+      ArrayModifiableDBIDs medoids = DBIDUtil.newArray(ids);
+      this.mi = medoids.iter();
+      this.mj = medoids.iter();
+      this.dq = dq;
+
+      // Repeat until everything merged into 1 cluster
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Medoid linkage clustering", size - 1, LOG) : null;
+      for(int i = 1; i < size; i++) {
+        end = shrinkActiveSet(mat.clustermap, end, findMerge());
+        LOG.incrementProcessed(prog);
       }
-      final int xoffset = MatrixParadigm.triangleSize(dx);
+      LOG.ensureCompleted(prog);
+      return (ClusterPrototypeMergeHistory) builder.complete();
+    }
 
-      for(int dy = 0; dy < dx; dy++) {
+    /**
+     * Perform the next merge step.
+     * 
+     * @return x, for shrinking the working set.
+     */
+    protected int findMerge() {
+      final double[] distances = mat.matrix;
+      double mindist = Double.POSITIVE_INFINITY;
+      int x = -1, y = -1;
+      for(int dx = 0; dx < end; dx++) {
         // Skip if object is already linked
-        if(mat.clustermap[dy] < 0) {
+        if(mat.clustermap[dx] < 0) {
           continue;
         }
+        final int xoffset = ClusterDistanceMatrix.triangleSize(dx);
 
-        double dist = distances[xoffset + dy];
-        if(dist < mindist) {
-          mindist = dist;
-          x = dx;
-          y = dy;
-        }
-      }
-    }
-    assert x >= 0 && y >= 0;
-    assert y < x; // We could swap otherwise, but this shouldn't arise.
-    merge(end, mat, mx, my, builder, clusters, dq, x, y);
-    return x;
-  }
+        for(int dy = 0; dy < dx; dy++) {
+          // Skip if object is already linked
+          if(mat.clustermap[dy] < 0) {
+            continue;
+          }
 
-  /**
-   * Execute the cluster merge.
-   * 
-   * @param end valid size
-   * @param mat matrix storage
-   * @param mx first medoid iterator
-   * @param my second medoid iterator
-   * @param builder Result builder
-   * @param clusters the current clustering
-   * @param dq the range query
-   * @param x first cluster to merge, with {@code x > y}
-   * @param y second cluster to merge, with {@code y < x}
-   */
-  protected void merge(int end, MatrixParadigm mat, DBIDArrayMIter mx, DBIDArrayMIter my, ClusterMergeHistoryBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
-    assert (y < x);
-    final DBIDArrayIter ix = mat.ix.seek(x), iy = mat.iy.seek(y);
-    final double[] distances = mat.matrix;
-    int offset = MatrixParadigm.triangleSize(x) + y;
-
-    ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
-
-    // Keep y
-    if(cy == null) {
-      cy = DBIDUtil.newArray();
-      cy.add(iy);
-    }
-    if(cx == null) {
-      cy.add(ix);
-    }
-    else {
-      cy.addDBIDs(cx);
-      clusters.remove(x);
-    }
-    clusters.put(y, cy);
-
-    // New cluster medoid
-    findMedoid(dq, cy, my.seek(y));
-    // parent of x is set to y
-    final int xx = mat.clustermap[x], yy = mat.clustermap[y];
-    final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
-    int zz = builder.strictAdd(xx, distances[offset], yy, my);
-    assert builder.getSize(zz) == sizex + sizey;
-    mat.clustermap[y] = zz;
-    mat.clustermap[x] = -1; // deactivate
-    updateMatrix(dq, end, mat, builder, x, y, mx, my);
-  }
-
-  /**
-   * Find the prototypes.
-   * 
-   * @param dq Distance query
-   * @param c Cluster
-   * @param prototype Prototype output
-   * @return New best distance
-   */
-  private static double findMedoid(DistanceQuery<?> dq, DBIDs c, DBIDArrayMIter prototype) {
-    if(c.size() == 2) {
-      final DBIDIter other = c.iter();
-      prototype.setDBID(other);
-      return dq.distance(prototype, other.advance());
-    }
-    double minDistSum = Double.POSITIVE_INFINITY;
-    for(DBIDIter i = c.iter(); i.valid(); i.advance()) {
-      // Maximum distance of i to all elements in cx
-      double distsum = 0;
-      for(DBIDIter j = c.iter(); j.valid(); j.advance()) {
-        if(!DBIDUtil.equal(i, j)) {
-          distsum += dq.distance(i, j);
-          if(distsum >= minDistSum) {
-            break;
+          double dist = distances[xoffset + dy];
+          if(dist < mindist) {
+            mindist = dist;
+            x = dx;
+            y = dy;
           }
         }
       }
-      // New best solution?
-      if(distsum < minDistSum) {
-        minDistSum = distsum;
-        prototype.setDBID(i);
-      }
+      merge(x, y);
+      return x;
     }
-    return minDistSum;
-  }
 
-  /**
-   * Update the scratch distance matrix.
-   *
-   * @param end Active set size
-   * @param mat Matrix view
-   * @param builder Hierarchy builder (to get cluster sizes)
-   * @param x First matrix position
-   * @param y Second matrix position
-   */
-  protected void updateMatrix(DistanceQuery<?> dq, int end, MatrixParadigm mat, ClusterMergeHistoryBuilder builder, int x, int y, DBIDArrayIter mi, DBIDArrayIter mj) {
-    // Update distance matrix. Note: y < x
-    final int ybase = MatrixParadigm.triangleSize(y);
-    double[] scratch = mat.matrix;
+    /**
+     * Execute the cluster merge.
+     *
+     * @param x first cluster to merge, with {@code x > y}
+     * @param y second cluster to merge, with {@code y < x}
+     */
+    protected void merge(int x, int y) {
+      assert x >= 0 && y >= 0;
+      assert y < x; // We could swap otherwise, but this shouldn't arise.
+      final double[] distances = mat.matrix;
+      final int offset = ClusterDistanceMatrix.triangleSize(x) + y;
+      ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
+      // Keep y
+      if(cy == null) {
+        cy = DBIDUtil.newArray();
+        cy.add(iy.seek(y));
+      }
+      if(cx == null) {
+        cy.add(ix.seek(x));
+      }
+      else {
+        cy.addDBIDs(cx);
+        clusters.remove(x);
+      }
+      clusters.put(y, cy);
 
-    // Write to (y, j), with j < y
-    int j = 0;
-    mi.seek(y);
-    for(; j < y; j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
-      }
-      assert j < y; // Otherwise, ybase + j is the wrong position!
-      scratch[ybase + j] = dq.distance(mi, mj.seek(j));
+      // New cluster medoid
+      findMedoid(dq, cy, mj.seek(y));
+      // parent of x is set to y
+      final int xx = mat.clustermap[x], yy = mat.clustermap[y];
+      final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+      int zz = builder.strictAdd(xx, distances[offset], yy, mj);
+      assert builder.getSize(zz) == sizex + sizey;
+      mat.clustermap[y] = zz;
+      mat.clustermap[x] = -1; // deactivate
+      updateMatrix(x, y);
     }
-    j++; // Skip y
-    // Write to (j, y), with y < j < x
-    int jbase = MatrixParadigm.triangleSize(j);
-    for(; j < x; jbase += j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
+
+    /**
+     * Find the prototypes.
+     * 
+     * @param dq Distance query
+     * @param c Cluster
+     * @param prototype Prototype output
+     * @return New best distance
+     */
+    private static double findMedoid(DistanceQuery<?> dq, DBIDs c, DBIDArrayMIter prototype) {
+      if(c.size() == 2) {
+        final DBIDIter other = c.iter();
+        prototype.setDBID(other);
+        return dq.distance(prototype, other.advance());
       }
-      scratch[jbase + y] = dq.distance(mi, mj.seek(j));
+      double minDistSum = Double.POSITIVE_INFINITY;
+      for(DBIDIter i = c.iter(); i.valid(); i.advance()) {
+        // Maximum distance of i to all elements in cx
+        double distsum = 0;
+        for(DBIDIter j = c.iter(); j.valid(); j.advance()) {
+          if(!DBIDUtil.equal(i, j)) {
+            distsum += dq.distance(i, j);
+            if(distsum >= minDistSum) {
+              break;
+            }
+          }
+        }
+        // New best solution?
+        if(distsum < minDistSum) {
+          minDistSum = distsum;
+          prototype.setDBID(i);
+        }
+      }
+      return minDistSum;
     }
-    jbase += j++; // Skip x
-    // Write to (j, y), with y < x < j
-    for(; j < end; jbase += j++) {
-      if(mat.clustermap[j] < 0) {
-        continue;
+
+    /**
+     * Update the scratch distance matrix.
+     *
+     * @param x First matrix position
+     * @param y Second matrix position
+     */
+    protected void updateMatrix(int x, int y) {
+      // Update distance matrix. Note: y < x
+      final int ybase = ClusterDistanceMatrix.triangleSize(y);
+      double[] scratch = mat.matrix;
+
+      // Write to (y, j), with j < y
+      int j = 0;
+      mi.seek(y);
+      for(; j < y; j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        assert j < y; // Otherwise, ybase + j is the wrong position!
+        scratch[ybase + j] = dq.distance(mi, mj.seek(j));
       }
-      scratch[jbase + y] = dq.distance(mi, mj.seek(j));
+      j++; // Skip y
+      // Write to (j, y), with y < j < x
+      int jbase = ClusterDistanceMatrix.triangleSize(j);
+      for(; j < x; jbase += j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        scratch[jbase + y] = dq.distance(mi, mj.seek(j));
+      }
+      jbase += j++; // Skip x
+      // Write to (j, y), with y < x < j
+      for(; j < end; jbase += j++) {
+        if(mat.clustermap[j] < 0) {
+          continue;
+        }
+        scratch[jbase + y] = dq.distance(mi, mj.seek(j));
+      }
     }
   }
 
