@@ -35,6 +35,8 @@ import elki.utilities.ELKIBuilder;
  * @author Erich Schubert
  */
 public class HACAMTest extends AbstractClusterAlgorithmTest {
+  // Note: there is an order dependence in this algorithm, because of frequent
+  // ties in two-element clusters.
   @Test
   public void testHACAM() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -42,8 +44,8 @@ public class HACAMTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, HACAM.class) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93998);
-    assertClusterSizes(clustering, new int[] { 200, 204, 234 });
+    assertFMeasure(db, clustering, 0.93866);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   @Test

@@ -20,8 +20,6 @@
  */
 package elki.clustering.hierarchical;
 
-import java.util.Arrays;
-
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -191,11 +189,10 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       this.mat = mat;
       this.builder = builder;
       this.end = size;
-
+      this.clusters = new Int2ObjectOpenHashMap<>(size);
       this.ix = ids.iter();
       this.iy = ids.iter();
       this.prots = prots;
-      this.clusters = new Int2ObjectOpenHashMap<>();
       this.tds = variant == Variant.MINIMUM_SUM_INCREASE ? new double[size] : null;
       this.dq = dq;
 
@@ -212,39 +209,6 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       }
       LOG.ensureCompleted(prog);
       return (ClusterPrototypeMergeHistory) builder.complete();
-    }
-
-    /**
-     * Initialize the NN cache.
-     * <p>
-     * TODO: why do we need this symmetric? Can we reuse super.initializatNNChache?
-     *
-     * @param scratch Scratch space
-     * @param bestd Best distance
-     * @param besti Best index
-     */
-    protected static void initializeNNCache(double[] scratch, double[] bestd, int[] besti) {
-      final int size = bestd.length;
-      Arrays.fill(bestd, Double.POSITIVE_INFINITY);
-      Arrays.fill(besti, -1);
-      for(int x = 1, p = 0; x < size; x++) {
-        assert p == ClusterDistanceMatrix.triangleSize(x);
-        double bestdx = Double.POSITIVE_INFINITY;
-        int bestix = -1;
-        for(int y = 0; y < x; y++, p++) {
-          final double v = scratch[p];
-          if(v < bestd[y]) {
-            bestd[y] = v;
-            besti[y] = x;
-          }
-          if(v < bestdx) {
-            bestdx = v;
-            bestix = y;
-          }
-        }
-        bestd[x] = bestdx;
-        besti[x] = bestix;
-      }
     }
 
     /**
@@ -320,7 +284,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       besti[x] = -1; // Deactivate x in cache
       updateMatrices(x, y);
       if(besti[y] == x) {
-        findBest(end, distances, bestd, besti, y);
+        findBest(distances, bestd, besti, y);
       }
     }
 
@@ -343,7 +307,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
           continue;
         }
         updateEntry(a, b);
-        updateCache(end, distances, bestd, besti, x, y, b, distances[yoffset + b]);
+        updateCache(distances, bestd, besti, x, y, b, distances[yoffset + b]);
       }
       // Update entries at (a,y) with a > y
       a = y + 1;
@@ -354,7 +318,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
           continue;
         }
         updateEntry(a, b);
-        updateCache(end, distances, bestd, besti, x, y, a, distances[ClusterDistanceMatrix.triangleSize(a) + y]);
+        updateCache(distances, bestd, besti, x, y, a, distances[ClusterDistanceMatrix.triangleSize(a) + y]);
       }
     }
 
@@ -482,70 +446,6 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
         }
       }
       return distsum;
-    }
-
-    /**
-     * Update the cache.
-     *
-     * @param size Working set size
-     * @param scratch Scratch matrix
-     * @param bestd Best distance
-     * @param besti Best index
-     * @param x First cluster
-     * @param y Second cluster, {@code y < x}
-     * @param j Updated value d(y, j)
-     * @param d New distance
-     */
-    private static void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
-      // New best
-      if(d <= bestd[j]) {
-        bestd[j] = d;
-        besti[j] = y;
-        return;
-      }
-      // Needs slow update.
-      if(besti[j] == x || besti[j] == y) {
-        findBest(size, scratch, bestd, besti, j);
-      }
-    }
-
-    /**
-     * Find the best in a row of the triangular matrix.
-     *
-     * @param size Working set size
-     * @param scratch Scratch matrix
-     * @param bestd Best distances cache
-     * @param besti Best indexes cache
-     * @param j Row to update
-     */
-    protected static void findBest(int size, double[] scratch, double[] bestd, int[] besti, int j) {
-      final int jbase = ClusterDistanceMatrix.triangleSize(j);
-      // The distance has increased, we may no longer be the best merge.
-      double bestdj = Double.POSITIVE_INFINITY;
-      int bestij = -1;
-      for(int i = 0, o = jbase; i < j; i++, o++) {
-        if(besti[i] < 0) {
-          continue;
-        }
-        final double dist = scratch[o];
-        if(dist < bestdj) {
-          bestdj = dist;
-          bestij = i;
-        }
-      }
-      for(int i = j + 1, o = jbase + j + j; i < size; o += i, i++) {
-        // assert(o == ClusterDistanceMatrix.triangleSize(i) + j);
-        if(besti[i] < 0) {
-          continue;
-        }
-        final double dist = scratch[o];
-        if(dist < bestdj) {
-          bestdj = dist;
-          bestij = i;
-        }
-      }
-      bestd[j] = bestdj;
-      besti[j] = bestij;
     }
   }
 
