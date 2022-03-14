@@ -228,9 +228,8 @@ public class ClusterMergeHistoryBuilder {
    * @param size Cluster size
    */
   public void setSize(int id, int size) {
-    assert id > ids.size();
-    assert csize[size - ids.size()] == size;
-    csize[size - ids.size()] = size;
+    assert id >= ids.size();
+    csize[id - ids.size()] = size;
   }
 
   /**
