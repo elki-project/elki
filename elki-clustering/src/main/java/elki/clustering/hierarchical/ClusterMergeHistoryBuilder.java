@@ -48,6 +48,11 @@ public class ClusterMergeHistoryBuilder {
   protected final ArrayDBIDs ids;
 
   /**
+   * The number of DBIDs.
+   */
+  final int n;
+
+  /**
    * Distance to the parent object.
    */
   protected double[] mergeDistance;
@@ -85,13 +90,30 @@ public class ClusterMergeHistoryBuilder {
   /**
    * Constructor.
    *
+   * @param ids empty id list
+   * @param n final number of entries
+   * @param isSquared Flag to indicate squared distances
+   */
+  public ClusterMergeHistoryBuilder(ArrayDBIDs ids, int n, boolean isSquared) {
+    super();
+    this.ids = ids;
+    this.n = n;
+    this.mergeDistance = new double[n - 1]; // n-1 merges
+    this.csize = new int[n - 1]; // n-1 merges
+    this.merges = new int[(n - 1) << 1]; // two values each merge
+    this.isSquared = isSquared;
+  }
+
+  /**
+   * Constructor.
+   *
    * @param ids IDs
    * @param isSquared Flag to indicate squared distances
    */
   public ClusterMergeHistoryBuilder(ArrayDBIDs ids, boolean isSquared) {
     super();
     this.ids = ids;
-    final int n = ids.size();
+    n = ids.size();
     this.mergeDistance = new double[n - 1]; // n-1 merges
     this.csize = new int[n - 1]; // n-1 merges
     this.merges = new int[(n - 1) << 1]; // two values each merge
@@ -113,9 +135,9 @@ public class ClusterMergeHistoryBuilder {
   public int add(int i, double dist, int j) {
     if(parent == null) {
       assert mergecount == 0;
-      parent = MathUtil.sequence(0, (ids.size() << 1) - 1);
+      parent = MathUtil.sequence(0, (n << 1) - 1);
     }
-    int t = mergecount + ids.size(); // next
+    int t = mergecount + n; // next
     // Follow i to its parent.
     for(int p = parent[i]; i != p;) {
       final int tmp = parent[p];
@@ -146,7 +168,6 @@ public class ClusterMergeHistoryBuilder {
    * @return
    */
   public int strictAdd(int source, double distance, int target) {
-    final int n = ids.size();
     assert source < n + mergecount && target < n + mergecount;
     assert prototypes == null;
     assert source != target;
@@ -168,7 +189,6 @@ public class ClusterMergeHistoryBuilder {
    * @retunr new cluster id
    */
   public int strictAdd(int source, double distance, int target, DBIDRef prototype) {
-    final int n = ids.size();
     if(mergecount == 0) {
       prototypes = DBIDUtil.newArray(n - 1);
     }
@@ -190,8 +210,8 @@ public class ClusterMergeHistoryBuilder {
    * @return Completed result
    */
   public ClusterMergeHistory complete() {
-    if(mergecount != ids.size() - 1) {
-      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
+    if(mergecount != n - 1) {
+      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (n - 1));
     }
     return prototypes != null ? //
         new ClusterPrototypeMergeHistory(ids, merges, mergeDistance, csize, isSquared, prototypes) : //
@@ -205,8 +225,8 @@ public class ClusterMergeHistoryBuilder {
    * @return Completed result.
    */
   public ClusterDensityMergeHistory complete(WritableDoubleDataStore coredists) {
-    if(mergecount != ids.size() - 1) {
-      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
+    if(mergecount != n - 1) {
+      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (n - 1));
     }
     return new ClusterDensityMergeHistory(ids, merges, mergeDistance, csize, isSquared, coredists);
   }
@@ -218,7 +238,7 @@ public class ClusterMergeHistoryBuilder {
    * @return Cluster size (initially 1).
    */
   public int getSize(int id) {
-    return id < ids.size() ? 1 : csize[id - ids.size()];
+    return id < n ? 1 : csize[id - n];
   }
 
   /**
@@ -228,9 +248,8 @@ public class ClusterMergeHistoryBuilder {
    * @param size Cluster size
    */
   public void setSize(int id, int size) {
-    assert id > ids.size();
-    assert csize[size - ids.size()] == size;
-    csize[size - ids.size()] = size;
+    assert id > n;
+    csize[id - n] = size;
   }
 
   /**
@@ -247,7 +266,7 @@ public class ClusterMergeHistoryBuilder {
     if(checkMonotone()) {
       return null; // No need to reorder
     }
-    final int m = mergecount, n = ids.size();
+    final int m = mergecount;
     double[] maxheight = mergeDistance.clone();
     // Max height in the subtree:
     for(int i = 0; i < m; i++) {

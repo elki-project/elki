@@ -20,6 +20,10 @@
  */
 package elki.clustering.hierarchical;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
+
+import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.GeometricLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.NumberVector;
@@ -28,7 +32,12 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.distance.CFDistance;
+import elki.index.tree.betula.distance.VarianceIncreaseDistance;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
@@ -57,24 +66,34 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Multidimensional Clustering Algorithms", //
     title = "Multidimensional Clustering Algorithms", //
     url = "http://www.multiresolutions.com/strule/MClA/")
-public class LinearMemoryNNChain<O extends NumberVector> implements HierarchicalClusteringAlgorithm {
+public class BetulaLinearMemoryNNChainCF implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(LinearMemoryNNChain.class);
+  private static final Logging LOG = Logging.getLogger(BetulaLinearMemoryNNChainCF.class);
 
   /**
-   * Linkage method.
+   * Distance function used.
    */
-  private GeometricLinkage linkage;
+  protected CFDistance distance;
+
+  /**
+   * CFTree factory.
+   */
+  CFTree.Factory<?> cffactory;
 
   /**
    * Constructor.
    *
-   * @param geomlinkage Linkage option
+   * @param distance Distance function to use
+   * @param linkage Linkage method
+   * @param
+   * @param
    */
-  public LinearMemoryNNChain(GeometricLinkage linkage) {
-    this.linkage = linkage;
+  public BetulaLinearMemoryNNChainCF(CFDistance distance, CFTree.Factory<?> cffactory) {
+    super();
+    this.distance = distance;
+    this.cffactory = cffactory;
   }
 
   /**
@@ -83,10 +102,30 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
    * @param relation Data to process
    * @return cluster merges
    */
-  public ClusterMergeHistory run(Relation<O> relation) {
-    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, true);
-    return new Instance<O>(linkage).run(ids, relation, builder);
+  public ClusterMergeHistory run(Relation<NumberVector> relation) {
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    CFTree<?> tree = cffactory.newTree(ids, relation, true);
+    ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
+
+    ArrayList<DBIDs> idList = new ArrayList<>();
+    double[] dists = new double[cfs.size()];
+    ListIterator<? extends ClusterFeature> lit = cfs.listIterator();
+    int i = 0;
+
+    ClusterFeature[] clusters = new ClusterFeature[cfs.size()];
+
+    while(lit.hasNext()) {
+      ClusterFeature cf = lit.next();
+      idList.add(tree.getDBIDs(cf));
+      dists[i] = cf.variance() / cf.getWeight();
+      clusters[i] = cf;
+      i++;
+    }
+
+    int[] clustermap = new int[cfs.size()];
+    ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, clustermap, false);
+
+    return new Instance(distance).run(clusters, clustermap, cmhb);
   }
 
   /**
@@ -96,34 +135,22 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
    * 
    * @param <O> vector type
    */
-  public static class Instance<O extends NumberVector> {
+  public static class Instance {
     /**
      * Linkage method.
      */
-    private GeometricLinkage linkage;
+    private CFDistance distance;
 
     /**
      * Constructor.
      *
      * @param linkage Linkage
      */
-    public Instance(GeometricLinkage linkage) {
-      this.linkage = linkage;
+    public Instance(CFDistance distance) {
+      this.distance = distance;
     }
 
-    public ClusterMergeHistory run(ArrayDBIDs ids, Relation<O> relation, ClusterMergeHistoryBuilder builder) {
-      DBIDArrayIter it = ids.iter();
-      final int size = relation.size();
-
-      // Instead of a distance matrix we have an array of points
-      double[][] clusters = new double[relation.size()][];
-      int t = 0;
-      for(it.seek(0); it.valid(); it.advance()) {
-        // TODO: can we avoid these copies with reasonable effort?
-        clusters[t++] = relation.get(it).toArray();
-      }
-
-      int[] clustermap = MathUtil.sequence(0, size);
+    public ClusterMergeHistory run(ClusterFeature[] clusters, int[] clustermap, ClusterMergeHistoryBuilder builder) {
 
       nnChainCore(clusters, clustermap, builder);
       builder.optimizeOrder();
@@ -137,7 +164,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
      * @param aIt2 Iterator to access relation objects
      * @param builder Result builder
      */
-    protected void nnChainCore(double[][] clusters, int[] clustermap, ClusterMergeHistoryBuilder builder) {
+    protected void nnChainCore(ClusterFeature[] clusters, int[] clustermap, ClusterMergeHistoryBuilder builder) {
       // The maximum chain size = number of ids + 1, but usually much less
       int size = clusters.length;
       IntegerArray chain = new IntegerArray(size << 1);
@@ -166,14 +193,12 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           chain.size -= 3;
         }
         // For ties, always prefer the second-last element b:
-        final int bSize = builder.getSize(b);
-        double minDist = linkage.distance(clusters[a], builder.getSize(a), clusters[b], bSize);
+        double minDist = distance.squaredDistance(clusters[a], clusters[b]);
         do {
-          final int aSize = builder.getSize(a);
           int c = b;
           for(int i = 0; i < a; i++) {
             if(i != b && clustermap[i] >= 0) {
-              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
+              double dist = distance.squaredDistance(clusters[a], clusters[i]);
               if(dist < minDist) {
                 minDist = dist;
                 c = i;
@@ -182,7 +207,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           }
           for(int i = a + 1; i < size; i++) {
             if(i != b && clustermap[i] >= 0) {
-              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
+              double dist = distance.squaredDistance(clusters[a], clusters[i]);
               if(dist < minDist) {
                 minDist = dist;
                 c = i;
@@ -201,7 +226,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           a = b;
           b = tmp;
         }
-        assert minDist == linkage.distance(clusters[a], builder.getSize(a), clusters[b], builder.getSize(b));
+        assert minDist == distance.squaredDistance(clusters[a], clusters[b]);
         merge(size, clusters, builder, clustermap, minDist, a, b);
         end = AGNES.Instance.shrinkActiveSet(clustermap, end, a);
         LOG.incrementProcessed(progress);
@@ -220,16 +245,16 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
      * @param x First matrix position
      * @param y Second matrix position
      */
-    protected void merge(int end, double[][] clusters, ClusterMergeHistoryBuilder builder, int[] clustermap, double mindist, int x, int y) {
+    protected void merge(int end, ClusterFeature[] clusters, ClusterMergeHistoryBuilder builder, int[] clustermap, double mindist, int x, int y) {
       assert x >= 0 && y >= 0;
       final int xx = clustermap[x], yy = clustermap[y];
       final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
-      int zz = builder.strictAdd(xx, linkage.restore(mindist, builder.isSquared), yy);
+      int zz = builder.strictAdd(xx, mindist, yy);
       assert builder.getSize(zz) == sizex + sizey;
       clustermap[y] = zz;
       clustermap[x] = -1; // deactivate
       // update the cluster center for y
-      clusters[y] = linkage.merge(clusters[x], sizex, clusters[y], sizey);
+      clusters[y].addToStatistics(clusters[x]);
     }
   }
 
@@ -240,34 +265,35 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
 
   /**
    * Parameterization class.
-   * 
-   * @author Robert Gehde
    *
-   * @hidden
-   *
-   * @param <O> Object type
+   * @author Andreas Lang
    */
-  public static class Par<O extends NumberVector> implements Parameterizer {
+  public static class Par implements Parameterizer {
     /**
-     * Linkage to use.
+     * Ignore cluster weights (naive approach)
      */
-    public static final OptionID LINKAGE_ID = AGNES.Par.LINKAGE_ID;
+    public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
 
     /**
-     * geometric linkage parameter.
+     * The distance function to use.
      */
-    protected GeometricLinkage linkage = WardLinkage.STATIC;
+    protected CFDistance distance;
+
+    /**
+     * CFTree factory.
+     */
+    CFTree.Factory<?> cffactory;
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<GeometricLinkage>(LINKAGE_ID, GeometricLinkage.class) //
-          .setDefaultValue(WardLinkage.class) //
-          .grab(config, x -> linkage = x);
+      cffactory = config.tryInstantiate(CFTree.Factory.class);
+      new ObjectParameter<CFDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, CFDistance.class, VarianceIncreaseDistance.class) //
+          .grab(config, x -> distance = x);
     }
 
     @Override
-    public LinearMemoryNNChain<O> make() {
-      return new LinearMemoryNNChain<>(linkage);
+    public BetulaLinearMemoryNNChainCF make() {
+      return new BetulaLinearMemoryNNChainCF(distance, cffactory);
     }
   }
 }
