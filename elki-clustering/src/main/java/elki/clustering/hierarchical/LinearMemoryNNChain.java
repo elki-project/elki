@@ -153,9 +153,8 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
         else {
           // Chain is expected to look like (.... a, b, c, b) with b and c
           // merged.
-          int lastIndex = chain.size;
-          a = chain.get(lastIndex - 2);
-          b = chain.get(lastIndex - 1);
+          a = chain.get(chain.size - 2);
+          b = chain.get(chain.size - 1);
           assert clustermap[b] >= 0;
           if(clustermap[a] < 0) {
             if(!warnedIrreducible) {

@@ -117,35 +117,40 @@ public class NNChain<O> extends AGNES<O> {
      * algorithms" by Daniel Müllner.
      */
     private void nnChainCore() {
-      final double[] distances = mat.matrix;
       final int size = mat.size;
+      boolean warnedIrreducible = false;
+      final double[] distances = mat.matrix;
+      final int[] clustermap = mat.clustermap;
       // The maximum chain size = number of ids + 1, but usually much less
       IntegerArray chain = new IntegerArray(size >> 2);
 
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
       for(int k = 1; k < size; k++) {
         int a = -1, b = -1;
-        if(chain.size() <= 3) {
+        if(chain.size() < 2) {
           // Accessing two arbitrary not yet merged elements could be optimized
           // to work in O(1) like in Müllner; however this usually does not have
           // a huge impact (empirically just about 1/5000 of total performance)
-          a = findUnlinked(0, end, mat.clustermap);
-          b = findUnlinked(a + 1, end, mat.clustermap);
+          a = findUnlinked(0, end, clustermap);
+          b = findUnlinked(a + 1, end, clustermap);
+          assert clustermap[a] >= 0 && clustermap[b] >= 0;
           chain.clear();
           chain.add(a);
         }
         else {
-          // Chain is expected to be (.... a, b, c, b) with b and c merged
-          int lastIndex = chain.size;
-          int c = chain.get(lastIndex - 2);
-          b = chain.get(lastIndex - 3);
-          a = chain.get(lastIndex - 4);
-          // Ensure we had a loop at the end:
-          assert chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b;
-          // if c < b, then we merged b -> c, otherwise c -> b
-          b = c < b ? c : b;
-          // Cut the tail:
-          chain.size -= 3;
+          a = chain.get(chain.size - 2);
+          b = chain.get(chain.size - 1);
+          assert clustermap[b] >= 0;
+          if(clustermap[a] < 0) {
+            if(!warnedIrreducible) {
+              LOG.warning("Detected an inversion in the clustering. NNChain on irreducible linkages may yield different results.");
+              warnedIrreducible = true;
+            }
+            chain.size -= 2; // cut the chain
+            k--; // retry
+            continue;
+          }
+          chain.size--; // Remove b
         }
         // For ties, always prefer the second-last element b:
         double minDist = mat.get(a, b);
@@ -153,7 +158,7 @@ public class NNChain<O> extends AGNES<O> {
           int c = b;
           final int ta = ClusterDistanceMatrix.triangleSize(a);
           for(int i = 0; i < a; i++) {
-            if(i != b && mat.clustermap[i] >= 0) {
+            if(i != b && clustermap[i] >= 0) {
               double dist = distances[ta + i];
               if(dist < minDist) {
                 minDist = dist;
@@ -162,7 +167,7 @@ public class NNChain<O> extends AGNES<O> {
             }
           }
           for(int i = a + 1; i < end; i++) {
-            if(i != b && mat.clustermap[i] >= 0) {
+            if(i != b && clustermap[i] >= 0) {
               double dist = distances[ClusterDistanceMatrix.triangleSize(i) + a];
               if(dist < minDist) {
                 minDist = dist;
@@ -184,7 +189,9 @@ public class NNChain<O> extends AGNES<O> {
         }
         assert minDist == mat.get(a, b);
         merge(minDist, a, b);
-        end = shrinkActiveSet(mat.clustermap, end, a); // shrink working set
+        chain.size -= 3;
+        chain.add(b);
+        end = shrinkActiveSet(clustermap, end, a); // shrink working set
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);
