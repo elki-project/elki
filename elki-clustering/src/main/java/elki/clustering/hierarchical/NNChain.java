@@ -161,7 +161,7 @@ public class NNChain<O> extends AGNES<O> {
               }
             }
           }
-          for(int i = a + 1; i < size; i++) {
+          for(int i = a + 1; i < end; i++) {
             if(i != b && mat.clustermap[i] >= 0) {
               double dist = distances[ClusterDistanceMatrix.triangleSize(i) + a];
               if(dist < minDist) {

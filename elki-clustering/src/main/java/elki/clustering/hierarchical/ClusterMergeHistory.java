@@ -106,7 +106,7 @@ public class ClusterMergeHistory {
    * @return Value
    */
   public DBIDVar assignVar(int i, DBIDVar var) {
-    assert i < ids.size() : "Can only assign the first N singleton clusters.";
+    assert i >= 0 && i < ids.size() : "Can only assign the first N singleton clusters.";
     return ids.assignVar(i, var);
   }
 

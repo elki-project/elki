@@ -127,6 +127,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
      */
     private void nnChainCore(DBIDArrayIter aIt, DBIDArrayIter aIt2, ClusterMergeHistoryBuilder builder, Relation<O> rel) {
       final int size = rel.size();
+      boolean warnedIrreducible = false;
       // The maximum chain size = number of ids + 1, but usually much less
       IntegerArray chain = new IntegerArray(size << 1);
       int[] clustermap = MathUtil.sequence(0, size);
@@ -142,9 +143,10 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running LinearMemoryNNChain", size - 1, LOG) : null;
       for(int k = 1, end = size; k < size; k++) {
         int a = -1, b = -1;
-        if(chain.size() <= 3) {
+        if(chain.size() < 2) {
           a = NNChain.Instance.findUnlinked(0, end, clustermap);
           b = NNChain.Instance.findUnlinked(a + 1, end, clustermap);
+          assert clustermap[a] >= 0 && clustermap[b] >= 0;
           chain.clear();
           chain.add(a);
         }
@@ -152,15 +154,19 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           // Chain is expected to look like (.... a, b, c, b) with b and c
           // merged.
           int lastIndex = chain.size;
-          int c = chain.get(lastIndex - 2);
-          b = chain.get(lastIndex - 3);
-          a = chain.get(lastIndex - 4);
-          // Ensure we had a loop at the end:
-          assert chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b;
-          // if c < b, then we merged b -> c, otherwise c -> b
-          b = c < b ? c : b;
-          // Cut the tail:
-          chain.size -= 3;
+          a = chain.get(lastIndex - 2);
+          b = chain.get(lastIndex - 1);
+          assert clustermap[b] >= 0;
+          if(clustermap[a] < 0) {
+            if(!warnedIrreducible) {
+              LOG.warning("Detected an inversion in the clustering. NNChain on irreducible linkages may yield different results.");
+              warnedIrreducible = true;
+            }
+            chain.size -= 2; // cut the chain
+            k--; // retry
+            continue;
+          }
+          chain.size--; // Remove b
         }
         // For ties, always prefer the second-last element b:
         final int bSize = builder.getSize(b);
@@ -168,17 +174,8 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
         do {
           final int aSize = builder.getSize(a);
           int c = b;
-          for(int i = 0; i < a; i++) {
-            if(i != b && clustermap[i] >= 0) {
-              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
-              if(dist < minDist) {
-                minDist = dist;
-                c = i;
-              }
-            }
-          }
-          for(int i = a + 1; i < size; i++) {
-            if(i != b && clustermap[i] >= 0) {
+          for(int i = 0; i < end; i++) {
+            if(i != a && i != b && clustermap[i] >= 0) {
               double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
               if(dist < minDist) {
                 minDist = dist;
@@ -201,6 +198,8 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
         assert minDist == linkage.distance(clusters[a], builder.getSize(a), clusters[b], builder.getSize(b));
         merge(size, clusters, builder, clustermap, minDist, a, b);
         end = AGNES.Instance.shrinkActiveSet(clustermap, end, a);
+        chain.size -= 3;
+        chain.add(b);
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);

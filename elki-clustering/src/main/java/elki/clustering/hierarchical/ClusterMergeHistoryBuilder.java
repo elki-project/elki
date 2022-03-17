@@ -147,6 +147,7 @@ public class ClusterMergeHistoryBuilder {
    */
   public int strictAdd(int source, double distance, int target) {
     final int n = ids.size();
+    assert source >= 0 && target >= 0;
     assert source < n + mergecount && target < n + mergecount;
     assert prototypes == null;
     assert source != target;
@@ -172,6 +173,7 @@ public class ClusterMergeHistoryBuilder {
     if(mergecount == 0) {
       prototypes = DBIDUtil.newArray(n - 1);
     }
+    assert source >= 0 && target >= 0;
     assert source < n + mergecount && target < n + mergecount;
     assert prototypes != null;
     assert source != target;
@@ -247,22 +249,14 @@ public class ClusterMergeHistoryBuilder {
       return null; // No need to reorder
     }
     final int m = mergecount, n = ids.size();
-    double[] maxheight = mergeDistance.clone();
-    // Max height in the subtree:
-    for(int i = 0; i < m; i++) {
-      int a = merges[i << 1] - n, b = merges[(i << 1) + 1] - n;
-      double h = maxheight[i];
-      double ha = a >= 0 ? maxheight[a] : h, hb = b >= 0 ? maxheight[b] : h;
-      maxheight[i] = ha > hb ? (ha > h ? ha : h) : (hb > h ? hb : h);
-    }
     int[] o1 = MathUtil.sequence(0, m);
     // Sort by max height, merge height, merge number:
     IntegerArrayQuickSort.sort(o1, (a, b) -> {
-      final double ha = maxheight[a], hb = maxheight[b];
-      if(ha < hb) {
+      final int sa = csize[a], sb = csize[b];
+      if(sa < sb) {
         return -1;
       }
-      if(ha > hb) {
+      if(sa > sb) {
         return 1;
       }
       final double da = mergeDistance[a], db = mergeDistance[b];
