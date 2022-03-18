@@ -26,7 +26,6 @@ import java.util.ListIterator;
 
 import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.GeometricLinkage;
-import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;

@@ -145,8 +145,22 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
         ClusterDistanceMatrix mat = initializeDistanceMatrix(cfs, distance);
         ClusterMergeHistoryBuilder cmhb = initializeHistoryBuilder(idList, relation.size(), dists, mat.clustermap, ignoreWeight);
         ClusterMergeHistory res = new Anderberg.Instance(linkage).run(mat, cmhb);
+        if(ignoreWeight) {
+            fixCount(cmhb);
+        }
         return res;
 
+    }
+
+    protected static void fixCount(ClusterMergeHistoryBuilder cmhb) {
+
+        int m = cmhb.mergecount;
+        int n = m + 1;
+        for(int i = 0; i < m; i++) {
+            int a = cmhb.merges[i << 1];
+            int b = cmhb.merges[(i << 1) + 1];
+            cmhb.setSize(n + i, cmhb.getSize(a) + cmhb.getSize(b));
+        }
     }
 
     protected static ClusterMergeHistoryBuilder initializeHistoryBuilder(ArrayList<DBIDs> idList, int n, double[] dists, int[] clustermap, boolean ignoreWeight) {
