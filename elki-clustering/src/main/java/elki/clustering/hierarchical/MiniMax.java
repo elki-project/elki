@@ -112,7 +112,8 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Initializes the inter-cluster distance matrix of possible merges
    * 
-   * @param mat Matrix
+   * @param ids Object ids
+   * @param prots Prototype storage
    * @param dq The distance query
    * @return mat Cluster distance matrix
    */
