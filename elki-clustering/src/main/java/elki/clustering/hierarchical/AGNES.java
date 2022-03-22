@@ -155,7 +155,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Initialize a distance matrix.
    *
-   * @param mat Matrix
+   * @param ids Object ids
    * @param dq Distance query
    * @param linkage Linkage method
    * @return cluster distance matrix
@@ -300,7 +300,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     /**
      * Update the scratch distance matrix.
      *
-     * @param mat Matrix view
+     * @param mindist Minimum distance
      * @param x First matrix position
      * @param y Second matrix position
      * @param sizex Old size of first cluster

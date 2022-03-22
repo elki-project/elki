@@ -71,7 +71,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
   /**
    * Constructor.
    *
-   * @param geomlinkage Linkage option
+   * @param linkage Linkage option
    */
   public LinearMemoryNNChain(GeometricLinkage linkage) {
     this.linkage = linkage;
