@@ -21,7 +21,6 @@
 package elki.clustering.hierarchical.extraction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import elki.Algorithm;
@@ -41,10 +40,8 @@ import elki.database.Database;
 import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
-import elki.math.PearsonCorrelation;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.io.FormatUtil;
@@ -222,12 +219,16 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       WritableDoubleDataStore epsilonMaxCi = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1.);
       WritableDoubleDataStore gloshScores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
 
-      int size, matrixSize;
-      size = matrixSize = this.relation.size();
-      matrixSize *= (matrixSize - 1);
-      matrixSize /= 2;
-      double[] copheneticMatrix = new double[matrixSize];
-      Arrays.fill(copheneticMatrix, -1.);
+//      int size;
+//      long matrixSize;
+//      size = this.relation.size();
+//      matrixSize = this.relation.size();
+//      matrixSize *= (matrixSize - 1);
+//      matrixSize /= 2;
+//      float[] copheneticMatrix = new float[(int) matrixSize];
+//      Arrays.fill(copheneticMatrix, -1.f);
+//      float[] copheneticMatrixB = new float[(int) matrixSize];
+//      Arrays.fill(copheneticMatrixB, -1.f);
 
       DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
       // Perform one join at a time, in increasing order
@@ -269,26 +270,38 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
         final TempCluster nclus; // Resulting cluster.
         if(!oSpurious && !cSpurious) {
-          {
-            ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-            membersOClus.addDBIDs(oclus.members);
-            for(TempCluster child : oclus.children) {
-              collectChildrens(membersOClus, child);
-            }
-            
-            ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-            membersCClus.addDBIDs(cclus.members);
-            for(TempCluster child : cclus.children) {
-              collectChildrens(membersCClus, child);
-            }
-            
-            for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-              for(DBIDMIter innerIt = membersCClus.iter(); innerIt.valid(); innerIt.advance()) {
-                int position = position(it, innerIt, size);
-                copheneticMatrix[position] = dist;
-              }
-            }
-          }
+//          {
+//            ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+//            membersOClus.addDBIDs(oclus.members);
+//            for(TempCluster child : oclus.children) {
+//              collectChildrens(membersOClus, child);
+//            }
+//
+//            ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+//            membersCClus.addDBIDs(cclus.members);
+//            for(TempCluster child : cclus.children) {
+//              collectChildrens(membersCClus, child);
+//            }
+//
+//            double minDist = Double.MAX_VALUE;
+//            int i = 0;
+//            int[] indices = new int[membersOClus.size() * membersCClus.size()];
+//            for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+//              for(DBIDMIter innerIt = membersCClus.iter(); innerIt.valid(); innerIt.advance()) {
+//                int position = position(it, innerIt, size);
+//                copheneticMatrix[position] = (float) dist;
+//
+//                double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
+//                if(distance < minDist) {
+//                  minDist = distance;
+//                }
+//                indices[i++] = position;
+//              }
+//            }
+//            for(int indice : indices) {
+//              copheneticMatrixB[indice] = (float) minDist;
+//            }
+//          }
           // Full merge: both not spurious, new parent.
           cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
           oclus = oclus != null ? oclus : new TempCluster(odist, olead);
@@ -306,27 +319,51 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
-            {
-              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-              membersOClus.addDBIDs(oclus.members);
-              for(TempCluster child : oclus.children) {
-                collectChildrens(membersOClus, child);
-              }
-              if(cclus == null) {
-                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-                  int position = position(clead, it, size);
-                  copheneticMatrix[position] = dist;
-                }
-              }
-              else {
-                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-                    int position = position(it, innerIt, size);
-                    copheneticMatrix[position] = dist;
-                  }
-                }
-              }
-            }
+//            {
+//              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+//              membersOClus.addDBIDs(oclus.members);
+//              for(TempCluster child : oclus.children) {
+//                collectChildrens(membersOClus, child);
+//              }
+//              if(cclus == null) {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersOClus.size()];
+//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+//                  int position = position(clead, it, size);
+//                  copheneticMatrix[position] = (float) dist;
+//
+//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(clead));
+//                  if(distance < minDist) {
+//                    minDist = distance;
+//                  }
+//                  indices[i++] = position;
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//              else {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersOClus.size() * cclus.members.size()];
+//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+//                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+//                    int position = position(it, innerIt, size);
+//                    copheneticMatrix[position] = (float) dist;
+//
+//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
+//                    if(distance < minDist) {
+//                      minDist = distance;
+//                    }
+//                    indices[i++] = position;
+//                  }
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//            }
 
             nclus = oclus.grow(dist, cclus, clead);
             if(cclus == null) {
@@ -334,27 +371,52 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
             }
           }
           else if(!cSpurious && cclus != null) {
-            {
-              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-              membersCClus.addDBIDs(cclus.members);
-              for(TempCluster child : cclus.children) {
-                collectChildrens(membersCClus, child);
-              }
-              if(oclus == null) {
-                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-                  int position = position(olead, it, size);
-                  copheneticMatrix[position] = dist;
-                }
-              } else {
-                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-                  for(DBIDMIter innerIt = oclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-                    int position = position(it, innerIt, size);
-                    copheneticMatrix[position] = dist;
-                  }
-                }
-              }
-            }
-            
+//            {
+//              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+//              membersCClus.addDBIDs(cclus.members);
+//              for(TempCluster child : cclus.children) {
+//                collectChildrens(membersCClus, child);
+//              }
+//              if(oclus == null) {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersCClus.size()];
+//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+//                  int position = position(olead, it, size);
+//                  copheneticMatrix[position] = (float) dist;
+//
+//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(olead));
+//                  if(distance < minDist) {
+//                    minDist = distance;
+//                  }
+//                  indices[i++] = position;
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//              else {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersCClus.size() * oclus.members.size()];
+//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+//                  for(DBIDMIter innerIt = oclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+//                    int position = position(it, innerIt, size);
+//                    copheneticMatrix[position] = (float) dist;
+//
+//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
+//                    if(distance < minDist) {
+//                      minDist = distance;
+//                    }
+//                    indices[i++] = position;
+//                  }
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//            }
+
             nclus = cclus.grow(dist, oclus, olead);
             if(epsilonMaxCi.doubleValue(olead) == -1.) {
               epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
@@ -366,48 +428,84 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           }
           // Then recycle, but reset
           else if(oclus != null) {
-            {
-              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-              membersOClus.addDBIDs(oclus.members);
-              for(TempCluster child : oclus.children) {
-                collectChildrens(membersOClus, child);
-              }
-              if(cclus == null) {
-                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-                  int position = position(clead, it, size);
-                  copheneticMatrix[position] = dist;
-                }
-              }
-              else {
-                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-                    int position = position(it, innerIt, size);
-                    copheneticMatrix[position] = dist;
-                  }
-                }
-              }
-            }
-            
+//            {
+//              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
+//              membersOClus.addDBIDs(oclus.members);
+//              for(TempCluster child : oclus.children) {
+//                collectChildrens(membersOClus, child);
+//              }
+//              if(cclus == null) {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersOClus.size()];
+//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+//                  int position = position(clead, it, size);
+//                  copheneticMatrix[position] = (float) dist;
+//
+//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(clead));
+//                  if(distance < minDist) {
+//                    minDist = distance;
+//                  }
+//                  indices[i++] = position;
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//              else {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersOClus.size() * cclus.members.size()];
+//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
+//                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
+//                    int position = position(it, innerIt, size);
+//                    copheneticMatrix[position] = (float) dist;
+//
+//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
+//                    if(distance < minDist) {
+//                      minDist = distance;
+//                    }
+//                    indices[i++] = position;
+//                  }
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//            }
+
             nclus = oclus.grow(dist, cclus, clead).resetAggregate();
             if(cclus == null) {
               gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
             }
           }
           else if(cclus != null) {
-            {
-              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-              membersCClus.addDBIDs(cclus.members);
-              for(TempCluster child : cclus.children) {
-                collectChildrens(membersCClus, child);
-              }
-              if(oclus == null) {
-                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-                  int position = position(olead, it, size);
-                  copheneticMatrix[position] = dist;
-                }
-              }
-            }
-            
+//            {
+//              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
+//              membersCClus.addDBIDs(cclus.members);
+//              for(TempCluster child : cclus.children) {
+//                collectChildrens(membersCClus, child);
+//              }
+//              if(oclus == null) {
+//                double minDist = Double.MAX_VALUE;
+//                int i = 0;
+//                int[] indices = new int[membersCClus.size()];
+//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
+//                  int position = position(olead, it, size);
+//                  copheneticMatrix[position] = (float) dist;
+//
+//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(olead));
+//                  if(distance < minDist) {
+//                    minDist = distance;
+//                  }
+//                  indices[i++] = position;
+//                }
+//                for(int indice : indices) {
+//                  copheneticMatrixB[indice] = (float) minDist;
+//                }
+//              }
+//            }
+
             nclus = cclus.grow(dist, oclus, olead).resetAggregate();
             if(epsilonMaxCi.doubleValue(olead) == -1.) {
               epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
@@ -420,11 +518,13 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           }
           // Last option: a new 2-element cluster.
           else {
-            {
-              int position = position(clead, olead, size);
-              copheneticMatrix[position] = dist;
-            }
-            
+//            {
+//              int position = position(clead, olead, size);
+////              copheneticMatrix[position] = (float) dist;
+//
+//              copheneticMatrixB[position] = (float) EuclideanDistance.STATIC.distance(relation.get(clead), relation.get(olead));
+//            }
+
             nclus = new TempCluster(dist, clead, olead);
             gloshScores.put(clead, 0.);
             gloshScores.put(olead, 0.);
@@ -450,9 +550,9 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         finalizeCluster(clus, dendrogram, nclus, false);
       }
 
-      {
-        computeCCC(copheneticMatrix);
-      }
+//      {
+//        computeCCC(copheneticMatrix, copheneticMatrixB);
+//      }
 
       // Store GLOSH scores
       Metadata.hierarchyOf(dendrogram).addChild(gloshScores);
@@ -460,53 +560,62 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       return dendrogram;
     }
 
-    private void collectChildrens(ModifiableDBIDs members, TempCluster cur) {
-      members.addDBIDs(cur.members);
-      for(TempCluster child : cur.children) {
-        collectChildrens(members, child);
-      }
-    }
+//    private void collectChildrens(ModifiableDBIDs members, TempCluster cur) {
+//      members.addDBIDs(cur.members);
+//      for(TempCluster child : cur.children) {
+//        collectChildrens(members, child);
+//      }
+//    }
 
-    private int position(DBIDRef a, DBIDRef b, int size) {
-      int i, j;
-      if(DBIDUtil.compare(a, b) < 0) {
-        i = DBIDUtil.asInteger(a);
-        j = DBIDUtil.asInteger(b);
-      }
-      else {
-        i = DBIDUtil.asInteger(b);
-        j = DBIDUtil.asInteger(a);
-      }
-      j = j - i;
-      i -= 1;
-      i = (i * (size - 1)) - (i * (i - 1) / 2);
-      i += j;
-      return i - 1; // zero-based
-    }
+//    private int position(DBIDRef a, DBIDRef b, int size) {
+//      long i, j;
+//      if(DBIDUtil.compare(a, b) < 0) {
+//        i = DBIDUtil.asInteger(a);
+//        j = DBIDUtil.asInteger(b);
+//      }
+//      else {
+//        i = DBIDUtil.asInteger(b);
+//        j = DBIDUtil.asInteger(a);
+//      }
+//      j = j - i;
+//      i -= 1;
+//      i = (i * (size - 1)) - (i * (i - 1) / 2);
+//      i += j;
+//      return (int) (i - 1); // zero-based
+//    }
 
-    private void computeCCC(double[] copheneticMatrix) {
-      int size, matrixSize;
-      size = matrixSize = this.relation.size();
-      matrixSize *= (matrixSize - 1);
-      matrixSize /= 2;
-
-      double[] distanceMatrix = new double[matrixSize];
-      DBIDArrayIter iter = DBIDUtil.newArray(relation.getDBIDs()).iter();
-      DBIDArrayIter innerIter = DBIDUtil.newArray(relation.getDBIDs()).iter();
-      int position = 0;
-      for(; iter.getOffset() < size - 1; iter.advance()) {
-        NumberVector first = relation.get(iter);
-        for(innerIter.seek(iter.getOffset() + 1); innerIter.valid(); innerIter.advance()) {
-          NumberVector second = relation.get(innerIter);
-          distanceMatrix[position++] = EuclideanDistance.STATIC.distance(first, second);
-        }
-      }
-      PearsonCorrelation corr = new PearsonCorrelation();
-      for(int i=0; i<matrixSize; i++) {
-        corr.put(distanceMatrix[i], copheneticMatrix[i]);
-      }
-      System.out.println("cophenetic correlation coefficient: " + corr.getCorrelation());
-    }
+//    private void computeCCC(float[] copheneticMatrix, float[] copheneticMatrixB) {
+//      int size;
+//      long matrixSize;
+//      size = this.relation.size();
+//      matrixSize = this.relation.size();
+//      matrixSize *= (matrixSize - 1);
+//      matrixSize /= 2;
+//
+//      double[] distanceMatrix = new double[(int) matrixSize];
+//      DBIDArrayIter iter = DBIDUtil.newArray(relation.getDBIDs()).iter();
+//      DBIDArrayIter innerIter = DBIDUtil.newArray(relation.getDBIDs()).iter();
+//      int position = 0;
+//      for(; iter.getOffset() < size - 1; iter.advance()) {
+//        NumberVector first = relation.get(iter);
+//        for(innerIter.seek(iter.getOffset() + 1); innerIter.valid(); innerIter.advance()) {
+//          NumberVector second = relation.get(innerIter);
+//          distanceMatrix[position++] = EuclideanDistance.STATIC.distance(first, second);
+//        }
+//      }
+//      PearsonCorrelation corr = new PearsonCorrelation();
+//      for(int i = 0; i < matrixSize; i++) {
+//        corr.put(distanceMatrix[i], copheneticMatrix[i]);
+//      }
+//      double r = corr.getCorrelation();
+//      System.out.println("cophenetic correlation coefficient: " + r + ", p-value: " + 2 * BetaDistribution.cdf((0.5 * (1 - FastMath.abs(r))), (matrixSize / 2 - 1), (matrixSize / 2 - 1)));
+////      corr.reset();
+////      for(int i = 0; i < matrixSize; i++) {
+////        corr.put(distanceMatrix[i], copheneticMatrixB[i]);
+////      }
+////      r = corr.getCorrelation();
+////      System.out.println("cophenetic correlation coefficient - minimum distance: " + r + ", p-value: " + 2 * BetaDistribution.cdf((0.5 * (1 - FastMath.abs(r))), (matrixSize / 2 - 1), (matrixSize / 2 - 1)));
+//    }
 
     /**
      * Spurious, also for non-materialized clusters.
