@@ -20,6 +20,8 @@
  */
 package elki.math.linearalgebra;
 
+import java.util.Arrays;
+
 import elki.math.linearalgebra.pca.EigenPair;
 import elki.utilities.datastructures.BitsUtil;
 import elki.utilities.documentation.Reference;
@@ -89,6 +91,7 @@ public class LOBPCG {
     }
     // INITS
     final int m = x[0].length;
+
     // mats in R^nxm = R^dxm
     double[][] w = new double[d][m], p = new double[d][m], c = new double[d][m],
         ax = new double[d][m], aw = new double[d][m], ap = new double[d][m];
@@ -105,7 +108,7 @@ public class LOBPCG {
     // check if conditions are given and create necessary mats (lxm)
     int l = (y != null && y.length > 0) ? y[0].length : 0;
     double[][] lm = l > 0 ? new double[l][m] : null;
-
+    boolean reinit = false;
     // CALCULATION
     // apply constraints to x
     double[][] yty = null;
@@ -120,7 +123,13 @@ public class LOBPCG {
     }
 
     // b orthonormalize x
-    r = orthonormalize(x, r, null);
+    try {
+      r = orthonormalize(x, r, null);
+    }
+    catch(ArithmeticException arie) {
+      System.out.println("critical error; input x singular!");
+    }
+
     // update ax
     adapter.ax(x, ax);
 
@@ -139,17 +148,17 @@ public class LOBPCG {
     // flags for resizing r,gramA/B
     boolean reinitR = true, reinitGram = true;
     // iterate up to maxit times
-    for(int i = 0; i < maxiterations; i++) {
+    int i = 0;
+    for(; i < maxiterations; i++) {
       // compute the residuals
       w = reducedMinusReducedTimesDiagReduced(ax, x, lambdadiag, w, indices);
+
       // Exclude from the index set J the indices that correspond to residual
       // vectors for which the norm has become smaller than the tolerance.
       // If J, then becomes empty; exit loop.
       for(int j = BitsUtil.nextSetBit(indices, 0); j != -1; j = BitsUtil.nextSetBit(indices, j + 1)) {
         if(BitsUtil.get(indices, j)) {
-          // FIXME: unnötige Kopie, dot-produkt direkt berechnen:
-          double[] wj = VMath.getCol(w, j);
-          if(VMath.dot(wj, wj) < threshold) {
+          if(Math.sqrt(directdot(x, j, w, j)) < threshold) {
             BitsUtil.clearI(indices, j);
             cursize--;
             reinitR = reinitGram = true;
@@ -163,10 +172,8 @@ public class LOBPCG {
         r = new double[cursize][cursize];
         reinitR = false;
       }
-
       // apply preconditioner to residuals W
       w = adapter.txReduced(w, w, indices);
-
       // apply the constraints to the preconditioned residuals W
       if(l != 0) {
         // yty contains inv(t(y) * y)
@@ -178,20 +185,23 @@ public class LOBPCG {
       // compute BW_j and b orthonormalize w_j
       // VMath.normalizeColumns(w);
       r = orthonormalize(w, r, indices);
-
       // compute aw_j
       aw = adapter.axReduced(w, aw, indices);
-      if(i > 0) {
-        // b-orthonormalize p_j
-        // VMath.normalizeColumns(p);
-        r = orthonormalize(p, r, indices);
-        // update ap
-        reducedTimesCompactEqualsFirstReduced(ap, r, indices);
-      }
 
+      if(i > 0 && !reinit) {
+        // b-orthonormalize p_j
+        try {
+          r = orthonormalize(p, r, indices);
+          // update ap
+          reducedTimesCompactEqualsFirstReduced(ap, r, indices);
+        }
+        catch(ArithmeticException arith) {
+          reinit = true;
+        }
+      }
       // PERFORM RAYLEIGH RITZ METHOD
-      // specify the initial gram matrix and set reinit gram 2 for 2nd iteration
-      if(i == 0) {
+      // specify the initial gram matrix
+      if(i == 0 || reinit) {
         final int gramsize = m + cursize;
         gramA = new double[gramsize][gramsize];
         gramB = new double[gramsize][gramsize];
@@ -205,60 +215,64 @@ public class LOBPCG {
       }
 
       // compute symmetric gram matrices
-      buildGramMatrices(gramA, gramB, lambdadiag, x, w, aw, p, ap, i, cursize, indices);
+      buildGramMatrices(gramA, gramB, lambdadiag, x, ax, w, aw, p, ap, reinit ? 0 : i, cursize, indices);
 
       // solve generalized eigenvalue problem
-      // TODO: this calculates 3m eigenpairs, but we only need m
-      // It could be done with Lanczos, but when i tried it i got alot of random
-      // values, probably because my implementation was faulty or unstable.
-      // As the other implementation uses a complete decomposition as well, I
-      // would keep this for now until all errors are resolved
-
+      // TODO: This way of solving the Eigenvalues is currently the main issue.
+      // With higher accuracy gramB becomes singular and thus cannot be
+      // inverted. A different method is needed to solve this directly
       double[][] t = VMath.times(VMath.inverse(gramB), gramA);
-      // LanczosEigenvalue laneig = new LanczosEigenvalue(t,m);
-      // c = laneig.eigv;
-      // System.arraycopy(laneig.lambda, 0, lambdadiag, 0, m);
+
       eigen = new EigenvalueDecomposition(t);
       c = eigen.getV();
       System.arraycopy(eigen.getRealEigenvalues(), 0, lambdadiag, 0, m);
 
       // compute Ritz vectors
-      if(i > 0) {
+      if(i > 0 && !reinit) {
         // partition c into ... according to number of columns in x,w_j and p_j
         // ....| cx | m x m
         // c = | cw | j x m
         // ....| cp | j x m
         partition(c, cx, cw, cp, indices, cursize, m);
+
         // update p, ap
         p = reducedTimesPlusReducedTimesEqualsSecond(w, cw, p, cp, indices);
         ap = reducedTimesPlusReducedTimesEqualsSecond(aw, cw, ap, cp, indices);
+
         // update x, ax
         timesPlusEqualsFirst(x, cx, p);
         timesPlusEqualsFirst(ax, cx, ap);
       }
       else {
+        reinit = false;
         // partition c into ... according to number of columns in x and w_j
         // ....| cx |
         // c = | cw |
         partition(c, cx, cw, indices, cursize, m);
+
         // update p, ap
         reducedTimesRowReduced(w, cw, p, indices);
         reducedTimesRowReduced(aw, cw, ap, indices);
+
         // update x, ax
         timesPlusEqualsFirst(x, cx, p);
         timesPlusEqualsFirst(ax, cx, ap);
       }
     }
+//    System.out.println("Number of iterations: " + i);
     // return the eigenvectors X and the eigenvalues lambda.
     EigenPair[] res = new EigenPair[m];
-    for(int i = 0; i < m; i++) {
-      res[i] = new EigenPair(VMath.getCol(x, i), lambdadiag[i]);
+    for(int t = 0; t < m; t++) {
+      res[t] = new EigenPair(VMath.getCol(x, t), lambdadiag[t]);
     }
     return res;
   }
 
   /**
    * builds the gram matrices from the given matrices
+   * 
+   * note: changed from approximate calculation(paper suggestion) to exact
+   * calculation due to singularity problems in the residuals
    * 
    * @param gramA target gram matrix
    * @param gramB target gram matrix
@@ -272,13 +286,13 @@ public class LOBPCG {
    * @param indices indicates the filled columns
    * @param it number of iteration
    */
-  protected void buildGramMatrices(double[][] gramA, double[][] gramB, double[] lambdadiag, double[][] x, double[][] w, double[][] aw, double[][] p, double[][] ap, int it, int cursize, long[] indices) {
+  protected void buildGramMatrices(double[][] gramA, double[][] gramB, double[] lambdadiag, double[][] x, double[][] ax, double[][] w, double[][] aw, double[][] p, double[][] ap, int it, int cursize, long[] indices) {
     final int m = lambdadiag.length;
     // GRAMA
-    for(int i = 0; i < m; i++) {
-      gramA[i][i] = lambdadiag[i];
-    }
+    transposeTimesIntoSymmetric(x, ax, gramA, 0, 0);
+
     transposeTimesReducedIntoCompactSymmetric(x, aw, gramA, indices, 0, m);
+    // -5e-13 python und -7e-13 hier
     if(it > 0) {
       transposeTimesReducedIntoCompactSymmetric(x, ap, gramA, indices, 0, m + cursize);
     }
@@ -292,13 +306,30 @@ public class LOBPCG {
     // TODO: this diagonal can be swapped by xtx, wtw, ptp,
     // as done in the online implementation. But it should work like this as
     // well according to the paper
-    for(int i = 0; i < t; i++) {
-      gramB[i][i] = 1;
-    }
+    transposeTimesIntoSymmetric(x, x, gramB, 0, 0);
+    reducedTransposeTimesReducedIntoCompactSymmetric(w, w, gramB, indices, m, m);
     transposeTimesReducedIntoCompactSymmetric(x, w, gramB, indices, 0, m);
     if(it > 0) {
+      reducedTransposeTimesReducedIntoCompactSymmetric(p, p, gramB, indices, m + cursize, m + cursize);
       transposeTimesReducedIntoCompactSymmetric(x, p, gramB, indices, 0, m + cursize);
       reducedTransposeTimesReducedIntoCompactSymmetric(w, p, gramB, indices, m, m + cursize);
+    }
+  }
+
+  protected static void transposeTimesIntoSymmetric(double[][] y, double[][] w, double[][] target, int istart, int jstart) {
+    final int rowdim1 = y.length; // is diff to rowdimT bc transposed
+    double[] acol = new double[rowdim1];
+    for(int i = 0, i2 = istart; i < y[0].length; i++, i2++) {
+      for(int j = 0; j < rowdim1; j++) {
+        acol[j] = y[j][i];
+      }
+      for(int j = 0, j2 = jstart; j < y[0].length; j++, j2++) {
+        double res = 0;
+        for(int k = 0; k < rowdim1; k++) {
+          res += acol[k] * w[k][j];
+        }
+        target[i2][j2] = target[j2][i2] = res;
+      }
     }
   }
 
@@ -354,6 +385,25 @@ public class LOBPCG {
   }
 
   /**
+   * Calculate the dotproduct of 2 matrix columns without copying the columns
+   * first.
+   * Calculates dot(a[][i],b[][j])
+   * 
+   * @param a first matrix
+   * @param i column index of first matrix
+   * @param b second matrix
+   * @param j column index of second matrix
+   * @return dotproduct of the given columns
+   */
+  private double directdot(double[][] a, int i, double[][] b, int j) {
+    double result = 0;
+    for(int k = 0; k < a[i].length; k++) {
+      result += a[k][i] * b[k][j];
+    }
+    return result;
+  }
+
+  /**
    * orthonormalizes matrix via cholesky-decomposition and inversion. Cache
    * can be used to reduce array creation.
    * overwrites matrix and cache, but not base and indices
@@ -365,10 +415,34 @@ public class LOBPCG {
    */
   protected static double[][] orthonormalize(double[][] matrix, double[][] cache, long[] indices) {
     if(indices != null) {
-      cache = reducedTransposeTimesReducedIntoCompact(matrix, cache, indices);
+      double[][] cach2 = new double[matrix.length][matrix[0].length];
+      for(int i = 0; i < cach2.length; i++) {
+        cach2[i] = Arrays.copyOf(matrix[i], matrix[0].length);
+      }
+      for(int i = 0; i < cach2.length; i++) {
+        for(int j = 0; j < cach2[i].length; j++) {
+          assert cach2[i][j] == matrix[i][j];
+        }
+      }
+      VMath.normalizeColumns(cach2);
+      cache = reducedTransposeTimesReducedIntoCompact(cach2, cache, indices);
+
+      // System.out.println("cache1: ");
+      // for(int t = 0; t <cache.length; t++) {
+      // System.out.println(Arrays.toString(cache[t]));
+      // }
       cache = new CholeskyDecomposition(cache).getL();
+
+      // System.out.println("cache2: ");
+      // for(int t = 0; t <cache.length; t++) {
+      // System.out.println(Arrays.toString(cache[t]));
+      // }
       cache = VMath.inverse(VMath.transpose(cache));
-      // cache = VMath.inverse(cache);
+
+      // System.out.println("cache3: ");
+      // for(int t = 0; t <cache.length; t++) {
+      // System.out.println(Arrays.toString(cache[t]));
+      // }// cache = VMath.inverse(cache);
       matrix = reducedTimesCompactEqualsFirstReduced(matrix, cache, indices);
     }
     else {
@@ -398,8 +472,7 @@ public class LOBPCG {
     final int rowdim = a.length;
     double[] acol = new double[rowdim];
 
-    for(int i = BitsUtil.nextSetBit(indices, 0),
-        i2 = 0; i != -1; i = BitsUtil.nextSetBit(indices, i + 1), i2++) {
+    for(int i = BitsUtil.nextSetBit(indices, 0), i2 = 0; i != -1; i = BitsUtil.nextSetBit(indices, i + 1), i2++) {
       for(int j = 0; j < rowdim; j++) {
         acol[j] = a[j][i];
       }
@@ -436,8 +509,7 @@ public class LOBPCG {
     double[] aline = new double[rowdim2];
     for(int i = 0; i < rowdim1; i++) {
       // copy important part of first row
-      for(int j = BitsUtil.nextSetBit(indices, 0),
-          j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
+      for(int j = BitsUtil.nextSetBit(indices, 0), j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
         aline[j2] = a1[i][j];
       }
       for(int j = BitsUtil.nextSetBit(indices, 0), j2 = 0; j != -1; j = BitsUtil.nextSetBit(indices, j + 1), j2++) {
