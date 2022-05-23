@@ -148,7 +148,7 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Connectivity checks", sids.size(), LOG) : null;
     final double r_square = model.r_square;
-    assert r_square != Double.NaN : "Model not trained correctly!";
+    assert !Double.isNaN(r_square) : "Model not trained correctly!";
 
     UnionFind uf = UnionFindUtil.make(sids);
     final double fixed = calcfixedpart(model, ids, sim);

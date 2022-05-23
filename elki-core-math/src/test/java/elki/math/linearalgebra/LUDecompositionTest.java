@@ -27,7 +27,7 @@ import org.junit.Test;
 
 /**
  * Unit test for LU decomposition.
- * 
+ * <p>
  * As reference if the LU Decomposition is working correctly the
  * LU-decomposition function of python3 scipy 0.18.1-2 package,
  * and octave 4.2.1 were used to calculate the correct result.
@@ -277,5 +277,16 @@ public final class LUDecompositionTest {
   @Test(expected = IllegalArgumentException.class)
   public void testSolveRowDimensionMismatch() {
     new LUDecomposition(M).solve(new double[][] { {} });
+  }
+
+  /**
+   * Test that the inverse is correct on a toy example.
+   */
+  @Test
+  public void testInverse() {
+    double[][] oga = new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 7 } };
+    double[][] should = new double[][] { { -13.0 / 6, 5.0 / 3, -1.0 / 2 }, { 7.0 / 3, -7.0 / 3, 1.0 }, { -1.0 / 2, 1.0, -1.0 / 2 } };
+    double[][] is = new LUDecomposition(oga, 3, 3).inverse();
+    assertTrue("Inverse not as expected", VMath.almostEquals(should, is, 1e-15));
   }
 }

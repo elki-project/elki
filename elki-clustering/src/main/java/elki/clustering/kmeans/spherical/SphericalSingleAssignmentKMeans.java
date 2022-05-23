@@ -49,7 +49,6 @@ public class SphericalSingleAssignmentKMeans<V extends NumberVector> extends Sph
    * Constructor.
    *
    * @param k Number of clusters
-   * @param maxiter Maximum number of iterations
    * @param initializer Initialization class
    */
   public SphericalSingleAssignmentKMeans(int k, KMeansInitialization initializer) {

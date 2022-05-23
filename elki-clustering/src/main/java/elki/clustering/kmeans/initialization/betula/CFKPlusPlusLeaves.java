@@ -116,7 +116,7 @@ public class CFKPlusPlusLeaves extends AbstractCFKMeansInitialization {
       }
       ClusterFeature cfi = cfs.get(i).getCF();
       means[m] = cfi.toArray();
-      if(m < k) {
+      if(m < k - 1) {
         weights[i] = 0.; // disable
         weightsum = updateWeights(cfi, cfs, weights);
       }
@@ -173,7 +173,7 @@ public class CFKPlusPlusLeaves extends AbstractCFKMeansInitialization {
    * Update the weight list.
    *
    * @param latest Latest center
-   * @param cf Cluster features
+   * @param cfs Cluster features
    * @param weights Weights
    * @return Weight sum
    */

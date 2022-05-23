@@ -281,6 +281,12 @@ public class ParameterTable extends JTable {
       panel.setLayout(new BorderLayout());
       panel.add(comboBox, BorderLayout.CENTER);
       comboBox.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      if(comboBox.getRenderer() instanceof JComponent) {
+        ((JComponent) comboBox.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+      }
+      if(comboBox.getEditor().getEditorComponent() instanceof JComponent) {
+        ((JComponent) comboBox.getEditor().getEditorComponent()).setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      }
     }
 
     @Override
@@ -783,7 +789,7 @@ public class ParameterTable extends JTable {
         Object binding = map.get(ks);
         Action action = (binding == null) ? null : am.get(binding);
         if(action != null) {
-          return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiers());
+          return SwingUtilities.notifyAction(action, ks, e, component, e.getModifiersEx());
         }
       }
       return false;

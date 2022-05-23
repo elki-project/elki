@@ -20,22 +20,20 @@
  */
 package elki.clustering.hierarchical;
 
-import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayMIter;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
-import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -70,16 +68,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "arXiv preprint arXiv:1109.2378", //
     url = "https://arxiv.org/abs/1109.2378", //
     bibkey = "DBLP:journals/corr/abs-1109-2378")
-public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxNNChain<O> extends MiniMax<O> {
   /**
    * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
-
-  /**
-   * Distance function used.
-   */
-  protected Distance<? super O> distance;
 
   /**
    * Constructor.
@@ -87,13 +80,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param distance Distance function
    */
   public MiniMaxNNChain(Distance<? super O> distance) {
-    super();
-    this.distance = distance;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
+    super(distance);
   }
 
   /**
@@ -102,111 +89,114 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    * @param relation Data relation
    * @return Clustering result
    */
-  public PointerPrototypeHierarchyResult run(Relation<O> relation) {
+  public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
-
-    // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
-    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(ids.size());
-
-    MatrixParadigm mat = new MatrixParadigm(ids);
-    ArrayModifiableDBIDs prots = DBIDUtil.newArray(MatrixParadigm.triangleSize(ids.size()));
-
-    MiniMax.initializeMatrices(mat, prots, dq);
-
-    nnChainCore(mat, prots.iter(), dq, builder, clusters);
-
-    return (PointerPrototypeHierarchyResult) builder.complete();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    ArrayModifiableDBIDs prots = DBIDUtil.newArray(ClusterDistanceMatrix.triangleSize(ids.size()));
+    ClusterDistanceMatrix mat = MiniMax.initializeMatrices(ids, prots, dq);
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
+    return new Instance().run(ids, mat, builder, dq, prots.iter());
   }
 
   /**
-   * Uses NNChain as in "Modern hierarchical, agglomerative clustering
-   * algorithms" by Daniel Müllner
+   * Main worker instance of MiniMaxNNChain.
    * 
-   * @param mat distance matrix
-   * @param prots computed prototypes
-   * @param dq distance query of the data set
-   * @param builder Result builder
-   * @param clusters current clusters
+   * @author Erich Schubert
    */
-  private void nnChainCore(MatrixParadigm mat, DBIDArrayMIter prots, DistanceQuery<O> dq, PointerHierarchyBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
-    final DBIDArrayIter ix = mat.ix;
-    final double[] distances = mat.matrix;
-    final int size = mat.size;
-    // The maximum chain size = number of ids + 1
-    IntegerArray chain = new IntegerArray(size + 1);
-
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
-    for(int k = 1, end = size; k < size; k++) {
-      int a = -1, b = -1;
-      if(chain.size() <= 3) {
-        // Accessing two arbitrary not yet merged elements could be optimized to
-        // work in O(1) like in Müllner;
-        // however this usually does not have a huge impact (empirically just
-        // about 1/5000 of total performance)
-        a = NNChain.findUnlinked(0, end, ix, builder);
-        b = NNChain.findUnlinked(a + 1, end, ix, builder);
-        chain.clear();
-        chain.add(a);
-      }
-      else {
-        // Chain is expected to look like (.... a, b, c, b) with b and c merged.
-        int lastIndex = chain.size;
-        int c = chain.get(lastIndex - 2);
-        b = chain.get(lastIndex - 3);
-        a = chain.get(lastIndex - 4);
-        // Ensure we had a loop at the end:
-        assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
-        // if c < b, then we merged b -> c, otherwise c -> b
-        b = c < b ? c : b;
-        // Cut the tail:
-        chain.size -= 3;
-      }
-      // For ties, always prefer the second-last element b:
-      double minDist = mat.get(a, b);
-      do {
-        int c = b;
-        final int ta = MatrixParadigm.triangleSize(a);
-        for(int i = 0; i < a; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[ta + i];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-        for(int i = a + 1; i < size; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[MatrixParadigm.triangleSize(i) + a];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-
-        b = a;
-        a = c;
-
-        chain.add(a);
-      }
-      while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
-
-      // We always merge the larger into the smaller index:
-      if(a < b) {
-        int tmp = a;
-        a = b;
-        b = tmp;
-      }
-      assert (minDist == mat.get(a, b));
-      assert (b < a);
-      MiniMax.merge(size, mat, prots, builder, clusters, dq, a, b);
-      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
-      LOG.incrementProcessed(progress);
+  public static class Instance extends MiniMax.Instance {
+    @Override
+    public ClusterPrototypeMergeHistory run(ArrayDBIDs ids, ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder, DistanceQuery<?> dq, DBIDArrayMIter prots) {
+      final int size = mat.size;
+      this.mat = mat;
+      this.builder = builder;
+      this.end = size;
+      this.clusters = new Int2ObjectOpenHashMap<>(size);
+      this.protiter = prots;
+      this.dq = dq;
+      this.ix = ids.iter();
+      this.iy = ids.iter();
+      nnChainCore();
+      builder.optimizeOrder();
+      return (ClusterPrototypeMergeHistory) builder.complete();
     }
-    LOG.ensureCompleted(progress);
+
+    /**
+     * Uses NNChain as in "Modern hierarchical, agglomerative clustering
+     * algorithms" by Daniel Müllner.
+     */
+    private void nnChainCore() {
+      final int size = mat.size;
+      final double[] distances = mat.matrix;
+      final int[] clustermap = mat.clustermap;
+      // The maximum chain size = number of ids + 1, but usually much less
+      IntegerArray chain = new IntegerArray(size << 1);
+
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMax-NNChain", size - 1, LOG) : null;
+      for(int k = 1; k < size; k++) {
+        int a = -1, b = -1;
+        if(chain.size() < 2) {
+          // Accessing two arbitrary not yet merged elements could be optimized
+          // to work in O(1) like in Müllner; however this usually does not have
+          // a huge impact (empirically just about 1/5000 of total performance)
+          a = NNChain.Instance.findUnlinked(0, end, clustermap);
+          b = NNChain.Instance.findUnlinked(a + 1, end, clustermap);
+          chain.clear();
+          chain.add(a);
+        }
+        else {
+          a = chain.get(chain.size - 2);
+          b = chain.get(chain.size - 1);
+          assert clustermap[a] >= 0 && clustermap[b] >= 0;
+          chain.size--; // Remove b
+        }
+        // For ties, always prefer the second-last element b:
+        double minDist = mat.get(a, b);
+        do {
+          int c = b;
+          final int ta = ClusterDistanceMatrix.triangleSize(a);
+          for(int i = 0; i < a; i++) {
+            if(i != b && clustermap[i] >= 0) {
+              double dist = distances[ta + i];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+          for(int i = a + 1; i < end; i++) {
+            if(i != b && clustermap[i] >= 0) {
+              double dist = distances[ClusterDistanceMatrix.triangleSize(i) + a];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+          b = a;
+          a = c;
+          chain.add(a);
+        }
+        while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
+
+        // We always merge the larger into the smaller index:
+        if(a < b) {
+          int tmp = a;
+          a = b;
+          b = tmp;
+        }
+        merge(a, b);
+        end = shrinkActiveSet(clustermap, end, a); // shrink working set
+        chain.size -= 3;
+        chain.add(b);
+        LOG.incrementProcessed(progress);
+      }
+      LOG.ensureCompleted(progress);
+    }
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**
@@ -218,18 +208,7 @@ public class MiniMaxNNChain<O> implements HierarchicalClusteringAlgorithm {
    *
    * @param <O> Object type
    */
-  public static class Par<O> implements Parameterizer {
-    /**
-     * The distance function to use.
-     */
-    protected Distance<? super O> distance;
-
-    @Override
-    public void configure(Parameterization config) {
-      new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
-          .grab(config, x -> distance = x);
-    }
-
+  public static class Par<O> extends MiniMax.Par<O> {
     @Override
     public MiniMaxNNChain<O> make() {
       return new MiniMaxNNChain<>(distance);

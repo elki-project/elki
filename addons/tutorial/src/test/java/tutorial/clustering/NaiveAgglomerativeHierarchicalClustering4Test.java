@@ -56,8 +56,8 @@ public class NaiveAgglomerativeHierarchicalClustering4Test extends AbstractClust
         .with(Algorithm.Utils.ALGORITHM_ID, NaiveAgglomerativeHierarchicalClustering4.class) //
         .with(NaiveAgglomerativeHierarchicalClustering4.Par.LINKAGE_ID, NaiveAgglomerativeHierarchicalClustering4.Linkage.WARD) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93866265);
-    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.938166);
+    assertClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
 
   @Test

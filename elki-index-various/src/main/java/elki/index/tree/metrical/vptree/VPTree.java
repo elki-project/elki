@@ -123,6 +123,17 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
   Node root;
 
   /**
+   * Constructor with default values, used by EmpiricalQueryOptimizer
+   *
+   * @param relation data for tree construction
+   * @param distance distance function for tree construction
+   * @param leafsize Leaf size and sample size (simpler parameterization)
+   */
+  public VPTree(Relation<O> relation, Distance<? super O> distance, int leafsize) {
+    this(relation, distance, RandomFactory.DEFAULT, leafsize, leafsize);
+  }
+
+  /**
    * Constructor.
    *
    * @param relation data for tree construction
@@ -463,10 +474,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         }
       }
       else {
-        if(rc != null && rc.lowBound <= x + tau && x - tau <= rc.highBound) {
+        if(rc.lowBound <= x + tau && x - tau <= rc.highBound) {
           tau = vpKNNSearch(knns, rc);
         }
-        if(lc != null && lc.lowBound <= x + tau && x - tau <= lc.highBound) {
+        if(lc.lowBound <= x + tau && x - tau <= lc.highBound) {
           tau = vpKNNSearch(knns, lc);
         }
       }
@@ -955,7 +966,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
         new IntParameter(SAMPLE_SIZE_ID, 10) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.sampleSize = x);
-        new IntParameter(TRUNCATE_ID, 5) //
+        new IntParameter(TRUNCATE_ID, 8) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
             .grab(config, x -> this.truncate = x);
         new RandomParameter(SEED_ID).grab(config, x -> random = x);

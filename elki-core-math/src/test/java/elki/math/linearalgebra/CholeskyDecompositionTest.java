@@ -156,4 +156,15 @@ public final class CholeskyDecompositionTest {
   public void testSolveRowDimensionMismatch() {
     new CholeskyDecomposition(new double[][] { { 1, -13 }, { 2, 12 } }).solve(new double[][] { { 1 }, { 1 } });
   }
+
+  /**
+   * Test that the inverse is correct on a toy example.
+   */
+  @Test
+  public void testInverse() {
+    double[][] oga = new double[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 7 } };
+    double[][] should = new double[][] { { -13.0 / 6, 5.0 / 3, -1.0 / 2 }, { 7.0 / 3, -7.0 / 3, 1.0 }, { -1.0 / 2, 1.0, -1.0 / 2 } };
+    double[][] is = new QRDecomposition(oga, 3, 3).inverse();
+    assertTrue("Inverse not as expected", VMath.almostEquals(should, is, 1e-14));
+  }
 }

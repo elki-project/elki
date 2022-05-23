@@ -1,63 +1,60 @@
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
- *
- * Copyright (C) 2019
+ * 
+ * Copyright (C) 2022
  * ELKI Development Team
- *
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package elki.clustering.hierarchical;
 
-import elki.database.datastore.DBIDDataStore;
 import elki.database.datastore.DoubleDataStore;
-import elki.database.ids.DBIDs;
+import elki.database.ids.ArrayDBIDs;
 
 /**
- * Extended pointer representation useful for HDBSCAN. In addition to the parent
- * object and the distance to the parent, it also includes the core distance,
- * which is a density estimation.
- *
+ * Hierarchical clustering merge list, with additional coredists information.
+ * 
  * @author Erich Schubert
- * @since 0.7.0
  */
-public class PointerDensityHierarchyResult extends PointerHierarchyResult {
+public class ClusterDensityMergeHistory extends ClusterMergeHistory {
   /**
-   * Core distance.
+   * Core distance information.
    */
-  DoubleDataStore coreDistance;
+  protected DoubleDataStore coredists;
 
   /**
    * Constructor.
-   * 
-   * @param ids IDs processed.
-   * @param parent Parent pointer.
-   * @param parentDistance Distance to parent.
-   * @param isSquared Flag to indicate squared distances
-   * @param coreDistance Core distances.
+   *
+   * @param ids Initial object ids
+   * @param merges Merge history 2*(N-1) values
+   * @param distances Distances
+   * @param sizes Cluster sizes
+   * @param isSquared If distances are squared distances
+   * @param coredists Density information
    */
-  public PointerDensityHierarchyResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, boolean isSquared, DoubleDataStore coreDistance) {
-    super(ids, parent, parentDistance, isSquared);
-    this.coreDistance = coreDistance;
+  public ClusterDensityMergeHistory(ArrayDBIDs ids, int[] merges, double[] distances, int[] sizes, boolean isSquared, DoubleDataStore coredists) {
+    super(ids, merges, distances, sizes, isSquared);
+    this.coredists = coredists;
   }
 
   /**
-   * Get the core distance.
+   * Get the core distances
    * 
-   * @return Core distances.
+   * @return Core distances
    */
   public DoubleDataStore getCoreDistanceStore() {
-    return coreDistance;
+    return coredists;
   }
 }

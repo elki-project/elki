@@ -458,7 +458,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
     /**
      * Compute the distance to a candidate object.
      * 
-     * @param p Object
+     * @param it Object reference
      * @return Distance
      */
     protected abstract double queryDistance(DBIDRef it);

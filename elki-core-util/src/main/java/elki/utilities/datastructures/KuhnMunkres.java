@@ -167,6 +167,7 @@ public class KuhnMunkres {
       double m = row[0];
       for(int j = 1; j < row.length; j++) {
         final double v = row[j];
+        assert !Double.isNaN(v);
         m = m <= v ? m : v;
       }
       for(int j = 0; j < row.length; j++) {
@@ -335,7 +336,8 @@ public class KuhnMunkres {
           else if(cmark != null && cmark[j] == i) {
             buf.append('|');
           }
-          buf.append(FormatUtil.NF4.format(costOf(i, j)));
+          // TODO: choose NF depending on value range.
+          buf.append(FormatUtil.NF2.format(costOf(i, j)));
           int p = 7 - (buf.length() - pos);
           if(p > 0) {
             buf.insert(pos, padding, 0, p);

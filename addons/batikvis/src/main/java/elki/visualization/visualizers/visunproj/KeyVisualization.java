@@ -206,6 +206,7 @@ public class KeyVisualization implements VisFactory {
       MarkerLibrary ml = style.markers();
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
       final List<Cluster<Model>> topcs = clustering.getToplevelClusters();
+      System.err.println(allcs.size()+" "+topcs.size());
 
       // Add a label for the clustering.
       {

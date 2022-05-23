@@ -71,8 +71,15 @@ public class WeightedQuickUnionInteger {
    * Constructor.
    */
   public WeightedQuickUnionInteger() {
-    weight = new int[INITIAL_SIZE];
-    parent = new int[INITIAL_SIZE];
+    this(INITIAL_SIZE);
+  }
+
+  /**
+   * Constructor.
+   */
+  public WeightedQuickUnionInteger(int size) {
+    weight = new int[size];
+    parent = new int[size];
   }
 
   /**

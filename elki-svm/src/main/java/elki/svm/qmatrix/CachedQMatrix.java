@@ -98,7 +98,7 @@ public final class CachedQMatrix implements QMatrix {
     // data: each used entry will cost 24, too.
     // Each of these arrays: 24 bytes overhead (once)
     // This structure: ~32 bytes (note: for compressed pointers!)
-    size = size_ - l * 36 - 24 * 4 - 32;
+    size = size_ - l * 36L - 24 * 4 - 32;
     size >>= 2; // Bytes to floats.
     // Minimum feasible cache size is two columns:
     size = Math.max(size, l << 1);

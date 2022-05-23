@@ -73,6 +73,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   private final Constructor<? extends Index> coverIndex;
 
   /**
+   * vp tree index class.
+   */
+  private final Constructor<? extends Index> vpIndex;
+
+  /**
    * k-d-tree index class.
    */
   private final Constructor<? extends Index> kdIndex;
@@ -111,7 +116,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     Constructor<? extends Index> coverIndex = null;
     try {
       Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.metrical.covertree.CoverTree");
-      coverIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, Distance.class);
+      coverIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, Distance.class, int.class);
     }
     catch(ClassNotFoundException e) {
       LOG.verbose("CoverTree is not available, and cannot be automatically used for optimization.");
@@ -121,13 +126,26 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
     this.coverIndex = coverIndex;
     //
+    Constructor<? extends Index> vpIndex = null;
+    try {
+      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.metrical.vptree.VPTree");
+      vpIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, Distance.class, int.class);
+    }
+    catch(ClassNotFoundException e) {
+      LOG.verbose("VPTree is not available, and cannot be automatically used for optimization.");
+    }
+    catch(NoSuchMethodException | SecurityException e) {
+      LOG.exception(e);
+    }
+    this.vpIndex = vpIndex;
+    //
     Constructor<? extends Index> kdIndex = null;
     try {
-      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.SmallMemoryKDTree");
+      Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.tree.spatial.kd.MemoryKDTree");
       kdIndex = (Constructor<? extends Index>) cls.getConstructor(Relation.class, int.class);
     }
     catch(ClassNotFoundException e) {
-      LOG.verbose("SmallMemoryKDTree is not available, and cannot be automatically used for optimization.");
+      LOG.verbose("MemoryKDTree is not available, and cannot be automatically used for optimization.");
     }
     catch(NoSuchMethodException | SecurityException e) {
       LOG.exception(e);
@@ -151,97 +169,69 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+    KNNIndex<O> idx = null;
+    // Try adding a preprocessor if requested:
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
+    }
+    if(idx == null) { // try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+    }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+    }
+    if(idx == null) { // cover tree is cheap and fast
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
-      // Precomputation can be useful additionally!
-      if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-        return idx.kNNByObject(distanceQuery, maxk, flags);
-      }
-    }
-    // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-      return null;
-    }
-    long freeMemory = getFreeMemory();
-    final long msize = maxk * 12L * relation.size();
-    if(msize > 0.8 * freeMemory) {
-      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
-      return null;
-    }
-    try {
-      idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
-      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
-      idx.initialize();
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
-        Metadata.hierarchyOf(relation).addWeakChild(idx);
-      }
       return idx.kNNByObject(distanceQuery, maxk, flags);
-    }
-    catch(InstantiationException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
-      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    KNNIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+    KNNIndex<O> idx = null;
+    // Try adding a preprocessor if requested:
+    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && (relation.getDBIDs() instanceof DBIDRange)) {
+    if(idx == null) { // try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+    }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+    }
+    if(idx == null) { // cover tree is cheap and fast
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+    }
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
       if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
-      // Precomputation can be useful additionally!
-      if((flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-        return idx.kNNByDBID(distanceQuery, maxk, flags);
-      }
-    }
-    // Next try adding a preprocessor:
-    if(knnIndex == null || (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0) {
-      return null;
-    }
-    long freeMemory = getFreeMemory();
-    final long msize = maxk * 12L * relation.size();
-    if(msize > 0.8 * freeMemory) {
-      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
-      return null;
-    }
-    try {
-      idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
-      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
-      idx.initialize();
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
-        Metadata.hierarchyOf(relation).addWeakChild(idx);
-      }
       return idx.kNNByDBID(distanceQuery, maxk, flags);
-    }
-    catch(InstantiationException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException e) {
-      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }
 
   @Override
   public <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = null;
+    if(idx == null) { // Try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+    }
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
     if(idx == null) {
       return null;
@@ -254,11 +244,17 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    RangeIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
-    if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+    RangeIndex<O> idx = null;
+    if(idx == null) { // Try k-d-tree
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+    }
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
@@ -272,9 +268,15 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    DistancePriorityIndex<O> idx = null;
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* empirical */);
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* empirical */);
     }
     if(idx == null) {
       return null;
@@ -287,9 +289,15 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
-    DistancePriorityIndex<O> idx = makeCoverTree(relation, distanceQuery.getDistance());
+    DistancePriorityIndex<O> idx = null;
+    if(idx == null) { // VP tree is cheap and fast
+      idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* needs optimization and benchmark */);
+    }
+    if(idx == null) {
+      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* needs optimization and benchmark */);
+    }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance());
+      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
@@ -333,7 +341,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
   }
 
-  private <O> DistancePriorityIndex<O> makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance) {
+  private <O> DistancePriorityIndex<O> makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance, int leafsize) {
     // TODO: make sure there is no such cover tree already!
     if(coverIndex == null || !distance.isMetric()) {
       return null;
@@ -341,7 +349,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     // TODO: auto-tune parameters based on dimensionality or sample?
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance, leafsize);
       LOG.verbose("Optimizer: automatically adding a cover tree index.");
       idx.initialize();
       return idx;
@@ -353,18 +361,38 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
-  private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance) {
+  private <O> DistancePriorityIndex<O> makeVPTree(Relation<? extends O> relation, Distance<? super O> distance, int leafsize) {
+    // TODO: make sure there is no such VP tree already!
+    if(vpIndex == null || !distance.isMetric()) {
+      return null;
+    }
+    // TODO: auto-tune parameters based on dimensionality or sample?
+    try {
+      @SuppressWarnings("unchecked")
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) vpIndex.newInstance(relation, distance, leafsize);
+      LOG.verbose("Optimizer: automatically adding a VP tree index.");
+      idx.initialize();
+      return idx;
+    }
+    catch(InstantiationException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      LOG.exception("Automatic VP tree creation failed.", e);
+    }
+    return null;
+  }
+
+  private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance, int k) {
     // TODO: make sure there is no such k-d-tree already!
     TypeInformation type = relation.getDataTypeInformation();
     if(kdIndex == null // not available
         || !TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type) //
         || !(distance instanceof LPNormDistance || distance instanceof SquaredEuclideanDistance) //
-        || ((FieldTypeInformation) type).getDimensionality() > 20) {
+        || ((FieldTypeInformation) type).getDimensionality() > 30) {
       return null;
     }
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, 5);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, k > 0 ? k : 0);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
       return idx;
@@ -372,6 +400,43 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     catch(InstantiationException | IllegalAccessException
         | IllegalArgumentException | InvocationTargetException e) {
       LOG.exception("Automatic k-d-tree creation failed.", e);
+    }
+    return null;
+  }
+
+  /**
+   * Make a knn preprocessor.
+   *
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distanceQuery distance query
+   * @param maxk Maximum k
+   * @param flags Optimizer flags
+   * @return knn preprocessor
+   */
+  @SuppressWarnings("unchecked")
+  private <O> KNNIndex<O> makeKnnPreprocessor(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(knnIndex == null) {
+      return null;
+    }
+    long freeMemory = getFreeMemory();
+    final long msize = maxk * 12L * relation.size();
+    if(msize > 0.8 * freeMemory) {
+      LOG.warning("Precomputing the kNN would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
+      return null;
+    }
+    try {
+      KNNIndex<O> idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
+      LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
+      idx.initialize();
+      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+        Metadata.hierarchyOf(relation).addWeakChild(idx);
+      }
+      return idx;
+    }
+    catch(InstantiationException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException e) {
+      LOG.exception("Automatic knn preprocessor creation failed.", e);
     }
     return null;
   }

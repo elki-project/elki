@@ -328,10 +328,10 @@ public class LUDecomposition implements java.io.Serializable {
    * @throws ArithmeticException Matrix is rank deficient.
    */
   public double[][] inverse() {
-    // Build permuted identity matrix efficiently:
+    // Build permuted identity matrix a bit more efficiently:
     double[][] b = new double[piv.length][m];
     for(int i = 0; i < piv.length; i++) {
-      b[piv[i]][i] = 1.;
+      b[i][piv[i]] = 1.;
     }
     return solveInplace(b);
   }

@@ -180,10 +180,10 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
   /**
    * Perform k-means clustering.
    *
-   * @param cfwmeans Cluster feature weighted means
    * @param cfs Cluster features
    * @param assignment Cluster assignment of each CF
    * @param weights Cluster weight output
+   * @param tree CF tree
    * @return Cluster means
    */
   private double[][] kmeans(ArrayList<? extends ClusterFeature> cfs, int[] assignment, int[] weights, CFTree<?> tree) {

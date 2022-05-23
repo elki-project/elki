@@ -66,7 +66,9 @@ public class FarthestSumPoints<O> extends FarthestPoints<O> {
     // Chose first mean
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     NumberVector prevmean = relation.get(first);
-    means[0] = prevmean.toArray();
+    if (!dropfirst) {
+      means[0] = prevmean.toArray();
+    }
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);

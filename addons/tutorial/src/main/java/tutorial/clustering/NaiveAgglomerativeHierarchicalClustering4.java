@@ -22,14 +22,13 @@ package tutorial.clustering;
 
 import elki.Algorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.clustering.hierarchical.ClusterMergeHistoryBuilder;
 import elki.clustering.hierarchical.SLINK;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.*;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
@@ -38,6 +37,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
@@ -176,7 +176,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
@@ -190,7 +190,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
 
     // Compute the initial (lower triangular) distance matrix.
     double[] scratch = new double[triangleSize(size)];
-    DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
+    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
     boolean square = Linkage.WARD.equals(linkage) && !distance.isSquared();
@@ -206,82 +206,65 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> implements Hierarchica
       }
     }
 
-    // Initialize space for result:
-    WritableDBIDDataStore parent = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore height = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableIntegerDataStore csize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      parent.put(it, it);
-      height.put(it, Double.POSITIVE_INFINITY);
-      csize.put(it, 1);
-    }
-
+    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
+    int[] cidx = MathUtil.sequence(0, size);
     // Repeat until everything merged, except the desired number of clusters:
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
     for(int i = 1; i < size; i++) {
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
-      for(ix.seek(0); ix.valid(); ix.advance()) {
-        if(height.doubleValue(ix) < Double.POSITIVE_INFINITY) {
-          continue;
-        }
-        final int xbase = triangleSize(ix.getOffset());
-        for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-          if(height.doubleValue(iy) < Double.POSITIVE_INFINITY) {
-            continue;
-          }
-          final int idx = xbase + iy.getOffset();
-          if(scratch[idx] <= min) {
-            min = scratch[idx];
-            minx = ix.getOffset();
-            miny = iy.getOffset();
+      for(int x = 1; x < size; x++) {
+        if(cidx[x] >= 0) {
+          final int xbase = triangleSize(x);
+          for(int y = 0; y < x; y++) {
+            if(cidx[y] >= 0) {
+              final int idx = xbase + y;
+              if(scratch[idx] <= min) {
+                min = scratch[idx];
+                minx = x;
+                miny = y;
+              }
+            }
           }
         }
       }
-      assert (minx >= 0 && miny >= 0);
-      // Avoid allocating memory, by reusing existing iterators:
-      ix.seek(minx);
-      iy.seek(miny);
+      assert minx >= 0 && miny >= 0;
       // Perform merge in data structure: x -> y
       // Since y < x, prefer keeping y, dropping x.
-      int sizex = csize.intValue(ix), sizey = csize.intValue(iy);
-      height.put(ix, min);
-      parent.put(ix, iy);
-      csize.put(iy, sizex + sizey);
+      final int sizex = builder.getSize(minx), sizey = builder.getSize(miny);
 
       // Update distance matrix. Note: miny < minx
       final int xbase = triangleSize(minx), ybase = triangleSize(miny);
       // Write to (y, j), with j < y
-      for(ij.seek(0); ij.getOffset() < miny; ij.advance()) {
-        if(height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
-          continue;
+      for(int j = 0; j < miny; j++) {
+        if(cidx[j] >= 0) {
+          scratch[ybase + j] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[ybase + j], builder.getSize(j), min);
         }
-        final int sizej = csize.intValue(ij);
-        scratch[ybase + ij.getOffset()] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[ybase + ij.getOffset()], sizej, min);
       }
       // Write to (j, y), with y < j < x
-      for(ij.seek(miny + 1); ij.getOffset() < minx; ij.advance()) {
-        if(height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
-          continue;
+      for(int j = miny + 1; j < minx; j++) {
+        if(cidx[j] >= 0) {
+          final int jbase = triangleSize(j);
+          scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jbase + miny], builder.getSize(j), min);
         }
-        final int jbase = triangleSize(ij.getOffset());
-        final int sizej = csize.intValue(ij);
-        scratch[jbase + miny] = linkage.combine(sizex, scratch[xbase + ij.getOffset()], sizey, scratch[jbase + miny], sizej, min);
       }
       // Write to (j, y), with y < x < j
-      for(ij.seek(minx + 1); ij.valid(); ij.advance()) {
-        if(height.doubleValue(ij) < Double.POSITIVE_INFINITY) {
-          continue;
+      for(int j = minx + 1; j < size; j++) {
+        if(cidx[j] >= 0) {
+          final int jbase = triangleSize(j);
+          scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], builder.getSize(j), min);
         }
-        final int jbase = triangleSize(ij.getOffset());
-        final int sizej = csize.intValue(ij);
-        scratch[jbase + miny] = linkage.combine(sizex, scratch[jbase + minx], sizey, scratch[jbase + miny], sizej, min);
       }
+
+      int zz = builder.add(minx, square ? Math.sqrt(min) : min, miny);
+      cidx[minx] = -1;
+      cidx[miny] = zz;
+
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
 
-    return new PointerHierarchyResult(ids, parent, height, dq.getDistance().isSquared());
+    return builder.complete();
   }
 
   /**

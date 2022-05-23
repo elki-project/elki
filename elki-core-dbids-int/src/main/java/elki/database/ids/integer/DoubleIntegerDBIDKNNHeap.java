@@ -156,6 +156,7 @@ class DoubleIntegerDBIDKNNHeap extends DoubleIntegerDBIDHeap implements KNNHeap 
   public void clear() {
     super.clear();
     numties = 0;
+    kdist = Double.POSITIVE_INFINITY;
   }
 
   @Override

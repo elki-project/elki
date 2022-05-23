@@ -36,10 +36,6 @@ import elki.utilities.ELKIBuilder;
  * @since 0.7.5
  */
 public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMiniMax() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -51,10 +47,6 @@ public class MiniMaxAnderbergTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  /**
-   * Run agglomerative hierarchical clustering with fixed parameters and compare
-   * the result to a golden standard.
-   */
   @Test
   public void testMiniMax2() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);

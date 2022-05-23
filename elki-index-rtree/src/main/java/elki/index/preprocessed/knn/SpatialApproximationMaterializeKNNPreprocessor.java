@@ -49,7 +49,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
  * distances) to each database object.
  * <p>
  * Used for example by {@link elki.outlier.lof.LOF}.
- * p>
+ * <p>
  * TODO correct handling of datastore events
  *
  * @author Erich Schubert

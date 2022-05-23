@@ -41,9 +41,7 @@ import elki.logging.Logging;
 import elki.logging.Logging.Level;
 import elki.logging.LoggingConfiguration;
 import elki.logging.progress.FiniteProgress;
-import elki.logging.statistics.DoubleStatistic;
-import elki.logging.statistics.Duration;
-import elki.logging.statistics.LongStatistic;
+import elki.logging.statistics.*;
 import elki.math.MathUtil;
 import elki.math.MeanVariance;
 import elki.result.Metadata;
@@ -110,6 +108,11 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
   private static final Logging LOG = Logging.getLogger(RangeQueryBenchmark.class);
 
   /**
+   * Query radius.
+   */
+  protected double radius = Double.NaN;
+
+  /**
    * The alternate query point source. Optional.
    */
   protected DatabaseConnection queries = null;
@@ -123,6 +126,22 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * Random generator factory
    */
   protected RandomFactory random;
+
+  /**
+   * Constructor.
+   *
+   * @param input Data input
+   * @param distance Distance function to use
+   * @param radius Query radius to use
+   * @param sampling Sampling rate
+   * @param random Random factory
+   */
+  public RangeQueryBenchmark(InputStep input, Distance<? super O> distance, double radius, double sampling, RandomFactory random) {
+    super(input, distance);
+    this.radius = radius;
+    this.sampling = sampling;
+    this.random = random;
+  }
 
   /**
    * Constructor.
@@ -151,7 +170,12 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     Duration dur = LOG.newDuration(key + ".duration");
     int hash;
     MeanVariance mv = new MeanVariance(); // result statistics to collect.
-    if(queries != null) {
+    if(!Double.isNaN(radius)) {
+      RangeSearcher<DBIDRef> rangeQuery = new QueryBuilder<>(relation, distance).rangeByDBID(radius);
+      logIndexStatistics(database);
+      hash = run(rangeQuery, relation, radius, dur, mv);
+    }
+    else if(queries != null) {
       RangeSearcher<O> rangeQuery = new QueryBuilder<>(relation, distance).rangeByObject();
       logIndexStatistics(database);
       hash = run(rangeQuery, relation, queries, dur, mv);
@@ -162,6 +186,10 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
       // Get a query radius relation:
       Relation<NumberVector> qrad = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_1D);
       hash = run(rangeQuery, relation, qrad, dur, mv);
+    }
+    LOG.statistics(dur.end());
+    if(dur instanceof MillisTimeDuration) {
+      LOG.statistics(new StringStatistic(key + ".duration.avg", dur.getDuration() / mv.getCount() * 1000. + " ns"));
     }
     LOG.statistics(new DoubleStatistic(key + ".results.mean", mv.getMean()));
     LOG.statistics(new DoubleStatistic(key + ".results.std", mv.getPopulationStddev()));
@@ -178,6 +206,30 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     for(It<Index> it = Metadata.hierarchyOf(database).iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
+  }
+
+  /**
+   * Run the algorithm, with constant radius
+   *
+   * @param rangeQuery query to test
+   * @param relation Relation
+   * @param radius Radius
+   * @param mv Mean and variance statistics
+   * @return hash code over all results
+   */
+  protected int run(RangeSearcher<DBIDRef> rangeQuery, Relation<O> relation, double radius, Duration dur, MeanVariance mv) {
+    final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), sampling, random);
+    int hash = 0;
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    dur.begin();
+    for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
+      DoubleDBIDList rres = rangeQuery.getRange(iditer, radius);
+      hash = Util.mixHashCodes(hash, processResult(rres, mv));
+      LOG.incrementProcessed(prog);
+    }
+    dur.end();
+    LOG.ensureCompleted(prog);
+    return hash;
   }
 
   /**
@@ -285,7 +337,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    */
   public static void main(String[] args) {
     LoggingConfiguration.setDefaultLevel(Level.STATISTICS);
-    runCLIApplication(KNNBenchmark.class, args);
+    runCLIApplication(RangeQueryBenchmark.class, args);
   }
 
   /**
@@ -298,6 +350,11 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param <O> Object type
    */
   public static class Par<O extends NumberVector> extends AbstractDistanceBasedApplication.Par<O> {
+    /**
+     * Parameter for the query radius
+     */
+    public static final OptionID RADIUS_ID = new OptionID("rangebench.radius", "Query radius to use a constant radius.");
+
     /**
      * Parameter for the query data set.
      */
@@ -324,6 +381,11 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     protected double sampling = -1;
 
     /**
+     * Query radius.
+     */
+    protected double radius = Double.NaN;
+
+    /**
      * Random generator factory
      */
     protected RandomFactory random;
@@ -331,9 +393,14 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+      new DoubleParameter(RADIUS_ID) //
           .setOptional(true) //
-          .grab(config, x -> queries = x);
+          .grab(config, x -> radius = x);
+      if(Double.isNaN(radius)) {
+        new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class) //
+            .setOptional(true) //
+            .grab(config, x -> queries = x);
+      }
       new DoubleParameter(SAMPLING_ID) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .setOptional(true) //
@@ -343,7 +410,9 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
 
     @Override
     public RangeQueryBenchmark<O> make() {
-      return new RangeQueryBenchmark<>(inputstep, distance, queries, sampling, random);
+      return Double.isNaN(radius) //
+          ? new RangeQueryBenchmark<>(inputstep, distance, queries, sampling, random) //
+          : new RangeQueryBenchmark<>(inputstep, distance, radius, sampling, random);
     }
   }
 }

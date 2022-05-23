@@ -1,0 +1,7 @@
+elki.index.tree.spatial.kd.split.BoundedMidpointSplit
+elki.index.tree.spatial.kd.split.LeastOneDimSSQSplit
+elki.index.tree.spatial.kd.split.LeastSSQSplit
+elki.index.tree.spatial.kd.split.MedianSplit
+elki.index.tree.spatial.kd.split.MedianVarianceSplit
+elki.index.tree.spatial.kd.split.MeanVarianceSplit
+elki.index.tree.spatial.kd.split.MidpointSplit

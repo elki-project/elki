@@ -89,7 +89,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements Hierar
    * Constructor.
    *
    * @param distance Distance function
-   * @param minPts Minimum number of points for density
+   * @param minPts Minimum number of points for coredists
    */
   public HDBSCANLinearMemory(Distance<? super O> distance, int minPts) {
     super(distance, minPts);
@@ -106,7 +106,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements Hierar
    * @param relation Relation
    * @return Clustering hierarchy
    */
-  public PointerDensityHierarchyResult run(Relation<O> relation) {
+  public ClusterDensityMergeHistory run(Relation<O> relation) {
     final QueryBuilder<O> qb = new QueryBuilder<>(relation, distance);
     final KNNSearcher<DBIDRef> knnQ = qb.kNNByDBID(minPts);
     final DistanceQuery<O> distQ = qb.distanceQuery();
@@ -125,8 +125,8 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements Hierar
         new HDBSCANAdapter(ids, coredists, distQ), //
         new HeapMSTCollector(heap, mprog, LOG));
     LOG.ensureCompleted(mprog);
-    return convertToPointerRepresentation(ids, heap, //
-        new PointerHierarchyBuilder(ids, distQ.getDistance().isSquared())) //
+    return convertToMergeList(ids, heap, //
+        new ClusterMergeHistoryBuilder(ids, distQ.getDistance().isSquared())) //
             .complete(coredists);
   }
 

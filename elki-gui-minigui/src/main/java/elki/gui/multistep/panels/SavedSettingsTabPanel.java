@@ -69,8 +69,6 @@ public class SavedSettingsTabPanel extends JPanel {
 
   /**
    * The UI to set parameters on.
-   * 
-   * TODO: Use an Interface instead?
    */
   private MultiStepGUI gui;
 
@@ -87,10 +85,18 @@ public class SavedSettingsTabPanel extends JPanel {
     this.setLayout(new GridBagLayout());
     // Dropdown for saved settings
     {
-      savedSettingsModel = new SettingsComboboxModel(store);
+      savedSettingsModel = new SettingsComboboxModel();
       savedCombo = new JComboBox<>(savedSettingsModel);
       savedCombo.setEditable(true);
       savedCombo.setSelectedItem("[Saved Settings]");
+      savedCombo.setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+      if(savedCombo.getRenderer() instanceof JComponent) {
+        ((JComponent) savedCombo.getRenderer()).setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
+      }
+      if(savedCombo.getEditor().getEditorComponent() instanceof JComponent) {
+        ((JComponent) savedCombo.getEditor().getEditorComponent()).setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
+      }
+
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.gridx = 0;
@@ -108,21 +114,21 @@ public class SavedSettingsTabPanel extends JPanel {
       JButton loadButton = new JButton("Load");
       loadButton.setMnemonic(KeyEvent.VK_L);
       loadButton.addActionListener((e) -> {
-        String key = savedSettingsModel.getSelectedItem();
-        ArrayList<String> settings = store.get(key);
-        SerializedParameterization config = new SerializedParameterization(settings);
-        gui.setParameters(config);
-        config.logUnusedParameters();
-        config.clearErrors();
+        ArrayList<String> settings = store.get(savedSettingsModel.getSelectedItem());
+        if(settings != null) {
+          SerializedParameterization config = new SerializedParameterization(settings);
+          gui.setParameters(config);
+          config.logUnusedParameters();
+          config.clearErrors();
+        }
       });
       buttonPanel.add(loadButton);
       // button to save settings
       JButton saveButton = new JButton("Save");
       saveButton.setMnemonic(KeyEvent.VK_S);
       saveButton.addActionListener((e) -> {
-        String key = savedSettingsModel.getSelectedItem();
-        store.put(key, gui.serializeParameters());
         try {
+          store.put(savedSettingsModel.getSelectedItem(), gui.serializeParameters());
           store.save();
         }
         catch(IOException e1) {
@@ -135,9 +141,8 @@ public class SavedSettingsTabPanel extends JPanel {
       JButton removeButton = new JButton("Remove");
       removeButton.setMnemonic(KeyEvent.VK_E);
       removeButton.addActionListener((e) -> {
-        String key = savedSettingsModel.getSelectedItem();
-        store.remove(key);
         try {
+          store.remove(savedSettingsModel.getSelectedItem());
           store.save();
         }
         catch(IOException e1) {
@@ -172,23 +177,15 @@ public class SavedSettingsTabPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Settings storage
-     */
-    protected SavedSettingsFile store;
-
-    /**
      * Selected entry
      */
     protected String selected = null;
 
     /**
      * Constructor
-     * 
-     * @param store Store to access
      */
-    public SettingsComboboxModel(SavedSettingsFile store) {
+    public SettingsComboboxModel() {
       super();
-      this.store = store;
     }
 
     @Override
