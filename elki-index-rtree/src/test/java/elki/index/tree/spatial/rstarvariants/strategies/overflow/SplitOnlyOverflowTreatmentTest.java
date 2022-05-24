@@ -41,7 +41,7 @@ import elki.utilities.ELKIBuilder;
 public class SplitOnlyOverflowTreatmentTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeAngTanLinearSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.OVERFLOW_STRATEGY_ID, SplitOnlyOverflowTreatment.class) //
         .build();

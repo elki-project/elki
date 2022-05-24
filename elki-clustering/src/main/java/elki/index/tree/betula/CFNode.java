@@ -70,8 +70,7 @@ public class CFNode<L extends ClusterFeature> implements AsClusterFeature {
   /**
    * Add a child without statistics
    * 
-   * @param cf Clustering Feature
-   * 
+   * @param node child
    * @return success
    */
   public boolean setChild(AsClusterFeature node) {

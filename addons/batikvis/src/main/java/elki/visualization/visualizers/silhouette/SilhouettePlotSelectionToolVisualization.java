@@ -229,7 +229,6 @@ public class SilhouettePlotSelectionToolVisualization implements VisFactory {
     /**
      * Gets the Index of the ClusterOrderEntry where the event occurred
      *
-     * @param order List of ClusterOrderEntries
      * @param cPt clicked point
      * @return Index of the object
      */

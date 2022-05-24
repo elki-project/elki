@@ -78,7 +78,7 @@ public final class ClassGenericsUtil {
     for(Class<?> inner : c.getDeclaredClasses()) {
       if(Parameterizer.class.isAssignableFrom(inner)) {
         try {
-          return inner.asSubclass(Parameterizer.class).newInstance();
+          return inner.asSubclass(Parameterizer.class).getDeclaredConstructor().newInstance();
         }
         catch(Exception e) {
           LOG.warning("Non-usable Parameterizer in class: " + c.getName());
@@ -214,7 +214,7 @@ public final class ClassGenericsUtil {
     Exception last = null;
     for(Class<?> c : ELKIServiceRegistry.findAllImplementations(clz)) {
       try {
-        return clz.cast(c.newInstance());
+        return clz.cast(c.getDeclaredConstructor().newInstance());
       }
       catch(Exception e) {
         last = e;
@@ -234,7 +234,7 @@ public final class ClassGenericsUtil {
    */
   public static <T> T loadDefault(Class<T> clz, String def) {
     try {
-      return clz.cast(ELKIServiceRegistry.findImplementation(clz, def).newInstance());
+      return clz.cast(ELKIServiceRegistry.findImplementation(clz, def).getDeclaredConstructor().newInstance());
     }
     catch(Exception e) {
       return instantiateLowlevel(clz);

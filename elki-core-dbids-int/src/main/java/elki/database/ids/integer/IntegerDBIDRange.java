@@ -56,6 +56,9 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
     super();
     this.start = start;
     this.len = len;
+    if(len < 0) {
+      throw new IllegalArgumentException("Negative length");
+    }
   }
 
   @Override
@@ -66,10 +69,10 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   @Override
   public boolean contains(DBIDRef o) {
     int oid = o.internalGetIndex();
-    if (oid < start) {
+    if(oid < start) {
       return false;
     }
-    if (oid >= start + len) {
+    if(oid >= start + len) {
       return false;
     }
     return true;
@@ -77,7 +80,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   @Override
   public DBID get(int i) {
-    if (i > len || i < 0) {
+    if(i > len || i < 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     return DBIDFactory.FACTORY.importInteger(start + i);
@@ -96,10 +99,14 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
-    if (var instanceof IntegerDBIDVar) {
+    if(index > len || index < 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(start + index);
       return var;
-    } else {
+    }
+    else {
       // Much less efficient:
       var.set(get(index));
       return var;
@@ -109,11 +116,11 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   @Override
   public int binarySearch(DBIDRef key) {
     int keyid = DBIDUtil.asInteger(key);
-    if (keyid < start) {
+    if(keyid < start) {
       return -1;
     }
     final int off = keyid - start;
-    if (off < len) {
+    if(off < len) {
       return off;
     }
     return -(len + 1);
@@ -131,6 +138,12 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   @Override
   public ArrayDBIDs slice(int begin, int end) {
+    if(begin > len || begin < 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    if(end > len || end < 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
     return new IntegerDBIDRange(begin + start, end - begin);
   }
 

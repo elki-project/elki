@@ -68,8 +68,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @has - - - ProjectedRangeByObject
  * @has - - - ProjectedRKNNByObject
  * 
- * @param <O> Outer object type.
- * @param <I> Inner object type.
+ * @param <O> Outer object type
+ * @param <I> Inner object type
  */
 public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeIndex<O> {
   /**
@@ -325,8 +325,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * Class to proxy range queries.
    * 
    * @author Erich Schubert
-   * 
-   * @param Distance type
    */
   class ProjectedRangeByObject implements RangeSearcher<O> {
     /**
@@ -376,8 +374,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * Class to proxy range queries.
    * 
    * @author Erich Schubert
-   * 
-   * @param Distance type
    */
   class ProjectedRangeByDBID implements RangeSearcher<DBIDRef> {
     /**
@@ -428,8 +424,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * Class to proxy RkNN queries.
    * 
    * @author Erich Schubert
-   * 
-   * @param Distance type
    */
   class ProjectedRKNNByObject implements RKNNSearcher<O> {
     /**
@@ -474,8 +468,6 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * Class to proxy RkNN queries.
    * 
    * @author Erich Schubert
-   * 
-   * @param Distance type
    */
   class ProjectedRKNNByDBID implements RKNNSearcher<DBIDRef> {
     /**

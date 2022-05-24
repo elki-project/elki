@@ -54,7 +54,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRStarTree() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .build();
     assertExactEuclidean(factory, RStarTreeKNNSearcher.class, RStarTreeRangeSearcher.class);

@@ -42,7 +42,7 @@ import elki.utilities.ELKIBuilder;
 public class GreeneSplitTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeGreeneSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.SPLIT_STRATEGY_ID, GreeneSplit.class) //
         .build();

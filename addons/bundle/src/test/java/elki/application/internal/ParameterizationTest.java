@@ -52,7 +52,7 @@ public class ParameterizationTest {
     for(Class<?> inner : cls.getDeclaredClasses()) {
       if(Parameterizer.class.isAssignableFrom(inner)) {
         Class<? extends Parameterizer> pcls = inner.asSubclass(Parameterizer.class);
-        pcls.newInstance();
+        pcls.getDeclaredConstructor().newInstance();
         assertTrue("More than one parameterization method in class " + cls.getName(), first);
         checkMakeInstance(cls, pcls);
         // Configure with missing values; must not throw an exception.

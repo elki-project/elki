@@ -28,6 +28,7 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 import elki.gui.icons.StockIcon;
 import elki.logging.LoggingUtil;
@@ -67,12 +68,15 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     super(fp, parent);
     // create components
     textfield = new JTextField();
+    textfield.setBorder(new EmptyBorder(3, 3, 3, 3));
     textfield.setToolTipText(param.getOptionID().getDescription());
     textfield.addActionListener(this);
     button = new JButton(StockIcon.getStockIcon(StockIcon.DOCUMENT_OPEN));
     button.setToolTipText(param.getOptionID().getDescription());
     button.addActionListener(this);
-    textfield.setText(fp.getValueAsString());
+    if(fp.isDefined()) {
+      textfield.setText(fp.getValueAsString());
+    }
 
     // make a panel
     GridBagConstraints constraints = new GridBagConstraints();

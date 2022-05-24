@@ -43,7 +43,7 @@ import elki.utilities.ELKIBuilder;
 public class LeastEnlargementInsertionStrategyTest extends AbstractIndexStructureTest {
   @Test
   public void testRTreeAngTanLinearSplit() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(RStarTreeFactory.Par.INSERTION_STRATEGY_ID, LeastEnlargementInsertionStrategy.class) //
         .build();

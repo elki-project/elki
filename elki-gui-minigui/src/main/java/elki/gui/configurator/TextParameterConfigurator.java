@@ -25,6 +25,7 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -52,6 +53,7 @@ public class TextParameterConfigurator extends AbstractSingleParameterConfigurat
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.weightx = 1.0;
     value = new JTextField();
+    value.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     if(param.isDefined() && !param.tookDefaultValue()) {
       value.setText(param.getValueAsString());
     }

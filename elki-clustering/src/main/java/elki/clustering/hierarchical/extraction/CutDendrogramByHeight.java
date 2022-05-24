@@ -22,10 +22,9 @@ package elki.clustering.hierarchical.extraction;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.ClusterMergeHistory;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
-import elki.database.ids.DBIDArrayIter;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
@@ -60,14 +59,26 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
    * @param hierarchical Produce a hierarchical output
    */
   public CutDendrogramByHeight(HierarchicalClusteringAlgorithm algorithm, double threshold, boolean hierarchical) {
-    super(algorithm, hierarchical);
+    this(algorithm, threshold, hierarchical, true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param algorithm Algorithm to run
+   * @param threshold Distance threshold
+   * @param hierarchical Produce a hierarchical output
+   * @param simplify Simplify by putting single points into merge clusters
+   */
+  public CutDendrogramByHeight(HierarchicalClusteringAlgorithm algorithm, double threshold, boolean hierarchical, boolean simplify) {
+    super(algorithm, hierarchical, simplify);
     this.threshold = threshold;
   }
 
   @Override
-  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
-    Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
+  public Clustering<DendrogramModel> run(ClusterMergeHistory merges) {
+    Clustering<DendrogramModel> result = new Instance(merges).extractClusters();
+    Metadata.hierarchyOf(result).addChild(merges);
     return result;
   }
 
@@ -80,19 +91,17 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
     /**
      * Constructor.
      *
-     * @param pointerresult Pointer result
+     * @param merges Pointer result
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      super(pointerresult);
+    public Instance(ClusterMergeHistory merges) {
+      super(merges);
     }
 
     @Override
-    protected int findSplit(DBIDArrayIter it) {
-      int split = ids.size();
-      it.seek(split - 1);
-      while(it.valid() && threshold <= lambda.doubleValue(it)) {
-        split--;
-        it.retract();
+    protected int findSplit() {
+      int split = merges.numMerges() - 1;
+      while(split > 1 && threshold <= merges.getMergeHeight(split - 1)) {
+        --split;
       }
       return split;
     }
@@ -128,7 +137,7 @@ public class CutDendrogramByHeight extends AbstractCutDendrogram implements Clus
 
     @Override
     public CutDendrogramByHeight make() {
-      return new CutDendrogramByHeight(algorithm, threshold, hierarchical);
+      return new CutDendrogramByHeight(algorithm, threshold, hierarchical, simplify);
     }
   }
 }

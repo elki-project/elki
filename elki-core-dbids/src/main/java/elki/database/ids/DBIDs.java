@@ -41,7 +41,7 @@ public interface DBIDs {
    * <pre>
    * {@code
    * for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-   *   DBID id = iter.getDBID();
+   *   NumberVector vec = relation.get(iter); // iter is a temporary object reference
    * }
    * }
    * </pre>

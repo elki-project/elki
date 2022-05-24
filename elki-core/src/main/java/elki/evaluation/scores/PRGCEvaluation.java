@@ -119,7 +119,7 @@ public class PRGCEvaluation implements ScoreEvaluation {
           curve.addAndSimplify(prevrecG, prevpreG);
         }
       }
-      if(curve != null && recG >= 0) {
+      if(curve != null) {
         curve.addAndSimplify(recG, preG);
       }
       if(recG > 0) {

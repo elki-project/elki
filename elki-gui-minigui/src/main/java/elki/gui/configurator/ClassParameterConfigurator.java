@@ -27,12 +27,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicArrowButton;
@@ -95,6 +90,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   public ClassParameterConfigurator(ClassParameter<?> cp, JComponent parent) {
     super(cp, parent);
     textfield = new JTextField();
+    textfield.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
     textfield.setToolTipText(param.getOptionID().getDescription());
     if(cp.isDefined() && !cp.tookDefaultValue()) {
       textfield.setText(cp.getValueAsString());

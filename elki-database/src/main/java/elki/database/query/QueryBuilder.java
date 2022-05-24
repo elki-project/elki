@@ -449,9 +449,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<RangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
       RangeSearcher<O> q = it.get().rangeByObject(distanceQuery, maxrange, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "range", q != null);
       if(q != null) {
         return q;
       }
@@ -503,9 +501,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<RangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
       RangeSearcher<DBIDRef> q = it.get().rangeByDBID(distanceQuery, maxrange, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "range", q != null);
       if(q != null) {
         return q;
       }
@@ -558,9 +554,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
       RangeSearcher<O> q = it.get().similarityRangeByObject(simQuery, threshold, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "similarity", q != null);
       if(q != null) {
         return q;
       }
@@ -607,9 +601,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<SimilarityRangeIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
       RangeSearcher<DBIDRef> q = it.get().similarityRangeByDBID(simQuery, threshold, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "similarity", q != null);
       if(q != null) {
         return q;
       }
@@ -654,9 +646,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
       RKNNSearcher<O> q = it.get().rkNNByObject(distanceQuery, k, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
-      }
+      logUsing(it.get(), "RkNN", q != null);
       if(q != null) {
         return q;
       }
@@ -698,9 +688,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<RKNNIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
       RKNNSearcher<DBIDRef> q = it.get().rkNNByDBID(distanceQuery, k, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());
-      }
+      logUsing(it.get(), "RkNN", q != null);
       if(q != null) {
         return q;
       }
@@ -743,9 +731,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
       PrioritySearcher<O> q = it.get().priorityByObject(distanceQuery, maxrange, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "priority", q != null);
       if(q != null) {
         return q;
       }
@@ -792,9 +778,7 @@ public class QueryBuilder<O> {
     flags ^= precompute; // Restore
     for(It<DistancePriorityIndex<O>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(DistancePriorityIndex.class); it.valid(); it.advance()) {
       PrioritySearcher<DBIDRef> q = it.get().priorityByDBID(distanceQuery, maxrange, flags);
-      if(LOG.isDebuggingFinest()) {
-        LOG.debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
-      }
+      logUsing(it.get(), "priority", q != null);
       if(q != null) {
         return q;
       }

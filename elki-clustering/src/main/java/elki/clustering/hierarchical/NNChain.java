@@ -22,8 +22,8 @@ package elki.clustering.hierarchical;
 
 import elki.clustering.hierarchical.linkage.Linkage;
 import elki.clustering.hierarchical.linkage.SingleLinkage;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDs;
+import elki.database.ids.ArrayDBIDs;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
@@ -77,127 +77,143 @@ public class NNChain<O> extends AGNES<O> {
   }
 
   @Override
-  public PointerHierarchyResult run(Relation<O> relation) {
+  public ClusterMergeHistory run(Relation<O> relation) {
     if(SingleLinkage.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
     }
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    final DBIDs ids = relation.getDBIDs();
-    MatrixParadigm mat = new MatrixParadigm(ids);
-
-    // Compute the initial (lower triangular) distance matrix.
-    initializeDistanceMatrix(mat, dq, linkage);
-
-    // Initialize space for result:
-    PointerHierarchyBuilder builder = new PointerHierarchyBuilder(ids, dq.getDistance().isSquared());
-
-    nnChainCore(mat, builder);
-    return builder.complete();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    ClusterDistanceMatrix mat = initializeDistanceMatrix(ids, dq, linkage);
+    return new Instance(linkage).run(mat, new ClusterMergeHistoryBuilder(ids, distance.isSquared()));
   }
 
   /**
-   * Uses NNChain as in "Modern hierarchical, agglomerative clustering
-   * algorithms" by Daniel Müllner
+   * Main worker instance of NNChain.
    * 
-   * @param mat Matrix view
-   * @param builder Result builder
+   * @author Erich Schubert
    */
-  private void nnChainCore(MatrixParadigm mat, PointerHierarchyBuilder builder) {
-    final DBIDArrayIter ix = mat.ix;
-    final double[] distances = mat.matrix;
-    final int size = mat.size;
-    // The maximum chain size = number of ids + 1
-    IntegerArray chain = new IntegerArray(size + 1);
+  public static class Instance extends AGNES.Instance {
+    /**
+     * Constructor.
+     *
+     * @param linkage Linkage
+     */
+    public Instance(Linkage linkage) {
+      super(linkage);
+    }
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
-    for(int k = 1, end = size; k < size; k++) {
-      int a = -1, b = -1;
-      if(chain.size() <= 3) {
-        // Accessing two arbitrary not yet merged elements could be optimized to
-        // work in O(1) like in Müllner;
-        // however this usually does not have a huge impact (empirically just
-        // about 1/5000 of total performance)
-        a = findUnlinked(0, end, ix, builder);
-        b = findUnlinked(a + 1, end, ix, builder);
-        chain.clear();
-        chain.add(a);
-      }
-      else {
-        // Chain is expected to look like (.... a, b, c, b) with b and c merged.
-        int lastIndex = chain.size;
-        int c = chain.get(lastIndex - 2);
-        b = chain.get(lastIndex - 3);
-        a = chain.get(lastIndex - 4);
-        // Ensure we had a loop at the end:
-        assert (chain.get(lastIndex - 1) == c || chain.get(lastIndex - 1) == b);
-        // if c < b, then we merged b -> c, otherwise c -> b
-        b = c < b ? c : b;
-        // Cut the tail:
+    @Override
+    public ClusterMergeHistory run(ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder) {
+      this.mat = mat;
+      this.builder = builder;
+      this.end = mat.size;
+      nnChainCore();
+      builder.optimizeOrder();
+      return builder.complete();
+    }
+
+    /**
+     * Uses NNChain as in "Modern hierarchical, agglomerative clustering
+     * algorithms" by Daniel Müllner.
+     */
+    private void nnChainCore() {
+      final int size = mat.size;
+      boolean warnedIrreducible = false;
+      final double[] distances = mat.matrix;
+      final int[] clustermap = mat.clustermap;
+      // The maximum chain size = number of ids + 1, but usually much less
+      IntegerArray chain = new IntegerArray(size >> 2);
+
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running NNChain", size - 1, LOG) : null;
+      for(int k = 1; k < size; k++) {
+        int a = -1, b = -1;
+        if(chain.size() < 2) {
+          // Accessing two arbitrary not yet merged elements could be optimized
+          // to work in O(1) like in Müllner; however this usually does not have
+          // a huge impact (empirically just about 1/5000 of total performance)
+          a = findUnlinked(0, end, clustermap);
+          b = findUnlinked(a + 1, end, clustermap);
+          assert clustermap[a] >= 0 && clustermap[b] >= 0;
+          chain.clear();
+          chain.add(a);
+        }
+        else {
+          a = chain.get(chain.size - 2);
+          b = chain.get(chain.size - 1);
+          assert clustermap[b] >= 0;
+          if(clustermap[a] < 0) {
+            if(!warnedIrreducible) {
+              LOG.warning("Detected an inversion in the clustering. NNChain on irreducible linkages may yield different results.");
+              warnedIrreducible = true;
+            }
+            chain.size -= 2; // cut the chain
+            k--; // retry
+            continue;
+          }
+          chain.size--; // Remove b
+        }
+        // For ties, always prefer the second-last element b:
+        double minDist = mat.get(a, b);
+        do {
+          int c = b;
+          final int ta = ClusterDistanceMatrix.triangleSize(a);
+          for(int i = 0; i < a; i++) {
+            if(i != b && clustermap[i] >= 0) {
+              double dist = distances[ta + i];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+          for(int i = a + 1; i < end; i++) {
+            if(i != b && clustermap[i] >= 0) {
+              double dist = distances[ClusterDistanceMatrix.triangleSize(i) + a];
+              if(dist < minDist) {
+                minDist = dist;
+                c = i;
+              }
+            }
+          }
+          b = a;
+          a = c;
+          chain.add(a);
+        }
+        while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
+
+        // We always merge the larger into the smaller index:
+        if(a < b) {
+          int tmp = a;
+          a = b;
+          b = tmp;
+        }
+        assert minDist == mat.get(a, b);
+        merge(minDist, a, b);
         chain.size -= 3;
+        chain.add(b);
+        end = shrinkActiveSet(clustermap, end, a); // shrink working set
+        LOG.incrementProcessed(progress);
       }
-      // For ties, always prefer the second-last element b:
-      double minDist = mat.get(a, b);
-      do {
-        int c = b;
-        final int ta = MatrixParadigm.triangleSize(a);
-        for(int i = 0; i < a; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[ta + i];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-        for(int i = a + 1; i < size; i++) {
-          if(i != b && !builder.isLinked(ix.seek(i))) {
-            double dist = distances[MatrixParadigm.triangleSize(i) + a];
-            if(dist < minDist) {
-              minDist = dist;
-              c = i;
-            }
-          }
-        }
-
-        b = a;
-        a = c;
-
-        chain.add(a);
-      }
-      while(chain.size() < 3 || a != chain.get(chain.size - 1 - 2));
-
-      // We always merge the larger into the smaller index:
-      if(a < b) {
-        int tmp = a;
-        a = b;
-        b = tmp;
-      }
-      assert (minDist == mat.get(a, b));
-      assert (b < a);
-      merge(size, mat, builder, minDist, a, b);
-      end = AGNES.shrinkActiveSet(ix, builder, end, a); // Shrink working set
-      LOG.incrementProcessed(progress);
+      LOG.ensureCompleted(progress);
     }
-    LOG.ensureCompleted(progress);
-  }
 
-  /**
-   * Find an unlinked object.
-   *
-   * @param pos Starting position
-   * @param end End position
-   * @param ix Iterator to translate into DBIDs
-   * @param builder Linkage information
-   * @return Position
-   */
-  public static int findUnlinked(int pos, int end, DBIDArrayIter ix, PointerHierarchyBuilder builder) {
-    while(pos < end) {
-      if(!builder.isLinked(ix.seek(pos))) {
-        return pos;
+    /**
+     * Find an unlinked object.
+     *
+     * @param pos Starting position
+     * @param end End position
+     * @param clustermap Map of indexes to current clusters
+     * @return Position
+     */
+    public static int findUnlinked(int pos, int end, int[] clustermap) {
+      while(pos < end) {
+        if(clustermap[pos] >= 0) {
+          return pos;
+        }
+        ++pos;
       }
-      ++pos;
+      return -1;
     }
-    return -1;
   }
 
   /**

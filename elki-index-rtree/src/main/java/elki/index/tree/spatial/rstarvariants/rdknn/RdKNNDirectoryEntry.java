@@ -34,7 +34,6 @@ import elki.index.tree.spatial.SpatialDirectoryEntry;
  * 
  * @author Elke Achtert
  * @since 0.1
- * @param Distance type
  */
 public class RdKNNDirectoryEntry extends SpatialDirectoryEntry implements RdKNNEntry {
   private static final long serialVersionUID = 2;

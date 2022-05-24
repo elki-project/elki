@@ -133,7 +133,7 @@ public class KNNBenchmark<O> extends AbstractDistanceBasedApplication<O> {
       logIndexStatistics(database);
       hash = run(knnQuery, dur, mv, mvdist);
     }
-    LOG.statistics(dur);
+    LOG.statistics(dur.end());
     if(dur instanceof MillisTimeDuration) {
       LOG.statistics(new StringStatistic(key + ".duration.avg", dur.getDuration() / mv.getCount() * 1000. + " ns"));
     }

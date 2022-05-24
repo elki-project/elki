@@ -32,6 +32,7 @@ import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -178,7 +179,7 @@ public class FastPAM<V> extends FastPAM1<V> {
         LOG.incrementProcessed(prog);
         findBestSwaps(m, bestids, best, cost, pcost);
         // Convergence check
-        int min = argmin(best);
+        int min = VMath.argmin(best);
         if(!(best[min] < -1e-12 * tc)) {
           break; // Converged
         }
@@ -188,7 +189,7 @@ public class FastPAM<V> extends FastPAM1<V> {
           tc += best[min];
           best[min] = Double.POSITIVE_INFINITY; // Deactivate
           // Find next candidate:
-          while((min = argmin(best)) >= 0 && best[min] < -1e-12 * tc) {
+          while((min = VMath.argmin(best)) >= 0 && best[min] < -1e-12 * tc) {
             bestids.assignVar(min, bestid);
             // Compare object to its own medoid.
             if(DBIDUtil.equal(m.seek(assignment.intValue(bestid) & 0x7FFF), bestid)) {
@@ -252,25 +253,6 @@ public class FastPAM<V> extends FastPAM1<V> {
           }
         }
       }
-    }
-
-    /**
-     * Find the smallest (most negative) value.
-     * 
-     * @param best Best changes
-     * @return Index of smallest value
-     */
-    protected static int argmin(double[] best) {
-      double min = Double.POSITIVE_INFINITY;
-      int ret = -1;
-      for(int i = 0; i < best.length; i++) {
-        final double v = best[i];
-        if(v < min) {
-          min = v;
-          ret = i;
-        }
-      }
-      return ret;
     }
 
     /**

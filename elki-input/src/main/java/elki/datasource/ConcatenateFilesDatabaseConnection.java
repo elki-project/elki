@@ -118,6 +118,9 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
           case NEXT_OBJECT:
             Object[] o = new Object[objects.metaLength()];
             o[0] = filestr;
+            if(meta == null) {
+              throw new IllegalStateException("Data without metadata in stream " + source.toString());
+            }
             for(int i = 0; i < meta.size(); i++) {
               o[i + 1] = source.data(i);
             }

@@ -19,6 +19,7 @@ elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
 elki.clustering.hierarchical.SLINK single-link single-linkage
 elki.clustering.hierarchical.Anderberg
 elki.clustering.hierarchical.NNChain
+elki.clustering.hierarchical.LinearMemoryNNChain
 elki.clustering.hierarchical.AGNES HAC SAHN
 elki.clustering.hierarchical.CLINK Defays
 elki.clustering.hierarchical.SLINKHDBSCANLinearMemory

@@ -170,9 +170,8 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
    * builds the tree recursively
    * 
    * @param current current node to build
-   * @param left left bound of the node
-   * @param right right bound of the node
-   * @param iter reference to the sorted DBIDs
+   * @param content data to index
+   * @param vps number of vantage points to use
    */
   private void buildTree(Node current, DBIDs content, int vps) {
     // find vantage points
@@ -238,11 +237,10 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
   }
 
   /**
-   * finds a vantage points in the DBIDs between left and right
-   * 
-   * @param left left bound
-   * @param right right bound
-   * @param iter DBIDs to find a vantage point in
+   * Finds a vantage points in the DBIDs between left and right
+   *
+   * @param content content to process
+   * @param vps Number of vantage points to choose
    * @return vantage point
    */
   private ArrayDBIDs findVantagePoints(DBIDs content, int vps) {
@@ -623,9 +621,8 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
      * Constructor.
      *
      * @param mindist Minimum distance
-     * @param left Interval begin
-     * @param right Interval end (exclusive)
-     * @param axis Next axis
+     * @param node Node
+     * @param vp Vantage point
      */
     public PrioritySearchBranch(double mindist, Node node, DBID vp) {
       this.mindist = mindist;

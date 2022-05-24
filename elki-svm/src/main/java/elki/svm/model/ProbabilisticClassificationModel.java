@@ -105,7 +105,7 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
           p[j] /= (1 + diff);
         }
       }
-      if(iter >= max_iter) {
+      if(iter == max_iter - 1) {
         LOG.info("Exceeds max_iter in multiclass_prob");
       }
     }

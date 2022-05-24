@@ -22,10 +22,9 @@ package elki.clustering.hierarchical.extraction;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.ClusterMergeHistory;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
-import elki.database.ids.DBIDArrayIter;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.utilities.optionhandling.OptionID;
@@ -61,14 +60,26 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
    * @param hierarchical Produce a hierarchical output
    */
   public CutDendrogramByNumberOfClusters(HierarchicalClusteringAlgorithm algorithm, int minclusters, boolean hierarchical) {
-    super(algorithm, hierarchical);
+    this(algorithm, minclusters, hierarchical, true);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param algorithm Algorithm to run
+   * @param minclusters Minimum number of clusters
+   * @param hierarchical Produce a hierarchical output
+   * @param simplify Simplify by putting single points into merge clusters
+   */
+  public CutDendrogramByNumberOfClusters(HierarchicalClusteringAlgorithm algorithm, int minclusters, boolean hierarchical, boolean simplify) {
+    super(algorithm, hierarchical, simplify);
     this.minclusters = minclusters;
   }
 
   @Override
-  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
-    Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
+  public Clustering<DendrogramModel> run(ClusterMergeHistory merges) {
+    Clustering<DendrogramModel> result = new Instance(merges).extractClusters();
+    Metadata.hierarchyOf(result).addChild(merges);
     return result;
   }
 
@@ -81,22 +92,23 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
     /**
      * Constructor.
      *
-     * @param pointerresult Pointer result
+     * @param merges cluster merge history
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      super(pointerresult);
+    public Instance(ClusterMergeHistory merges) {
+      super(merges);
     }
 
     @Override
-    protected int findSplit(DBIDArrayIter it) {
-      int split = ids.size() > minclusters ? ids.size() - minclusters : 0;
-      it.seek(split);
+    protected int findSplit() {
+      if(merges.size() <= minclusters) {
+        return 0; // no splits
+      }
+      int split = merges.size() - minclusters;
       // Stop distance:
-      final double stopdist = lambda.doubleValue(it);
-
+      final double stopdist = merges.getMergeHeight(split);
       // Tie handling: decrement split.
-      for(it.retract(); it.valid() && stopdist <= lambda.doubleValue(it); it.retract()) {
-        split--;
+      while(split > 0 && stopdist == merges.getMergeHeight(split - 1)) {
+        --split;
       }
       return split;
     }
@@ -133,7 +145,7 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
 
     @Override
     public CutDendrogramByNumberOfClusters make() {
-      return new CutDendrogramByNumberOfClusters(algorithm, minclusters, hierarchical);
+      return new CutDendrogramByNumberOfClusters(algorithm, minclusters, hierarchical, simplify);
     }
   }
 }

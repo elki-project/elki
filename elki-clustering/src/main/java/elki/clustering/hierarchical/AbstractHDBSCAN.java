@@ -82,7 +82,7 @@ public abstract class AbstractHDBSCAN<O> implements Algorithm {
    * Constructor.
    *
    * @param distance Distance function
-   * @param minPts Minimum number of points for density
+   * @param minPts Minimum number of points for coredists
    */
   public AbstractHDBSCAN(Distance<? super O> distance, int minPts) {
     super();
@@ -221,14 +221,13 @@ public abstract class AbstractHDBSCAN<O> implements Algorithm {
    * @param builder Hierarchy builder
    * @return builder, for method chaining
    */
-  protected PointerHierarchyBuilder convertToPointerRepresentation(ArrayDBIDs ids, DoubleLongHeap heap, PointerHierarchyBuilder builder) {
+  protected ClusterMergeHistoryBuilder convertToMergeList(ArrayDBIDs ids, DoubleLongHeap heap, ClusterMergeHistoryBuilder builder) {
     final Logging LOG = getLogger();
-    DBIDVar p = DBIDUtil.newVar(), q = DBIDUtil.newVar();
     FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Converting MST to pointer representation", heap.size(), LOG) : null;
     while(!heap.isEmpty()) {
       final long pair = heap.peekValue();
       final int i = (int) (pair >>> 31), j = (int) (pair & 0x7FFFFFFFL);
-      builder.add(ids.assignVar(i, p), heap.peekKey(), ids.assignVar(j, q));
+      builder.add(i, heap.peekKey(), j);
       heap.poll();
       LOG.incrementProcessed(pprog);
     }

@@ -21,6 +21,7 @@
 package elki.data.type;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 
 import elki.data.NumberVector;
@@ -154,13 +155,14 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).newInstance();
+        ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).getDeclaredConstructor().newInstance();
         return new SimpleTypeInformation<>(clz, label, serializer);
       }
       catch(ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
       }
-      catch(InstantiationException | IllegalAccessException e) {
+      catch(InstantiationException | IllegalAccessException
+          | InvocationTargetException | NoSuchMethodException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }
@@ -234,11 +236,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).newInstance();
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).getDeclaredConstructor().newInstance();
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).newInstance();
+        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).getDeclaredConstructor().newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
         return new VectorTypeInformation<>(factory, serializer, mindim, maxdim);
@@ -246,7 +248,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       catch(ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
       }
-      catch(InstantiationException | IllegalAccessException e) {
+      catch(InstantiationException | IllegalAccessException
+          | InvocationTargetException | NoSuchMethodException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }
@@ -325,13 +328,13 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).newInstance();
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).getDeclaredConstructor().newInstance();
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         // Serialization class
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).newInstance();
+        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).getDeclaredConstructor().newInstance();
         // Dimensionalities
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
@@ -350,7 +353,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       catch(ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
       }
-      catch(InstantiationException | IllegalAccessException e) {
+      catch(InstantiationException | IllegalAccessException
+          | InvocationTargetException | NoSuchMethodException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }

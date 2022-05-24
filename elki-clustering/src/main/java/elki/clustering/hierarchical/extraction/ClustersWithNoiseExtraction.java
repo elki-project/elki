@@ -25,26 +25,28 @@ import java.util.ArrayList;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerDensityHierarchyResult;
-import elki.clustering.hierarchical.PointerHierarchyResult;
+import elki.clustering.hierarchical.ClusterMergeHistory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.datastore.*;
-import elki.database.ids.*;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.ModifiableDBIDs;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 /**
  * Extraction of a given number of clusters with a minimum size, and noise.
@@ -121,12 +123,12 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
   /**
    * Process an existing result.
    * 
-   * @param pointerresult Existing result in pointer representation.
+   * @param merges Existing result in pointer representation.
    * @return Clustering
    */
-  public Clustering<Model> run(PointerHierarchyResult pointerresult) {
-    Clustering<Model> result = new Instance(pointerresult).run();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
+  public Clustering<Model> run(ClusterMergeHistory merges) {
+    Clustering<Model> result = new Instance(merges).run();
+    Metadata.hierarchyOf(result).addChild(merges);
     return result;
   }
 
@@ -137,43 +139,17 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
    */
   protected class Instance {
     /**
-     * Unordered IDs
-     */
-    protected ArrayDBIDs ids;
-
-    /**
-     * Parent pointer
-     */
-    protected DBIDDataStore pi;
-
-    /**
-     * Merge distance
-     */
-    protected DoubleDataStore lambda;
-
-    /**
-     * Core distances (if available, may be {@code null}).
-     */
-    protected DoubleDataStore coredist = null;
-
-    /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyResult pointerresult;
+    protected ClusterMergeHistory merges;
 
     /**
      * Constructor.
      *
-     * @param pointerresult Hierarchical result
+     * @param merges Hierarchical result
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      this.ids = pointerresult.topologicalSort();
-      this.pi = pointerresult.getParentStore();
-      this.lambda = pointerresult.getParentDistanceStore();
-      this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyResult) {
-        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
-      }
+    public Instance(ClusterMergeHistory merges) {
+      this.merges = merges;
     }
 
     /**
@@ -182,115 +158,83 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
      * @return Hierarchical clustering
      */
     public Clustering<Model> run() {
-      // Sort DBIDs by lambda, to process merges in increasing order.
-      ArrayDBIDs order = pointerresult.topologicalSort();
-
-      // int numMerges = ids.size() - numCl;
-      DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
-
+      final int n = merges.size();
       // In a first pass, find the stop position.
-      // Cluster sizes, initial size: 1
-      WritableIntegerDataStore clustersizes = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, 1);
-      int curGood = 0, bestCl = ids.size(), bestOff = ids.size() - bestCl - 1;
-      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Finding best threshold", ids.size(), LOG) : null;
-      DBIDArrayIter it = order.iter();
-      for(; it.valid(); it.advance()) {
-        curGood += mergeClusterSizes(clustersizes, it, pi.assignVar(it, succ));
+      int curGood = 0, bestCl = n, bestOff = n - bestCl - 1;
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Finding best threshold", merges.numMerges(), LOG) : null;
+      for(int i = 0, m = merges.numMerges(); i < m; i++) {
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
+        final int sa = a < n ? 1 : merges.getSize(a - n);
+        final int sb = b < n ? 1 : merges.getSize(b - n);
+        final int sc = merges.getSize(i);
+        // Change in good clusters
+        curGood += (sa >= minClSize ? -1 : 0) + (sb >= minClSize ? -1 : 0) + (sc >= minClSize ? 1 : 0);
         // Desired number of clusters, or at least new best:
         if(curGood == numCl || Math.abs(curGood - numCl) < Math.abs(bestCl - numCl)) {
           bestCl = curGood;
-          bestOff = it.getOffset() + 1;
+          bestOff = i;
         }
         LOG.incrementProcessed(progress);
-      }
-      if(progress != null) {
-        progress.setProcessed(ids.size(), LOG);
       }
       LOG.ensureCompleted(progress);
       if(bestCl != numCl) {
         LOG.warning("Could not find a result with exactly " + numCl + " clusters (+ noise), generating " + bestCl + " clusters instead.");
       }
 
-      // Now perform the necessary merges:
-      WritableDataStore<ArrayModifiableDBIDs> clusters = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, ArrayModifiableDBIDs.class);
       progress = LOG.isVerbose() ? new FiniteProgress("Performing cluster merges", bestOff, LOG) : null;
-      for(it.seek(0); it.getOffset() < bestOff; it.advance()) {
-        mergeClusters(clusters, it, pi.assignVar(it, succ));
+      Int2IntOpenHashMap leafMap = new Int2IntOpenHashMap(merges.size());
+      leafMap.defaultReturnValue(-1);
+      ArrayList<ModifiableDBIDs> clusterMembers = new ArrayList<>(merges.size() - bestCl + 2);
+      clusterMembers.add(DBIDUtil.newArray()); // noise
+
+      final DBIDVar tmp = DBIDUtil.newVar();
+      // Process merges backwards, starting at the split point (less
+      // allocations). We build a map (merge number -> cluster number), and add
+      // singleton objects to their clusters.
+      for(int i = bestOff; i >= 0; --i) {
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
+        int c = leafMap.remove(i + n); // no longer needed
+        ModifiableDBIDs ci = null;
+        if(c < 0 && merges.getSize(i) < minClSize) {
+          c = 0; // put into noise
+        }
+        if(c < 0) { // not yet created
+          c = clusterMembers.size(); // next index
+          ci = DBIDUtil.newArray();
+          clusterMembers.add(ci);
+        }
+        else {
+          ci = clusterMembers.get(c);
+        }
+        if(b < n) { // b is singleton, add
+          ci.add(merges.assignVar(b, tmp));
+        }
+        else { // ca = c
+          leafMap.put(b, c);
+        }
+        if(a < n) { // a is singleton, add
+          ci.add(merges.assignVar(a, tmp));
+        }
+        else { // ca = c
+          leafMap.put(a, c);
+        }
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);
 
-      ArrayModifiableDBIDs noise = DBIDUtil.newArray();
-      Cluster<Model> nclus = new Cluster<>("Noise", noise, true);
+      // Wrap as cluster objects:
       ArrayList<Cluster<Model>> toplevel = new ArrayList<>(bestCl + 1);
-      toplevel.add(nclus); // We eventually remove this later on.
-
-      // Third pass: wrap clusters into output format, collect noise.
-      for(it.seek(0); it.valid(); it.advance()) {
-        ArrayModifiableDBIDs c = clusters.get(it);
-        if(c == null) {
-          if(it.getOffset() >= bestOff) {
-            noise.add(it);
-          }
-        }
-        else if(c.size() < minClSize) {
-          noise.addDBIDs(c);
-        }
-        else {
-          toplevel.add(new Cluster<>(c));
-        }
+      // Noise cluster?
+      if(!clusterMembers.get(0).isEmpty()) {
+        toplevel.add(new Cluster<>("Noise", clusterMembers.get(0), true));
+      }
+      for(int i = 1; i < clusterMembers.size(); i++) {
+        toplevel.add(new Cluster<>(clusterMembers.get(i)));
       }
 
-      // No noise cluster?
-      if(noise.isEmpty()) {
-        toplevel.remove(0);
-      }
       Clustering<Model> dendrogram = new Clustering<>(toplevel);
       Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       return dendrogram;
-    }
-
-    /**
-     * Merge two clusters, size only.
-     * 
-     * @param clustersizes Cluster sizes
-     * @param it Source object (disappears)
-     * @param succ Target object
-     * @return Change in the number of good clusters (-1,0,+1)
-     */
-    private int mergeClusterSizes(WritableIntegerDataStore clustersizes, DBIDRef it, DBIDRef succ) {
-      int c1 = clustersizes.intValue(it), c2 = clustersizes.intValue(succ);
-      int c12 = c1 + c2;
-      clustersizes.put(succ, c12);
-      return (c12 >= minClSize ? 1 : 0) - (c1 >= minClSize ? 1 : 0) - (c2 >= minClSize ? 1 : 0);
-    }
-
-    /**
-     * Merge two clusters
-     * 
-     * @param clusters Temporary clusters
-     * @param it Source object (disappears)
-     * @param succ Target object
-     */
-    private void mergeClusters(WritableDataStore<ArrayModifiableDBIDs> clusters, DBIDRef it, DBIDRef succ) {
-      ArrayModifiableDBIDs c1 = clusters.get(it), c2 = clusters.get(succ);
-      if(c1 == null) {
-        if(c2 == null) {
-          clusters.put(succ, c2 = DBIDUtil.newArray());
-          c2.add(succ);
-        }
-        c2.add(it);
-      }
-      else {
-        if(c2 == null) {
-          c1.add(succ);
-          clusters.put(succ, c1);
-        }
-        else {
-          c2.addDBIDs(c1);
-        }
-        clusters.put(it, null);
-      }
     }
   }
 

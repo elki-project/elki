@@ -15,15 +15,13 @@ def getCommitHash() {
   return ""
 }
 
-// UMLgraph requires graphviz installed, and doesn't work with Java 11 yet.
-def useumlgraph = file('/usr/bin/dot').exists() && !JavaVersion.current().isJava11Compatible()
+// UMLgraph requires graphviz installed. Windows and OSX users, please provide a patch
+def useuml = file('/usr/bin/dot').exists()
 
 subprojects {
-  if (useumlgraph) {
-    configurations { umlgraph }
-    repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.dspinellis:UMLGraph:master-SNAPSHOT' } // Via jitpack
-    // repositories { maven { url 'https://jitpack.io' } }; dependencies { umlgraph 'com.github.kno10:UMLGraph:java8-SNAPSHOT' } // jitpack
-    // repositories { mavenLocal() }; dependencies { umlgraph 'org.umlgraph:umlgraph:5.7.3-SNAPSHOT' } // local installation
+  if (useuml) {
+    configurations { umlDoclet }
+    dependencies { umlDoclet group: 'nl.talsmasoftware', name: 'umldoclet', version: '2.0.15' }
   }
 
   // Javadoc options
@@ -66,32 +64,12 @@ subprojects {
       // Add --allow-script-in-comments if available (some 1.8 versions only)
       if(JavaVersion.current().isJava8Compatible()) { addBooleanOption('-allow-script-in-comments').value = true }
       if(JavaVersion.current().isJava9()) addBooleanOption('html4', true)
-      // UMLgraph is optional - needs graphviz installed, and no Java 11+
-      if (useumlgraph) {
-        doclet = 'org.umlgraph.doclet.UmlGraphDoc'
-        docletpath = configurations.umlgraph.files.asType(List)
-          addBooleanOption('inferrel', true) // Generates many multi-edges
-          addBooleanOption('inferdep', true) // Generates many multi-edges
-          addStringOption('inferdepvis', 'public')
-          addBooleanOption('qualify', true)
-          addBooleanOption('postfixpackage', true)
-          addBooleanOption('hideGenerics', true)
-          addBooleanOption('horizontal', true)
-          addBooleanOption('hideprivateinner', true)
-          addStringOption('hide', 'java.*|fastutil.*|org.apache.*|elki.*\\.(Instance(\\..*)?|Parameterizer)')
-          addStringOption('collpackages', 'java.util.*|fastutil.*|elki.utilities.datastructures.*')
-          addStringOption('edgefontsize', '7')
-          addStringOption('edgefontname', 'Roboto')
-          addStringOption('nodefontsize', '8')
-          addStringOption('nodefontname', 'Roboto')
-          addStringOption('nodefontclassname', 'Roboto')
-          addStringOption('nodefontpackagesize', '7')
-          addStringOption('nodefontpackagename', 'Roboto')
-          addStringOption('nodefonttagname', 'Roboto')
-          addStringOption('nodefonttagsize', '7')
-          addStringOption('nodesep', '0.15')
-          addStringOption('ranksep', '0.25')
-          addStringOption('outputencoding', 'UTF-8')
+      // UmlDoclet is optional - needs graphviz installed
+      if (useuml) {
+        docletpath = configurations.umlDoclet.files.asType(List)
+        doclet = "nl.talsmasoftware.umldoclet.UMLDoclet"
+        addStringOption "umlCustomDirective", "remove .*\\.(Instance|Par|Parameterizer|Factory)\$"
+        addBooleanOption "createPumlFiles", true
       }
       tags("hidden:X", "opt:X", "has:X", "navhas:X", "assoc:X", "navassoc:X", "composed:X", "navcomposed:X", "stereotype:X", "depend:X")
     }
@@ -107,9 +85,11 @@ subprojects {
       exclude "overview.html"
     }
     inputs.files fileTree("$rootDir/elki/src/main/javadoc")
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
     into "$project.buildDir/docs/javadoc"
   }
-  javadoc.dependsOn copyDocResources
+  javadoc.finalizedBy copyDocResources
+  javadocJar.dependsOn copyDocResources
   // Additional documentation: parameters
   task documentParameters(type: JavaExec, dependsOn: classes) {
     description "Generate parameter documentation"
@@ -117,7 +97,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/parameters-byclass.html"
-    main = 'elki.application.internal.DocumentParameters'
+    mainClass = 'elki.application.internal.DocumentParameters'
     args "$project.buildDir/docs/javadoc/parameters-byclass.html"
     args "$project.buildDir/docs/javadoc/parameters-byopt.html"
   }
@@ -129,7 +109,7 @@ subprojects {
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
     outputs.file "$project.buildDir/docs/javadoc/references.html"
-    main = 'elki.application.internal.DocumentReferences'
+    mainClass = 'elki.application.internal.DocumentReferences'
     args "$project.buildDir/docs/javadoc/references.html"
     args "$project.buildDir/docs/references.md"
   }

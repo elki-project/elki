@@ -20,6 +20,8 @@
  */
 package elki.clustering.hierarchical.linkage;
 
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -82,12 +84,12 @@ import elki.utilities.optionhandling.Parameterizer;
     bibkey = "doi:10.1080/01621459.1963.10500845")
 @Reference(authors = "D. Wishart", //
     title = "256. Note: An Algorithm for Hierarchical Classifications", //
-    booktitle = "BBiometrics 25(1)", //
+    booktitle = "Biometrics 25(1)", //
     url = "https://doi.org/10.2307/2528688", //
     bibkey = "doi:10.2307/2528688")
 @Alias({ "ward", "MISSQ" })
 @Priority(Priority.IMPORTANT + 1)
-public class WardLinkage implements Linkage {
+public class WardLinkage implements GeometricLinkage {
   /**
    * Static instance of class.
    */
@@ -116,6 +118,16 @@ public class WardLinkage implements Linkage {
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
     return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
+  }
+
+  @Override
+  public double[] merge(double[] x, int sizex, double[] y, int sizey) {
+    return VMath.timesPlusTimes(x, sizex / (double) (sizex + sizey), y, sizey / (double) (sizex + sizey));
+  }
+
+  @Override
+  public double distance(double[] x, int sizex, double[] y, int sizey) {
+    return (sizex * sizey) / (double) (sizex + sizey) * SquaredEuclideanDistance.STATIC.distance(x, y);
   }
 
   /**

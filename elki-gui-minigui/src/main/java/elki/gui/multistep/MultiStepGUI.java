@@ -23,26 +23,20 @@ package elki.gui.multistep;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.io.FileNotFoundException;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
+import javax.swing.*;
 
 import elki.KDDTask;
 import elki.application.AbstractApplication;
 import elki.gui.GUIUtil;
 import elki.gui.minigui.MiniGUI;
-import elki.gui.multistep.panels.AlgorithmTabPanel;
-import elki.gui.multistep.panels.EvaluationTabPanel;
-import elki.gui.multistep.panels.InputTabPanel;
-import elki.gui.multistep.panels.LoggingTabPanel;
-import elki.gui.multistep.panels.OutputTabPanel;
-import elki.gui.multistep.panels.SavedSettingsTabPanel;
+import elki.gui.multistep.panels.*;
 import elki.gui.util.LogPanel;
 import elki.gui.util.SavedSettingsFile;
 import elki.logging.CLISmartHandler;
@@ -74,6 +68,11 @@ public class MultiStepGUI extends AbstractApplication {
    * ELKI logger for the GUI
    */
   private static final Logging LOG = Logging.getLogger(MultiStepGUI.class);
+
+  /**
+   * Quit action, for mnemonics.
+   */
+  private static final String ACTION_QUIT = "quit";
 
   /**
    * The frame
@@ -120,7 +119,10 @@ public class MultiStepGUI extends AbstractApplication {
    */
   public MultiStepGUI() {
     super();
-    frame = new JFrame("ELKI ExpGUI");
+    frame = new JFrame("ELKI Multi-Step GUI");
+    Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+    int ppi = java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
+    frame.setPreferredSize(new Dimension(Math.min(10 * ppi, screen.width), Math.min(10 * ppi, screen.height - 32)));
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
@@ -128,44 +130,54 @@ public class MultiStepGUI extends AbstractApplication {
     catch(Exception e) {
       // Ignore - icon not found is not fatal.
     }
-
     frame.setLayout(new GridBagLayout());
-    {
-      // setup text output area
-      outputArea = new LogPanel();
 
-      // Create the scroll pane and add the table to it.
-      JScrollPane outputPane = new JScrollPane(outputArea);
-      outputPane.setPreferredSize(new Dimension(800, 400));
+    // setup text output area
+    outputArea = new LogPanel();
 
-      // Add the output pane to the bottom
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 1;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
-      frame.add(outputPane, constraints);
+    // Create the scroll pane and add the table to it.
+    JScrollPane outputPane = new JScrollPane(outputArea);
+    outputPane.setPreferredSize(new Dimension(800, 400));
 
-      // reconfigure logging
-      outputArea.becomeDefaultLogger();
-    }
-    {
-      // setup tabbed panels
-      JTabbedPane panels = new JTabbedPane();
+    // Add the output pane to the bottom
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 1;
+    constraints.weightx = constraints.weighty = 1;
+    frame.add(outputPane, constraints);
 
-      // Add the output pane to the bottom
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 0;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
-      frame.add(panels, constraints);
+    // reconfigure logging
+    outputArea.becomeDefaultLogger();
 
-      addPanels(panels);
-    }
+    // setup tabbed panels
+    JTabbedPane panels = new JTabbedPane();
+
+    // Add the output pane to the bottom
+    constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = constraints.gridy = 0;
+    constraints.weightx = constraints.weighty = 1;
+    frame.add(panels, constraints);
+
+    addPanels(panels);
     frame.pack();
+
+    // Keyboard bindings to quit.
+    JRootPane rootpane = frame.getRootPane();
+    rootpane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
+    rootpane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK), ACTION_QUIT);
+    rootpane.getActionMap().put(ACTION_QUIT, new AbstractAction() {
+      /**
+       * Serial version
+       */
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        frame.dispose();
+      }
+    });
   }
 
   private void addPanels(JTabbedPane panels) {
@@ -173,11 +185,11 @@ public class MultiStepGUI extends AbstractApplication {
     try {
       settings.load();
     }
-    catch(FileNotFoundException | NoSuchFileException e) {
-      LOG.warning("Error loading saved settings.", e);
+    catch(NoSuchFileException e) {
+      // ok.
     }
     catch(IOException e) {
-      LOG.exception(e);
+      LOG.exception("Error loading saved settings.", e);
     }
 
     inputTab = new InputTabPanel();
@@ -253,12 +265,7 @@ public class MultiStepGUI extends AbstractApplication {
         try {
           final MultiStepGUI gui = new MultiStepGUI();
           gui.run();
-          if(args != null && args.length > 0) {
-            gui.setParameters(new SerializedParameterization(args));
-          }
-          else {
-            gui.setParameters(new SerializedParameterization());
-          }
+          gui.setParameters(args != null && args.length > 0 ? new SerializedParameterization(args) : new SerializedParameterization());
         }
         catch(Exception | Error e) {
           // Restore error handler, as the GUI is likely broken.

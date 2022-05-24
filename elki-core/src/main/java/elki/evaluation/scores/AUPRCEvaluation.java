@@ -87,9 +87,6 @@ public class AUPRCEvaluation implements ScoreEvaluation {
         adapter.advance();
       } // Loop while tied:
       while(adapter.valid() && adapter.tiedToPrevious());
-      if(rank == prevrank) {
-        continue;
-      }
       if(pos == prevpos) {
         curve.addAndSimplify(pos, pos / (double) rank);
         continue;
@@ -139,7 +136,7 @@ public class AUPRCEvaluation implements ScoreEvaluation {
         adapter.advance();
       } // Loop while tied:
       while(adapter.valid() && adapter.tiedToPrevious());
-      if(rank == prevrank || pos == prevpos) {
+      if (pos == prevpos) {
         continue;
       }
       final int newpos = pos - prevpos, ties = rank - prevrank;

@@ -529,8 +529,8 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
      * @param right rightmost datapoint used for construction
      * @param dimWidth Array containing the width of all dimensions on the
      *        complete dataset
-     * @param mbw factor when to stop construction. Stop if splitdimwidth < mbw
-     *        * dimwidth[splitdim]
+     * @param mbw factor when to stop construction. Stop if splitdimwidth &lt;
+     *        mbw * dimwidth[splitdim]
      */
     public KDTree(Relation<? extends NumberVector> relation, ArrayModifiableDBIDs sorted, int left, int right, double[] dimWidth, double mbw) {
       DBIDArrayIter iter = sorted.iter();
@@ -659,7 +659,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
 
     /**
      * Parameter to specify the pruning criterion during the algorithm.
-     * Stop going down the kd-tree when possible weight error e < tau *
+     * Stop going down the kd-tree when possible weight error e &lt; tau *
      * totalweight. Must be between 0 and 1. Low for precise, high for fast
      * results.
      */

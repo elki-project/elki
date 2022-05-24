@@ -26,20 +26,20 @@ import java.util.Collection;
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.PointerDensityHierarchyResult;
-import elki.clustering.hierarchical.PointerHierarchyResult;
-import elki.clustering.hierarchical.PointerPrototypeHierarchyResult;
+import elki.clustering.hierarchical.ClusterDensityMergeHistory;
+import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.clustering.hierarchical.ClusterPrototypeMergeHistory;
 import elki.data.Cluster;
 import elki.data.Clustering;
-import elki.data.NumberVector;
 import elki.data.model.DendrogramModel;
 import elki.data.model.PrototypeDendrogramModel;
 import elki.data.type.TypeInformation;
-import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.datastore.*;
-import elki.database.ids.*;
-import elki.database.relation.Relation;
+import elki.database.datastore.DoubleDataStore;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDVar;
+import elki.database.ids.ModifiableDBIDs;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
@@ -52,6 +52,9 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
@@ -119,25 +122,18 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   @Override
   public Clustering<DendrogramModel> autorun(Database database) {
-    Relation<? extends NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    return runOther(algorithm.autorun(database), relation);
+    return run(algorithm.autorun(database));
   }
 
   /**
    * Process an existing result.
    * 
-   * @param pointerresult Existing result in pointer representation.
+   * @param merges Existing result in pointer representation.
    * @return Clustering
    */
-  public Clustering<DendrogramModel> run(PointerHierarchyResult pointerresult) {
-    Clustering<DendrogramModel> result = new Instance(pointerresult).run();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
-    return result;
-  }
-
-  public Clustering<DendrogramModel> runOther(PointerHierarchyResult pointerresult, Relation<? extends NumberVector> relation) {
-    Clustering<DendrogramModel> result = new Instance(pointerresult, relation).run();
-    Metadata.hierarchyOf(result).addChild(pointerresult);
+  public Clustering<DendrogramModel> run(ClusterMergeHistory merges) {
+    Clustering<DendrogramModel> result = new Instance(merges).run();
+    Metadata.hierarchyOf(result).addChild(merges);
     return result;
   }
 
@@ -147,57 +143,26 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    * @author Erich Schubert
    */
   protected class Instance {
-    protected Relation<? extends NumberVector> relation;
-
-    /**
-     * Unordered IDs
-     */
-    protected ArrayDBIDs ids;
-
-    /**
-     * Parent pointer
-     */
-    protected DBIDDataStore pi;
-
-    /**
-     * Merge distance
-     */
-    protected DoubleDataStore lambda;
-
-    /**
-     * Core distances (if available, may be {@code null}).
-     */
-    protected DoubleDataStore coredist = null;
-
     /**
      * The hierarchical result to process.
      */
-    protected PointerHierarchyResult pointerresult;
+    protected ClusterMergeHistory merges;
+
+    /**
+     * Core distances, if available.
+     */
+    protected DoubleDataStore coredist;
 
     /**
      * Constructor.
      *
-     * @param pointerresult Hierarchical result
+     * @param merges Hierarchical result
      */
-    public Instance(PointerHierarchyResult pointerresult) {
-      this.ids = pointerresult.topologicalSort();
-      this.pi = pointerresult.getParentStore();
-      this.lambda = pointerresult.getParentDistanceStore();
-      this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyResult) {
-        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
+    public Instance(ClusterMergeHistory merges) {
+      this.merges = merges;
+      if(merges instanceof ClusterDensityMergeHistory) {
+        this.coredist = ((ClusterDensityMergeHistory) merges).getCoreDistanceStore();
       }
-    }
-
-    public Instance(PointerHierarchyResult pointerresult, Relation<? extends NumberVector> relation) {
-      this.ids = pointerresult.topologicalSort();
-      this.pi = pointerresult.getParentStore();
-      this.lambda = pointerresult.getParentDistanceStore();
-      this.pointerresult = pointerresult;
-      if(pointerresult instanceof PointerDensityHierarchyResult) {
-        this.coredist = ((PointerDensityHierarchyResult) pointerresult).getCoreDistanceStore();
-      }
-      this.relation = relation;
     }
 
     /**
@@ -206,334 +171,56 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @return Hierarchical clustering
      */
     public Clustering<DendrogramModel> run() {
-      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
+      Int2ObjectMap<TempCluster> cluster_map = new Int2ObjectOpenHashMap<>(merges.size() >> 1);
+      DBIDVar tmp = DBIDUtil.newVar();
+      final int n = merges.size();
 
-      // Sort DBIDs by lambda, to process merges in increasing order.
-      ArrayDBIDs order = pointerresult.topologicalSort();
-
-      WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
-
-      ArrayModifiableDBIDs noise = DBIDUtil.newArray();
-      ArrayList<TempCluster> toplevel = new ArrayList<>();
-
-      WritableDoubleDataStore epsilonMaxCi = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1.);
-      WritableDoubleDataStore gloshScores = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
-
-//      int size;
-//      long matrixSize;
-//      size = this.relation.size();
-//      matrixSize = this.relation.size();
-//      matrixSize *= (matrixSize - 1);
-//      matrixSize /= 2;
-//      float[] copheneticMatrix = new float[(int) matrixSize];
-//      Arrays.fill(copheneticMatrix, -1.f);
-//      float[] copheneticMatrixB = new float[(int) matrixSize];
-//      Arrays.fill(copheneticMatrixB, -1.f);
-
-      DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", merges.numMerges(), LOG) : null;
       // Perform one join at a time, in increasing order
-      for(DBIDArrayIter clead = order.iter(); clead.valid(); clead.advance()) {
-        final double dist = lambda.doubleValue(clead); // Join distance
-        final double cdist = (coredist != null) ? coredist.doubleValue(clead) : dist;
+      for(int i = 0, m = merges.numMerges(); i < m; i++) {
+        final double dist = merges.getMergeHeight(i); // Join distance
+        final int a = merges.getMergeA(i), b = merges.getMergeB(i);
         // Original cluster (may be null):
-        TempCluster cclus = cluster_map.get(clead);
-        // Per definition of pointer hierarchy, must not be referenced anymore:
-        cluster_map.put(clead, null); // Forget previous assignment.
+        TempCluster cclus = cluster_map.remove(a); // Take out
+        final double cdist = (coredist != null && a < n) ? coredist.doubleValue(merges.assignVar(a, tmp)) : dist;
         final boolean cSpurious = isSpurious(cclus, cdist <= dist);
-
-        // Successor object/cluster:
-        pi.assignVar(clead, olead); // Find successor
-        // If we don't have a (different) successor, we are at the root level.
-        if(DBIDUtil.equal(clead, olead) || olead.isEmpty()) {
-          if(cclus != null) {
-            if(cclus.isSpurious(minClSize)) {
-              noise.addDBIDs(cclus.members);
-            }
-            else {
-              toplevel.add(cclus);
-            }
-            cluster_map.put(clead, null);
-          }
-          else if(cSpurious) { // Spurious singleton
-            noise.add(clead);
-          }
-          else { // Non-spurious singleton
-            toplevel.add(new TempCluster(dist, clead));
-          }
-          LOG.incrementProcessed(progress);
-          continue; // top level cluster.
-        }
         // Other cluster (cluster of successor)
-        TempCluster oclus = cluster_map.get(olead);
-        final double odist = (coredist != null) ? coredist.doubleValue(olead) : dist;
+        TempCluster oclus = cluster_map.remove(b);
+        final double odist = (coredist != null && b < n) ? coredist.doubleValue(merges.assignVar(b, tmp)) : dist;
         final boolean oSpurious = isSpurious(oclus, odist <= dist);
 
         final TempCluster nclus; // Resulting cluster.
-        if(!oSpurious && !cSpurious) {
-//          {
-//            ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-//            membersOClus.addDBIDs(oclus.members);
-//            for(TempCluster child : oclus.children) {
-//              collectChildrens(membersOClus, child);
-//            }
-//
-//            ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-//            membersCClus.addDBIDs(cclus.members);
-//            for(TempCluster child : cclus.children) {
-//              collectChildrens(membersCClus, child);
-//            }
-//
-//            double minDist = Double.MAX_VALUE;
-//            int i = 0;
-//            int[] indices = new int[membersOClus.size() * membersCClus.size()];
-//            for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-//              for(DBIDMIter innerIt = membersCClus.iter(); innerIt.valid(); innerIt.advance()) {
-//                int position = position(it, innerIt, size);
-//                copheneticMatrix[position] = (float) dist;
-//
-//                double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
-//                if(distance < minDist) {
-//                  minDist = distance;
-//                }
-//                indices[i++] = position;
-//              }
-//            }
-//            for(int indice : indices) {
-//              copheneticMatrixB[indice] = (float) minDist;
-//            }
-//          }
+        if(!cSpurious && !oSpurious) {
           // Full merge: both not spurious, new parent.
-          cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
-          oclus = oclus != null ? oclus : new TempCluster(odist, olead);
-          nclus = new TempCluster(dist, oclus, cclus);
-          if(epsilonMaxCi.doubleValue(olead) == 0.) { // Singleton cluster.
-            gloshScores.put(olead, 0.);
-          }
-          if(epsilonMaxCi.doubleValue(clead) == 0.) { // Singleton cluster.
-            gloshScores.put(clead, 0.);
-          }
-          epsilonMaxCi.put(olead, //
-              epsilonMaxCi.doubleValue(clead) < epsilonMaxCi.doubleValue(olead) ? //
-                  epsilonMaxCi.doubleValue(clead) : epsilonMaxCi.doubleValue(olead));
+          assert cclus != null || a < n;
+          assert oclus != null || b < n;
+          cclus = cclus != null ? cclus : new TempCluster(a, cdist, merges.assignVar(a, tmp));
+          oclus = oclus != null ? oclus : new TempCluster(b, odist, merges.assignVar(b, tmp));
+          nclus = new TempCluster(i, dist, oclus, cclus);
         }
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
-//            {
-//              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-//              membersOClus.addDBIDs(oclus.members);
-//              for(TempCluster child : oclus.children) {
-//                collectChildrens(membersOClus, child);
-//              }
-//              if(cclus == null) {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersOClus.size()];
-//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-//                  int position = position(clead, it, size);
-//                  copheneticMatrix[position] = (float) dist;
-//
-//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(clead));
-//                  if(distance < minDist) {
-//                    minDist = distance;
-//                  }
-//                  indices[i++] = position;
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//              else {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersOClus.size() * cclus.members.size()];
-//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-//                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-//                    int position = position(it, innerIt, size);
-//                    copheneticMatrix[position] = (float) dist;
-//
-//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
-//                    if(distance < minDist) {
-//                      minDist = distance;
-//                    }
-//                    indices[i++] = position;
-//                  }
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//            }
-
-            nclus = oclus.grow(dist, cclus, clead);
-            if(cclus == null) {
-              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
-            }
+            nclus = oclus.grow(i, dist, cclus, a < n ? merges.assignVar(a, tmp) : null);
           }
           else if(!cSpurious && cclus != null) {
-//            {
-//              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-//              membersCClus.addDBIDs(cclus.members);
-//              for(TempCluster child : cclus.children) {
-//                collectChildrens(membersCClus, child);
-//              }
-//              if(oclus == null) {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersCClus.size()];
-//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-//                  int position = position(olead, it, size);
-//                  copheneticMatrix[position] = (float) dist;
-//
-//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(olead));
-//                  if(distance < minDist) {
-//                    minDist = distance;
-//                  }
-//                  indices[i++] = position;
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//              else {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersCClus.size() * oclus.members.size()];
-//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-//                  for(DBIDMIter innerIt = oclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-//                    int position = position(it, innerIt, size);
-//                    copheneticMatrix[position] = (float) dist;
-//
-//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
-//                    if(distance < minDist) {
-//                      minDist = distance;
-//                    }
-//                    indices[i++] = position;
-//                  }
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//            }
-
-            nclus = cclus.grow(dist, oclus, olead);
-            if(epsilonMaxCi.doubleValue(olead) == -1.) {
-              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
-            }
-
-            if(oclus == null) {
-              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
-            }
+            nclus = cclus.grow(i, dist, oclus, b < n ? merges.assignVar(b, tmp) : null);
           }
-          // Then recycle, but reset
+          // Then recycle the existing cluster, but reset
           else if(oclus != null) {
-//            {
-//              ModifiableDBIDs membersOClus = DBIDUtil.newArray();
-//              membersOClus.addDBIDs(oclus.members);
-//              for(TempCluster child : oclus.children) {
-//                collectChildrens(membersOClus, child);
-//              }
-//              if(cclus == null) {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersOClus.size()];
-//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-//                  int position = position(clead, it, size);
-//                  copheneticMatrix[position] = (float) dist;
-//
-//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(clead));
-//                  if(distance < minDist) {
-//                    minDist = distance;
-//                  }
-//                  indices[i++] = position;
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//              else {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersOClus.size() * cclus.members.size()];
-//                for(DBIDMIter it = membersOClus.iter(); it.valid(); it.advance()) {
-//                  for(DBIDMIter innerIt = cclus.members.iter(); innerIt.valid(); innerIt.advance()) {
-//                    int position = position(it, innerIt, size);
-//                    copheneticMatrix[position] = (float) dist;
-//
-//                    double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(innerIt));
-//                    if(distance < minDist) {
-//                      minDist = distance;
-//                    }
-//                    indices[i++] = position;
-//                  }
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//            }
-
-            nclus = oclus.grow(dist, cclus, clead).resetAggregate();
-            if(cclus == null) {
-              gloshScores.put(clead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
-            }
+            nclus = oclus.grow(i, dist, cclus, a < n ? merges.assignVar(a, tmp) : null).resetAggregate();
           }
           else if(cclus != null) {
-//            {
-//              ModifiableDBIDs membersCClus = DBIDUtil.newArray();
-//              membersCClus.addDBIDs(cclus.members);
-//              for(TempCluster child : cclus.children) {
-//                collectChildrens(membersCClus, child);
-//              }
-//              if(oclus == null) {
-//                double minDist = Double.MAX_VALUE;
-//                int i = 0;
-//                int[] indices = new int[membersCClus.size()];
-//                for(DBIDMIter it = membersCClus.iter(); it.valid(); it.advance()) {
-//                  int position = position(olead, it, size);
-//                  copheneticMatrix[position] = (float) dist;
-//
-//                  double distance = EuclideanDistance.STATIC.distance(relation.get(it), relation.get(olead));
-//                  if(distance < minDist) {
-//                    minDist = distance;
-//                  }
-//                  indices[i++] = position;
-//                }
-//                for(int indice : indices) {
-//                  copheneticMatrixB[indice] = (float) minDist;
-//                }
-//              }
-//            }
-
-            nclus = cclus.grow(dist, oclus, olead).resetAggregate();
-            if(epsilonMaxCi.doubleValue(olead) == -1.) {
-              epsilonMaxCi.put(olead, epsilonMaxCi.doubleValue(clead));
-            }
-
-            if(oclus == null) {
-              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
-              gloshScores.put(olead, 1. - (epsilonMaxCi.doubleValue(olead) / dist));
-            }
+            nclus = cclus.grow(i, dist, oclus, b < n ? merges.assignVar(b, tmp) : null).resetAggregate();
           }
-          // Last option: a new 2-element cluster.
-          else {
-//            {
-//              int position = position(clead, olead, size);
-////              copheneticMatrix[position] = (float) dist;
-//
-//              copheneticMatrixB[position] = (float) EuclideanDistance.STATIC.distance(relation.get(clead), relation.get(olead));
-//            }
-
-            nclus = new TempCluster(dist, clead, olead);
-            gloshScores.put(clead, 0.);
-            gloshScores.put(olead, 0.);
-
-            epsilonMaxCi.put(olead, dist);
+          else { // new 2-element cluster, but which may still be spurious
+            assert a < n && b < n;
+            nclus = new TempCluster(i, dist, merges.assignVar(a, tmp));
+            nclus.members.add(merges.assignVar(b, tmp));
           }
         }
-        assert (nclus != null);
-        cluster_map.put(olead, nclus);
+        assert nclus != null;
+        cluster_map.put(i + n, nclus);
         LOG.incrementProcessed(progress);
       }
       LOG.ensureCompleted(progress);
@@ -541,81 +228,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       // Build final dendrogram:
       final Clustering<DendrogramModel> dendrogram = new Clustering<>();
       Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
-      Cluster<DendrogramModel> nclus = null;
-      if(noise.size() > 0) {
-        nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
-        dendrogram.addToplevelCluster(nclus);
+      for(TempCluster clus : cluster_map.values()) {
+        finalizeCluster(clus, dendrogram, null, false);
       }
-      for(TempCluster clus : toplevel) {
-        finalizeCluster(clus, dendrogram, nclus, false);
-      }
-
-//      {
-//        computeCCC(copheneticMatrix, copheneticMatrixB);
-//      }
-
-      // Store GLOSH scores
-      Metadata.hierarchyOf(dendrogram).addChild(gloshScores);
-
       return dendrogram;
     }
-
-//    private void collectChildrens(ModifiableDBIDs members, TempCluster cur) {
-//      members.addDBIDs(cur.members);
-//      for(TempCluster child : cur.children) {
-//        collectChildrens(members, child);
-//      }
-//    }
-
-//    private int position(DBIDRef a, DBIDRef b, int size) {
-//      long i, j;
-//      if(DBIDUtil.compare(a, b) < 0) {
-//        i = DBIDUtil.asInteger(a);
-//        j = DBIDUtil.asInteger(b);
-//      }
-//      else {
-//        i = DBIDUtil.asInteger(b);
-//        j = DBIDUtil.asInteger(a);
-//      }
-//      j = j - i;
-//      i -= 1;
-//      i = (i * (size - 1)) - (i * (i - 1) / 2);
-//      i += j;
-//      return (int) (i - 1); // zero-based
-//    }
-
-//    private void computeCCC(float[] copheneticMatrix, float[] copheneticMatrixB) {
-//      int size;
-//      long matrixSize;
-//      size = this.relation.size();
-//      matrixSize = this.relation.size();
-//      matrixSize *= (matrixSize - 1);
-//      matrixSize /= 2;
-//
-//      double[] distanceMatrix = new double[(int) matrixSize];
-//      DBIDArrayIter iter = DBIDUtil.newArray(relation.getDBIDs()).iter();
-//      DBIDArrayIter innerIter = DBIDUtil.newArray(relation.getDBIDs()).iter();
-//      int position = 0;
-//      for(; iter.getOffset() < size - 1; iter.advance()) {
-//        NumberVector first = relation.get(iter);
-//        for(innerIter.seek(iter.getOffset() + 1); innerIter.valid(); innerIter.advance()) {
-//          NumberVector second = relation.get(innerIter);
-//          distanceMatrix[position++] = EuclideanDistance.STATIC.distance(first, second);
-//        }
-//      }
-//      PearsonCorrelation corr = new PearsonCorrelation();
-//      for(int i = 0; i < matrixSize; i++) {
-//        corr.put(distanceMatrix[i], copheneticMatrix[i]);
-//      }
-//      double r = corr.getCorrelation();
-//      System.out.println("cophenetic correlation coefficient: " + r + ", p-value: " + 2 * BetaDistribution.cdf((0.5 * (1 - FastMath.abs(r))), (matrixSize / 2 - 1), (matrixSize / 2 - 1)));
-////      corr.reset();
-////      for(int i = 0; i < matrixSize; i++) {
-////        corr.put(distanceMatrix[i], copheneticMatrixB[i]);
-////      }
-////      r = corr.getCorrelation();
-////      System.out.println("cophenetic correlation coefficient - minimum distance: " + r + ", p-value: " + 2 * BetaDistribution.cdf((0.5 * (1 - FastMath.abs(r))), (matrixSize / 2 - 1), (matrixSize / 2 - 1)));
-//    }
 
     /**
      * Spurious, also for non-materialized clusters.
@@ -639,8 +256,8 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten) {
       final String name = "C_" + FormatUtil.NF6.format(temp.dist);
       DendrogramModel model;
-      if(temp.members != null && !temp.members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyResult) {
-        model = new PrototypeDendrogramModel(temp.dist, ((PointerPrototypeHierarchyResult) pointerresult).findPrototype(temp.members));
+      if(temp.members != null && !temp.members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
+        model = new PrototypeDendrogramModel(temp.dist, ((ClusterPrototypeMergeHistory) merges).prototype(temp.seq));
       }
       else {
         model = new DendrogramModel(temp.dist);
@@ -685,6 +302,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
    */
   private static class TempCluster {
     /**
+     * Merge id of the cluster for prototype identification.
+     */
+    protected int seq;
+
+    /**
      * New ids, not yet in child clusters.
      */
     protected ModifiableDBIDs members = DBIDUtil.newArray();
@@ -712,35 +334,27 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     /**
      * Constructor.
      *
+     * @param seq Cluster generation sequence
      * @param dist Distance
      * @param a Object reference
      */
-    public TempCluster(double dist, DBIDRef a) {
+    public TempCluster(int seq, double dist, DBIDRef a) {
+      this.seq = seq;
       this.dist = dist;
       this.members.add(a);
       this.aggregate = 1. / dist;
     }
 
     /**
-     * Constructor.
-     *
-     * @param dist Distance
-     */
-    public TempCluster(double dist, DBIDRef a, DBIDRef b) {
-      this.dist = dist;
-      this.members.add(a);
-      this.members.add(b);
-      this.aggregate = 2. / dist;
-    }
-
-    /**
      * Cluster containing two existing clusters.
      *
+     * @param seq Cluster generation sequence
      * @param dist Distance
      * @param a First cluster
      * @param b Second cluster
      */
-    public TempCluster(double dist, TempCluster a, TempCluster b) {
+    public TempCluster(int seq, double dist, TempCluster a, TempCluster b) {
+      this.seq = seq;
       this.dist = dist;
       this.children.add(a);
       this.children.add(b);
@@ -751,12 +365,14 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     /**
      * Join the contents of another cluster.
      *
+     * @param seq Cluster generation sequence
      * @param dist Join distance
      * @param other Other cluster (may be {@code null})
      * @param id Cluster lead, for 1-element clusters.
      * @return {@code this}
      */
-    public TempCluster grow(double dist, TempCluster other, DBIDRef id) {
+    public TempCluster grow(int seq, double dist, TempCluster other, DBIDRef id) {
+      this.seq = seq;
       this.dist = dist;
       if(other == null) {
         this.members.add(id);

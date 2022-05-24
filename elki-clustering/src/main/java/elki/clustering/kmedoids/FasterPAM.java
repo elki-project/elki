@@ -29,6 +29,7 @@ import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
 
 /**
@@ -157,7 +158,7 @@ public class FasterPAM<O> extends FastPAM<O> {
           double acc = computeReassignmentCost(h, cost);
 
           // Find the best possible swap for each medoid:
-          int min = argmin(cost);
+          int min = VMath.argmin(cost);
           double bestcost = cost[min] + acc;
           if(!(bestcost < -1e-12 * tc)) {
             continue;
