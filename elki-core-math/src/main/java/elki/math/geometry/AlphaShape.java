@@ -20,7 +20,9 @@
  */
 package elki.math.geometry;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 import elki.data.spatial.Polygon;
@@ -95,10 +97,7 @@ public class AlphaShape {
       BitsUtil.setI(visited, i);
       SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
       if(tri.r2 <= alpha2) {
-        // Check neighbors
-        processNeighbor(open, visited, i, tri.ab, tri.a, tri.b);
-        processNeighbor(open, visited, i, tri.bc, tri.b, tri.c);
-        processNeighbor(open, visited, i, tri.ca, tri.c, tri.a);
+        processNeighbor(open, visited, i, tri);
       }
       for(IntegerArray po : open) {
         List<double[]> cur = new ArrayList<>(po.size);
@@ -112,41 +111,57 @@ public class AlphaShape {
     return polys;
   }
 
-  private void processNeighbor(List<IntegerArray> open, long[] visited, int i, int ab, int a, int b) {
-    if(ab < 0) { // Nonexistant neighbor
-      addEdge(open, a, b);
-      return;
-    }
-    final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
-    if(BitsUtil.get(visited, ab)) {
-      // We already discarded the neighbor polygon, but we still get an edge.
-      if(next.r2 > alpha2) {
+  private void processNeighbor(List<IntegerArray> open, long[] visited, int i, SweepHullDelaunay2D.Triangle tri) {
+    Deque<int[]> stack = new ArrayDeque<>();
+
+    // Check neighbors
+    stack.push(new int[]{i, tri.ca, tri.c, tri.a});
+    stack.push(new int[]{i, tri.bc, tri.b, tri.c});
+    stack.push(new int[]{i, tri.ab, tri.a, tri.b});
+
+    while (!stack.isEmpty()) {
+      int[] nextParams = stack.pop();
+
+      int cur = nextParams[0];
+      int ab = nextParams[1];
+      int a = nextParams[2];
+      int b = nextParams[3];
+
+      if(ab < 0) { // Nonexistant neighbor
         addEdge(open, a, b);
+        continue;
       }
-      return;
+      final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
+      if(BitsUtil.get(visited, ab)) {
+        // We already discarded the neighbor polygon, but we still get an edge.
+        if(next.r2 > alpha2) {
+          addEdge(open, a, b);
+        }
+        continue;
+      }
+      BitsUtil.setI(visited, ab);
+      if(next.r2 <= alpha2) {
+        // Walk 'around' the next triangle
+        if(next.ab == cur) {
+          assert next.b == a && next.a == b;
+          stack.push(new int[]{ab, next.ca, next.c, b});
+          stack.push(new int[]{ab, next.bc, a, next.c});
+        }
+        else if(next.bc == cur) {
+          assert next.c == a && next.b == b;
+          stack.push(new int[]{ab, next.ab, next.a, b});
+          stack.push(new int[]{ab, next.ca, a, next.a});
+        }
+        else /* if(next.ca == i) */ {
+          assert next.ca == cur;
+          assert next.a == a && next.c == b;
+          stack.push(new int[]{ab, next.bc, next.b, b});
+          stack.push(new int[]{ab, next.ab, a, next.b});
+        }
+        continue;
+      }
+      addEdge(open, a, b);
     }
-    BitsUtil.setI(visited, ab);
-    if(next.r2 <= alpha2) {
-      // Walk 'around' the next triangle
-      if(next.ab == i) {
-        assert next.b == a && next.a == b;
-        processNeighbor(open, visited, ab, next.bc, a, next.c);
-        processNeighbor(open, visited, ab, next.ca, next.c, b);
-      }
-      else if(next.bc == i) {
-        assert next.c == a && next.b == b;
-        processNeighbor(open, visited, ab, next.ca, a, next.a);
-        processNeighbor(open, visited, ab, next.ab, next.a, b);
-      }
-      else /* if(next.ca == i) */ {
-        assert next.ca == i;
-        assert next.a == a && next.c == b;
-        processNeighbor(open, visited, ab, next.ab, a, next.b);
-        processNeighbor(open, visited, ab, next.bc, next.b, b);
-      }
-      return;
-    }
-    addEdge(open, a, b);
   }
 
   /**
