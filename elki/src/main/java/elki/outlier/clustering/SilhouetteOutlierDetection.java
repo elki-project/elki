@@ -137,71 +137,97 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
     DoubleMinMax mm = new DoubleMinMax();
 
     List<? extends Cluster<?>> clusters = c.getAllClusters();
-    for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-        case TREAT_NOISE_AS_SINGLETONS:
-          // As suggested in Rousseeuw, we use 0 for singletons.
-          for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-            scores.put(iter, 0.);
+    // Only one cluster or noise
+    if(clusters.size() < 2) {
+      for(Cluster<?> cluster : clusters) {
+        if(cluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+          case TREAT_NOISE_AS_SINGLETONS:
+            // Treat noise cluster as singletons:
+            for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+              scores.put(iter, 0.);
+            }
+            mm.put(0.);
+            continue;
+          case MERGE_NOISE:
+            // Treat as cluster below
+            break;
           }
-          mm.put(0.);
-          continue;
-        case MERGE_NOISE:
-          // Treat as cluster below
-          break;
+        }
+        for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+          scores.put(iter, 0.5);
+          mm.put(0.5);
         }
       }
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      double[] as = new double[ids.size()]; // temporary storage.
-      DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
-      for(it1.seek(0); it1.valid(); it1.advance()) {
-        // a: In-cluster distances
-        double a = as[it1.getOffset()]; // Already computed distances
-        for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
-          final double dist = dq.distance(it1, it2);
-          a += dist;
-          as[it2.getOffset()] += dist;
-        }
-        a /= (ids.size() - 1);
-        // b: other clusters:
-        double min = Double.POSITIVE_INFINITY;
-        for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster) {
+    }
+    else {
+      for(Cluster<?> cluster : clusters) {
+        if(cluster.size() <= 1 || cluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+          case TREAT_NOISE_AS_SINGLETONS:
+            // As suggested in Rousseeuw, we use 0 for singletons.
+            for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+              scores.put(iter, 0.);
+            }
+            mm.put(0.);
             continue;
+          case MERGE_NOISE:
+            // Treat as cluster below
+            break;
           }
-          if(ocluster.isNoise()) {
-            switch(noiseOption){
-            case IGNORE_NOISE:
-              continue;
-            case MERGE_NOISE:
-              // No special treatment
-              break;
-            case TREAT_NOISE_AS_SINGLETONS:
-              // Treat noise cluster as singletons:
-              for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-                double dist = dq.distance(it1, it3);
-                if(dist < min) {
-                  min = dist;
-                }
-              }
+        }
+        ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
+        double[] as = new double[ids.size()]; // temporary storage.
+        DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
+        for(it1.seek(0); it1.valid(); it1.advance()) {
+          // a: In-cluster distances
+          double a = as[it1.getOffset()]; // Already computed distances
+          for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
+            final double dist = dq.distance(it1, it2);
+            a += dist;
+            as[it2.getOffset()] += dist;
+          }
+          a /= (ids.size() - 1);
+          // b: other clusters:
+          double min = Double.POSITIVE_INFINITY;
+          for(Cluster<?> ocluster : clusters) {
+            if(ocluster == /* yes, reference identity */cluster) {
               continue;
             }
+            if(ocluster.isNoise()) {
+              switch(noiseOption){
+              case IGNORE_NOISE:
+                continue;
+              case MERGE_NOISE:
+                // No special treatment
+                break;
+              case TREAT_NOISE_AS_SINGLETONS:
+                // Treat noise cluster as singletons:
+                for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
+                  double dist = dq.distance(it1, it3);
+                  if(dist < min) {
+                    min = dist;
+                  }
+                }
+                continue;
+              }
+            }
+            final DBIDs oids = ocluster.getIDs();
+            double b = 0.;
+            for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
+              b += dq.distance(it1, it3);
+            }
+            b /= oids.size();
+            if(b < min) {
+              min = b;
+            }
           }
-          final DBIDs oids = ocluster.getIDs();
-          double b = 0.;
-          for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
-            b += dq.distance(it1, it3);
-          }
-          b /= oids.size();
-          if(b < min) {
-            min = b;
-          }
+          final double score = (min - a) / Math.max(min, a);
+          scores.put(it1, score);
+          mm.put(score);
         }
-        final double score = (min - a) / Math.max(min, a);
-        scores.put(it1, score);
-        mm.put(score);
       }
     }
     // Build result representation.
