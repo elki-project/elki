@@ -231,7 +231,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
     }
     if(idx == null) {
-      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
     if(idx == null) {
       return null;
@@ -252,7 +252,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
     }
     if(idx == null) {
-      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
     if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
@@ -273,7 +273,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* empirical */);
     }
     if(idx == null) {
-      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* empirical */);
@@ -294,7 +294,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* needs optimization and benchmark */);
     }
     if(idx == null) {
-      makeCoverTree(relation, distanceQuery.getDistance(), 20 /* needs optimization and benchmark */);
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* needs optimization and benchmark */);
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
