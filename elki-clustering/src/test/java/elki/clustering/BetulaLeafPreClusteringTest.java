@@ -45,8 +45,8 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.FEATURES_ID, VIIFeature.Factory.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.88147);
-    assertClusterSizes(clustering, new int[] { 66, 167, 185, 220 });
+    assertFMeasure(db, clustering, 0.8619);
+    assertClusterSizes(clustering, new int[] { 105, 112, 200, 221 });
   }
 
   @Test
@@ -57,8 +57,8 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.ABSORPTION_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.939321);
-    assertClusterSizes(clustering, new int[] { 200, 207, 231 });
+    assertFMeasure(db, clustering, 0.93866);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
   @Test
@@ -70,8 +70,8 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidEuclideanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.940272);
-    assertClusterSizes(clustering, new int[] { 70, 173, 195, 200 });
+    assertFMeasure(db, clustering, 0.93909);
+    assertClusterSizes(clustering, new int[] { 72, 168, 198, 200 });
   }
 
   @Test
@@ -83,8 +83,8 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, CentroidManhattanDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.94478);
-    assertClusterSizes(clustering, new int[] { 68, 173, 197, 200 });
+    assertFMeasure(db, clustering, 0.92236);
+    assertClusterSizes(clustering, new int[] { 83, 154, 200, 201 });
   }
 
   @Test
@@ -96,8 +96,8 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.DISTANCE_ID, AverageInterclusterDistance.class)//
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.963418);
-    assertClusterSizes(clustering, new int[] { 57, 185, 196, 200 });
+    assertFMeasure(db, clustering, 0.860623);
+    assertClusterSizes(clustering, new int[] { 102, 114, 200, 222 });
   }
 
   @Test
@@ -122,7 +122,7 @@ public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
         .with(CFTree.Factory.Par.BRANCHING_ID, 4) // Force branching
         .with(CFTree.Factory.Par.MAXLEAVES_ID, 4) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.853165);
-    assertClusterSizes(clustering, new int[] { 97, 112, 205, 224 });
+    assertFMeasure(db, clustering, 0.8857);
+    assertClusterSizes(clustering, new int[] { 71, 147, 199, 221 });
   }
 }

@@ -49,7 +49,7 @@ public class CFRandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.90380);
-    assertClusterSizes(clustering, new int[] { 92, 142, 200, 204 });
+    assertFMeasure(db, clustering, 0.84975);
+    assertClusterSizes(clustering, new int[] { 93, 107, 211, 227 });
   }
 }

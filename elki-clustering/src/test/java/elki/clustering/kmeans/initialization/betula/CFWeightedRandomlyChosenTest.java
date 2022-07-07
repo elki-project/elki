@@ -49,7 +49,7 @@ public class CFWeightedRandomlyChosenTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86239);
-    assertClusterSizes(clustering, new int[] { 107, 110, 200, 221 });
+    assertFMeasure(db, clustering, 0.85483);
+    assertClusterSizes(clustering, new int[] { 76, 124, 211, 227 });
   }
 }
