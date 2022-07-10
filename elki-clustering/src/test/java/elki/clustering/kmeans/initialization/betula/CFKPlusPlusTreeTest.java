@@ -49,8 +49,8 @@ public class CFKPlusPlusTreeTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.857682);
-    assertClusterSizes(clustering, new int[] { 103, 109, 200, 226 });
+    assertFMeasure(db, clustering, 0.90380);
+    assertClusterSizes(clustering, new int[] { 92, 142, 200, 204 });
   }
 
   @Test
@@ -65,7 +65,7 @@ public class CFKPlusPlusTreeTest extends AbstractClusterAlgorithmTest {
         .with(CFKPlusPlusTree.Par.FIRST_UNIFORM_ID) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.84938);
-    assertClusterSizes(clustering, new int[] { 95, 105, 212, 226 });
+    assertFMeasure(db, clustering, 0.889966);
+    assertClusterSizes(clustering, new int[] { 107, 127, 200, 204 });
   }
 }
