@@ -48,4 +48,16 @@ public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest
     assertAUC(db, "Noise", result, 0.73073);
     assertSingleScore(result, 416, 0.4743337);
   }
+  
+  @Test
+  public void testSilhouetteOutlierDetectionOneCluster() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
+        .with(SilhouetteOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
+        .with(KMeans.K_ID, 1) //
+        .with(KMeans.SEED_ID, 0) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.5);
+    assertSingleScore(result, 416, 0.5);
+  }
 }
