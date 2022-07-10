@@ -395,7 +395,7 @@ public class CFTree<L extends ClusterFeature> {
       if(cf == null) {
         break;
       }
-      final double d2 = sqabsorption(nv, cf.getCF());
+      final double d2 = sqdistance(nv, cf.getCF());
       if(d2 < bestd) {
         best = cf;
         bestd = d2;
@@ -405,7 +405,7 @@ public class CFTree<L extends ClusterFeature> {
     // Leaf node:
     if(!(best instanceof CFNode)) {
       // Threshold constraint satisfied?
-      if(abs.squaredDistance(nv, best.getCF()) <= thresholdsq) {
+      if(sqabsorption(nv, best.getCF()) <= thresholdsq) {
         best.getCF().addToStatistics(nv);
         if(idmap != null) {
           idmap.get((L) best).add(dbid);
@@ -575,7 +575,7 @@ public class CFTree<L extends ClusterFeature> {
     assert (best != nleaf);
     if(!(best instanceof CFNode)) {
       // Threshold constraint satisfied?
-      if(abs.squaredDistance(best.getCF(), nleaf.getCF()) <= thresholdsq) {
+      if(sqabsorption(best.getCF(), nleaf.getCF()) <= thresholdsq) {
         best.getCF().addToStatistics(nleaf.getCF());
         if(idmap != null) {
           idmap.get(best).addDBIDs(idmap.remove(nleaf));
