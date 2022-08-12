@@ -31,8 +31,10 @@ import elki.algorithm.AbstractSimpleAlgorithmTest;
 import elki.clustering.kmeans.LloydKMeans;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.clustering.trivial.ByLabelClustering;
+import elki.clustering.trivial.TrivialAllInOne;
 import elki.data.Clustering;
 import elki.data.NumberVector;
+import elki.data.model.Model;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
 import elki.database.query.distance.PrimitiveDistanceQuery;
@@ -57,7 +59,7 @@ import elki.utilities.random.RandomFactory;
  * @author Robert Gehde
  */
 public class SilhouetteTest {
-  final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
+  final static String DATASET = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   /**
    * Test for {@link Silhouette} with ByLabelClustering and
@@ -70,7 +72,7 @@ public class SilhouetteTest {
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20, param);
     Silhouette<NumberVector> silh = new ELKIBuilder<>(Silhouette.class). //
         with(Silhouette.Par.DISTANCE_ID, dist). //
         with(Silhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
@@ -80,7 +82,7 @@ public class SilhouetteTest {
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -111,7 +113,7 @@ public class SilhouetteTest {
     ListParameterization param = new ListParameterization();
     param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
         new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20, param);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20, param);
     Silhouette<NumberVector> silh = new ELKIBuilder<>(Silhouette.class). //
         with(Silhouette.Par.DISTANCE_ID, dist). //
         with(Silhouette.Par.NOISE_ID, NoiseHandling.MERGE_NOISE).build();
@@ -121,7 +123,7 @@ public class SilhouetteTest {
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.CLASSLABEL));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -148,14 +150,14 @@ public class SilhouetteTest {
   @Test
   public void testEvaluateSilhouetteTestKMeans() {
     EuclideanDistance dist = EuclideanDistance.STATIC;
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, 20);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
     Silhouette<NumberVector> silh = new ELKIBuilder<>(Silhouette.class).with(Silhouette.Par.DISTANCE_ID, dist).with(Silhouette.Par.NOISE_ID, NoiseHandling.TREAT_NOISE_AS_SINGLETONS).build();
 
-    LloydKMeans<NumberVector> clustering = new LloydKMeans<NumberVector>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
+    LloydKMeans<NumberVector> clustering = new LloydKMeans<>(dist, 3, 20, new RandomlyChosen<>(new RandomFactory(12341234L)));
     Clustering<?> rbl = clustering.run(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
     Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
     // evaluate clustering
-    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<NumberVector>(rel, dist), rbl);
+    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, dist), rbl);
 
     // get measurement data
     It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
@@ -173,5 +175,36 @@ public class SilhouetteTest {
     assertFalse("Too many measurements", silit.hasNext());
 
     assertEquals("Silhouette not as expected", 0.6970597031375269, m.getVal(), 1e-15);
+  }
+
+  /**
+   * Test for {@link Silhouette} with a single cluster only.
+   */
+  @Test
+  public void testEvaluateSilhouetteSingleCluster() {
+    EuclideanDistance dist = EuclideanDistance.STATIC;
+    ListParameterization param = new ListParameterization();
+    param.addParameter(AbstractDatabaseConnection.Par.FILTERS_ID, //
+        new ELKIBuilder<ClassLabelFilter>(ClassLabelFilter.class).with(ClassLabelFilter.Par.CLASS_LABEL_INDEX_ID, 0).build());
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20, param);
+    Relation<NumberVector> rel = db.getRelation(dist.getInputTypeRestriction());
+    Silhouette<NumberVector> silh = new ELKIBuilder<>(Silhouette.class).with(Silhouette.Par.DISTANCE_ID, dist).build();
+    Clustering<Model> rbl = new TrivialAllInOne().run(rel); // Fake clustering
+    silh.evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, dist), rbl);
+    // get measurement data
+    It<ScoreResult> it = Metadata.hierarchyOf(rbl).iterChildren().filter(EvaluationResult.class);
+    assertTrue("No evaluation result", it.valid());
+    assertTrue("Not a score result", it.get() instanceof EvaluationResult);
+    EvaluationResult er = it.get();
+    it.advance();
+    assertFalse("More than one evaluation result?", it.valid());
+
+    MeasurementGroup silhouette = er.findOrCreateGroup("Distance-based");
+    // check measurements
+    Iterator<Measurement> silit = silhouette.iterator();
+    assertTrue("No silhouette measurement", silit.hasNext());
+    Measurement m = silit.next();
+    assertFalse("Too many measurements", silit.hasNext());
+    assertEquals("Silhouette not as expected", 0., m.getVal(), 0);
   }
 }
