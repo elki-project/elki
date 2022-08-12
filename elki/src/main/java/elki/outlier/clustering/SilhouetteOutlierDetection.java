@@ -20,32 +20,27 @@
  */
 package elki.outlier.clustering;
 
-import java.util.List;
-
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
-import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
-import elki.evaluation.clustering.internal.Silhouette;
 import elki.evaluation.clustering.internal.NoiseHandling;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
+import elki.result.Metadata;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -127,85 +122,24 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
    * @param database Database
    * @return Outlier scores
    */
+  @Override
   public OutlierResult autorun(Database database) {
     Clustering<?> c = clusterer.autorun(database);
-
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-
-    WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
-    DoubleMinMax mm = new DoubleMinMax();
-
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
-    for(Cluster<?> cluster : clusters) {
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-        case TREAT_NOISE_AS_SINGLETONS:
-          // As suggested in Rousseeuw, we use 0 for singletons.
-          for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-            scores.put(iter, 0.);
-          }
-          mm.put(0.);
-          continue;
-        case MERGE_NOISE:
-          // Treat as cluster below
-          break;
-        }
-      }
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      double[] as = new double[ids.size()]; // temporary storage.
-      DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
-      for(it1.seek(0); it1.valid(); it1.advance()) {
-        // a: In-cluster distances
-        double a = as[it1.getOffset()]; // Already computed distances
-        for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
-          final double dist = dq.distance(it1, it2);
-          a += dist;
-          as[it2.getOffset()] += dist;
-        }
-        a /= (ids.size() - 1);
-        // b: other clusters:
-        double min = Double.POSITIVE_INFINITY;
-        for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster) {
-            continue;
-          }
-          if(ocluster.isNoise()) {
-            switch(noiseOption){
-            case IGNORE_NOISE:
-              continue;
-            case MERGE_NOISE:
-              // No special treatment
-              break;
-            case TREAT_NOISE_AS_SINGLETONS:
-              // Treat noise cluster as singletons:
-              for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-                double dist = dq.distance(it1, it3);
-                if(dist < min) {
-                  min = dist;
-                }
-              }
-              continue;
-            }
-          }
-          final DBIDs oids = ocluster.getIDs();
-          double b = 0.;
-          for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
-            b += dq.distance(it1, it3);
-          }
-          b /= oids.size();
-          if(b < min) {
-            min = b;
-          }
-        }
-        final double score = (min - a) / Math.max(min, a);
-        scores.put(it1, score);
-        mm.put(score);
-      }
+    new Silhouette<O>(distance, noiseOption, false).evaluateClustering(relation, dq, c);
+    // Find the silhouette scores:
+    It<DoubleRelation> it = Metadata.hierarchyOf(c).iterDescendants() //
+        .filter(DoubleRelation.class) //
+        .filter(x -> x.getLongName() == Silhouette.SILHOUETTE_NAME);
+    if(!it.valid()) {
+      throw new NullPointerException("Silhouette did not produce Silhouette scores.");
     }
-    // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("Silhouette Coefficients", relation.getDBIDs(), scores);
+    DoubleRelation scoreResult = it.get();
+    DoubleMinMax mm = new DoubleMinMax();
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      mm.put(scoreResult.doubleValue(iter));
+    }
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
     return new OutlierResult(scoreMeta, scoreResult);
   }
