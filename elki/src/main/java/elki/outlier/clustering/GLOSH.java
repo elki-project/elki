@@ -75,8 +75,7 @@ public class GLOSH implements OutlierAlgorithm {
   /**
    * Constructor with parameters.
    * 
-   * @param hdbscanExtraction HDBSCANHierarchyExtraction algorithm to
-   *        use.
+   * @param hdbscanExtraction HDBSCAN* extraction to use
    */
   public GLOSH(HDBSCANHierarchyExtraction hdbscanExtraction) {
     super();
@@ -92,16 +91,14 @@ public class GLOSH implements OutlierAlgorithm {
     if(scores == null) {
       throw new IllegalStateException("Were not GLOSH scores generated from clustering hierarchies?");
     }
-
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       minmax.put(scores.doubleValue(iditer));
     }
-
     // Wrap the result in the standard containers
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, 1);
     OutlierResult result = new OutlierResult(meta, new MaterializedDoubleRelation("GLOSH score", relation.getDBIDs(), scores));
-    // TODO
+    // Confuses auto-evaluation:
     // Metadata.hierarchyOf(result).addChild(hdbscanresult);
     return result;
   }
