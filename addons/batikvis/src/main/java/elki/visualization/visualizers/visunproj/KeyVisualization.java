@@ -53,9 +53,9 @@ import net.jafama.FastMath;
 
 /**
  * Visualizer, displaying the key for a clustering.
- *
+ * <p>
  * TODO: re-add automatic sizing depending on the number of clusters.
- *
+ * <p>
  * TODO: also show in scatter plot detail view.
  *
  * @author Erich Schubert
@@ -206,7 +206,6 @@ public class KeyVisualization implements VisFactory {
       MarkerLibrary ml = style.markers();
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
       final List<Cluster<Model>> topcs = clustering.getToplevelClusters();
-      System.err.println(allcs.size()+" "+topcs.size());
 
       // Add a label for the clustering.
       {
