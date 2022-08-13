@@ -202,28 +202,28 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           // Full merge: both not spurious, new parent.
           assert cclus != null || a < n;
           assert oclus != null || b < n;
-          cclus = cclus != null ? cclus : new TempCluster(a, cdist, merges.assignVar(a, tmp), cdist);
-          oclus = oclus != null ? oclus : new TempCluster(b, odist, merges.assignVar(b, tmp), odist);
+          cclus = cclus != null ? cclus : new TempCluster(a, cdist, merges.assignVar(a, tmp));
+          oclus = oclus != null ? oclus : new TempCluster(b, odist, merges.assignVar(b, tmp));
           nclus = new TempCluster(i, dist, oclus, cclus);
         }
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
-            nclus = a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp), cdist) : oclus.grow(i, dist, cclus);
+            nclus = a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp)) : oclus.grow(i, dist, cclus);
           }
           else if(!cSpurious && cclus != null) {
-            nclus = b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp), odist) : cclus.grow(i, dist, oclus);
+            nclus = b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp)) : cclus.grow(i, dist, oclus);
           }
           // ospurious, but recycle the existing cluster, but reset
           else if(oclus != null) {
-            nclus = (a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp), cdist) : oclus.grow(i, dist, cclus)).resetAggregate();
+            nclus = (a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp)) : oclus.grow(i, dist, cclus)).resetAggregate();
           }
           else if(cclus != null) {
-            nclus = (b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp), odist) : cclus.grow(i, dist, oclus)).resetAggregate();
+            nclus = (b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp)) : cclus.grow(i, dist, oclus)).resetAggregate();
           }
           else { // new 2-element cluster, but which may still be spurious
             assert a < n && b < n;
-            nclus = new TempCluster(i, dist, merges.assignVar(a, tmp), cdist < odist ? cdist : odist);
+            nclus = new TempCluster(i, dist, merges.assignVar(a, tmp));
             nclus.members.add(merges.assignVar(b, tmp));
           }
         }
@@ -263,9 +263,10 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param clustering Parent clustering
      * @param glosh GLOSH scores output
      * @param parent Parent cluster (for hierarchical output)
-     * @param flatten Flag to flatten all clusters below.
+     * @param flatten Flag to flatten all clusters below
+     * @return smallest distance when the cluster exists
      */
-    private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, Cluster<DendrogramModel> parent, boolean flatten) {
+    private double finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, Cluster<DendrogramModel> parent, boolean flatten) {
       final String name = "C_" + FormatUtil.NF6.format(temp.dist);
       DendrogramModel model;
       if(temp.members != null && !temp.members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
@@ -281,15 +282,17 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       else {
         clustering.addToplevelCluster(clus);
       }
-      collectChildren(temp, clustering, glosh, temp, clus, flatten);
+      double dmin = collectChildren(temp, clustering, glosh, temp, clus, flatten);
       for(DBIDIter it = temp.members.iter(); it.valid(); it.advance()) {
         // Note: we work with dists = 1/f.
-        final double cdist = coredist != null ? coredist.doubleValue(it) : temp.dist;
-        assert temp.dmin <= cdist : temp.dmin + " > " + cdist;
-        glosh.put(it, cdist > 0 ? 1. - temp.dmin / cdist : 0.);
+        double cdist = coredist != null ? coredist.doubleValue(it) : temp.dist;
+        cdist = cdist >= dmin ? cdist : dmin;
+        assert minClSize > 2 || dmin <= cdist : dmin + " > " + cdist;
+        glosh.put(it, cdist > 0 ? 1. - dmin / cdist : 0.);
       }
       temp.members = null;
       temp.children = null;
+      return dmin;
     }
 
     /**
@@ -299,19 +302,23 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param glosh GLOSH scores output
      * @param cur Current temporary cluster
      * @param clus Output cluster
-     * @param flatten Flag to indicate everything below should be flattened.
+     * @param flatten Flag to indicate everything below should be flattened
+     * @return smallest distance when the cluster exists
      */
-    private void collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
+    private double collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
+      double dmin = cur.dmin;
       for(TempCluster child : cur.children) {
+        double cdmin;
         if(flatten || child.totalStability() < 0) {
           temp.members.addDBIDs(child.members);
-          collectChildren(temp, clustering, glosh, child, clus, flatten);
+          cdmin = collectChildren(temp, clustering, glosh, child, clus, flatten);
         }
         else {
-          finalizeCluster(child, clustering, glosh, clus, true);
+          cdmin = finalizeCluster(child, clustering, glosh, clus, true);
         }
-        assert temp.dmin <= child.dmin;
+        dmin = dmin < cdmin ? dmin : cdmin;
       }
+      return dmin;
     }
   }
 
@@ -362,14 +369,12 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param seq Cluster generation sequence
      * @param dist Distance
      * @param a Object reference
-     * @param dmin Smallest core distance
      */
-    public TempCluster(int seq, double dist, DBIDRef a, double dmin) {
+    public TempCluster(int seq, double dist, DBIDRef a) {
       this.seq = seq;
-      this.dist = dist;
+      this.dist = this.dmin = dist;
       this.members.add(a);
       this.aggregate = 1. / dist;
-      this.dmin = dmin;
     }
 
     /**
@@ -383,11 +388,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     public TempCluster(int seq, double dist, TempCluster a, TempCluster b) {
       this.seq = seq;
       this.dist = dist;
+      this.dmin = a.dmin < b.dmin ? a.dmin : b.dmin;
       this.children.add(a);
       this.children.add(b);
       this.childrenTotal = a.totalElements() + b.totalElements();
       this.aggregate = this.childrenTotal / dist;
-      this.dmin = a.dmin < b.dmin ? a.dmin : b.dmin;
     }
 
     /**
@@ -401,12 +406,12 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     public TempCluster grow(int seq, double dist, TempCluster other) {
       this.seq = seq;
       this.dist = dist;
+      this.dmin = this.dmin < other.dmin ? this.dmin : other.dmin;
       assert other.children.isEmpty();
       this.members.addDBIDs(other.members);
       this.aggregate += other.members.size() / dist;
       other.members = null; // Invalidate
       other.children = null; // Invalidate
-      this.dmin = this.dmin < other.dmin ? this.dmin : other.dmin;
       return this;
     }
 
@@ -416,13 +421,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param seq Cluster generation sequence
      * @param dist Join distance
      * @param id Cluster lead, for 1-element clusters.
-     * @param dmin Smallest core distance
      * @return {@code this}
      */
-    public TempCluster grow(int seq, double dist, DBIDRef id, double dmin) {
+    public TempCluster grow(int seq, double dist, DBIDRef id) {
       this.seq = seq;
-      this.dist = dist;
-      this.dmin = this.dmin < dmin ? this.dmin : dmin;
+      this.dist = this.dmin = dist;
       this.members.add(id);
       this.aggregate += 1. / dist;
       return this;
@@ -435,6 +438,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      */
     public TempCluster resetAggregate() {
       aggregate = totalElements() / dist;
+      this.dmin = dist;
       return this;
     }
 
