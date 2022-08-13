@@ -25,21 +25,18 @@ import java.util.Collection;
 
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
-import elki.clustering.hierarchical.ClusterDensityMergeHistory;
-import elki.clustering.hierarchical.ClusterMergeHistory;
-import elki.clustering.hierarchical.ClusterPrototypeMergeHistory;
+import elki.clustering.hierarchical.*;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.data.model.PrototypeDendrogramModel;
 import elki.data.type.TypeInformation;
 import elki.database.Database;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.DoubleDataStore;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.ModifiableDBIDs;
+import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.ids.*;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.result.Metadata;
@@ -57,7 +54,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
- * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
+ * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN,
+ * and additionally also compute the GLOSH outlier scores.
  * <p>
  * In contrast to the authors top-down approach, we use a bottom-up approach
  * based on the more efficient pointer representation introduced in SLINK.
@@ -70,6 +68,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * R. J. G. B. Campello, D. Moulavi, J. Sander<br>
  * Density-Based Clustering Based on Hierarchical Density Estimates<br>
  * Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)
+ * <p>
+ * R. J. G. B. Campello, D. Moulavi, A. Zimek, J. Sander<br>
+ * Hierarchical Density Estimates for Data Clustering, Visualization, and
+ * Outlier Detection<br>
+ * ACM Trans. Knowl. Discov. Data 10(1)
  * <p>
  * Note: some of the code is rather complex because we delay the creation of
  * one-element clusters to reduce garbage collection overhead.
@@ -85,6 +88,11 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
     booktitle = "Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining (PAKDD)", //
     url = "https://doi.org/10.1007/978-3-642-37456-2_14", //
     bibkey = "DBLP:conf/pakdd/CampelloMS13")
+@Reference(authors = "R. J. G. B. Campello, D. Moulavi, A. Zimek, J. Sander", //
+    title = "Hierarchical Density Estimates for Data Clustering, Visualization, and Outlier Detection", //
+    booktitle = "ACM Trans. Knowl. Discov. Data 10(1)", //
+    url = "https://doi.org/10.1145/2733381", //
+    bibkey = "DBLP:journals/tkdd/CampelloMZS15")
 public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.
@@ -194,28 +202,28 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
           // Full merge: both not spurious, new parent.
           assert cclus != null || a < n;
           assert oclus != null || b < n;
-          cclus = cclus != null ? cclus : new TempCluster(a, cdist, merges.assignVar(a, tmp));
-          oclus = oclus != null ? oclus : new TempCluster(b, odist, merges.assignVar(b, tmp));
+          cclus = cclus != null ? cclus : new TempCluster(a, cdist, merges.assignVar(a, tmp), cdist);
+          oclus = oclus != null ? oclus : new TempCluster(b, odist, merges.assignVar(b, tmp), odist);
           nclus = new TempCluster(i, dist, oclus, cclus);
         }
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
-            nclus = oclus.grow(i, dist, cclus, a < n ? merges.assignVar(a, tmp) : null);
+            nclus = a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp), cdist) : oclus.grow(i, dist, cclus);
           }
           else if(!cSpurious && cclus != null) {
-            nclus = cclus.grow(i, dist, oclus, b < n ? merges.assignVar(b, tmp) : null);
+            nclus = b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp), odist) : cclus.grow(i, dist, oclus);
           }
-          // Then recycle the existing cluster, but reset
+          // ospurious, but recycle the existing cluster, but reset
           else if(oclus != null) {
-            nclus = oclus.grow(i, dist, cclus, a < n ? merges.assignVar(a, tmp) : null).resetAggregate();
+            nclus = (a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp), cdist) : oclus.grow(i, dist, cclus)).resetAggregate();
           }
           else if(cclus != null) {
-            nclus = cclus.grow(i, dist, oclus, b < n ? merges.assignVar(b, tmp) : null).resetAggregate();
+            nclus = (b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp), odist) : cclus.grow(i, dist, oclus)).resetAggregate();
           }
           else { // new 2-element cluster, but which may still be spurious
             assert a < n && b < n;
-            nclus = new TempCluster(i, dist, merges.assignVar(a, tmp));
+            nclus = new TempCluster(i, dist, merges.assignVar(a, tmp), cdist < odist ? cdist : odist);
             nclus.members.add(merges.assignVar(b, tmp));
           }
         }
@@ -225,12 +233,15 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       }
       LOG.ensureCompleted(progress);
 
-      // Build final dendrogram:
+      // Build final dendrogram, and compute GLOSH scores:
+      WritableDoubleDataStore glosh = DataStoreUtil.makeDoubleStorage(merges.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       final Clustering<DendrogramModel> dendrogram = new Clustering<>();
       Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       for(TempCluster clus : cluster_map.values()) {
-        finalizeCluster(clus, dendrogram, null, false);
+        finalizeCluster(clus, dendrogram, glosh, null, false);
       }
+      // Also store GLOSH scores.
+      Metadata.hierarchyOf(dendrogram).addChild(glosh);
       return dendrogram;
     }
 
@@ -250,10 +261,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      *
      * @param temp Current temporary cluster
      * @param clustering Parent clustering
+     * @param glosh GLOSH scores output
      * @param parent Parent cluster (for hierarchical output)
      * @param flatten Flag to flatten all clusters below.
      */
-    private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten) {
+    private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, Cluster<DendrogramModel> parent, boolean flatten) {
       final String name = "C_" + FormatUtil.NF6.format(temp.dist);
       DendrogramModel model;
       if(temp.members != null && !temp.members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
@@ -269,7 +281,13 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       else {
         clustering.addToplevelCluster(clus);
       }
-      collectChildren(temp, clustering, temp, clus, flatten);
+      collectChildren(temp, clustering, glosh, temp, clus, flatten);
+      for(DBIDIter it = temp.members.iter(); it.valid(); it.advance()) {
+        // Note: we work with dists = 1/f.
+        final double cdist = coredist != null ? coredist.doubleValue(it) : temp.dist;
+        assert temp.dmin <= cdist : temp.dmin + " > " + cdist;
+        glosh.put(it, cdist > 0 ? 1. - temp.dmin / cdist : 0.);
+      }
       temp.members = null;
       temp.children = null;
     }
@@ -278,19 +296,21 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * Recursive flattening of clusters.
      *
      * @param clustering Output clustering
+     * @param glosh GLOSH scores output
      * @param cur Current temporary cluster
      * @param clus Output cluster
      * @param flatten Flag to indicate everything below should be flattened.
      */
-    private void collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
+    private void collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
       for(TempCluster child : cur.children) {
         if(flatten || child.totalStability() < 0) {
           temp.members.addDBIDs(child.members);
-          collectChildren(temp, clustering, child, clus, flatten);
+          collectChildren(temp, clustering, glosh, child, clus, flatten);
         }
         else {
-          finalizeCluster(child, clustering, clus, true);
+          finalizeCluster(child, clustering, glosh, clus, true);
         }
+        assert temp.dmin <= child.dmin;
       }
     }
   }
@@ -317,6 +337,11 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     protected double dist = 0.;
 
     /**
+     * Minimum height (densest object).
+     */
+    protected double dmin = 0.;
+
+    /**
      * Mass aggregate.
      */
     protected double aggregate = 0.;
@@ -337,12 +362,14 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param seq Cluster generation sequence
      * @param dist Distance
      * @param a Object reference
+     * @param dmin Smallest core distance
      */
-    public TempCluster(int seq, double dist, DBIDRef a) {
+    public TempCluster(int seq, double dist, DBIDRef a, double dmin) {
       this.seq = seq;
       this.dist = dist;
       this.members.add(a);
       this.aggregate = 1. / dist;
+      this.dmin = dmin;
     }
 
     /**
@@ -360,6 +387,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       this.children.add(b);
       this.childrenTotal = a.totalElements() + b.totalElements();
       this.aggregate = this.childrenTotal / dist;
+      this.dmin = a.dmin < b.dmin ? a.dmin : b.dmin;
     }
 
     /**
@@ -368,23 +396,35 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @param seq Cluster generation sequence
      * @param dist Join distance
      * @param other Other cluster (may be {@code null})
-     * @param id Cluster lead, for 1-element clusters.
      * @return {@code this}
      */
-    public TempCluster grow(int seq, double dist, TempCluster other, DBIDRef id) {
+    public TempCluster grow(int seq, double dist, TempCluster other) {
       this.seq = seq;
       this.dist = dist;
-      if(other == null) {
-        this.members.add(id);
-        this.aggregate += 1. / dist;
-      }
-      else {
-        assert (other.children.isEmpty());
-        this.members.addDBIDs(other.members);
-        this.aggregate += other.members.size() / dist;
-        other.members = null; // Invalidate
-        other.children = null; // Invalidate
-      }
+      assert other.children.isEmpty();
+      this.members.addDBIDs(other.members);
+      this.aggregate += other.members.size() / dist;
+      other.members = null; // Invalidate
+      other.children = null; // Invalidate
+      this.dmin = this.dmin < other.dmin ? this.dmin : other.dmin;
+      return this;
+    }
+
+    /**
+     * Join the contents of another cluster.
+     *
+     * @param seq Cluster generation sequence
+     * @param dist Join distance
+     * @param id Cluster lead, for 1-element clusters.
+     * @param dmin Smallest core distance
+     * @return {@code this}
+     */
+    public TempCluster grow(int seq, double dist, DBIDRef id, double dmin) {
+      this.seq = seq;
+      this.dist = dist;
+      this.dmin = this.dmin < dmin ? this.dmin : dmin;
+      this.members.add(id);
+      this.aggregate += 1. / dist;
       return this;
     }
 
@@ -479,7 +519,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<HierarchicalClusteringAlgorithm>(Algorithm.Utils.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class) //
+      new ObjectParameter<HierarchicalClusteringAlgorithm>(Algorithm.Utils.ALGORITHM_ID, HierarchicalClusteringAlgorithm.class, HDBSCANLinearMemory.class) //
           .grab(config, x -> algorithm = x);
       new IntParameter(MINCLUSTERSIZE_ID, 1) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
