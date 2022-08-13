@@ -22,8 +22,8 @@ package elki.outlier.clustering;
 
 import java.util.List;
 
+import elki.clustering.kmeans.ExponionKMeans;
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.LloydKMeans;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -34,12 +34,13 @@ import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
+import elki.distance.NumberVectorDistance;
+import elki.distance.minkowski.SparseSquaredEuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.logging.Logging;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.BasicOutlierScoreMeta;
@@ -48,6 +49,7 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -55,11 +57,14 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * The scores are assigned by the objects distance to the nearest center.
  * <p>
- * We don't have a clear reference for this approach, but it seems to be a best
- * practise in some areas to remove objects that have the largest distance from
- * their center. If you need to cite this approach, please cite the ELKI version
- * you used (use the <a href="https://elki-project.github.io/publications">ELKI
- * publication list</a> for citation information and BibTeX templates).
+ * We do not have a clear reference for this approach, but it seems to be a best
+ * practice in some areas to remove objects that have the largest distance from
+ * their center. This can for example be found mentioned in the book of Han,
+ * Kamber and Pei, but our implementation goes beyond their approach when it
+ * comes to handling singleton objects (that are a cluster of their own). To
+ * cite this approach, please cite the ELKI version you used (use the
+ * <a href="https://elki-project.github.io/publications">ELKI publication
+ * list</a> for citation information and BibTeX templates).
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -70,18 +75,44 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class KMeansOutlierDetection<O extends NumberVector> implements OutlierAlgorithm {
   /**
-   * Clustering algorithm to use
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(KMeansOutlierDetection.class);
+
+  /**
+   * Outlier scoring rule
+   * 
+   * @author Erich Schubert
+   */
+  public static enum Rule {
+    /** Simple distance-based rule */
+    DISTANCE,
+    /** Distance with singletons */
+    DISTANCE_SINGLETONS,
+    /** Variance change */
+    VARIANCE
+  }
+
+  /**
+   * K-Means clustering algorithm to use
    */
   KMeans<O, ?> clusterer;
+
+  /**
+   * Outlier scoring rule
+   */
+  Rule rule;
 
   /**
    * Constructor.
    *
    * @param clusterer Clustering algorithm
+   * @param rule Decision rule
    */
-  public KMeansOutlierDetection(KMeans<O, ?> clusterer) {
+  public KMeansOutlierDetection(KMeans<O, ?> clusterer, Rule rule) {
     super();
     this.clusterer = clusterer;
+    this.rule = rule;
   }
 
   @Override
@@ -97,28 +128,118 @@ public class KMeansOutlierDetection<O extends NumberVector> implements OutlierAl
    */
   public OutlierResult run(Relation<O> relation) {
     Clustering<?> c = clusterer.run(relation);
-
-    DistanceQuery<O> dq = new QueryBuilder<>(relation, clusterer.getDistance()).distanceQuery();
+    NumberVectorDistance<? super O> distfunc = clusterer.getDistance();
+    if(rule == Rule.VARIANCE && !(distfunc instanceof SquaredEuclideanDistance || distfunc instanceof SparseSquaredEuclideanDistance)) {
+      LOG.warning("K-means should be used with squared Euclidean distance only.");
+    }
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     DoubleMinMax mm = new DoubleMinMax();
 
-    @SuppressWarnings("unchecked")
-    NumberVector.Factory<O> factory = (NumberVector.Factory<O>) RelationUtil.assumeVectorField(relation).getFactory();
-    List<? extends Cluster<?>> clusters = c.getAllClusters();
-    for(Cluster<?> cluster : clusters) {
-      // FIXME: use a primitive distance function on number vectors instead.
-      O mean = factory.newNumberVector(ModelUtil.getPrototype(cluster.getModel(), relation));
-      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-        double dist = dq.distance(mean, iter);
-        scores.put(iter, dist);
-        mm.put(dist);
-      }
+    switch(rule){
+    case DISTANCE:
+      distanceScoring(c, relation, distfunc, scores, mm);
+      break;
+    case DISTANCE_SINGLETONS:
+      singletonsScoring(c, relation, distfunc, scores, mm);
+      break;
+    case VARIANCE:
+      varianceScoring(c, relation, distfunc, scores, mm);
+      break;
     }
 
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans outlier scores", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     return new OutlierResult(scoreMeta, scoreResult);
+  }
+
+  /**
+   * Simple distance-based scoring function.
+   *
+   * @param c Clustering
+   * @param relation data relation
+   * @param distfunc Distance function
+   * @param scores Scores output
+   * @param mm Minimum and maximum
+   */
+  private void distanceScoring(Clustering<?> c, Relation<O> relation, NumberVectorDistance<? super O> distfunc, WritableDoubleDataStore scores, DoubleMinMax mm) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    for(Cluster<?> cluster : clusters) {
+      NumberVector mean = ModelUtil.getPrototype(cluster.getModel(), relation);
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+        final O obj = relation.get(iter);
+        double score = Double.NaN;
+        // distance to the cluster's center:
+        score = cluster.size() == 1 ? 0. : distfunc.distance(mean, obj);
+        scores.put(iter, score);
+        mm.put(score);
+      }
+    }
+  }
+
+  /**
+   * Distance-based scoring that takes singletons into account.
+   *
+   * @param c Clustering
+   * @param relation data relation
+   * @param distfunc Distance function
+   * @param scores Scores output
+   * @param mm Minimum and maximum
+   */
+  private void singletonsScoring(Clustering<?> c, Relation<O> relation, NumberVectorDistance<? super O> distfunc, WritableDoubleDataStore scores, DoubleMinMax mm) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    for(Cluster<?> cluster : clusters) {
+      NumberVector mean = ModelUtil.getPrototype(cluster.getModel(), relation);
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+        final O obj = relation.get(iter);
+        double score = Double.NaN;
+        if(cluster.size() == 1 && clusters.size() > 1) {
+          score = Double.POSITIVE_INFINITY;
+          for(Cluster<?> c2 : clusters) {
+            double dist = distfunc.distance(ModelUtil.getPrototype(c2.getModel(), relation), obj);
+            score = dist < score ? dist : score;
+          }
+        }
+        else {
+          score = distfunc.distance(mean, obj);
+        }
+        scores.put(iter, score);
+        mm.put(score);
+      }
+    }
+  }
+
+  /**
+   * Variance-based scoring function.
+   *
+   * @param c Clustering
+   * @param relation data relation
+   * @param distfunc Distance function
+   * @param scores Scores output
+   * @param mm Minimum and maximum
+   */
+  private void varianceScoring(Clustering<?> c, Relation<O> relation, NumberVectorDistance<? super O> distfunc, WritableDoubleDataStore scores, DoubleMinMax mm) {
+    List<? extends Cluster<?>> clusters = c.getAllClusters();
+    for(Cluster<?> cluster : clusters) {
+      NumberVector mean = ModelUtil.getPrototype(cluster.getModel(), relation);
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+        final O obj = relation.get(iter);
+        double score = Double.NaN;
+        if(cluster.size() == 1 && clusters.size() > 1) {
+          score = Double.POSITIVE_INFINITY;
+          for(Cluster<?> c2 : clusters) {
+            double dist = distfunc.distance(ModelUtil.getPrototype(c2.getModel(), relation), obj);
+            dist = dist * c2.size() / (c2.size() + 1);
+            score = dist < score ? dist : score;
+          }
+        }
+        else {
+          score = distfunc.distance(mean, obj) * cluster.size() / (cluster.size() - 1);
+        }
+        scores.put(iter, score);
+        mm.put(score);
+      }
+    }
   }
 
   /**
@@ -138,19 +259,32 @@ public class KMeansOutlierDetection<O extends NumberVector> implements OutlierAl
         "Clustering algorithm to use for detecting outliers.");
 
     /**
+     * Parameter for choosing the scoring rule.
+     */
+    public static final OptionID RULE_ID = new OptionID("kmeansod.scoring", //
+        "Scoring rule for scoring outliers.");
+
+    /**
      * Clustering algorithm to use
      */
     KMeans<O, ?> clusterer;
 
+    /**
+     * Outlier scorig rule
+     */
+    Rule rule;
+
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<KMeans<O, ?>>(CLUSTERING_ID, KMeans.class, LloydKMeans.class) //
+      new ObjectParameter<KMeans<O, ?>>(CLUSTERING_ID, KMeans.class, ExponionKMeans.class) //
           .grab(config, x -> clusterer = x);
+      new EnumParameter<Rule>(RULE_ID, Rule.class, Rule.VARIANCE) //
+          .grab(config, x -> rule = x);
     }
 
     @Override
     public KMeansOutlierDetection<O> make() {
-      return new KMeansOutlierDetection<>(clusterer);
+      return new KMeansOutlierDetection<>(clusterer, rule);
     }
   }
 }
