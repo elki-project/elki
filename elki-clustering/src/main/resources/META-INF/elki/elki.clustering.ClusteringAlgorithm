@@ -69,6 +69,7 @@ elki.clustering.Leader
 elki.clustering.NaiveMeanShiftClustering
 elki.clustering.optics.OPTICSXi
 elki.clustering.silhouette.PAMSIL
+elki.clustering.silhouette.PAMMEDSIL
 elki.clustering.SNNClustering
 elki.clustering.biclustering.ChengAndChurch
 elki.clustering.correlation.COPAC
