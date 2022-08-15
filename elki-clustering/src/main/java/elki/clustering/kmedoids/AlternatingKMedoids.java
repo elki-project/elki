@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import elki.Algorithm;
-import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.clustering.kmedoids.initialization.AlternateRefinement;
@@ -98,7 +97,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @param <V> vector datatype
+ * @param <O> vector datatype
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "F. E. Maranzana", //
@@ -116,7 +115,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Expert Systems with Applications 36(2)", //
     url = "https://doi.org/10.1016/j.eswa.2008.01.039", //
     bibkey = "DBLP:journals/eswa/ParkJ09")
-public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class AlternatingKMedoids<O> implements KMedoidsClustering<O> {
   /**
    * The logger for this class.
    */
@@ -130,7 +129,7 @@ public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<Me
   /**
    * Distance function used.
    */
-  protected Distance<? super V> distance;
+  protected Distance<? super O> distance;
 
   /**
    * Number of clusters to find.
@@ -145,7 +144,7 @@ public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<Me
   /**
    * Method to choose initial means.
    */
-  protected KMedoidsInitialization<V> initializer;
+  protected KMedoidsInitialization<O> initializer;
 
   /**
    * Constructor.
@@ -155,7 +154,7 @@ public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<Me
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AlternatingKMedoids(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public AlternatingKMedoids(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     super();
     this.distance = distance;
     this.k = k;
@@ -168,14 +167,13 @@ public class AlternatingKMedoids<V> implements ClusteringAlgorithm<Clustering<Me
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  /**
-   * Run k-medoids
-   *
-   * @param relation relation to use
-   * @return result
-   */
-  public Clustering<MedoidModel> run(Relation<V> relation) {
-    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
+  @Override
+  public Clustering<MedoidModel> run(Relation<O> relation) {
+    return run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
+  }
+
+  @Override
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
     // Choose initial medoids
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));

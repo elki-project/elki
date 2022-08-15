@@ -90,7 +90,7 @@ public class FasterPAM<O> extends FastPAM<O> {
    * @param medoids Current medoids
    * @param assignment Cluster assignment output
    */
-  protected void run(DistanceQuery<O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
   }
 

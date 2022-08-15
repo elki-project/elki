@@ -23,7 +23,6 @@ package elki.clustering.kmedoids;
 import java.util.Random;
 
 import elki.Algorithm;
-import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Cluster;
@@ -85,14 +84,14 @@ import elki.utilities.random.RandomFactory;
  * @navassoc - - - elki.data.model.MedoidModel
  * @has - - - Assignment
  *
- * @param <V> Vector type
+ * @param <O> Input data type
  */
 @Reference(authors = "R. T. Ng, J. Han", //
     title = "CLARANS: a method for clustering objects for spatial data mining", //
     booktitle = "IEEE Transactions on Knowledge and Data Engineering 14(5)", //
     url = "https://doi.org/10.1109/TKDE.2002.1033770", //
     bibkey = "DBLP:journals/tkde/NgH02")
-public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class CLARANS<O> implements KMedoidsClustering<O> {
   /**
    * Class logger.
    */
@@ -101,7 +100,7 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
   /**
    * Distance function used.
    */
-  protected Distance<? super V> distance;
+  protected Distance<? super O> distance;
 
   /**
    * Number of clusters to find.
@@ -132,7 +131,7 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
    * @param maxneighbor Neighbor sampling rate (absolute or relative)
    * @param random Random generator
    */
-  public CLARANS(Distance<? super V> distance, int k, int numlocal, double maxneighbor, RandomFactory random) {
+  public CLARANS(Distance<? super O> distance, int k, int numlocal, double maxneighbor, RandomFactory random) {
     super();
     this.distance = distance;
     this.k = k;
@@ -147,7 +146,13 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
    * @param relation Data relation
    * @return Clustering
    */
-  public Clustering<MedoidModel> run(Relation<V> relation) {
+  @Override
+  public Clustering<MedoidModel> run(Relation<O> relation) {
+    return run(relation, k, new QueryBuilder<>(relation, distance).distanceQuery());
+  }
+
+  @Override
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
     if(relation.size() <= 0) {
       Clustering<MedoidModel> empty = new Clustering<>();
       Metadata.of(empty).setLongName("CLARANS Clustering");
@@ -158,7 +163,6 @@ public class CLARANS<V> implements ClusteringAlgorithm<Clustering<MedoidModel>> 
       LOG.warning("A very large k was chosen. This implementation is not optimized for this case.");
     }
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
     final boolean metric = distance.isMetric();
 
     // Number of retries, relative rate, or absolute count:

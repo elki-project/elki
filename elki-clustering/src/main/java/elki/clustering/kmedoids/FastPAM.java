@@ -121,7 +121,7 @@ public class FastPAM<V> extends FastPAM1<V> {
   }
 
   @Override
-  protected void run(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  protected void run(DistanceQuery<? super V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment, fasttol).run(medoids, maxiter);
   }
 
