@@ -1,8 +1,11 @@
+/**
+ * Silhouette clustering algorithms
+ */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2019
+ * Copyright (C) 2022
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,28 +21,4 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.clustering.kmedoids.initialization;
-
-import elki.database.ids.DBIDs;
-import elki.database.query.distance.DistanceQuery;
-
-/**
- * Interface for initializing K-Medoids. In contrast to k-means initializers,
- * this initialization will only return members of the original data set.
- * 
- * @author Erich Schubert
- * @since 0.5.0
- * 
- * @param <O> Object type
- */
-public interface KMedoidsInitialization<O> {
-  /**
-   * Choose initial means
-   * 
-   * @param k Parameter k
-   * @param ids Candidate IDs.
-   * @param distance Distance function
-   * @return List of chosen means for k-means
-   */
-  DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distance);
-}
+package elki.clustering.silhouette;

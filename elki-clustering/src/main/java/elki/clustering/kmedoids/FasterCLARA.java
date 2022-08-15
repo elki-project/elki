@@ -127,14 +127,19 @@ public class FasterCLARA<V> extends FasterPAM<V> {
 
   @Override
   public Clustering<MedoidModel> run(Relation<V> relation) {
+    // Note: CLARA does not need/use a full distance matrix
+    return run(relation, k, new QueryBuilder<>(relation, distance).distanceQuery());
+  }
+
+  @Override
+  public Clustering<MedoidModel> run(Relation<V> relation, int k, DistanceQuery<? super V> distQ) {
     DBIDs ids = relation.getDBIDs();
-    DistanceQuery<V> distQ = new QueryBuilder<>(relation, distance).distanceQuery();
     int samplesize = Math.min(ids.size(), (int) (sampling <= 1 ? sampling * ids.size() : sampling));
     if(samplesize < 3 * k) {
       LOG.warning("The sampling size is set to a very small value, it should be much larger than k.");
     }
 
-    CLARA.CachedDistanceQuery<V> cachedQ = new CLARA.CachedDistanceQuery<V>(distQ, (samplesize * (samplesize - 1)) >> 1);
+    CLARA.CachedDistanceQuery<? super V> cachedQ = new CLARA.CachedDistanceQuery<>(distQ, (samplesize * (samplesize - 1)) >> 1);
 
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;

@@ -3,6 +3,7 @@ elki.clustering.kmedoids.initialization.BUILD
 elki.clustering.kmedoids.initialization.LAB
 elki.clustering.kmedoids.initialization.AlternateRefinement
 elki.clustering.kmedoids.initialization.ParkJun
+elki.clustering.kmedoids.initialization.KMedoidsKMedoidsInitialization
 elki.clustering.kmeans.initialization.FarthestPoints
 elki.clustering.kmeans.initialization.FarthestSumPoints
 elki.clustering.kmeans.initialization.FirstK

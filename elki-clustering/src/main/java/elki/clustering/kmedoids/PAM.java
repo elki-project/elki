@@ -21,7 +21,6 @@
 package elki.clustering.kmedoids;
 
 import elki.Algorithm;
-import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmedoids.initialization.BUILD;
@@ -100,7 +99,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "INFOR: Information Systems and Operational Research 21(2)", //
     url = "https://doi.org/10.1080/03155986.1983.11731889", //
     bibkey = "doi:10.1080/03155986.1983.11731889")
-public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class PAM<O> implements KMedoidsClustering<O> {
   /**
    * The logger for this class.
    */
@@ -150,16 +149,15 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
-  /**
-   * Run k-medoids
-   *
-   * @param relation relation to use
-   * @return result
-   */
+  @Override
   public Clustering<MedoidModel> run(Relation<O> relation) {
-    DistanceQuery<O> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
+    return run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
+  }
+
+  @Override
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
     DBIDs ids = relation.getDBIDs();
-    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids);
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
 
     // Setup cluster assignment store
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
@@ -183,9 +181,10 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
    *
    * @param distQ Distance query
    * @param ids IDs to choose from
+   * @param k Number of medoids to choose from
    * @return Initial medoids
    */
-  protected ArrayModifiableDBIDs initialMedoids(DistanceQuery<O> distQ, DBIDs ids) {
+  protected ArrayModifiableDBIDs initialMedoids(DistanceQuery<? super O> distQ, DBIDs ids, int k) {
     if(getLogger().isStatistics()) {
       getLogger().statistics(new StringStatistic(getClass().getName() + ".initialization", initializer.toString()));
     }
@@ -207,7 +206,7 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
    * @param medoids Current medoids
    * @param assignment Cluster assignment output
    */
-  protected void run(DistanceQuery<O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
   }
 
@@ -264,8 +263,8 @@ public class PAM<O> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
     /**
      * Run the PAM optimization phase.
      *
-     * @param medoids Medoids list
-     * @param maxiter
+     * @param medoids Initial medoids list
+     * @param maxiter Maximum number of iterations
      * @return final cost
      */
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {

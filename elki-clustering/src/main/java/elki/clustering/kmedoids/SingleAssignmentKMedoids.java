@@ -69,7 +69,7 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
   }
 
   @Override
-  protected void run(DistanceQuery<O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment).run(medoids);
   }
 

@@ -89,7 +89,7 @@ public class FastPAM1<V> extends PAM<V> {
   }
 
   @Override
-  protected void run(DistanceQuery<V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  protected void run(DistanceQuery<? super V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
   }
 
