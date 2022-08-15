@@ -31,7 +31,6 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.ids.*;
 import elki.database.relation.Relation;
-import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.VMath;
@@ -43,6 +42,7 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * k-means--: A Unified Approach to Clustering and Outlier Detection.
@@ -81,6 +81,11 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
   public double rate;
 
   /**
+   * Create a noise cluster, otherwise assign to the nearest cluster.
+   */
+  public boolean noiseFlag;
+
+  /**
    * Constructor.
    *
    * @param distance distance function
@@ -90,9 +95,10 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
    * @param noiseFlag Create a noise cluster instead of assigning to the nearest
    *        cluster
    */
-  public KMeansMinusMinus(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, double rate) {
+  public KMeansMinusMinus(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, double rate, boolean noiseFlag) {
     super(distance, k, maxiter, initializer);
     this.rate = rate;
+    this.noiseFlag = noiseFlag;
   }
 
   @Override
@@ -167,9 +173,9 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     }
 
     protected Clustering<KMeansModel> buildResultWithNoise() {
-      // create noisecluster
+      // create noisecluster if wanted
       ModifiableDoubleDBIDList noiseids = null;
-      if(heapsize > 0) {
+      if(noiseFlag && heapsize > 0) {
         clusters.add(noiseids = DBIDUtil.newDistanceDBIDList((minHeap.size())));
         double tresh = minHeap.peek();
         for(int i = 0; i < k; i++) {
@@ -197,10 +203,8 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       }
 
       // Noise Cluster
-      if(noiseids != null && !noiseids.isEmpty()) {
-        double[] dummyMeans = new double[RelationUtil.dimensionality(relation)];
-        Arrays.fill(dummyMeans, 0.);
-        result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(dummyMeans, 0)));
+      if(noiseFlag && noiseids != null && !noiseids.isEmpty()) {
+        result.addToplevelCluster(new Cluster<>(noiseids, true, new KMeansModel(null, 0)));
       }
       return result;
     }
@@ -295,9 +299,20 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     public static final OptionID RATE_ID = new OptionID("kmeansmm.l", "Number of outliers to ignore, or (if less than 1) a relative rate.");
 
     /**
+     * Flag to produce a "noise" cluster, instead of assigning them to the
+     * nearest neighbor.
+     */
+    public static final OptionID NOISE_FLAG_ID = new OptionID("kmeansmm.noisecluster", "Create a noise cluster, instead of assigning the noise objects.");
+
+    /**
      * Outlier rate.
      */
     private double rate;
+
+    /**
+     * Noise cluster flag.
+     */
+    private boolean noiseFlag;
 
     @Override
     public void configure(Parameterization config) {
@@ -305,11 +320,12 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
       new DoubleParameter(RATE_ID, 0.05) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> rate = x);
+      new Flag(NOISE_FLAG_ID).grab(config, x -> noiseFlag = x);
     }
 
     @Override
     public KMeansMinusMinus<V> make() {
-      return new KMeansMinusMinus<V>(distance, k, maxiter, initializer, rate);
+      return new KMeansMinusMinus<V>(distance, k, maxiter, initializer, rate, noiseFlag);
     }
   }
 }

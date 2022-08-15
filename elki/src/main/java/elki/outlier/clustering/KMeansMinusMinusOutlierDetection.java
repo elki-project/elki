@@ -59,7 +59,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * Proc. 13th SIAM Int. Conf. on Data Mining (SDM 2013)
  *
  * @author Braulio V.S. Vinces (ELKIfication)
- * @since 0.7.5
  *
  * @has - - - KMeans
  *
@@ -120,8 +119,7 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
     DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans-- outlier scores", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    // TODO: When the clustering output is added, the OutlierRankingEvaluation
-    // statistics are lost.
+    // TODO:
     // Metadata.hierarchyOf(result).addChild(c);
     return result;
   }
