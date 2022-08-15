@@ -104,10 +104,6 @@ public class PAMSIL<O> extends PAM<O> {
 
   /**
    * Instance for a single dataset.
-   * <p>
-   * Note: we experimented with not caching the distance to nearest and second
-   * nearest, but only the assignments. The matrix lookup was more expensive, so
-   * this is probably worth the 2*n doubles in storage.
    *
    * @author Erich Schubert
    */
@@ -251,11 +247,11 @@ public class PAMSIL<O> extends PAM<O> {
           if(DBIDUtil.equal(x, y)) {
             continue;
           }
-          int c = assignment.intValue(y);
+          final int c = assignment.intValue(y);
           sums[c] += distQ.distance(x, y);
           count[c] += 1;
         }
-        int c = assignment.intValue(x);
+        final int c = assignment.intValue(x);
         if(count[c] == 0) {
           continue; // else: s(x)=0
         }

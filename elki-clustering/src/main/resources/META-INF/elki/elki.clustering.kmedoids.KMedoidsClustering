@@ -12,3 +12,4 @@ elki.clustering.kmedoids.PAM
 elki.clustering.kmedoids.ReynoldsPAM
 elki.clustering.kmedoids.SingleAssignmentKMedoids
 elki.clustering.silhouette.PAMSIL
+elki.clustering.silhouette.PAMMEDSIL

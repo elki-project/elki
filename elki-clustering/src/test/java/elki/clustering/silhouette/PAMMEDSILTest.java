@@ -41,15 +41,15 @@ import elki.evaluation.clustering.internal.Silhouette;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Test PAMSIL clustering.
+ * Test PAMMEDSIL clustering.
  *
  * @author Erich Schubert
  */
-public class PAMSILTest extends AbstractClusterAlgorithmTest {
+public class PAMMEDSILTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testPAMSIL() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<MedoidModel> result = new ELKIBuilder<PAMSIL<NumberVector>>(PAMSIL.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<PAMMEDSIL<NumberVector>>(PAMMEDSIL.class) //
         .with(KMedoidsKMedoidsInitialization.Par.INNER_ID, FasterPAM.class) //
         .with(KMeans.K_ID, 3) //
         .build().autorun(db);
@@ -64,7 +64,7 @@ public class PAMSILTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testPAMSILworseStart() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<MedoidModel> result = new ELKIBuilder<PAMSIL<NumberVector>>(PAMSIL.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<PAMMEDSIL<NumberVector>>(PAMMEDSIL.class) //
         .with(KMeans.INIT_ID, KMedoidsKMedoidsInitialization.class) //
         .with(KMeans.INIT_ID, FirstK.class) //
         .with(KMeans.K_ID, 3) //
