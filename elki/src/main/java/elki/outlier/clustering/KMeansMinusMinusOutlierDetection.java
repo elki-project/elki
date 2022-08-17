@@ -75,16 +75,16 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
   /**
    * Clustering algorithm to use
    */
-  KMeansMinusMinus<V> clusterer;
+  KMeansMinusMinus<V> kmeansminusminus;
 
   /**
    * Constructor.
    *
-   * @param clusterer Clustering algorithm
+   * @param kmeansminusminus Clustering algorithm
    */
-  public KMeansMinusMinusOutlierDetection(KMeansMinusMinus<V> clusterer) {
+  public KMeansMinusMinusOutlierDetection(KMeansMinusMinus<V> kmeansminusminus) {
     super();
-    this.clusterer = clusterer;
+    this.kmeansminusminus = kmeansminusminus;
   }
 
   /**
@@ -94,7 +94,7 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<V> relation) {
-    Clustering<?> c = clusterer.run(relation);
+    Clustering<?> c = kmeansminusminus.run(relation);
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB);
     final double outlier = 1.;
@@ -116,7 +116,7 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
     }
 
     // Build result representation.
-    DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans-- outlier scores", relation.getDBIDs(), scores);
+    DoubleRelation scoreResult = new MaterializedDoubleRelation("KMeans-- outlier score", relation.getDBIDs(), scores);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0., Double.POSITIVE_INFINITY, 0.);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // TODO:
@@ -126,7 +126,7 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(clusterer.getDistance().getInputTypeRestriction());
+    return TypeUtil.array(kmeansminusminus.getDistance().getInputTypeRestriction());
   }
 
   /**
@@ -138,19 +138,19 @@ public class KMeansMinusMinusOutlierDetection<V extends NumberVector> implements
    */
   public static class Par<V extends NumberVector> implements Parameterizer {
     /**
-     * Clustering algorithm to use
+     * Clustering algorithm to run.
      */
-    KMeansMinusMinus<V> clusterer;
+    KMeansMinusMinus<V> kmeansminuminus;
 
     @Override
     public void configure(Parameterization config) {
-      Class<KMeansMinusMinus<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(KMeansMinusMinus.class);
-      clusterer = config.tryInstantiate(cls);
+      Class<KMeansMinusMinus<V>> clazz = ClassGenericsUtil.uglyCastIntoSubclass(KMeansMinusMinus.class);
+      kmeansminuminus = config.tryInstantiate(clazz);
     }
 
     @Override
     public KMeansMinusMinusOutlierDetection<V> make() {
-      return new KMeansMinusMinusOutlierDetection<>(clusterer);
+      return new KMeansMinusMinusOutlierDetection<>(kmeansminuminus);
     }
   }
 }

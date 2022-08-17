@@ -34,19 +34,31 @@ import elki.utilities.ELKIBuilder;
  * Tests the KMeansMinusMinusOutlierDetection algorithm.
  *
  * @author Braulio V.S. Vinces
- * @since 0.7.5
  */
 public class KMeansMinusMinusOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testKMeansOutlierDetection() {
+  public void testKMeansMinusMinusOutlierDetection() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<KMeansMinusMinusOutlierDetection<DoubleVector>>(KMeansMinusMinusOutlierDetection.class) //
+        .with(KMeansMinusMinus.Par.RATE_ID, 0.1) //
+        .with(KMeansMinusMinus.Par.NOISE_FLAG_ID, true) //
+        .with(KMeans.K_ID, 10) //
+        .with(KMeans.SEED_ID, 0) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.765);
+    assertSingleScore(result, 416, 1.0);
+  }
+
+  @Test
+  public void testKMeansMinusMinusOutlierDetectionNoiseFlagFalse() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<KMeansMinusMinusOutlierDetection<DoubleVector>>(KMeansMinusMinusOutlierDetection.class) //
         .with(KMeansMinusMinus.Par.RATE_ID, 0.1) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 0) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.765);
-    assertSingleScore(result, 416, 1.0);
+    assertAUC(db, "Noise", result, 0.5);
+    assertSingleScore(result, 416, 0.0);
   }
 
 }
