@@ -22,42 +22,41 @@ package elki.outlier.clustering;
 
 import org.junit.Test;
 
-import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.HamerlyKMeans;
-import elki.outlier.AbstractOutlierAlgorithmTest;
-import elki.data.DoubleVector;
+import elki.Algorithm;
+import elki.clustering.hierarchical.HDBSCANLinearMemory;
+import elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
 import elki.database.Database;
+import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Tests the Silhouette outlier detection algorithm.
+ * Tests the GLOSH outlier detection algorithm.
  *
- * @author Erich Schubert
- * @since 0.7.5
+ * @author Braulio V.S. Vinces
  */
-public class SilhouetteOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
+public class GLOSHTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testSilhouetteOutlierDetection() {
+  public void testGLOSHOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-    OutlierResult result = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
-        .with(SilhouetteOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
-        .with(KMeans.K_ID, 10) //
-        .with(KMeans.SEED_ID, 0) //
+    OutlierResult result = new ELKIBuilder<>(GLOSH.class) //
+        .with(HDBSCANHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 2) //
+        .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 2) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.73073);
-    assertSingleScore(result, 416, 0.4743337);
+    assertAUC(db, "Noise", result, 0.5614);
+    assertSingleScore(result, 416, 0.995778);
   }
 
   @Test
-  public void testSilhouetteOutlierDetectionOneCluster() {
+  public void testGLOSHOutlierDetectionMinpts() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-    OutlierResult result = new ELKIBuilder<SilhouetteOutlierDetection<DoubleVector>>(SilhouetteOutlierDetection.class) //
-        .with(SilhouetteOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
-        .with(KMeans.K_ID, 1) //
-        .with(KMeans.SEED_ID, 0) //
+    OutlierResult result = new ELKIBuilder<>(GLOSH.class) //
+        .with(HDBSCANHierarchyExtraction.Par.MINCLUSTERSIZE_ID, 5) //
+        .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
+        .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 5) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.5);
-    assertSingleScore(result, 416, 0.0);
+    assertAUC(db, "Noise", result, 0.89913);
+    assertSingleScore(result, 416, 0.95125);
   }
 }

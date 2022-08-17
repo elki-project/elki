@@ -23,10 +23,10 @@ package elki.outlier.clustering;
 import org.junit.Test;
 
 import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.HamerlyKMeans;
-import elki.outlier.AbstractOutlierAlgorithmTest;
+import elki.clustering.kmeans.ShallotKMeans;
 import elki.data.DoubleVector;
 import elki.database.Database;
+import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
 
@@ -38,14 +38,67 @@ import elki.utilities.ELKIBuilder;
  */
 public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testKMeansOutlierDetection() {
+  public void testKMeansOutlierDistance() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
-        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, HamerlyKMeans.class) //
+        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, ShallotKMeans.class) //
         .with(KMeans.K_ID, 10) //
         .with(KMeans.SEED_ID, 0) //
+        .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.DISTANCE) //
         .build().autorun(db);
     assertAUC(db, "Noise", result, 0.8654);
     assertSingleScore(result, 416, 0.0102546);
+  }
+
+  @Test
+  public void testKMeansOutlierVariance() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, ShallotKMeans.class) //
+        .with(KMeans.K_ID, 10) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.VARIANCE) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.865);
+    assertSingleScore(result, 416, 0.010665);
+  }
+
+  @Test
+  public void testKMeansOutlierDistanceHighK() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, ShallotKMeans.class) //
+        .with(KMeans.K_ID, 100) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.DISTANCE) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.771933);
+    assertSingleScore(result, 416, 0.00576);
+  }
+
+  @Test
+  public void testKMeansOutlierSingletons() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, ShallotKMeans.class) //
+        .with(KMeans.K_ID, 100) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.DISTANCE_SINGLETONS) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.771933);
+    assertSingleScore(result, 416, 0.00576);
+  }
+
+  @Test
+  public void testKMeansOutlierSingletonsVariance() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<KMeansOutlierDetection<DoubleVector>>(KMeansOutlierDetection.class) //
+        .with(KMeansOutlierDetection.Par.CLUSTERING_ID, ShallotKMeans.class) //
+        .with(KMeans.K_ID, 100) //
+        .with(KMeans.SEED_ID, 0) //
+        .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.VARIANCE) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.7908);
+    assertSingleScore(result, 416, 0.00864);
   }
 }

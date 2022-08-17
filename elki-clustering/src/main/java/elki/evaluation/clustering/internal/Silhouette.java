@@ -147,70 +147,75 @@ public class Silhouette<O> implements Evaluator {
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
     // Store values for the Silhouette plot
-    WritableDoubleDataStore silhouettes = DataStoreFactory.FACTORY.makeDoubleStorage(rel.getDBIDs(), DataStoreFactory.HINT_DB);
-    for(Cluster<?> cluster : clusters) {
-      // Note: we treat 1-element clusters the same as noise.
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-          ignorednoise += cluster.size();
-          continue; // Ignore noise elements
-        case TREAT_NOISE_AS_SINGLETONS:
-          // As suggested in Rousseeuw, we use 0 for singletons.
-          msil.put(0., cluster.size());
-          for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-            silhouettes.putDouble(it, 0);
-          }
-          continue;
-        case MERGE_NOISE:
-          break; // Treat as cluster below
-        }
-      }
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      double[] as = new double[ids.size()]; // temporary storage.
-      DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
-      for(it1.seek(0); it1.valid(); it1.advance()) {
-        // a: In-cluster distances
-        double a = as[it1.getOffset()]; // Already computed distances
-        for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
-          final double dist = dq.distance(it1, it2);
-          a += dist;
-          as[it2.getOffset()] += dist;
-        }
-        a /= (ids.size() - 1);
-        // b: minimum average distance to other clusters:
-        double b = Double.POSITIVE_INFINITY;
-        for(Cluster<?> ocluster : clusters) {
-          if(ocluster == /* yes, reference identity */cluster) {
-            continue; // Same cluster
-          }
-          if(ocluster.size() <= 1 || ocluster.isNoise()) {
-            switch(noiseOption){
-            case IGNORE_NOISE:
-              continue; // Ignore noise elements
-            case TREAT_NOISE_AS_SINGLETONS:
-              // Treat noise cluster as singletons:
-              for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
-                final double dist = dq.distance(it1, it3);
-                b = dist < b ? dist : b; // Minimum average
-              }
-              continue;
-            case MERGE_NOISE:
-              break; // Treat as cluster below
+    WritableDoubleDataStore silhouettes = DataStoreFactory.FACTORY.makeDoubleStorage(rel.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
+    if(clusters.size() <= 1) {
+      msil.put(0, rel.size()); // no other cluster exists, use silhouette 0
+    }
+    else {
+      for(Cluster<?> cluster : clusters) {
+        // Note: we treat 1-element clusters the same as noise.
+        if(cluster.size() <= 1 || cluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+            ignorednoise += cluster.size();
+            continue; // Ignore noise elements
+          case TREAT_NOISE_AS_SINGLETONS:
+            // As suggested in Rousseeuw, we use 0 for singletons.
+            msil.put(0., cluster.size());
+            for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+              silhouettes.putDouble(it, 0);
             }
+            continue;
+          case MERGE_NOISE:
+            break; // Treat as cluster below
           }
-          final DBIDs oids = ocluster.getIDs();
-          double btmp = 0.;
-          for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
-            btmp += dq.distance(it1, it3);
-          }
-          btmp /= oids.size(); // Average
-          b = btmp < b ? btmp : b; // Minimum average
         }
-        // One cluster only? Then use 0.
-        final double s = b < Double.POSITIVE_INFINITY ? (b - a) / (b > a ? b : a) : 0;
-        msil.put(s);
-        silhouettes.putDouble(it1, s);
+        ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
+        double[] as = new double[ids.size()]; // temporary storage.
+        DBIDArrayIter it1 = ids.iter(), it2 = ids.iter();
+        for(it1.seek(0); it1.valid(); it1.advance()) {
+          // a: In-cluster distances
+          double a = as[it1.getOffset()]; // Already computed distances
+          for(it2.seek(it1.getOffset() + 1); it2.valid(); it2.advance()) {
+            final double dist = dq.distance(it1, it2);
+            a += dist;
+            as[it2.getOffset()] += dist;
+          }
+          a /= ids.size() - 1;
+          // b: minimum average distance to other clusters:
+          double b = Double.POSITIVE_INFINITY;
+          for(Cluster<?> ocluster : clusters) {
+            if(ocluster == /* yes, reference identity */cluster) {
+              continue; // Same cluster
+            }
+            if(ocluster.size() <= 1 || ocluster.isNoise()) {
+              switch(noiseOption){
+              case IGNORE_NOISE:
+                continue; // Ignore noise elements
+              case TREAT_NOISE_AS_SINGLETONS:
+                // Treat noise cluster as singletons:
+                for(DBIDIter it3 = ocluster.getIDs().iter(); it3.valid(); it3.advance()) {
+                  final double dist = dq.distance(it1, it3);
+                  b = dist < b ? dist : b; // Minimum average
+                }
+                continue;
+              case MERGE_NOISE:
+                break; // Treat as cluster below
+              }
+            }
+            final DBIDs oids = ocluster.getIDs();
+            double btmp = 0.;
+            for(DBIDIter it3 = oids.iter(); it3.valid(); it3.advance()) {
+              btmp += dq.distance(it1, it3);
+            }
+            btmp /= oids.size(); // Average
+            b = btmp < b ? btmp : b; // Minimum average
+          }
+          // One cluster only? Then use 0.
+          final double s = b < Double.POSITIVE_INFINITY ? (b - a) / (b > a ? b : a) : 0;
+          msil.put(s);
+          silhouettes.putDouble(it1, s);
+        }
       }
     }
     double penalty = 1.;
