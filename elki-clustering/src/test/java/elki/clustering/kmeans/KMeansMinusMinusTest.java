@@ -40,23 +40,24 @@ public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
-        .with(KMeans.SEED_ID, 7) //
+        .with(KMeans.SEED_ID, 0) //
         .with(KMeansMinusMinus.Par.RATE_ID, 0.) //
         .build().autorun(db);
-    assertFMeasure(db, result, 0.998005);
+    assertFMeasure(db, result, 0.9980050099749501);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 
   @Test
-  public void testKMeansMinusMinus() {
+  public void testKMeansMinusMinusNoiseFlag() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<KMeansMinusMinus<DoubleVector>>(KMeansMinusMinus.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 0) //
         .with(KMeansMinusMinus.Par.RATE_ID, 0.1) //
+        .with(KMeansMinusMinus.Par.NOISE_FLAG_ID, true) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.9303073926666102);
-    assertClusterSizes(result, new int[] { 200, 200, 112, 188, 200, 100 });
+    assertClusterSizes(result, new int[] { 100, 112, 188, 200, 200, 200 });
   }
 
 }
