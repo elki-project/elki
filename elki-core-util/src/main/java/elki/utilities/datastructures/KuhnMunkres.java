@@ -50,6 +50,7 @@ import elki.utilities.io.FormatUtil;
  * TODO: also implement the Jonker-Volgenant variant!
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "H. W. Kuhn", //
     title = "The Hungarian method for the assignment problem", //

@@ -38,6 +38,7 @@ import elki.database.query.range.RangeSearcher;
  * distance.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @opt nodefillcolor LemonChiffon
  *

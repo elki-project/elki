@@ -29,6 +29,7 @@ import elki.index.tree.betula.features.ClusterFeature;
  * For performance we (usually, except Manhattan) use squared distances.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @assoc - - - ClusteringFeature
  * @assoc - - - NumberVector

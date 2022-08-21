@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Tests the GLOSH outlier detection algorithm.
  *
  * @author Braulio V.S. Vinces
+ * @since 0.8.0
  */
 public class GLOSHTest extends AbstractOutlierAlgorithmTest {
   @Test

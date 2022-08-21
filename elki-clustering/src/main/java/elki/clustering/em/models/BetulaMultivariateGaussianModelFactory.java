@@ -46,6 +46,7 @@ import net.jafama.FastMath;
  * Information Systems
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //

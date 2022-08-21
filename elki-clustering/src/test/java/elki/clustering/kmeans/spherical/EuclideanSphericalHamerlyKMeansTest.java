@@ -41,6 +41,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * TODO: use a more appropriate data set
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class EuclideanSphericalHamerlyKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

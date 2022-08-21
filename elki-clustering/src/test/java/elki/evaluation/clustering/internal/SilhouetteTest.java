@@ -57,6 +57,7 @@ import elki.utilities.random.RandomFactory;
  * clustering
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class SilhouetteTest {
   final static String DATASET = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";

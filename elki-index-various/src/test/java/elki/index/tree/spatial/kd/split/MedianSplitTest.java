@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link MedianSplit}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MedianSplitTest extends AbstractIndexStructureTest {
   @Test

@@ -35,6 +35,7 @@ import elki.math.geometry.XYCurve;
  * Unit test for Precision-Recall-Gain-Curves.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class PRGCEvaluationTest {
   @Test

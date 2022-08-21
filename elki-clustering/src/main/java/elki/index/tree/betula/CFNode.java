@@ -27,6 +27,7 @@ import elki.index.tree.betula.features.ClusterFeature;
  * Interface for TreeNode
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  * 
  * @param <L> Cluster feature type
  */

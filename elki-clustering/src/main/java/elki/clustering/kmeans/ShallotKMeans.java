@@ -43,6 +43,7 @@ import elki.utilities.documentation.Reference;
  * Proc. 18th Int. Symp. Intelligent Data Analysis (IDA)
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

@@ -38,6 +38,7 @@ import elki.utilities.documentation.Reference;
  * http://software-and-algorithms.blogspot.com/2012/09/the-hungarian-algorithm-for-assignment.html
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "K. L. Stern", //
     title = "The Hungarian Algorithm for the Assignment Problem", //

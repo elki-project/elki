@@ -33,6 +33,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for Pruning k-means.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KDTreePruningKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

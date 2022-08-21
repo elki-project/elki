@@ -66,6 +66,7 @@ import elki.utilities.random.RandomFactory;
  * 
  * @author Robert Gehde
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type to cluster
  */

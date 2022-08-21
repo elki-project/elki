@@ -26,6 +26,7 @@ import elki.data.NumberVector;
  * Interface for basic ClusteringFeature functions
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public interface ClusterFeature extends AsClusterFeature, NumberVector {
   /**

@@ -42,6 +42,7 @@ import elki.utilities.optionhandling.Parameterizer;
  *
  * @author Andreas Lang
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Alias({ "D2" })
 @Reference(authors = "Andreas Lang and Erich Schubert", //

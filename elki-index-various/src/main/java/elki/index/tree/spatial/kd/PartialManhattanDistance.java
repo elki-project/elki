@@ -27,6 +27,7 @@ import elki.distance.minkowski.ManhattanDistance;
  * Partial distance computations for Euclidean distance.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PartialManhattanDistance implements PartialDistance<NumberVector> {
   /**

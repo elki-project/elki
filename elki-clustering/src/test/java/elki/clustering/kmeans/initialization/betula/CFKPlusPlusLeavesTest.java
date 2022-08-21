@@ -36,6 +36,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for CF k-means++
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class CFKPlusPlusLeavesTest extends AbstractClusterAlgorithmTest {
   @Test

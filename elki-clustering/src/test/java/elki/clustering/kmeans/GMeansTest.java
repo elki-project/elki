@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for G-Means.
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class GMeansTest extends AbstractClusterAlgorithmTest {
   @Test

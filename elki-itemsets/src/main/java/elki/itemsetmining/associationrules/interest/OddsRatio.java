@@ -40,6 +40,7 @@ import elki.utilities.documentation.Reference;
  * Information Systems 29.4
  * 
  * @author Abhishek Sharma
+ * @since 0.8.0
  */
 @Reference(authors = "F. Mosteller", //
     title = "Association and Estimation in Contingency Tables", //

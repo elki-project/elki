@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for {@link GreedyKCenter} clustering.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class GreedyKCenterTest extends AbstractClusterAlgorithmTest {
   @Test

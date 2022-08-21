@@ -32,6 +32,7 @@ import elki.database.ids.DBIDUtil;
  * and the SkLearn example
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class EntropyTest extends AbstractClusterEvaluationTest {
   /**

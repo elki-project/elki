@@ -52,6 +52,7 @@ import elki.utilities.documentation.Reference;
  * Discovery and Data Mining, PAKDD-98
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - MedoidModel
  * @has - - - KMedoidsInitialization

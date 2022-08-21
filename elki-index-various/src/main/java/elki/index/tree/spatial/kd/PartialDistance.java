@@ -24,6 +24,7 @@ package elki.index.tree.spatial.kd;
  * Interface to maintain partial distance bounds.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface PartialDistance<O> {
   /**

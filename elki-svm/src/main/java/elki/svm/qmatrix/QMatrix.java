@@ -24,6 +24,7 @@ package elki.svm.qmatrix;
  * API to get kernel similarity values.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface QMatrix {
   /**

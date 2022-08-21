@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for Support Vector Data Description (SVDD) outlier detection.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SVDDTest extends AbstractOutlierAlgorithmTest {
   @Test

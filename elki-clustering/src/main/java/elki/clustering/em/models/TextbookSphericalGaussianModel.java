@@ -32,6 +32,7 @@ import net.jafama.FastMath;
  * Simple spherical Gaussian cluster.
  * 
  * @author Andreas Lang
+ * @since 0.7.0
  */
 public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVector, EMModel> {
   /**

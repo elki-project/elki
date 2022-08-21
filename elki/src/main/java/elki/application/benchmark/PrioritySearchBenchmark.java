@@ -61,6 +61,7 @@ import elki.workflow.InputStep;
  * the original database.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type
  *

@@ -36,6 +36,7 @@ import elki.utilities.optionhandling.Parameterizer;
  *
  * @author Robert Gehde
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "P. Flach and M. Knull", //
     title = "Precision-Recall-Gain Curves: {PR} Analysis Done Right", //

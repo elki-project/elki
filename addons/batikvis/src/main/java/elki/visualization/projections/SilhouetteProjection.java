@@ -32,6 +32,7 @@ import elki.visualization.silhouette.SilhouettePlot;
  * Silhouette projection.
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class SilhouetteProjection implements Projection {
   /**

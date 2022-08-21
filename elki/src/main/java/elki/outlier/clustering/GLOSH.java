@@ -58,6 +58,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * ACM Trans. Knowl. Discov. Data 10(1)
  * 
  * @author Braulio V.S. Vinces (ELKIfication)
+ * @since 0.8.0
  */
 @Title("GLOSH: Global-Local Outlier Scores from Hierarchies")
 @Description("The GLOSH outlier score assigned is based on a sound statistical interpretation from the HDBSCAN hierarchy.")

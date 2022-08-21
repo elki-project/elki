@@ -53,6 +53,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * 7th Pacific-Asia Conf. Advances in Knowledge Discovery and Data Mining, PAKDD
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "Jörg Sander, Xuejie Qin, Zhiyong Lu, Nan Niu, Alex Kovarsky", //
     title = "Automatic Extraction of Clusters from Hierarchical Clustering Representations", //

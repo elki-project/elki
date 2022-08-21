@@ -30,6 +30,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Clustering Feature of stable BIRCH with covariance instead of variance
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  * 
  */
 public class VVVFeature implements ClusterFeature {

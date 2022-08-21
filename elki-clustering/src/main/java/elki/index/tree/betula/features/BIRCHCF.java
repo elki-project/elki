@@ -31,6 +31,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Clustering Feature of BIRCH, only for comparison
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class BIRCHCF implements ClusterFeature {
   /**

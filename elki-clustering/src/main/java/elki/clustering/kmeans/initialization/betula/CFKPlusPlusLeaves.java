@@ -47,6 +47,7 @@ import elki.utilities.random.RandomFactory;
  * Information Systems
  *
  * @author Andreas Lang
+ * @since 0.8.0
  */
 @Alias("leaves")
 @Reference(authors = "Andreas Lang and Erich Schubert", //

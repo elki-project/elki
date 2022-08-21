@@ -40,6 +40,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * Unit test for prior probability classification.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PriorProbabilityClassifierTest extends AbstractSimpleAlgorithmTest {
   @Test

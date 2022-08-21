@@ -38,6 +38,7 @@ import elki.utilities.ELKIBuilder;
  * Test {@link RStarTree} using {@link AngTanLinearSplit}
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class AngTanLinearSplitTest extends AbstractIndexStructureTest {
   @Test

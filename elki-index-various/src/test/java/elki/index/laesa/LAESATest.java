@@ -30,6 +30,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link LAESA}.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class LAESATest extends AbstractIndexStructureTest {
   @Test

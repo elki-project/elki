@@ -35,6 +35,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test the AlternateRefinement initialization.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class AlternateRefinementTest extends AbstractClusterAlgorithmTest {
   @Test

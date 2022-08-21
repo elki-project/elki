@@ -40,6 +40,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Journal of Complex Systems 1(2)
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "S. M. Omohundro", //
     title = "Efficient Algorithms with Neural Network Behaviour", //

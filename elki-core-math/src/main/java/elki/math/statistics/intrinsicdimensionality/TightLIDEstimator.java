@@ -44,6 +44,7 @@ import net.jafama.FastMath;
  * Proc. 2019 SIAM International Conference on Data Mining (SDM)
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "Laurent Amsaleg, Oussama Chelly, Michael E. Houle, Ken-ichi Kawarabayashi, Milos Radovanovic, Weeris Treeratanajaru", //
     title = "Intrinsic Dimensionality Estimation within Tight Localities", //

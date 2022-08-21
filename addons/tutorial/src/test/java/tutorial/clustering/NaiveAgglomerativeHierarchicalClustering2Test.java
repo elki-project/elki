@@ -33,6 +33,7 @@ import elki.utilities.ELKIBuilder;
  * Test agglomerative hierarchical clustering, using the naive algorithm.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class NaiveAgglomerativeHierarchicalClustering2Test extends AbstractClusterAlgorithmTest {
   @Test

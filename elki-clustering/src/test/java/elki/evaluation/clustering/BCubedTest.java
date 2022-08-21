@@ -31,6 +31,7 @@ import elki.database.ids.DBIDUtil;
  * Validate {@link BCubed} based measures with the SkLearn example
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class BCubedTest extends AbstractClusterEvaluationTest {
   /**

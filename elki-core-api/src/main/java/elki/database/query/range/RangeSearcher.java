@@ -32,6 +32,7 @@ import elki.database.ids.ModifiableDoubleDBIDList;
  * called "range queries".
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @opt nodefillcolor LemonChiffon
  * @navassoc - create - DoubleDBIDList

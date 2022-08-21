@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Assign each object to the nearest medoid once.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SingleAssignmentKMedoidsTest extends AbstractClusterAlgorithmTest {
   @Test

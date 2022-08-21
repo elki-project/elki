@@ -52,6 +52,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @author Minh Nhat Nguyen
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <V> Number vector type
  */

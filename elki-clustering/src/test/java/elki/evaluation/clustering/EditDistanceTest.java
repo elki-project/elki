@@ -31,6 +31,7 @@ import elki.database.ids.DBIDUtil;
  * Validate {@link EditDistance} with respect to the SkLearn Example.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class EditDistanceTest extends AbstractClusterEvaluationTest {
   /**

@@ -32,6 +32,7 @@ import elki.math.linearalgebra.VMath;
  * Unit test to validate the Welch-T-Test
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class WelchTTestTest {
   @Test

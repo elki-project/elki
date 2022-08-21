@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link MeanVarianceSplit}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MeanVarianceSplitTest extends AbstractIndexStructureTest {
   @Test

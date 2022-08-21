@@ -37,6 +37,7 @@ import elki.utilities.ELKIBuilder;
  * work, as a side effect).
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class FasterPAMTest extends AbstractClusterAlgorithmTest {
   @Test

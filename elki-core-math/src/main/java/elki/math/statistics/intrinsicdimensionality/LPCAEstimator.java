@@ -41,6 +41,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Local PCA based ID estimator.
  *
  * @author Erik Thordsen
+ * @since 0.8.0
  */
 public class LPCAEstimator implements IntrinsicDimensionalityEstimator<NumberVector> {
   /**

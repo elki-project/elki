@@ -34,6 +34,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
  * Instance of priority search for a particular spatial index.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @assoc - - - AbstractRStarTree
  * @assoc - - - SpatialPrimitiveDistance

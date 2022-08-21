@@ -31,6 +31,7 @@ import elki.workflow.InputStep;
  * Abstract base class for distance-based tasks and experiments.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type
  */

@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for AFK-MC² initialization.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class AFKMC2Test extends AbstractClusterAlgorithmTest {
   @Test

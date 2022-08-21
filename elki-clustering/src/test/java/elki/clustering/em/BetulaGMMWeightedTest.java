@@ -45,6 +45,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for BIRCH clustering with GMM.
  *
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public class BetulaGMMWeightedTest extends AbstractClusterAlgorithmTest {
   @Test

@@ -60,6 +60,7 @@ import elki.utilities.optionhandling.parameterization.EmptyParameterization;
  * TODO: use a service loader to load optimization modules.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  * 
  * @param <O> Object type
  */

@@ -36,6 +36,7 @@ import elki.utilities.ELKIBuilder;
  * Test the linear-memory version of NNChain
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class LinearMemoryNNChainTest extends AbstractClusterAlgorithmTest {
   @Test

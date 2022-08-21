@@ -72,6 +72,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Neural computation 13.7
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> Object type
  */

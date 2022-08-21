@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for BIRCH clustering with k-means.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class BIRCHLloydKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

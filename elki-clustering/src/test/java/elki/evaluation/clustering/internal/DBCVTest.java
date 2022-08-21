@@ -53,6 +53,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * set because there may be multiple different minimum spanning trees.
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class DBCVTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini-jitter.csv";

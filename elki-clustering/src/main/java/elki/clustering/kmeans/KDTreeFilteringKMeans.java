@@ -58,6 +58,7 @@ import elki.utilities.documentation.Reference;
  *
  * @author Cedrik Lüdicke (initial version)
  * @author Erich Schubert (optimizations, rewrite)
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

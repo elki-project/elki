@@ -33,6 +33,7 @@ import elki.utilities.ELKIBuilder;
  * Perform hierarchical clustering around medoids.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class HACAMTest extends AbstractClusterAlgorithmTest {
   // Note: there is an order dependence in this algorithm, because of frequent

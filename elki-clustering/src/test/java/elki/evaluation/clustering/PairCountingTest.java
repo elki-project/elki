@@ -39,6 +39,7 @@ import elki.database.ids.DBIDUtil;
  *
  * @author Erich Schubert
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class PairCountingTest extends AbstractClusterEvaluationTest {
   // the following values depend on the data set used!

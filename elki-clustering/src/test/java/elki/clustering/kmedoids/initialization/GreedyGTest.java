@@ -35,6 +35,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test the GreedyG initialization.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class GreedyGTest extends AbstractClusterAlgorithmTest {
   @Test

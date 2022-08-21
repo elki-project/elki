@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Tests the tutorial ODIN algorithm.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ODINTest extends AbstractOutlierAlgorithmTest {
   @Test

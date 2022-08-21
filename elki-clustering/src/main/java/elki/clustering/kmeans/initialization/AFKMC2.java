@@ -40,6 +40,7 @@ import elki.utilities.random.RandomFactory;
  * Neural Information Processing Systems 2016
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "O. Bachem, M. Lucic, S. H. Hassani, A. Krause", //
     title = "Fast and Provably Good Seedings for k-Means", //

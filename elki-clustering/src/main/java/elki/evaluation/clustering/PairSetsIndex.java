@@ -36,6 +36,7 @@ import elki.utilities.documentation.Reference;
  * IEEE Transactions on Knowledge and Data Engineering 28(8)
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 @Reference(authors = "M. Rezaei and F. Pasi", //
     title = "Set Matching Measures for External Cluster Validity", //

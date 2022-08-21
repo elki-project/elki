@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for libSVM one-class outlier detection.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LibSVMOneClassOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test

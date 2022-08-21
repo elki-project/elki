@@ -39,6 +39,7 @@ import elki.utilities.ELKIBuilder;
  * {@link MaxExtensionSortTileRecursiveBulkSplit}
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MaxExtensionSortTileRecursiveBulkSplitTest extends AbstractIndexStructureTest {
   @Test

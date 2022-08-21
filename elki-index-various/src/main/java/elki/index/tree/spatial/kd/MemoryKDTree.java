@@ -74,6 +74,7 @@ import elki.utilities.pairs.IntIntPair;
  * TODO: add support for weighted Minkowski distances.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @has - - - KDTreeKNNSearcher
  * @has - - - KDTreeRangeSearcher

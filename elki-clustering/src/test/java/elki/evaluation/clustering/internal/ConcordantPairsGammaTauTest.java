@@ -53,6 +53,7 @@ import elki.utilities.random.RandomFactory;
  * Clustering
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class ConcordantPairsGammaTauTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";

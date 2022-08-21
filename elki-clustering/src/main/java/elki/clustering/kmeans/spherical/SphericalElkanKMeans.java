@@ -53,6 +53,7 @@ import elki.utilities.documentation.Reference;
  * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

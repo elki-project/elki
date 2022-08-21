@@ -32,6 +32,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Bounded midpoint splitting.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class BoundedMidpointSplit implements SplitStrategy {
   /**

@@ -31,6 +31,7 @@ import elki.utilities.random.XorShift1024NonThreadsafeRandom;
  * Unit tests for the DBIDUtil utility package.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class DBIDUtilTest {
   @Test

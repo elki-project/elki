@@ -40,6 +40,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * Unit test for KNN classification.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KNNClassifierTest extends AbstractSimpleAlgorithmTest {
   @Test

@@ -4,6 +4,7 @@ package elki.svm.data;
  * API to plug in custom data representations into libSVM.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface DataSet {
   /**

@@ -36,6 +36,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for Betula clustering.
  *
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public class BetulaLeafPreClusteringTest extends AbstractClusterAlgorithmTest {
   @Test

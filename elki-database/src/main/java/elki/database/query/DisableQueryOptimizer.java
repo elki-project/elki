@@ -28,6 +28,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Dummy implementation to <i>disable</i> automatic optimization.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Alias({ "no", "none", "false", "disable", "disabled" })

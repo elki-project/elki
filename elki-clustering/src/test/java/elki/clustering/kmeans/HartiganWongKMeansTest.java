@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for Hartigan and Wong k-means.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class HartiganWongKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

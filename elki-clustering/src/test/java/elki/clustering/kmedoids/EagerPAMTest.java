@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Test eager PAM k-Medoids clustering.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class EagerPAMTest extends AbstractClusterAlgorithmTest {
   @Test

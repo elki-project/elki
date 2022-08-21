@@ -35,6 +35,7 @@ import elki.utilities.documentation.Reference;
  * Proceedings of the European Knowledge Acquisition Workshop (EKAW'88)
  * 
  * @author Abhishek Sharma
+ * @since 0.8.0
  */
 @Reference(authors = "M. Sebag, M. Schoenauer", //
     title = "Generation of rules with certainty and confidence factors from incomplete and incoherent learning bases", //

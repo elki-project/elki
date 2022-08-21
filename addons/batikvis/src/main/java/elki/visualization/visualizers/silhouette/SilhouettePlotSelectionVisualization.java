@@ -41,6 +41,7 @@ import elki.visualization.visualizers.Visualization;
  * Visualize the selection in a Silhouette Plot.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @stereotype factory
  * @composed - - - Mode

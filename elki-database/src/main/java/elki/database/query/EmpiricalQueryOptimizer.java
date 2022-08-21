@@ -44,6 +44,7 @@ import elki.utilities.Alias;
  * Class to automatically add indexes to a database.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Alias("auto")
 public class EmpiricalQueryOptimizer implements QueryOptimizer {

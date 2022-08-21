@@ -60,6 +60,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Information Systems
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @depend - - - CFTree
  */

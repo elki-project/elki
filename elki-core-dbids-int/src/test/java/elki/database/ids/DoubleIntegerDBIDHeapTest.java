@@ -30,6 +30,7 @@ import org.junit.Test;
  * Test for min and max heaps.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class DoubleIntegerDBIDHeapTest {
   @Test

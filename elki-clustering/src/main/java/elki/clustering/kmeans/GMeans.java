@@ -58,6 +58,7 @@ import elki.utilities.random.RandomFactory;
  * Neural Information Processing Systems
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @param <V> Vector
  * @param <M> Model

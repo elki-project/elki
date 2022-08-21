@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for k-MC² initialization.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KMC2Test extends AbstractClusterAlgorithmTest {
   @Test

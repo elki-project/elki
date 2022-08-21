@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for FCM clustering.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class FuzzyCMeansTest extends AbstractClusterAlgorithmTest {
   @Test

@@ -43,6 +43,7 @@ import elki.utilities.datastructures.iterator.It;
  * Test the class that automatically evaluates a clustering.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class EvaluateClusteringTest {
   // the following values depend on the data set used!

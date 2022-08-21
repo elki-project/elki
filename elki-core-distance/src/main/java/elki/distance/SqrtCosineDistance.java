@@ -41,6 +41,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * it is a metric on normalized vectors.
  *
  * @author Erich Schubert
+ * @since 0.1
  */
 public class SqrtCosineDistance extends CosineDistance {
   /**

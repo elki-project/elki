@@ -35,6 +35,7 @@ import elki.database.ids.DoubleDBIDHeap;
  * query.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type
  */

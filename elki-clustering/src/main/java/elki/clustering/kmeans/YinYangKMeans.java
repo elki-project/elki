@@ -57,6 +57,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Minh Nhat Nguyen
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <V> Vector type
  */

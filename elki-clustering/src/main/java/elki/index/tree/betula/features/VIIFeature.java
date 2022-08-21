@@ -31,6 +31,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * feature
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public class VIIFeature implements ClusterFeature {
   /**

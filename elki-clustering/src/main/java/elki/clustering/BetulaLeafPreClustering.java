@@ -68,6 +68,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
  * Information Systems
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @depend - - - CFTree
  */

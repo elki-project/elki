@@ -41,6 +41,7 @@ import elki.visualization.silhouette.SilhouettePlot;
  * Projection for Silhouette plots.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class SilhouettePlotProjector implements Projector {
   /**

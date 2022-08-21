@@ -36,6 +36,7 @@ import elki.similarity.Similarity;
  * be used to disable this functionality, for example for benchmarking purposes.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface QueryOptimizer {
   /**

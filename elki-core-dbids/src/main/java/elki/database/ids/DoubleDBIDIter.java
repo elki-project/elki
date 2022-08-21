@@ -27,6 +27,7 @@ package elki.database.ids;
  * {@link elki.database.ids.DBIDRef}.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public interface DoubleDBIDIter extends DBIDIter {
   /**

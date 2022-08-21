@@ -39,6 +39,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Note: this distance did not work well in the original work, apparently.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang", //

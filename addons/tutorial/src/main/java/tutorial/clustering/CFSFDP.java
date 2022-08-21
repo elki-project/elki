@@ -62,6 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Science 344 (6191), 2014
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type
  */
