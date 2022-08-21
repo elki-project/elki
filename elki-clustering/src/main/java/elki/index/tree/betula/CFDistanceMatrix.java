@@ -7,6 +7,7 @@ import elki.utilities.exceptions.AbortException;
  * Cluster feature distance matrix, used for clustering.
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public class CFDistanceMatrix {
   /**

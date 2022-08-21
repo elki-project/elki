@@ -30,6 +30,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link VPTree}.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class VPTreeTest extends AbstractIndexStructureTest {
   @Test

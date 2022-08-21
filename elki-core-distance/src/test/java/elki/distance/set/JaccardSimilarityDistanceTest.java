@@ -28,6 +28,7 @@ import elki.utilities.ELKIBuilder;
  * Tests for Jaccard Distance
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class JaccardSimilarityDistanceTest extends AbstractSetDistanceTest {
   /**

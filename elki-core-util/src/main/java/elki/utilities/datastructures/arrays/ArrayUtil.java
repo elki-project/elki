@@ -27,6 +27,7 @@ import java.util.Random;
  * Utility functions for manipulating arrays.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ArrayUtil {
   /**

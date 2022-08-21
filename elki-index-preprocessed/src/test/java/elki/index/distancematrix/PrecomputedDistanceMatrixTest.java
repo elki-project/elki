@@ -43,6 +43,7 @@ import elki.utilities.optionhandling.parameterization.ListParameterization;
  * Unit test for the precomputed distance matrix.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PrecomputedDistanceMatrixTest extends AbstractIndexStructureTest {
   // the following values depend on the data set used!

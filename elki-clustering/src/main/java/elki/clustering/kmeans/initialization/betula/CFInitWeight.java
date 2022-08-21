@@ -26,6 +26,7 @@ import elki.index.tree.betula.features.ClusterFeature;
  * Initialization weight function for k-means initialization with BETULA.
  *
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public interface CFInitWeight {
   /**

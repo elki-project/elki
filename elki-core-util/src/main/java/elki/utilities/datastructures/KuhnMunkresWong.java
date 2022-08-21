@@ -43,6 +43,7 @@ import elki.utilities.documentation.Reference;
  * BIT Numerical Mathematics 19(3)
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "J. K. Wong", //
     title = "A new implementation of an algorithm for the optimal assignment problem: An improved version of Munkres' algorithm", //

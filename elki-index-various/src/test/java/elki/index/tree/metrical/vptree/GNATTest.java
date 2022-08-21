@@ -30,6 +30,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for GNAT.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class GNATTest extends AbstractIndexStructureTest {
   @Test

@@ -34,6 +34,7 @@ import elki.utilities.documentation.Reference;
  * Data Mining and Analysis: Fundamental Concepts and Algorithms<br>
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 @Reference(authors = "M. J. Zaki and W. Meira Jr.", //
     title = "Data Mining and Analysis: Fundamental Concepts and Algorithms", //

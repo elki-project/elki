@@ -51,6 +51,7 @@ import net.jafama.FastMath;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //

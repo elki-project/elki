@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Test the simpler diagonal Gaussian model.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class DiagonalGaussianModelTest extends AbstractClusterAlgorithmTest {
   @Test

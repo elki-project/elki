@@ -56,6 +56,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * Proceedings of the Conference "Lernen, Wissen, Daten, Analysen", LWDA
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @has - - - PointerPrototypeHierarchyResult
  *

@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Tests for Support Vector Clustering ({@link SupportVectorClustering})
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class SupportVectorClusteringTest extends AbstractClusterAlgorithmTest {
   @Test

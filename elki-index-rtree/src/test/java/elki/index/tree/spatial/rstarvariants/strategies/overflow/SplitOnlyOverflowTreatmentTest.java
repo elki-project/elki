@@ -37,6 +37,7 @@ import elki.utilities.ELKIBuilder;
  * Test the split only overflow treatment.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SplitOnlyOverflowTreatmentTest extends AbstractIndexStructureTest {
   @Test

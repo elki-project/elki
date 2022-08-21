@@ -35,6 +35,7 @@ import elki.visualization.visualizers.AbstractVisualization;
  * Abstract base class for silhouette visualizer
  *
  * @author Robert Gehde
+ * @since 0.8.0
  * 
  * @assoc - - - SilhouetteProjection
  */

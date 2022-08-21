@@ -48,6 +48,7 @@ import net.jafama.FastMath;
  * Information Systems
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "Andreas Lang and Erich Schubert", //

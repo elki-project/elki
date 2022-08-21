@@ -33,6 +33,7 @@ import elki.database.relation.Relation;
  * the split partitions are encoded in this array.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface SplitStrategy {
   /**

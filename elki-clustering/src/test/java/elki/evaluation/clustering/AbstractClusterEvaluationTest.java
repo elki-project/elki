@@ -38,6 +38,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  *
  * @author Erich Schubert
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public abstract class AbstractClusterEvaluationTest {
   // SKLEARN example

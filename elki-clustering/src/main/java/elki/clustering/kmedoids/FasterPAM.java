@@ -47,6 +47,7 @@ import elki.utilities.documentation.Reference;
  * Preprint
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - MedoidModel
  * @has - - - KMedoidsInitialization

@@ -31,6 +31,7 @@ import elki.database.ids.DBIDUtil;
  * Validate the {@link MaximumMatchingAccuracy} measure.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class MaximumMatchingAccuracyTest extends AbstractClusterEvaluationTest {
   @Test

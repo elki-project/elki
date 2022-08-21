@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Test the same-size k-means algorithm
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SameSizeKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

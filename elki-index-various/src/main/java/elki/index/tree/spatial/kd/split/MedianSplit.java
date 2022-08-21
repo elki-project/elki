@@ -32,6 +32,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Split on the median of the axis with the largest length.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MedianSplit implements SplitStrategy {
   /**

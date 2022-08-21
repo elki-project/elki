@@ -56,6 +56,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
+ * @since 0.8.0
  */
 @Reference(authors = "E. Fouché, K. Böhm", //
     title = "Monte Carlo Density Estimation", //

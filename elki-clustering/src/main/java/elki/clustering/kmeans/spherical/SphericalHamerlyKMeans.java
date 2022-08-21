@@ -55,6 +55,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * Int. Conf. on Similarity Search and Applications, SISAP 2021
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

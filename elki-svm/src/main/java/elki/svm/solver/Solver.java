@@ -66,6 +66,7 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * solution will be put in \(\alpha\), objective value will be put in obj
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class Solver {
   private static final Logging LOG = Logging.getLogger(Solver.class);

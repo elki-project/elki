@@ -30,6 +30,7 @@ import elki.logging.Logging;
  * Use the squared values of precomputed kNN.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PreprocessorSquaredKNNQuery extends PreprocessorKNNQuery {
   /**

@@ -32,6 +32,7 @@ import elki.distance.PrimitiveDistance;
  * Abstract base test for set distances.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public abstract class AbstractSetDistanceTest extends AbstractDistanceTest {
   /**

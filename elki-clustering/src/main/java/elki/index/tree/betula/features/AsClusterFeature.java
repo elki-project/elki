@@ -26,6 +26,7 @@ package elki.index.tree.betula.features;
  * returns the cluster feature of the node.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface AsClusterFeature {
   /**

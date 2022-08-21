@@ -38,6 +38,7 @@ import elki.utilities.optionhandling.OptionID;
  *
  * @author Andreas Lang
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - creates - BetulaClusterModel
  *

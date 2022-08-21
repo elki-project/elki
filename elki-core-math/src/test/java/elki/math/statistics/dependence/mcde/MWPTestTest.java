@@ -34,6 +34,7 @@ import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
+ * @since 0.8.0
  */
 public class MWPTestTest {
   @Test

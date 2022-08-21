@@ -53,6 +53,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @author Alexander Voß
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

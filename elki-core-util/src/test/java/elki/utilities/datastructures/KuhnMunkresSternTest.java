@@ -31,6 +31,7 @@ import org.junit.Test;
  * Test the Kuhn-Munkres implementation.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KuhnMunkresSternTest {
   @Test

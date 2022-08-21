@@ -27,6 +27,7 @@ import elki.database.ids.ArrayDBIDs;
  * Hierarchical clustering merge list, with additional coredists information.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ClusterDensityMergeHistory extends ClusterMergeHistory {
   /**

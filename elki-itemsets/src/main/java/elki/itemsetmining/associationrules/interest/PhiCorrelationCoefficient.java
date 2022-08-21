@@ -42,6 +42,7 @@ import elki.utilities.documentation.Reference;
  * Wiley Series in Probability and Statistics
  * 
  * @author Abhishek Sharma
+ * @since 0.8.0
  */
 @Reference(authors = "A. Agresti", //
     title = "Categorical Data Analysis", //

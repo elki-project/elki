@@ -39,6 +39,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
  * coordinate data.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface DistanceBasedIntrinsicDimensionalityEstimator extends IntrinsicDimensionalityEstimator<Object> {
   /**

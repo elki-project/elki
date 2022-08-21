@@ -39,6 +39,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Proc. 13th Int. Conf. Similarity Search and Applications (SISAP'2020)
  *
  * @author Erik Thordsen
+ * @since 0.8.0
  */
 @Reference(authors = "Erik Thordsen and Erich Schubert", //
     title = "ABID: Angle Based Intrinsic Dimensionality", //

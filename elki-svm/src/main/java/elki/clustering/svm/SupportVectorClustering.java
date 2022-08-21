@@ -76,6 +76,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Journal of Machine Learning Research 2 (2001)
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 @Reference(authors = "A. Ben-Hur, D. Horn, H. T. Siegelmann, V. Vapnik", //
     title = "A Support Vector Method for Clustering", //

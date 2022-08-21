@@ -42,6 +42,7 @@ import net.jafama.FastMath;
  * PLoS ONE 10(3)
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  * 
  * @has - - - XYCurve
  */

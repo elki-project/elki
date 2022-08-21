@@ -90,6 +90,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
  *
  * @author Erich Schubert
  * @author Andreas Lang
+ * @since 0.8.0
  *
  * @has - - - ClusteringFeature
  * @has - - - LeafIterator

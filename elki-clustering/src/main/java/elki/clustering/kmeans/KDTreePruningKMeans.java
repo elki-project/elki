@@ -66,6 +66,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Cedrik Lüdicke (initial version)
  * @author Erich Schubert (optimizations, rewrite)
+ * @since 0.8.0
  *
  * @navassoc - - - KMeansModel
  *

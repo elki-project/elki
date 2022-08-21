@@ -30,6 +30,7 @@ import elki.visualization.VisualizerContext;
  * Produce Silhouette plot projections
  *
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @has - - - SilhouettePlotProjector
  */

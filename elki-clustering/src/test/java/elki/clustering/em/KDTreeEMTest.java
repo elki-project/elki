@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Test the kd-tree accelerated EM clustering.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class KDTreeEMTest extends AbstractClusterAlgorithmTest {
   @Test

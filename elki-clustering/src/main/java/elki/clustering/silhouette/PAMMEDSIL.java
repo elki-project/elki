@@ -51,6 +51,7 @@ import elki.utilities.documentation.Reference;
  * Journal of Statistical Computation and Simulation 73(8)
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Input data type
  */

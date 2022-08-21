@@ -31,6 +31,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Classic midpoint split, halfway on the axis of largest extend.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MidpointSplit implements SplitStrategy {
   /**

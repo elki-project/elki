@@ -29,6 +29,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerHeap;
  * Wrapper around a primitive heap to handle DBIDs.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @composed - - - DoubleIntegerHeap
  */

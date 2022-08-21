@@ -50,6 +50,7 @@ import elki.utilities.random.RandomFactory;
  * Proc. 30th AAAI Conference on Artificial Intelligence
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "O. Bachem, M. Lucic, S. H. Hassani, A. Krause", //
     title = "Approximate K-Means++ in Sublinear Time", //

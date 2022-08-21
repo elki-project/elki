@@ -56,6 +56,7 @@ import elki.utilities.random.RandomFactory;
  * Modeling Decisions for Artificial Intelligence
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Vector type
  */

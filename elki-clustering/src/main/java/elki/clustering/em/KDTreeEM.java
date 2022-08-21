@@ -76,6 +76,7 @@ import net.jafama.FastMath;
  * Neural Information Processing Systems (NIPS 1998)
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 @Description("Gaussian mixture modeling accelerated using a kd-tree")
 @Reference(authors = "Andrew W. Moore", //

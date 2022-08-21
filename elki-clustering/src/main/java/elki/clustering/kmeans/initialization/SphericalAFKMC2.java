@@ -49,6 +49,7 @@ import elki.utilities.random.RandomFactory;
  * Proc. 10th Asian Conference on Machine Learning, ACML
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "R. Pratap, A. A. Deshmukh, P. Nair, T. Dutt", //
     title = "A Faster Sampling Algorithm for Spherical k-means", //

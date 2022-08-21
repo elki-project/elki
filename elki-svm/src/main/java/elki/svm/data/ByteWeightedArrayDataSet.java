@@ -8,6 +8,7 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * This is an efficient array based data set implementation.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ByteWeightedArrayDataSet implements DataSet {
   DataSet inner;

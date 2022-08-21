@@ -30,6 +30,7 @@ import elki.database.query.similarity.SimilarityQuery;
  * Use a relation as data set
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SimilarityQueryAdapter implements DataSet {
   /**

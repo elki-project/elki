@@ -37,6 +37,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Doctoral Dissertation, 1997.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang", //

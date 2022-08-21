@@ -32,6 +32,7 @@ import elki.database.relation.Relation;
  * These may be used to initialize PAMSIL clustering, for example.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public interface KMedoidsClustering<O> extends ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**

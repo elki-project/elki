@@ -31,6 +31,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for the CFSFDP algorithm.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class CFSFDPTest extends AbstractClusterAlgorithmTest {
   @Test

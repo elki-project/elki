@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link BoundedMidpointSplit}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class BoundedMidpointSplitTest extends AbstractIndexStructureTest {
   @Test

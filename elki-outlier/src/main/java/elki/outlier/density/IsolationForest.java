@@ -72,6 +72,7 @@ import net.jafama.FastMath;
  * Transactions on Knowledge Discovery from Data (TKDD)
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Reference(authors = "F. T. Liu, K. M. Ting, Z.-H. Zhou", //
     title = "Isolation-Based Anomaly Detection", //

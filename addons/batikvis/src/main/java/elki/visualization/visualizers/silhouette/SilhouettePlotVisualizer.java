@@ -43,6 +43,7 @@ import elki.visualization.visualizers.Visualization;
  * Visualize a Silhouette result by constructing a Silhouette plot for it.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @stereotype factory
  * @navassoc - create - Instance

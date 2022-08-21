@@ -57,6 +57,7 @@ import elki.utilities.optionhandling.parameters.PatternParameter;
  * Neural Information Processing Systems (NIPS 2015)
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 @Reference(authors = "P. Flach and M. Knull", //
     title = "Precision-Recall-Gain Curves: {PR} Analysis Done Right", //

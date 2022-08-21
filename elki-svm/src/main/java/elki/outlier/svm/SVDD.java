@@ -62,6 +62,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Mach. Learn. 54(1): 45-66
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  * 
  * @param <V> Object type
  */

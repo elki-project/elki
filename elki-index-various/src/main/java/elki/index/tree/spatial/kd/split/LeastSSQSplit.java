@@ -32,6 +32,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Split by the best reduction in sum-of-squares.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LeastSSQSplit implements SplitStrategy {
   /**

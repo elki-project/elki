@@ -33,6 +33,7 @@ import elki.utilities.datastructures.iterator.It;
  * Basic unit test of metadata functionality.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MetadataTest {
   @Test

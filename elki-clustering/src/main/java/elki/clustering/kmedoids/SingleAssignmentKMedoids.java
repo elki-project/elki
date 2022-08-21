@@ -44,6 +44,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * object to the nearest neighbor.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @navassoc - - - MedoidModel
  * @has - - - KMedoidsInitialization

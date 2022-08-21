@@ -39,6 +39,7 @@ import elki.utilities.ELKIBuilder;
  * {@link AdaptiveSortTileRecursiveBulkSplit}
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class AdaptiveSortTileRecursiveBulkSplitTest extends AbstractIndexStructureTest {
   @Test

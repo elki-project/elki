@@ -29,6 +29,7 @@ import elki.database.relation.Relation;
  * Find radius neighbors by querying with the original object.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> relation object type
  */

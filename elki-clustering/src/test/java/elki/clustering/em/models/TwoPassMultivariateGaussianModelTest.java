@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Test the two-pass EM model.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class TwoPassMultivariateGaussianModelTest extends AbstractClusterAlgorithmTest {
   @Test

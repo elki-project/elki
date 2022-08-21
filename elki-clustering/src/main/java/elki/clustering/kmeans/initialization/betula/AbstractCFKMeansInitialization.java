@@ -37,6 +37,7 @@ import elki.utilities.random.RandomFactory;
  * {@link AbstractKMeansInitialization} instead.
  * 
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public abstract class AbstractCFKMeansInitialization {
   /**

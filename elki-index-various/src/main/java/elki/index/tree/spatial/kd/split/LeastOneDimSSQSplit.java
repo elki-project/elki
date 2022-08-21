@@ -35,6 +35,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * dimension at a time.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LeastOneDimSSQSplit implements SplitStrategy {
   /**

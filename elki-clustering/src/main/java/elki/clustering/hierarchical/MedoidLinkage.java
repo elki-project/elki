@@ -60,6 +60,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * Intelligent Systems (ISIS)
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @has - - - PointerPrototypeHierarchyResult
  *

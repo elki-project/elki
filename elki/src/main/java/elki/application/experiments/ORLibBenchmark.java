@@ -65,6 +65,7 @@ import elki.utilities.random.RandomFactory;
  * Load an ORlib problem to evaluate k-medoids clustering quality.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ORLibBenchmark extends AbstractApplication {
   /**

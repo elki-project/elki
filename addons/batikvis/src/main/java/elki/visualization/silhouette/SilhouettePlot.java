@@ -36,6 +36,7 @@ import elki.visualization.style.StylingPolicy;
  * Class to produce an Silhouette plot image.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @composed - - - LinearScale
  */

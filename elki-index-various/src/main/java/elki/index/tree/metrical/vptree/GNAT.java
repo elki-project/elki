@@ -64,6 +64,7 @@ import elki.utilities.random.RandomFactory;
  * Proc. 21th Int. Conf. on Very Large Data Bases (VLDB)
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @param <O> Object type indexed
  */

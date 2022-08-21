@@ -49,6 +49,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * This is based on a MiniMax kind of cluster model.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @assoc - analyzes - Clustering
  * @composed - - - NoiseHandling

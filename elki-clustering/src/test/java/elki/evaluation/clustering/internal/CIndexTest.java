@@ -53,6 +53,7 @@ import elki.utilities.random.RandomFactory;
  * Test for {@link CIndex} with ByLabelClustering and KMeans clustering
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class CIndexTest {
   final static String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";

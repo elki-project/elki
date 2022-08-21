@@ -28,6 +28,7 @@ import elki.database.ids.DBID;
  * MedoidLinkage, and MiniMax clustering)
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ClusterPrototypeMergeHistory extends ClusterMergeHistory {
   /**

@@ -31,6 +31,7 @@ import elki.evaluation.clustering.EvaluateClustering;
  * {@link EvaluateClustering}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @opt nodefillcolor LemonChiffon
  * @param <M> Model type

@@ -28,6 +28,7 @@ import elki.utilities.ELKIBuilder;
  * Test for Hamming Distance.
  *
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class HammingDistanceTest extends AbstractSetDistanceTest {
   /**

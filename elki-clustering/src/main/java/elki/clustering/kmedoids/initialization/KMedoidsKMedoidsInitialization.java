@@ -46,6 +46,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * TODO: this could be made more useful by adding a sampling option.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KMedoidsKMedoidsInitialization<O> implements KMedoidsInitialization<O> {
   /**

@@ -80,6 +80,7 @@ import net.jafama.FastMath;
  * Springer, 1981
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  *
  * @param <V> Vector Type of the data, must be subclass of {@link NumberVector}
  */

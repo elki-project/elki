@@ -50,6 +50,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * http://www.multiresolutions.com/strule/MClA/
  *
  * @author Erich Schubert, Robert Gehde
+ * @since 0.8.0
  *
  * @param <O> Object type
  */

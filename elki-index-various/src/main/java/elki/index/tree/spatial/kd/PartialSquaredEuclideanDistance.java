@@ -27,6 +27,7 @@ import elki.distance.minkowski.SquaredEuclideanDistance;
  * Partial distance computations for squared Euclidean distance.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PartialSquaredEuclideanDistance implements PartialDistance<NumberVector> {
   /**

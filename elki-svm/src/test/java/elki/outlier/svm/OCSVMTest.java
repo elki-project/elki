@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for one-class SVM (OCSVM) outlier detection.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class OCSVMTest extends AbstractOutlierAlgorithmTest {
   @Test

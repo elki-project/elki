@@ -31,6 +31,7 @@ import elki.database.query.range.RangeSearcher;
  * Interface for incremental priority-based search using distance functions.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type
  */

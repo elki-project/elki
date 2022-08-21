@@ -71,6 +71,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * 
  * @author Cabral, Eugênio F. (Original Code)
  * @author Braulio V.S. Vinces (ELKIfication)
+ * @since 0.8.0
  */
 @Title("HySortOD: Hypercube-Based Outlier Detection")
 @Description("Algorithm that uses an efficient hypercube-ordering-and-searching strategy for fast outlier detection.")

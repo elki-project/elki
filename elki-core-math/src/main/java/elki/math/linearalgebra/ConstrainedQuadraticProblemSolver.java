@@ -33,6 +33,7 @@ import java.util.Arrays;
  * outcomes until it finds the best solution.
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public class ConstrainedQuadraticProblemSolver {
   /**

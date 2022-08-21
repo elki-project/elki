@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link LeastSSQSplit}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LeastSSQSplitTest extends AbstractIndexStructureTest {
   @Test

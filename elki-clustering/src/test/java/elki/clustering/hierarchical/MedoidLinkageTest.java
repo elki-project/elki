@@ -33,6 +33,7 @@ import elki.utilities.ELKIBuilder;
  * Test the medoid linkage
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class MedoidLinkageTest extends AbstractClusterAlgorithmTest {
   @Test

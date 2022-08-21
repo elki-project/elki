@@ -58,6 +58,7 @@ import elki.utilities.datastructures.iterator.It;
  * TODO: add a modCounter, and fail if concurrent modifications happen?
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class Metadata extends WeakReference<Object> {
   /**

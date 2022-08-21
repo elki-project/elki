@@ -44,6 +44,7 @@ import elki.utilities.ELKIBuilder;
  * Test PAMMEDSIL clustering.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class PAMMEDSILTest extends AbstractClusterAlgorithmTest {
   @Test

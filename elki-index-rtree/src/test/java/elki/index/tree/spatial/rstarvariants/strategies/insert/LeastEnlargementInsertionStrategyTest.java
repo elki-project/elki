@@ -39,6 +39,7 @@ import elki.utilities.ELKIBuilder;
  * TODO: also test the others more carefully, with ties (integer data?).
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LeastEnlargementInsertionStrategyTest extends AbstractIndexStructureTest {
   @Test

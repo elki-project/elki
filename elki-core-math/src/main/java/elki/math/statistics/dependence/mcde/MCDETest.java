@@ -31,6 +31,7 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
  *
  * @author Alan Mazankiewicz
  * @author Edouard Fouché
+ * @since 0.8.0
  *
  * @param <R> RankStruct or Subclass of RankStruct
  */

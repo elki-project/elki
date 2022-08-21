@@ -31,6 +31,7 @@ import elki.utilities.ELKIBuilder;
  * Tests the tutorial standard deviation outlier algorithm.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class DistanceStddevOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test

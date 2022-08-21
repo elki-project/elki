@@ -37,6 +37,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 @Priority(Priority.SUPPLEMENTARY)
 @Reference(authors = "T. Zhang, R. Ramakrishnan, M. Livny", //

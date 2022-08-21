@@ -29,6 +29,7 @@ import org.junit.Test;
  * have it depend on the database and queries to avoid circular dependencies.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class TightLIDEstimatorTest {
   @Test

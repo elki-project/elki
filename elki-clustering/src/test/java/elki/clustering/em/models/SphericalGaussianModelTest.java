@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Test the simple spherical Gaussian model.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SphericalGaussianModelTest extends AbstractClusterAlgorithmTest {
   @Test

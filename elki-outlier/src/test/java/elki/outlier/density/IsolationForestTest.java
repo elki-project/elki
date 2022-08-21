@@ -31,6 +31,7 @@ import elki.utilities.ELKIBuilder;
  * Tests the IsolationForest algorithm.
  * 
  * @author Braulio V.S. Vinces
+ * @since 0.8.0
  */
 public class IsolationForestTest extends AbstractOutlierAlgorithmTest {
   @Test

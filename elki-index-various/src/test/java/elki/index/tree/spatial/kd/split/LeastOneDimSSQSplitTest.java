@@ -32,6 +32,7 @@ import elki.utilities.ELKIBuilder;
  * Unit test for the {@link LeastOneDimSSQSplit}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class LeastOneDimSSQSplitTest extends AbstractIndexStructureTest {
   @Test

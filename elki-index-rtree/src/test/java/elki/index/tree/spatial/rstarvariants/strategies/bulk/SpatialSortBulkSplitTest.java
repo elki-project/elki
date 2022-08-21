@@ -42,6 +42,7 @@ import elki.utilities.ELKIBuilder;
  * Test spatial sorting bulk splits.
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SpatialSortBulkSplitTest extends AbstractIndexStructureTest {
   /**

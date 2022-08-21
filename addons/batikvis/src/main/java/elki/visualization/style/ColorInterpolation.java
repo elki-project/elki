@@ -29,6 +29,7 @@ import static elki.visualization.svg.SVGUtil.stringToColor;
  * Color interpolation
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public enum ColorInterpolation {
   /**

@@ -33,6 +33,7 @@ import elki.utilities.ELKIBuilder;
  * Regression test for Filtering k-means.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class KDTreeFilteringKMeansTest extends AbstractClusterAlgorithmTest {
   @Test

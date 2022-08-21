@@ -34,6 +34,7 @@ import elki.utilities.random.RandomFactory;
  * initialize regular k-means, use {@link KMeansPlusPlus} instead.
  *
  * @author Andreas Lang
+ * @since 0.8.0
  */
 public class BIRCHKMeansPlusPlus {
   /**

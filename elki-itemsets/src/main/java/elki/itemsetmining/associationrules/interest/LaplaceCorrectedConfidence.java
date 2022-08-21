@@ -40,6 +40,7 @@ import elki.utilities.documentation.Reference;
  * Information Systems 29.4
  * 
  * @author Abhishek Sharma
+ * @since 0.8.0
  */
 @Reference(authors = "P. Clark, R. Boswell", //
     title = "Rule induction with CN2: Some recent improvements", //

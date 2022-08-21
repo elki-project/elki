@@ -66,6 +66,7 @@ import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualizati
  * Visualizer generating the alpha shape of each cluster.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @stereotype factory
  * @navassoc - create - Instance

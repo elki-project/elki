@@ -26,6 +26,7 @@ package elki.clustering.hierarchical.linkage;
  * data points (for vector data only).
  * 
  * @author Robert Gehde
+ * @since 0.8.0
  */
 public interface GeometricLinkage extends Linkage {
   /**

@@ -59,6 +59,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * European Journal of Operational Research 52(1)
  *
  * @author Erich Schubert
+ * @since 0.8.0
  *
  * @param <O> Object type for KMedoids initialization
  */

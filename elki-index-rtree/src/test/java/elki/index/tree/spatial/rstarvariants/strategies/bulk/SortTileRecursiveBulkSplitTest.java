@@ -38,6 +38,7 @@ import elki.utilities.ELKIBuilder;
  * Test {@link RStarTree} bulk loaded using {@link SortTileRecursiveBulkSplit}
  * 
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class SortTileRecursiveBulkSplitTest extends AbstractIndexStructureTest {
   @Test

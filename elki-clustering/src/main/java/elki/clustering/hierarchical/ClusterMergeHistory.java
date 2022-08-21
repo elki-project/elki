@@ -43,6 +43,7 @@ import elki.database.ids.DBIDVar;
  * {@link ClusterMergeHistoryBuilder#optimizeOrder()}.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class ClusterMergeHistory {
   /**

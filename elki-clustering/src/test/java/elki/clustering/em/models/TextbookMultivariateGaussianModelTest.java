@@ -34,6 +34,7 @@ import elki.utilities.ELKIBuilder;
  * Test the textbook EM approach which is not numerically stable.
  *
  * @author Erich Schubert
+ * @since 0.8.0
  */
 public class TextbookMultivariateGaussianModelTest extends AbstractClusterAlgorithmTest {
   @Test
