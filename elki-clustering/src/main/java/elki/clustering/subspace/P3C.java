@@ -234,12 +234,12 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
     EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models, 0.);
     assignUnassigned(relation, probClusterIGivenX, models, noise);
 
-    double emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    double emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
     for(int it = 1; it <= maxEmIterations || maxEmIterations < 0; it++) {
       final double emOld = emNew;
       EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models, 0.);
       // reassign probabilities
-      emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+      emNew = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
 
       if(LOG.isStatistics()) {
         LOG.statistics(new DoubleStatistic(getClass().getName() + ".iteration-" + it + ".logexpectation", emNew));

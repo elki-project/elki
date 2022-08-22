@@ -32,13 +32,12 @@ import elki.database.relation.Relation;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.scaling.ScalingFunction;
-import elki.utilities.scaling.outlier.OutlierLinearScaling;
 import elki.utilities.scaling.outlier.OutlierScaling;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
@@ -111,7 +110,7 @@ public class BubbleVisualization implements VisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    if(settings.scaling != null && settings.scaling instanceof OutlierScaling) {
+    if(settings.scaling instanceof OutlierScaling) {
       final OutlierResult outlierResult = task.getResult();
       ((OutlierScaling) settings.scaling).prepare(outlierResult);
     }
@@ -307,7 +306,8 @@ public class BubbleVisualization implements VisFactory {
     @Override
     public void configure(Parameterization config) {
       new Flag(FILL_ID).grab(config, x -> fill = x);
-      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, OutlierLinearScaling.class) //
+      new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class) //
+          .setOptional(true) //
           .grab(config, x -> scaling = x);
     }
 

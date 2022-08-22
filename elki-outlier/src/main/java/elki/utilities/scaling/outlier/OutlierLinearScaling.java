@@ -22,10 +22,11 @@ package elki.utilities.scaling.outlier;
 
 import elki.database.ids.DBIDIter;
 import elki.database.relation.DoubleRelation;
+import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -93,11 +94,11 @@ public class OutlierLinearScaling implements OutlierScaling {
 
   @Override
   public double getScaled(double value) {
-    assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if(value <= min) {
-      return 0;
+    assert factor != 0 : "prepare() was not run prior to using the scaling function.";
+    if(factor < 0) {
+      return value >= max ? 0 : Math.min(1, ((value - max) / factor));
     }
-    return Math.min(1, ((value - min) / factor));
+    return value <= min ? 0 : Math.min(1, ((value - min) / factor));
   }
 
   @Override
@@ -124,6 +125,9 @@ public class OutlierLinearScaling implements OutlierScaling {
       max = max != null ? max : ma;
     }
     factor = max > min ? max - min : 1.;
+    if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
+      factor *= -1;
+    }
   }
 
   @Override

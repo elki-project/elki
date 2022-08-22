@@ -281,7 +281,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
     // TODO: use approximate values from the kd-tree here, too!
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
     if(exactAssign) {
-      logLikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+      logLikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
     }
     else {
       logLikelihood = makeStats(tree, MathUtil.sequence(0, k), probClusterIGivenX) / relation.size();
