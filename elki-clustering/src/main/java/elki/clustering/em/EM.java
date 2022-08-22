@@ -38,6 +38,7 @@ import elki.data.type.TypeUtil;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDataStore;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
@@ -240,18 +241,20 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     // initial models
     List<? extends EMClusterModel<? super O, M>> models = mfactory.buildInitialModels(relation, k);
     WritableDataStore<double[]> probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+    double loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".loglikelihood");
     LOG.statistics(likestat.setDouble(loglikelihood));
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
-    double bestloglikelihood = Double.NEGATIVE_INFINITY;//loglikelihood; // For detecting instabilities.
+    double bestloglikelihood = Double.NEGATIVE_INFINITY;// loglikelihood; // For
+                                                        // detecting
+                                                        // instabilities.
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
       // reassign probabilities
-      loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX);
+      loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
 
       LOG.statistics(likestat.setDouble(loglikelihood));
       if(loglikelihood - bestloglikelihood > delta) {
@@ -350,13 +353,14 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param relation the database used for assignment to instances
    * @param models Cluster models
    * @param probClusterIGivenX Output storage for cluster probabilities
+   * @param loglikelihoods Per-object log likelihood, for EM Outlier; may be
+   *        {@code null} if not used
    * @param <O> Object type
    * @return the expectation value of the current mixture of distributions
    */
-  public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<? super O, ?>> models, WritableDataStore<double[]> probClusterIGivenX) {
+  public static <O> double assignProbabilitiesToInstances(Relation<? extends O> relation, List<? extends EMClusterModel<? super O, ?>> models, WritableDataStore<double[]> probClusterIGivenX, WritableDoubleDataStore loglikelihoods) {
     final int k = models.size();
     double emSum = 0.;
-
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       O vec = relation.get(iditer);
       double[] probs = new double[k];
@@ -369,6 +373,9 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
         probs[i] = FastMath.exp(probs[i] - logP);
       }
       probClusterIGivenX.put(iditer, probs);
+      if(loglikelihoods != null) {
+        loglikelihoods.put(iditer, logP);
+      }
       emSum += logP;
     }
     return emSum / relation.size();
@@ -406,16 +413,6 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    */
   protected static double logSumExp(double a, double b) {
     return (a > b ? a : b) + FastMath.log(a > b ? FastMath.exp(b - a) + 1 : FastMath.exp(a - b) + 1);
-  }
-
-  /**
-   * Set whether the clustering is supposed to preserve cluster assignment
-   * probabilities. Used by {@link elki.outlier.clustering.EMOutlier}.
-   *
-   * @param soft return assignment probabilities
-   */
-  public void setSoft(boolean soft) {
-    this.soft = soft;
   }
 
   /**

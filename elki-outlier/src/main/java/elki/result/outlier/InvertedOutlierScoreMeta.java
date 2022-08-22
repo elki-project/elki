@@ -61,30 +61,32 @@ public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
   public InvertedOutlierScoreMeta(double actualMinimum, double actualMaximum) {
     super(actualMinimum, actualMaximum);
   }
-  
+
   @Override
   public double normalizeScore(double value) {
     double center = 0.0;
-    if (!Double.isNaN(theoreticalBaseline) && !Double.isInfinite(theoreticalBaseline)) {
+    if(!Double.isNaN(theoreticalBaseline) && !Double.isInfinite(theoreticalBaseline)) {
       center = theoreticalBaseline;
-    } else if (!Double.isNaN(theoreticalMaximum) && !Double.isInfinite(theoreticalMaximum)) {
+    }
+    else if(!Double.isNaN(theoreticalMaximum) && !Double.isInfinite(theoreticalMaximum)) {
       center = theoreticalMaximum;
-    } else if (!Double.isNaN(actualMaximum) && !Double.isInfinite(actualMaximum)) {
+    }
+    else if(!Double.isNaN(actualMaximum) && !Double.isInfinite(actualMaximum)) {
       center = actualMaximum;
     }
-    if (value > center) {
+    if(value > center) {
       return 0.0;
     }
     double min = Double.NaN;
-    if (!Double.isNaN(theoreticalMinimum) && !Double.isInfinite(theoreticalMinimum)) {
+    if(!Double.isNaN(theoreticalMinimum) && !Double.isInfinite(theoreticalMinimum)) {
       min = theoreticalMinimum;
     }
-    else if (!Double.isNaN(actualMinimum) && !Double.isInfinite(actualMinimum)) {
+    else if(!Double.isNaN(actualMinimum) && !Double.isInfinite(actualMinimum)) {
       min = actualMinimum;
     }
-    if (!Double.isNaN(min) && !Double.isInfinite(min) && min != center) {
+    if(!Double.isNaN(min) && !Double.isInfinite(min) && min <= center) {
       return (center - value) / (center - min);
     }
     return center - value;
-  }  
+  }
 }
