@@ -31,7 +31,6 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
-import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 
@@ -58,7 +57,6 @@ import elki.utilities.documentation.Title;
     booktitle = "Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX 2002)", //
     url = "https://doi.org/10.1007/3-540-45643-0_13", //
     bibkey = "DBLP:conf/alenex/Phillips02")
-@Priority(Priority.RECOMMENDED - 1)
 public class CompareMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
