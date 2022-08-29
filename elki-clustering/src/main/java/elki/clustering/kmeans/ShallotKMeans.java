@@ -31,6 +31,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 
 /**
@@ -54,6 +55,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "Proc. 18th Int. Symp. Intelligent Data Analysis (IDA)", //
     url = "https://doi.org/10.1007/978-3-030-44584-3_8", //
     bibkey = "DBLP:conf/ida/Borgelt20")
+@Priority(Priority.RECOMMENDED)
 public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
   /**
    * The logger for this class.
@@ -120,17 +122,17 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           minIdx = 1;
           minId2 = 0;
         }
-        for(int j = 2; j < k; j++) {
-          if(min2 > cdist[minIdx][j]) {
-            double dist = distance(fv, means[j]);
+        for(int i = 2; i < k; i++) {
+          if(min2 > cdist[minIdx][i]) {
+            double dist = distance(fv, means[i]);
             if(dist < min1) {
               minId2 = minIdx;
-              minIdx = j;
+              minIdx = i;
               min2 = min1;
               min1 = dist;
             }
             else if(dist < min2) {
-              minId2 = j;
+              minId2 = i;
               min2 = dist;
             }
           }
@@ -154,29 +156,28 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
-        // Compute the current bound:
         final double z = lower.doubleValue(it);
-        final double sa = sep[orig];
+        final double so = sep[orig];
         double u = upper.doubleValue(it);
-        if(u <= z || u <= sa) {
+        if(u <= z || u <= so) {
           continue;
         }
-        // Update the upper bound
-        NumberVector fv = relation.get(it);
+        // Make the upper bound tight first:
+        final NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
         upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-        if(u <= z || u <= sa) {
+        if(u <= z || u <= so) {
           continue;
         }
-        double r = u + 0.5 * sa; // Our cdist are scaled 0.5
-        if(cdist[orig][cnum[orig][0]] > r) {
+        // Our cdist are scaled 0.5, so we need half r:
+        if(cdist[orig][cnum[orig][0]] > u + 0.5 * so) {
           continue;
         }
         // Shallot modification #1: try old second-nearest first:
-        int secn = second.intValue(it);
+        final int osecn = second.intValue(it);
         // Exact distance to previous second nearest
-        double secd2 = distance(fv, means[secn]);
-        int ref = orig; // closest center "z" in Borgelts paper
+        double secd2 = distance(fv, means[osecn]);
+        int ref = orig, secn = osecn; // closest center "z" in Borgelts paper
         if(secd2 < curd2) {
           // Previous second closest is closer, swap:
           final double tmp = secd2;
@@ -187,46 +188,54 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           // Update u
           u = isSquared ? Math.sqrt(curd2) : curd2;
         }
-        // Second Shallot improvement: r
-        double l = Math.min(u + sa, 2 * u + cdist[orig][cnum[orig][0]]);
-        r = 0.5 * (u + l); // Our cdist are scaled by 0.5
+        // Shallot improvement 1.5:
+        // note that secd2 is still squared, cdist is half the distance
+        // 0.5*(u+l), with l=min(u+d(x,p), 2u+2*cdist[z])
+        double lp = u + (isSquared ? Math.sqrt(secd2) : secd2); // l for p
+        double lv = 2 * (u + cdist[ref][cnum[ref][0]]); // l for v2(z)y
+        double l = lp < lv ? lp : lv;
+        double rhalf = Math.min(u + 0.5 * sep[ref], 0.5 * (u + l));
         // Find closest center, and distance to two closest centers
-        double min1 = curd2, min2 = secd2;
-        int cur = ref, minId2 = secn;
+        double min1 = curd2, min2 = l * l;
+        int cur = ref, minId2 = lp < lv ? secn : cnum[ref][0];
         for(int i = 0; i < k - 1; i++) {
           int c = cnum[ref][i];
-          if(c == secn) {
-            continue; // Handled above
-          }
-          if(cdist[ref][c] > r) {
+          if(cdist[ref][c] > rhalf) {
             break;
           }
-          double dist = distance(fv, means[c]);
+          final double dist = c == secn ? secd2 : distance(fv, means[c]);
           if(dist < min1) {
             minId2 = cur;
             cur = c;
             min2 = min1;
             min1 = dist;
-            // Second Shallot improvement: r shrinking
-            if(min1 < l) {
-              r = 0.5 * (u + (l = min1));
+            if(min1 < l * l) {
+              l = isSquared ? Math.sqrt(min2) : min2;
+              // Second Shallot improvement: r shrinking
+              rhalf = Math.min(rhalf, 0.5 * (u + l));
             }
           }
           else if(dist < min2) {
             minId2 = c;
             min2 = dist;
+            l = isSquared ? Math.sqrt(min2) : min2;
+            // Second Shallot improvement: r shrinking
+            rhalf = Math.min(rhalf, 0.5 * (u + l));
           }
         }
+        // Object has to be reassigned.
         if(cur != orig) {
           clusters.get(cur).add(it);
           clusters.get(orig).remove(it);
           assignment.putInt(it, cur);
-          second.putInt(it, minId2);
           plusMinusEquals(sums[cur], sums[orig], fv);
           ++changed;
           upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
         }
-        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
+        lower.putDouble(it, l);
+        if(osecn != minId2) { // second might have changed
+          second.putInt(it, minId2);
+        }
       }
       return changed;
     }

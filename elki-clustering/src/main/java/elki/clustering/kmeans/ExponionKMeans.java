@@ -28,6 +28,7 @@ import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
+import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
 
 /**
@@ -54,6 +55,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "Proc. 33nd Int. Conf. on Machine Learning, ICML 2016", //
     url = "http://jmlr.org/proceedings/papers/v48/newling16.html", //
     bibkey = "DBLP:conf/icml/NewlingF16")
+@Priority(Priority.RECOMMENDED - 1) // Shallot is usually better
 public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
   /**
    * The logger for this class.
@@ -169,13 +171,13 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         if(u <= z || u <= sa) {
           continue;
         }
-        double r = u + 0.5 * sa; // Our cdist are scaled 0.5
+        double rhalf = u + 0.5 * sa; // Our cdist are scaled 0.5
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
         int cur = orig;
         for(int i = 0; i < k - 1; i++) {
           final int c = cnum[orig][i]; // Optimized ordering
-          if(cdist[orig][c] > r) {
+          if(cdist[orig][c] > rhalf) {
             break;
           }
           double dist = distance(fv, means[c]);

@@ -72,7 +72,7 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(KMeans.SEED_ID, 0) //
         .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.DISTANCE) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.771933);
+    assertAUC(db, "Noise", result, 0.77473);
     assertSingleScore(result, 416, 0.00576);
   }
 
@@ -85,7 +85,7 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(KMeans.SEED_ID, 0) //
         .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.DISTANCE_SINGLETONS) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.771933);
+    assertAUC(db, "Noise", result, 0.7748);
     assertSingleScore(result, 416, 0.00576);
   }
 
@@ -98,7 +98,7 @@ public class KMeansOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
         .with(KMeans.SEED_ID, 0) //
         .with(KMeansOutlierDetection.Par.RULE_ID, KMeansOutlierDetection.Rule.VARIANCE) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.7908);
+    assertAUC(db, "Noise", result, 0.79273);
     assertSingleScore(result, 416, 0.00864);
   }
 }
