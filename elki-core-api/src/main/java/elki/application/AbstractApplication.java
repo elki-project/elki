@@ -92,20 +92,20 @@ public abstract class AbstractApplication {
   /**
    * Version number of the reference below.
    */
-  private static final String REFERENCE_VERSION = "0.7.5";
+  private static final String REFERENCE_VERSION = "0.8.0";
 
   /**
    * Information for citation and version.
    */
-  @Reference(authors = "Erich Schubert and Arthur Zimek", //
-      title = "ELKI: A large open-source library for data analysis - ELKI Release 0.7.5 \"Heidelberg\"", //
-      booktitle = "CoRR", //
-      url = "https://arxiv.org/abs/1902.03616", //
-      bibkey = "DBLP:journals/corr/abs-1902-03616")
-  public static final String REFERENCE = "ELKI Release 0.7.5 (2019, February) published in:" + NEWLINE + NEWLINE //
-      + "Erich Schubert and Arthur Zimek:" + NEWLINE //
-      + "ELKI: A large open-source library for data analysis - ELKI Release 0.7.5 \"Heidelberg\"." + NEWLINE //
-      + "CoRR arXiv:1902.03616" + NEWLINE;
+  @Reference(authors = "Erich Schubert", //
+      title = "Automatic Indexing for Similarity Search in ELKI", //
+      booktitle = "Int. Conf. Similarity Search and Applications", //
+      url = "https://doi.org/10.1007/978-3-031-17849-8_16", //
+      bibkey = "DBLP:conf/sisap/Schubert22")
+  public static final String REFERENCE = "ELKI Release 0.8.0 (2022, September) published in:" + NEWLINE + NEWLINE //
+      + "Erich Schubert:" + NEWLINE //
+      + "Automatic Indexing for Similarity Search in ELKI." + NEWLINE //
+      + "Int. Conf. Similarity Search and Applications, 2022" + NEWLINE;
 
   /**
    * Constructor.
