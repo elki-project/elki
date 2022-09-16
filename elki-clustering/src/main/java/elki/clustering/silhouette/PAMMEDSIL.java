@@ -26,6 +26,7 @@ import elki.data.model.MedoidModel;
 import elki.database.datastore.IntegerDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -49,7 +50,13 @@ import elki.utilities.documentation.Reference;
  * M. Van der Laan, K. Pollard, J. Bryan<br>
  * A new partitioning around medoids algorithm<br>
  * Journal of Statistical Computation and Simulation 73(8)
- * 
+ * <p>
+ * This already incorporates some optimizations from:
+ * <p>
+ * Lars Lenssen and Erich Schubert<br>
+ * Clustering by Direct Optimization of the Medoid Silhouette<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2022
+ *
  * @author Erich Schubert
  * @since 0.8.0
  *
@@ -60,6 +67,10 @@ import elki.utilities.documentation.Reference;
     booktitle = "Journal of Statistical Computation and Simulation 73(8)", //
     url = "https://doi.org/10.1080/0094965031000136012", //
     bibkey = "doi:10.1080/0094965031000136012")
+@Reference(authors = "Lars Lenssen and Erich Schubert", //
+    title = "Clustering by Direct Optimization of the Medoid Silhouette", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2022", //
+    url = "https://doi.org/10.1007/978-3-031-17849-8_15", bibkey = "DBLP:conf/sisap/LenssenS22")
 public class PAMMEDSIL<O> extends PAMSIL<O> {
   /**
    * The logger for this class.
@@ -86,7 +97,7 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
    */
   @Override
   public Clustering<MedoidModel> run(Relation<O> relation) {
-    Clustering<MedoidModel> result = super.run(relation);
+    Clustering<MedoidModel> result = run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
     Metadata.of(result).setLongName("PAMMEDSIL Clustering");
     return result;
   }
@@ -151,7 +162,7 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
           // Find the best possible swap for h:
           for(int pi = 0; pi < k; pi++) {
             reassignToNearestCluster(assignment, scratch, medoids, pi, h);
-            final double csil = medoidsilhouette(scratch, m);
+            final double csil = medoidsilhouette(scratch, m, pi, h);
             if(csil > best) {
               best = csil;
               bestid.set(h);
@@ -162,12 +173,12 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
         if(best <= sil) {
           break;
         }
-        medoids.set(bestcluster, bestid);
         if(LOG.isStatistics()) {
           LOG.statistics(new DoubleStatistic(key + ".iteration-" + iteration + ".medoid-silhouette", best));
         }
         sil = best;
         reassignToNearestCluster(assignment, assignment, medoids, bestcluster, bestid);
+        medoids.set(bestcluster, bestid); // reassign expects old medoids!
       }
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {
@@ -187,20 +198,47 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
     protected double medoidsilhouette(IntegerDataStore assignment, DBIDArrayIter m) {
       double silsum = 0;
       for(DBIDIter x = ids.iter(); x.valid(); x.advance()) {
-        int c = assignment.intValue(x);
-        double a = Double.NaN, b = Double.POSITIVE_INFINITY;
+        final int c = assignment.intValue(x);
+        double a = DBIDUtil.equal(x, m.seek(c)) ? 0 : distQ.distance(x, m);
+        double b = Double.POSITIVE_INFINITY;
         for(m.seek(0); m.valid(); m.advance()) {
-          if(m.getOffset() == c) {
-            a = DBIDUtil.equal(x, m) ? 0 : distQ.distance(x, m);
-          }
-          else {
+          if(m.getOffset() != c) {
             double d = distQ.distance(x, m);
             b = d < b ? d : b;
           }
         }
-        silsum += (b - a) / (a > b ? a : b);
+        assert a <= b : "Not assigned to nearest";
+        silsum += b > 0 ? a / b : 0.;
       }
-      return silsum / ids.size();
+      return 1. - silsum / ids.size();
+    }
+
+    /**
+     * Evaluate the average medoid Silhouette of the current cluster assignment
+     *
+     * @param assignment cluster assignment
+     * @param m medoid iterator
+     * @param hoff replacement offset
+     * @param h replacement medoid
+     * @return Average silhouette width
+     */
+    protected double medoidsilhouette(IntegerDataStore assignment, DBIDArrayIter m, int hoff, DBIDRef h) {
+      double silsum = 0;
+      for(DBIDIter x = ids.iter(); x.valid(); x.advance()) {
+        final int c = assignment.intValue(x);
+        DBIDRef mc = c == hoff ? h : m.seek(c);
+        double a = DBIDUtil.equal(x, mc) ? 0 : distQ.distance(x, mc);
+        double b = Double.POSITIVE_INFINITY;
+        for(m.seek(0); m.valid(); m.advance()) {
+          if(m.getOffset() != c) {
+            double d = distQ.distance(x, m.getOffset() == hoff ? h : m);
+            b = d < b ? d : b;
+          }
+        }
+        assert a <= b : "Not assigned to nearest";
+        silsum += b > 0 ? a / b : 0.;
+      }
+      return 1. - silsum / ids.size();
     }
   }
 

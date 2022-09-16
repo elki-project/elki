@@ -27,8 +27,6 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.initialization.FirstK;
-import elki.clustering.kmedoids.FasterPAM;
-import elki.clustering.kmedoids.initialization.KMedoidsKMedoidsInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.MedoidModel;
@@ -41,17 +39,16 @@ import elki.evaluation.clustering.internal.Silhouette;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Test PAMSIL clustering.
+ * Test FastMSC clustering.
  *
  * @author Erich Schubert
  * @since 0.8.0
  */
-public class PAMSILTest extends AbstractClusterAlgorithmTest {
+public class FastMSCTest extends AbstractClusterAlgorithmTest {
   @Test
-  public void testPAMSIL() {
+  public void testFastMSC() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<MedoidModel> result = new ELKIBuilder<PAMSIL<NumberVector>>(PAMSIL.class) //
-        .with(KMedoidsKMedoidsInitialization.Par.INNER_ID, FasterPAM.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<FastMSC<NumberVector>>(FastMSC.class) //
         .with(KMeans.K_ID, 3) //
         .with(KMeans.SEED_ID, 0) //
         .build().autorun(db);
@@ -64,10 +61,9 @@ public class PAMSILTest extends AbstractClusterAlgorithmTest {
   }
 
   @Test
-  public void testPAMSILworseStart() {
+  public void testFastMSCworseStart() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<MedoidModel> result = new ELKIBuilder<PAMSIL<NumberVector>>(PAMSIL.class) //
-        .with(KMeans.INIT_ID, KMedoidsKMedoidsInitialization.class) //
+    Clustering<MedoidModel> result = new ELKIBuilder<FastMSC<NumberVector>>(FastMSC.class) //
         .with(KMeans.INIT_ID, FirstK.class) //
         .with(KMeans.K_ID, 3) //
         .build().autorun(db);
@@ -77,5 +73,20 @@ public class PAMSILTest extends AbstractClusterAlgorithmTest {
     double sil = new Silhouette<NumberVector>(EuclideanDistance.STATIC, false) //
         .evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, EuclideanDistance.STATIC), result);
     assertEquals("Silhouette not as expected", 0.8484889738366984, sil, 1e-15);
+  }
+
+  @Test
+  public void testFastMSCKTwo() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<MedoidModel> result = new ELKIBuilder<FastMSC<NumberVector>>(FastMSC.class) //
+        .with(KMeans.INIT_ID, FirstK.class) //
+        .with(KMeans.K_ID, 2) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.785693747);
+    assertClusterSizes(result, new int[] { 159, 171 });
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    double sil = new Silhouette<NumberVector>(EuclideanDistance.STATIC, false) //
+        .evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, EuclideanDistance.STATIC), result);
+    assertEquals("Silhouette not as expected", 0.7664603331156499, sil, 1e-15);
   }
 }
