@@ -159,7 +159,6 @@ public abstract class AbstractIndexStructureTest {
   /**
    * Verify the neighbors.
    *
-   * @param q Query
    * @param results Results
    * @param refd Reference distances
    * @param refid Reference ids
@@ -314,7 +313,6 @@ public abstract class AbstractIndexStructureTest {
    * @param factory Index factory
    * @param expectKNNQuery expected knn query class
    * @param expectRangeQuery expected range query class
-   * @param dbidonly test DBID queries only
    */
   protected static void assertExactCosine(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     assertExactCosine(factory, expectKNNQuery, expectRangeQuery, false);
@@ -367,7 +365,6 @@ public abstract class AbstractIndexStructureTest {
    * @param factory Index factory
    * @param expectKNNQuery expected knn query class
    * @param expectRangeQuery expected range query class
-   * @param dbidonly test DBID queries only
    */
   protected static void assertSinglePoint(IndexFactory<?> factory, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     ArrayAdapterDatabaseConnection dbc = new ArrayAdapterDatabaseConnection(new double[][] { { 1, 0 } });
@@ -396,9 +393,7 @@ public abstract class AbstractIndexStructureTest {
    * Test helper
    * 
    * @param factory Index factory
-   * @param expectKNNQuery expected knn query class
-   * @param expectRangeQuery expected range query class
-   * @param dbidonly test DBID queries only
+   * @param expectQuery expected knn query class
    */
   protected static void assertPrioritySearchEuclidean(IndexFactory<?> factory, Class<?> expectQuery) {
     assertPrioritySearchEuclidean(factory, expectQuery, false);
