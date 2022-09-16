@@ -318,7 +318,7 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
     /**
      * Assign each object to the nearest cluster when replacing one medoid.
      *
-     * @param means Cluster medoids
+     * @param medoids Cluster medoids
      * @param b Medoid position index
      * @param j New medoid
      * @return medoid silhouette
