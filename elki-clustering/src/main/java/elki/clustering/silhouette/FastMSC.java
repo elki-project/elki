@@ -1,20 +1,20 @@
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
- * 
+ *
  * Copyright (C) 2022
  * ELKI Development Team
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,6 +39,7 @@ import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
@@ -59,7 +60,7 @@ import elki.utilities.exceptions.AbortException;
  * Lars Lenssen and Erich Schubert<br>
  * Clustering by Direct Optimization of the Medoid Silhouette<br>
  * Int. Conf. on Similarity Search and Applications, SISAP 2022
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O>
@@ -99,10 +100,10 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
   /**
    * Data stored per point. Unfortunately, this introduces noticable overheads
    * from Java memory management over the Rust version.
-   * 
+   *
    * @author Erich Schubert
    */
-  private static class Record {
+  protected static class Record {
     /** Nearest medoid */
     int m1 = -1;
 
@@ -130,29 +131,29 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
 
   /**
    * FastMSC clustering instance for a particular data set.
-   * 
+   *
    * @author Erich Schubert
    */
   protected class Instance {
     /**
      * Ids to process.
      */
-    DBIDs ids;
+    protected DBIDs ids;
 
     /**
      * Distance function to use.
      */
-    DistanceQuery<?> distQ;
+    protected DistanceQuery<?> distQ;
 
     /**
      * Distances and nearest medoids.
      */
-    WritableDataStore<Record> assignment;
+    protected WritableDataStore<Record> assignment;
 
     /**
      * Output cluster mapping.
      */
-    WritableIntegerDataStore output;
+    protected WritableIntegerDataStore output;
 
     /**
      * Constructor.
@@ -199,7 +200,7 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
         int bestcluster = -1;
         // Iterate over all non-medoids:
         for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-          if(lastswap.isSet() && DBIDUtil.equal(j, lastswap)) {
+          if(DBIDUtil.equal(j, lastswap)) {
             break; // Entire pass without finding an improvement.
           }
           // Compare object to its own medoid.
@@ -209,13 +210,12 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
           System.arraycopy(losses, 0, scratch, 0, k);
           double acc = findBestSwap(j, scratch);
           // Find the best possible swap for j:
-          for(int b = 0; b < k; b++) {
-            double l = scratch[b] + acc;
-            if(l > best) {
-              best = l;
-              bestid.set(j);
-              bestcluster = b;
-            }
+          int b = VMath.argmax(scratch);
+          double l = scratch[b] + acc;
+          if(l > best) {
+            best = l;
+            bestid.set(j);
+            bestcluster = b;
           }
         }
         if(best <= 0.) {

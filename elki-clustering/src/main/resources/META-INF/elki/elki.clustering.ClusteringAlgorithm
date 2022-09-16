@@ -68,6 +68,7 @@ elki.clustering.kmedoids.SingleAssignmentKMedoids
 elki.clustering.Leader
 elki.clustering.NaiveMeanShiftClustering
 elki.clustering.optics.OPTICSXi
+elki.clustering.silhouette.FasterMSC
 elki.clustering.silhouette.FastMSC
 elki.clustering.silhouette.PAMSIL
 elki.clustering.silhouette.PAMMEDSIL
