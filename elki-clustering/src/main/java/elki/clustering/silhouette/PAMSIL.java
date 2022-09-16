@@ -32,6 +32,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.IntegerDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
+import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -56,6 +57,12 @@ import elki.utilities.exceptions.AbortException;
  * M. Van der Laan, K. Pollard, J. Bryan<br>
  * A new partitioning around medoids algorithm<br>
  * Journal of Statistical Computation and Simulation 73(8)
+ * <p>
+ * This already incorporates some optimizations from:
+ * <p>
+ * Lars Lenssen and Erich Schubert<br>
+ * Clustering by Direct Optimization of the Medoid Silhouette<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2022
  * 
  * @author Erich Schubert
  * @since 0.8.0
@@ -67,6 +74,10 @@ import elki.utilities.exceptions.AbortException;
     booktitle = "Journal of Statistical Computation and Simulation 73(8)", //
     url = "https://doi.org/10.1080/0094965031000136012", //
     bibkey = "doi:10.1080/0094965031000136012")
+@Reference(authors = "Lars Lenssen and Erich Schubert", //
+    title = "Clustering by Direct Optimization of the Medoid Silhouette", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2022", //
+    url = "https://doi.org/10.1007/978-3-031-17849-8_15", bibkey = "DBLP:conf/sisap/LenssenS22")
 public class PAMSIL<O> extends PAM<O> {
   /**
    * The logger for this class.
@@ -93,7 +104,7 @@ public class PAMSIL<O> extends PAM<O> {
    */
   @Override
   public Clustering<MedoidModel> run(Relation<O> relation) {
-    Clustering<MedoidModel> result = super.run(relation);
+    Clustering<MedoidModel> result = run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
     Metadata.of(result).setLongName("PAMSIL Clustering");
     return result;
   }
@@ -209,10 +220,10 @@ public class PAMSIL<O> extends PAM<O> {
     /**
      * Assign each object to the nearest cluster.
      *
-     * @param means Cluster medoids
+     * @param medoids Cluster medoids
      */
-    protected void assignToNearestCluster(ArrayDBIDs means) {
-      DBIDArrayIter miter = means.iter();
+    protected void assignToNearestCluster(ArrayDBIDs medoids) {
+      DBIDArrayIter miter = medoids.iter();
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY;
         int minindx = -1;
@@ -226,6 +237,7 @@ public class PAMSIL<O> extends PAM<O> {
         if(minindx < 0) {
           throw new AbortException("Too many infinite distances. Cannot assign objects.");
         }
+        assert minindx < medoids.size();
         assignment.put(iditer, minindx);
       }
     }
@@ -274,22 +286,20 @@ public class PAMSIL<O> extends PAM<O> {
      *
      * @param prev Previous assignment
      * @param assignment New assignment
-     * @param means Cluster medoids
+     * @param medoids Previous cluster medoids
      * @param pi Medoid position
      * @param h New medoid
      */
-    protected void reassignToNearestCluster(IntegerDataStore prev, WritableIntegerDataStore assignment, ArrayDBIDs means, int pi, DBIDRef h) {
-      DBIDArrayIter miter = means.iter();
+    protected void reassignToNearestCluster(IntegerDataStore prev, WritableIntegerDataStore assignment, ArrayDBIDs medoids, int pi, DBIDRef h) {
+      DBIDArrayIter miter = medoids.iter();
       for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
-        final double d = distQ.distance(iditer, h); // new distance
+        double mindist = distQ.distance(iditer, h); // new distance
         int minindx = prev.intValue(iditer);
-        final double od = distQ.distance(iditer, miter.seek(minindx)); // old
-        if(d < od) {
-          minindx = pi; // assign to new center
+        final double od = DBIDUtil.equal(miter.seek(minindx), h) ? mindist : distQ.distance(iditer, miter); // old
+        if(mindist <= od) {
+          minindx = pi; // assign to new center, must be closest
         }
         else if(minindx == pi) {
-          double mindist = d;
-          minindx = pi;
           for(miter.seek(0); miter.valid(); miter.advance()) {
             if(miter.getOffset() != pi) {
               final double dist = distQ.distance(iditer, miter);
