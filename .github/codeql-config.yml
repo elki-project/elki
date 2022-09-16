@@ -1,0 +1,22 @@
+name: "CodeQL config file"
+query-filters:
+- exclude:
+    id: java/inconsistent-equals-and-hashcode
+- exclude:
+    id: java/inconsistent-compareto-and-equals
+- exclude:
+    id: java/confusing-method-signature
+- exclude:
+    id: java/deprecated-call # STATIC instances
+- exclude:
+    id: java/local-shadows-field # local copies for optimization
+- exclude:
+    id: java/local-variable-is-never-read # many false positives
+- exclude:
+    id: java/unused-parameter # false positives, used in subclass
+- exclude:
+    id: java/constants-only-interface # false positives in Parameterizers
+- exclude:
+    id: java/class-name-matches-super-class # Par, Instance, Factory...
+- exclude:
+    id: java/comparison-of-identical-expressions # NaN checks

@@ -4,9 +4,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, main ]
 
 jobs:
   build:
@@ -17,9 +17,21 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: java
+        queries: +security-and-quality
+        config-file: ./.github/codeql-config.yml
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
+      # run codeQL before tests, to not see warnings for trivialities still tested.
+      # hence, aseemble, codeQL, test
+    - name: Assemble with Gradle
+      run: ./gradlew --no-daemon assemble
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+    - name: Finish build with Gradle (run tests)
       run: ./gradlew --no-daemon build
   codecov:
     runs-on: ubuntu-latest
