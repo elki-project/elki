@@ -153,7 +153,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         Class<Object> clz = (Class<Object>) Class.forName(typename);
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        label = ("".equals(label)) ? null : label;
+        label = label.length() == 0 ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).getDeclaredConstructor().newInstance();
         return new SimpleTypeInformation<>(clz, label, serializer);
@@ -238,7 +238,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).getDeclaredConstructor().newInstance();
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        label = ("".equals(label)) ? null : label;
+        label = label.length() == 0 ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).getDeclaredConstructor().newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
@@ -331,7 +331,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ELKIServiceRegistry.findImplementation(NumberVector.Factory.class, typename).getDeclaredConstructor().newInstance();
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        label = ("".equals(label)) ? null : label;
+        label = label.length() == 0 ? null : label;
         // Serialization class
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).getDeclaredConstructor().newInstance();

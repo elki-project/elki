@@ -46,7 +46,7 @@ public class IntegerHeapTest {
     int[] desc = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
     IntegerMinHeap hasc = new IntegerMinHeap();
     IntegerMaxHeap hdesc = new IntegerMaxHeap();
-    for(Integer i : data) {
+    for(int i : data) {
       for(int j = 0; j < dup; j++) {
         hasc.add(i);
         hdesc.add(i);
