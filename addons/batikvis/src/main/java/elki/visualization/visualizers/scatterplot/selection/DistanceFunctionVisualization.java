@@ -207,7 +207,7 @@ public class DistanceFunctionVisualization implements VisFactory {
    *
    * @navhas - visualizes - DBIDSelection
    */
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

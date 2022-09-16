@@ -97,7 +97,7 @@ public class OPTICSPlotCutVisualization implements VisFactory {
    * @author Heidi Kolb
    * @author Erich Schubert
    */
-  public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
+  public static class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**
      * CSS-Styles
      */

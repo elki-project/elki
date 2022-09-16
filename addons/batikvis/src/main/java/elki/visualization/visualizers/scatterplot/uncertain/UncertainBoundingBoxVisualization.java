@@ -96,7 +96,7 @@ public class UncertainBoundingBoxVisualization implements VisFactory {
    *
    * @assoc - - - StylingPolicy
    */
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * CSS class for uncertain bounding boxes.
      */

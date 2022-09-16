@@ -71,7 +71,7 @@ public class IndexStatistics implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public class IndexMetaResult extends CollectionResult<Pair<String, String>> {
+  public static class IndexMetaResult extends CollectionResult<Pair<String, String>> {
     /**
      * Constructor.
      * 

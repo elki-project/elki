@@ -160,7 +160,7 @@ public class PlotItem {
    * @return Iterator
    */
   public Iterator<PlotItem> itemIterator() {
-    return new ItmItr();
+    return new ItmItr(this);
   }
 
   @Override
@@ -173,7 +173,7 @@ public class PlotItem {
    *
    * @author Erich Schubert
    */
-  private class ItmItr implements Iterator<PlotItem> {
+  private static class ItmItr implements Iterator<PlotItem> {
     PlotItem next;
 
     Iterator<PlotItem> cur;
@@ -183,11 +183,11 @@ public class PlotItem {
     /**
      * Constructor.
      */
-    public ItmItr() {
+    public ItmItr(PlotItem start) {
       super();
-      this.next = PlotItem.this;
+      this.next = start;
       this.cur = null;
-      this.sub = subitems.iterator();
+      this.sub = start.subitems.iterator();
     }
 
     @Override

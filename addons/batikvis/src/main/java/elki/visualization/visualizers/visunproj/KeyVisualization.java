@@ -154,7 +154,7 @@ public class KeyVisualization implements VisFactory {
    *
    * @navhas - visualizes - Clustering
    */
-  public class Instance extends AbstractVisualization {
+  public static class Instance extends AbstractVisualization {
     /**
      * CSS class for key captions.
      */

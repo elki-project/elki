@@ -127,7 +127,7 @@ public class TooltipStringVisualization implements VisFactory {
    *
    * @navhas - visualizes - Relation
    */
-  public class Instance extends AbstractTooltipVisualization {
+  public static class Instance extends AbstractTooltipVisualization {
     /**
      * Number value to visualize
      */

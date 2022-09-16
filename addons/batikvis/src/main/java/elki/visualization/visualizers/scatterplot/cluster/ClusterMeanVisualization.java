@@ -91,7 +91,7 @@ public class ClusterMeanVisualization implements VisFactory {
    * @navhas - visualizes - MeanModel
    * @navhas - visualizes - MedoidModel
    */
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * CSS class name for center of the means
      */

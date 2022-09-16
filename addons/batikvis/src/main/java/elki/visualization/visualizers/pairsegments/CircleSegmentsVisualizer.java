@@ -131,9 +131,8 @@ public class CircleSegmentsVisualizer implements VisFactory {
    *
    * @assoc - - - Segments
    * @has - - - SegmentsStylingPolicy
-   *
    */
-  public class Instance extends AbstractVisualization implements ResultListener {
+  public static class Instance extends AbstractVisualization implements ResultListener {
     /** Minimum width (radian) of Segment */
     private static final double SEGMENT_MIN_ANGLE = 0.01;
 

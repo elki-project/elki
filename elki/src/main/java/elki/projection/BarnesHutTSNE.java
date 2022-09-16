@@ -146,6 +146,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @param pij Sparse initial affinity matrix
    * @param sol Solution output array (preinitialized)
    */
+  @Override
   protected void optimizetSNE(AffinityMatrix pij, double[][] sol) {
     final int size = pij.size();
     if(size * 3L * dim > 0x7FFF_FFFAL) {

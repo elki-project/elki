@@ -273,7 +273,7 @@ public class TreePopup extends JPopupMenu {
    * 
    * @author Erich Schubert
    */
-  public class Renderer extends JPanel implements TreeCellRenderer {
+  public static class Renderer extends JPanel implements TreeCellRenderer {
     /**
      * Serial version
      */

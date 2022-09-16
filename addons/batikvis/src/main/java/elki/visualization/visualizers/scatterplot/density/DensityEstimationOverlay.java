@@ -99,7 +99,7 @@ public class DensityEstimationOverlay implements VisFactory {
    */
   // TODO: make parameterizable, in particular color map, kernel bandwidth and
   // kernel function
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Density map resolution
      */

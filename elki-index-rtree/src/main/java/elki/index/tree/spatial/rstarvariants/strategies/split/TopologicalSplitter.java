@@ -86,7 +86,7 @@ public class TopologicalSplitter implements SplitStrategy {
    * 
    * @param <E> Actual entry type
    */
-  private class Split<A, E extends SpatialComparable> {
+  private static class Split<A, E extends SpatialComparable> {
     /**
      * The index of the split point.
      */

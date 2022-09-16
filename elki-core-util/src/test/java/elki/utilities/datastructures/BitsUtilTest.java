@@ -199,7 +199,7 @@ public class BitsUtilTest {
     long[] rnds = new long[cnt];
     long[][] bits = new long[cnt][];
     for(int i = 0; i < cnt; i++) {
-      rnds[i] = Math.abs(r.nextLong());
+      rnds[i] = r.nextLong() & 0x7FFF_FFFF_FFFF_FFFFL; // unsigned
       bits[i] = make(Long.SIZE, rnds[i]);
     }
 
@@ -220,7 +220,7 @@ public class BitsUtilTest {
     for(int i = 0; i < cnt; i++) {
       long[] btmp = truncateI(copy(bits[i]), 47);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(Long.compare(rnds[i] & ((1 << 48) - 1), rnds[j]), compare(btmp, bits[j]));
+        assertEquals(Long.compare(rnds[i] & ((1L << 48) - 1), rnds[j]), compare(btmp, bits[j]));
       }
     }
 

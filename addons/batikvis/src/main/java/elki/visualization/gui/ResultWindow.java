@@ -588,7 +588,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    *
    * @author Erich Schubert
    */
-  private class TextWriterPanel extends JPanel {
+  private static class TextWriterPanel extends JPanel {
     /**
      * Serial version.
      */

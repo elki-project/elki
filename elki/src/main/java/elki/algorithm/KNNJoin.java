@@ -316,7 +316,7 @@ public class KNNJoin implements Algorithm {
    *
    * @author Erich Schubert
    */
-  private class Task implements Comparable<Task> {
+  private static class Task implements Comparable<Task> {
     /**
      * Minimum distance.
      */

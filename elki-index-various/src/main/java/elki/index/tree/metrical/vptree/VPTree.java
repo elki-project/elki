@@ -448,7 +448,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @author Robert Gehde
    * @author Erich Schubert
    */
-  public abstract class VPTreeKNNSearcher {
+  public static abstract class VPTreeKNNSearcher {
     /**
      * Recursive search function
      * 
@@ -552,7 +552,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
    * @author Robert Gehde
    * @author Erich Schubert
    */
-  public abstract class VPTreeRangeSearcher {
+  public static abstract class VPTreeRangeSearcher {
     /**
      * Recursive search function.
      *

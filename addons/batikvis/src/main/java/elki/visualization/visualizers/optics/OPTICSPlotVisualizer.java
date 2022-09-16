@@ -86,7 +86,7 @@ public class OPTICSPlotVisualizer implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public class Instance extends AbstractOPTICSVisualization {
+  public static class Instance extends AbstractOPTICSVisualization {
     /**
      * Constructor.
      *

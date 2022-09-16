@@ -752,7 +752,7 @@ public class ParameterTable extends JTable {
    *
    * @author Erich Schubert
    */
-  private class DispatchingPanel extends JPanel {
+  private static class DispatchingPanel extends JPanel {
     /**
      * Serial version.
      */

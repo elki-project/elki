@@ -69,8 +69,8 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
   public boolean adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
     // NOT "||". no short-circuiting here!
     return entry.setRoutingObjectID(routingObjectID) //
-        | entry.setParentDistance(parentDistance) //
-        | entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
+        || entry.setParentDistance(parentDistance) //
+        || entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
   }
 
   /**

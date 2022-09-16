@@ -488,7 +488,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * 
    * @author Robert Gehde
    */
-  class KDTree {
+  static class KDTree {
     /**
      * Child nodes:
      */

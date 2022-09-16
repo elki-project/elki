@@ -111,7 +111,7 @@ public class OPTICSPlotSelectionVisualization implements VisFactory {
    *
    * @has - visualizes 1 DBIDSelection
    */
-  public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
+  public static class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**
      * CSS class for markers
      */
