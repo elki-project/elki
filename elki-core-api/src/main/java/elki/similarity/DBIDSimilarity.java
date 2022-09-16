@@ -33,14 +33,5 @@ import elki.database.ids.DBID;
  * @assoc - "defined on" - DBID
  */
 public interface DBIDSimilarity extends PrimitiveSimilarity<DBID> {
-  /**
-   * Computes the similarity between two given DatabaseObjects according to this
-   * similarity function.
-   *
-   * @param id1 first object id
-   * @param id2 second object id
-   * @return the similarity between two given DatabaseObjects according to this
-   *         similarity function
-   */
-  double similarity(DBID id1, DBID id2);
+  // Empty marker interface
 }

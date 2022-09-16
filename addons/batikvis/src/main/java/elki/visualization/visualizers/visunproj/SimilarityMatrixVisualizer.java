@@ -90,7 +90,7 @@ public class SimilarityMatrixVisualizer implements VisFactory {
    *
    * @navhas - visualizes 1 SimilarityMatrix
    */
-  public class Instance extends AbstractVisualization {
+  public static class Instance extends AbstractVisualization {
     /**
      * The actual pixmap result.
      */

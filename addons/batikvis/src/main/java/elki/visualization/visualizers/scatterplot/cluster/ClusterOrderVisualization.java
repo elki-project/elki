@@ -96,7 +96,7 @@ public class ClusterOrderVisualization implements VisFactory {
    * @navhas - visualizes - ClusterOrder
    */
   // TODO: listen for CLUSTER ORDER changes.
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
      * CSS class name
      */

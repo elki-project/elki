@@ -156,7 +156,7 @@ public class JudgeOutlierScores implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public class ScoreResult extends CollectionResult<double[]> {
+  public static class ScoreResult extends CollectionResult<double[]> {
     /**
      * Constructor.
      * 

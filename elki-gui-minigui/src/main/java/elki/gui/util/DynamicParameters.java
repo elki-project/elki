@@ -81,7 +81,7 @@ public class DynamicParameters {
    * 
    * @author Erich Schubert
    */
-  public class Node {
+  public static class Node {
     protected Parameter<?> param;
 
     protected String value;

@@ -81,7 +81,7 @@ public class KernelMatrix {
    * @author Erich Schubert
    * @hidden
    */
-  private class RangeMap implements DBIDMap {
+  private static class RangeMap implements DBIDMap {
     DBIDRange range;
 
     public RangeMap(DBIDRange range) {
@@ -106,7 +106,7 @@ public class KernelMatrix {
    * @author Erich Schubert
    * @hidden
    */
-  private class SortedArrayMap implements DBIDMap {
+  private static class SortedArrayMap implements DBIDMap {
     ArrayModifiableDBIDs ids;
 
     public SortedArrayMap(DBIDs ids) {

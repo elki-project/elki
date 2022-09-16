@@ -88,7 +88,7 @@ public class PixmapVisualizer implements VisFactory {
    *
    * @navhas - visualizes 1 PixmapResult
    */
-  public class Instance extends AbstractVisualization {
+  public static class Instance extends AbstractVisualization {
     /**
      * The actual pixmap result.
      */

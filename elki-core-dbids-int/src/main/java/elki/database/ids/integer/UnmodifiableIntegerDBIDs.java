@@ -84,7 +84,7 @@ public class UnmodifiableIntegerDBIDs implements StaticDBIDs, IntegerDBIDs {
    * 
    * @author Erich Schubert
    */
-  class UnmodifiableDBIDIter implements IntegerDBIDIter {
+  static class UnmodifiableDBIDIter implements IntegerDBIDIter {
     /**
      * Wrapped iterator.
      */

@@ -134,7 +134,7 @@ public class OPTICSClusterVisualization implements VisFactory {
    *
    * @navassoc - visualizes - Clustering
    */
-  public class Instance extends AbstractOPTICSVisualization {
+  public static class Instance extends AbstractOPTICSVisualization {
     /**
      * CSS class for markers
      */

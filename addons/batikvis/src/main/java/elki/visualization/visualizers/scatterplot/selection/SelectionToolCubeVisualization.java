@@ -110,7 +110,7 @@ public class SelectionToolCubeVisualization implements VisFactory {
    *
    * @navhas - updates - RangeSelection
    */
-  public class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -72,12 +72,8 @@ public class IterableIt<O> implements It<O> {
     return this;
   }
 
-  /**
-   * Get the current element.
-   * 
-   * @return current element
-   */
   @SuppressWarnings("unchecked")
+  @Override
   public O get() {
     return cur != END_VALUE ? (O) cur : null;
   }

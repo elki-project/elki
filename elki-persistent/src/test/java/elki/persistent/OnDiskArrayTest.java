@@ -47,8 +47,6 @@ public class OnDiskArrayTest {
 
   /**
    * Set up the temp file for testing.
-   *
-   * @throws IOException
    */
   @Before
   public void setup() throws IOException {
@@ -58,8 +56,6 @@ public class OnDiskArrayTest {
 
   /**
    * Delete the file after the test.
-   *
-   * @throws IOException
    */
   @After
   public void cleanup() {

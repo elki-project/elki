@@ -92,7 +92,7 @@ public class MarkerVisualization implements VisFactory {
    *
    * @assoc - - - StylingPolicy
    */
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -103,7 +103,7 @@ public class MoveObjectsToolVisualization implements VisFactory {
    *
    * @navhas - edits - elki.data.NumberVector
    */
-  public class Instance extends AbstractScatterplotVisualization implements DragListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DragListener {
     /**
      * CSS tag for our event rectangle
      */

@@ -107,7 +107,7 @@ public class SelectionToolDotVisualization implements VisFactory {
    *
    * @navhas - updates - DBIDSelection
    */
-  public class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {
     /**
      * CSS class of the selection rectangle while selecting.
      */

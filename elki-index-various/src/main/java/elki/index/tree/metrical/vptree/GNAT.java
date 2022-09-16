@@ -384,7 +384,7 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
    *
    * @author Robert Gehde
    */
-  public abstract class GNATKNNSearcher {
+  public static abstract class GNATKNNSearcher {
     /**
      * Search the k nearest neighbors
      * 
@@ -499,7 +499,7 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
    * 
    * @author Robert Gehde
    */
-  public abstract class GNATRangeSearcher {
+  public static abstract class GNATRangeSearcher {
     /**
      * Perform a range search on the MVP Tree
      *

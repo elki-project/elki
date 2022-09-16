@@ -88,11 +88,7 @@ public class ArrayListIter<O> implements ArrayIter, It<O> {
     return this;
   }
 
-  /**
-   * Get the current element.
-   * 
-   * @return current element
-   */
+  @Override
   public O get() {
     return data.get(pos);
   }

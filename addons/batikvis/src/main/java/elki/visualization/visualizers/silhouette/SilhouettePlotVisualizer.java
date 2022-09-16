@@ -86,7 +86,7 @@ public class SilhouettePlotVisualizer implements VisFactory {
    *
    * @author Robert Gehde
    */
-  public class Instance extends AbstractSilhouetteVisualization {
+  public static class Instance extends AbstractSilhouetteVisualization {
     /**
      * Constructor.
      *

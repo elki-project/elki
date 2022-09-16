@@ -719,7 +719,7 @@ public class MiniGUI extends AbstractApplication {
    *
    * @composed - - - elki.gui.util.SavedSettingsFile
    */
-  class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
+  static class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
     /**
      * Serial version.
      */

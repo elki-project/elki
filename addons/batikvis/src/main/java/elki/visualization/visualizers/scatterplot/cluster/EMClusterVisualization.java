@@ -121,7 +121,7 @@ public class EMClusterVisualization implements VisFactory {
    */
   // TODO: nicer stacking of n-fold hulls
   // TODO: can we find a proper sphere for 3+ dimensions?
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

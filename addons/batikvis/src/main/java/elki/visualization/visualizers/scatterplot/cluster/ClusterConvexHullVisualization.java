@@ -113,7 +113,7 @@ public class ClusterConvexHullVisualization implements VisFactory {
    * @navhas - visualizes - Clustering
    * @assoc - - - FilteredConvexHull2D
    */
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -113,7 +113,7 @@ public class COPVectorVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

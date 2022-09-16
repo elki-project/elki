@@ -89,9 +89,8 @@ public class AxisVisualization implements VisFactory {
    * @author Remigius Wojdanowski
    *
    * @assoc - - - SVGSimpleLinearAxis
-   *
    */
-  public class Instance extends AbstractScatterplotVisualization {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Constructor.
      *

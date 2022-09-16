@@ -82,7 +82,7 @@ public class SilhouettePlotSelectionVisualization implements VisFactory {
    *
    * @has - visualizes 1 DBIDSelection
    */
-  public class Instance extends AbstractSilhouetteVisualization {
+  public static class Instance extends AbstractSilhouetteVisualization {
     /**
      * CSS class for markers
      */

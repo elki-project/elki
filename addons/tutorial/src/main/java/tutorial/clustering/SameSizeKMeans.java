@@ -360,7 +360,7 @@ public class SameSizeKMeans<V extends NumberVector> extends AbstractKMeans<V, Me
    *
    * @author Erich Schubert
    */
-  private class Meta {
+  private static class Meta {
     /**
      * Distance to the cluster centers.
      */
@@ -411,7 +411,7 @@ public class SameSizeKMeans<V extends NumberVector> extends AbstractKMeans<V, Me
    *
    * @author Erich Schubert
    */
-  public class PreferenceComparator implements IntComparator {
+  public static class PreferenceComparator implements IntComparator {
     /**
      * Meta to use for comparison.
      */

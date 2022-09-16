@@ -106,7 +106,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
    *
    * @author Erich Schubert
    */
-  private class Itr implements IntegerDBIDArrayIter {
+  private static class Itr implements IntegerDBIDArrayIter {
     /**
      * Wrapped iterator.
      */

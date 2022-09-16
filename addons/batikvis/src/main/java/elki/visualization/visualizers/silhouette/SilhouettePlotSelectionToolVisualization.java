@@ -106,7 +106,7 @@ public class SilhouettePlotSelectionToolVisualization implements VisFactory {
    *
    * @has - visualizes 1 DBIDSelection
    */
-  public class Instance extends AbstractSilhouetteVisualization implements DragableArea.DragListener {
+  public static class Instance extends AbstractSilhouetteVisualization implements DragableArea.DragListener {
     /**
      * CSS class for markers
      */

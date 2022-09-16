@@ -97,7 +97,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
    *
    * @assoc - - - SteepAreaResult
    */
-  public class Instance extends AbstractOPTICSVisualization {
+  public static class Instance extends AbstractOPTICSVisualization {
     /**
      * CSS class for markers
      */
