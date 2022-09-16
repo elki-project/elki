@@ -85,6 +85,7 @@ elki.clustering.optics.OPTICSXi
 elki.clustering.optics.OPTICSHeap
 elki.clustering.optics.OPTICSList
 elki.clustering.optics.FastOPTICS
+elki.clustering.silhouette.FasterMSC
 elki.clustering.silhouette.FastMSC
 elki.clustering.silhouette.PAMSIL
 elki.clustering.silhouette.PAMMEDSIL
