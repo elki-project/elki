@@ -909,7 +909,7 @@ public final class FormatUtil {
       // OK. Probably not exported.
     }
     try {
-      Process p = Runtime.getRuntime().exec(new String[] { "sh", "-c", "tput cols 2> /dev/tty" });
+      Process p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", "tput cols 2> /dev/tty" });
       byte[] buf = new byte[16];
       p.getOutputStream().close(); // We do not intend to write.
       int l = p.getInputStream().read(buf);
