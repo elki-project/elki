@@ -121,8 +121,8 @@ public abstract class AbstractSetDistanceTest extends AbstractDistanceTest {
    * Tests the given distance function with varying length
    * 
    * @param distfunc the distance function to test
+   * @param result expected value
    * @param tolerance tolerance used for floating point distances
-   * @param results An array of results for the given Testcases
    */
   public static void assertIntegerVectorVarLen(PrimitiveDistance<? super FeatureVector<?>> distfunc, double result, double tolerance) {
     assertEquals("Varying length distances", result, distfunc.distance(FEATVECTORS[6], FEATVECTORS[5]), tolerance);
