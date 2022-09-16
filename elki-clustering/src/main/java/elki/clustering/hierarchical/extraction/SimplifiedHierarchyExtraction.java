@@ -290,7 +290,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
       }
 
       DendrogramModel model;
-      if(members != null && !members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
+      if(!members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
         model = new PrototypeDendrogramModel(depth, ((ClusterPrototypeMergeHistory) merges).prototype(seq));
       }
       else {

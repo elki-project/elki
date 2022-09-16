@@ -322,7 +322,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
               cmap.put(i + n, cb);
             }
             else { // new height, need merge cluster
-              assert clb != null;
               cmap.put(i + n, clusters.size());
               if(!simplify) {
                 clusters.add(clu = makeCluster(i + n, DBIDUtil.EMPTYDBIDS));
@@ -374,7 +373,7 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
       }
 
       DendrogramModel model;
-      if(members != null && !members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
+      if(!members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
         model = new PrototypeDendrogramModel(depth, ((ClusterPrototypeMergeHistory) merges).prototype(seq));
       }
       else {
@@ -382,7 +381,6 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
       }
       return new Cluster<>(name, members, model);
     }
-
   }
 
   @Override
