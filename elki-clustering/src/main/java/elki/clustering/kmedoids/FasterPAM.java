@@ -132,17 +132,17 @@ public class FasterPAM<O> extends FastPAM<O> {
         LOG.statistics(new DoubleStatistic(KEY + ".iteration-" + 0 + ".cost", tc));
       }
 
-      IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("PAM iteration", LOG) : null;
       // Swap phase
+      IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("FasterPAM iteration", LOG) : null;
+      double[] cost = new double[k], pcost = new double[k];
+      // Compute costs of reassigning to the second closest medoid.
+      updatePriorCost(pcost);
       DBIDArrayIter m = medoids.iter();
       DBIDVar lastswap = DBIDUtil.newVar();
-      double[] cost = new double[k], pcost = new double[k];
       int iteration = 0, prevswaps = 0, swaps = 0;
       while(iteration < maxiter || maxiter <= 0) {
         ++iteration;
         LOG.incrementProcessed(prog);
-        // Compute costs of reassigning to the second closest medoid.
-        updatePriorCost(pcost);
         // Iterate over all non-medoids:
         for(DBIDIter h = ids.iter(); h.valid(); h.advance()) {
           // Check if we completed an entire round without swapping:
