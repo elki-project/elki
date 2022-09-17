@@ -169,6 +169,7 @@ public class FasterMSC<O> extends FastMSC<O> {
           if(l > sil) {
             medoids.set(b, j);
             sil = doSwap(medoids, b, j);
+            swaps++;
             if(LOG.isStatistics()) {
               LOG.statistics(new DoubleStatistic(key + ".swap-" + swaps + ".medoid-silhouette", sil));
             }
