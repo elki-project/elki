@@ -71,9 +71,7 @@ class DoubleIntegerDBIDHeap implements DoubleDBIDHeap {
     heap.replaceTopElement(distance, id.internalGetIndex());
   }
 
-  /**
-   * Pop the topmost element.
-   */
+  @Override
   public void poll() {
     heap.poll();
   }

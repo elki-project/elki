@@ -28,13 +28,6 @@ package elki.database.ids;
  */
 public interface DoubleDBIDListMIter extends DoubleDBIDListIter, DBIDArrayMIter {
   /**
-   * Update the current DBID value.
-   *
-   * @param ref Current value.
-   */
-  void setDBID(DBIDRef ref);
-
-  /**
    * Update the value at the current position.
    *
    * @param value New value

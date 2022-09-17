@@ -112,11 +112,6 @@ class DoubleIntegerDBIDKNNHeap extends DoubleIntegerDBIDHeap implements KNNHeap 
     return kdist;
   }
 
-  @Override
-  public double insert(double distance, DBIDRef id, int max) {
-    throw new UnsupportedOperationException("You cannot override the k of kNN heaps.");
-  }
-
   /**
    * Ensure the ties array has capacity for at least one more element.
    *
@@ -130,9 +125,7 @@ class DoubleIntegerDBIDKNNHeap extends DoubleIntegerDBIDHeap implements KNNHeap 
     ++numties;
   }
 
-  /**
-   * Pop the topmost element.
-   */
+  @Override
   public void poll() {
     if(numties > 0) {
       --numties;

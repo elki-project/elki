@@ -130,6 +130,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
    * @param indices Output of indexes
    * @param initialScale Initial scaling factor
    */
+  @Override
   protected void computePij(DBIDRange ids, KNNSearcher<DBIDRef> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
     Duration timer = LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin();
     final double logPerp = FastMath.log(perplexity);

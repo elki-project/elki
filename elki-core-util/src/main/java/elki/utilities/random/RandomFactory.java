@@ -22,6 +22,8 @@ package elki.utilities.random;
 
 import java.util.Random;
 
+import elki.logging.LoggingUtil;
+
 /**
  * RandomFactory is responsible for creating {@link Random} generator objects.
  * It does not provide individual random numbers, but will create a random
@@ -56,7 +58,13 @@ public class RandomFactory {
    */
   private static long getGlobalSeed() {
     String sseed = System.getProperty("elki.seed");
-    return (sseed != null) ? Long.parseLong(sseed) : System.nanoTime();
+    try {
+      return (sseed != null && sseed.length() > 0) ? Long.parseLong(sseed) : System.nanoTime();
+    }
+    catch(NumberFormatException e) {
+      LoggingUtil.warning("Failed to parse elki.seed environment variable containing '" + sseed + "', falling back to system time for seeding.");
+      return System.nanoTime();
+    }
   }
 
   /**

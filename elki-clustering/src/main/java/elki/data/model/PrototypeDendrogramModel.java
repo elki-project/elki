@@ -46,9 +46,7 @@ public class PrototypeDendrogramModel extends DendrogramModel implements Prototy
     this.prototype = prototype;
   }
 
-  /**
-   * @return prototype
-   */
+  @Override
   public DBID getPrototype() {
     return prototype;
   }

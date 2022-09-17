@@ -145,6 +145,7 @@ public class MWPTest implements MCDETest<MWPTest.MWPRanking> {
    *        correctedRanks() computed for reference dimension
    * @return p-value from two sided Mann-Whitney-U test
    */
+  @Override
   public double statisticalTest(int start, int width, boolean[] slice, MWPRanking corrected_ranks) {
     final int safeStart = getSafeCut(start, corrected_ranks.adjusted);
     final int len = corrected_ranks.index.length;
