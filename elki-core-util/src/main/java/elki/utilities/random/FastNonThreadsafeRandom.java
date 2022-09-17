@@ -70,7 +70,7 @@ public class FastNonThreadsafeRandom extends Random {
   }
 
   @Override
-  public void setSeed(long seed) {
+  public synchronized void setSeed(long seed) {
     this.seed = (seed ^ multiplier) & mask;
   }
 

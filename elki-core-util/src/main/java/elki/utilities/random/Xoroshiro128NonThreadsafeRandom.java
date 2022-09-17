@@ -76,7 +76,7 @@ public class Xoroshiro128NonThreadsafeRandom extends Random {
   }
 
   @Override
-  public void setSeed(long seed) {
+  public synchronized void setSeed(long seed) {
     long xor64 = seed != 0 ? seed : 4101842887655102017L;
     // XorShift64* generator to seed:
     xor64 ^= xor64 >>> 12; // a
