@@ -20,6 +20,8 @@
  */
 package elki.clustering.silhouette;
 
+import java.util.Arrays;
+
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
@@ -100,11 +102,101 @@ public class FasterMSC<O> extends FastMSC<O> {
 
   @Override
   protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
-    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    if(k == 2) { // optimized codepath for k=2
+      new Instance2(distQ, ids, assignment).run(medoids, maxiter);
+    }
+    else {
+      new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    }
   }
 
   /**
-   * FastMSC clustering instance for a particular data set.
+   * FasterMSC clustering instance for k=2, simplified.
+   *
+   * @author Erich Schubert
+   */
+  protected class Instance2 extends FastMSC<O>.Instance2 {
+    /**
+     * Constructor.
+     *
+     * @param distQ Distance query
+     * @param ids IDs to process
+     * @param assignment Cluster assignment
+     */
+    public Instance2(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment) {
+      super(distQ, ids, assignment);
+    }
+
+    /**
+     * Run the FasterMSC optimization phase.
+     *
+     * @param medoids Initial medoids list
+     * @param maxiter Maximum number of iterations
+     * @return final medoid Silhouette
+     */
+    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
+      final int k = medoids.size();
+      assert k == 2;
+      // Initial assignment to nearest medoids
+      double sil = assignToNearestCluster(medoids);
+      DBIDArrayIter m = medoids.iter();
+      String key = getClass().getName().replace("$Instance", "");
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(key + ".iteration-" + 0 + ".medoid-silhouette", sil));
+      }
+      double[] scratch = new double[k];
+
+      IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("FastMSC iteration", LOG) : null;
+      // Swap phase
+      DBIDVar lastswap = DBIDUtil.newVar();
+      int iteration = 0, prevswaps = 0, swaps = 0;
+      while(iteration < maxiter || maxiter <= 0) {
+        ++iteration;
+        LOG.incrementProcessed(prog);
+        // Iterate over all non-medoids:
+        for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
+          if(DBIDUtil.equal(j, lastswap)) {
+            break; // Entire pass without finding an improvement.
+          }
+          // Compare object to its own medoid.
+          if(DBIDUtil.equal(m.seek(assignment.intValue(j)), j)) {
+            continue; // This is a medoid.
+          }
+          Arrays.fill(scratch, 0);
+          findBestSwap(j, scratch);
+          int b = scratch[0] > scratch[1] ? 0 : 1;
+          double l = scratch[b];
+          if(l > sil) {
+            medoids.set(b, j);
+            sil = doSwap(medoids, b, j);
+            if(LOG.isStatistics()) {
+              LOG.statistics(new DoubleStatistic(key + ".swap-" + swaps + ".medoid-silhouette", sil));
+            }
+            lastswap.set(j);
+          }
+        }
+        if(LOG.isStatistics()) {
+          LOG.statistics(new LongStatistic(key + ".iteration-" + iteration + ".swaps", swaps - prevswaps));
+        }
+        if(prevswaps == swaps) {
+          break; // Converged
+        }
+        prevswaps = swaps;
+        if(LOG.isStatistics()) {
+          LOG.statistics(new DoubleStatistic(key + ".iteration-" + iteration + ".medoid-silhouette", sil));
+        }
+      }
+      LOG.setCompleted(prog);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new LongStatistic(key + ".iterations", iteration));
+        LOG.statistics(new DoubleStatistic(key + ".final-medoid-silhouette", sil));
+      }
+      return sil;
+    }
+  }
+
+  /**
+   * FasterMSC clustering instance for a particular data set.
    *
    * @author Erich Schubert
    */
@@ -131,7 +223,7 @@ public class FasterMSC<O> extends FastMSC<O> {
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
-      double sil = 1 - assignToNearestCluster(medoids) / ids.size();
+      double sil = assignToNearestCluster(medoids);
       DBIDArrayIter m = medoids.iter();
       String key = getClass().getName().replace("$Instance", "");
       if(LOG.isStatistics()) {
