@@ -322,13 +322,10 @@ public class ParameterTable extends JTable {
       Object val = table.getValueAt(row, column);
       if(val != null && val instanceof String) {
         String sval = (String) val;
-        if(sval.equals(DynamicParameters.STRING_OPTIONAL)) {
+        if(sval.equals(DynamicParameters.STRING_OPTIONAL) || sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
           sval = "";
         }
-        if(sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
-          sval = "";
-        }
-        if(sval != "") {
+        else if(sval.length() > 0) {
           comboBox.addItem(sval);
           comboBox.setSelectedIndex(0);
         }
@@ -340,7 +337,7 @@ public class ParameterTable extends JTable {
           if(!Flag.SET.equals(val)) {
             comboBox.addItem(Flag.SET);
           }
-          if(!Flag.NOT_SET.equals(val)) {
+          else if(!Flag.NOT_SET.equals(val)) {
             comboBox.addItem(Flag.NOT_SET);
           }
         }
@@ -561,7 +558,7 @@ public class ParameterTable extends JTable {
         return;
       }
       if(e.getSource() == popup) {
-        if(e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+        if(TreePopup.ACTION_CANCELED.equals(e.getActionCommand())) {
           popup.setVisible(false);
           textfield.requestFocus();
           return;
@@ -577,8 +574,7 @@ public class ParameterTable extends JTable {
                   || val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
                 val = "";
               }
-              val = val.isEmpty() ? newClass : val + ClassListParameter.LIST_SEP + newClass;
-              textfield.setText(val);
+              textfield.setText(val.isEmpty() ? newClass : val + ClassListParameter.LIST_SEP + newClass);
             }
             else {
               textfield.setText(newClass);

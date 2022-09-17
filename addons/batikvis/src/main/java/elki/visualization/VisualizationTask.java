@@ -69,7 +69,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
 
   /**
    * Update flags enum.
-   * 
+   * <p>
    * TODO: can these be replaced by listeners?
    *
    * @author Erich Schubert
@@ -101,7 +101,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
 
   /**
    * Meta data key: Level for visualizer ordering
-   *
+   * <p>
    * Returns an integer indicating the "height" of this Visualizer. It is
    * intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
@@ -270,7 +270,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
 
   /**
    * Flag as tool visualizer.
-   * 
+   * <p>
    * TODO: don't use a separate boolean for this, but e.g. interface?
    * 
    * @param t Tool flag
@@ -372,24 +372,19 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
       return this.level - other.level;
     }
     // sort by name otherwise.
-    String name1 = this.getMenuName();
-    String name2 = other.getMenuName();
-    if(name1 != null && name2 != null && name1 != name2) {
-      return name1.compareTo(name2);
-    }
-    return 0;
+    String name1 = this.getMenuName(), name2 = other.getMenuName();
+    return (name1 != null && name2 != null && name1 != name2) ? name1.compareTo(name2) : 0;
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
+    StringBuilder buf = new StringBuilder(200) //
+        .append("VisTask: ").append(factory.getClass().getName()).append(' ');
     Metadata m = result != null ? Metadata.get(result) : null;
     if(m != null) {
       buf.append("Result: ").append(m.getLongName()).append(' ');
     }
-    buf.append(super.toString());
-    return buf.toString();
+    return buf.append(super.toString()).toString();
   }
 
   @Override
@@ -401,6 +396,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   @Override
   public boolean equals(Object o) {
     // Also don't inherit equals based on list contents!
-    return (this == o);
+    return this == o;
   }
 }

@@ -110,8 +110,6 @@ public class HierarchicalClassLabel extends ClassLabel {
    * first. Names at a lower level are compared only if their parent-names are
    * equal. Names at a level are tried to be compared as integer values. If this
    * does not succeed, both names are compared as Strings.
-   * 
-   * {@inheritDoc}
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
@@ -157,8 +155,6 @@ public class HierarchicalClassLabel extends ClassLabel {
   /**
    * Returns a String representation of this HierarchicalClassLabel using
    * {@link #separatorString separatorString} to separate levels.
-   * 
-   * {@inheritDoc}
    */
   @Override
   public String toString() {
