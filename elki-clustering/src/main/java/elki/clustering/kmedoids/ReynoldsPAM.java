@@ -111,6 +111,7 @@ public class ReynoldsPAM<V> extends PAM<V> {
      * @param maxiter
      * @return final cost
      */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids

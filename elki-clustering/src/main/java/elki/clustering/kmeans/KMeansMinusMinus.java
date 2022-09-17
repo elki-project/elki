@@ -216,6 +216,7 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
      *
      * @return the number of reassigned objects
      */
+    @Override
     protected int assignToNearestCluster() {
       assert (k == means.length);
       int changed = 0;

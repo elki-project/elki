@@ -179,11 +179,7 @@ public class MedoidLinkage<O> implements HierarchicalClusteringAlgorithm {
       return (ClusterPrototypeMergeHistory) builder.complete();
     }
 
-    /**
-     * Perform the next merge step.
-     * 
-     * @return x, for shrinking the working set.
-     */
+    @Override
     protected int findMerge() {
       final double[] distances = mat.matrix;
       double mindist = Double.POSITIVE_INFINITY;

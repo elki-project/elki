@@ -75,6 +75,14 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
    */
   private static final Logging LOG = Logging.getLogger(FastMSC.class);
 
+  /**
+   * Constructor.
+   *
+   * @param distance Distance function
+   * @param k Number of cluster
+   * @param maxiter Maximum number of iterations
+   * @param initializer Initialization
+   */
   public FastMSC(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     super(distance, k, maxiter, initializer);
   }

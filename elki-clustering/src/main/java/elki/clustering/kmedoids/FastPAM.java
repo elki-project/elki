@@ -156,6 +156,7 @@ public class FastPAM<V> extends FastPAM1<V> {
      * @param maxiter
      * @return final cost
      */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
@@ -265,6 +266,7 @@ public class FastPAM<V> extends FastPAM1<V> {
      * @param mnum Medoid number to be replaced
      * @return cost
      */
+    @Override
     protected double computeReassignmentCost(DBIDRef h, int mnum) {
       double cost = 0.;
       // Compute costs of reassigning other objects j:

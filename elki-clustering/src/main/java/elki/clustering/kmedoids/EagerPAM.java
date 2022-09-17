@@ -102,6 +102,7 @@ public class EagerPAM<O> extends PAM<O> {
    * @param medoids Current medoids
    * @param assignment Cluster assignment output
    */
+  @Override
   protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
   }
@@ -134,6 +135,7 @@ public class EagerPAM<O> extends PAM<O> {
      * @param maxiter
      * @return final cost
      */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
@@ -210,6 +212,7 @@ public class EagerPAM<O> extends PAM<O> {
   /**
    * Get the static class logger.
    */
+  @Override
   protected Logging getLogger() {
     return LOG;
   }

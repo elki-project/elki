@@ -164,6 +164,7 @@ public class SphericalElkanKMeans<V extends NumberVector> extends SphericalSimpl
      * @param csim Output array of similarity
      * @param ccsim Output square root of Center-to-Center similarities
      */
+    @Override
     protected void recomputeSeperation(double[] csim, double[][] ccsim) {
       final int k = means.length;
       assert csim.length == k;

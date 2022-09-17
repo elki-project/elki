@@ -116,11 +116,7 @@ public class AFKMC2 extends KMC2 {
       }
     }
 
-    /**
-     * Class logger.
-     * 
-     * @return Logger
-     */
+    @Override
     protected Logging getLogger() {
       return LOG;
     }

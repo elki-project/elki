@@ -259,6 +259,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
      * @param sums Input sums
      * @param prev Previous means (to handle empty clusters)
      */
+    @Override
     protected void meansFromSums(double[][] dst, double[][] sums, double[][] prev) {
       for(int i = 0; i < dst.length; i++) {
         final double w = VMath.euclideanLength(sums[i]);

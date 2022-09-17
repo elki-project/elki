@@ -186,6 +186,7 @@ public class Anderberg<O> extends AGNES<O> {
      *
      * @return x, for shrinking the working set.
      */
+    @Override
     protected int findMerge() {
       double mindist = Double.POSITIVE_INFINITY;
       int x = -1, y = -1;
@@ -207,13 +208,7 @@ public class Anderberg<O> extends AGNES<O> {
       return x;
     }
 
-    /**
-     * Execute the cluster merge.
-     *
-     * @param mindist Distance that was used for merging
-     * @param x First matrix position
-     * @param y Second matrix position
-     */
+    @Override
     protected void merge(double mindist, int x, int y) {
       assert y < x;
       final int xx = mat.clustermap[x], yy = mat.clustermap[y];
@@ -229,15 +224,7 @@ public class Anderberg<O> extends AGNES<O> {
       }
     }
 
-    /**
-     * Update the scratch distance matrix.
-     *
-     * @param mindist Distance that was used for merging
-     * @param x First matrix position
-     * @param y Second matrix position
-     * @param sizex Old size of first cluster, with {@code x > y}
-     * @param sizey Old size of second cluster, with {@code y > x}
-     */
+    @Override
     protected void updateMatrix(double mindist, int x, int y, int sizex, int sizey) {
       final int xbase = ClusterDistanceMatrix.triangleSize(x);
       final int ybase = ClusterDistanceMatrix.triangleSize(y);

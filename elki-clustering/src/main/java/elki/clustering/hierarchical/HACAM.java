@@ -212,11 +212,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       return (ClusterPrototypeMergeHistory) builder.complete();
     }
 
-    /**
-     * Perform the next merge step.
-     * 
-     * @return x, for shrinking the active set.
-     */
+    @Override
     protected int findMerge() {
       double mindist = Double.POSITIVE_INFINITY;
       int x = -1, y = -1;
