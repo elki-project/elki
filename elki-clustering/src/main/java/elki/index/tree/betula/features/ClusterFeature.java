@@ -49,13 +49,6 @@ public interface ClusterFeature extends AsClusterFeature, NumberVector {
   void resetStatistics();
 
   /**
-   * Returns the number of dimensions
-   * 
-   * @return dimensionality
-   */
-  int getDimensionality();
-
-  /**
    * Return the weight
    * 
    * @return weight of CF

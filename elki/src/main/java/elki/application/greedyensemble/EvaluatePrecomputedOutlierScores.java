@@ -251,7 +251,13 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     double adjdcg = (ndcg - endcg) / (1 - endcg);
     final int p = label.lastIndexOf('-');
     String prefix = label.substring(0, p);
-    int k = Integer.valueOf(label.substring(p + 1));
+    int k = 0;
+    try {
+      k = Integer.valueOf(label.substring(p + 1));
+    }
+    catch(NumberFormatException e) {
+      LOG.error("Expected a number in label '" + label + "'");
+    }
     // Write CSV
     if(name != null) {
       fout.append('"').append(name).append("\",");

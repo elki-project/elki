@@ -55,6 +55,7 @@ public interface KNNHeap extends DoubleDBIDHeap {
    * @param id ID number
    * @return Distance to the element at the top of the heap
    */
+  @Override
   double insert(double distance, DBIDRef id);
 
   /**
@@ -63,7 +64,9 @@ public interface KNNHeap extends DoubleDBIDHeap {
    * @throws UnsupportedOperationException
    */
   @Deprecated
-  double insert(double distance, DBIDRef id, int max);
+  default double insert(double distance, DBIDRef id, int max) {
+    throw new UnsupportedOperationException("You cannot override the k of kNN heaps.");
+  }
 
   /**
    * Get the K parameter ("maxsize" internally).

@@ -388,6 +388,7 @@ public class OnDiskArray implements AutoCloseable {
    * 
    * @throws IOException on IO errors
    */
+  @Override
   public synchronized void close() throws IOException {
     writable = false;
     if(map != null) {

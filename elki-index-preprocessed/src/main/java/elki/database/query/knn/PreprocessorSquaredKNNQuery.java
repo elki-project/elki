@@ -59,6 +59,7 @@ public class PreprocessorSquaredKNNQuery extends PreprocessorKNNQuery {
    * 
    * @return Class logger.
    */
+  @Override
   protected Logging getLogger() {
     return LOG;
   }

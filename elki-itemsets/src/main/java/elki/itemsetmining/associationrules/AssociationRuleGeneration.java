@@ -134,6 +134,7 @@ public class AssociationRuleGeneration implements Algorithm {
    * @param database Database
    * @return Association rules
    */
+  @Override
   public AssociationRuleResult autorun(Database database) {
     // Run frequent itemset mining
     return new Instance().run(frequentItemAlgo.autorun(database));
