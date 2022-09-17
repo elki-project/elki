@@ -150,9 +150,7 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
     }
   }
 
-  /**
-   * Get the static class logger.
-   */
+  @Override
   protected Logging getLogger() {
     return LOG;
   }

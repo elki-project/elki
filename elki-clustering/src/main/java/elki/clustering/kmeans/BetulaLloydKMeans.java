@@ -124,6 +124,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
    * @param relation Input data
    * @return Clustering
    */
+  @Override
   public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
     ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();

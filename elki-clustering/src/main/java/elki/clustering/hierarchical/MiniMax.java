@@ -191,11 +191,7 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
       return (ClusterPrototypeMergeHistory) builder.complete();
     }
 
-    /**
-     * Find the best merge.
-     * 
-     * @return x, for shrinking the working set.
-     */
+    @Override
     protected int findMerge() {
       final double[] distances = mat.matrix;
       double mindist = Double.POSITIVE_INFINITY;

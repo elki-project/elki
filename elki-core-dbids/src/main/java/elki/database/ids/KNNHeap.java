@@ -64,6 +64,7 @@ public interface KNNHeap extends DoubleDBIDHeap {
    * @throws UnsupportedOperationException
    */
   @Deprecated
+  @Override
   default double insert(double distance, DBIDRef id, int max) {
     throw new UnsupportedOperationException("You cannot override the k of kNN heaps.");
   }

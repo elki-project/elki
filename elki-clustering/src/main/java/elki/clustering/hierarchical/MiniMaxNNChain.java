@@ -89,6 +89,7 @@ public class MiniMaxNNChain<O> extends MiniMax<O> {
    * @param relation Data relation
    * @return Clustering result
    */
+  @Override
   public ClusterPrototypeMergeHistory run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());

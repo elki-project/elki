@@ -73,12 +73,20 @@ public class FasterMSC<O> extends FastMSC<O> {
    */
   private static final Logging LOG = Logging.getLogger(FasterMSC.class);
 
+  /**
+   * Constructor.
+   *
+   * @param distance Distance function
+   * @param k Number of cluster
+   * @param maxiter Maximum number of iterations
+   * @param initializer Initialization
+   */
   public FasterMSC(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     super(distance, k, maxiter, initializer);
   }
 
   /**
-   * Run FastMSC
+   * Run FasterMSC
    *
    * @param relation relation to use
    * @return result
@@ -119,6 +127,7 @@ public class FasterMSC<O> extends FastMSC<O> {
      * @param maxiter Maximum number of iterations
      * @return final medoid Silhouette
      */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids

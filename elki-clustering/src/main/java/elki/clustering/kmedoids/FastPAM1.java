@@ -111,12 +111,13 @@ public class FastPAM1<V> extends PAM<V> {
     }
 
     /**
-     * Run the PAM optimization phase.
+     * Run the FastPAM optimization phase.
      *
      * @param medoids Medoids list
      * @param maxiter
      * @return cost
      */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
@@ -204,6 +205,7 @@ public class FastPAM1<V> extends PAM<V> {
      * @param means Object centroids
      * @return Assignment cost
      */
+    @Override
     protected double assignToNearestCluster(ArrayDBIDs means) {
       DBIDArrayIter miter = means.iter();
       double cost = 0.;
