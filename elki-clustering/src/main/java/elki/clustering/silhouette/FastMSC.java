@@ -198,7 +198,7 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
 
       IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("FastMSC iteration", LOG) : null;
       // Swap phase
-      DBIDVar bestid = DBIDUtil.newVar(), lastswap = DBIDUtil.newVar();
+      DBIDVar bestid = DBIDUtil.newVar();
       int iteration = 0;
       while(iteration < maxiter || maxiter <= 0) {
         ++iteration;
@@ -208,9 +208,6 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
         int bestcluster = -1;
         // Iterate over all non-medoids:
         for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
-          if(DBIDUtil.equal(j, lastswap)) {
-            break; // Entire pass without finding an improvement.
-          }
           // Compare object to its own medoid.
           if(DBIDUtil.equal(m.seek(assignment.get(j).m1), j)) {
             continue; // This is a medoid.
@@ -235,7 +232,6 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
           LOG.statistics(new DoubleStatistic(key + ".iteration-" + iteration + ".medoid-silhouette", sil));
         }
         updateRemovalLoss(losses);
-        lastswap.set(bestid);
       }
       LOG.setCompleted(prog);
       if(LOG.isStatistics()) {

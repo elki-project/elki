@@ -89,4 +89,19 @@ public class FasterMSCTest extends AbstractClusterAlgorithmTest {
         .evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, EuclideanDistance.STATIC), result);
     assertEquals("Silhouette not as expected", 0.7664603331156499, sil, 1e-15);
   }
+
+  @Test
+  public void testFasterMSCKFour() {
+    Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
+    Clustering<MedoidModel> result = new ELKIBuilder<FasterMSC<NumberVector>>(FasterMSC.class) //
+        .with(KMeans.INIT_ID, FirstK.class) //
+        .with(KMeans.K_ID, 4) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.923322767);
+    assertClusterSizes(result, new int[] { 5, 56, 111, 158 });
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    double sil = new Silhouette<NumberVector>(EuclideanDistance.STATIC, false) //
+        .evaluateClustering(rel, new PrimitiveDistanceQuery<>(rel, EuclideanDistance.STATIC), result);
+    assertEquals("Silhouette not as expected", 0.8473403086724154, sil, 1e-15);
+  }
 }
