@@ -157,7 +157,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
       return;
     }
     if(e.getSource() == popup) {
-      if(e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+      if(TreePopup.ACTION_CANCELED.equals(e.getActionCommand())) {
         popup.setVisible(false);
         textfield.requestFocus();
         return;

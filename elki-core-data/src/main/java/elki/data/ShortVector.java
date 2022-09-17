@@ -91,11 +91,8 @@ public class ShortVector implements NumberVector {
    * 
    * @param dimension the selected attribute. Attributes are counted starting
    *        with 0.
-   * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
-   * 
-   *         {@inheritDoc}
    */
   @Override
   @Deprecated

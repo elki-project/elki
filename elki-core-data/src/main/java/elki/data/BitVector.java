@@ -288,8 +288,6 @@ public class BitVector implements SparseNumberVector {
    * suitable to be parsed by
    * {@link elki.datasource.parser.BitVectorLabelParser
    * BitVectorLabelParser}.
-   *
-   * {@inheritDoc}
    */
   @Override
   public String toString() {
@@ -307,8 +305,6 @@ public class BitVector implements SparseNumberVector {
    * Indicates whether some other object is "equal to" this BitVector. This
    * BitVector is equal to the given object, if the object is a BitVector of
    * same dimensionality and with identical bits set.
-   *
-   * {@inheritDoc}
    */
   @Override
   public boolean equals(Object obj) {

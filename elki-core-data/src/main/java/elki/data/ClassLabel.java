@@ -61,16 +61,12 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    * Any ClassLabel requires a method to represent the label as a String. If
    * <code>ClassLabel a.equals((ClassLabel) b)</code>, then also
    * <code>a.toString().equals(b.toString())</code> should hold.
-   * 
-   * {@inheritDoc}
    */
   @Override
   public abstract String toString();
 
   /**
    * Returns the hashCode of the String-representation of this ClassLabel.
-   * 
-   * {@inheritDoc}
    */
   @Override
   public int hashCode() {

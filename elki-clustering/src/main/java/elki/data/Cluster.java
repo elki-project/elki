@@ -275,10 +275,8 @@ public class Cluster<M extends Model> implements TextWriteable {
    */
   public static final Comparator<Cluster<?>> BY_NAME_SORTER = (o1, o2) -> //
   o1 == o2 ? 0 : o1 == null ? +1 : o2 == null ? -1 : //
-  // sort by label if possible
-      o1.name != o2.name ? (o1.name == null ? +1 : o2.name == null ? -1 : o1.name.compareTo(o2.name)) : 0;
+      o1.name == o2.name ? 0 : (o1.name == null ? +1 : o2.name == null ? -1 : o1.name.compareTo(o2.name));
 
-  /** {@inheritDoc} */
   @Override
   public String toString() {
     return "Cluster(name=" + getName() + ",size=" + size() + ",model=" //

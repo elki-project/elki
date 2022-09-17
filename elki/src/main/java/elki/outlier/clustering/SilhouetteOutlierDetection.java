@@ -131,7 +131,7 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
     // Find the silhouette scores:
     It<DoubleRelation> it = Metadata.hierarchyOf(c).iterDescendants() //
         .filter(DoubleRelation.class) //
-        .filter(x -> x.getLongName() == Silhouette.SILHOUETTE_NAME);
+        .filter(x -> Silhouette.SILHOUETTE_NAME.equals(x.getLongName()));
     if(!it.valid()) {
       throw new NullPointerException("Silhouette did not produce Silhouette scores.");
     }

@@ -68,9 +68,10 @@ public class IntegerVector implements NumberVector {
    * @param nocopy Flag to use without copying.
    */
   private IntegerVector(int[] values, boolean nocopy) {
-    if (nocopy) {
+    if(nocopy) {
       this.values = values;
-    } else {
+    }
+    else {
       this.values = new int[values.length];
       System.arraycopy(values, 0, this.values, 0, values.length);
     }
@@ -95,11 +96,8 @@ public class IntegerVector implements NumberVector {
    * 
    * @param dimension the selected attribute. Attributes are counted starting
    *        with 0.
-   * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
-   * 
-   *         {@inheritDoc}
    */
   @Override
   @Deprecated
@@ -125,7 +123,7 @@ public class IntegerVector implements NumberVector {
   @Override
   public double[] toArray() {
     double[] data = new double[values.length];
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       data[i] = values[i];
     }
     return data;
@@ -134,9 +132,9 @@ public class IntegerVector implements NumberVector {
   @Override
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
-    for (int i = 0; i < values.length; i++) {
+    for(int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if (i + 1 < values.length) {
+      if(i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -155,7 +153,7 @@ public class IntegerVector implements NumberVector {
     public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
       int[] values = new int[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.get(array, i).intValue();
       }
       return new IntegerVector(values, true);
@@ -165,7 +163,7 @@ public class IntegerVector implements NumberVector {
     public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       int[] values = new int[dim];
-      for (int i = 0; i < dim; i++) {
+      for(int i = 0; i < dim; i++) {
         values[i] = adapter.getInteger(array, i);
       }
       return new IntegerVector(values, true);
@@ -208,7 +206,7 @@ public class IntegerVector implements NumberVector {
       final byte dimensionality = buffer.get();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
       final int[] values = new int[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getInt();
       }
       return new IntegerVector(values, true);
@@ -219,7 +217,7 @@ public class IntegerVector implements NumberVector {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * vec.values.length);
       buffer.put((byte) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putInt(vec.values[i]);
       }
     }
@@ -246,7 +244,7 @@ public class IntegerVector implements NumberVector {
       final short dimensionality = buffer.getShort();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
       final int[] values = new int[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getInt();
       }
       return new IntegerVector(values, true);
@@ -257,7 +255,7 @@ public class IntegerVector implements NumberVector {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * vec.values.length);
       buffer.putShort((short) vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         buffer.putInt(vec.values[i]);
       }
     }
@@ -282,7 +280,7 @@ public class IntegerVector implements NumberVector {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
       final int[] values = new int[dimensionality];
-      for (int i = 0; i < dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         values[i] = ByteArrayUtil.readSignedVarint(buffer);
       }
       return new IntegerVector(values, true);
@@ -292,7 +290,7 @@ public class IntegerVector implements NumberVector {
     public void toByteBuffer(ByteBuffer buffer, IntegerVector vec) throws IOException {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         ByteArrayUtil.writeSignedVarint(buffer, vec.values[i]);
       }
     }
@@ -301,7 +299,7 @@ public class IntegerVector implements NumberVector {
     public int getByteSize(IntegerVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       int len = ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
-      for (int i = 0; i < vec.values.length; i++) {
+      for(int i = 0; i < vec.values.length; i++) {
         len += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
       }
       return len;
