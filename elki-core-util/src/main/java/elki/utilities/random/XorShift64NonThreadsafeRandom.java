@@ -76,7 +76,7 @@ public class XorShift64NonThreadsafeRandom extends Random {
   }
 
   @Override
-  public void setSeed(long seed) {
+  public synchronized void setSeed(long seed) {
     x = seed != 0L ? seed : 4101842887655102017L;
   }
 
