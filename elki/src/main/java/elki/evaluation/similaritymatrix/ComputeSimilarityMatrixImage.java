@@ -24,17 +24,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import elki.Algorithm;
 import elki.database.Database;
-import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -49,8 +46,8 @@ import elki.result.OrderingResult;
 import elki.result.PixmapResult;
 import elki.result.ResultUtil;
 import elki.result.outlier.OutlierResult;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -267,7 +264,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     public File getAsFile() {
       if(imgfile == null) {
         try {
-          imgfile = File.createTempFile(IMGFILEPREFIX, ".png");
+          imgfile = Files.createTempFile(IMGFILEPREFIX, ".png").toFile();
           imgfile.deleteOnExit();
           ImageIO.write(img, "PNG", imgfile);
         }
