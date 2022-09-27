@@ -68,7 +68,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
     booktitle = "Information Systems", //
     url = "https://doi.org/10.1016/j.is.2021.101918", //
-    bibkey = "DBLP:journals/is/LangS21")
+    bibkey = "DBLP:journals/is/LangS22")
 public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel> {
   /**
    * Class logger.

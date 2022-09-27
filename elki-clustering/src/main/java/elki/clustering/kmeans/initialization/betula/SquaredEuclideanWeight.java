@@ -39,7 +39,7 @@ import elki.utilities.documentation.Reference;
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
     booktitle = "Information Systems", //
     url = "https://doi.org/10.1016/j.is.2021.101918", //
-    bibkey = "DBLP:journals/is/LangS21")
+    bibkey = "DBLP:journals/is/LangS22")
 public class SquaredEuclideanWeight implements CFInitWeight {
   @Override
   public double squaredWeight(ClusterFeature c1, ClusterFeature c2) {
