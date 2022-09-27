@@ -57,7 +57,7 @@ public class DocumentReferences {
 
   private static final String DBLPPREFIX = "DBLP:";
 
-  private static final String DBLPURL = "https://dblp.uni-trier.de/rec/bibtex/";
+  private static final String DBLPURL = "https://dblp.org/rec/bibtex/";
 
   /**
    * Logger
@@ -118,7 +118,7 @@ public class DocumentReferences {
     void writeReference(Reference ref);
 
     default String nameFor(Class<?> cls) {
-      return cls.getName().replace('$', '.');
+      return cls.getName().split("\\$", 2)[0];
     }
 
     default String linkFor(Class<?> cls) {
@@ -203,7 +203,7 @@ public class DocumentReferences {
       Element classa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
       classa.setAttribute(HTMLUtil.HTML_ID_ATTRIBUTE, nameFor(cls));
       classa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkFor(cls));
-      classa.setTextContent(cls.getName());
+      classa.setTextContent(nameFor(cls));
       classdt.appendChild(classa);
     }
 
@@ -441,7 +441,7 @@ public class DocumentReferences {
     public int compare(Object o1, Object o2) {
       String n1 = (o1 instanceof Class) ? ((Class<?>) o1).getName() : ((Package) o1).getName();
       String n2 = (o2 instanceof Class) ? ((Class<?>) o2).getName() : ((Package) o2).getName();
-      return n1.compareTo(n2);
+      return n1.compareToIgnoreCase(n2);
     }
   };
 
@@ -470,8 +470,7 @@ public class DocumentReferences {
       return (s1 == s2) ? 0 //
           : (s1 == null) ? -1 //
               : (s2 == null) ? +1 //
-                  : s1.compareTo(s2);
+                  : s1.compareToIgnoreCase(s2);
     }
   };
-
 }
