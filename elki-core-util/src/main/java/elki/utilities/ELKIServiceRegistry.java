@@ -277,8 +277,8 @@ public class ELKIServiceRegistry {
       return findAllImplementations(restrictionClass);
     }
     // This codepath is used by utility classes to also find buggy
-    // implementations (e.g. non-instantiable, abstract) of the interfaces.
-    List<Class<?>> known = findAllImplementations(restrictionClass);
+    // implementations (e.g., non-instantiable, abstract) of the interfaces.
+    List<Class<?>> known = new ArrayList<>(findAllImplementations(restrictionClass));
     // For quickly skipping seen entries:
     HashSet<Class<?>> dupes = new HashSet<>(known);
     for(Iterator<Class<?>> iter = ELKIServiceScanner.nonindexedClasses(); iter.hasNext();) {

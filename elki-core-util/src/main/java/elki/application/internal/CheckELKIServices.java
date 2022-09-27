@@ -20,15 +20,15 @@
  */
 package elki.application.internal;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -43,8 +43,8 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
 
 /**
- * Helper application to test the ELKI properties file for "missing"
- * implementations.
+ * Helper application to test the ELKI service properties files for missing
+ * implementation entries, for listing available implementations in the UIs.
  *
  * @author Erich Schubert
  * @since 0.2
@@ -86,48 +86,58 @@ public class CheckELKIServices {
    */
   public void checkServices(String update) {
     TreeSet<String> props = new TreeSet<>();
-    Enumeration<URL> us;
     try {
-      us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX);
-    }
-    catch(IOException e) {
-      throw new AbortException("Error enumerating service folders.", e);
-    }
-    while(us.hasMoreElements()) {
-      URL u = us.nextElement();
-      try {
-        if(("jar".equals(u.getProtocol()))) {
-          JarURLConnection con = (JarURLConnection) u.openConnection();
-          try (JarFile jar = con.getJarFile()) {
-            Enumeration<JarEntry> entries = jar.entries();
-            while(entries.hasMoreElements()) {
-              String prop = entries.nextElement().getName();
-              if(prop.contains("..")) {
-                LOG.warning("Jar file contains illegal file name: " + prop);
-              }
-              else if(prop.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
-                props.add(prop.substring(ELKIServiceLoader.RESOURCE_PREFIX.length()));
-              }
-              else if(prop.startsWith(ELKIServiceLoader.FILENAME_PREFIX)) {
-                props.add(prop.substring(ELKIServiceLoader.FILENAME_PREFIX.length()));
-              }
-            }
-          }
-          continue;
-        }
+      // This only lists file resources:
+      Enumeration<URL> us = getClass().getClassLoader().getResources(ELKIServiceLoader.RESOURCE_PREFIX);
+      while(us.hasMoreElements()) {
+        URL u = us.nextElement();
         if("file".equals(u.getProtocol())) {
           props.addAll(Arrays.asList(new File(u.toURI()).list()));
         }
       }
-      catch(IOException | URISyntaxException e) {
-        throw new AbortException("Error enumerating service folders.", e);
+      // Find jars on the class path:
+      String classpath = System.getProperty("java.class.path");
+      for(String cp : classpath.split(File.pathSeparator)) {
+        try {
+          Path jp = Paths.get(cp).normalize();
+          if(Files.isDirectory(jp)) {
+            continue; // Supposedly processed above
+          }
+          if(!Files.exists(jp) || !Files.isReadable(jp)) {
+            if(!cp.contains("/bin/default")) { // eclipse weirdness
+              LOG.warning("Path does not exist, or is not readable: " + cp);
+            }
+            continue;
+          }
+          try (JarFile jar = new JarFile(jp.toFile())) {
+            Enumeration<JarEntry> entries = jar.entries();
+            while(entries.hasMoreElements()) {
+              Path ep = Paths.get(entries.nextElement().getName()).normalize();
+              if(ep.startsWith("..")) {
+                LOG.warning("Jar file contains illegal path: " + ep);
+              }
+              else if(ep.startsWith(ELKIServiceLoader.RESOURCE_PREFIX)) {
+                props.add(Paths.get(ELKIServiceLoader.RESOURCE_PREFIX).relativize(ep).toString());
+              }
+              else if(ep.startsWith(ELKIServiceLoader.FILENAME_PREFIX)) {
+                props.add(Paths.get(ELKIServiceLoader.FILENAME_PREFIX).relativize(ep).toString());
+              }
+            }
+          }
+          catch(IOException e) {
+            LOG.warning("Error reading " + jp + ": " + e.getMessage(), e);
+          }
+        }
+        catch(Exception e) {
+          LOG.warning("Could not process class path entry " + cp + ": " + e.getMessage(), e);
+        }
       }
-
+    }
+    catch(IOException | URISyntaxException e) {
+      throw new AbortException("Error enumerating service folders.", e);
     }
     for(String prop : props) {
-      if(LOG.isVerbose()) {
-        LOG.verbose("Checking property: " + prop);
-      }
+      LOG.verbose("Checking property: " + prop);
       checkService(prop, update);
     }
   }
@@ -161,6 +171,19 @@ public class CheckELKIServices {
       while(us.hasMoreElements()) {
         URL u = us.nextElement();
         boolean injar = "jar".equals(u.getProtocol());
+        if(injar) {
+          // Ensure the jar is open:
+          for(FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+            if(provider.getScheme().equalsIgnoreCase("jar")) {
+              try {
+                provider.getFileSystem(u.toURI());
+              }
+              catch(FileSystemNotFoundException e) {
+                provider.newFileSystem(u.toURI(), Collections.emptyMap());
+              }
+            }
+          }
+        }
         try (BufferedReader r = Files.newBufferedReader(Paths.get(u.toURI()))) {
           for(String line; (line = r.readLine()) != null;) {
             m.reset(line);
@@ -189,7 +212,7 @@ public class CheckELKIServices {
       // TODO: sort by package, then classname
       Collections.sort(sorted);
       if(update == null) {
-        StringBuilder message = new StringBuilder().append("Class ").append(prop)//
+        StringBuilder message = new StringBuilder().append("Class ").append(prop) //
             .append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
           message.append(remaining).append(FormatUtil.NEWLINE);
@@ -225,7 +248,7 @@ public class CheckELKIServices {
    *
    * @param parent Parent class
    * @param classname Class name
-   * @param parts Splitted sevice line
+   * @param parts Splitted service line
    */
   @SuppressWarnings("unchecked")
   private void checkAliases(Class<?> parent, String classname, String[] parts) {
