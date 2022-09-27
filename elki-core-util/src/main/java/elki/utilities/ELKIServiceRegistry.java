@@ -342,7 +342,7 @@ public class ELKIServiceRegistry {
     }
 
     if(!restrictionClass.isAssignableFrom(clazz)) {
-      LOG.warning("Invalid entry in service file for class " + restrictionClass.getName() + ": " + value);
+      LOG.warning("Cannot load " + value + " as it does not implement " + restrictionClass.getName());
       clazz = FAILED_LOAD;
     }
     if(e != null) {
