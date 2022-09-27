@@ -45,7 +45,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * D. M. Endres, J. E. Schindelin<br>
  * A new metric for probability distributions<br>
- * IEEE Transactions on Information Theory, 49(7)
+ * IEEE Transactions on Information Theory 49(7)
  *
  * @author Erich Schubert
  * @since 0.7.5
@@ -59,7 +59,7 @@ import elki.utilities.optionhandling.Parameterizer;
     bibkey = "DBLP:conf/iccv/PuzichaRTB99")
 @Reference(authors = "D. M. Endres, J. E. Schindelin", //
     title = "A new metric for probability distributions", //
-    booktitle = "IEEE Transactions on Information Theory, 49(7)", //
+    booktitle = "IEEE Transactions on Information Theory 49(7)", //
     url = "https://doi.org/10.1109/TIT.2003.813506", //
     bibkey = "DBLP:journals/tit/EndresS03")
 public class ChiDistance extends ChiSquaredDistance {

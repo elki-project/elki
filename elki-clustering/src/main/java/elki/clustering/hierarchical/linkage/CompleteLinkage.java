@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * A method of establishing groups of equal amplitude in plant sociology based
  * on similarity of species and its application to analyses of the vegetation on
  * Danish commons<br>
- * Biologiske Skrifter 5 (4)
+ * Kongelige Danske Videnskabernes Selskab, Biologiske Skrifter 5(4)
  * <p>
  * P. Macnaughton-Smith<br>
  * Some statistical and other numerical techniques for classifying
@@ -78,7 +78,7 @@ import elki.utilities.optionhandling.Parameterizer;
 @Priority(Priority.IMPORTANT)
 @Reference(authors = "T. Sørensen", //
     title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
-    booktitle = "Biologiske Skrifter 5 (4)", //
+    booktitle = "Kongelige Danske Videnskabernes Selskab, Biologiske Skrifter 5(4)", //
     bibkey = "journals/misc/Sorensen48")
 @Reference(authors = "P. Macnaughton-Smith", //
     title = "Some statistical and other numerical techniques for classifying individuals", //

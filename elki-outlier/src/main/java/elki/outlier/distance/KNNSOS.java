@@ -69,7 +69,7 @@ import net.jafama.FastMath;
  * Erich Schubert, Michael Gertz<br>
  * Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier
  * Detection: A Remedy Against the Curse of Dimensionality?<br>
- * Proc. Int. Conf. Similarity Search and Applications, SISAP'2017
+ * Proc. Int. Conf. Similarity Search and Applications, SISAP 2017
  * <p>
  * Original reference:
  * <p>
@@ -85,7 +85,7 @@ import net.jafama.FastMath;
 @Title("KNNSOS: k-Nearest-Neighbor Stochastic Outlier Selection")
 @Reference(authors = "Erich Schubert, Michael Gertz", //
     title = "Intrinsic t-Stochastic Neighbor Embedding for Visualization and Outlier Detection: A Remedy Against the Curse of Dimensionality?", //
-    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP'2017", //
+    booktitle = "Proc. Int. Conf. Similarity Search and Applications, SISAP 2017", //
     url = "https://doi.org/10.1007/978-3-319-68474-1_13", //
     bibkey = "DBLP:conf/sisap/SchubertG17")
 @Reference(authors = "J. Janssens, F. Huszár, E. Postma, J. van den Herik", //

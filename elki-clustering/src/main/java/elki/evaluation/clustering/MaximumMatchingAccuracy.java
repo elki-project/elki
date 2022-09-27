@@ -37,9 +37,9 @@ import elki.utilities.documentation.Reference;
  * @since 0.8.0
  */
 @Reference(authors = "M. J. Zaki and W. Meira Jr.", //
-    title = "Data Mining and Analysis: Fundamental Concepts and Algorithms", //
-    booktitle = "", //
-    url = "http://www.dataminingbook.info/", //
+    title = "Clustering Validation", //
+    booktitle = "Data Mining and Analysis: Fundamental Concepts and Algorithms", //
+    url = "https://dataminingbook.info/book_html/chap17/book.html", //
     bibkey = "DBLP:books/cu/ZM2014")
 public class MaximumMatchingAccuracy {
   /**
