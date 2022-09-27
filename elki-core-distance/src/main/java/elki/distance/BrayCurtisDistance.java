@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * A method of establishing groups of equal amplitude in plant sociology based
  * on similarity of species and its application to analyses of the vegetation on
  * Danish commons<br>
- * Kongelige Danske Videnskabernes Selskab 5 (4)
+ * Kongelige Danske Videnskabernes Selskab, Biologiske Skrifter 5(4)
  * <p>
  * and:
  * <p>
@@ -71,7 +71,7 @@ import elki.utilities.optionhandling.Parameterizer;
     bibkey = "doi:10.2307/1942268")
 @Reference(authors = "T. Sørensen", //
     title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
-    booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)", //
+    booktitle = "Kongelige Danske Videnskabernes Selskab, Biologiske Skrifter 5(4)", //
     bibkey = "journals/misc/Sorensen48")
 @Reference(authors = "L. R. Dice", //
     title = "Measures of the Amount of Ecologic Association Between Species", //
