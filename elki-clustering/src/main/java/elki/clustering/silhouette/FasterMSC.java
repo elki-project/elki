@@ -25,15 +25,20 @@ import java.util.Arrays;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.DoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
@@ -87,27 +92,27 @@ public class FasterMSC<O> extends FastMSC<O> {
     super(distance, k, maxiter, initializer);
   }
 
-  /**
-   * Run FasterMSC
-   *
-   * @param relation relation to use
-   * @return result
-   */
   @Override
-  public Clustering<MedoidModel> run(Relation<O> relation) {
-    Clustering<MedoidModel> result = run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
-    Metadata.of(result).setLongName("FastMSC Clustering");
-    return result;
-  }
-
-  @Override
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
+    DoubleDataStore silhouettes;
     if(k == 2) { // optimized codepath for k=2
-      new Instance2(distQ, ids, assignment).run(medoids, maxiter);
+      Instance2 instance = new Instance2(distQ, ids, assignment);
+      instance.run(medoids, maxiter);
+      silhouettes = instance.silhouetteScores();
     }
     else {
-      new Instance(distQ, ids, assignment).run(medoids, maxiter);
+      Instance instance = new Instance(distQ, ids, assignment);
+      instance.run(medoids, maxiter);
+      silhouettes = instance.silhouetteScores();
     }
+    getLogger().statistics(optd.end());
+    Clustering<MedoidModel> res = wrapResult(ids, assignment, medoids, "FasterMSC Clustering");
+    Metadata.hierarchyOf(res).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, ids, silhouettes));
+    return res;
   }
 
   /**

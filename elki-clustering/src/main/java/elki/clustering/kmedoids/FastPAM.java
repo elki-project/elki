@@ -24,13 +24,19 @@ import java.util.Arrays;
 
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.data.Clustering;
+import elki.data.model.MedoidModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.Priority;
@@ -70,7 +76,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @param <V> vector datatype
+ * @param <O> vector datatype
  */
 @Priority(Priority.IMPORTANT + 2)
 @Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
@@ -78,7 +84,7 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
     booktitle = "Proc. 12th Int. Conf. Similarity Search and Applications (SISAP'2019)", //
     url = "https://doi.org/10.1007/978-3-030-32047-8_16", //
     bibkey = "DBLP:conf/sisap/SchubertR19")
-public class FastPAM<V> extends FastPAM1<V> {
+public class FastPAM<O> extends FastPAM1<O> {
   /**
    * The logger for this class.
    */
@@ -102,7 +108,7 @@ public class FastPAM<V> extends FastPAM1<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public FastPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     this(distance, k, maxiter, initializer, 1.);
   }
 
@@ -115,14 +121,20 @@ public class FastPAM<V> extends FastPAM1<V> {
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
-  public FastPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer, double fasttol) {
+  public FastPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer, double fasttol) {
     super(distance, k, maxiter, initializer);
     this.fasttol = fasttol;
   }
 
   @Override
-  protected void run(DistanceQuery<? super V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     new Instance(distQ, ids, assignment, fasttol).run(medoids, maxiter);
+    getLogger().statistics(optd.end());
+    return wrapResult(ids, assignment, medoids, "PAM Clustering");
   }
 
   /**

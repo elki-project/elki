@@ -22,9 +22,7 @@ package elki.clustering.kmedoids;
 
 import java.util.Random;
 
-import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
-import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.database.datastore.DataStoreFactory;
@@ -38,7 +36,6 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
-import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -147,11 +144,9 @@ public class CLARA<V> extends PAM<V> {
     }
 
     CachedDistanceQuery<? super V> cachedQ = new CachedDistanceQuery<>(distQ, (samplesize * (samplesize - 1)) >> 1);
-
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
-
     Random rnd = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
@@ -184,17 +179,7 @@ public class CLARA<V> extends PAM<V> {
     if(bestmedoids == null) {
       throw new IllegalStateException("numsamples must be larger than 0.");
     }
-
-    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
-
-    // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>();
-    Metadata.of(result).setLongName("CLARA Clustering");
-    for(DBIDArrayIter it = bestmedoids.iter(); it.valid(); it.advance()) {
-      MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
-      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
-    }
-    return result;
+    return wrapResult(ids, bestclusters, bestmedoids, "CLARA Clustering");
   }
 
   /**
@@ -236,7 +221,7 @@ public class CLARA<V> extends PAM<V> {
    * @param distQ distance query
    * @return Sum of distances.
    */
-  static double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, WritableIntegerDataStore assignment, DistanceQuery<?> distQ) {
+  protected static double assignRemainingToNearestCluster(ArrayDBIDs means, DBIDs ids, DBIDs rids, WritableIntegerDataStore assignment, DistanceQuery<?> distQ) {
     rids = DBIDUtil.ensureSet(rids); // Ensure we have fast contains
     double distsum = 0.;
     DBIDArrayIter miter = means.iter();
@@ -267,7 +252,7 @@ public class CLARA<V> extends PAM<V> {
    *
    * @param <V> Data type
    */
-  static class CachedDistanceQuery<V> implements DistanceQuery<V> {
+  protected static class CachedDistanceQuery<V> implements DistanceQuery<V> {
     /**
      * Inner distance query
      */

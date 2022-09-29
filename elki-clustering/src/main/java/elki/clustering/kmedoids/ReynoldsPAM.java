@@ -21,16 +21,20 @@
 package elki.clustering.kmedoids;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.data.Clustering;
+import elki.data.model.MedoidModel;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.documentation.Reference;
 
@@ -52,14 +56,14 @@ import elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @param <V> vector datatype
+ * @param <O> vector datatype
  */
 @Reference(authors = "A. P. Reynolds, G. Richards, B. de la Iglesia, V. J. Rayward-Smith", //
     title = "Clustering Rules: A Comparison of Partitioning and Hierarchical Clustering Algorithms", //
     booktitle = "J. Math. Model. Algorithms 5(4)", //
     url = "https://doi.org/10.1007/s10852-005-9022-1", //
     bibkey = "DBLP:journals/jmma/ReynoldsRIR06")
-public class ReynoldsPAM<V> extends PAM<V> {
+public class ReynoldsPAM<O> extends PAM<O> {
   /**
    * The logger for this class.
    */
@@ -78,13 +82,19 @@ public class ReynoldsPAM<V> extends PAM<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public ReynoldsPAM(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public ReynoldsPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     super(distance, k, maxiter, initializer);
   }
 
   @Override
-  protected void run(DistanceQuery<? super V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    getLogger().statistics(optd.end());
+    return wrapResult(ids, assignment, medoids, "PAM Clustering");
   }
 
   /**

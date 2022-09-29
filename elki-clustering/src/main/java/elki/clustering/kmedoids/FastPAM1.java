@@ -23,14 +23,20 @@ package elki.clustering.kmedoids;
 import java.util.Arrays;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.data.Clustering;
+import elki.data.model.MedoidModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -57,7 +63,7 @@ import elki.utilities.exceptions.AbortException;
  * @author Erich Schubert
  * @since 0.7.5
  *
- * @param <V> vector datatype
+ * @param <O> vector datatype
  */
 @Reference(authors = "Erich Schubert, Peter J. Rousseeuw", //
     title = "Faster k-Medoids Clustering: Improving the PAM, CLARA, and CLARANS Algorithms", //
@@ -65,7 +71,7 @@ import elki.utilities.exceptions.AbortException;
     url = "https://doi.org/10.1007/978-3-030-32047-8_16", //
     bibkey = "DBLP:conf/sisap/SchubertR19")
 @Priority(Priority.SUPPLEMENTARY) // Use FastPAM instead
-public class FastPAM1<V> extends PAM<V> {
+public class FastPAM1<O> extends PAM<O> {
   /**
    * The logger for this class.
    */
@@ -84,13 +90,19 @@ public class FastPAM1<V> extends PAM<V> {
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public FastPAM1(Distance<? super V> distance, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public FastPAM1(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
     super(distance, k, maxiter, initializer);
   }
 
   @Override
-  protected void run(DistanceQuery<? super V> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    getLogger().statistics(optd.end());
+    return wrapResult(ids, assignment, medoids, "PAM Clustering");
   }
 
   /**
