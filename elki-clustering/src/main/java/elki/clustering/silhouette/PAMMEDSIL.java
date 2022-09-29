@@ -23,16 +23,17 @@ package elki.clustering.silhouette;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
-import elki.database.datastore.IntegerDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
+import elki.database.datastore.*;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
@@ -89,22 +90,19 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
     super(distance, k, maxiter, initializer);
   }
 
-  /**
-   * Run PAMMEDSIL
-   *
-   * @param relation relation to use
-   * @return result
-   */
   @Override
-  public Clustering<MedoidModel> run(Relation<O> relation) {
-    Clustering<MedoidModel> result = run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
-    Metadata.of(result).setLongName("PAMMEDSIL Clustering");
-    return result;
-  }
-
-  @Override
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
-    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
+    Instance instance = new Instance(distQ, ids, assignment);
+    instance.run(medoids, maxiter);
+    DoubleDataStore silhouettes = instance.silhouetteScores();
+    getLogger().statistics(optd.end());
+    Clustering<MedoidModel> res = wrapResult(ids, assignment, medoids, "PAMMEDSIL Clustering");
+    Metadata.hierarchyOf(res).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, ids, silhouettes));
+    return res;
   }
 
   /**
@@ -236,7 +234,9 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
           }
         }
         assert a <= b : "Not assigned to nearest";
-        silsum += b > 0 ? a / b : 0.;
+        final double s = b > 0 ? a / b : 0.;
+        silhouettes.putDouble(x, s);
+        silsum += s;
       }
       return 1. - silsum / ids.size();
     }

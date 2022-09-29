@@ -28,13 +28,15 @@ import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.database.datastore.*;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.evaluation.clustering.internal.Silhouette;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
@@ -84,27 +86,27 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
     super(distance, k, maxiter, initializer);
   }
 
-  /**
-   * Run FastMSC
-   *
-   * @param relation relation to use
-   * @return result
-   */
   @Override
-  public Clustering<MedoidModel> run(Relation<O> relation) {
-    Clustering<MedoidModel> result = run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
-    Metadata.of(result).setLongName("FastMSC Clustering");
-    return result;
-  }
-
-  @Override
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
+    DoubleDataStore silhouettes;
     if(k == 2) { // optimized codepath for k=2
-      new Instance2(distQ, ids, assignment).run(medoids, maxiter);
+      Instance2 instance = new Instance2(distQ, ids, assignment);
+      instance.run(medoids, maxiter);
+      silhouettes = instance.silhouetteScores();
     }
     else {
-      new Instance(distQ, ids, assignment).run(medoids, maxiter);
+      Instance instance = new Instance(distQ, ids, assignment);
+      instance.run(medoids, maxiter);
+      silhouettes = instance.silhouetteScores();
     }
+    getLogger().statistics(optd.end());
+    Clustering<MedoidModel> res = wrapResult(ids, assignment, medoids, "FastMSC Clustering");
+    Metadata.hierarchyOf(res).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, ids, silhouettes));
+    return res;
   }
 
   /**
@@ -276,6 +278,22 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
         silsum += djo < dmo ? loss(djo, dmo) : loss(dmo, djo);
       }
       return 1. - silsum / ids.size();
+    }
+
+    /**
+     * Get the silhouette scores per point (must be run() first)
+     *
+     * @return Silhouette scores
+     */
+    public DoubleDataStore silhouetteScores() {
+      WritableDoubleDataStore silhouettes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        final int a = assignment.intValue(iter);
+        final double d1 = (a == 0 ? dm0 : dm1).doubleValue(iter);
+        final double d2 = (a == 0 ? dm1 : dm0).doubleValue(iter);
+        silhouettes.putDouble(iter, d1 > 0 ? 1. - d1 / d2 : 1.);
+      }
+      return silhouettes;
     }
   }
 
@@ -634,6 +652,20 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
         losses[reco.m1] += l12 - loss(reco.d2, reco.d3);
         losses[reco.m2] += l12 - loss(reco.d1, reco.d3);
       }
+    }
+
+    /**
+     * Get the silhouette scores per point (must be run() first)
+     *
+     * @return Silhouette scores
+     */
+    public DoubleDataStore silhouetteScores() {
+      WritableDoubleDataStore silhouettes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        final Record rec = assignment.get(iter);
+        silhouettes.putDouble(iter, rec.d1 > 0 ? 1. - rec.d1 / rec.d2 : 1.);
+      }
+      return silhouettes;
     }
   }
 

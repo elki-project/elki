@@ -23,16 +23,22 @@ package elki.clustering.kmedoids;
 import elki.Algorithm;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.data.Clustering;
+import elki.data.model.MedoidModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.utilities.Priority;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -70,8 +76,14 @@ public class SingleAssignmentKMedoids<O> extends PAM<O> {
   }
 
   @Override
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     new Instance(distQ, ids, assignment).run(medoids);
+    getLogger().statistics(optd.end());
+    return wrapResult(ids, assignment, medoids, "PAM Clustering");
   }
 
   /**

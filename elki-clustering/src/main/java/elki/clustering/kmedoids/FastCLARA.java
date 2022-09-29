@@ -22,16 +22,13 @@ package elki.clustering.kmedoids;
 
 import java.util.Random;
 
-import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
-import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.MedoidModel;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.query.QueryBuilder;
@@ -41,7 +38,6 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
-import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -140,11 +136,9 @@ public class FastCLARA<V> extends FastPAM<V> {
     }
 
     CLARA.CachedDistanceQuery<? super V> cachedQ = new CLARA.CachedDistanceQuery<>(distQ, (samplesize * (samplesize - 1)) >> 1);
-
     double best = Double.POSITIVE_INFINITY;
     ArrayModifiableDBIDs bestmedoids = null;
     WritableIntegerDataStore bestclusters = null;
-
     Random rnd = random.getSingleThreadedRandom();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
@@ -177,17 +171,7 @@ public class FastCLARA<V> extends FastPAM<V> {
     if(bestmedoids == null) {
       throw new IllegalStateException("numsamples must be larger than 0.");
     }
-
-    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, bestclusters, k);
-
-    // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>();
-    Metadata.of(result).setLongName("CLARA Clustering");
-    for(DBIDArrayIter it = bestmedoids.iter(); it.valid(); it.advance()) {
-      MedoidModel model = new MedoidModel(DBIDUtil.deref(it));
-      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], model));
-    }
-    return result;
+    return wrapResult(ids, bestclusters, bestmedoids, "CLARA Clustering");
   }
 
   /**

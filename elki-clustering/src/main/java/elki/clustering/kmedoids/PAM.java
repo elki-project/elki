@@ -145,11 +145,6 @@ public class PAM<O> implements KMedoidsClustering<O> {
   }
 
   @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(distance.getInputTypeRestriction());
-  }
-
-  @Override
   public Clustering<MedoidModel> run(Relation<O> relation) {
     return run(relation, k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
   }
@@ -158,22 +153,11 @@ public class PAM<O> implements KMedoidsClustering<O> {
   public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
     DBIDs ids = relation.getDBIDs();
     ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
-
-    // Setup cluster assignment store
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
-    run(distQ, ids, medoids, assignment);
+    new Instance(distQ, ids, assignment).run(medoids, maxiter);
     getLogger().statistics(optd.end());
-
-    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
-
-    // Wrap result
-    Clustering<MedoidModel> result = new Clustering<>();
-    Metadata.of(result).setLongName("PAM Clustering");
-    for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
-      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
-    }
-    return result;
+    return wrapResult(ids, assignment, medoids, "PAM Clustering");
   }
 
   /**
@@ -198,16 +182,22 @@ public class PAM<O> implements KMedoidsClustering<O> {
   }
 
   /**
-   * Run the main algorithm. Internal use, for easier subclassing, this
-   * primarily is a wrapper around "new Instance" for subclasses.
+   * Wrap the clustering result.
    * 
-   * @param distQ Distance query
-   * @param ids IDs to process
-   * @param medoids Current medoids
-   * @param assignment Cluster assignment output
+   * @param ids Object ids
+   * @param assignment Cluster assignment
+   * @param medoids Medoids
+   * @param name Clustering name
+   * @return Wrapped result
    */
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
-    new Instance(distQ, ids, assignment).run(medoids, maxiter);
+  protected static Clustering<MedoidModel> wrapResult(DBIDs ids, WritableIntegerDataStore assignment, ArrayModifiableDBIDs medoids, String name) {
+    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, medoids.size());
+    Clustering<MedoidModel> result = new Clustering<>();
+    Metadata.of(result).setLongName(name);
+    for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance()) {
+      result.addToplevelCluster(new Cluster<>(clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
+    }
+    return result;
   }
 
   /**
@@ -403,6 +393,11 @@ public class PAM<O> implements KMedoidsClustering<O> {
       }
       return cost;
     }
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
   /**

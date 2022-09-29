@@ -21,13 +21,19 @@
 package elki.clustering.kmedoids;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.data.Clustering;
+import elki.data.model.MedoidModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
+import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
+import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
@@ -82,23 +88,20 @@ public class FasterPAM<O> extends FastPAM<O> {
     super(distance, k, maxiter, initializer);
   }
 
-  /**
-   * Run the main algorithm. Internal use, for easier subclassing, this
-   * primarily is a wrapper around "new Instance" for subclasses.
-   * 
-   * @param distQ Distance query
-   * @param ids IDs to process
-   * @param medoids Current medoids
-   * @param assignment Cluster assignment output
-   */
   @Override
-  protected void run(DistanceQuery<? super O> distQ, DBIDs ids, ArrayModifiableDBIDs medoids, WritableIntegerDataStore assignment) {
+  public Clustering<MedoidModel> run(Relation<O> relation, int k, DistanceQuery<? super O> distQ) {
+    DBIDs ids = relation.getDBIDs();
+    ArrayModifiableDBIDs medoids = initialMedoids(distQ, ids, k);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     new Instance(distQ, ids, assignment).run(medoids, maxiter);
+    getLogger().statistics(optd.end());
+    return wrapResult(ids, assignment, medoids, "FasterPAM Clustering");
   }
 
   /**
    * Instance for a single dataset.
-   *
+   * <p>
    * Note: we experimented with not caching the distance to nearest and second
    * nearest, but only the assignments. The matrix lookup was more expensive, so
    * this is probably worth the 2*n doubles in storage.
