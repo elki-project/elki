@@ -1,3 +1,0 @@
-queries:
-  - exclude: java/comparison-of-identical-expressions
-  - exclude: java/non-sync-override
