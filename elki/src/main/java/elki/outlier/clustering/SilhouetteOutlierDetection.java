@@ -39,7 +39,6 @@ import elki.outlier.OutlierAlgorithm;
 import elki.result.Metadata;
 import elki.result.outlier.InvertedOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
-import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -126,12 +125,17 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
   public OutlierResult autorun(Database database) {
     Clustering<?> c = clusterer.autorun(database);
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
-    DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    new Silhouette<O>(distance, noiseOption, false).evaluateClustering(relation, dq, c);
-    // Find the silhouette scores:
+    // Check if the clustering already provides a Silhouette:
     It<DoubleRelation> it = Metadata.hierarchyOf(c).iterDescendants() //
         .filter(DoubleRelation.class) //
         .filter(x -> Silhouette.SILHOUETTE_NAME.equals(x.getLongName()));
+    if(!it.valid()) { // Otherwise, run Silhouette:
+      DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
+      new Silhouette<O>(distance, noiseOption, false).evaluateClustering(relation, dq, c);
+      it = Metadata.hierarchyOf(c).iterDescendants() //
+          .filter(DoubleRelation.class) //
+          .filter(x -> Silhouette.SILHOUETTE_NAME.equals(x.getLongName()));
+    }
     if(!it.valid()) {
       throw new NullPointerException("Silhouette did not produce Silhouette scores.");
     }
@@ -140,8 +144,7 @@ public class SilhouetteOutlierDetection<O> implements OutlierAlgorithm {
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       mm.put(scoreResult.doubleValue(iter));
     }
-    OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5);
-    return new OutlierResult(scoreMeta, scoreResult);
+    return new OutlierResult(new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), -1., 1., .5), scoreResult);
   }
 
   /**
