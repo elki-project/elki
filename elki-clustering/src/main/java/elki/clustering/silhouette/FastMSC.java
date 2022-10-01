@@ -39,7 +39,9 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
+import elki.result.EvaluationResult;
 import elki.result.Metadata;
+import elki.result.EvaluationResult.MeasurementGroup;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
 
@@ -93,19 +95,23 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     DoubleDataStore silhouettes;
+    double sil;
     if(k == 2) { // optimized codepath for k=2
       Instance2 instance = new Instance2(distQ, ids, assignment);
-      instance.run(medoids, maxiter);
+      sil = instance.run(medoids, maxiter);
       silhouettes = instance.silhouetteScores();
     }
     else {
       Instance instance = new Instance(distQ, ids, assignment);
-      instance.run(medoids, maxiter);
+      sil = instance.run(medoids, maxiter);
       silhouettes = instance.silhouetteScores();
     }
     getLogger().statistics(optd.end());
     Clustering<MedoidModel> res = wrapResult(ids, assignment, medoids, "FastMSC Clustering");
     Metadata.hierarchyOf(res).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, ids, silhouettes));
+    EvaluationResult ev = EvaluationResult.findOrCreate(res, "Internal Clustering Evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
+    g.addMeasure("Medoid Silhouette", sil, -1., 1., 0., false);
     return res;
   }
 
