@@ -35,6 +35,8 @@ import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
+import elki.result.EvaluationResult;
+import elki.result.EvaluationResult.MeasurementGroup;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 
@@ -97,11 +99,14 @@ public class PAMMEDSIL<O> extends PAMSIL<O> {
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     Instance instance = new Instance(distQ, ids, assignment);
-    instance.run(medoids, maxiter);
+    double sil = instance.run(medoids, maxiter);
     DoubleDataStore silhouettes = instance.silhouetteScores();
     getLogger().statistics(optd.end());
     Clustering<MedoidModel> res = wrapResult(ids, assignment, medoids, "PAMMEDSIL Clustering");
     Metadata.hierarchyOf(res).addChild(new MaterializedDoubleRelation(Silhouette.SILHOUETTE_NAME, ids, silhouettes));
+    EvaluationResult ev = EvaluationResult.findOrCreate(res, "Internal Clustering Evaluation");
+    MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
+    g.addMeasure("Medoid Silhouette", sil, -1., 1., 0., false);
     return res;
   }
 
