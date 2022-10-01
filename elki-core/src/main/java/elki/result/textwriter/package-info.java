@@ -1,5 +1,5 @@
 /**
- * Text serialization (CSV, Gnuplot, Console, ...)
+ * Text serialization (CSV, Gnuplot, Console, ...).
  *
  * @opt include .*elki.result.textwriter.writers.TextWriterTextWriteable
  */

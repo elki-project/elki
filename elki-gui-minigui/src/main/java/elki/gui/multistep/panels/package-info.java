@@ -1,5 +1,5 @@
 /**
- * Panels for the multi-step GUI
+ * Panels for the multi-step GUI.
  */
 /*
  * This file is part of ELKI:

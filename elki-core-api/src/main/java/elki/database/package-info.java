@@ -1,5 +1,5 @@
 /**
- * ELKI database layer - loading, storing, indexing and accessing data
+ * ELKI database layer - loading, storing, indexing and accessing data.
  *
  * @opt hide elki.utilities
  * @opt hide elki.result

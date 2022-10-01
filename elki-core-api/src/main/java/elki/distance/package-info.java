@@ -5,7 +5,7 @@
  * <p>There are three basic types of distance functions:
  * <ul>
  * <li>{@link elki.distance.PrimitiveDistance Primitive Distance Function}s that can be computed for any two objects.</li>
- * <li>{@link elki.distance.DBIDDistance DBID Distance Function}s, that are only defined for object IDs, e.g. an external distance matrix</li>
+ * <li>{@link elki.distance.DBIDDistance DBID Distance Function}s, that are only defined for object IDs, e.g., an external distance matrix</li>
  * <li>{@link elki.distance.IndexBasedDistance Index-Based Distance Function}s, that require an indexing/preprocessing step, and are then valid for existing database objects.</li>
  * </ul>
  * These types differ significantly in both implementation and use.

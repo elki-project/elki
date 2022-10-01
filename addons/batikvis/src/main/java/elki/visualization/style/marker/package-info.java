@@ -1,5 +1,5 @@
 /**
- * Draw plot markers
+ * Draw plot markers.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Spherical k-means clustering and variations
+ * Spherical k-means clustering and variations.
  */
 /*
  * This file is part of ELKI:
@@ -21,4 +21,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("Spherical k-means")
 package elki.clustering.kmeans.spherical;
+
+import elki.utilities.documentation.Title;

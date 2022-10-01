@@ -1,4 +1,6 @@
-/** Classes for logging various statistics. */
+/**
+ * Classes for logging various statistics.
+ */
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures

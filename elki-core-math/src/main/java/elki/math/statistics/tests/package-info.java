@@ -1,5 +1,5 @@
 /**
- * Statistical tests
+ * Statistical tests.
  */
 /*
  * This file is part of ELKI:

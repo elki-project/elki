@@ -1,5 +1,5 @@
 /**
- * Visualizers based on parallel coordinates
+ * Visualizers based on parallel coordinates.
  */
 /*
  * This file is part of ELKI:

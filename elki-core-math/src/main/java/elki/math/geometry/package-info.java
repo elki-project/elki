@@ -1,5 +1,5 @@
 /**
- * Algorithms from computational geometry
+ * Algorithms from computational geometry.
  */
 /*
  * This file is part of ELKI:

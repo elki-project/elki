@@ -39,7 +39,7 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Add Jitter, preserving the histogram properties (same sum, nonnegative).
+ * Add jitter, preserving the histogram properties (same sum, nonnegative).
  * <p>
  * For each vector, the total sum of all dimensions is computed.<br>
  * Then a random vector of the average length <code>jitter * scale</code> is
@@ -49,7 +49,7 @@ import elki.utilities.random.RandomFactory;
  * most dimensions will be low, and higher in few.
  * <p>
  * This is designed to degrade the quality of a histogram, while preserving the
- * total sum (e.g. to keep the normalization). The factor "jitter" can be used
+ * total sum (e.g., to keep the normalization). The factor "jitter" can be used
  * to control the degradation amount.
  * 
  * @author Erich Schubert

@@ -1,5 +1,5 @@
 /**
- * Splitting strategies for R-Trees
+ * Splitting strategies for R-trees.
  */
 /*
  * This file is part of ELKI:

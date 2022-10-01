@@ -1,5 +1,5 @@
 /**
- * Color scheme handling for ELKI
+ * Color scheme handling for ELKI visualization.
  */
 /*
  * This file is part of ELKI:

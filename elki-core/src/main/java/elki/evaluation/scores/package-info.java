@@ -1,5 +1,5 @@
 /**
- * Evaluation of rankings and scorings
+ * Evaluation of rankings and scorings.
  *
  * @opt hide java.util.*
  */

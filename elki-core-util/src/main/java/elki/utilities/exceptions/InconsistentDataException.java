@@ -22,8 +22,8 @@ package elki.utilities.exceptions;
 
 /**
  * Data inconsistency exception.
- * 
- * Thrown when inconsistent data was detected e.g. in an index.
+ * <p>
+ * Thrown when inconsistent data was detected, e.g., in an index.
  * 
  * @author Erich Schubert
  * @since 0.7.5

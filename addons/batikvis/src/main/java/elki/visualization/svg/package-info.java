@@ -1,5 +1,5 @@
 /**
- * Base SVG functionality (generation, markers, thumbnails, export, ...)
+ * Base SVG functionality (generation, markers, thumbnails, export, ...).
  */
 /*
  * This file is part of ELKI:

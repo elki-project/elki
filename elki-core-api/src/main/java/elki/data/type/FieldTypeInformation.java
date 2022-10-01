@@ -21,10 +21,8 @@
 package elki.data.type;
 
 /**
- * Types with a fixed dimensionality (e.g. vector fields, but also e.g. polygon
- * types)
- *
- * TODO: implement polygon and rectangle types!
+ * Types with a fixed dimensionality (e.g., vector fields, but also e.g.,
+ * polygon types).
  *
  * @author Erich Schubert
  * @since 0.7.0

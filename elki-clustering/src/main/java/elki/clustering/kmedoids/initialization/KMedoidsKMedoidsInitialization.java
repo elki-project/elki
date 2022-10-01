@@ -32,6 +32,8 @@ import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.utilities.documentation.Description;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -48,6 +50,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.8.0
  */
+@Title("K-medoids Initialization by K-medoids")
+@Description("Initialize k-medoids with k-medoids, usually a less expensive variant.")
 public class KMedoidsKMedoidsInitialization<O> implements KMedoidsInitialization<O> {
   /**
    * Inner k-medoids clustering to use.

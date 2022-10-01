@@ -1,5 +1,5 @@
 /**
- * Data projections
+ * Data projections.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Splitting strategies of nodes in an M-Tree (and variants)
+ * Splitting strategies of nodes in an M-tree (and variants).
  */
 /*
  * This file is part of ELKI:

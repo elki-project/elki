@@ -1,6 +1,6 @@
 /**
  * Prepared queries for &epsilon;-range queries, that return all objects within
- * the radius &epsilon;
+ * the radius &epsilon;.
  *
  * @opt hide elki.algorithm.*
  */

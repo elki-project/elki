@@ -1,5 +1,6 @@
 /**
- * Meta clustering algorithms, that get their result from other clusterings or external sources.
+ * Meta clustering algorithms, that get their result from other clusterings or
+ * external sources.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  */

@@ -1,5 +1,5 @@
 /**
- * Visualizers for clustering results based on parallel coordinates
+ * Visualizers for clustering results based on parallel coordinates.
  */
 /*
  * This file is part of ELKI:

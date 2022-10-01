@@ -1,5 +1,5 @@
 /**
- * Prepared queries for similarity functions
+ * Prepared queries for similarity functions.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Classes for managing a detail view
+ * Classes for managing a detail view.
  */
 /*
  * This file is part of ELKI:

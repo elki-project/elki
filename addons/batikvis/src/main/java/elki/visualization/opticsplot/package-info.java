@@ -1,5 +1,5 @@
 /**
- * Code for drawing OPTICS plots
+ * Code for drawing OPTICS plots.
  */
 /*
  * This file is part of ELKI:

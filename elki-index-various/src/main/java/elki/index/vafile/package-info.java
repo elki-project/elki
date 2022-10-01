@@ -1,5 +1,5 @@
 /**
- * Vector Approximation File
+ * Vector Approximation File.
  */
 // TODO: add projected VA files
 // TODO: allow different binning and projection strategies.

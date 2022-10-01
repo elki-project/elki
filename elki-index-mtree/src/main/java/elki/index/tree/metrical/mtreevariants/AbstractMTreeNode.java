@@ -56,7 +56,7 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
   }
 
   /**
-   * Adjusts the parameters of the entry representing this node (e.g. after
+   * Adjusts the parameters of the entry representing this node (e.g., after
    * insertion of new objects). Subclasses may need to overwrite this method.
    * 
    * @param entry the entry representing this node

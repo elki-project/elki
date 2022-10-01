@@ -1,5 +1,5 @@
 /**
- * Package to provide a visualization GUI
+ * Package to provide a visualization GUI.
  */
 /*
  * This file is part of ELKI:

@@ -1,7 +1,5 @@
 /**
  * Utility applications for using ELKI with Lucene databases.
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

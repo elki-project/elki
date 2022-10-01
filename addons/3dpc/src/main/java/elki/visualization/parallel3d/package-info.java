@@ -1,7 +1,7 @@
 /**
  * 3DPC: 3D parallel coordinate plot visualization for ELKI.
  * <p>
- * This is an add-on module. Details were published as:
+ * This is an optional add-on module.
  * <p>
  * Reference:
  * <p>

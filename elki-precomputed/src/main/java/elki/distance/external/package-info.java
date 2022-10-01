@@ -1,5 +1,5 @@
 /**
- * Distance functions using external data sources
+ * Distance functions using external data sources.
  *
  * @opt include .*elki.distance.AbstractDBIDRangeDistance
  */

@@ -117,7 +117,7 @@ public interface Algorithm {
         // Other parameters are the bound relations
         for(int i = 1; i <= inputs.length; i++) {
           // TODO: don't bind the same relation twice?
-          // But sometimes this is wanted (e.g. using projected distances)
+          // But sometimes this is wanted (e.g., using projected distances)
           relations[i] = database.getRelation(inputs[i - 1]);
           signature[i] = Relation.class;
         }

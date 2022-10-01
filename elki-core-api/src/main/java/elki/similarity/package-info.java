@@ -1,5 +1,5 @@
 /**
- * Similarity functions
+ * Similarity functions.
  *
  * @opt hide elki.algorithm.*
  */

@@ -1,5 +1,5 @@
 /**
- * Data normalization (and reconstitution) of data sets
+ * Data normalization (and reconstitution) of data sets.
  */
 /*
  * This file is part of ELKI:

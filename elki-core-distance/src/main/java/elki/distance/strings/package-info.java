@@ -1,5 +1,5 @@
 /**
- * Distance functions for strings
+ * Distance functions for strings.
  *
  * @opt include .*elki.distance.PrimitiveDistance
  */

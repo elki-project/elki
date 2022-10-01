@@ -1,5 +1,5 @@
 /**
- * {@link elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree}
+ * {@link elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree}.
  */
 /*
  * This file is part of ELKI:

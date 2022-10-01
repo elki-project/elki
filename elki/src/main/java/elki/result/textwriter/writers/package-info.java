@@ -1,6 +1,5 @@
 /**
  * Serialization handlers for individual data types.
- * 
  */
 /*
  * This file is part of ELKI:

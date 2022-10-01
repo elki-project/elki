@@ -1,5 +1,5 @@
 /**
- * Tree-based index structures
+ * Tree-based index structures.
  */
 /*
  * This file is part of ELKI:

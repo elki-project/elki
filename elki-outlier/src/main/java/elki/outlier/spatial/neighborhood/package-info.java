@@ -1,5 +1,5 @@
 /**
- * Spatial outlier neighborhood classes
+ * Spatial outlier neighborhood classes.
  */
 /*
  * This file is part of ELKI:
@@ -21,4 +21,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("Spatial neighborhoods for geographic outlier detection.")
 package elki.outlier.spatial.neighborhood;
+
+import elki.utilities.documentation.Title;

@@ -1,5 +1,5 @@
 /**
- * Distance functions using correlations
+ * Distance functions for color histograms.
  *
  * @opt include .*elki.distance.MatrixWeightedQuadraticDistance
  * @opt include .*elki.distance.AbstractNumberVectorDistance

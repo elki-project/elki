@@ -1,7 +1,6 @@
 /**
- * Meta estimators: estimators that do not actually estimate themselves, but instead use other estimators, e.g. on a trimmed data set, or as an ensemble.
- * 
- * @author Erich Schubert
+ * Meta estimators: estimators that do not actually estimate themselves, but
+ * instead use other estimators, e.g., on a trimmed data set, or as an ensemble.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Queries on the R-Tree family of indexes: kNN and range queries
+ * Queries on the R-Tree family of indexes: kNN and range queries.
  */
 /*
  * This file is part of ELKI:

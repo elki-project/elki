@@ -1,5 +1,5 @@
 /**
- * Insertion strategies for R-Trees
+ * Insertion strategies for R-trees.
  */
 /*
  * This file is part of ELKI:

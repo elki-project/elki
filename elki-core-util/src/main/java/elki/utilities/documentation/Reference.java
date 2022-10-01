@@ -50,7 +50,7 @@ public @interface Reference {
   String title();
 
   /**
-   * Publication Authors
+   * Publication authors.
    * 
    * @return authors
    */
@@ -64,21 +64,21 @@ public @interface Reference {
   String booktitle();
 
   /**
-   * Prefix to the reference, e.g. "Generalization of a method proposed in"
+   * Prefix to the reference, e.g., "Generalization of a method proposed in".
    * 
    * @return Prefix or empty string
    */
   String prefix() default "";
 
   /**
-   * Reference URL, e.g. DOI
+   * Reference URL, e.g., DOI.
    * 
    * @return Reference URL or empty string
    */
   String url() default "";
 
   /**
-   * BibTeX key
+   * BibTeX key.
    * 
    * @return BibTeX in the bibliography
    */

@@ -40,6 +40,7 @@ import elki.logging.statistics.StringStatistic;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -72,6 +73,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @param <V> vector datatype
  */
+@Title("K-d-tree K-means with Pruning")
 @Reference(authors = "K. Alsabti, S. Ranka, V. Singh", //
     title = "An efficient k-means clustering algorithm", //
     booktitle = "Electrical Engineering and Computer Science, Technical Report 43", //

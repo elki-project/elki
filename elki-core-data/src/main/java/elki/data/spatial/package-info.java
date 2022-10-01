@@ -1,5 +1,5 @@
 /**
- * Spatial data types - interfaces and utilities
+ * Spatial data types - interfaces and utilities.
  */
 /*
  * This file is part of ELKI:

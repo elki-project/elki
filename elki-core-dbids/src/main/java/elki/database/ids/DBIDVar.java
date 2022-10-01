@@ -26,7 +26,7 @@ import elki.database.datastore.DBIDDataStore;
  * (Persistent) variable storing a DBID reference.
  * <p>
  * In contrast to the {@link DBIDRef} API, which are read-only references, this
- * variable can be updated to point to a different DBID, e.g. the current best
+ * variable can be updated to point to a different DBID, e.g., the current best
  * candidate.
  *
  * @author Erich Schubert

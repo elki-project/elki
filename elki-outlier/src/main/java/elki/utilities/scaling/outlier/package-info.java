@@ -1,6 +1,6 @@
 /**
  * Scaling of outlier scores, that require a statistical analysis of the
- * occurring values
+ * occurring values.
  */
 /*
  * This file is part of ELKI:

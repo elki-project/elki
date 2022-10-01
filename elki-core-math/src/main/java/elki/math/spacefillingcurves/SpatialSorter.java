@@ -47,8 +47,8 @@ public interface SpatialSorter {
    * Sort part of the list (start to end).
    * 
    * @param objs the spatial objects to be sorted
-   * @param start First index to sort (e.g. 0)
-   * @param end End of range (e.g. <code>site()</code>)
+   * @param start First index to sort (e.g., 0)
+   * @param end End of range (e.g., <code>site()</code>)
    * @param minmax Array with dim pairs of (min, max) of value ranges
    * @param dims Dimensions to sort by, for indexing vectors <em>and</em>
    *        {@code minmax}.

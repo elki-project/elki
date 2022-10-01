@@ -1,5 +1,5 @@
 /**
- * {@link elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTree}
+ * {@link elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTree}.
  */
 /*
  * This file is part of ELKI:

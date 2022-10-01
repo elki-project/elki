@@ -1,5 +1,5 @@
 /**
- * Statistical tests and methods
+ * Statistical tests and methods.
  */
 /*
  * This file is part of ELKI:

@@ -54,6 +54,7 @@ import elki.logging.statistics.LongStatistic;
 import elki.result.Metadata;
 import elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,6 +78,7 @@ import elki.utilities.random.RandomFactory;
  * @author Klaus Arthur Schmidt
  * @since 0.7.0
  */
+@Title("UK-means")
 @Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
     title = "Uncertain data mining: An example in clustering location data", //
     booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006)", //
@@ -237,7 +239,7 @@ public class UKMeans implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
    * Get expected distance between a Vector and an uncertain object
    *
-   * @param rep A vector, e.g. a cluster representative
+   * @param rep A vector, e.g., a cluster representative
    * @param uo A discrete uncertain object
    * @return The distance
    */

@@ -1,5 +1,5 @@
 /**
- * Result types, representation and handling
+ * Result types, representation and handling.
  *
  * @opt hide java.util.*
  * @opt hide elki.algorithm.*

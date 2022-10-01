@@ -1,5 +1,5 @@
 /**
- * Delegate implementation of a hierarchy
+ * Delegate implementation of a hierarchy.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Pair-segment analysis of multiple clusterings
+ * Pair-segment analysis of multiple clusterings.
  *
  * @opt include .*elki.evaluation.Evaluator
  * @opt include .*elki.data.Clustering

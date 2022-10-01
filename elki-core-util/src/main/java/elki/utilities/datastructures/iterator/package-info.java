@@ -1,5 +1,5 @@
 /**
- * ELKI Iterator API
+ * ELKI Iterator API.
  * <p>
  * ELKI uses a custom iterator API instead of the usual
  * {@link java.util.Iterator} classes (the "Java Collections API").

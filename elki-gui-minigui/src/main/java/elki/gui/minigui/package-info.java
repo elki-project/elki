@@ -1,5 +1,5 @@
 /**
- * A very simple UI to build ELKI command lines
+ * A very simple UI to build ELKI command lines.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Multi-step GUI for ELKI
+ * Multi-step GUI for ELKI.
  */
 /*
  * This file is part of ELKI:

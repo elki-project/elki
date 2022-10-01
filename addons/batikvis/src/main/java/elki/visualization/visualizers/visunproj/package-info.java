@@ -1,5 +1,5 @@
 /**
- * Visualizers that do not use a particular projection
+ * Visualizers that do not use a particular projection.
  */
 /*
  * This file is part of ELKI:

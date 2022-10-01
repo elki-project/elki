@@ -39,7 +39,7 @@
  * <li>{@link elki.database.DatabaseUtil}: database utility
  * functions (centroid etc.).</li>
  * <li>{@link elki.result.ResultUtil}: result processing
- * functions (e.g. extracting sub-results).</li>
+ * functions (e.g., extracting sub-results).</li>
  * </ul>
  * </li>
  * <li>Output-related:

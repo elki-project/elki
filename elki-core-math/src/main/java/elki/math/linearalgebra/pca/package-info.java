@@ -1,5 +1,5 @@
 /**
- * Principal Component Analysis (PCA) and Eigenvector processing
+ * Principal Component Analysis (PCA) and eigenvector processing.
  *
  * @opt hide elki.datasource.filter.transform
  * @opt hide elki.index

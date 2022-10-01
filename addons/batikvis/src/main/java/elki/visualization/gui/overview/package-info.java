@@ -1,5 +1,5 @@
 /**
- * Classes for managing the overview plot
+ * Classes for managing the overview plot.
  *
  * @opt hide java.awt.event.*
  */

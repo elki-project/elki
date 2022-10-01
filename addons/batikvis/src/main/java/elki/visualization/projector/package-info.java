@@ -1,6 +1,6 @@
 /**
  * Projectors are responsible for finding appropriate projections for data
- * relations
+ * relations.
  */
 /*
  * This file is part of ELKI:

@@ -30,6 +30,7 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -58,6 +59,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Title("CK-means")
 @Reference(authors = "S. D. Lee, B. Kao, R. Cheng", //
     title = "Reducing UK-means to K-means", //
     booktitle = "ICDM Data Mining Workshops, 2007", //

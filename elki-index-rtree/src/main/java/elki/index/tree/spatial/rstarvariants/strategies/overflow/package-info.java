@@ -1,5 +1,5 @@
 /**
- * Overflow treatment strategies for R-Trees
+ * Overflow treatment strategies for R-trees.
  */
 /*
  * This file is part of ELKI:

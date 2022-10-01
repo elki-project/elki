@@ -23,4 +23,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("Parallel implementations of distance-based outlier detection")
 package elki.outlier.distance.parallel;
+
+import elki.utilities.documentation.Title;

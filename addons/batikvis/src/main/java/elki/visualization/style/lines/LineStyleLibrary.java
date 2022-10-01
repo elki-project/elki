@@ -35,7 +35,7 @@ import elki.visualization.css.CSSClass;
  * <dt>{@link #FLAG_WEAK}</dt>
  * <dd>Request a "weaker" version of the same style</dd>
  * <dt>{@link #FLAG_INTERPOLATED}</dt>
- * <dd>Request an "interpolated" version of the same style (e.g. lighter or
+ * <dd>Request an "interpolated" version of the same style (e.g., lighter or
  * dashed)</dd>
  * </dl>
  * 

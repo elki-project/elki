@@ -1,9 +1,5 @@
 /**
- * 
- */
-/**
- * @author erich
- *
+ * JOGL implementation of scatter plots.
  */
 /*
  * This file is part of ELKI:

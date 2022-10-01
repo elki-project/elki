@@ -1,6 +1,6 @@
 /**
  * <b>Database queries</b> - computing distances, neighbors, similarities - API
- * and general documentation
+ * and general documentation.
  * <h2>Introduction</h2>
  * The database query API is designed around the concept of <b>prepared
  * statements</b>.

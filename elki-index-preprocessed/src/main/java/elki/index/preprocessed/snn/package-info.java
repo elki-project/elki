@@ -1,5 +1,5 @@
 /**
- * Indexes providing nearest neighbor sets
+ * Indexes providing nearest neighbor sets.
  */
 /*
  * This file is part of ELKI:

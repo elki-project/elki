@@ -1,8 +1,8 @@
 /**
- * Parsers for different file formats and data types
+ * Parsers for different file formats and data types.
  * <p>
  * The general use-case for any parser is to create objects out of an
- * {@link java.io.InputStream} (e.g. by reading a data file).
+ * {@link java.io.InputStream} (e.g., by reading a data file).
  * The objects are packed in a
  * {@link elki.datasource.bundle.MultipleObjectsBundle} which,
  * in turn, is used by a
@@ -35,7 +35,7 @@
  * 0.</li>
  * <li>Files can be gzip compressed.</li>
  * </ul>
- * This file format is e.g. also suitable to gnuplot.
+ * This file format is, e.g., also suitable to gnuplot.
  *
  * @opt hide java.io.*
  * @opt hide elki.utilities.*

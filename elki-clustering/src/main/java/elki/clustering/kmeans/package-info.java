@@ -1,5 +1,5 @@
 /**
- * K-means clustering and variations
+ * K-means clustering and variations.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.kmeans.initialization.KMeansInitialization
@@ -26,4 +26,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("K-means clustering")
 package elki.clustering.kmeans;
+
+import elki.utilities.documentation.Title;

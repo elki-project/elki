@@ -1,5 +1,5 @@
 /**
- * Classes from the tutorial on implementing a custom k-means variation
+ * Classes from the tutorial on implementing a custom k-means variation.
  */
 /*
  * This file is part of ELKI:

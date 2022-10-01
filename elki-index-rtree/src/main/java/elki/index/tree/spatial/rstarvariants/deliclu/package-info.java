@@ -1,5 +1,5 @@
 /**
- * {@link elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree}
+ * {@link elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree}.
  */
 /*
  * This file is part of ELKI:

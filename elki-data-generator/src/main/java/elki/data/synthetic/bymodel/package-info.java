@@ -1,5 +1,5 @@
 /**
- * Generator using a distribution model specified in an XML configuration file
+ * Generator using a distribution model specified in an XML configuration file.
  * <p>
  * {@link elki.application.GeneratorXMLSpec} is a standalone
  * application that loads an XML specification file and generates a synthetic

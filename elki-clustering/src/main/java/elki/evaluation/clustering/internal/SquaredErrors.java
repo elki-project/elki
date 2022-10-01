@@ -50,12 +50,12 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * only (when used with other distances, it will manually square the values; but
  * beware that the result is less meaningful with other distance functions).
  * <p>
- * For clusterings that provide a cluster prototype object (e.g. k-means), the
+ * For clusterings that provide a cluster prototype object (e.g., k-means), the
  * prototype will be used. For other algorithms, the centroid will be
  * recomputed.
  * <p>
  * TODO: support non-vector based clusterings, too, if the algorithm provided a
- * prototype object (e.g. PAM).
+ * prototype object (e.g., PAM).
  * <p>
  * TODO: when combined with k-means, detect if the distance functions agree
  * (both should be using squared Euclidean), and reuse the SSQ values provided

@@ -32,6 +32,7 @@ import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 
 import net.jafama.FastMath;
 
@@ -53,6 +54,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.7.0
  */
+@Title("Bayesian Information Criterion (X-means Version)")
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //

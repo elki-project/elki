@@ -1,5 +1,5 @@
 /**
- * Pairs utility classes
+ * Pairs utility classes.
  * <p>
  * A number of commonly needed primitive pairs are the following:
  * <ul>

@@ -1,5 +1,5 @@
 /**
- * Data type information, also used for type restrictions
+ * Data type information, also used for type restrictions.
  */
 /*
  * This file is part of ELKI:

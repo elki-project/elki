@@ -1,5 +1,5 @@
 /**
- * Entry distsribution strategies of nodes in an M-Tree (and variants).
+ * Entry distribution strategies of nodes in an M-tree (and variants).
  */
 /*
  * This file is part of ELKI:

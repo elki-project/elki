@@ -1,5 +1,5 @@
 /**
- * Code for drawing silhouette plots
+ * Code for drawing silhouette plots.
  */
 /*
  * This file is part of ELKI:

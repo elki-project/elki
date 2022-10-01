@@ -1,5 +1,5 @@
 /**
- * Mathematical operations and utilities used throughout the framework
+ * Mathematical operations and utilities used throughout the framework.
  */
 /*
  * This file is part of ELKI:

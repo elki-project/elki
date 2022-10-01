@@ -36,6 +36,7 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.random.RandomFactory;
 
 /**
@@ -52,6 +53,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Vector type
  */
+@Title("K-means++")
 @Reference(authors = "D. Arthur, S. Vassilvitskii", //
     title = "k-means++: the advantages of careful seeding", //
     booktitle = "Proc. 18th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2007)", //

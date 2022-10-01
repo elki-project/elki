@@ -1,5 +1,5 @@
 /**
- * Prepared queries for distances
+ * Prepared queries for distances.
  *
  * @opt hide .*Instance
  * @opt hide elki.index.distance.*

@@ -40,6 +40,7 @@ import elki.math.MathUtil;
 import elki.math.linearalgebra.CovarianceMatrix;
 import elki.math.statistics.tests.AndersonDarlingTest;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -63,6 +64,7 @@ import elki.utilities.random.RandomFactory;
  * @param <V> Vector
  * @param <M> Model
  */
+@Title("G-means")
 @Reference(authors = "G. Hamerly and C. Elkan", //
     title = "Learning the k in k-means", //
     booktitle = "Neural Information Processing Systems", //

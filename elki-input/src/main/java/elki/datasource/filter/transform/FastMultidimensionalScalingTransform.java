@@ -116,7 +116,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       SimpleTypeInformation<? extends Object> type = objects.meta(r);
       @SuppressWarnings("unchecked")
       final List<Object> column = (List<Object>) objects.getColumn(r);
-      // Not supported column (e.g. labels):
+      // Not supported column (e.g., labels):
       if(!dist.getInputTypeRestriction().isAssignableFromType(type)) {
         bundle.appendColumn(type, column);
         continue;

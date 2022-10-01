@@ -18,7 +18,7 @@
  * e.g.:
  * 
  * <pre>
- *elki.index.level = FINE
+ * elki.index.level = FINE
  * </pre>
  * 
  * to set the logging level for the index structure package to FINE.

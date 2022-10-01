@@ -1,5 +1,5 @@
 /**
- * Insertion (choose path) strategies of nodes in an M-Tree (and variants)
+ * Insertion (choose path) strategies of nodes in an M-tree (and variants).
  */
 /*
  * This file is part of ELKI:

@@ -27,6 +27,6 @@ package elki.visualization.style;
  * @since 0.5.0
  */
 public interface SingleObjectsStylingPolicy extends StylingPolicy {
-  // TODO: finish and use, e.g. for outliers and density visualization
+  // TODO: finish and use, e.g., for outliers and density visualization
   // TODO: do we need anything here beyond "not a class styling policy"?
 }

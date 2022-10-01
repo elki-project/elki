@@ -1,5 +1,5 @@
 /**
- * Clustering algorithms
+ * Clustering algorithms.
  * <p>
  * Clustering algorithms are supposed to implement the
  * {@link elki.Algorithm}-Interface.

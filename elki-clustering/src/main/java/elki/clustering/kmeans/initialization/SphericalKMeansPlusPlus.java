@@ -37,6 +37,7 @@ import elki.distance.*;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -60,6 +61,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Vector type
  */
+@Title("Spherical K-means++")
 @Reference(authors = "Y. Endo and S. Miyamoto", //
     title = "Spherical k-Means++ Clustering", //
     booktitle = "Modeling Decisions for Artificial Intelligence", //

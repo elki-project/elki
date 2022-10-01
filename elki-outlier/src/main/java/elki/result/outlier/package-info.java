@@ -1,5 +1,5 @@
 /**
- * Outlier result classes
+ * Outlier result classes.
  */
 /*
  * This file is part of ELKI:

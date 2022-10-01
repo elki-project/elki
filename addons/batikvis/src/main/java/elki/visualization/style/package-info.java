@@ -1,5 +1,5 @@
 /**
- * Style management for ELKI visualizations
+ * Style management for ELKI visualizations.
  */
 /*
  * This file is part of ELKI:

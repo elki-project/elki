@@ -41,7 +41,7 @@ import elki.utilities.Priority;
 /**
  * Trivial method that takes the average of all dimensions (for one-dimensional
  * data that is just the actual value!) as outlier score. Mostly useful to
- * convert a 1d data set into a score, e.g. in geodata.
+ * convert a 1d data set into a score, e.g., in geodata.
  * 
  * @author Erich Schubert
  * @since 0.6.0

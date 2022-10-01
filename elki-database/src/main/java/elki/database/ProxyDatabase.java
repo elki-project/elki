@@ -30,7 +30,7 @@ import elki.logging.Logging;
 import elki.result.Metadata;
 
 /**
- * A proxy database to use e.g. for projections and partitions.
+ * A proxy database to use, e.g., for projections and partitions.
  *
  * @author Erich Schubert
  * @since 0.4.0

@@ -1,5 +1,5 @@
 /**
- * Linear Approximating and Eliminating Search Algorithm
+ * Linear Approximating and Eliminating Search Algorithm (LAESA).
  */
 /*
  * This file is part of ELKI:

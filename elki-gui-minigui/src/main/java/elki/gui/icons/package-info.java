@@ -1,5 +1,5 @@
 /**
- * Icons for ELKI GUI. Mostly from the Tango Project (Public Domain)
+ * Icons for ELKI GUI. Mostly from the Tango Project (Public Domain).
  */
 /*
  * This file is part of ELKI:

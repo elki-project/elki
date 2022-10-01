@@ -1,5 +1,5 @@
 /**
- * Utilities for arrays: advanced sorting for primitvie arrays
+ * Utilities for arrays: advanced sorting for primitive arrays.
  */
 /*
  * This file is part of ELKI:

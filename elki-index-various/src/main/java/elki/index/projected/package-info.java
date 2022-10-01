@@ -1,5 +1,5 @@
 /**
- * Projected indexes for data
+ * Projected indexes for data.
  */
 /*
  * This file is part of ELKI:

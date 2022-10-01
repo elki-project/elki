@@ -46,7 +46,7 @@ import elki.utilities.documentation.Title;
  * <p>
  * This "algorithm" puts elements into the same cluster when they agree in their
  * labels. I.e. it just uses a predefined clustering, and is mostly useful for
- * testing and evaluation (e.g. comparing the result of a real algorithm to a
+ * testing and evaluation (e.g., comparing the result of a real algorithm to a
  * reference result / golden standard).
  * <p>
  * This variant derives a hierarchical result by doing a prefix comparison on

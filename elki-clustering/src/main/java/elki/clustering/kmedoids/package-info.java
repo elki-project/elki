@@ -1,5 +1,5 @@
 /**
- * K-medoids clustering (PAM)
+ * K-medoids clustering (PAM).
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.kmeans.initialization.KMedoidsInitialization

@@ -1,5 +1,5 @@
 /**
- * Visualizers for outlier scores based on 2D projections
+ * Visualizers for outlier scores based on 2D projections.
  */
 /*
  * This file is part of ELKI:

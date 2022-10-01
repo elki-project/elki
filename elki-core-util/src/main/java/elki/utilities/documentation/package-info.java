@@ -1,5 +1,5 @@
 /**
- * Documentation utilities: Annotations for Title, Description, Reference
+ * Documentation utilities: Annotations for Title, Description, Reference.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Strategies for M-Trees (and variants)
+ * Strategies for M-trees (and variants).
  */
 /*
  * This file is part of ELKI:

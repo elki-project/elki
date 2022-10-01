@@ -38,8 +38,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
  * <p>
  * This optimization is attributed to M. R. Anderberg.
  * <p>
- * This particular implementation is based on Anderberg
- * <p>
  * Reference:
  * <p>
  * M. R. Anderberg<br>

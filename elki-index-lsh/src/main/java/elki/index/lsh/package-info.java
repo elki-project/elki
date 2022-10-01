@@ -1,5 +1,5 @@
 /**
- * Locality Sensitive Hashing
+ * Locality Sensitive Hashing.
  */
 /*
  * This file is part of ELKI:

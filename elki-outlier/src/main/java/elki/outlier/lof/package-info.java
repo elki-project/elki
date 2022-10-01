@@ -1,5 +1,5 @@
 /**
- * LOF family of outlier detection algorithms
+ * LOF family of outlier detection algorithms.
  *
  * @opt include .*elki.outlier.OutlierAlgorithm
  */

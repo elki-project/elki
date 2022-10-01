@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Outlier detection based on the in-degree of the kNN graph.
  * <p>
  * This is a curried version: instead of using a threshold T to obtain a binary
- * decision, we use the computed value as outlier score; normalized by kto
+ * decision, we use the computed value as outlier score; normalized by k to
  * make the numbers more comparable across different parameterizations.
  * <p>
  * Reference:

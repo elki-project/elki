@@ -1,5 +1,5 @@
 /**
- * Visualizers for inspecting cluster differences using pair counting segments
+ * Visualizers for inspecting cluster differences using pair counting segments.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * {@link elki.index.tree.spatial.rstarvariants.rstar.RStarTree}
+ * {@link elki.index.tree.spatial.rstarvariants.rstar.RStarTree}.
  */
 /*
  * This file is part of ELKI:

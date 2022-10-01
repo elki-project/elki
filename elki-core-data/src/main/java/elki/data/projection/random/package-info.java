@@ -1,5 +1,5 @@
 /**
- * Random projection families
+ * Random projection families.
  */
 /*
  * This file is part of ELKI:

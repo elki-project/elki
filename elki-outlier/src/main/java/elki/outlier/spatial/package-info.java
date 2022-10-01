@@ -1,5 +1,5 @@
 /**
- * Spatial outlier detection algorithms
+ * Spatial outlier detection algorithms.
  *
  * @opt include .*elki.outlier.OutlierAlgorithm
  */

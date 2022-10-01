@@ -1,8 +1,6 @@
 /**
  * Estimators for statistical distributions.
  * 
- * @author Erich Schubert
- * 
  * @opt hide elki.math.statistics.distribution.estimator.meta.*
  */
 /*

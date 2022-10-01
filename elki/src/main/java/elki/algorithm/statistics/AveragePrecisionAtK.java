@@ -191,7 +191,7 @@ public class AveragePrecisionAtK<O> implements Algorithm {
         }
       }
     }
-    // Fallback to equality, e.g. on class labels
+    // Fallback to equality, e.g., on class labels
     return ref.equals(test);
   }
 

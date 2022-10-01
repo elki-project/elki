@@ -1,5 +1,5 @@
 /**
- * Graphical User Interfaces for ELKI
+ * Graphical User Interfaces for ELKI.
  */
 /*
  * This file is part of ELKI:

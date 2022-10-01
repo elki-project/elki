@@ -30,7 +30,7 @@ import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Pseudo-k-Means variations, that assigns each object to the nearest center.
+ * Pseudo-k-means variations, that assigns each object to the nearest center.
  *
  * @author Erich Schubert
  * @since 0.7.0

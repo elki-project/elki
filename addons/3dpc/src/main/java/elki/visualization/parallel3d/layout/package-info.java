@@ -1,7 +1,5 @@
 /**
  * Layouting algorithms for 3D parallel coordinate plots.
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

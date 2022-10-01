@@ -1,5 +1,5 @@
 /**
- * Prepared queries for k nearest neighbor (kNN) queries
+ * Prepared queries for k nearest neighbor (kNN) queries.
  *
  * @opt hide elki.algorithm.*
  * @opt hide java.util.*

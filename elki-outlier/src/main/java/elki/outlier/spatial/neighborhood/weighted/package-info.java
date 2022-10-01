@@ -1,5 +1,5 @@
 /**
- * Weighted Neighborhood definitions
+ * Weighted neighborhood definitions.
  */
 /*
  * This file is part of ELKI:

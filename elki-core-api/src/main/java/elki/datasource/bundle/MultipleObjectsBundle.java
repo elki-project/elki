@@ -34,7 +34,7 @@ import elki.utilities.exceptions.AbortException;
 
 /**
  * This class represents a set of "packaged" objects, which is a transfer
- * container for objects e.g. from parsers to a database. It contains the object
+ * container for objects, e.g., from parsers to a database. It contains the object
  * with multiple representations outside of any index structure.
  * 
  * @author Erich Schubert

@@ -25,7 +25,7 @@ import elki.utilities.optionhandling.OptionID;
 /**
  * The eigenpair filter is used to filter eigenpairs (i.e. eigenvectors and
  * their corresponding eigenvalues) which are a result of a Variance Analysis
- * Algorithm, e.g. Principal Component Analysis. The eigenpairs are filtered
+ * Algorithm, e.g., Principal Component Analysis. The eigenpairs are filtered
  * into two types: strong and weak eigenpairs, where strong eigenpairs having
  * high variances and weak eigenpairs having small variances.
  *

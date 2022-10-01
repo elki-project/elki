@@ -1,5 +1,5 @@
 /**
- * Classes from the tutorial on implementing distance functions
+ * Classes from the tutorial on implementing distance functions.
  */
 /*
  * This file is part of ELKI:

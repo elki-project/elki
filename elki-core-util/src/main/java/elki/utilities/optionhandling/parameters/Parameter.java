@@ -150,7 +150,7 @@ public interface Parameter<T> {
   boolean isValid(Object obj) throws ParameterException;
 
   /**
-   * Returns a string representation of the parameter's type (e.g. an
+   * Returns a string representation of the parameter's type (e.g., an
    * {@link elki.utilities.optionhandling.parameters.IntParameter}
    * should return {@code <int>}).
    *

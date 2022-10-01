@@ -1,5 +1,5 @@
 /**
- * Tree-based index structures for <em>metrical</em> vector spaces
+ * Tree-based index structures for <em>metrical</em> vector spaces.
  */
 /*
  * This file is part of ELKI:

@@ -1,8 +1,6 @@
 /**
  * Extraction of partitional clusterings from hierarchical results.
  *
- * @author Erich Schubert
- *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.hierarchical.HierarchicalClusteringAlgorithm
  * @opt include .*elki.clustering.hierarchical.PointerHierarchyResult

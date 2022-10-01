@@ -1,5 +1,5 @@
 /**
- * Visualizers based on 1D projected histograms
+ * Visualizers based on 1D projected histograms.
  */
 /*
  * This file is part of ELKI:

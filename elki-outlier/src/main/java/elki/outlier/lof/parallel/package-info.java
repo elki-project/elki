@@ -33,6 +33,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("Parallel implementations of LOF algorithms")
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
     title = "Local Outlier Detection Reconsidered: a Generalized View on Locality with Applications to Spatial, Video, and Network Outlier Detection", //
     booktitle = "Data Mining and Knowledge Discovery 28(1)", //
@@ -41,3 +42,4 @@
 package elki.outlier.lof.parallel;
 
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;

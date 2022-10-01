@@ -1,5 +1,5 @@
 /**
- * Prepared queries for reverse k nearest neighbor (rkNN) queries
+ * Prepared queries for reverse k nearest neighbor (rkNN) queries.
  * 
  * @opt hide elki.algorithm.*
  */

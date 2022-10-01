@@ -94,7 +94,7 @@ public class HeapPerformanceTest {
 
     // System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
     assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.1 * pqtime);
-    // 1.1 allows some difference in measuring, which can occur e.g. due to Jacoco instrumentation
+    // 1.1 allows some difference in measuring, which can occur, e.g., due to Jacoco instrumentation
   }
 
   private void testHeap(final List<Integer> elements, ComparableMinHeap<Integer> pq) {
