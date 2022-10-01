@@ -239,15 +239,22 @@ public class AndersonDarlingTest {
    * <p>
    * Note: the equations assume a correction with
    * {@link #removeBiasNormalDistributionDAgostino}.
+   * <p>
+   * Reference:
+   * <p>
+   * L. Jäntschi and S. D. Bolboacă<br>
+   * Computation of Probability Associated with Anderson-Darling Statistic<br>
+   * Mathematics 6(6)
    * 
    * @param A2 Anderson Darling statistic
    * @param n sample size
    * @return quantile
    */
-  @Reference(authors = "L. Jäntschi and S. D: Bolboacă", //
-      booktitle = "Mathematics", //
+  @Reference(authors = "L. Jäntschi and S. D. Bolboacă", //
+      booktitle = "Mathematics 6(6)", //
       title = "Computation of Probability Associated with Anderson-Darling Statistic", //
-      url = "https://www.mdpi.com/2227-7390/6/6/88")
+      url = "https://doi.org/10.3390/math6060088", //
+      bibkey = "doi:10.3390/math6060088")
   public static double pValueCase0(double A2, int n) {
     if(A2 == Double.POSITIVE_INFINITY) {
       return 0;

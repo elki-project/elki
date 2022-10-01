@@ -137,7 +137,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       title = "Notes on Bayesian Information Criterion Calculation for X-Means Clustering", //
       booktitle = "Online", //
       url = "https://github.com/bobhancock/goxmeans/blob/master/doc/BIC_notes.pdf", //
-      bibkey = "")
+      bibkey = "web/FogliaH12")
   public static double logLikelihood(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistance<?> distance) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // number of clusters
