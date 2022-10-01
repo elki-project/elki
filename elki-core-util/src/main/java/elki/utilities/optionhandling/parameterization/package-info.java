@@ -1,8 +1,7 @@
 /**
- * Configuration managers
+ * Configuration managers.
  * <p>
- * See the {@link elki.utilities.optionhandling} package for
- * documentation!
+ * See the {@link elki.utilities.optionhandling} package for documentation!
  */
 /*
  * This file is part of ELKI:

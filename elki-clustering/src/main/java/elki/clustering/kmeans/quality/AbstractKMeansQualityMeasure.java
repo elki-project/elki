@@ -40,7 +40,7 @@ import net.jafama.FastMath;
 
 /**
  * Base class for evaluating clusterings by information criteria (such as AIC or
- * BIC). Provides helper functions (e.g. max likelihood calculation) to its
+ * BIC). Provides helper functions (e.g., max likelihood calculation) to its
  * subclasses.
  * <p>
  * References:

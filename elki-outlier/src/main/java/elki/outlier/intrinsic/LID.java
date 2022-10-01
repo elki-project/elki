@@ -46,6 +46,7 @@ import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -70,6 +71,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
+@Title("LID: Intrinsic Dimensionality Outlier")
 @Reference(authors = "Michael E. Houle, Erich Schubert, Arthur Zimek", //
     title = "On the Correlation Between Local Intrinsic Dimensionality and Outlierness", //
     booktitle = "Proc. 11th Int. Conf. Similarity Search and Applications (SISAP'2018)", //

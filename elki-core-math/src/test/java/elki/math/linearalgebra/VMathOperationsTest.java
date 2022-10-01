@@ -43,20 +43,20 @@ public final class VMathOperationsTest {
   /**
    * Method for testing that exceptions are raised if dimension mismatches in
    * input data occur.
-   * 
+   * <p>
    * This test caches Assertion Errors with a given Message if the -ea option is
    * set or rather if assertions are executed. If the -ea option is not set, an
    * ArrayIndexOutOfBoundsException may occur, but out of optimization
    * considerations we don't want to guarantee this exception. So in this case
    * we can't decide if a dimension mismatch has occurred. This is why we need
    * the {@link failWrapper} method.
-   * 
+   * <p>
    * Let's make an example of usage: <br>
    * Let's take two Vectors v1, v2 with different lengths.
    * So v1 + v2 should not be possible to compute, so we want v1.length to equal
    * v2.length and assert with the {@link ERR_VEC_DIMENSIONS} error
    * Message. If we think of any implementation of a plus(v1, v2) method with
-   * vectors as arrays e.g. {@link VMath#plus(double[], double[])},
+   * vectors as arrays, e.g., {@link VMath#plus(double[], double[])},
    * we are going to iterate either over the length of v1 or v2. But with
    * assertions turned of (no -ea set) either v1+v2 or v2+v1 is going to raise
    * an ArrayIndexOutOfBoundsException, while the other is not.
@@ -86,7 +86,7 @@ public final class VMathOperationsTest {
 
   /**
    * FailWrapper function, to wrap a fail into an assertion.
-   * 
+   * <p>
    * This is needed to toggle the fail with the -ea option.
    * 
    * @param msg the msg of {@link assertDimensionMismatch}
@@ -100,7 +100,7 @@ public final class VMathOperationsTest {
 
   /**
    * Test the copy functions of VMath class.
-   * 
+   * <p>
    * Tested Methods:
    * copy(vector), copy(Matrix), columPackedCopy(Matrix), rowPackedcCopy(Matrix)
    */
@@ -215,7 +215,7 @@ public final class VMathOperationsTest {
 
   /**
    * Testing the almostEquals methods of VMath class.
-   * 
+   * <p>
    * Note that almostEquals(m1,m2) is equivalent to almostEquals(m1,m2,
    * {@link VMath#DELTA})
    */
@@ -388,7 +388,7 @@ public final class VMathOperationsTest {
 
   /**
    * Testing setMatrix, setCol and setRow methods of VMath class.
-   * 
+   * <p>
    * Since the get-methods of the VMath class are tested independently of set in
    * {@link #testGet()},
    * we mainly test here via those get Methods.
@@ -516,7 +516,7 @@ public final class VMathOperationsTest {
   /**
    * Testing that the *Equals methods tested in this class work in place and
    * that the other methods tested create a new instance.
-   * 
+   * <p>
    * Tests of methods where the class of the instance returned differs form the
    * class of input are reasonably omitted, when testing reference. We omit the
    * copy methods as well because the only testing made there is the reference.
@@ -566,7 +566,7 @@ public final class VMathOperationsTest {
    * Testing that correct Error is raised when dimension of the input data
    * mismatch the needs of the method.
    * Methods where no error is to be raised are omitted.
-   *
+   * <p>
    * See {@link assertDimensionMismatch} for details.
    */
   @Test

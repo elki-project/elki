@@ -1,5 +1,5 @@
 /**
- * Evaluate an outlier score using a misclassification based cost model
+ * Evaluate an outlier score using a misclassification based cost model.
  *
  * @opt include .*elki.evaluation.Evaluator
  */

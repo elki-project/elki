@@ -1,7 +1,5 @@
 /**
  * Methods for estimating the intrinsic dimensionality.
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

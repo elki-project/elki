@@ -1,5 +1,5 @@
 /**
- * Classes for performing queries (knn, range, ...) on metrical trees
+ * Classes for performing queries (knn, range, ...) on metrical trees.
  */
 /*
  * This file is part of ELKI:

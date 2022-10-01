@@ -30,9 +30,9 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Class to generate unweighted discrete uncertain objects.
- *
+ * <p>
  * This is a second-order generator: it requires the use of another generator to
- * sample from (e.g. {@link UniformUncertainifier} or
+ * sample from (e.g., {@link UniformUncertainifier} or
  * {@link SimpleGaussianUncertainifier}).
  *
  * @author Erich Schubert

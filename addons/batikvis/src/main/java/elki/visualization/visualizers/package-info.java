@@ -1,5 +1,5 @@
 /**
- * Visualizers for various results
+ * Visualizers for various results.
  *
  * @opt hide elki.utilities.datastructures.AnyMap
  * @opt hide Visualization.Factory

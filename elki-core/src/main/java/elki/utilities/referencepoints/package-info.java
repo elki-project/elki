@@ -1,7 +1,7 @@
 /**
- * Package containing strategies to obtain reference points
+ * Package containing strategies to obtain reference points.
  * <p>
- * Shared code for various algorithms that use reference points
+ * Shared code for various algorithms that use reference points.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Distance functions based on subspaces
+ * Distance functions based on subspaces.
  * 
  * @opt hide elki.math.dimensionsimilarity
  */

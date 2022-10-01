@@ -23,7 +23,7 @@ package elki.result;
 import java.util.Iterator;
 
 /**
- * Interface of an "iterable" result (e.g. a list, table) that can be printed one-by-one.
+ * Interface of an "iterable" result (e.g., a list, table) that can be printed one-by-one.
  * (At least when the class O is TextWriteable)
  * 
  * @author Erich Schubert

@@ -1,5 +1,5 @@
 /**
- * Tree-based index structures for <em>spatial</em> indexing
+ * Tree-based index structures for <em>spatial</em> indexing.
  *
  * @opt hide elki.tree.spatial.rstarvariants.deliclu
  */

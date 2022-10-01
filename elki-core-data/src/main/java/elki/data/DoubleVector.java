@@ -127,9 +127,9 @@ public class DoubleVector implements NumberVector {
 
   /**
    * Wrap a double array as vector (without copying).
-   * 
-   * Note: modifying the array afterwards can lead to problems if the data has
-   * e.g. been added to an index, which relies on them being immutable!
+   * <p>
+   * Note: modifying the array afterwards can lead to problems if the data has,
+   * e.g., been added to an index, which relies on them being immutable!
    * 
    * @param vals Values
    * @return Wrapped vector

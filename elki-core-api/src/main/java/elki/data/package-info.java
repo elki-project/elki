@@ -1,5 +1,5 @@
 /**
- * Basic classes for different data types, database object types and label types
+ * Basic classes for different data types, database object types and label types.
  *
  * @opt hide .*Serializer
  * @opt hide .*(Float|Double|Integer|Long|Short|Byte|Bit)Vector\.Factory

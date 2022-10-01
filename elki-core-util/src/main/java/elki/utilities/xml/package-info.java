@@ -1,5 +1,5 @@
 /**
- * XML and XHTML utilities
+ * XML and XHTML utilities.
  */
 /*
  * This file is part of ELKI:

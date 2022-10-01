@@ -271,7 +271,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Flag as tool visualizer.
    * <p>
-   * TODO: don't use a separate boolean for this, but e.g. interface?
+   * TODO: don't use a separate boolean for this, but, e.g., interface?
    * 
    * @param t Tool flag
    * @return {@code this}, for method chaining.

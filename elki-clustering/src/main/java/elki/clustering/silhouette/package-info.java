@@ -1,5 +1,5 @@
 /**
- * Silhouette clustering algorithms
+ * Silhouette clustering algorithms.
  */
 /*
  * This file is part of ELKI:

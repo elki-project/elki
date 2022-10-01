@@ -1,5 +1,5 @@
 /**
- * Statistical measures of dependence, such as correlation
+ * Statistical measures of dependence, such as correlation.
  */
 /*
  * This file is part of ELKI:

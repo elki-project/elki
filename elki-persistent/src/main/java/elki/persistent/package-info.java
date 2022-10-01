@@ -1,5 +1,5 @@
 /**
- * Persistent data management
+ * Persistent data management.
  */
 /*
  * This file is part of ELKI:

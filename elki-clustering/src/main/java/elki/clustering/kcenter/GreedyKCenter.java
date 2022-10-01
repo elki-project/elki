@@ -38,6 +38,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -70,6 +71,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type to cluster
  */
+@Title("Greedy K-center Clustering")
 @Reference(authors = "T. F. Gonzalez", //
     title = "Clustering to Minimize the Maximum Intercluster Distance", //
     booktitle = "Theoretical Computer Science, 38", //

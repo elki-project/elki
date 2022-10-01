@@ -48,7 +48,7 @@ import elki.workflow.InputStep;
 /**
  * Algorithm to validate the quality of an approximative kNN index, by
  * performing a number of queries and comparing them to the results obtained by
- * exact indexing (e.g. linear scanning).
+ * exact indexing (e.g., linear scanning).
  * 
  * @author Erich Schubert
  * @since 0.6.0

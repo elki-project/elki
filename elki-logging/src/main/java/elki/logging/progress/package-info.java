@@ -1,5 +1,5 @@
 /**
- * Progress status objects (for UI)
+ * Progress status objects (for UI).
  */
 /*
  * This file is part of ELKI:

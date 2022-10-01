@@ -138,7 +138,7 @@ public class GrahamScanConvexHull2D {
   /**
    * Find the starting point, and sort it to the beginning of the list. The
    * starting point must be on the outer hull. Any "most extreme" point will do,
-   * e.g. the one with the lowest Y coordinate and for ties with the lowest X.
+   * e.g., the one with the lowest Y coordinate and for ties with the lowest X.
    */
   private void findStartingPoint() {
     // Well, we already know the best Y value...

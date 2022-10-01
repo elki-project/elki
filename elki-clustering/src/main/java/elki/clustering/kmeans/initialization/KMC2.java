@@ -34,6 +34,7 @@ import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,6 +53,7 @@ import elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.8.0
  */
+@Title("K-MC²")
 @Reference(authors = "O. Bachem, M. Lucic, S. H. Hassani, A. Krause", //
     title = "Approximate K-Means++ in Sublinear Time", //
     booktitle = "Proc. 30th AAAI Conference on Artificial Intelligence", //

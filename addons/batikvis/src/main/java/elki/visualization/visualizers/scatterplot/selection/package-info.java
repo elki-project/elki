@@ -1,5 +1,5 @@
 /**
- * Visualizers for object selection based on 2D projections
+ * Visualizers for object selection based on 2D projections.
  */
 /*
  * This file is part of ELKI:

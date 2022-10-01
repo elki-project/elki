@@ -26,7 +26,7 @@ import elki.visualization.svg.SVGPlot;
 
 /**
  * A marker library is a class that can generate and draw various styles of
- * markers. Different uses might require different marker libraries (e.g. full
+ * markers. Different uses might require different marker libraries (e.g., full
  * screen, thumbnail, print)
  * 
  * @author Erich Schubert

@@ -41,6 +41,7 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.FormatUtil;
 import elki.utilities.optionhandling.OptionID;
@@ -50,10 +51,10 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * tSNE using Barnes-Hut-Approximation.
+ * t-SNE using Barnes-Hut-Approximation.
  * <p>
  * For larger data sets, use an index to make finding the nearest neighbors
- * faster, e.g. cover tree or k-d-tree.
+ * faster, e.g., cover tree or k-d-tree.
  * <p>
  * Reference:
  * <p>
@@ -68,6 +69,7 @@ import elki.utilities.random.RandomFactory;
  *
  * @param <O> Object type
  */
+@Title("t-SNE using Barnes-Hut-Approximation")
 @Reference(authors = "L. J. P. van der Maaten", //
     title = "Accelerating t-SNE using Tree-Based Algorithms", //
     booktitle = "Journal of Machine Learning Research 15", //

@@ -1,5 +1,5 @@
 /**
- * Configurator components
+ * Configurator components.
  *
  * @opt hide javax.swing.*
  * @opt hide java.awt.event

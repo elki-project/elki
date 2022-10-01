@@ -35,7 +35,7 @@ import java.nio.ByteBuffer;
  */
 public interface ByteBufferSerializer<T> {
   /**
-   * Deserialize an object from a byte buffer (e.g. disk)
+   * Deserialize an object from a byte buffer (e.g., disk)
    * 
    * @param buffer Data array to process
    * @return Deserialized object
@@ -46,7 +46,7 @@ public interface ByteBufferSerializer<T> {
   T fromByteBuffer(ByteBuffer buffer) throws IOException;
 
   /**
-   * Serialize the object to a byte array (e.g. disk)
+   * Serialize the object to a byte array (e.g., disk)
    * 
    * @param buffer Buffer to serialize to
    * @param object Object to serialize

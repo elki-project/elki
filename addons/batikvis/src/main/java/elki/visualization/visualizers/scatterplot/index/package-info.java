@@ -1,5 +1,5 @@
 /**
- * Visualizers for index structures based on 2D projections
+ * Visualizers for index structures based on 2D projections.
  */
 /*
  * This file is part of ELKI:

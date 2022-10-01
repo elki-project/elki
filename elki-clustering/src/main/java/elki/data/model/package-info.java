@@ -1,5 +1,5 @@
 /**
- * Cluster models classes for various algorithms
+ * Cluster models classes for various algorithms.
  *
  * @opt include .*elki.data.Cluster
  * @opt include .*elki.data.Clustering

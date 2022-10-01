@@ -1,8 +1,7 @@
 /**
- * Classes for various typed parameters
+ * Classes for various typed parameters.
  * <p>
- * See the {@link elki.utilities.optionhandling} package for
- * documentation!
+ * See the {@link elki.utilities.optionhandling} package for documentation!
  *
  * @opt hide elki.utilities.*
  * @opt hide gui.configurator.*

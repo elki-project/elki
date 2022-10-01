@@ -1,5 +1,5 @@
 /**
- * Index structure implementations
+ * Index structure implementations.
  *
  * @opt hide elki.index.*\.*\.Factory
  * @opt hide elki.index.tree.TreeIndexFactory

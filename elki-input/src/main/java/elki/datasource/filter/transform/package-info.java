@@ -1,5 +1,5 @@
 /**
- * Data space transformations
+ * Data space transformations.
  *
  * @opt include .*elki.datasource.filter.ObjectFilter
  * @opt include .*elki.datasource.filter.StreamFilter

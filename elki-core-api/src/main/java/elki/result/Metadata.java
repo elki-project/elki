@@ -930,7 +930,7 @@ public class Metadata extends WeakReference<Object> {
   }
 
   /**
-   * Base class for iterators that need to look ahead, e.g. to check
+   * Base class for iterators that need to look ahead, e.g., to check
    * conditions on the next element.
    *
    * @author Erich Schubert

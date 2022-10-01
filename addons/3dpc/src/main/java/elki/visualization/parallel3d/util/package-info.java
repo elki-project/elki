@@ -1,7 +1,5 @@
 /**
  * Utility classes (primarily rendering utilities).
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

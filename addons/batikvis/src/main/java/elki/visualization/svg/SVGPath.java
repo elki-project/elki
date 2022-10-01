@@ -171,7 +171,7 @@ public class SVGPath {
   }
 
   /**
-   * Constructor from a double[] collection (e.g. a polygon)
+   * Constructor from a double[] collection (e.g., a polygon)
    *
    * @param vectors vectors
    */

@@ -1,5 +1,5 @@
 /**
- * Commonly used functionality useful for Apache Batik
+ * Commonly used functionality useful for Apache Batik.
  */
 /*
  * This file is part of ELKI:

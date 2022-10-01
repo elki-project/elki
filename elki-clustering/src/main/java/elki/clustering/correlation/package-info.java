@@ -1,5 +1,5 @@
 /**
- * Correlation clustering algorithms
+ * Correlation clustering algorithms.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  * @opt include .*elki.clustering.Abstract.*Clustering

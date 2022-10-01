@@ -214,7 +214,7 @@ public class KMLOutputHandler implements ResultHandler {
       xmlw.writeCharacters("ELKI KML output for " + Metadata.of(outlierResult).getLongName());
       xmlw.writeEndElement(); // name
       writeNewlineOnDebug(xmlw);
-      // TODO: e.g. list the settings in the description?
+      // TODO: e.g., list the settings in the description?
       xmlw.writeStartElement("description");
       xmlw.writeCharacters("ELKI KML output for " + Metadata.of(outlierResult).getLongName());
       xmlw.writeEndElement(); // description
@@ -362,7 +362,7 @@ public class KMLOutputHandler implements ResultHandler {
       xmlw.writeCharacters("ELKI KML output for " + Metadata.of(clustering).getLongName());
       xmlw.writeEndElement(); // name
       writeNewlineOnDebug(xmlw);
-      // TODO: e.g. list the settings in the description?
+      // TODO: e.g., list the settings in the description?
       xmlw.writeStartElement("description");
       xmlw.writeCharacters("ELKI KML output for " + Metadata.of(clustering).getLongName());
       xmlw.writeEndElement(); // description

@@ -1,5 +1,5 @@
 /**
- * Visualization package of ELKI
+ * Visualization package of ELKI.
  *
  * @opt hide elki.utilities
  * @opt hide java.lang.*

@@ -1,5 +1,5 @@
 /**
- * Space filling curves
+ * Space filling curves.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Visualizers for index structure based on parallel coordinates
+ * Visualizers for index structure based on parallel coordinates.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Utility classes for simple ensembles
+ * Utility classes for simple ensembles.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Visualizers for object selection based on parallel projections
+ * Visualizers for object selection based on parallel projections.
  */
 /*
  * This file is part of ELKI:

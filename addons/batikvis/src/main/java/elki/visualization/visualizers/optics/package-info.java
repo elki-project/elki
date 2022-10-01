@@ -1,5 +1,5 @@
 /**
- * Visualizers that do work on OPTICS plots
+ * Visualizers that do work on OPTICS plots.
  */
 /*
  * This file is part of ELKI:

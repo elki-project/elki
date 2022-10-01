@@ -33,7 +33,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Class to run PCA on given data.
  * <p>
- * The various methods will start PCA at different places (e.g. with database
+ * The various methods will start PCA at different places (e.g., with database
  * IDs, database query results, a precomputed covariance matrix or eigenvalue
  * decomposition).
  * <p>

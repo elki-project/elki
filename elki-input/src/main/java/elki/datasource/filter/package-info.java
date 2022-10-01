@@ -1,5 +1,5 @@
 /**
- * Data filtering, in particular for normalization and projection
+ * Data filtering, in particular for normalization and projection.
  *
  * @opt hide elki.utilities.*
  * @opt hide elki.datasource.filter\.(normalization|transform)\.*

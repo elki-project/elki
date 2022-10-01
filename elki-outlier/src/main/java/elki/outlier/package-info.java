@@ -1,5 +1,5 @@
 /**
- * Outlier detection algorithms
+ * Outlier detection algorithms.
  * 
  * @see elki.algorithm
  * 

@@ -22,8 +22,8 @@ package elki.utilities.exceptions;
 
 /**
  * Exception thrown when no compatible data was found.
- *
- * Often this is caused by trying to run e.g. an algorithm that requires a
+ * <p>
+ * Often this is caused by trying to run, e.g., an algorithm that requires a
  * vector field of fixed dimensionality on a data set that is of varying
  * dimensionality, or when trying to run an algorithm that only supports
  * numerical attributes on non-numerical data.

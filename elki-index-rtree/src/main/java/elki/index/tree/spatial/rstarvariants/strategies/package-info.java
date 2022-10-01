@@ -1,5 +1,5 @@
 /**
- * Various strategies for R-Trees and variants
+ * Various strategies for R-trees and variants.
  */
 /*
  * This file is part of ELKI:

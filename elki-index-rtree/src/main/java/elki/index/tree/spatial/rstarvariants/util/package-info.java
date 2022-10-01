@@ -1,5 +1,5 @@
 /**
- * Utilities for R*-Tree and variants
+ * Utilities for R*-tree and variants.
  */
 /*
  * This file is part of ELKI:

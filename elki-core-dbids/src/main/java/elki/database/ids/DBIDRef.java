@@ -46,7 +46,7 @@ public interface DBIDRef {
 
   /**
    * <b>WARNING:</b> Hash codes of this interface <b>might not be stable</b>
-   * (e.g. for iterators).
+   * (e.g., for iterators).
    * <p>
    * Use {@link DBIDUtil#deref} to get an object with a stable hash code!
    *

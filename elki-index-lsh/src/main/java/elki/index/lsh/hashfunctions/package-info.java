@@ -1,5 +1,5 @@
 /**
- * Hash functions for LSH
+ * Hash functions for LSH.
  */
 /*
  * This file is part of ELKI:

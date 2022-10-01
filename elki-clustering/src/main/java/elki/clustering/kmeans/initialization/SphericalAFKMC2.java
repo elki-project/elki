@@ -30,6 +30,7 @@ import elki.database.relation.Relation;
 import elki.distance.*;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -51,6 +52,7 @@ import elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.8.0
  */
+@Title("Spherical AFK-MC²")
 @Reference(authors = "R. Pratap, A. A. Deshmukh, P. Nair, T. Dutt", //
     title = "A Faster Sampling Algorithm for Spherical k-means", //
     booktitle = "Proc. 10th Asian Conference on Machine Learning, ACML", //

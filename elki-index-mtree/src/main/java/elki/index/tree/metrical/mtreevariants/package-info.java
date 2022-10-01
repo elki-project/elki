@@ -1,5 +1,5 @@
 /**
- * M-Tree and variants
+ * M-tree and variants.
  */
 /*
  * This file is part of ELKI:

@@ -28,7 +28,7 @@ import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Title;
 
 /**
- * Null algorithm, which does nothing. Can be used to e.g. visualize a data set.
+ * Null algorithm, which does nothing. Can be used to, e.g., visualize a data set.
  * 
  * @author Erich Schubert
  * @since 0.2

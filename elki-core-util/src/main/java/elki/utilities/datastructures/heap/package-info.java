@@ -1,5 +1,5 @@
 /**
- * Heap structures and variations such as bounded priority heaps
+ * Heap structures and variations such as bounded priority heaps.
  */
 /*
  * This file is part of ELKI:

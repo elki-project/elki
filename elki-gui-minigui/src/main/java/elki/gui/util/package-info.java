@@ -1,5 +1,5 @@
 /**
- * Utility classes for GUIs (e.g. a class to display a logging panel)
+ * Utility classes for GUIs (e.g., a class to display a logging panel).
  */
 /*
  * This file is part of ELKI:

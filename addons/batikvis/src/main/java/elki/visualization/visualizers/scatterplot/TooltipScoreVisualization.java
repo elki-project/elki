@@ -227,7 +227,7 @@ public class TooltipScoreVisualization implements VisFactory {
     /**
      * Parameter for the gamma-correction.
      */
-    public static final OptionID DIGITS_ID = new OptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
+    public static final OptionID DIGITS_ID = new OptionID("tooltip.digits", "Number of digits to show (e.g., when visualizing outlier scores)");
 
     @Override
     public void configure(Parameterization config) {

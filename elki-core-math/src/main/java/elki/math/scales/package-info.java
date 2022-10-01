@@ -1,5 +1,5 @@
 /**
- * Scales handling for plotting
+ * Scales handling for plotting.
  */
 /*
  * This file is part of ELKI:

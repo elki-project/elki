@@ -1,5 +1,5 @@
 /**
- * Visualizers that do work on Silhouette plots
+ * Visualizers that do work on Silhouette plots.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Classes for computing histograms
+ * Classes for computing histograms.
  * <p>
  * This package contains two families of histograms. Static histograms have a
  * fixed initial number of bins. When encountering values outside of their

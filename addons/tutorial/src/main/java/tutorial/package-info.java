@@ -1,5 +1,5 @@
 /**
- * Classes for ELKI tutorials
+ * Classes for ELKI tutorials.
  */
 /*
  * This file is part of ELKI:

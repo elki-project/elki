@@ -1,5 +1,5 @@
 /**
- * Generators for synthetic data sets
+ * Generators for synthetic data sets.
  */
 /*
  * This file is part of ELKI:

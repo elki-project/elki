@@ -1,5 +1,5 @@
 /**
- * Relations, materialized and virtual (views)
+ * Relations, materialized and virtual (views).
  */
 /*
  * This file is part of ELKI:

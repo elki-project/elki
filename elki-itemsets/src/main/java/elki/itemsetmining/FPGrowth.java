@@ -60,10 +60,10 @@ import elki.utilities.documentation.Reference;
  * optimized.
  * <p>
  * The worst case memory use probably is \(O(\min(n\cdot l,i^l))\) where i is
- * the
- * number of items, l the average itemset length, and n the number of items. The
- * worst case scenario is when every item is frequent, and every transaction is
- * unique. The resulting tree will then be larger than the original data.
+ * the number of items, l the average itemset length, and n the number of
+ * items. The worst case scenario is when every item is frequent, and every
+ * transaction is unique. The resulting tree will then be larger than the
+ * original data.
  * <p>
  * Reference:
  * <p>

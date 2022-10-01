@@ -1,5 +1,5 @@
 /**
- * Evaluation of clustering results
+ * Evaluation of clustering results.
  *
  * @opt include .*elki.evaluation.Evaluator
  * @opt include .*elki.data.Clustering

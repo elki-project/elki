@@ -1,5 +1,5 @@
 /**
- * Data normalization
+ * Data normalization.
  *
  * @opt include .*elki.datasource.filter.ObjectFilter
  */

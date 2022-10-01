@@ -1,5 +1,5 @@
 /**
- * Constraints allow to restrict possible values for parameters
+ * Constraints allow to restrict possible values for parameters.
  */
 /*
  * This file is part of ELKI:

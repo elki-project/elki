@@ -52,7 +52,7 @@ import net.jafama.FastMath;
  * <p>
  * <b>Important note: this code hasn't been double checked yet. While it
  * probably works for some simple cases such as example data set generation, do
- * <em>not</em> rely on it for e.g. quasi monte carlo methods without
+ * <em>not</em> rely on it for, e.g., quasi monte carlo methods without
  * double-checking the quality, and looking at more advanced methods!</b>
  * <p>
  * Let me repeat this: this code was written <b>to generate toy datasets</b>. It

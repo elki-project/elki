@@ -1,5 +1,5 @@
 /**
- * Save dialog for SVG plots
+ * Save dialog for SVG plots.
  */
 /*
  * This file is part of ELKI:

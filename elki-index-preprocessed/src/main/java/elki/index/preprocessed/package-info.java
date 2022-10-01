@@ -1,5 +1,5 @@
 /**
- * Index structure based on preprocessors
+ * Index structure based on preprocessors.
  */
 /*
  * This file is part of ELKI:

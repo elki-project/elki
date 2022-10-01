@@ -1,5 +1,5 @@
 /**
- * K-center clustering
+ * K-center clustering.
  */
 /*
  * This file is part of ELKI:

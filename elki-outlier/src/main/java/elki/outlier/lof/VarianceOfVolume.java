@@ -61,8 +61,7 @@ import net.jafama.FastMath;
  * Variance of Volume for outlier detection.
  * <p>
  * The volume is estimated by the distance to the k-nearest neighbor, then
- * the
- * variance of volume is computed.
+ * the variance of volume is computed.
  * <p>
  * Unfortunately, this approach needs an enormous numerical precision, and may
  * not work for high-dimensional, non-normalized data. We therefore divide each

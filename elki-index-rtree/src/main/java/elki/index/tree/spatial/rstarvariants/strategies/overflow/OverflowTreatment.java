@@ -26,7 +26,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 
 /**
- * Reinsertion strategy to resolve overflows in the RStarTree.
+ * Reinsertion strategy to resolve overflows in the R*-tree.
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -45,7 +45,7 @@ public interface OverflowTreatment {
    * @param tree Tree
    * @param node Node
    * @param path Path
-   * @return true when already handled (e.g. by reinserting)
+   * @return true when already handled (e.g., by reinserting)
    */
   <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E, ?> tree, N node, IndexTreePath<E> path);
 }

@@ -1,5 +1,5 @@
 /**
- * Meta outlier detection algorithms: external scores, score rescaling
+ * Meta outlier detection algorithms: external scores, score rescaling.
  *
  * @opt include .*elki.outlier.OutlierAlgorithm
  */

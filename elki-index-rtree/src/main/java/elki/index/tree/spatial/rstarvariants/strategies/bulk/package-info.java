@@ -1,5 +1,5 @@
 /**
- * Packages for bulk-loading R*-Trees
+ * Packages for bulk-loading R*-trees.
  */
 /*
  * This file is part of ELKI:

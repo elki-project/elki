@@ -1,5 +1,5 @@
 /**
- * Standard distributions, with random generation functionalities
+ * Standard distributions, with random generation functionalities.
  */
 /*
  * This file is part of ELKI:

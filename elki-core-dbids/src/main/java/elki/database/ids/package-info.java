@@ -2,7 +2,7 @@
  * Database object identification and ID group handling <em>API</em>.
  * <p>
  * Database IDs (short: DBID) in ELKI are based on the factory pattern, to allow replacing
- * the simple Integer-based DBIDs with more complex implementations, e.g. for use with external
+ * the simple Integer-based DBIDs with more complex implementations, e.g., for use with external
  * databases or to add tracking for debugging purposes. This also allows adding of more efficient
  * implementations later on in a single place.
  * <p>

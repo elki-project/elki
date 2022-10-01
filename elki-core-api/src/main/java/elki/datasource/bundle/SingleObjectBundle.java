@@ -29,7 +29,7 @@ import elki.database.ids.DBIDVar;
 
 /**
  * This class represents a "packaged" object, which is a transfer container for
- * objects e.g. from parsers to a database. It contains the object with multiple
+ * objects, e.g., from parsers to a database. It contains the object with multiple
  * representations outside of any index structure.
  * 
  * @author Erich Schubert

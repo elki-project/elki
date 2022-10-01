@@ -30,8 +30,8 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * This is a fake datasource that produces a static DBID range only.
- * 
- * This is useful when using e.g. a distance matrix to access external data.
+ * <p>
+ * This is useful when using, e.g., a distance matrix to access external data.
  * 
  * @author Erich Schubert
  * @since 0.5.0

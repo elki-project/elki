@@ -208,7 +208,7 @@ public final class HTMLUtil {
   public static final String HTML_ID_ATTRIBUTE = "id";
 
   /**
-   * HTML name attribute (e.g. A tag)
+   * HTML name attribute (e.g., a tag)
    */
   public static final String HTML_NAME_ATTRIBUTE = "name";
 

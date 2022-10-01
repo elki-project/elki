@@ -1,5 +1,5 @@
 /**
- * Visualizers for data set density in a scatterplot projection
+ * Visualizers for data set density in a scatterplot projection.
  */
 /*
  * This file is part of ELKI:

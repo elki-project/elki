@@ -28,6 +28,7 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 
 /**
  * Filtering or "blacklisting" K-means with k-d-tree acceleration.
@@ -64,6 +65,7 @@ import elki.utilities.documentation.Reference;
  *
  * @param <V> vector datatype
  */
+@Title("K-d-tree K-means with Filtering")
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "Accelerating Exact k-means Algorithms with Geometric Reasoning", //
     booktitle = "Proc. ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining", //

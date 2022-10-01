@@ -1,7 +1,5 @@
 /**
  * Preprocessed index used by the FastOPTICS algorithm.
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

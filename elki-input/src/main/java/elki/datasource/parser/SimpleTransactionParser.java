@@ -36,10 +36,10 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Simple parser for transactional data, such as market baskets.
- *
+ * <p>
  * To keep the input format simple and readable, all tokens are assumed to be of
  * text and separated by whitespace, and each transaction is on a separate line.
- *
+ * <p>
  * An example file containing two transactions looks like this
  *
  * <pre>
@@ -47,7 +47,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * paste tomato basil
  * </pre>
  *
- * TODO: add a parameter to e.g. use the first or last entry as labels instead
+ * TODO: add a parameter to, e.g., use the first or last entry as labels instead
  * of tokens.
  *
  * @author Erich Schubert

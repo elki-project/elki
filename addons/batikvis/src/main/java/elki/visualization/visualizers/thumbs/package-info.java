@@ -1,5 +1,5 @@
 /**
- * Thumbnail "Visualizers" (that take care of refreshing thumbnails)
+ * Thumbnail "Visualizers" (that take care of refreshing thumbnails).
  */
 /*
  * This file is part of ELKI:

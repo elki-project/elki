@@ -170,7 +170,7 @@ public abstract class AbstractParameter<P extends AbstractParameter<P, T>, T> im
   }
 
   /**
-   * Validate a value after parsing (e.g. do constraint checks!)
+   * Validate a value after parsing (e.g., do constraint checks!)
    * 
    * @param obj Object to validate
    * @return true iff the object is valid for this parameter.

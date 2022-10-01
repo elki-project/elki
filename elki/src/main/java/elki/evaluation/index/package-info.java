@@ -1,5 +1,5 @@
 /**
- * Simple index evaluation methods
+ * Simple index evaluation methods.
  */
 /*
  * This file is part of ELKI:

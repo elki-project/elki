@@ -1,5 +1,5 @@
 /**
- * Basic memory structures such as heaps and object hierarchies
+ * Basic memory structures such as heaps and object hierarchies.
  */
 /*
  * This file is part of ELKI:

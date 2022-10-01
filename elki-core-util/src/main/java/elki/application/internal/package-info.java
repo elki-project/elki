@@ -1,5 +1,5 @@
 /**
- * Internal utilities for development
+ * Internal utilities for development.
  * 
  * @opt include .*elki.utilities.optionhandling.AbstractParameterizer
  * @opt include .*elki.utilities.ELKIServiceLoader

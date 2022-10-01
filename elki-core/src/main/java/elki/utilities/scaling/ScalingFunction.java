@@ -21,7 +21,7 @@
 package elki.utilities.scaling;
 
 /**
- * Interface for scaling functions used e.g. by outlier evaluation such as
+ * Interface for scaling functions used, e.g., by outlier evaluation such as
  * Histograms and visualization.
  * <p>
  * When using outlier scaling functions, make sure to invoke

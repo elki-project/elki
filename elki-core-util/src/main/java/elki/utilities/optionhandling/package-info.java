@@ -205,7 +205,7 @@
  * TODO issue)
  * </li>
  * <li><b>Tracking parameterizations:</b>:
- * Sometimes (e.g. for help functions, re-running, configuration templates etc.)
+ * Sometimes (e.g., for help functions, re-running, configuration templates etc.)
  * it is required to track all parameters an (sub-) algorithm consumed. This can
  * be done using a
  * {@link elki.utilities.optionhandling.parameterization.TrackParameters

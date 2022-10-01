@@ -1,6 +1,6 @@
 /**
  * Weight functions used in weighted PCA via
- * {@link elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder}
+ * {@link elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder}.
  */
 /*
  * This file is part of ELKI:

@@ -51,11 +51,11 @@ import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualizati
 
 /**
  * Visualize uncertain objects by multiple samples.
- *
+ * <p>
  * Note: this is currently a hack. Our projection only applies to vector field
- * relations currently, and this visualizer activates if such a relation (e.g. a
- * sample, or the center of mass) has a parent relation of type UncertainObject.
- * But it serves the purpose.
+ * relations currently, and this visualizer activates if such a relation (e.g.,
+ * a sample, or the center of mass) has a parent relation of type
+ * UncertainObject. But it serves the purpose.
  *
  * @author Erich Schubert
  * @since 0.7.0

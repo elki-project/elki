@@ -1,5 +1,5 @@
 /**
- * Generate line styles for plotting in CSS
+ * Generate line styles for plotting in CSS.
  */
 /*
  * This file is part of ELKI:

@@ -1,5 +1,5 @@
 /**
- * Managing CSS styles / classes
+ * Managing CSS styles / classes.
  */
 /*
  * This file is part of ELKI:

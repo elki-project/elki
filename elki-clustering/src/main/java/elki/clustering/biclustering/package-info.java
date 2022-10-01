@@ -1,5 +1,5 @@
 /**
- * Biclustering algorithms
+ * Biclustering algorithms.
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  */

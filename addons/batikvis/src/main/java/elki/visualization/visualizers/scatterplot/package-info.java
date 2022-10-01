@@ -1,5 +1,5 @@
 /**
- * Visualizers based on scatterplots
+ * Visualizers based on scatterplots.
  *
  * @opt hide elki.visualization.batikutil.*
  * @opt hide elki.visualization.svg.*

@@ -51,6 +51,7 @@ import elki.logging.statistics.StringStatistic;
 import elki.math.MathUtil;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
+import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.WrongParameterValueException;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -87,6 +88,7 @@ import elki.utilities.random.RandomFactory;
  * @param <V> Vector type
  * @param <M> Model type
  */
+@Title("X-means")
 @Reference(authors = "D. Pelleg, A. Moore", //
     title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
     booktitle = "Proc. 17th Int. Conf. on Machine Learning (ICML 2000)", //
@@ -311,7 +313,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     /**
      * Quality measure to use for evaluating splits.
      */
-    public static final OptionID INFORMATION_CRITERION_ID = new OptionID("xmeans.quality", "The quality measure to evaluate splits (e.g. AIC, BIC)");
+    public static final OptionID INFORMATION_CRITERION_ID = new OptionID("xmeans.quality", "The quality measure to evaluate splits (e.g., AIC, BIC)");
 
     /**
      * Variant of kMeans

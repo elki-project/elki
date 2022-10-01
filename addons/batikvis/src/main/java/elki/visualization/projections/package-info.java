@@ -1,5 +1,5 @@
 /**
- * Visualization projections
+ * Visualization projections.
  */
 /*
  * This file is part of ELKI:

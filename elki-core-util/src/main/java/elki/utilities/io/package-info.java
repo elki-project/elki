@@ -1,7 +1,5 @@
 /**
  * Utility classes for input/output.
- * 
- * @author Erich Schubert
  */
 /*
  * This file is part of ELKI:

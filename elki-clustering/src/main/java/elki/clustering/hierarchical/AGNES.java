@@ -377,7 +377,7 @@ public class AGNES<O> implements HierarchicalClusteringAlgorithm {
     /**
      * Option ID for linkage parameter.
      */
-    public static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Linkage method to use (e.g. Ward, Single-Link)");
+    public static final OptionID LINKAGE_ID = new OptionID("hierarchical.linkage", "Linkage method to use (e.g., Ward, Single-Link)");
 
     /**
      * Current linkage in use.

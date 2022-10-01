@@ -1,5 +1,5 @@
 /**
- * Object bundles - exchange container for multi-represented objects
+ * Object bundles - exchange container for multi-represented objects.
  *
  * @opt hide java.util.*
  */

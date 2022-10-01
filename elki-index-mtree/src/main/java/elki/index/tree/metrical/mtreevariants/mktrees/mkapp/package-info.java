@@ -1,5 +1,5 @@
 /**
- * {@link elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTree}
+ * {@link elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTree}.
  */
 /*
  * This file is part of ELKI:

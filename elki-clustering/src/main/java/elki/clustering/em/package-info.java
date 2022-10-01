@@ -1,5 +1,6 @@
 /**
- * Expectation-Maximization clustering algorithm.
+ * Expectation-Maximization clustering algorithm for Gaussian Mixture Modeling
+ * (GMM).
  *
  * @opt include .*elki.clustering.ClusteringAlgorithm
  */
@@ -23,4 +24,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("EM (Gaussian Mixture Modeling with Expectation Maximization)")
 package elki.clustering.em;
+
+import elki.utilities.documentation.Title;

@@ -1,5 +1,5 @@
 /**
- * Naming schemes for clusters (for output when an algorithm doesn't generate
+ * Naming schemes for clusters (for output when an algorithm does not generate
  * cluster names).
  */
 /*

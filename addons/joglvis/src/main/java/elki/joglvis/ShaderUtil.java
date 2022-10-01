@@ -124,7 +124,7 @@ public final class ShaderUtil {
      * Constructor.
      *
      * @param message Error message
-     * @param cause Cause (e.g. file not found)
+     * @param cause Cause (e.g., file not found)
      */
     public ShaderCompilationException(String message, Throwable cause) {
       super(message, cause);

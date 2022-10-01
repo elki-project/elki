@@ -85,7 +85,7 @@ public class GeneratorMain {
   protected boolean testAgainstModel = true;
 
   /**
-   * Pattern, which clusters (e.g. "Noise") to relabel by the second best
+   * Pattern, which clusters (e.g., "Noise") to relabel by the second best
    * cluster.
    */
   protected Pattern relabelClusters = null;

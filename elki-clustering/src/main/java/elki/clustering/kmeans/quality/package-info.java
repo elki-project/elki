@@ -24,4 +24,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+@Title("Quality Measures for K-means")
 package elki.clustering.kmeans.quality;
+
+import elki.utilities.documentation.Title;

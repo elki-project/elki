@@ -1,5 +1,5 @@
 /**
- * Reinsertion strategies for R-Trees
+ * Reinsertion strategies for R-trees.
  */
 /*
  * This file is part of ELKI:

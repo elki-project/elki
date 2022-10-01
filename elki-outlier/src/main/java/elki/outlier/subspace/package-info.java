@@ -1,5 +1,5 @@
 /**
- * Subspace outlier detection methods
+ * Subspace outlier detection methods.
  * <p>
  * Methods that detect outliers in subspaces (projections) of the data set.
  *
