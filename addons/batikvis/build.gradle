@@ -2,19 +2,19 @@ description = 'ELKI - Batik Visualization'
 dependencies {
   api project(':elki-gui-minigui') // For GUIUtil, otherwise elki would be enough
   api project(':elki-uncertain')
-  api(group: 'org.apache.xmlgraphics', name: 'batik-dom', version:'1.14+') {
+  api(group: 'org.apache.xmlgraphics', name: 'batik-dom', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
-  api(group: 'org.apache.xmlgraphics', name: 'batik-swing', version:'1.14+') {
+  api(group: 'org.apache.xmlgraphics', name: 'batik-swing', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
-  api(group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version:'1.14+') {
+  api(group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
-  api(group: 'org.apache.xmlgraphics', name: 'batik-ext', version:'1.14+') {
+  api(group: 'org.apache.xmlgraphics', name: 'batik-ext', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
-  api(group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'1.14+') {
+  api(group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
   api(group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'2.6+') {
