@@ -58,6 +58,7 @@ jar {
 }
 
 sourceJar.from(configurations.doc)
+sourceJar.dependsOn project(":elki-core-util").sourceJar // template-generated sources
 
 javadoc {
   source configurations.doc

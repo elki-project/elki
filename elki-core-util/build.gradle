@@ -47,6 +47,8 @@ task generateCodeArrays(description: "Generate code from templates") {
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeArrays
+tasks.sourceJar.dependsOn generateCodeArrays
+
 task generateCodeHeaps(description: "Generate code from templates") {
       def pkg = "elki/utilities/datastructures/heap/";
       def out = new File(generatedSrcDir, pkg);
@@ -137,6 +139,7 @@ task generateCodeHeaps(description: "Generate code from templates") {
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeHeaps
+tasks.sourceJar.dependsOn generateCodeHeaps
 
 dependencies {
   api project(':elki-logging')
