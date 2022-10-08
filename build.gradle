@@ -10,7 +10,7 @@ allprojects  {
   apply plugin: 'maven-publish' // Not strictly necessary, but convenient
   repositories { mavenCentral() }
 
-  group = 'elki'
+  group = 'io.github.elki-project'
   version = '0.8.0'
 
   sourceCompatibility = 1.8
