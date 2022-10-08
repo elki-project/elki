@@ -17,7 +17,7 @@ dependencies {
   api(group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'[1.14,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
-  api(group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'2.6+') {
+  api(group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'[2.6,)') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
   implementation(group: 'xalan', name: 'serializer', version:'[2.7.2,3)') {
