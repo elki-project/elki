@@ -64,6 +64,7 @@ subprojects {
       // Add --allow-script-in-comments if available (some 1.8 versions only)
       if(JavaVersion.current().isJava8Compatible()) { addBooleanOption('-allow-script-in-comments').value = true }
       if(JavaVersion.current().isJava9()) addBooleanOption('html4', true)
+      if(JavaVersion.current().isJava11()) { addBooleanOption('-no-module-directories').value = true }
       // UmlDoclet is optional - needs graphviz installed
       if (useuml) {
         docletpath = configurations.umlDoclet.files.asType(List)
