@@ -29,6 +29,7 @@ import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
@@ -40,12 +41,23 @@ import elki.utilities.random.RandomFactory;
  * <p>
  * Note: this is less random than other initializations, so running multiple
  * times will be more likely to return the same local minima.
+ * <p>
+ * While likely proposed several times, an early reference is:
+ * <p>
+ * I. Katsavounidis, C.-C. Jay Kuo, Z. Zhang<br>
+ * A new initialization technique for generalized Lloyd iteration<br>
+ * IEEE Signal Process. Lett. 1(10)
  *
  * @author Erich Schubert
  * @since 0.6.0
  *
  * @param <O> Object type for kMedoids and kMedians
  */
+@Reference(authors = "I. Katsavounidis, C.-C. Jay Kuo, Z. Zhang", //
+    title = "A new initialization technique for generalized Lloyd iteration", //
+    booktitle = "IEEE Signal Process. Lett. 1(10)", //
+    url = "https://doi.org/10.1109/97.329844", //
+    bibkey = "DBLP:journals/spl/KatsavounidisKZ94")
 public class FarthestPoints<O> extends AbstractKMeansInitialization implements KMedoidsInitialization<O> {
   /**
    * Discard the first vector.
@@ -76,7 +88,7 @@ public class FarthestPoints<O> extends AbstractKMeansInitialization implements K
     // Chose first mean
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     NumberVector prevmean = relation.get(first);
-    if (!dropfirst) {
+    if(!dropfirst) {
       means[0] = prevmean.toArray();
     }
 
