@@ -313,7 +313,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double[] clusterProbabilities = probClusterIGivenX.get(iditer);
         O instance = relation.get(iditer);
-        for(int i = 0; i < clusterProbabilities.length; i++) {
+        for(int i = 0; i < k; i++) {
           final double prob = clusterProbabilities[i];
           if(prob > 1e-10) {
             models.get(i).firstPassE(instance, prob);
@@ -328,7 +328,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       O instance = relation.get(iditer);
-      for(int i = 0; i < clusterProbabilities.length; i++) {
+      for(int i = 0; i < k; i++) {
         final double prob = clusterProbabilities[i];
         if(prob > 1e-10) {
           models.get(i).updateE(instance, prob);
@@ -336,7 +336,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
         wsum[i] += prob;
       }
     }
-    for(int i = 0; i < models.size(); i++) {
+    for(int i = 0; i < k; i++) {
       // MLE / MAP
       final double weight = prior <= 0. ? wsum[i] / relation.size() : (wsum[i] + prior - 1) / (relation.size() + prior * k - k);
       models.get(i).finalizeEStep(weight, prior);
@@ -363,7 +363,8 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     double emSum = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       O vec = relation.get(iditer);
-      double[] probs = new double[k];
+      double[] probs = probClusterIGivenX.get(iditer);
+      probs = probs != null ? probs : new double[k];
       for(int i = 0; i < k; i++) {
         double v = models.get(i).estimateLogDensity(vec);
         probs[i] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
