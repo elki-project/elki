@@ -335,7 +335,7 @@ public class SphericalKMeans<V extends NumberVector> extends AbstractKMeans<V, K
 
     @Override
     public SphericalKMeans<V> make() {
-      return new SphericalKMeans<V>(k, maxiter, initializer);
+      return new SphericalKMeans<>(k, maxiter, initializer);
     }
   }
 }

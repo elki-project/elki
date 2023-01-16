@@ -26,7 +26,6 @@ import java.util.List;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
-import elki.data.model.EMModel;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.math.MeanVariance;
@@ -47,7 +46,7 @@ import net.jafama.FastMath;
  *
  * @has - - - SphericalGaussianModel
  */
-public class TextbookSphericalGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
+public class TextbookSphericalGaussianModelFactory implements GaussianClusterModelFactory {
   /**
    * Class to choose the initial means
    */

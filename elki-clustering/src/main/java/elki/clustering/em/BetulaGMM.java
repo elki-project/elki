@@ -89,7 +89,7 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(BetulaGMMWeighted.class);
+  private static final Logging LOG = Logging.getLogger(BetulaGMM.class);
 
   /**
    * CFTree factory.

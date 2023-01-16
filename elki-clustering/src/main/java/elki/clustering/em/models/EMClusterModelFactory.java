@@ -23,6 +23,7 @@ package elki.clustering.em.models;
 import java.util.List;
 
 import elki.data.model.Model;
+import elki.data.type.TypeInformation;
 import elki.database.relation.Relation;
 import elki.utilities.optionhandling.OptionID;
 
@@ -51,4 +52,11 @@ public interface EMClusterModelFactory<O, M extends Model> {
    * Parameter to specify the cluster center initialization.
    */
   static final OptionID INIT_ID = new OptionID("em.centers", "Method to choose the initial cluster centers.");
+
+  /**
+   * Get the data type processed by this model (e.g., vector field)
+   * 
+   * @return Model type
+   */
+  TypeInformation getInputTypeRestriction();
 }
