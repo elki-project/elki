@@ -383,7 +383,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   }
 
   /**
-   * Compute log(sum(exp(x_i)), with attention to numerical issues.
+   * Compute log(sum(exp(x_i))), with attention to numerical issues.
    * 
    * @param x Input
    * @return Result
