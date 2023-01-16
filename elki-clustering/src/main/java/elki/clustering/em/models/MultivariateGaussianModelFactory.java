@@ -28,7 +28,6 @@ import java.util.List;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
-import elki.data.model.EMModel;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.math.linearalgebra.CovarianceMatrix;
@@ -50,7 +49,7 @@ import net.jafama.FastMath;
  *
  * @has - - - MultivariateGaussianModel
  */
-public class MultivariateGaussianModelFactory implements EMClusterModelFactory<NumberVector, EMModel> {
+public class MultivariateGaussianModelFactory implements GaussianClusterModelFactory {
   /**
    * Class to choose the initial means
    */

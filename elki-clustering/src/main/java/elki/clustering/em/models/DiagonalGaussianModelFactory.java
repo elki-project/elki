@@ -27,6 +27,8 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.data.type.TypeInformation;
+import elki.data.type.TypeUtil;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.math.MeanVariance;
@@ -80,6 +82,11 @@ public class DiagonalGaussianModelFactory implements EMClusterModelFactory<Numbe
       models.add(new DiagonalGaussianModel(1. / k, nv, variances));
     }
     return models;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   /**

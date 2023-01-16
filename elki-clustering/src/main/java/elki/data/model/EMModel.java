@@ -26,6 +26,8 @@ import elki.utilities.io.FormatUtil;
 /**
  * Cluster model of an EM cluster, providing a mean and a full covariance
  * Matrix.
+ * <p>
+ * TODO: also allow simpler (non-covariate) models.
  * 
  * @author Erich Schubert
  * @since 0.2

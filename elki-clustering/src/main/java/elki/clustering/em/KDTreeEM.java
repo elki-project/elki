@@ -34,6 +34,7 @@ import elki.data.Clustering;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
+import elki.data.type.CombinedTypeInformation;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -480,7 +481,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(new CombinedTypeInformation(TypeUtil.NUMBER_VECTOR_FIELD, mfactory.getInputTypeRestriction()));
   }
 
   /**

@@ -220,7 +220,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    return TypeUtil.array(mfactory.getInputTypeRestriction());
   }
 
   /**
