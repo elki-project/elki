@@ -96,18 +96,6 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
       super(relation, df, means);
     }
 
-    @Override
-    protected int iterate(int iteration) {
-      if(iteration == 1) {
-        return initialAssignToNearestCluster();
-      }
-      meansFromSums(newmeans, sums, means);
-      movedDistance(means, newmeans, sep);
-      updateBounds(sep);
-      copyMeans(newmeans, means);
-      return assignToNearestCluster();
-    }
-
     /**
      * Perform initial cluster assignment.
      *
