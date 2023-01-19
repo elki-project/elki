@@ -20,26 +20,29 @@
  */
 package elki.clustering.kmeans;
 
-import java.util.Arrays;
-
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
+import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Hamerly's fast k-means by exploiting the triangle inequality.
+ * Simplified version of Hamerly's fast k-means by exploiting the triangle
+ * inequality, with the cluster-separation checks omitted.
  * <p>
  * Reference:
  * <p>
- * G. Hamerly<br>
- * Making k-means even faster<br>
- * Proc. 2010 SIAM International Conference on Data Mining
+ * J. Newling<br>
+ * Fast k-means with accurate bounds<br>
+ * Proc. 33nd Int. Conf. on Machine Learning, ICML 2016
  *
  * @author Erich Schubert
  * @since 0.7.0
@@ -48,16 +51,21 @@ import elki.utilities.documentation.Reference;
  *
  * @param <V> vector datatype
  */
-@Reference(authors = "G. Hamerly", //
-    title = "Making k-means even faster", //
-    booktitle = "Proc. 2010 SIAM International Conference on Data Mining", //
-    url = "https://doi.org/10.1137/1.9781611972801.12", //
-    bibkey = "DBLP:conf/sdm/Hamerly10")
-public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMeans<V> {
+@Reference(authors = "J. Newling", //
+    title = "Fast k-means with accurate bounds", //
+    booktitle = "Proc. 33nd Int. Conf. on Machine Learning, ICML 2016", //
+    url = "http://jmlr.org/proceedings/papers/v48/newling16.html", //
+    bibkey = "DBLP:conf/icml/NewlingF16")
+public class SimplifiedHamerlyKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(HamerlyKMeans.class);
+  private static final Logging LOG = Logging.getLogger(SimplifiedHamerlyKMeans.class);
+
+  /**
+   * Flag whether to compute the final variance statistic.
+   */
+  protected boolean varstat = false;
 
   /**
    * Constructor.
@@ -68,8 +76,9 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
    * @param initializer Initialization method
    * @param varstat Compute the variance statistic
    */
-  public HamerlyKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
-    super(distance, k, maxiter, initializer, varstat);
+  public SimplifiedHamerlyKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer, boolean varstat) {
+    super(distance, k, maxiter, initializer);
+    this.varstat = varstat;
   }
 
   @Override
@@ -84,7 +93,32 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
    *
    * @author Erich Schubert
    */
-  protected static class Instance extends SimplifiedHamerlyKMeans.Instance {
+  protected static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Sum aggregate for the new mean.
+     */
+    double[][] sums;
+
+    /**
+     * Scratch space for new means.
+     */
+    double[][] newmeans;
+
+    /**
+     * Upper bounds
+     */
+    WritableDoubleDataStore upper;
+
+    /**
+     * Lower bounds
+     */
+    WritableDoubleDataStore lower;
+
+    /**
+     * Separation of means / distance moved.
+     */
+    double[] sep;
+
     /**
      * Constructor.
      *
@@ -94,6 +128,12 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
       super(relation, df, means);
+      upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
+      lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
+      final int dim = means[0].length;
+      sums = new double[k][dim];
+      newmeans = new double[k][dim];
+      sep = new double[k];
     }
 
     @Override
@@ -115,8 +155,6 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
      */
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
-      double[][] cdist = new double[k][k];
-      computeSquaredSeparation(cdist);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         NumberVector fv = relation.get(it);
         // Find closest center, and distance to two closest centers:
@@ -130,16 +168,14 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
           minIndex = 1;
         }
         for(int i = 2; i < k; i++) {
-          if(min2 > cdist[minIndex][i]) {
-            double dist = distance(fv, means[i]);
-            if(dist < min1) {
-              minIndex = i;
-              min2 = min1;
-              min1 = dist;
-            }
-            else if(dist < min2) {
-              min2 = dist;
-            }
+          double dist = distance(fv, means[i]);
+          if(dist < min1) {
+            minIndex = i;
+            min2 = min1;
+            min1 = dist;
+          }
+          else if(dist < min2) {
+            min2 = dist;
           }
         }
         // Assign to nearest cluster.
@@ -154,22 +190,20 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
 
     @Override
     protected int assignToNearestCluster() {
-      recomputeSeperation(sep);
       int changed = 0;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         final int orig = assignment.intValue(it);
         // Compute the current bound:
         final double l = lower.doubleValue(it);
-        final double sa = sep[orig];
         double u = upper.doubleValue(it);
-        if(u <= l || u <= sa) {
+        if(u <= l) {
           continue;
         }
         // Update the upper bound
         NumberVector fv = relation.get(it);
         double curd2 = distance(fv, means[orig]);
         upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-        if(u <= l || u <= sa) {
+        if(u <= l) {
           continue;
         }
         // Find closest center, and distance to the second closest center
@@ -204,27 +238,28 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
     }
 
     /**
-     * Recompute the separation of cluster means.
-     * <p>
-     * Used by Hamerly.
+     * Update the bounds for k-means.
      *
-     * @param sep Output array of separation (half-sqrt scaled)
+     * @param move Movement of centers
      */
-    protected void recomputeSeperation(double[] sep) {
-      final int k = means.length;
-      assert sep.length == k;
-      Arrays.fill(sep, Double.POSITIVE_INFINITY);
-      for(int i = 1; i < k; i++) {
-        double[] m1 = means[i];
-        for(int j = 0; j < i; j++) {
-          double d = distance(m1, means[j]);
-          sep[i] = (d < sep[i]) ? d : sep[i];
-          sep[j] = (d < sep[j]) ? d : sep[j];
+    protected void updateBounds(double[] move) {
+      // Find the maximum and second largest movement.
+      int most = 0;
+      double delta = move[0], delta2 = 0;
+      for(int i = 1; i < move.length; i++) {
+        final double m = move[i];
+        if(m > delta) {
+          delta2 = delta;
+          delta = move[most = i];
+        }
+        else if(m > delta2) {
+          delta2 = m;
         }
       }
-      // We need half the Euclidean distance
-      for(int i = 0; i < k; i++) {
-        sep[i] = .5 * (isSquared ? Math.sqrt(sep[i]) : sep[i]);
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        final int a = assignment.intValue(it);
+        upper.increment(it, move[a]);
+        lower.increment(it, a == most ? -delta2 : -delta);
       }
     }
 
@@ -244,10 +279,21 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
    *
    * @author Erich Schubert
    */
-  public static class Par<V extends NumberVector> extends SimplifiedHamerlyKMeans.Par<V> {
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     @Override
-    public HamerlyKMeans<V> make() {
-      return new HamerlyKMeans<>(distance, k, maxiter, initializer, varstat);
+    protected boolean needsMetric() {
+      return true;
+    }
+
+    @Override
+    public void configure(Parameterization config) {
+      super.configure(config);
+      super.getParameterVarstat(config);
+    }
+
+    @Override
+    public SimplifiedHamerlyKMeans<V> make() {
+      return new SimplifiedHamerlyKMeans<>(distance, k, maxiter, initializer, varstat);
     }
   }
 }
