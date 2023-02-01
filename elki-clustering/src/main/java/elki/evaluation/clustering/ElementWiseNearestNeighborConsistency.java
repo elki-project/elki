@@ -25,14 +25,14 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.List;
 
-public class NearestNeighborConsistency<O> implements Evaluator {
+public class ElementWiseNearestNeighborConsistency<O> implements Evaluator {
 
     private final Distance<? super O> distance;
 
     protected final int k;
     protected final int kPlus;
 
-    public NearestNeighborConsistency(Distance<? super O> distance, int k) {
+    public ElementWiseNearestNeighborConsistency(Distance<? super O> distance, int k) {
         super();
         this.distance = distance;
         this.k = k;
@@ -40,7 +40,7 @@ public class NearestNeighborConsistency<O> implements Evaluator {
     }
 
     /**
-     * Calculate (absolute) kNN consistency for all datapoints and determines the ratio.
+     * Calculate fractional kNN consistency for all datapoints and average them.
      * @param clustering Cluster to evaluate
      * @param relation datapoints
      * @return fractional kNN consistency
@@ -51,30 +51,35 @@ public class NearestNeighborConsistency<O> implements Evaluator {
         List<? extends Cluster<?>> clusters = clustering.getAllClusters();
         KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kPlus);
 
-        int amountKNNCElements = 0;
+        double kNNc = 0.0;
         for(Cluster<?> cluster: clusters){
             DBIDs clusterIDs = cluster.getIDs();
-            elementLoop:for(DBIDIter clusterElement = clusterIDs.iter(); clusterElement.valid(); clusterElement.advance()){
+            for(DBIDIter clusterElement = clusterIDs.iter(); clusterElement.valid(); clusterElement.advance()){
+                int neighborsInCluster = 0;
                 KNNList neighbors = knnQuery.getKNN(clusterElement,kPlus);
                 for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()){
-                    if(!clusterIDs.contains(neighbor)){
-                        continue elementLoop;
+                    if(DBIDUtil.equal(neighbor , clusterElement)){
+                        continue;
+                    }
+                    if(clusterIDs.contains(neighbor)){
+                        neighborsInCluster++;
                     }
                 }
-                elementKNNConsistency.put(clusterElement, 1);
-                amountKNNCElements++;
+                double fractionalKNNc = (double)neighborsInCluster/(neighbors.size()-1); //neighbors size can be greater than kPlus for elements with same distance
+                elementKNNConsistency.put(clusterElement, fractionalKNNc);
+                kNNc += fractionalKNNc;
             }
         }
 
-        double kNNc =  (double) amountKNNCElements/ relation.size();
+        kNNc =  kNNc/ relation.size();
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("kNN Consistency", kNNc, 0, 1., false);
+        g.addMeasure("EW kNN Consistency", kNNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("kNN Consistency", relation.getDBIDs(), elementKNNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW kNN Consistency", relation.getDBIDs(), elementKNNConsistency));
 
         return kNNc;
     }
@@ -113,7 +118,7 @@ public class NearestNeighborConsistency<O> implements Evaluator {
 
         @Override
         public Object make() {
-            return new NearestNeighborConsistency<>(distance, k);
+            return new ElementWiseNearestNeighborConsistency<>(distance, k);
         }
     }
 }
