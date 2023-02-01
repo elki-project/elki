@@ -12,6 +12,8 @@ elki.evaluation.clustering.internal.SquaredErrors
 elki.evaluation.clustering.internal.ClusterRadius
 elki.evaluation.clustering.NearestNeighborConsistency
 elki.evaluation.clustering.ElementWiseNearestNeighborConsistency
+elki.evaluation.clustering.MutualNeighborConsistency
+elki.evaluation.clustering.ElementWiseMutualNeighborConsistency
 elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 elki.evaluation.clustering.extractor.SimplifiedHierarchyExtractionEvaluator
 elki.evaluation.clustering.extractor.HDBSCANHierarchyExtractionEvaluator
