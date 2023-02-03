@@ -87,9 +87,6 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
      * @author Erich Schubert
      */
     static final class Node {
-
-        int id;
-
         /**
          * Objects in this node. Except for the first, which is the routing
          * object.
@@ -124,7 +121,7 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
          */
         public Node(DBIDRef r, double maxDist, double parentDist) {
             this.singletons = DBIDUtil.newDistanceDBIDList();
-            this.singletons.add(0., r);
+            this.singletons.add(0., r); // TODO, keep one
             this.children = new ArrayList<>();
             this.maxDist = maxDist;
             this.parentDist = parentDist;
@@ -141,7 +138,7 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         public Node(DBIDRef r, double maxDist, double parentDist, DoubleDBIDList singletons) {
             assert !singletons.contains(r);
             this.singletons = DBIDUtil.newDistanceDBIDList(singletons.size() + 1);
-            this.singletons.add(0., r);
+            this.singletons.add(0., r); // TODO, keep one
             for(DoubleDBIDListIter it = singletons.iter(); it.valid(); it.advance()) {
                 this.singletons.add(it.doubleValue(), it);
             }

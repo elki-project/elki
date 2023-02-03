@@ -29,6 +29,7 @@ import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
@@ -142,11 +143,26 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
         }
 
         public void generateCover() {
-            for(int i = 0; i < k; i++) {
-                Iterator<Node> nit = nodeManager.getNodes(i);
-                while(nit.hasNext()) {
-                    addNode(nit.next(), i);
-                }
+            Node root = tree.getRoot();
+            generateCover(root);
+        }
+
+        public void generateCover(Node cur) {
+            int clu = nodeManager.get(cur);
+            if(clu >= 0) {
+                addNode(cur, clu);
+                return;
+            }
+            for(Node n : cur.children) {
+                generateCover(n);
+            }
+            DBIDIter it = cur.singletons.iter();
+            if(cur.children.isEmpty()) {
+                clusters.get(nodeManager.get(it)).add(it);
+            }
+            it.advance();
+            for(; it.valid(); it.advance()) {
+                clusters.get(nodeManager.get(it)).add(it);
             }
         }
 
@@ -184,7 +200,6 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
 
             return changed;
         }
-
     }
 
     @Override

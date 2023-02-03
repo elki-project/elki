@@ -20,15 +20,12 @@
  */
 package elki.clustering.kmeans.covertree;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import elki.clustering.kmeans.covertree.KMeansCoverTree.Node;
 import elki.data.NumberVector;
+import elki.database.datastore.DataStoreFactory;
+import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
@@ -37,19 +34,12 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 
 public class NodeManager {
-    protected List<List<Node>> tmpClusters;
-
-    protected int[] tmpAssignment;
-
-    /**
-     * Store the elements per cluster.
-     */
-    protected List<ModifiableDBIDs> clusters;
-
     /**
      * A mapping of elements to cluster ids.
      */
     protected WritableIntegerDataStore assignment;
+
+    protected WritableIntegerDataStore nodeSize;
 
     /**
      * Sum aggregate for the new mean.
@@ -65,65 +55,128 @@ public class NodeManager {
     KMeansCoverTree<?> tree;
 
     public NodeManager(int k, int dim, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, KMeansCoverTree<?> tree, Relation<? extends NumberVector> relation) {
-        this.clusters = clusters;
         this.assignment = assignment;
+        this.nodeSize = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
         this.relation = relation;
         this.tree = tree;
-        tmpClusters = new ArrayList<>(k);
-        for(int i = 0; i < k; i++) {
-            tmpClusters.add(new ArrayList<>(100));
-        }
-        tmpAssignment = new int[tree.size];
-        Arrays.fill(tmpAssignment, -1);
         sums = new double[k][dim];
         sizes = new int[k];
-        initIds(tree.getRoot());
     }
 
     /**
-     * @return previous cluster
+     * 
+     * @param n Node
+     * @return current assignment
      */
+    public int get(Node n) {
+        return n.size == nodeSize.intValue(n.singletons.iter()) ? get(n.singletons.iter()) : -1;
+    }
+
+    /**
+     * 
+     * @param n Node
+     * @return current assignment
+     */
+    public int getF(Node n) {
+        return get(n.singletons.iter());
+    }
+
+    /**
+     * 
+     * @param id DBID
+     * @return current assignment
+     */
+    public int get(DBIDRef id) {
+        return assignment.intValue(id);
+    }
+
     public int add(int cluster, Node n) {
+        assert (cluster != get(n.singletons.iter()) && cluster >= 0);
+        assert (get(n) == -1);
+        assert (testClean(n, -1) == 0);
         plusEquals(sums[cluster], n.meansum);
-        tmpClusters.get(cluster).add(n);
         sizes[cluster] += n.size;
-        int oldass = tmpAssignment[n.id];
-        tmpAssignment[n.id] = cluster;
-        return oldass == cluster ? 0 : n.size;
+        nodeSize.putInt(n.singletons.iter(), n.size);
+        assignment.put(n.singletons.iter(), cluster);
+        assert (testTree(n, false));
+        return n.size;
     }
 
-    public int check(int cluster, Node n) {
-        return tmpAssignment[n.id] == cluster ? 0 : n.size;
+    public int add(int cluster, DBIDRef id, NumberVector fv) {
+        assert (cluster != get(id) && cluster >= 0);
+        assert (get(id) == -1);
+        plusEquals(sums[cluster], fv);
+        // clusters.get(cluster).add(id);
+        sizes[cluster]++;
+        nodeSize.putInt(id, 1);
+        assignment.put(id, cluster);
+        return 1;
+    }
+
+    public void clean(Node n) {
+        assignment.put(n.singletons.iter(), -1);
+    }
+
+    public void clean(DBIDRef id) {
+        assignment.put(id, -1);
     }
 
     /**
      * @return previous cluster
      */
-    public int add(int cluster, DBIDRef id, NumberVector fv) {
-        plusEquals(sums[cluster], fv);
-        clusters.get(cluster).add(id);
-        sizes[cluster]++;
-        return assignment.put(id, cluster) == cluster ? 0 : 1;
+    public void remove(int cluster, Node n) {
+        if(cluster == -2) {
+            return;
+        }
+        // externer check ob child nodes noch Zugewiesen sind.
+        if(cluster == -1) {
+            removeRec(n);
+            assert (testClean(n, -1) == 0);
+            return;
+        }
+        minusEquals(sums[cluster], n.meansum);
+        sizes[cluster] -= n.size;
+        // nodeSize.putInt(n.singletons.iter(), n.size);
+        assignment.put(n.singletons.iter(), -1);
+        assert (testClean(n, -1) == 0);
+        assert (testTree(n, true));
+        return;
     }
 
-    /**
-     * @return Iterator over all nodes of the cluster
-     */
-    public Iterator<Node> getNodes(int cluster) {
-        return tmpClusters.get(cluster).iterator();
+    public void removeRec(Node n) {
+        // Check
+        for(Node c : n.children) {
+            int oldass = get(c);
+            if(oldass >= 0) {
+                remove(oldass, c);
+                continue;
+            }
+            removeRec(c);
+        }
+        DBIDIter it = n.singletons.iter();
+        if(n.children.isEmpty()) {
+            remove(get(it), it, relation.get(it));
+        }
+        it.advance();
+        for(; it.valid(); it.advance()) {
+            remove(get(it), it, relation.get(it));
+        }
+        assert (testClean(n, -1) == 0);
+    }
+
+    public void remove(int cluster, DBIDRef id, NumberVector fv) {
+        if(cluster < 0) {
+            return;
+        }
+        minusEquals(sums[cluster], fv);
+        sizes[cluster]--;
+        // TODO: return value nutzen
+        assignment.put(id, -1);
+        // nodeSize.putInt(id, 1);
+        return;
     }
 
     public void reset() {
-        Arrays.fill(sizes, 0);
-        for(int i = 0; i < sums.length; i++) {
-            Arrays.fill(sums[i], 0.);
-        }
-        for(ModifiableDBIDs cluster : clusters) {
-            cluster.clear();
-        }
-        for(List<Node> list : tmpClusters) {
-            list.clear();
-        }
     }
 
     public double[][] getSums() {
@@ -152,11 +205,70 @@ public class NodeManager {
         }
     }
 
-    private void initIds(Node cur) {
-        cur.id = nodecount++;
-        for(Node child : cur.children) {
-            initIds(child);
+    protected static void minusEquals(double[] sum, double[] meansum) {
+        for(int i = 0; i < sum.length; i++) {
+            sum[i] -= meansum[i];
         }
+    }
+
+    private static void minusEquals(double[] sum, NumberVector vec) {
+        for(int d = 0; d < sum.length; d++) {
+            sum[d] -= vec.doubleValue(d);
+        }
+    }
+
+    public boolean testTree(Node cur, boolean assigned) {
+        boolean intact = true;
+        if(get(cur) != -1) {
+            if(assigned) {
+                intact = false;
+            }
+            assigned = true;
+        }
+        DBIDIter it = cur.singletons.iter();
+        if(get(it) != -1 && nodeSize.intValue(it) == 1) {
+            if(assigned) {
+                intact = false;
+            }
+        }
+        it.advance();
+        for(; it.valid(); it.advance()) {
+            if(get(it) != -1) {
+                if(assigned) {
+                    intact = false;
+                }
+            }
+        }
+        for(Node child : cur.children) {
+            intact = intact & testTree(child, assigned);
+        }
+
+        return intact;
+    }
+
+    public int testClean(Node n, int clu) {
+        int fails = 0;
+        if(get(n) != clu) {
+            fails++;
+        }
+        if(fails > 0) {
+            int x = 10;
+        }
+        for(Node c : n.children) {
+            fails += testClean(c, clu);
+        }
+        if(fails > 0) {
+            int x = 10;
+        }
+        for(DBIDIter it = n.singletons.iter().advance(); it.valid(); it.advance()) {
+            if(get(it) != clu) {
+                fails++;
+            }
+        }
+        if(fails > 0) {
+            int x = 10;
+        }
+        return fails;
     }
 
     public int testAssign(DBIDRef id, int clu, double[][] means) {
