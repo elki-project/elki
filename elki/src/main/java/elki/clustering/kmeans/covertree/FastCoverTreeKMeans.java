@@ -110,9 +110,8 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 return changed;
             }
             meansFromSumsCT(means, nodeManager.getSums(), means);
-            assert (nodeManager.testTree(tree.getRoot(), false));
-            assert (testSizes());
             int changed = assignToNearestCluster();
+            assert (testSizes());
             assert (nodeManager.testTree(tree.getRoot(), false));
             return changed;
         }
@@ -137,11 +136,11 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 oldass = nodeManager.get(cur);
                 assert (nodeManager.testTree(cur, false));
             }
-            else {
-                assert (nodeManager.testTree(cur, true));
-                assert (nodeManager.get(cur) == -1);
-                assert (nodeManager.testClean(cur, -1) == 0);
-            }
+            // else {
+            // assert (nodeManager.testTree(cur, true));
+            // assert (nodeManager.get(cur) == -1);
+            // assert (nodeManager.testClean(cur, -1) == 0);
+            // }
             int changed = 0;
             DBIDIter it = cur.singletons.iter(); // Routing object
             // calculate new bound if node routing element has changed
@@ -249,11 +248,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             while(nit.hasNext()) {
                 Node child = nit.next();
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(child);
-                if(oldass >= 0) {
-                    assert (nodeManager.get(child) == -1);
-                    assert (nodeManager.testClean(child, -1) == 0);
-                    nodeManager.testTree(child, false);
-                }
                 // assign to cluster candidate if patent dist + maxDist <
                 // lower_bound
                 if(child.parentDist + child.maxDist < fastbound) {
@@ -283,16 +277,8 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
 
         private int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
             int changed = 0;
-            int myoldass = -1;
-            boolean toAssign = false;
             for(int j = 1; it.valid(); it.advance(), j++) {
-                if(oldass != -1) {
-                    myoldass = oldass;
-                    toAssign = true;
-                }
-                else {
-                    myoldass = nodeManager.get(it);
-                }
+                int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);

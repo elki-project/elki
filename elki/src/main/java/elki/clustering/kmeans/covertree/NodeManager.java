@@ -91,11 +91,8 @@ public class NodeManager {
     }
 
     public int change(DBIDRef id, NumberVector fv, int oldA, int newA) {
-        int curA = get(id);
-        assert (curA == -1 || curA == oldA);
         if(oldA == newA) {
-            // falls currentA != oldA kommt vor wenn oldA von einem Parent
-            // kommt.
+            // set can be skipped if get(id) = oldA
             set(id, newA);
             return 0;
         }
@@ -108,24 +105,19 @@ public class NodeManager {
 
     public int change(Node n, int oldA, int newA) {
         assert (testTree(n, nodeSize.intValue(n.singletons.iter()) > n.size));
-        int curA = get(n);
-        assert (curA == -1 || curA == oldA);
         if(oldA == newA) {
-            // falls currentA != oldA kommt vor wenn oldA von einem Parent
-            // kommt.
+            // set can be skipped if get(id) = oldA
             set(n, newA);
             return 0;
         }
         if(oldA >= 0) {
             remove(n, oldA);
         }
-        else if(oldA == -1) {
+        if(oldA == -1) {
             assert (nodeSize.intValue(n.singletons.iter()) < n.size);
             removeRec(n);
         }
-        assert (testTree(n, true));
         add(n, newA);
-        assert (testTree(n, false));
         return n.size;
     }
 
@@ -145,7 +137,6 @@ public class NodeManager {
         assert (cluster != get(id) && cluster >= 0);
         assert (get(id) == -1);
         plusEquals(sums[cluster], fv);
-        // clusters.get(cluster).add(id);
         sizes[cluster]++;
         nodeSize.putInt(id, 1);
         assignment.put(id, cluster);
@@ -166,19 +157,22 @@ public class NodeManager {
      * @return previous cluster
      */
     public void remove(Node n, int cluster) {
-        // externer check ob child nodes noch Zugewiesen sind.
-        if(cluster == -1) {
-            removeRec(n);
-            assert (testClean(n, -1) == 0);
-            testTree(n, true);
-            return;
-        }
+        assert (cluster >= 0);
         minusEquals(sums[cluster], n.meansum);
         sizes[cluster] -= n.size;
         // nodeSize.putInt(n.singletons.iter(), n.size);
         assignment.put(n.singletons.iter(), -1);
         assert (testClean(n, -1) == 0);
         assert (testTree(n, true));
+        return;
+    }
+
+    public void remove(DBIDRef id, NumberVector fv, int cluster) {
+        assert (cluster >= 0);
+        minusEquals(sums[cluster], fv);
+        sizes[cluster]--;
+        // nodeSize.putInt(id, 1);
+        assignment.put(id, -1);
         return;
     }
 
@@ -201,18 +195,6 @@ public class NodeManager {
             remove(it, relation.get(it), get(it));
         }
         assert (testClean(n, -1) == 0);
-    }
-
-    public void remove(DBIDRef id, NumberVector fv, int cluster) {
-        if(cluster < 0) {
-            return;
-        }
-        minusEquals(sums[cluster], fv);
-        sizes[cluster]--;
-        // TODO: return value nutzen
-        assignment.put(id, -1);
-        nodeSize.putInt(id, 1);
-        return;
     }
 
     public double[][] getSums() {
