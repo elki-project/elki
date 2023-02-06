@@ -112,12 +112,13 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             meansFromSumsCT(means, nodeManager.getSums(), means);
             assert (nodeManager.testTree(tree.getRoot(), false));
             assert (testSizes());
-            return assignToNearestCluster();
+            int changed = assignToNearestCluster();
+            assert (nodeManager.testTree(tree.getRoot(), false));
+            return changed;
         }
 
         @Override
         protected int assignToNearestCluster() {
-            nodeManager.reset();
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
@@ -125,7 +126,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
         }
 
         protected int initialAssignToNearestCluster() {
-            nodeManager.reset();
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
@@ -154,11 +154,13 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 double newbound = Math.sqrt(min1) + cur.parentDist + 2 * cur.maxDist;
                 if(newbound < min2) { // Equation 14
                     assert (nodeManager.testAssign(cur, cand[0], means) == 0);
-                    if(cand[0] == oldass) {
-                        return 0;
-                    }
-                    nodeManager.remove(oldass, cur);
-                    return nodeManager.add(cand[0], cur);
+                    // if(cand[0] == oldass) {
+                    // nodeManager.set(oldass, cur); // nicht immer nötig
+                    // return 0;
+                    // }
+                    // nodeManager.remove(oldass, cur);
+                    // return nodeManager.add(cand[0], cur);
+                    return nodeManager.change(cur, oldass, cand[0]);
                 }
                 newbound *= newbound;
                 // int oldAlive = alive;
@@ -203,11 +205,13 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             if(fastbound < min2) {
                 nodestatFilter += alive * (cur.size - cur.singletons.size());
                 assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
-                if(cand[minInd] == oldass) {
-                    return 0;
-                }
-                nodeManager.remove(oldass, cur);
-                return nodeManager.add(cand[minInd], cur);
+                // if(cand[minInd] == oldass) {
+                // nodeManager.set(oldass, cur); // nicht immer nötig
+                // return 0;
+                // }
+                // nodeManager.remove(oldass, cur);
+                // return nodeManager.add(cand[minInd], cur);
+                return nodeManager.change(cur, oldass, cand[minInd]);
             }
             if(dists != parentdists) {
                 cand = Arrays.copyOfRange(cand, 0, alive);
@@ -226,10 +230,14 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             if(cur.children.isEmpty()) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
                 assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                if(myoldass != cand[0]) {
-                    nodeManager.remove(myoldass, it, relation.get(it));
-                    changed += nodeManager.add(cand[0], it, relation.get(it));
-                }
+                // if(myoldass != cand[0]) {
+                // nodeManager.remove(myoldass, it, relation.get(it));
+                // changed += nodeManager.add(cand[0], it, relation.get(it));
+                // }
+                // else if(myoldass == oldass) {
+                // nodeManager.set(myoldass, it);
+                // }
+                changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
             }
             // assign other singletons
             it.advance();
@@ -244,21 +252,29 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 if(oldass >= 0) {
                     assert (nodeManager.get(child) == -1);
                     assert (nodeManager.testClean(child, -1) == 0);
+                    nodeManager.testTree(child, false);
                 }
                 // assign to cluster candidate if patent dist + maxDist <
                 // lower_bound
                 if(child.parentDist + child.maxDist < fastbound) {
                     nodestatFilter += child.size * alive;
-                    if(myoldass != cand[0]) {
-                        nodeManager.remove(myoldass, child);
-                        changed += nodeManager.add(cand[0], child);
-                    }
+                    // if(myoldass != cand[0]) {
+                    // nodeManager.remove(myoldass, child);
+                    // changed += nodeManager.add(cand[0], child);
+                    // nodeManager.testTree(child, false);
+                    // }
+                    // else if(myoldass == oldass) {
+                    // nodeManager.set(myoldass, child);
+                    // }
+                    changed += nodeManager.change(child, myoldass, cand[0]);
                     assert (nodeManager.testAssign(child, cand[0], means) == 0);
                 }
                 else {
                     changed += assignNode(child, alive, oldass, min1, min2, dists, cand);
+                    assert (nodeManager.testTree(child, false));
                 }
             }
+            assert (nodeManager.testTree(cur, false));
             if(minInd != 0) {
                 swap(0, minInd, cand);
             }
@@ -267,18 +283,28 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
 
         private int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
             int changed = 0;
+            int myoldass = -1;
+            boolean toAssign = false;
             for(int j = 1; it.valid(); it.advance(), j++) {
-                int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
-                if(oldass >= 0) {
-                    assert (nodeManager.get(it) == -1);
+                if(oldass != -1) {
+                    myoldass = oldass;
+                    toAssign = true;
+                }
+                else {
+                    myoldass = nodeManager.get(it);
                 }
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    if(myoldass != cand[0]) {
-                        nodeManager.remove(myoldass, it, relation.get(it));
-                        changed += nodeManager.add(cand[0], it, relation.get(it));
-                    }
+                    // if(myoldass != cand[0]) {
+                    // nodeManager.remove(myoldass, it, relation.get(it));
+                    // changed += nodeManager.add(cand[0], it,
+                    // relation.get(it));
+                    // }
+                    // else if(toAssign) {
+                    // nodeManager.set(myoldass, it);
+                    // }
+                    nodeManager.change(it, relation.get(it), myoldass, cand[0]);
                 }
                 else {
                     NumberVector fv = relation.get(it);
@@ -298,13 +324,15 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                         }
                     }
                     assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
-                    if(myoldass != cand[sMinInd]) {
-                        nodeManager.remove(myoldass, it, relation.get(it));
-                        changed += nodeManager.add(cand[sMinInd], it, relation.get(it));
-                    }
-                    else {
-                        nodeManager.clean(it);
-                    }
+                    // if(myoldass != cand[sMinInd]) {
+                    // nodeManager.remove(myoldass, it, relation.get(it));
+                    // changed += nodeManager.add(cand[sMinInd], it,
+                    // relation.get(it));
+                    // }
+                    // else if(toAssign) {
+                    // nodeManager.set(myoldass, it);
+                    // }
+                    changed += nodeManager.change(it, fv, myoldass, cand[sMinInd]);
                 }
             }
             return changed;
