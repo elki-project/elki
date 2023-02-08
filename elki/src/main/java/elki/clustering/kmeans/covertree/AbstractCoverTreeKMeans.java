@@ -229,6 +229,38 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return count == size;
         }
 
+        public int testUpper(DBIDRef id, double u) {
+            int valid = 0;
+            double b = Double.MAX_VALUE;
+            for(int i = 0; i < means.length; i++) {
+                double d = distance(relation.get(id), means[i]);
+                d = Math.sqrt(d);
+                if(d < b) {
+                    b = d;
+                }
+            }
+            if(b > u) {
+                valid = 1;
+            }
+            return valid;
+        }
+
+        public int testLower(DBIDRef id, double u, double l, int clu) {
+            int valid = 0;
+            double b = Double.MAX_VALUE;
+            for(int i = 0; i < means.length; i++) {
+                double d = distance(relation.get(id), means[i]);
+                d = Math.sqrt(d);
+                if(i != clu && d < b) {
+                    b = d;
+                }
+            }
+            if(b < l) {
+                valid = 1;
+            }
+            return valid;
+        }
+
         public void printLog() {
             Logging log = getLogger();
             log.statistics(new LongStatistic(key + ".Singleton.filter", singletonstatFilter));
@@ -240,9 +272,6 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             log.statistics(new LongStatistic(key + ".Node.icDist", nodestatIcDist));
         }
     }
-
-    @Override
-    protected abstract Logging getLogger();
 
     /**
      * Parameterization class.

@@ -67,6 +67,11 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
         return instance.buildResult(varstat, relation);
     }
 
+    @Override
+    protected Logging getLogger() {
+        return LOG;
+    }
+
     protected static class Instance extends AbstractCoverTreeKMeans.Instance {
 
         /**
@@ -98,17 +103,17 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
-            return assignNode(root, k, -1, 0., -1., new double[k], MathUtil.sequence(0, k));
+            return assignNode(root, k, -1, Double.POSITIVE_INFINITY, Double.MAX_VALUE, new double[k], MathUtil.sequence(0, k));
         }
 
         protected int initialAssignToNearestCluster() {
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
-            return assignNode(root, k, -2, 0., -1., new double[k], MathUtil.sequence(0, k));
+            return assignNode(root, k, -2, Double.POSITIVE_INFINITY, -1., new double[k], MathUtil.sequence(0, k));
         }
 
-        private int assignNode(Node cur, int alive, int oldass, double min1, double min2, double[] parentdists, int[] cand) {
+        protected int assignNode(Node cur, int alive, int oldass, double min1, double min2, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
                 assert (nodeManager.testTree(cur, false));
@@ -118,7 +123,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             // calculate new bound if node routing element has changed
             int minInd = 0;
             double[] dists;
-            if(cur.parentDist != 0 || min2 == -1) {
+            if(cur.parentDist != 0 || min1 == Double.POSITIVE_INFINITY) {
                 NumberVector fv = relation.get(it); // Routing object number
                                                     // vector
                 min1 = distance(fv, means[cand[0]]);
@@ -217,7 +222,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             return changed;
         }
 
-        private int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
+        protected int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
             int changed = 0;
             for(int j = 1; it.valid(); it.advance(), j++) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
@@ -257,15 +262,10 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
 
     }
 
-    @Override
-    protected Logging getLogger() {
-        return LOG;
-    }
-
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
         @Override
