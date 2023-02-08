@@ -113,12 +113,12 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             nodeManager = new NodeManager(k, means[0].length, clusters, assignment, tree, relation);
         }
 
-        protected int pruneD(double[] dists, int[] cand, double fastbound, int alive) {
-            // candidate 0 is the neaest and can not be pruned
-            for(int i = 1; i < alive;) {
-                if(dists[i] > fastbound) {
+        protected int pruneD(double[] dists, int[] cand, double nodeUpper, int alive) {
+            // candidate 0 and 1 are the neaest and can not be pruned
+            for(int i = 2; i < alive;) {
+                if(dists[i] > nodeUpper) {
                     --alive;
-                    while(alive > i && dists[alive] > fastbound) {
+                    while(alive > i && dists[alive] > nodeUpper) {
                         --alive;
                     }
                     swap(dists, i, alive, cand);

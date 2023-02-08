@@ -103,17 +103,17 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
-            return assignNode(root, k, -1, Double.POSITIVE_INFINITY, Double.MAX_VALUE, new double[k], MathUtil.sequence(0, k));
+            return assignNode(root, k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
         }
 
         protected int initialAssignToNearestCluster() {
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
 
-            return assignNode(root, k, -2, Double.POSITIVE_INFINITY, -1., new double[k], MathUtil.sequence(0, k));
+            return assignNode(root, k, -2, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
         }
 
-        protected int assignNode(Node cur, int alive, int oldass, double min1, double min2, double[] parentdists, int[] cand) {
+        protected int assignNode(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
                 assert (nodeManager.testTree(cur, false));
@@ -121,9 +121,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             int changed = 0;
             DBIDIter it = cur.singletons.iter(); // Routing object
             // calculate new bound if node routing element has changed
+            double min1 = parentdists[0];
+            double min2 = parentdists[1];
             int minInd = 0;
+            int min2Ind = 1;
             double[] dists;
-            if(cur.parentDist != 0 || min1 == Double.POSITIVE_INFINITY) {
+            if(cur.parentDist != 0 || radius == Double.POSITIVE_INFINITY) {
                 NumberVector fv = relation.get(it); // Routing object number
                                                     // vector
                 min1 = distance(fv, means[cand[0]]);
@@ -149,11 +152,13 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                     if(min1 >= bound) {
                         dists[i] = distance(fv, means[cand[i]]);
                         if(dists[i] < min1) {
+                            min2Ind = minInd;
                             minInd = i;
                             min2 = min1;
                             min1 = dists[i];
                         }
                         else if(dists[i] < min2) {
+                            min2Ind = i;
                             min2 = dists[i];
                         }
                     }
@@ -163,8 +168,8 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                     }
                 }
                 if(isSquared) {
-                    min1 = Math.sqrt(min1);
-                    min2 = Math.sqrt(min2);
+                    dists[minInd] = min1 = Math.sqrt(min1);
+                    dists[min2Ind] = min2 = Math.sqrt(min2);
                 }
                 // end of calculation for new routing element
             }
@@ -179,6 +184,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             }
             if(dists != parentdists) {
                 cand = Arrays.copyOfRange(cand, 0, alive);
+            }
+            if(min2Ind != 1) {
+                swap(dists, min2Ind, 1, cand);
+                if(minInd == 1) {
+                    minInd = min2Ind;
+                }
             }
             if(minInd != 0) {
                 swap(dists, minInd, 0, cand);
@@ -211,14 +222,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                     assert (nodeManager.testAssign(child, cand[0], means) == 0);
                 }
                 else {
-                    changed += assignNode(child, alive, oldass, min1, min2, dists, cand);
+                    // TODO change radius if necessary
+                    changed += assignNode(child, alive, oldass, cur.maxDist, dists, cand);
                     assert (nodeManager.testTree(child, false));
                 }
             }
             assert (nodeManager.testTree(cur, false));
-            if(minInd != 0) {
-                swap(0, minInd, cand);
-            }
             return changed;
         }
 
