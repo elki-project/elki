@@ -36,6 +36,7 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
+import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.optionhandling.OptionID;
@@ -74,6 +75,22 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
     protected abstract static class Instance extends AbstractKMeans.Instance {
         KMeansCoverTree<? extends NumberVector> tree;
 
+        double[][] cdist;
+
+        double[][] scdist;
+
+        long singletonstatPrune;
+
+        long singletonstatFilter;
+
+        long singletonstatIcDist;
+
+        long nodestatPrune;
+
+        long nodestatFilter;
+
+        long nodestatIcDist;
+
         NodeManager nodeManager;
 
         /**
@@ -91,7 +108,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
             super(relation, df, means);
             this.tree = tree;
-            // cand = MathUtil.sequence(0, k);
+            cdist = new double[means.length][means.length];
+            scdist = new double[means.length][means.length];
+            nodeManager = new NodeManager(k, means[0].length, clusters, assignment, tree, relation);
         }
 
         protected int pruneD(double[] dists, int[] cand, double fastbound, int alive) {
@@ -199,6 +218,26 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
 
             return changed;
+        }
+
+        public boolean testSizes() {
+            int count = 0;
+            for(int i = 0; i < k; i++) {
+                count += nodeManager.getSize(i);
+            }
+            int size = relation.size();
+            return count == size;
+        }
+
+        public void printLog() {
+            Logging log = getLogger();
+            log.statistics(new LongStatistic(key + ".Singleton.filter", singletonstatFilter));
+            log.statistics(new LongStatistic(key + ".Singleton.prune", singletonstatPrune));
+            log.statistics(new LongStatistic(key + ".Singleton.icDist", singletonstatIcDist));
+
+            log.statistics(new LongStatistic(key + ".Node.filter", nodestatFilter));
+            log.statistics(new LongStatistic(key + ".Node.prune", nodestatPrune));
+            log.statistics(new LongStatistic(key + ".Node.icDist", nodestatIcDist));
         }
     }
 

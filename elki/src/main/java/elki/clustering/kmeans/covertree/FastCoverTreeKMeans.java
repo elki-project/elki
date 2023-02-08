@@ -21,7 +21,6 @@
 package elki.clustering.kmeans.covertree;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 import elki.clustering.kmeans.covertree.KMeansCoverTree.Node;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
@@ -33,7 +32,6 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
-import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -71,22 +69,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
 
     protected static class Instance extends AbstractCoverTreeKMeans.Instance {
 
-        double[][] cdist;
-
-        double[][] scdist;
-
-        long singletonstatPrune;
-
-        long singletonstatFilter;
-
-        long singletonstatIcDist;
-
-        long nodestatPrune;
-
-        long nodestatFilter;
-
-        long nodestatIcDist;
-
         /**
          * Constructor.
          *
@@ -96,17 +78,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
          */
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
             super(relation, df, means, tree);
-            nodeManager = new NodeManager(k, means[0].length, clusters, assignment, tree, relation);
-            cdist = new double[means.length][means.length];
-            scdist = new double[means.length][means.length];
         }
 
         @Override
         protected int iterate(int iteration) {
             if(iteration == 1) {
-                // nodeManager.init = true;
                 int changed = initialAssignToNearestCluster();
-                // nodeManager.init = false;
                 return changed;
             }
             meansFromSumsCT(means, nodeManager.getSums(), means);
@@ -136,11 +113,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 oldass = nodeManager.get(cur);
                 assert (nodeManager.testTree(cur, false));
             }
-            // else {
-            // assert (nodeManager.testTree(cur, true));
-            // assert (nodeManager.get(cur) == -1);
-            // assert (nodeManager.testClean(cur, -1) == 0);
-            // }
             int changed = 0;
             DBIDIter it = cur.singletons.iter(); // Routing object
             // calculate new bound if node routing element has changed
@@ -153,12 +125,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 double newbound = Math.sqrt(min1) + cur.parentDist + 2 * cur.maxDist;
                 if(newbound < min2) { // Equation 14
                     assert (nodeManager.testAssign(cur, cand[0], means) == 0);
-                    // if(cand[0] == oldass) {
-                    // nodeManager.set(oldass, cur); // nicht immer nötig
-                    // return 0;
-                    // }
-                    // nodeManager.remove(oldass, cur);
-                    // return nodeManager.add(cand[0], cur);
                     return nodeManager.change(cur, oldass, cand[0]);
                 }
                 newbound *= newbound;
@@ -204,12 +170,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             if(fastbound < min2) {
                 nodestatFilter += alive * (cur.size - cur.singletons.size());
                 assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
-                // if(cand[minInd] == oldass) {
-                // nodeManager.set(oldass, cur); // nicht immer nötig
-                // return 0;
-                // }
-                // nodeManager.remove(oldass, cur);
-                // return nodeManager.add(cand[minInd], cur);
                 return nodeManager.change(cur, oldass, cand[minInd]);
             }
             if(dists != parentdists) {
@@ -218,7 +178,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             if(minInd != 0) {
                 swap(dists, minInd, 0, cand);
             }
-            // nodeManager.skip(cur);
             // Prune candidate list
             fastbound *= fastbound;
             int old = alive;
@@ -229,13 +188,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             if(cur.children.isEmpty()) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
                 assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                // if(myoldass != cand[0]) {
-                // nodeManager.remove(myoldass, it, relation.get(it));
-                // changed += nodeManager.add(cand[0], it, relation.get(it));
-                // }
-                // else if(myoldass == oldass) {
-                // nodeManager.set(myoldass, it);
-                // }
                 changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
             }
             // assign other singletons
@@ -244,22 +196,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             changed += assignSingletons(cur, oldass, fastbound, it, dists, cand, alive);
 
             // Assign children
-            Iterator<Node> nit = cur.children.iterator();
-            while(nit.hasNext()) {
-                Node child = nit.next();
+            for(Node child : cur.children) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(child);
                 // assign to cluster candidate if patent dist + maxDist <
                 // lower_bound
                 if(child.parentDist + child.maxDist < fastbound) {
                     nodestatFilter += child.size * alive;
-                    // if(myoldass != cand[0]) {
-                    // nodeManager.remove(myoldass, child);
-                    // changed += nodeManager.add(cand[0], child);
-                    // nodeManager.testTree(child, false);
-                    // }
-                    // else if(myoldass == oldass) {
-                    // nodeManager.set(myoldass, child);
-                    // }
                     changed += nodeManager.change(child, myoldass, cand[0]);
                     assert (nodeManager.testAssign(child, cand[0], means) == 0);
                 }
@@ -282,14 +224,6 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    // if(myoldass != cand[0]) {
-                    // nodeManager.remove(myoldass, it, relation.get(it));
-                    // changed += nodeManager.add(cand[0], it,
-                    // relation.get(it));
-                    // }
-                    // else if(toAssign) {
-                    // nodeManager.set(myoldass, it);
-                    // }
                     nodeManager.change(it, relation.get(it), myoldass, cand[0]);
                 }
                 else {
@@ -310,38 +244,10 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                         }
                     }
                     assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
-                    // if(myoldass != cand[sMinInd]) {
-                    // nodeManager.remove(myoldass, it, relation.get(it));
-                    // changed += nodeManager.add(cand[sMinInd], it,
-                    // relation.get(it));
-                    // }
-                    // else if(toAssign) {
-                    // nodeManager.set(myoldass, it);
-                    // }
                     changed += nodeManager.change(it, fv, myoldass, cand[sMinInd]);
                 }
             }
             return changed;
-        }
-
-        public boolean testSizes() {
-            int count = 0;
-            for(int i = 0; i < k; i++) {
-                count += nodeManager.getSize(i);
-            }
-            int size = relation.size();
-            return count == size;
-        }
-
-        public void printLog() {
-            Logging log = getLogger();
-            log.statistics(new LongStatistic(key + ".Singleton.filter", singletonstatFilter));
-            log.statistics(new LongStatistic(key + ".Singleton.prune", singletonstatPrune));
-            log.statistics(new LongStatistic(key + ".Singleton.icDist", singletonstatIcDist));
-
-            log.statistics(new LongStatistic(key + ".Node.filter", nodestatFilter));
-            log.statistics(new LongStatistic(key + ".Node.prune", nodestatPrune));
-            log.statistics(new LongStatistic(key + ".Node.icDist", nodestatIcDist));
         }
 
         @Override
