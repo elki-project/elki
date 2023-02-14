@@ -9,7 +9,7 @@ import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
@@ -18,17 +18,16 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
-import elki.math.MathUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKMeans<V> {
+public class ShaCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKMeans<V> {
 
     int switchover;
 
-    public SHamCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
+    public ShaCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc);
         this.switchover = switchover;
     }
@@ -54,34 +53,16 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
         return LOG;
     }
 
-    protected static class Instance extends FastCoverTreeKMeans.Instance {
+    protected static class Instance extends SExpCoverTreeKMeans.Instance {
 
         /**
-         * Upper bounds
+         * Second nearest cluster.
          */
-        WritableDoubleDataStore upper;
-
-        /**
-         * Lower bounds
-         */
-        WritableDoubleDataStore lower;
-
-        double[][] newmeans;
-
-        /**
-         * Separation of means / distance moved.
-         */
-        double[] sep;
-
-        int switchover;
+        WritableIntegerDataStore second;
 
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
-            super(relation, df, means, tree);
-            this.switchover = switchover;
-            upper = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
-            lower = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
-            newmeans = new double[k][means[0].length];
-            sep = new double[means.length];
+            super(relation, df, means, tree, switchover);
+            second = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
         }
 
         @Override
@@ -110,12 +91,6 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
             return assignPointsToNearestCluster();
         }
 
-        protected int assignToClusterBounds() {
-            combinedSeperation(cdist, scdist);
-            Node root = tree.getRoot();
-            return assignNodeBounds(root, k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
-        }
-
         protected int assignNodeBounds(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
@@ -136,7 +111,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 double newbound = Math.sqrt(min1) + cur.parentDist + 2 * cur.maxDist;
                 if(newbound < min2) { // Equation 14
                     assert (nodeManager.testAssign(cur, cand[0], means) == 0);
-                    return addBound(cur, oldass, cand[0], Math.sqrt(min1) + cur.maxDist, min2 - radius);
+                    return addBound(cur, oldass, cand[0], cand[1], Math.sqrt(min1) + cur.maxDist, min2 - radius);
                 }
                 newbound = min2 + 2 * radius;
                 newbound *= newbound;
@@ -180,7 +155,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 if(fastbound < min2) {
                     nodestatFilter += alive * (cur.size - cur.singletons.size());
                     assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
-                    return addBound(cur, oldass, cand[minInd], min1 + cur.maxDist, min2 - cur.maxDist);
+                    return addBound(cur, oldass, cand[minInd], cand[min2Ind], min1 + cur.maxDist, min2 - cur.maxDist);
                 }
             }
             else {
@@ -189,7 +164,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 if(fastbound < min2) {
                     nodestatFilter += alive * (cur.size - cur.singletons.size());
                     assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
-                    return addBound(cur, oldass, cand[minInd], min1 + cur.maxDist, min2 - radius);
+                    return addBound(cur, oldass, cand[minInd], cand[min2Ind], min1 + cur.maxDist, min2 - radius);
                 }
             }
             if(dists != parentdists) {
@@ -215,7 +190,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
             if(cur.children.isEmpty()) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
                 assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                changed += addBound(it, relation.get(it), myoldass, cand[0], min1, min2);
+                changed += addBound(it, relation.get(it), myoldass, cand[0], cand[1], min1, min2);
             }
             // assign other singletons
             it.advance();
@@ -229,7 +204,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 // lower_bound
                 if(child.parentDist + child.maxDist < fastbound) {
                     nodestatFilter += child.size * alive;
-                    changed += addBound(child, myoldass, cand[0], min1 + child.parentDist + child.maxDist, min2 - child.parentDist - child.maxDist);
+                    changed += addBound(child, myoldass, cand[0], cand[1], min1 + child.parentDist + child.maxDist, min2 - child.parentDist - child.maxDist);
                     assert (nodeManager.testAssign(child, cand[0], means) == 0);
                 }
                 else {
@@ -247,18 +222,20 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    changed += addBound(it, relation.get(it), myoldass, cand[0], min1 + cur.maxDist, min2 - cur.maxDist);
+                    changed += addBound(it, relation.get(it), myoldass, cand[0], cand[1], min1 + cur.maxDist, min2 - cur.maxDist);
                 }
                 else {
                     NumberVector fv = relation.get(it);
                     double minS1 = distance(fv, means[cand[0]]);
                     double minS2 = distance(fv, means[cand[0]]);
                     int sMinInd = 0;
+                    int sMin2Ind = 1;
                     if(minS2 < minS1) {
                         double t = minS2;
                         minS2 = minS1;
                         minS1 = t;
                         sMinInd = 1;
+                        sMin2Ind = 0;
                     }
                     double mybound = Math.sqrt(minS2) + cur.singletons.doubleValue(j);
                     mybound *= mybound;
@@ -270,11 +247,13 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                         if(minS2 >= scdist[cand[sMinInd]][cand[i]]) {
                             final double dist = distance(fv, means[cand[i]]);
                             if(dist < minS1) {
+                                sMin2Ind = sMinInd;
                                 sMinInd = i;
                                 minS2 = minS1;
                                 minS1 = dist;
                             }
                             if(dist < minS2) {
+                                sMin2Ind = i;
                                 minS2 = dist;
                             }
                         }
@@ -283,7 +262,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                         }
                     }
                     assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
-                    changed += addBound(it, fv, myoldass, cand[sMinInd], Math.sqrt(minS1), Math.sqrt(minS2));
+                    changed += addBound(it, fv, myoldass, cand[sMinInd], cand[sMin2Ind], Math.sqrt(minS1), Math.sqrt(minS2));
                 }
             }
             return changed;
@@ -291,39 +270,77 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
 
         protected int assignPointsToNearestCluster() {
             recomputeSeperation(sep, scdist);
+            nearestMeans(scdist, cnum);
             int changed = 0;
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
                 final int orig = assignment.intValue(it);
-                // Compute the current bound:
-                final double l = lower.doubleValue(it);
-                final double sa = sep[orig];
+                final double z = lower.doubleValue(it);
+                final double so = sep[orig];
                 double u = upper.doubleValue(it);
-                if(u <= l || u <= sa) {
+                if(u <= z || u <= so) {
                     continue;
                 }
-                // Update the upper bound
-                NumberVector fv = relation.get(it);
+                // Make the upper bound tight first:
+                final NumberVector fv = relation.get(it);
                 double curd2 = distance(fv, means[orig]);
                 upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-                if(u <= l || u <= sa) {
+                if(u <= z || u <= so) {
                     continue;
                 }
-                // Find closest center, and distance to the second closest
-                // center
-                double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
-                int cur = orig;
-                for(int i = 0; i < k; i++) {
-                    if(i == orig) {
-                        continue;
+                // Our cdist are scaled 0.5, so we need half r:
+                if(scdist[orig][cnum[orig][0]] > u + 0.5 * so) {
+                    continue;
+                }
+                // Shallot modification #1: try old second-nearest first:
+                final int osecn = second.intValue(it);
+                // Exact distance to previous second nearest
+                double secd2 = distance(fv, means[osecn]);
+                int ref = orig, secn = osecn; // closest center "z" in Borgelts
+                                              // paper
+                if(secd2 < curd2) {
+                    // Previous second closest is closer, swap:
+                    final double tmp = secd2;
+                    secd2 = curd2;
+                    curd2 = tmp;
+                    ref = secn;
+                    secn = orig;
+                    // Update u
+                    u = isSquared ? Math.sqrt(curd2) : curd2;
+                }
+                // Shallot improvement 1.5:
+                // note that secd2 is still squared, cdist is half the distance
+                // 0.5*(u+l), with l=min(u+d(x,p), 2u+2*cdist[z])
+                double lp = u + (isSquared ? Math.sqrt(secd2) : secd2); // l for
+                                                                        // p
+                double lv = 2 * (u + scdist[ref][cnum[ref][0]]); // l for v2(z)y
+                double l = lp < lv ? lp : lv;
+                double rhalf = Math.min(u + 0.5 * sep[ref], 0.5 * (u + l));
+                // Find closest center, and distance to two closest centers
+                double min1 = curd2, min2 = l * l;
+                int cur = ref, minId2 = lp < lv ? secn : cnum[ref][0];
+                for(int i = 0; i < k - 1; i++) {
+                    int c = cnum[ref][i];
+                    if(scdist[ref][c] > rhalf) {
+                        break;
                     }
-                    double dist = distance(fv, means[i]);
+                    final double dist = c == secn ? secd2 : distance(fv, means[c]);
                     if(dist < min1) {
-                        cur = i;
+                        minId2 = cur;
+                        cur = c;
                         min2 = min1;
                         min1 = dist;
+                        if(min1 < l * l) {
+                            l = isSquared ? Math.sqrt(min2) : min2;
+                            // Second Shallot improvement: r shrinking
+                            rhalf = Math.min(rhalf, 0.5 * (u + l));
+                        }
                     }
                     else if(dist < min2) {
+                        minId2 = c;
                         min2 = dist;
+                        l = isSquared ? Math.sqrt(min2) : min2;
+                        // Second Shallot improvement: r shrinking
+                        rhalf = Math.min(rhalf, 0.5 * (u + l));
                     }
                 }
                 // Object has to be reassigned.
@@ -332,12 +349,15 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                     ++changed;
                     upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
                 }
-                lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
+                lower.putDouble(it, l);
+                if(osecn != minId2) { // second might have changed
+                    second.putInt(it, minId2);
+                }
             }
             return changed;
         }
 
-        protected int addBound(Node n, int oldass, int clu, double u, double l) {
+        protected int addBound(Node n, int oldass, int clu, int clu2, double u, double l) {
             // nodemanager first
             int changed = nodeManager.change(n, oldass, clu);
             ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size); // size
@@ -348,6 +368,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
             for(DBIDIter it = collect.iter(); it.valid(); it.advance()) {
                 upper.putDouble(it, u);
                 lower.putDouble(it, l);
+                second.putInt(it, clu2);
                 assignment.put(it, clu);
                 assert (testUpper(it, u) == 0);
                 assert (testLower(it, u, l, clu) == 0);
@@ -355,37 +376,17 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
             return changed;
         }
 
-        protected int addBound(DBIDRef id, NumberVector fv, int oldass, int clu, double u, double l) {
+        protected int addBound(DBIDRef id, NumberVector fv, int oldass, int clu, int clu2, double u, double l) {
             int changed = nodeManager.change(id, fv, oldass, clu);
             if(l == Double.POSITIVE_INFINITY) {
                 l = 0;
             }
             upper.putDouble(id, u);
             lower.putDouble(id, l);
+            second.putInt(id, clu2);
             assert (testUpper(id, u) == 0);
             assert (testLower(id, u, l, clu) == 0);
             return changed;
-        }
-
-        protected void updateBounds(double[] move) {
-            // Find the maximum and second largest movement.
-            int most = 0;
-            double delta = move[0], delta2 = 0;
-            for(int i = 1; i < move.length; i++) {
-                final double m = move[i];
-                if(m > delta) {
-                    delta2 = delta;
-                    delta = move[most = i];
-                }
-                else if(m > delta2) {
-                    delta2 = m;
-                }
-            }
-            for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-                final int a = assignment.intValue(it);
-                upper.increment(it, move[a]);
-                lower.increment(it, a == most ? -delta2 : -delta);
-            }
         }
 
         @Override
@@ -424,8 +425,8 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
         }
 
         @Override
-        public SHamCoverTreeKMeans<V> make() {
-            return new SHamCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
+        public ShaCoverTreeKMeans<V> make() {
+            return new ShaCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
         }
     }
 
