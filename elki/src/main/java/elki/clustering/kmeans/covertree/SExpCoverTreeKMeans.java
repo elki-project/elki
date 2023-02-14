@@ -1,24 +1,14 @@
 package elki.clustering.kmeans.covertree;
 
-import java.util.Arrays;
-
-import elki.clustering.kmeans.covertree.KMeansCoverTree.Node;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.DataStoreUtil;
-import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
-import elki.math.MathUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -44,7 +34,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
         tree.initialize();
         Instance instance = new Instance(relation, distance, initialMeans(relation), tree, switchover);
         instance.run(maxiter);
-        instance.generateCover();
+        instance.materializeClusters();
         instance.printLog();
         return instance.buildResult(varstat, relation);
     }
@@ -80,10 +70,9 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 meansFromSumsCT(means, nodeManager.getSums(), means);
                 int changed = assignToClusterBounds();
                 assert (testSizes());
-                assert (nodeManager.testTree(tree.getRoot(), false));
                 return changed;
             }
-            meansFromSums(newmeans, nodeManager.getSums(), means);
+            meansFromSumsCT(newmeans, nodeManager.getSums(), means);
             movedDistance(means, newmeans, sep);
             updateBounds(sep);
             copyMeans(newmeans, means);
@@ -131,8 +120,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 }
                 // Object has to be reassigned.
                 if(cur != orig) {
-                    assignment.putInt(it, cur);
-                    plusMinusEquals(nodeManager.getSums()[cur], nodeManager.getSums()[orig], fv);
+                    nodeManager.fChange(it, fv, orig, cur);
                     ++changed;
                     upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
                 }

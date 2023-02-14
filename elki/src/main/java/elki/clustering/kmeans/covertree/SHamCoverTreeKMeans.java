@@ -350,8 +350,8 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 l = 0.;
             }
             for(DBIDIter it = collect.iter(); it.valid(); it.advance()) {
-                // upper.putDouble(it, u);
-                // lower.putDouble(it, l);
+                upper.putDouble(it, u);
+                lower.putDouble(it, l);
                 assignment.put(it, clu);
                 assert (testUpper(it, u) == 0);
                 assert (testLower(it, u, l, clu) == 0);
@@ -364,8 +364,8 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
             if(l == Double.POSITIVE_INFINITY) {
                 l = 0;
             }
-            // upper.putDouble(id, u);
-            // lower.putDouble(id, l);
+            upper.putDouble(id, u);
+            lower.putDouble(id, l);
             assert (testUpper(id, u) == 0);
             assert (testLower(id, u, l, clu) == 0);
             return changed;
