@@ -103,6 +103,11 @@ public class NodeManager {
         return 1;
     }
 
+    public void fChange(DBIDRef id, NumberVector fv, int oldA, int newA) {
+        remove(id, fv, oldA);
+        add(id, fv, newA);
+    }
+
     public int change(Node n, int oldA, int newA) {
         assert (testTree(n, nodeSize.intValue(n.singletons.iter()) > n.size));
         if(oldA == newA) {

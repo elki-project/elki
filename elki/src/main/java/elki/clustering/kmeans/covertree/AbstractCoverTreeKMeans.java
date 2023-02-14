@@ -230,7 +230,7 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
         }
 
         public int testUpper(DBIDRef id, double u) {
-            int valid = 0;
+            int invalid = 0;
             double b = Double.MAX_VALUE;
             for(int i = 0; i < means.length; i++) {
                 double d = distance(relation.get(id), means[i]);
@@ -240,13 +240,13 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
                 }
             }
             if(b > u) {
-                valid = 1;
+                invalid = 1;
             }
-            return valid;
+            return invalid;
         }
 
         public int testLower(DBIDRef id, double u, double l, int clu) {
-            int valid = 0;
+            int invalid = 0;
             double b = Double.MAX_VALUE;
             for(int i = 0; i < means.length; i++) {
                 double d = distance(relation.get(id), means[i]);
@@ -256,9 +256,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
                 }
             }
             if(b < l) {
-                valid = 1;
+                invalid = 1;
             }
-            return valid;
+            return invalid;
         }
 
         public void printLog() {

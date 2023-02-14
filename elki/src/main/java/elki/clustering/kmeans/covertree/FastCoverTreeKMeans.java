@@ -238,7 +238,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    nodeManager.change(it, relation.get(it), myoldass, cand[0]);
+                    changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
                 }
                 else {
                     NumberVector fv = relation.get(it);
