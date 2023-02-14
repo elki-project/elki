@@ -185,6 +185,12 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
         }
 
+        public void materializeClusters() {
+            for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+                clusters.get(assignment.intValue(it)).add(it);
+            }
+        }
+
         /**
          * Compute means from cluster sums by averaging.
          * 
