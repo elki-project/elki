@@ -161,6 +161,27 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
         }
 
+        /**
+         * Separation of means.
+         *
+         * @param sep    Output array of separation (half-sqrt scaled)
+         * @param cdist  Pairwise separation output (as sqrt/2)
+         * @param scdist Pairwise separation output (as squared/4)
+         */
+        protected void combinedSeperation(double sep[], double[][] cdist, double[][] scdist) {
+            final int k = means.length;
+            for(int i = 1; i < k; i++) {
+                double[] mi = means[i];
+                for(int j = 0; j < i; j++) {
+                    scdist[i][j] = scdist[j][i] = 0.25 * distance(mi, means[j]);
+                    final double halfd = Math.sqrt(scdist[i][j]);
+                    cdist[i][j] = cdist[j][i] = halfd;
+                    sep[i] = (halfd < sep[i]) ? halfd : sep[i];
+                    sep[j] = (halfd < sep[j]) ? halfd : sep[j];
+                }
+            }
+        }
+
         public void generateCover() {
             Node root = tree.getRoot();
             generateCover(root);

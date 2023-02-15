@@ -263,8 +263,8 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
         }
 
         protected int assignPointsToNearestCluster() {
-            recomputeSeperation(sep, scdist);
-            nearestMeans(scdist, cnum);
+            recomputeSeperation(sep, cdist);
+            nearestMeans(cdist, cnum);
             int changed = 0;
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
                 final int orig = assignment.intValue(it);
@@ -282,7 +282,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
                     continue;
                 }
                 // Our cdist are scaled 0.5, so we need half r:
-                if(scdist[orig][cnum[orig][0]] > u + 0.5 * so) {
+                if(cdist[orig][cnum[orig][0]] > u + 0.5 * so) {
                     continue;
                 }
                 // Shallot modification #1: try old second-nearest first:
@@ -306,7 +306,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
                 // 0.5*(u+l), with l=min(u+d(x,p), 2u+2*cdist[z])
                 double lp = u + (isSquared ? Math.sqrt(secd2) : secd2); // l for
                                                                         // p
-                double lv = 2 * (u + scdist[ref][cnum[ref][0]]); // l for v2(z)y
+                double lv = 2 * (u + cdist[ref][cnum[ref][0]]); // l for v2(z)y
                 double l = lp < lv ? lp : lv;
                 double rhalf = Math.min(u + 0.5 * sep[ref], 0.5 * (u + l));
                 // Find closest center, and distance to two closest centers
@@ -314,7 +314,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
                 int cur = ref, minId2 = lp < lv ? secn : cnum[ref][0];
                 for(int i = 0; i < k - 1; i++) {
                     int c = cnum[ref][i];
-                    if(scdist[ref][c] > rhalf) {
+                    if(cdist[ref][c] > rhalf) {
                         break;
                     }
                     final double dist = c == secn ? secd2 : distance(fv, means[c]);

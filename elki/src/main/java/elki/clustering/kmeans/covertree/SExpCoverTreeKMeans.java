@@ -74,8 +74,8 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKM
         }
 
         protected int assignPointsToNearestCluster() {
-            recomputeSeperation(sep, scdist);
-            nearestMeans(scdist, cnum);
+            recomputeSeperation(sep, cdist);
+            nearestMeans(cdist, cnum);
             int changed = 0;
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
                 final int orig = assignment.intValue(it);
@@ -99,7 +99,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKM
                 int cur = orig;
                 for(int i = 0; i < k - 1; i++) {
                     final int c = cnum[orig][i]; // Optimized ordering
-                    if(scdist[orig][c] > r) {
+                    if(cdist[orig][c] > r) {
                         break;
                     }
                     double dist = distance(fv, means[c]);

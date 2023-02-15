@@ -290,7 +290,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
         }
 
         protected int assignPointsToNearestCluster() {
-            recomputeSeperation(sep, scdist);
+            recomputeSeperation(sep);
             int changed = 0;
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
                 final int orig = assignment.intValue(it);
@@ -385,6 +385,31 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 final int a = assignment.intValue(it);
                 upper.increment(it, move[a]);
                 lower.increment(it, a == most ? -delta2 : -delta);
+            }
+        }
+
+        /**
+         * Recompute the separation of cluster means.
+         * <p>
+         * Used by Hamerly.
+         *
+         * @param sep Output array of separation (half-sqrt scaled)
+         */
+        protected void recomputeSeperation(double[] sep) {
+            final int k = means.length;
+            assert sep.length == k;
+            Arrays.fill(sep, Double.POSITIVE_INFINITY);
+            for(int i = 1; i < k; i++) {
+                double[] m1 = means[i];
+                for(int j = 0; j < i; j++) {
+                    double d = distance(m1, means[j]);
+                    sep[i] = (d < sep[i]) ? d : sep[i];
+                    sep[j] = (d < sep[j]) ? d : sep[j];
+                }
+            }
+            // We need half the Euclidean distance
+            for(int i = 0; i < k; i++) {
+                sep[i] = .5 * (isSquared ? Math.sqrt(sep[i]) : sep[i]);
             }
         }
 
