@@ -9,24 +9,18 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.IntParameter;
 
-public class SExpCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKMeans<V> {
-
-    int switchover;
+public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKMeans<V> {
 
     public SExpCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
-        super(k, maxiter, initializer, varstat, expansion, trunc);
-        this.switchover = switchover;
+        super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
     }
 
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(FastCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(SExpCoverTreeKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -141,27 +135,11 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
      *
      * @author Erich Schubert
      */
-    public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
-
-        public static final OptionID SWITCH_ID = new OptionID("covertree.switch", "Switches from covertree to Hamerly.");
-
-        int switchover;
-
-        @Override
-        protected boolean needsMetric() {
-            return true;
-        }
-
-        protected void getParameterSwitch(Parameterization config) {
-            new IntParameter(SWITCH_ID, 5) //
-                    .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
-                    .grab(config, x -> switchover = x);
-        }
+    public static class Par<V extends NumberVector> extends SHamCoverTreeKMeans.Par<V> {
 
         @Override
         public void configure(Parameterization config) {
             super.configure(config);
-            getParameterSwitch(config);
         }
 
         @Override

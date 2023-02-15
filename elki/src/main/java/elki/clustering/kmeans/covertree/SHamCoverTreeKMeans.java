@@ -36,7 +36,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(FastCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(SHamCoverTreeKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -400,7 +400,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
      *
      * @author Erich Schubert
      */
-    public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
+    public static class Par<V extends NumberVector> extends FastCoverTreeKMeans.Par<V> {
 
         public static final OptionID SWITCH_ID = new OptionID("covertree.switch", "Switches from covertree to Hamerly.");
 
