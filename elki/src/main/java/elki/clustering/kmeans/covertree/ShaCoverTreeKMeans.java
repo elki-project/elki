@@ -221,7 +221,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
                 else {
                     NumberVector fv = relation.get(it);
                     double minS1 = distance(fv, means[cand[0]]);
-                    double minS2 = distance(fv, means[cand[0]]);
+                    double minS2 = distance(fv, means[cand[1]]);
                     int sMinInd = 0;
                     int sMin2Ind = 1;
                     if(minS2 < minS1) {

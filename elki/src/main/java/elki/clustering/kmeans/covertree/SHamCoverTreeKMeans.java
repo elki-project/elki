@@ -252,7 +252,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
                 else {
                     NumberVector fv = relation.get(it);
                     double minS1 = distance(fv, means[cand[0]]);
-                    double minS2 = distance(fv, means[cand[0]]);
+                    double minS2 = distance(fv, means[cand[1]]);
                     int sMinInd = 0;
                     if(minS2 < minS1) {
                         double t = minS2;
