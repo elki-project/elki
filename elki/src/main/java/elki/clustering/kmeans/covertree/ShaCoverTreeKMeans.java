@@ -216,48 +216,47 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    changed += addBound(it, relation.get(it), myoldass, cand[0], cand[1], min1 + cur.maxDist, min2 - cur.maxDist);
+                    changed += addBound(it, relation.get(it), myoldass, cand[0], cand[1], min1 + cur.singletons.doubleValue(j), min2 - cur.singletons.doubleValue(j));
+                    continue;
                 }
-                else {
-                    NumberVector fv = relation.get(it);
-                    double minS1 = distance(fv, means[cand[0]]);
-                    double minS2 = distance(fv, means[cand[1]]);
-                    int sMinInd = 0;
-                    int sMin2Ind = 1;
-                    if(minS2 < minS1) {
-                        double t = minS2;
-                        minS2 = minS1;
-                        minS1 = t;
-                        sMinInd = 1;
-                        sMin2Ind = 0;
-                    }
-                    double mybound = Math.sqrt(minS2) + cur.singletons.doubleValue(j);
-                    mybound *= mybound;
-                    int sal = pruneD(dists, cand, mybound, alive);
+                NumberVector fv = relation.get(it);
+                double minS1 = distance(fv, means[cand[0]]);
+                double minS2 = distance(fv, means[cand[1]]);
+                int sMinInd = 0;
+                int sMin2Ind = 1;
+                if(minS2 < minS1) {
+                    double t = minS2;
+                    minS2 = minS1;
+                    minS1 = t;
+                    sMinInd = 1;
+                    sMin2Ind = 0;
+                }
+                double mybound = Math.sqrt(minS2) + cur.singletons.doubleValue(j);
+                mybound *= mybound;
+                int sal = pruneD(dists, cand, mybound, alive);
 
-                    singletonstatPrune += alive - sal;
+                singletonstatPrune += alive - sal;
 
-                    for(int i = 2; i < sal; i++) {
-                        if(minS2 >= scdist[cand[sMinInd]][cand[i]]) {
-                            final double dist = distance(fv, means[cand[i]]);
-                            if(dist < minS1) {
-                                sMin2Ind = sMinInd;
-                                sMinInd = i;
-                                minS2 = minS1;
-                                minS1 = dist;
-                            }
-                            if(dist < minS2) {
-                                sMin2Ind = i;
-                                minS2 = dist;
-                            }
+                for(int i = 2; i < sal; i++) {
+                    if(minS2 >= scdist[cand[sMinInd]][cand[i]]) {
+                        final double dist = distance(fv, means[cand[i]]);
+                        if(dist < minS1) {
+                            sMin2Ind = sMinInd;
+                            sMinInd = i;
+                            minS2 = minS1;
+                            minS1 = dist;
                         }
-                        else {
-                            singletonstatIcDist++;
+                        if(dist < minS2) {
+                            sMin2Ind = i;
+                            minS2 = dist;
                         }
                     }
-                    assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
-                    changed += addBound(it, fv, myoldass, cand[sMinInd], cand[sMin2Ind], Math.sqrt(minS1), Math.sqrt(minS2));
+                    else {
+                        singletonstatIcDist++;
+                    }
                 }
+                assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
+                changed += addBound(it, fv, myoldass, cand[sMinInd], cand[sMin2Ind], Math.sqrt(minS1), Math.sqrt(minS2));
             }
             return changed;
         }
