@@ -266,7 +266,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
 
                     singletonstatPrune += alive - sal;
 
-                    for(int i = 1; i < sal; i++) {
+                    for(int i = 2; i < sal; i++) {
                         if(minS2 >= scdist[cand[sMinInd]][cand[i]]) {
                             final double dist = distance(fv, means[cand[i]]);
                             if(dist < minS1) {
