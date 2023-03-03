@@ -15,7 +15,6 @@ import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.utilities.datastructures.iterator.It;
-import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -91,8 +90,6 @@ public class Enforce<O> implements ClusteringAlgorithm<Clustering<Model>> {
     }
 
     public static class Par<V extends NumberVector> implements Parameterizer {
-
-        public static final OptionID CNS_TYPE = new OptionID("closedneighborhoodset.neighborhoodrelation", "Type of neighborhood - knn/kmn");
         protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
 
         public static ClusteringAlgorithm<Clustering<Model>> baseAlgorithm;
@@ -100,7 +97,7 @@ public class Enforce<O> implements ClusteringAlgorithm<Clustering<Model>> {
         @Override
         public void configure(Parameterization config){
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, NearestNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, NearestNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
 
             new ObjectParameter<ClusteringAlgorithm<Clustering<Model>>>(Utils.ALGORITHM_ID, ClusteringAlgorithm.class)
@@ -109,7 +106,7 @@ public class Enforce<O> implements ClusteringAlgorithm<Clustering<Model>> {
         }
 
         @Override
-        public ClusteringAlgorithm<Clustering<Model>> make() {
+        public Enforce<V> make() {
             return new Enforce<>(baseAlgorithm, closedNeighborhoodSetGenerator);
         }
     }

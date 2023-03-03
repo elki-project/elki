@@ -16,10 +16,7 @@ import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.optionhandling.OptionID;
-import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.ArrayList;
@@ -182,20 +179,14 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
 
     public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
 
-        public static final OptionID CNS_TYPE = new OptionID("closedneighborhoodset.neighborhoodrelation", "Type of neighborhood - knn/kmn");
         protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
 
-        public static final OptionID K_NEIGHBORS = new OptionID("kmeanscp.kneighbors", "Number of Neighbors checked.");
-        protected int kNeighbors;
 
         @Override
         public void configure(Parameterization config){
             super.configure(config);
-            new IntParameter(K_NEIGHBORS, 2)
-                    .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
-                    .grab(config, x-> kNeighbors = x );
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
 
             config.descend(Utils.DISTANCE_FUNCTION_ID);
@@ -203,7 +194,7 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
         }
 
         @Override
-        public AbstractKMeans<V, ?> make() {
+        public FastKMeansCP<V> make() {
             return new FastKMeansCP<>( k, maxiter, initializer, closedNeighborhoodSetGenerator);
         }
     }
