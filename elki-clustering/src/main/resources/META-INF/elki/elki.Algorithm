@@ -113,3 +113,4 @@ elki.clustering.trivial.ByLabelHierarchicalClustering
 elki.clustering.trivial.TrivialAllInOne
 elki.clustering.trivial.TrivialAllNoise
 elki.clustering.trivial.ByLabelOrAllInOneClustering
+elki.clustering.neighborhood.Enforce
