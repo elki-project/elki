@@ -1,4 +1,4 @@
-package elki.evaluation.clustering;
+package elki.evaluation.clustering.neighborhood;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -6,13 +6,13 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
+import elki.helper.MutualNeighborQuery;
+import elki.helper.MutualNeighborQueryBuilder;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
@@ -25,63 +25,56 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.List;
 
-public class ElementWiseNearestNeighborConsistency<O> implements Evaluator {
+public class MutualNeighborConsistency<O> implements Evaluator {
 
     private final Distance<? super O> distance;
 
-    protected final int k;
-    protected final int kPlus;
+    protected int k;
+    int kplus;
 
-    public ElementWiseNearestNeighborConsistency(Distance<? super O> distance, int k) {
+    public MutualNeighborConsistency(Distance<? super O> distance, int k) {
         super();
         this.distance = distance;
         this.k = k;
-        this.kPlus = k+1;
+        this.kplus = k+1;
     }
 
-    /**
-     * Calculate fractional kNN consistency for all datapoints and average them.
-     * @param clustering Cluster to evaluate
-     * @param relation datapoints
-     * @return fractional kNN consistency
-     */
     public double evaluateClustering(Clustering<?> clustering, Relation<O> relation){
 
-        WritableDoubleDataStore elementKNNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
+        WritableDoubleDataStore elementKMNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
         List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-        KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kPlus);
+        MutualNeighborQuery<DBIDRef> kmnQuery = new MutualNeighborQueryBuilder<>(relation, distance).precomputed().byDBID(kplus);
 
-        double kNNc = 0.0;
+        int amountKMNConsistentElements = 0;
+
         for(Cluster<?> cluster: clusters){
-            DBIDs clusterIDs = cluster.getIDs();
-            for(DBIDIter clusterElement = clusterIDs.iter(); clusterElement.valid(); clusterElement.advance()){
-                int neighborsInCluster = 0;
-                KNNList neighbors = knnQuery.getKNN(clusterElement,kPlus);
+            DBIDs clusterElementIds = cluster.getIDs();
+
+            clusterElementLoop:for(DBIDIter clusterElement = clusterElementIds.iter(); clusterElement.valid(); clusterElement.advance()){
+
+                DBIDs neighbors = kmnQuery.getMutualNeighbors(clusterElement, kplus);
                 for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()){
-                    if(DBIDUtil.equal(neighbor , clusterElement)){
-                        continue;
-                    }
-                    if(clusterIDs.contains(neighbor)){
-                        neighborsInCluster++;
+                    if(!clusterElementIds.contains(neighbor)){
+                        continue clusterElementLoop;
                     }
                 }
-                double fractionalKNNc = (double)neighborsInCluster/(neighbors.size()-1); //neighbors size can be greater than kPlus for elements with same distance
-                elementKNNConsistency.put(clusterElement, fractionalKNNc);
-                kNNc += fractionalKNNc;
+                elementKMNConsistency.put(clusterElement, 1);
+                amountKMNConsistentElements++;
             }
+
         }
 
-        kNNc =  kNNc/ relation.size();
+        double kMNc  = (double) amountKMNConsistentElements / relation.size();
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("EW kNN Consistency", kNNc, 0, 1., false);
+        g.addMeasure("kMN Consistency", kMNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW kNN Consistency", relation.getDBIDs(), elementKNNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("kMN Consistency", relation.getDBIDs(), elementKMNConsistency));
 
-        return kNNc;
+        return kMNc;
     }
 
     @Override
@@ -100,11 +93,11 @@ public class ElementWiseNearestNeighborConsistency<O> implements Evaluator {
 
     }
 
-    public static class Par<O> implements Parameterizer{
+    public static class Par<O> implements Parameterizer {
 
-        public static final OptionID DISTANCE_ID = new OptionID("knnc.distance", "Distance function to use for computing the knnc.");
+        public static final OptionID DISTANCE_ID = new OptionID("kmnc.distance", "Distance function to use for computing the kmnc.");
 
-        public static final OptionID NUMBER_K = new OptionID("knnc.k", "Number of Neighbors checked.");
+        public static final OptionID NUMBER_K = new OptionID("kmnc.k", "Number of Neighbors checked.");
         private Distance<? super O> distance;
         private int k;
 
@@ -117,8 +110,8 @@ public class ElementWiseNearestNeighborConsistency<O> implements Evaluator {
         }
 
         @Override
-        public Object make() {
-            return new ElementWiseNearestNeighborConsistency<>(distance, k);
+        public MutualNeighborConsistency<O> make() {
+            return new MutualNeighborConsistency<>(distance, k);
         }
     }
 }
