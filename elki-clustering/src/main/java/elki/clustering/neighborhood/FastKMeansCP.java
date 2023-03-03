@@ -3,7 +3,7 @@ package elki.clustering.neighborhood;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator;
-import elki.clustering.neighborhood.helper.NearestNeighborClosedNeighborhoodSetGenerator;
+import elki.clustering.neighborhood.helper.MutualNeighborClosedNeighborhoodSetGenerator;
 import elki.clustering.neighborhood.model.CNSrepresentor;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -105,7 +105,7 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
             for(int currentCNS = 0; currentCNS < closedNeighborhoodSets.length; currentCNS++  ){
                 double[] mean = new double[dim];
                 int CNSsize =  closedNeighborhoodSets[currentCNS].size();
-                for(DBIDIter element = closedNeighborhoodSets[0].iter(); element.valid(); element.advance()){
+                for(DBIDIter element = closedNeighborhoodSets[currentCNS].iter(); element.valid(); element.advance()){
                     VMath.plusEquals(mean, relation.get(element).toArray());
                 }
                 VMath.timesEquals(mean, 1.0 / CNSsize);
@@ -146,18 +146,18 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
             }
 
             for(CNSrepresentor representative: representatives) {
-                NumberVector vector = DoubleVector.wrap(representative.cnsMean);
+                NumberVector cnsMean = DoubleVector.wrap(representative.cnsMean);
 
-                double mindist = distance.distance(vector, DoubleVector.wrap(means[0]));
+                double minDist = distance.distance(cnsMean, DoubleVector.wrap(means[0]));
                 int minIndex = 0;
                 for (int i = 1; i < k; i++) {
-                    double dist = distance.distance(vector, DoubleVector.wrap(means[i]));
-                    if (dist < mindist) {
+                    double dist = distance.distance(cnsMean, DoubleVector.wrap(means[i]));
+                    if (dist < minDist) {
                         minIndex = i;
-                        mindist = dist;
+                        minDist = dist;
                     }
                 }
-                varsum[minIndex] += isSquared ? mindist : (mindist * mindist);
+                varsum[minIndex] += isSquared ? minDist : (minDist * minDist);
                 CnsClusters.get(minIndex).add(representative);
                 if( !((Integer)minIndex).equals(cnsAssignment.put(representative, minIndex)) ) {
                     changed += representative.size;
@@ -195,7 +195,7 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
                     .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
                     .grab(config, x-> kNeighbors = x );
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, NearestNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
 
             config.descend(Utils.DISTANCE_FUNCTION_ID);
