@@ -8,10 +8,14 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.helper.MutualNeighborQuery;
 import elki.helper.MutualNeighborQueryBuilder;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 import java.util.ArrayList;
 
-public class MutualNeighborClosedNeighborhoodSetGenerator<O> implements ClosedNeighborhoodSetGenerator<O> {
+public class MutualNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
 
     private final int k;
     private final int kPlus;
@@ -54,6 +58,11 @@ public class MutualNeighborClosedNeighborhoodSetGenerator<O> implements ClosedNe
         return finalComponents;
     }
 
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+        return distance.getInputTypeRestriction();
+    }
+
     private void DFSaddComponents(DBIDRef element, MutualNeighborQuery<DBIDRef> kmn, WritableDataStore<Boolean> visited, ModifiableDBIDs component){
         if(!visited.get(element)){
             visited.put(element, true);
@@ -62,6 +71,27 @@ public class MutualNeighborClosedNeighborhoodSetGenerator<O> implements ClosedNe
             for(DBIDIter neighbors = kmn.getMutualNeighbors(element, kPlus).iter(); neighbors.valid(); neighbors.advance()){
                 DFSaddComponents(neighbors, kmn, visited, component);
             }
+        }
+    }
+
+    public static class Par<O> extends AbstractClosedNeighborhoodSetGenerator.Par<O>{
+
+        OptionID K_NEIGHBORS = new OptionID("closedNeighborhoodSet.k", "The amount of neighbors to consider to create the closed neighborhood set.");
+        private int k;
+
+        @Override
+        public void configure(Parameterization config){
+            super.configure(config);
+
+            new IntParameter(K_NEIGHBORS, 2)
+                    .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
+                    .grab(config, p-> k = p);
+
+        }
+
+        @Override
+        public Object make() {
+            return new MutualNeighborClosedNeighborhoodSetGenerator<>(k, distance) ;
         }
     }
 
