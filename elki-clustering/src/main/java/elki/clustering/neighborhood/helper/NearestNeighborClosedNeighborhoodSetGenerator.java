@@ -9,10 +9,14 @@ import elki.database.query.knn.KNNSearcher;
 import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 import java.util.ArrayList;
 
-public class NearestNeighborClosedNeighborhoodSetGenerator<O> implements ClosedNeighborhoodSetGenerator<O> {
+public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
 
     int k;
     int kPlus;
@@ -75,6 +79,33 @@ public class NearestNeighborClosedNeighborhoodSetGenerator<O> implements ClosedN
 
         }
     }
+
+    public static class Par<O> extends AbstractClosedNeighborhoodSetGenerator.Par<O>{
+
+        OptionID K_NEIGHBORS = new OptionID("closedNeighborhoodSet.k", "The amount of neighbors to consider to create the closed neighborhood set.");
+        private int k;
+
+        @Override
+        public void  configure(Parameterization config) {
+            super.configure(config);
+            new IntParameter(K_NEIGHBORS, 2)
+                    .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
+                    .grab(config, p-> k = p);
+        }
+
+        @Override
+        public Object make() {
+            return new NearestNeighborClosedNeighborhoodSetGenerator<>(k,distance);
+        }
+    }
+
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+        return distance.getInputTypeRestriction();
+    }
+
+
+
 
     public static class Factory<O> implements ClosedNeighborhoodSetGenerator.Factory<O> {
         private final int k;

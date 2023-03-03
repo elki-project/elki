@@ -15,4 +15,6 @@ public interface ClosedNeighborhoodSetGenerator<O> {
 
     }
 
+    TypeInformation getInputTypeRestriction() ;
+
 }
