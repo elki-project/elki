@@ -22,7 +22,7 @@ public class NearestNeighborClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets2NN(){
         int kNeighbors = 2;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new NearestNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new NearestNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 
@@ -35,7 +35,7 @@ public class NearestNeighborClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets1NN(){
         int kNeighbors = 1;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new NearestNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new NearestNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 

@@ -1,8 +1,6 @@
 package elki.clustering.neighborhood.helper;
 
 import elki.data.type.TypeInformation;
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNSearcher;
@@ -14,13 +12,14 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-import java.util.ArrayList;
-
 public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
 
     int k;
     int kPlus;
     Distance<? super O> distance;
+
+    KNNSearcher<DBIDRef> knn;
+    RKNNSearcher<DBIDRef> rknn;
 
     /**
      * Generate a closed neighborhood set for the KNN neighborhood relation.
@@ -28,56 +27,30 @@ public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractCl
      * @param k number of neighbors (excluding the origin)
      * @param distance rank neighbors based on this distance
      */
-    NearestNeighborClosedNeighborhoodSetGenerator(int k, Distance<? super O> distance){
+    public NearestNeighborClosedNeighborhoodSetGenerator(int k, Distance<? super O> distance){
        this.k = k;
        this.distance = distance;
        this.kPlus = k+1;
     }
 
-
+    @Override
     public StaticDBIDs[] getClosedNeighborhoods(Relation<O> relation) {
-        KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kPlus);
-        RKNNSearcher<DBIDRef> rKnnQuery = new QueryBuilder<>(relation, distance).precomputed().rKNNByDBID(kPlus);
-
-        WritableDataStore<Boolean> visited = DataStoreFactory.FACTORY.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, Boolean.class);
-        ArrayList<ModifiableDBIDs> connectedComponents = new ArrayList<>();
-
-        for (DBIDIter element = relation.iterDBIDs(); element.valid(); element.advance()){
-            visited.put(element, false);
-        }
-
-        int currentComponentIndex = 0;
-        for(DBIDIter element = relation.iterDBIDs(); element.valid(); element.advance()){
-            if(visited.get(element)){
-                continue;
-            }
-            connectedComponents.add(currentComponentIndex, DBIDUtil.newArray());
-            DFSaddComponents(element, knnQuery, rKnnQuery, visited, connectedComponents.get(currentComponentIndex++));
-        }
-
-        StaticDBIDs[] finalComponents = new StaticDBIDs[currentComponentIndex];
-
-        for(int i = 0; i < currentComponentIndex; i++){
-            finalComponents[i] = DBIDUtil.makeUnmodifiable(connectedComponents.get(i));
-        }
-
-        return finalComponents;
+        knn = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kPlus);
+        rknn = new QueryBuilder<>(relation, distance).precomputed().rKNNByDBID(kPlus);
+        return super.getClosedNeighborhoods(relation);
     }
 
-    private void DFSaddComponents(DBIDRef element, KNNSearcher<DBIDRef> knn, RKNNSearcher<DBIDRef> rknn, WritableDataStore<Boolean> visited, ModifiableDBIDs component){
-        if(!visited.get(element)){
+    @Override
+    protected DBIDs getNeighbors(DBIDRef element) {
+        ModifiableDBIDs neighbors = DBIDUtil.newArray(2*k);
+        neighbors.addDBIDs(knn.getKNN(element, kPlus));
+        neighbors.addDBIDs(rknn.getRKNN(element, kPlus));
+        return neighbors;
+    }
 
-            visited.put(element, true);
-            component.add(element);
-
-            for(DBIDIter iter = knn.getKNN(element, kPlus).iter(); iter.valid(); iter.advance()){
-                DFSaddComponents(iter, knn, rknn, visited, component);
-            }
-            for(DBIDIter iter = rknn.getRKNN(element, kPlus).iter(); iter.valid(); iter.advance()){
-                DFSaddComponents(iter, knn, rknn, visited, component);
-            }
-
-        }
+    @Override
+    public TypeInformation getInputTypeRestriction() {
+        return distance.getInputTypeRestriction();
     }
 
     public static class Par<O> extends AbstractClosedNeighborhoodSetGenerator.Par<O>{
@@ -88,50 +61,15 @@ public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractCl
         @Override
         public void  configure(Parameterization config) {
             super.configure(config);
-            new IntParameter(K_NEIGHBORS, 2)
+            new IntParameter(K_NEIGHBORS)
                     .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
                     .grab(config, p-> k = p);
         }
 
         @Override
-        public Object make() {
-            return new NearestNeighborClosedNeighborhoodSetGenerator<>(k,distance);
-        }
-    }
-
-    @Override
-    public TypeInformation getInputTypeRestriction() {
-        return distance.getInputTypeRestriction();
-    }
-
-
-
-
-    public static class Factory<O> implements ClosedNeighborhoodSetGenerator.Factory<O> {
-        private final int k;
-
-        /**
-         * distance function to use
-         */
-        private final Distance<? super O> distance;
-
-        /**
-         * Factory Constructor
-         */
-        public Factory(int k, Distance<? super O> distance) {
-            super();
-            this.k = k;
-            this.distance = distance;
-        }
-
-        @Override
-        public ClosedNeighborhoodSetGenerator<O> instantiate() {
+        public NearestNeighborClosedNeighborhoodSetGenerator<O> make() {
             return new NearestNeighborClosedNeighborhoodSetGenerator<>(k, distance);
         }
-
-        @Override
-        public TypeInformation getInputTypeRestriction() {
-            return distance.getInputTypeRestriction();
-        }
     }
+
 }
