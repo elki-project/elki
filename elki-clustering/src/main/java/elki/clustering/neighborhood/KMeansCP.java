@@ -3,7 +3,7 @@ package elki.clustering.neighborhood;
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator;
-import elki.clustering.neighborhood.helper.NearestNeighborClosedNeighborhoodSetGenerator;
+import elki.clustering.neighborhood.helper.MutualNeighborClosedNeighborhoodSetGenerator;
 import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.KMeansModel;
@@ -126,7 +126,7 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
         public void configure(Parameterization config){
             super.configure(config);
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, NearestNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
 
             config.descend(Utils.DISTANCE_FUNCTION_ID);
