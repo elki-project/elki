@@ -10,6 +10,7 @@ import elki.database.Database;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.clustering.EvaluateClustering.ScoreResult;
+import elki.evaluation.clustering.neighborhood.NearestNeighborConsistency;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.utilities.ELKIBuilder;

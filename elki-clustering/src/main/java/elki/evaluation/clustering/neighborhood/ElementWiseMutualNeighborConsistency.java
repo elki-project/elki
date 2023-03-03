@@ -1,4 +1,4 @@
-package elki.evaluation.clustering;
+package elki.evaluation.clustering.neighborhood;
 
 import elki.data.Cluster;
 import elki.data.Clustering;
@@ -6,13 +6,13 @@ import elki.database.Database;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
-import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
+import elki.helper.MutualNeighborQuery;
+import elki.helper.MutualNeighborQueryBuilder;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
@@ -25,58 +25,64 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.List;
 
-public class NearestNeighborConsistency<O> implements Evaluator {
+public class ElementWiseMutualNeighborConsistency<O> implements Evaluator {
 
     private final Distance<? super O> distance;
 
-    protected final int k;
-    protected final int kPlus;
+    protected int k;
+    int kplus;
 
-    public NearestNeighborConsistency(Distance<? super O> distance, int k) {
+    public ElementWiseMutualNeighborConsistency(Distance<? super O> distance, int k) {
         super();
         this.distance = distance;
         this.k = k;
-        this.kPlus = k+1;
+        this.kplus = k+1;
     }
 
-    /**
-     * Calculate (absolute) kNN consistency for all datapoints and determines the ratio.
-     * @param clustering Cluster to evaluate
-     * @param relation datapoints
-     * @return fractional kNN consistency
-     */
     public double evaluateClustering(Clustering<?> clustering, Relation<O> relation){
 
-        WritableDoubleDataStore elementKNNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
+        WritableDoubleDataStore elementKMNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
         List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-        KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).precomputed().kNNByDBID(kPlus);
+        MutualNeighborQuery<DBIDRef> kmnQuery = new MutualNeighborQueryBuilder<>(relation, distance).precomputed().byDBID(kplus);
 
-        int amountKNNCElements = 0;
+        double kMNc = 0.0;
+
         for(Cluster<?> cluster: clusters){
-            DBIDs clusterIDs = cluster.getIDs();
-            elementLoop:for(DBIDIter clusterElement = clusterIDs.iter(); clusterElement.valid(); clusterElement.advance()){
-                KNNList neighbors = knnQuery.getKNN(clusterElement,kPlus);
-                for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()){
-                    if(!clusterIDs.contains(neighbor)){
-                        continue elementLoop;
+            DBIDs clusterElementIds = cluster.getIDs();
+
+            for(DBIDIter clusterElement = clusterElementIds.iter(); clusterElement.valid(); clusterElement.advance()){
+                int neighborsInCluster = 0;
+                DBIDs neighbors = kmnQuery.getMutualNeighbors(clusterElement, kplus);
+
+                if(neighbors.size() == 0){
+                    elementKMNConsistency.put(clusterElement, 1.);
+                    kMNc += 1.;
+                }else {
+
+                    for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+                        if (clusterElementIds.contains(neighbor)) {
+                            neighborsInCluster++;
+                        }
                     }
+                    double fractionalKNNc = (double) neighborsInCluster / (neighbors.size() );
+                    elementKMNConsistency.put(clusterElement, fractionalKNNc);
+                    kMNc += fractionalKNNc;
                 }
-                elementKNNConsistency.put(clusterElement, 1);
-                amountKNNCElements++;
             }
+
         }
 
-        double kNNc =  (double) amountKNNCElements/ relation.size();
+        kMNc  = kMNc/ relation.size();
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("kNN Consistency", kNNc, 0, 1., false);
+        g.addMeasure("EW kMN Consistency", kMNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("kNN Consistency", relation.getDBIDs(), elementKNNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW kMN Consistency", relation.getDBIDs(), elementKMNConsistency));
 
-        return kNNc;
+        return kMNc;
     }
 
     @Override
@@ -95,11 +101,11 @@ public class NearestNeighborConsistency<O> implements Evaluator {
 
     }
 
-    public static class Par<O> implements Parameterizer{
+    public static class Par<O> implements Parameterizer {
 
-        public static final OptionID DISTANCE_ID = new OptionID("knnc.distance", "Distance function to use for computing the knnc.");
+        public static final OptionID DISTANCE_ID = new OptionID("kmnc.distance", "Distance function to use for computing the kmnc.");
 
-        public static final OptionID NUMBER_K = new OptionID("knnc.k", "Number of Neighbors checked.");
+        public static final OptionID NUMBER_K = new OptionID("kmnc.k", "Number of Neighbors checked.");
         private Distance<? super O> distance;
         private int k;
 
@@ -112,8 +118,8 @@ public class NearestNeighborConsistency<O> implements Evaluator {
         }
 
         @Override
-        public Object make() {
-            return new NearestNeighborConsistency<>(distance, k);
+        public ElementWiseMutualNeighborConsistency<O> make() {
+            return new ElementWiseMutualNeighborConsistency<>(distance, k);
         }
     }
 }
