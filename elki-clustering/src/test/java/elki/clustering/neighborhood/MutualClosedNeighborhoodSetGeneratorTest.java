@@ -21,7 +21,7 @@ public class MutualClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets2MN(){
         int kNeighbors = 2;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 
@@ -34,7 +34,7 @@ public class MutualClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets3MN(){
         int kNeighbors = 3;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 
@@ -47,7 +47,7 @@ public class MutualClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets4MN(){
         int kNeighbors = 4;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 
@@ -60,7 +60,7 @@ public class MutualClosedNeighborhoodSetGeneratorTest {
     public void testAmountOfClosedNeighborhoodSets5MN(){
         int kNeighbors = 5;
         NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator.Factory<DoubleVector>(kNeighbors, distance).instantiate();
+        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
 
         Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
 
