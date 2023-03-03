@@ -10,7 +10,6 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -44,17 +43,16 @@ public class CNSClustering<O> implements ClusteringAlgorithm<Clustering<Model>> 
 
     public static class Par<O> implements Parameterizer{
 
-        public static final OptionID CNS_TYPE = new OptionID("closedneighborhoodset.neighborhoodrelation", "Type of neighborhood - knn/kmn");
         protected ClosedNeighborhoodSetGenerator<O> closedNeighborhoodSetGenerator;
 
         @Override
         public void configure(Parameterization config) {
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<O>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<O>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
         }
 
         @Override
-        public Object make() {
+        public CNSClustering<O> make() {
             return new CNSClustering<>(closedNeighborhoodSetGenerator);
         }
     }

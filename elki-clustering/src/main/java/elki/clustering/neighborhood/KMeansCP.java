@@ -13,7 +13,6 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -119,14 +118,13 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
 
     public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
 
-        public static final OptionID CNS_TYPE = new OptionID("closedneighborhoodset.neighborhoodrelation", "Type of neighborhood - knn/kmn");
         protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
 
         @Override
         public void configure(Parameterization config){
             super.configure(config);
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_TYPE, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
+            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
 
             config.descend(Utils.DISTANCE_FUNCTION_ID);
@@ -134,7 +132,7 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
         }
 
         @Override
-        public AbstractKMeans<V, ?> make() {
+        public KMeansCP<V> make() {
             return new KMeansCP<>( k, maxiter, initializer, closedNeighborhoodSetGenerator);
         }
     }
