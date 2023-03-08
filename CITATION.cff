@@ -1,0 +1,150 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Schubert
+    given-names: Erich
+    orcid: 0000-0001-9143-4880
+  - family-names: Zimek
+    given-names: Arthur
+    orcid: 0000-0001-7713-4208
+title: "ELKI Data Mining Framework"
+version: 0.8.0
+date-released: 2022-10-08
+license: AGPL-3.0
+preferred-citation:
+  title: "Automatic Indexing for Similarity Search in ELKI"
+  doi: "10.1007/978-3-031-17849-8_16"
+  year: "2022"
+  type: conference-paper
+  conference: "Similarity Search and Applications - 15th International Conference, SISAP 2022, Bologna, Italy, October 5-7, 2022, Proceedings"
+  authors:
+    - family-names: Schubert
+      given-names: Erich
+references:
+- title: "ELKI: A Software System for Evaluation of Subspace Clustering Algorithms"
+  doi: "10.1007/978-3-540-69497-7_41"
+  year: "2008"
+  type: conference-paper
+  conference: "Scientific and Statistical Database Management, 20th International Conference, SSDBM 2008, Hong Kong, China, July 9-11, 2008, Proceedings"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Zimek
+      given-names: Arthur
+- title: "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series"
+  doi: "10.1007/978-3-642-02982-0_35"
+  year: "2009"
+  type: conference-paper
+  conference: "Advances in Spatial and Temporal Databases, 11th International Symposium, SSTD 2009, Aalborg, Denmark, July 8-10, 2009, Proceedings"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Bernecker
+      given-names: Thomas
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Zimek
+      given-names: Arthur
+- title: "Visual Evaluation of Outlier Detection Models"
+  doi: "10.1007/978-3-642-12098-5_34"
+  year: "2010"
+  type: conference-paper
+  conference: "Database Systems for Advanced Applications, 15th International Conference, DASFAA 2010, Tsukuba, Japan, April 1-4, 2010, Proceedings, Part II"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Reichert
+      given-names: Lisa
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Wojdanowski
+      given-names: Remigius
+    - family-names: Zimek
+      given-names: Arthur
+- title: "Spatial Outlier Detection: Data, Algorithms, Visualizations"
+  doi: "10.1007/978-3-642-22922-0_41"
+  year: "2011"
+  type: conference-paper
+  conference: "Advances in Spatial and Temporal Databases - 12th International Symposium, SSTD 2011, Minneapolis, MN, USA, August 24-26, 2011, Proceedings"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Hettab
+      given-names: Ahmed
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Zimek
+      given-names: Arthur
+- title: "Evaluation of Clusterings - Metrics and Visual Support"
+  doi: "10.1109/ICDE.2012.128"
+  year: "2012"
+  type: conference-paper
+  conference: "IEEE 28th International Conference on Data Engineering (ICDE 2012), Washington, DC, USA (Arlington, Virginia), 1-5 April, 2012"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Goldhofer
+      given-names: Sascha
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Zimek
+      given-names: Arthur
+- title: "Interactive data mining with 3D-parallel-coordinate-trees"
+  doi: "10.1145/2463676.2463696"
+  year: "2013"
+  type: conference-paper
+  conference: "Proceedings of the ACM SIGMOD International Conference on Management of Data, SIGMOD 2013, New York, NY, USA, June 22-27, 2013"
+  authors:
+    - family-names: Achtert
+      given-names: Elke
+    - family-names: Kriegel
+      given-names: Hans-Peter
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Zimek
+      given-names: Arthur
+- title: "ELKI: A large open-source library for data analysis - ELKI Release 0.7.5 \"Heidelberg\""
+  year: "2019"
+  type: article
+  journal: "CoRR"
+  authors:
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Zimek
+      given-names: Arthur
+- title: "A Framework for Clustering Uncertain Data"
+  doi: "10.14778/2824032.2824115"
+  year: "2015"
+  type: article
+  journal: "Proc. VLDB Endow."
+  authors:
+    - family-names: Schubert
+      given-names: Erich
+    - family-names: Koos
+      given-names: Alexander
+    - family-names: Emrich
+      given-names: Tobias
+    - family-names: Züfle
+      given-names: Andreas
+    - family-names: Schmid
+      given-names: Klaus Arthur
+    - family-names: Zimek
+      given-names: Arthur
+- title: "Automatic Indexing for Similarity Search in ELKI"
+  doi: "10.1007/978-3-031-17849-8_16"
+  year: "2022"
+  type: conference-paper
+  conference: "Similarity Search and Applications - 15th International Conference, SISAP 2022, Bologna, Italy, October 5-7, 2022, Proceedings"
+  authors:
+    - family-names: Schubert
+      given-names: Erich
