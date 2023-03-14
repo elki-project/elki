@@ -1,3 +1,0 @@
-elki.clustering.neighborhood.MutualNeighborClosedNeighborhoodSetGenerator
-elki.clustering.neighborhood.NearestNeighborClosedNeighborhoodSetGenerator
-elki.clustering.neighborhood.EpsNeighborClosedNeighborhoodSetGenerator
