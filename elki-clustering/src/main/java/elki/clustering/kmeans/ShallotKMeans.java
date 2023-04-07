@@ -209,7 +209,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
             cur = c;
             min2 = min1;
             min1 = dist;
-            if(min1 < l * l) {
+            if(min2 < l * l) {
               l = isSquared ? Math.sqrt(min2) : min2;
               // Second Shallot improvement: r shrinking
               rhalf = Math.min(rhalf, 0.5 * (u + l));
