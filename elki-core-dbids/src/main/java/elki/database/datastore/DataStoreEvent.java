@@ -60,8 +60,8 @@ public class DataStoreEvent {
   public DataStoreEvent(DBIDs inserts, DBIDs removals, DBIDs updates) {
     super();
     this.inserts = inserts;
-    this.removals = inserts;
-    this.updates = inserts;
+    this.removals = removals;
+    this.updates = updates;
   }
 
   /**

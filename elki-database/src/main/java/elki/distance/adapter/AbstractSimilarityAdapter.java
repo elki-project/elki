@@ -88,7 +88,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     }
     // Same similarity function
     AbstractSimilarityAdapter<?> other = (AbstractSimilarityAdapter<?>) obj;
-    return other.similarityFunction.equals(other.similarityFunction);
+    return similarityFunction.equals(other.similarityFunction);
   }
 
   @Override
