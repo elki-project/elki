@@ -138,7 +138,7 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
     for(int loop = 0; loop < MAX_ITER; ++loop) {
       boolean changed = false;
       for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
-        // Change mask to make the current Fobject anomalous
+        // Change mask to make the current object anomalous
         boolean wasadded = anomalous.add(iter) || !anomalous.remove(iter);
         NumberVector vec = relation.get(iter);
         builder.put(vec, wasadded ? -1 : +1); // Remove
