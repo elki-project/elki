@@ -34,7 +34,7 @@ import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.PreprocessorKNNQuery;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -55,7 +55,8 @@ import elki.utilities.random.RandomFactory;
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
  * <p>
- * This version does the bulk kNN-join operation, i.e. precomputes the k nearest
+ * This version does the bulk kNN-join operation, i.e., precomputes the k
+ * nearest
  * neighbors for every object, then discards the curves. This is usually more
  * memory intensive but faster than {@link SpacefillingKNNPreprocessor}.
  * <p>
@@ -242,9 +243,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
   }
 
   @Override
-  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distQ, int maxk, int flags) {
+  public PreprocessorKNNQuery kNNByDBID(DistanceQuery<O> distQ, int maxk, int flags) {
     return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
-        super.kNNByObject(distQ, maxk, flags);
+        super.kNNByDBID(distQ, maxk, flags);
   }
 
   /**
