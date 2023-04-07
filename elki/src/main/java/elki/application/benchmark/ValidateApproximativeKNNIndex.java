@@ -30,6 +30,7 @@ import elki.database.ids.*;
 import elki.database.query.LinearScanQuery;
 import elki.database.query.QueryBuilder;
 import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.WrappedKNNDBIDByLookup;
 import elki.database.relation.Relation;
 import elki.datasource.DatabaseConnection;
 import elki.datasource.bundle.MultipleObjectsBundle;
@@ -128,16 +129,19 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
     int misses = 0;
     // No query set - use original database.
     if(queries == null || pattern != null) {
-      // Approximate query:
-      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().kNNByDBID(k);
+      // Approximate query, optimized + cheap ~ no liner scan, no automatic index
+      KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).optimizedOnly().cheapOnly().kNNByDBID(k);
       if(knnQuery == null || knnQuery instanceof LinearScanQuery) {
         throw new AbortException("Expected an accelerated query, but got a linear scan -- index is not used.");
       }
       // Exact query:
       KNNSearcher<DBIDRef> truekNNQuery = forcelinear ? new QueryBuilder<>(relation, distance).linearOnly().kNNByDBID(k) //
           : new QueryBuilder<>(relation, distance).exactOnly().kNNByDBID(k);
-      if(knnQuery.getClass().equals(truekNNQuery.getClass())) {
-        LOG.warning("Query classes are the same. This experiment may be invalid!");
+      // Wrapped queries make detection more difficult.
+      Class<?> kqc = knnQuery instanceof WrappedKNNDBIDByLookup ? ((WrappedKNNDBIDByLookup<?>) knnQuery).getWrapped().getClass() : knnQuery.getClass();
+      Class<?> tkqc = truekNNQuery instanceof WrappedKNNDBIDByLookup ? ((WrappedKNNDBIDByLookup<?>) truekNNQuery).getWrapped().getClass() : truekNNQuery.getClass();
+      if(kqc.equals(tkqc)) {
+        LOG.warning("Reference and test query classes are the same. This experiment is invalid: " + tkqc);
       }
 
       // Relation to filter on

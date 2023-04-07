@@ -62,6 +62,17 @@ public class WrappedKNNDBIDByLookup<O> implements KNNSearcher<DBIDRef> {
   }
 
   /**
+   * Get the wrapped searcher. This is mostly meaningful for comparing that two
+   * wrappers are not the same (note that equals is not suitable for this
+   * currently).
+   * 
+   * @return wrapped searcher
+   */
+  public KNNSearcher<O> getWrapped() {
+    return inner;
+  }
+
+  /**
    * Linear scan searcher.
    * 
    * @author Erich Schubert
