@@ -94,7 +94,7 @@ public class KernelDensityFittingTest {
 
     double splitval = 0.5;
     int splitpoint = 0;
-    while(fulldata[splitpoint] < splitval && splitpoint < fulldata.length) {
+    while(splitpoint < fulldata.length && fulldata[splitpoint] < splitval) {
       splitpoint++;
     }
     double[] halfdata = Arrays.copyOf(fulldata, splitpoint);

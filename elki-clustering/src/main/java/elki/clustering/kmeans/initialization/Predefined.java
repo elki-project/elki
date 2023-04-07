@@ -58,19 +58,6 @@ public class Predefined extends AbstractKMeansInitialization {
   /**
    * Set the initial means.
    *
-   * Important notice: Use with care - the means are <em>not copied</em>!
-   *
-   * @param initialMeans initial means.
-   */
-  public void setInitialMeans(List<double[]> initialMeans) {
-    this.setInitialMeans(initialMeans);
-  }
-
-  /**
-   * Set the initial means.
-   *
-   * Important notice: Use with care - the means are <em>not copied</em>!
-   *
    * @param initialMeans initial means.
    */
   public void setInitialClusters(List<? extends Cluster<? extends MeanModel>> initialMeans) {
@@ -83,7 +70,7 @@ public class Predefined extends AbstractKMeansInitialization {
 
   /**
    * Set the initial means.
-   *
+   * <p>
    * Important notice: Use with care - the means are <em>not copied</em>!
    *
    * @param initialMeans initial means.
