@@ -122,7 +122,7 @@ public class FastMSC<O> extends PAMMEDSIL<O> {
    *
    * @author Erich Schubert
    */
-  protected class Instance2 {
+  protected static class Instance2 {
     /**
      * Ids to process.
      */

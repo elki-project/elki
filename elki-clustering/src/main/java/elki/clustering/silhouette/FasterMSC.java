@@ -126,7 +126,7 @@ public class FasterMSC<O> extends FastMSC<O> {
    *
    * @author Erich Schubert
    */
-  protected class Instance2 extends FastMSC<O>.Instance2 {
+  protected static class Instance2 extends FastMSC.Instance2 {
     /**
      * Constructor.
      *
@@ -138,13 +138,7 @@ public class FasterMSC<O> extends FastMSC<O> {
       super(distQ, ids, assignment);
     }
 
-    /**
-     * Run the FasterMSC optimization phase.
-     *
-     * @param medoids Initial medoids list
-     * @param maxiter Maximum number of iterations
-     * @return final medoid Silhouette
-     */
+    @Override
     protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       assert k == 2;

@@ -96,11 +96,7 @@ public class HamerlyKMeans<V extends NumberVector> extends SimplifiedHamerlyKMea
       super(relation, df, means);
     }
 
-    /**
-     * Perform initial cluster assignment.
-     *
-     * @return Number of changes (i.e., relation size)
-     */
+    @Override
     protected int initialAssignToNearestCluster() {
       assert k == means.length;
       double[][] cdist = new double[k][k];
