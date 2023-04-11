@@ -21,6 +21,7 @@
 
 package elki.clustering.kmeans.covertree;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import elki.clustering.kmeans.AbstractKMeans;
@@ -170,6 +171,7 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
          */
         protected void combinedSeperation(double sep[], double[][] cdist, double[][] scdist) {
             final int k = means.length;
+            Arrays.fill(sep, Double.POSITIVE_INFINITY);
             for(int i = 1; i < k; i++) {
                 double[] mi = means[i];
                 for(int j = 0; j < i; j++) {

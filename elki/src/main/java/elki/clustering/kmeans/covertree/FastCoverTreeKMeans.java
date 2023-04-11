@@ -137,7 +137,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 }
                 newbound *= newbound;
                 // int oldAlive = alive;
-                // Equation 15 based on 14
+                // Equation 15
                 alive = pruneD(parentdists, cand, newbound, alive);
                 dists = new double[alive];
                 dists[0] = min1;
@@ -145,6 +145,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 for(int i = 1; i < alive; i++) {
                     // use sqrt values but handle maxdist > cdist + min2
                     double bound = 0;
+                    // Equation 10
                     if(cur.maxDist < cdist[cand[minInd]][cand[i]]) {
                         bound = cdist[cand[minInd]][cand[i]] - cur.maxDist;
                         bound *= bound;
@@ -177,6 +178,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 dists = parentdists;
             }
             double fastbound = min1 + 2 * cur.maxDist;
+            // Equation 11
             if(fastbound < min2) {
                 nodestatFilter += alive * (cur.size - cur.singletons.size());
                 assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
@@ -197,6 +199,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             // Prune candidate list
             fastbound *= fastbound;
             int old = alive;
+            // Equation 12
             alive = pruneD(dists, cand, fastbound, alive);
             nodestatPrune += (old - alive) * (cur.size - cur.singletons.size());
 
@@ -216,6 +219,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(child);
                 // assign to cluster candidate if patent dist + maxDist <
                 // lower_bound
+                // Equation 13
                 if(child.parentDist + child.maxDist < fastbound) {
                     nodestatFilter += child.size * alive;
                     changed += nodeManager.change(child, myoldass, cand[0]);
@@ -235,6 +239,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             int changed = 0;
             for(int j = 1; it.valid(); it.advance(), j++) {
                 int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
+                // Equation 13 r = 0
                 if(cur.singletons.doubleValue(j) <= fastbound) {
                     singletonstatFilter += alive;
                     assert (nodeManager.testAssign(it, cand[0], means) == 0);
@@ -255,6 +260,9 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
                                 sMinInd = i;
                                 min = dist;
                             }
+                        }
+                        else {
+                            singletonstatIcDist++;
                         }
                     }
                     assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
