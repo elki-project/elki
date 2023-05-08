@@ -39,7 +39,7 @@ import elki.utilities.documentation.Reference;
  * <p>
  * Reference:
  * <p>
- * J. Newling<br>
+ * J. Newling and F. Fleuret<br>
  * Fast k-means with accurate bounds<br>
  * Proc. 33nd Int. Conf. on Machine Learning, ICML 2016
  *
@@ -50,7 +50,7 @@ import elki.utilities.documentation.Reference;
  *
  * @param <V> vector datatype
  */
-@Reference(authors = "J. Newling", //
+@Reference(authors = "J. Newling and F. Fleuret", //
     title = "Fast k-means with accurate bounds", //
     booktitle = "Proc. 33nd Int. Conf. on Machine Learning, ICML 2016", //
     url = "http://jmlr.org/proceedings/papers/v48/newling16.html", //
@@ -171,7 +171,7 @@ public class ExponionKMeans<V extends NumberVector> extends HamerlyKMeans<V> {
         if(u <= z || u <= sa) {
           continue;
         }
-        double rhalf = u + 0.5 * sa; // Our cdist are scaled 0.5
+        double rhalf = u + sa; // Our cdist are scaled 0.5
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
         int cur = orig;

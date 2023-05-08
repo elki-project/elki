@@ -170,7 +170,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
           continue;
         }
         // Our cdist are scaled 0.5, so we need half r:
-        if(cdist[orig][cnum[orig][0]] > u + 0.5 * so) {
+        if(cdist[orig][cnum[orig][0]] > u + so) {
           continue;
         }
         // Shallot modification #1: try old second-nearest first:
@@ -194,7 +194,7 @@ public class ShallotKMeans<V extends NumberVector> extends ExponionKMeans<V> {
         double lp = u + (isSquared ? Math.sqrt(secd2) : secd2); // l for p
         double lv = 2 * (u + cdist[ref][cnum[ref][0]]); // l for v2(z)y
         double l = lp < lv ? lp : lv;
-        double rhalf = Math.min(u + 0.5 * sep[ref], 0.5 * (u + l));
+        double rhalf = Math.min(u + sep[ref], 0.5 * (u + l));
         // Find closest center, and distance to two closest centers
         double min1 = curd2, min2 = l * l;
         int cur = ref, minId2 = lp < lv ? secn : cnum[ref][0];
