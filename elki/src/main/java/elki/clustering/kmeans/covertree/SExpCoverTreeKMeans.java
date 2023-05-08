@@ -78,47 +78,47 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKM
             nearestMeans(cdist, cnum);
             int changed = 0;
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-                final int orig = assignment.intValue(it);
-                // Compute the current bound:
-                final double z = lower.doubleValue(it);
-                final double sa = sep[orig];
-                double u = upper.doubleValue(it);
-                if(u <= z || u <= sa) {
-                    continue;
+              final int orig = assignment.intValue(it);
+              // Compute the current bound:
+              final double z = lower.doubleValue(it);
+              final double sa = sep[orig];
+              double u = upper.doubleValue(it);
+              if(u <= z || u <= sa) {
+                continue;
+              }
+              // Update the upper bound
+              NumberVector fv = relation.get(it);
+              double curd2 = distance(fv, means[orig]);
+              upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
+              if(u <= z || u <= sa) {
+                continue;
+              }
+              double rhalf = u + sa; // Our cdist are scaled 0.5
+              // Find closest center, and distance to two closest centers
+              double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
+              int cur = orig;
+              for(int i = 0; i < k - 1; i++) {
+                final int c = cnum[orig][i]; // Optimized ordering
+                if(cdist[orig][c] > rhalf) {
+                  break;
                 }
-                // Update the upper bound
-                NumberVector fv = relation.get(it);
-                double curd2 = distance(fv, means[orig]);
-                upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-                if(u <= z || u <= sa) {
-                    continue;
+                double dist = distance(fv, means[c]);
+                if(dist < min1) {
+                  cur = c;
+                  min2 = min1;
+                  min1 = dist;
                 }
-                double r = u + 0.5 * sa; // Our cdist are scaled 0.5
-                // Find closest center, and distance to two closest centers
-                double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
-                int cur = orig;
-                for(int i = 0; i < k - 1; i++) {
-                    final int c = cnum[orig][i]; // Optimized ordering
-                    if(cdist[orig][c] > r) {
-                        break;
-                    }
-                    double dist = distance(fv, means[c]);
-                    if(dist < min1) {
-                        cur = c;
-                        min2 = min1;
-                        min1 = dist;
-                    }
-                    else if(dist < min2) {
-                        min2 = dist;
-                    }
+                else if(dist < min2) {
+                  min2 = dist;
                 }
-                // Object has to be reassigned.
-                if(cur != orig) {
-                    nodeManager.fChange(it, fv, orig, cur);
-                    ++changed;
-                    upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
-                }
-                lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
+              }
+              // Object has to be reassigned.
+              if(cur != orig) {
+                nodeManager.fChange(it, fv, orig, cur);
+                ++changed;
+                upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
+              }
+              lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
             }
             return changed;
         }
