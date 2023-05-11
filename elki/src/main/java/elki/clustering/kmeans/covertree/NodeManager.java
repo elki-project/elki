@@ -78,7 +78,7 @@ public class NodeManager {
      * @return current assignment
      */
     public int get(Node n) {
-        return n.size == nodeSize.intValue(n.singletons.iter()) ? get(n.singletons.iter()) : -1;
+        return n.size == nodeSize.intValue(n) ? get(n) : -1;
     }
 
     /**
@@ -87,7 +87,7 @@ public class NodeManager {
      * @return current assignment
      */
     public int getF(Node n) {
-        return get(n.singletons.iter());
+        return get(n);
     }
 
     public int change(DBIDRef id, NumberVector fv, int oldA, int newA) {
@@ -109,7 +109,7 @@ public class NodeManager {
     }
 
     public int change(Node n, int oldA, int newA) {
-        assert (testTree(n, nodeSize.intValue(n.singletons.iter()) > n.size));
+        assert (testTree(n, nodeSize.intValue(n) > n.size));
         if(oldA == newA) {
             // set can be skipped if get(id) = oldA
             set(n, newA);
@@ -119,7 +119,7 @@ public class NodeManager {
             remove(n, oldA);
         }
         if(oldA == -1) {
-            assert (nodeSize.intValue(n.singletons.iter()) < n.size);
+            assert (nodeSize.intValue(n) < n.size);
             removeRec(n);
         }
         add(n, newA);
@@ -127,13 +127,13 @@ public class NodeManager {
     }
 
     public int add(Node n, int cluster) {
-        assert (cluster != get(n.singletons.iter()) && cluster >= 0);
+        assert (cluster != get(n) && cluster >= 0);
         assert (get(n) == -1);
         assert (testClean(n, -1) == 0);
         plusEquals(sums[cluster], n.meansum);
         sizes[cluster] += n.size;
-        nodeSize.putInt(n.singletons.iter(), n.size);
-        assignment.put(n.singletons.iter(), cluster);
+        nodeSize.putInt(n, n.size);
+        assignment.put(n, cluster);
         assert (testTree(n, false));
         return n.size;
     }
@@ -154,8 +154,8 @@ public class NodeManager {
     }
 
     public void set(Node n, int cluster) {
-        assignment.put(n.singletons.iter(), cluster);
-        nodeSize.put(n.singletons.iter(), n.size);
+        assignment.put(n, cluster);
+        nodeSize.put(n, n.size);
     }
 
     /**
@@ -166,7 +166,7 @@ public class NodeManager {
         minusEquals(sums[cluster], n.meansum);
         sizes[cluster] -= n.size;
         // nodeSize.putInt(n.singletons.iter(), n.size);
-        assignment.put(n.singletons.iter(), -1);
+        assignment.put(n, -1);
         assert (testClean(n, -1) == 0);
         assert (testTree(n, true));
         return;
@@ -306,7 +306,11 @@ public class NodeManager {
                 min = d;
             }
         }
-        return sMinInd == clu ? 0 : 1;
+        if(sMinInd == clu) {
+            return 0;
+        }
+        return 1;
+        // return sMinInd == clu ? 0 : 1;
     }
 
     public int testAssign(Node n, int clu, double[][] means) {

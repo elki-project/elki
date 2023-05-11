@@ -86,7 +86,7 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
      *
      * @author Erich Schubert
      */
-    static final class Node {
+    static final class Node implements DBIDRef {
         /**
          * Objects in this node. Except for the first, which is the routing
          * object.
@@ -153,6 +153,11 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
             this.singletons.add(0., r);
             this.meansum = mean;
             this.size = weight;
+        }
+
+        @Override
+        public int internalGetIndex() {
+            return this.singletons.internalGetIndex(0);
         }
     }
 
