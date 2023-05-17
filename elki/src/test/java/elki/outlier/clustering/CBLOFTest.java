@@ -22,6 +22,7 @@ package elki.outlier.clustering;
 
 import org.junit.Test;
 
+import elki.clustering.Leader;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmeans.SortMeans;
 import elki.outlier.AbstractOutlierAlgorithmTest;
@@ -38,10 +39,22 @@ import elki.utilities.ELKIBuilder;
  */
 public class CBLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
-  public void testCBLOFDetection() {
+  public void testCBLOFLeader() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
     OutlierResult result = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
-        .with(CBLOF.Par.ALPHPA_ID, 0.8) //
+        .with(CBLOF.Par.ALPHA_ID, 0.8) //
+        .with(CBLOF.Par.BETA_ID, 3) //
+        .with(Leader.Par.THRESHOLD_ID, 1) //
+        .build().autorun(db);
+    assertAUC(db, "Noise", result, 0.839);
+    assertSingleScore(result, 416, 251.5063269);
+  }
+
+  @Test
+  public void testCBLOFKMeans() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
+    OutlierResult result = new ELKIBuilder<CBLOF<DoubleVector>>(CBLOF.class) //
+        .with(CBLOF.Par.ALPHA_ID, 0.8) //
         .with(CBLOF.Par.BETA_ID, 3) //
         .with(CBLOF.Par.CLUSTERING_ID, SortMeans.class) //
         .with(KMeans.K_ID, 1) //

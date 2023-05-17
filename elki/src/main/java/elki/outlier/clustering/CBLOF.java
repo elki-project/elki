@@ -27,7 +27,7 @@ import java.util.List;
 
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.kmeans.SortMeans;
+import elki.clustering.Leader;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.NumberVector;
@@ -284,7 +284,7 @@ public class CBLOF<O extends NumberVector> implements OutlierAlgorithm {
     /**
      * Parameter to specify the alpha value to be used by the algorithm.
      */
-    public static final OptionID ALPHPA_ID = new OptionID("cblof.alpha", "The ratio of the data that should be included in the large clusters");
+    public static final OptionID ALPHA_ID = new OptionID("cblof.alpha", "The ratio of the data that should be included in the large clusters");
 
     /**
      * Parameter to specify the beta value to be used by the algorithm.
@@ -323,14 +323,14 @@ public class CBLOF<O extends NumberVector> implements OutlierAlgorithm {
     public void configure(Parameterization config) {
       new ObjectParameter<NumberVectorDistance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, NumberVectorDistance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
-      new DoubleParameter(ALPHPA_ID)//
+      new DoubleParameter(ALPHA_ID)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> alpha = x);
       new DoubleParameter(BETA_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
           .grab(config, x -> beta = x);
-      new ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>>(CLUSTERING_ID, ClusteringAlgorithm.class, SortMeans.class) //
+      new ObjectParameter<ClusteringAlgorithm<Clustering<MeanModel>>>(CLUSTERING_ID, ClusteringAlgorithm.class, Leader.class) //
           .grab(config, x -> clusteringAlgorithm = x);
     }
 
