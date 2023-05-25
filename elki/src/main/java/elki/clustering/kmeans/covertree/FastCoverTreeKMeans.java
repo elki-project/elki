@@ -73,6 +73,7 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
     }
 
     protected static class Instance extends AbstractCoverTreeKMeans.Instance {
+        public boolean flat = false;
 
         /**
          * Constructor.

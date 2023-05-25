@@ -78,7 +78,7 @@ public class NodeManager {
      * @return current assignment
      */
     public int get(Node n) {
-        return n.size == nodeSize.intValue(n) ? get(n) : -1;
+        return n.size == nodeSize.intValue(n) ? getF(n) : -1;
     }
 
     /**
@@ -87,7 +87,7 @@ public class NodeManager {
      * @return current assignment
      */
     public int getF(Node n) {
-        return get(n);
+        return assignment.intValue(n);
     }
 
     public int change(DBIDRef id, NumberVector fv, int oldA, int newA) {
@@ -330,6 +330,7 @@ public class NodeManager {
                 }
             }
             if(sMinInd != clu) {
+                min = Math.sqrt(min);
                 invalid++;
             }
         }
