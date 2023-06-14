@@ -68,11 +68,11 @@ public class MutualNeighborConsistency<O> implements Evaluator {
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("kMN Consistency", kMNc, 0, 1., false);
+        g.addMeasure(k + "-MN Consistency", kMNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("kMN Consistency", relation.getDBIDs(), elementKMNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation(k + "-MN Consistency", relation.getDBIDs(), elementKMNConsistency));
 
         return kMNc;
     }

@@ -13,6 +13,7 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
+import elki.logging.statistics.Duration;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -40,6 +41,12 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
         return instance.buildResult();
     }
 
+    protected DBIDs[] getCNS(Relation<V> relation){
+        Duration cnsTime = LOG.newDuration(closedNeighborhoodSetGenerator.getClass().getName() + ".time").begin();
+        DBIDs[] dbids = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
+        LOG.statistics(cnsTime.end());
+        return dbids;
+    }
 
 
     protected class Instance extends AbstractKMeans.Instance {
@@ -55,7 +62,7 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
          */
         public Instance(Relation<V> relation, NumberVectorDistance<?> df, double[][] means) {
             super(relation, df, means);
-            CNSs = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
+            CNSs = getCNS(relation);
         }
 
         @Override
