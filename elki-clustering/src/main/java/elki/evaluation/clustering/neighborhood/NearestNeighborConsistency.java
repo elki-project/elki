@@ -70,11 +70,11 @@ public class NearestNeighborConsistency<O> implements Evaluator {
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("kNN Consistency", kNNc, 0, 1., false);
+        g.addMeasure(k + "-NN Consistency", kNNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("kNN Consistency", relation.getDBIDs(), elementKNNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation(k + "-NN Consistency", relation.getDBIDs(), elementKNNConsistency));
 
         return kNNc;
     }

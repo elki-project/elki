@@ -15,14 +15,17 @@ import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
+import elki.logging.statistics.Duration;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
+import elki.utilities.optionhandling.parameters.ClassParameter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID;
 
 public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
 
@@ -40,6 +43,13 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
         Instance instance = new Instance(rel, distance, initialMeans(rel));
         instance.run(maxiter);
         return instance.buildResult();
+    }
+
+    protected DBIDs[] getCNS(Relation<V> relation){
+        Duration cnsTime = LOG.newDuration(closedNeighborhoodSetGenerator.getClass().getName() + ".time").begin();
+        DBIDs[] dbids = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
+        LOG.statistics(cnsTime.end());
+        return dbids;
     }
 
     @Override
@@ -67,7 +77,7 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
          */
         public Instance(Relation<V> relation, NumberVectorDistance<?> df, double[][] means) {
             super(relation, df, means);
-            CNSs = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
+            CNSs = getCNS(relation);
             cnsRepresentors = initalizeCNSrepresentors(CNSs);
             CnsClusters = new ArrayList<>(k);
             for(int i = 0; i < k; i++){
@@ -100,17 +110,15 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
             CNSrepresentor[] representors = new CNSrepresentor[closedNeighborhoodSets.length];
 
             for(int currentCNS = 0; currentCNS < closedNeighborhoodSets.length; currentCNS++  ){
-                double[] mean = new double[dim];
+                double[] sum = new double[dim];
                 int CNSsize =  closedNeighborhoodSets[currentCNS].size();
                 for(DBIDIter element = closedNeighborhoodSets[currentCNS].iter(); element.valid(); element.advance()){
-                    VMath.plusEquals(mean, relation.get(element).toArray());
+                    VMath.plusEquals(sum, relation.get(element).toArray());
                 }
-                VMath.timesEquals(mean, 1.0 / CNSsize);
-
-                representors[currentCNS] = new CNSrepresentor(mean, CNSsize, closedNeighborhoodSets[currentCNS]);
+                representors[currentCNS] = new CNSrepresentor(VMath.times(sum, 1.0 / CNSsize), sum, CNSsize, closedNeighborhoodSets[currentCNS]);
             }
 
-            return  representors;
+            return representors;
         }
 
         protected double[][] weightedMeans(List<List<CNSrepresentor>> clusters, double[][]means){
@@ -160,7 +168,6 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
                     changed += representative.size;
                 }
             }
-
             return changed;
         }
 
@@ -171,26 +178,19 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
                     clusters.get(i).addDBIDs(cns.cnsElements);
                 }
             }
-
             return super.buildResult();
         }
     }
 
-
     public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
-
         protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
-
 
         @Override
         public void configure(Parameterization config){
             super.configure(config);
 
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
+            new ClassParameter<ClosedNeighborhoodSetGenerator<V>>(CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
                     .grab(config, x -> closedNeighborhoodSetGenerator = x);
-
-            config.descend(Utils.DISTANCE_FUNCTION_ID);
-
         }
 
         @Override
@@ -199,6 +199,4 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
         }
     }
 
-
 }
-

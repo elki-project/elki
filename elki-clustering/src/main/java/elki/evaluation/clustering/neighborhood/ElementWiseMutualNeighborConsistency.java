@@ -76,11 +76,11 @@ public class ElementWiseMutualNeighborConsistency<O> implements Evaluator {
 
         EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
         EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("EW kMN Consistency", kMNc, 0, 1., false);
+        g.addMeasure("EW " + k + "-MN Consistency", kMNc, 0, 1., false);
         if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
             Metadata.of(ev).notifyChanged();
         }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW kMN Consistency", relation.getDBIDs(), elementKMNConsistency));
+        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW " + k + "-MN Consistency", relation.getDBIDs(), elementKMNConsistency));
 
         return kMNc;
     }

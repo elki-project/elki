@@ -6,12 +6,15 @@ public class CNSrepresentor {
     public int size;
     public double[] cnsMean;
 
+    public double[] elementSum;
+
     public DBIDs cnsElements;
 
-    public CNSrepresentor(double[] cnsMean, int size, DBIDs cnsElements) {
+    public CNSrepresentor(double[] cnsMean, double[] elementSum, int size, DBIDs cnsElements) {
         this.cnsMean = cnsMean;
         this.size = size;
         this.cnsElements = cnsElements;
+        this.elementSum = elementSum; //currently unstable
     }
 
 }
