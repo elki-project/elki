@@ -28,15 +28,16 @@ import java.util.Map;
 import static elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID;
 
 /**
- * Improves {@link KMeansCP} by using the average of a CNS instead of consider each underlying datapoint.
+ * Improves {@link FastKMeansCP} by not recompute <code>cns.avg * cns.size</code>  of all CNS every Iteration but instead uses the precomputed <code>cns.sum</code>.
+ * @bug Currently not always converging.
  */
-public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
+public class FasterKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
 
-    private static final Logging LOG = Logging.getLogger(FastKMeansCP.class);
+    private static final Logging LOG = Logging.getLogger(FasterKMeansCP.class);
     private final ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
 
 
-    public FastKMeansCP(int kCluster, int maxiter, KMeansInitialization initializer, ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator){
+    public FasterKMeansCP(int kCluster, int maxiter, KMeansInitialization initializer, ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator){
         super(kCluster, maxiter, initializer);
         this.closedNeighborhoodSetGenerator = closedNeighborhoodSetGenerator;
     }
@@ -60,14 +61,11 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
         return LOG;
     }
 
-
-
     protected class Instance extends AbstractKMeans.Instance {
 
         protected DBIDs[] CNSs;
         protected CNSrepresentor[] cnsRepresentors;
         protected List<List<CNSrepresentor>> CnsClusters;
-
         protected Map<CNSrepresentor, Integer> cnsAssignment;
 
 
@@ -135,10 +133,10 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
                 }
 
                 int amountElements = cluster.get(0).size;
-                double[] sum = VMath.times(cluster.get(0).cnsMean, cluster.get(0).size);
+                double[] sum = cluster.get(0).elementSum;
 
                 for(int i = 1; i < cluster.size(); i++ ){
-                    VMath.plusEquals(sum, VMath.times(cluster.get(i).cnsMean, cluster.get(i).size));
+                    VMath.plusEquals(sum, cluster.get(i).elementSum);
                     amountElements += cluster.get(i).size;
                 }
                 newMeans[clusterIndex] = VMath.timesEquals(sum, 1.0/ amountElements);
@@ -197,8 +195,8 @@ public class FastKMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMea
         }
 
         @Override
-        public FastKMeansCP<V> make() {
-            return new FastKMeansCP<>( k, maxiter, initializer, closedNeighborhoodSetGenerator);
+        public FasterKMeansCP<V> make() {
+            return new FasterKMeansCP<>( k, maxiter, initializer, closedNeighborhoodSetGenerator);
         }
     }
 

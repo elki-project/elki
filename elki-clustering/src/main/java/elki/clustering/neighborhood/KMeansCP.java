@@ -19,6 +19,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.Arrays;
 
+/**
+ * Create neighborhood consistent clusterings by calculating closed neighborhood sets and run lloyd-iteration for these sets.
+ */
 public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
 
     private static final Logging LOG = Logging.getLogger(KMeansCP.class);
