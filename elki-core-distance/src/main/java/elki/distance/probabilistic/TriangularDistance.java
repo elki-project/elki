@@ -44,7 +44,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti<br>
  * Hilbert Exclusion: Improved Metric Search through Finite Isometric
  * Embeddings<br>
- * arXiv preprint arXiv:1604.08640
+ * ACM Trans. Inf. Syst. 35(3)
  * <p>
  * TODO: support sparse vectors, varying length
  *
@@ -53,9 +53,9 @@ import elki.utilities.optionhandling.Parameterizer;
  */
 @Reference(authors = "R. Connor, F. A. Cardillo, L. Vadicamo, F. Rabitti", //
     title = "Hilbert Exclusion: Improved Metric Search through Finite Isometric Embeddings", //
-    booktitle = "arXiv preprint arXiv:1604.08640", //
-    url = "http://arxiv.org/abs/1604.08640", //
-    bibkey = "DBLP:journals/corr/ConnorCVR16")
+    booktitle = "ACM Trans. Inf. Syst. 35(3)", //
+    url = "http://doi.org/10.1145/3001583", //
+    bibkey = "DBLP:journals/tois/ConnorCVR17")
 public class TriangularDistance extends TriangularDiscriminationDistance {
   /**
    * Static instance. Use this!
