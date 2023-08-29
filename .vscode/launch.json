@@ -1,0 +1,44 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ELKI MiniGUI",
+            "request": "launch",
+            "mainClass": "elki.gui.minigui.MiniGUI",
+            "projectName": "elki-bundle",
+            "vmArgs": "-Xmx32736m "
+        },
+        {
+            "type": "java",
+            "name": "ELKI MiniGUI Debug",
+            "request": "launch",
+            "mainClass": "elki.gui.minigui.MiniGUI",
+            "projectName": "elki-bundle",
+            "vmArgs": "-Xmx32736m -ea "
+        },
+        {
+            "type": "java",
+            "name": "ELKI Rerun last",
+            "request": "launch",
+            "mainClass": "elki.gui.minigui.MiniGUI",
+            "projectName": "elki-bundle",
+            "args": "-minigui.last -minigui.autorun",
+            "vmArgs": "-Xmx32736m -ea "
+        },
+        {
+            "type": "java",
+            "name": "ELKI check service files",
+            "request": "launch",
+            "mainClass": "elki.application.internal.CheckELKIServices",
+            "projectName": "elki-bundle"
+        },
+        {
+            "type": "java",
+            "name": "ELKI check parameterizables",
+            "request": "launch",
+            "mainClass": "elki.application.internal.CheckParameterizables",
+            "projectName": "elki-bundle"
+        }
+    ]
+}

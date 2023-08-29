@@ -1,0 +1,24 @@
+{
+    "java.format.settings.url": "conventions/elkiformatter.xml",
+    "editor.formatOnPaste": true,
+    //"editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modifications",
+    "java.test.config": [
+        {
+            "name": "myConfiguration",
+            "workingDirectory": "${workspaceFolder}",
+            "args": [
+                "-c",
+                "com.test"
+            ],
+            "vmArgs": [
+                "-Xmx512M",
+                "-ea"
+            ],
+            "env": {
+                "key": "value"
+            }
+        }
+    ],
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable"
+}
