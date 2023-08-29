@@ -19,6 +19,15 @@
 /**/nbdist/
 /**/nbactions.xml
 /**/nb-configuration.xml
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+# Local History for Visual Studio Code
+.history/
 # Output folders and files
 /**/target/
 /**/build/
