@@ -6,8 +6,7 @@
             "name": "ELKI MiniGUI",
             "request": "launch",
             "mainClass": "elki.gui.minigui.MiniGUI",
-            "projectName": "elki-bundle",
-            "vmArgs": "-Xmx32736m "
+            "projectName": "elki-bundle"
         },
         {
             "type": "java",
@@ -15,7 +14,7 @@
             "request": "launch",
             "mainClass": "elki.gui.minigui.MiniGUI",
             "projectName": "elki-bundle",
-            "vmArgs": "-Xmx32736m -ea "
+            "vmArgs": "-ea"
         },
         {
             "type": "java",
@@ -24,7 +23,7 @@
             "mainClass": "elki.gui.minigui.MiniGUI",
             "projectName": "elki-bundle",
             "args": "-minigui.last -minigui.autorun",
-            "vmArgs": "-Xmx32736m -ea "
+            "vmArgs": "-ea"
         },
         {
             "type": "java",
