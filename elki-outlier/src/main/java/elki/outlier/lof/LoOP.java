@@ -193,7 +193,7 @@ public class LoOP<O> implements OutlierAlgorithm {
       FiniteProgress progressLOOPs = LOG.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), LOG) : null;
       final double norm = 1. / (nplof * MathUtil.SQRT2);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        double loop = NormalDistribution.erf((plofs.doubleValue(iditer) - 1.) * norm);
+        double loop = NormalDistribution.erf(plofs.doubleValue(iditer) * norm);
         plofs.putDouble(iditer, loop);
         mm.put(loop);
         LOG.incrementProcessed(progressLOOPs);
@@ -220,9 +220,7 @@ public class LoOP<O> implements OutlierAlgorithm {
     // computing PRDs
     FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNN(iditer, kreach + 1); // +
-                                                                       // query
-                                                                       // point
+      final KNNList neighbors = knn.getKNN(iditer, kreach + 1); // + query point
       // use first kref neighbors as reference set
       int ks = 0;
       double ssum = 0.;
@@ -254,8 +252,7 @@ public class LoOP<O> implements OutlierAlgorithm {
     FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
     double nplof = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNN(iditer, kcomp + 1); // + query
-                                                                      // point
+      final KNNList neighbors = knn.getKNN(iditer, kcomp + 1); // + query point
       // use first kref neighbors as comparison set.
       int ks = 0;
       double sum = 0.;
@@ -266,12 +263,12 @@ public class LoOP<O> implements OutlierAlgorithm {
         sum += pdists.doubleValue(neighbor);
         ks++;
       }
-      double plof = MathUtil.max(pdists.doubleValue(iditer) * ks / sum, 1.0);
+      double plof = MathUtil.max(pdists.doubleValue(iditer) * ks / sum - 1, 0.0);
       if(Double.isNaN(plof) || Double.isInfinite(plof)) {
-        plof = 1.0;
+        plof = 0.0;
       }
       plofs.putDouble(iditer, plof);
-      nplof += (plof - 1.0) * (plof - 1.0);
+      nplof += plof * plof;
 
       LOG.incrementProcessed(progressPLOFs);
     }
