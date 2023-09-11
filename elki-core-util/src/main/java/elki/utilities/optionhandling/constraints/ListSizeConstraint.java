@@ -57,7 +57,7 @@ public class ListSizeConstraint implements ParameterConstraint<Object> {
    * Checks if the list parameter fulfills the size constraint. If not, a
    * parameter exception is thrown.
    *
-   * @throws ParameterException, if the size of the list parameter given is not
+   * @throws ParameterException if the size of the list parameter given is not
    *         equal to the list size constraint specified.
    */
   @Override

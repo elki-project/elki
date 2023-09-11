@@ -23,7 +23,7 @@ package elki.utilities.datastructures.arraylike;
 import java.util.Arrays;
 
 /**
- * Array of ${type} values (primitive, avoiding the boxing overhead of ArrayList<${boxedtype}>).
+ * Array of ${type} values (primitive, avoiding the boxing overhead of {@code ArrayList<${boxedtype}>}).
  * <p>
  * This class is generated from a code template.
  *

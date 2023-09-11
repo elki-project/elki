@@ -86,7 +86,7 @@ import elki.workflow.InputStep;
  * where the additional column is the radius.
  * <p>
  * Alternatively, if you work with a single file, you need to use the filter
- * command <tt>-dbc.filter SplitNumberVectorFilter -split.dims 1,2,3</tt> to
+ * command <code>-dbc.filter SplitNumberVectorFilter -split.dims 1,2,3</code> to
  * split the relation into a 3-dimensional data vector, and 1 dimensional radius
  * vector.
  * <p>
@@ -214,6 +214,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param rangeQuery query to test
    * @param relation Relation
    * @param radius Radius
+   * @param dur Duration for logging
    * @param mv Mean and variance statistics
    * @return hash code over all results
    */
@@ -238,6 +239,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param rangeQuery query to test
    * @param relation Relation
    * @param radrel Radius relation
+   * @param dur Duration for logging
    * @param mv Mean and variance statistics
    * @return hash code over all results
    */
@@ -262,6 +264,7 @@ public class RangeQueryBenchmark<O extends NumberVector> extends AbstractDistanc
    * @param rangeQuery query to test
    * @param relation Relation
    * @param queries Queries database connection
+   * @param dur Duration for logging
    * @param mv Statistics output
    * @return result hashcode
    */

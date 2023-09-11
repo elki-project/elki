@@ -48,8 +48,8 @@ public class RangeSelection extends DBIDSelection {
   /**
    * Constructor.
    *
-   * @param selection
-   * @param ranges
+   * @param selection Selected objects
+   * @param ranges Bounding box of range
    */
   public RangeSelection(DBIDs selection, ModifiableHyperBoundingBox ranges) {
     super(selection);

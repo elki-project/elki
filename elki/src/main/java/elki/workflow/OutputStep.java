@@ -95,6 +95,9 @@ public class OutputStep implements WorkflowStep {
     defaultHandlers.add(clz);
   }
 
+  /**
+   * Default handlers, visualization for GUI and writer for command line.
+   */
   protected static ArrayList<Class<? extends ResultHandler>> defaultHandlers = null;
 
   /**

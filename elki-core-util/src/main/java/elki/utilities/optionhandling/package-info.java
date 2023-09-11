@@ -1,6 +1,5 @@
 /**
  * Parameter handling and option descriptions.
- * <p>
  * <ol>
  * <li><b>Option ID</b>: Any parameter <em>must</em> have an
  * {@link elki.utilities.optionhandling.OptionID OptionID}.<br>

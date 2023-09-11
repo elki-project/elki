@@ -80,7 +80,7 @@ public interface AffinityMatrix {
    * }
    * </pre>
    * 
-   * Important: you need to use the return value of <tt>iterAdvance</tt> for the
+   * Important: you need to use the return value of <code>iterAdvance</code> for the
    * next iteration, or you will have an endless loop.
    *
    * @param x Point to get the neighbors for

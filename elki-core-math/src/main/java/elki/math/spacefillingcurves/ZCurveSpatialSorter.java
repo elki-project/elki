@@ -108,7 +108,7 @@ public class ZCurveSpatialSorter implements SpatialSorter {
    * less than, all elements after the position are larger than the threshold
    * value in the given dimension. (desc inverts the sorting!)
    * 
-   * Only the elements in the interval <tt>[start: end[</tt> are sorted!
+   * Only the elements in the interval <code>[start:end[</code> are sorted!
    * 
    * @param objs List of objects
    * @param start Start of sorting range

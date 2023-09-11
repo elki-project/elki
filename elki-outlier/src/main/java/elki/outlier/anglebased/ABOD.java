@@ -97,6 +97,7 @@ public class ABOD<V extends NumberVector> implements OutlierAlgorithm {
   /**
    * Run ABOD on the data set.
    *
+   * @param relation Input data
    * @return Angle-based outlier detection result
    */
   public OutlierResult run(Relation<V> relation) {

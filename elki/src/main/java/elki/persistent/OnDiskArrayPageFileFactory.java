@@ -48,6 +48,7 @@ public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFile
    * Constructor.
    * 
    * @param pageSize Page size
+   * @param fileName File name
    */
   public OnDiskArrayPageFileFactory(int pageSize, Path fileName) {
     super(pageSize);

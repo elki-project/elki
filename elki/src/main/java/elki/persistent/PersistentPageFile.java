@@ -85,6 +85,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
    * Creates a new PersistentPageFile from an existing file.
    * 
    * @param pageSize the page size
+   * @param filename file name
    * @param pageclass the class of pages to be used
    */
   public PersistentPageFile(int pageSize, Path filename, Class<P> pageclass) {

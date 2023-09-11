@@ -65,7 +65,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * Constructor.
    *
-   * @param algorithms
+   * @param algorithms Algorithms to run
    */
   public AlgorithmStep(List<? extends Algorithm> algorithms) {
     super();

@@ -42,7 +42,7 @@ import elki.utilities.optionhandling.OptionID;
  * matching.
  * <p>
  * Note: when debugging index usage, set logging for this package to FINEST via
- * <tt>-enableDebug elki.database=FINEST</tt>
+ * <code>-enableDebug elki.database=FINEST</code>
  *
  * @author Erich Schubert
  * @since 0.1

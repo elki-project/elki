@@ -223,6 +223,8 @@ public abstract class AbstractApplication {
 
   /**
    * Print the description for the given parameter
+   *
+   * @param descriptionClass class to describe
    */
   private static void printDescription(Class<?> descriptionClass) {
     if(descriptionClass == null) {
@@ -289,9 +291,10 @@ public abstract class AbstractApplication {
     public static final OptionID VERBOSE_ID = new OptionID("verbose", "Enable verbose messages.");
 
     /**
-     * Parse the standard <tt>-verbose</tt> options.
+     * Parse the standard <code>-verbose</code> options.
      *
      * @param config Parameterization
+     * @return Logging level to use
      */
     public static java.util.logging.Level parseVerbose(Parameterization config) {
       Flag verboseF = new Flag(Par.VERBOSE_ID);
@@ -304,7 +307,7 @@ public abstract class AbstractApplication {
     }
 
     /**
-     * Parse the standard <tt>-debug</tt> parameter.
+     * Parse the standard <code>-debug</code> parameter.
      *
      * @param config Parameterization
      * @return Levels to set, or {@code null}

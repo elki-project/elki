@@ -235,7 +235,7 @@ public class ORLibBenchmark extends AbstractApplication {
    * @param reader Reader
    * @param tok Tokenizer
    * @return Matrix (missing values are infinity)
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   private static double[] readEdges(int n, TokenizedReader reader, Tokenizer tok) throws IOException {
     double[] mat = new double[(n * (n - 1)) >>> 1];

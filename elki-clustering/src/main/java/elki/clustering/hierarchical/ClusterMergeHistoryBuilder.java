@@ -187,7 +187,7 @@ public class ClusterMergeHistoryBuilder {
    * @param distance Link distance
    * @param target Parent
    * @param prototype Cluster prototype
-   * @retunr new cluster id
+   * @return new cluster id
    */
   public int strictAdd(int source, double distance, int target, DBIDRef prototype) {
     if(mergecount == 0) {

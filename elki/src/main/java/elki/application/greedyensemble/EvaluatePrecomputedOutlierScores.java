@@ -62,7 +62,7 @@ import elki.utilities.optionhandling.parameters.StringParameter;
  * <li>Each line is a different algorithm</li>
  * <li>There is a mandatory label column, containing the method name</li>
  * <li>The first line <i>must</i> contain the ground-truth, titled
- * <tt>bylabel</tt>, where <tt>0</tt> indicates an inlier and <tt>1</tt>
+ * <code>bylabel</code>, where <code>0</code> indicates an inlier and <code>1</code>
  * indicates an outlier</li>
  * </ul>
  * The evaluation assumes that high scores correspond to outliers, unless the
