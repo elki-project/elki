@@ -47,7 +47,9 @@ public class ArffParserTest extends AbstractDataSourceTest {
   @Test
   public void dense() throws IOException {
     String filename = UNITTEST + "parsertest.arff";
-    Parser parser = new ELKIBuilder<>(ArffParser.class).build();
+    Parser parser = new ELKIBuilder<>(ArffParser.class)
+      .with(ArffParser.Par.MAGIC_EID_ID, "External-?ID")
+      .build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {
@@ -80,7 +82,9 @@ public class ArffParserTest extends AbstractDataSourceTest {
   @Test
   public void sparse() throws IOException {
     String filename = UNITTEST + "parsertest.sparse.arff";
-    Parser parser = new ELKIBuilder<>(ArffParser.class).build();
+    Parser parser = new ELKIBuilder<>(ArffParser.class)
+      .with(ArffParser.Par.MAGIC_EID_ID, "External-?ID")
+      .build();
     MultipleObjectsBundle bundle;
     try (InputStream is = open(filename);
         InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser)) {

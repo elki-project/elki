@@ -55,7 +55,7 @@ public class ByLabelOutlier implements OutlierAlgorithm {
   /**
    * The default pattern to use.
    */
-  public static final String DEFAULT_PATTERN = ".*(Outlier|Noise).*";
+  public static final String DEFAULT_PATTERN = "(outlier|noise|yes|anomal\\w*)";
 
   /**
    * The pattern we match with.
