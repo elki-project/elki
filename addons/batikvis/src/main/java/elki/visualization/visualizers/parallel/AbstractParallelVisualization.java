@@ -112,7 +112,7 @@ public abstract class AbstractParallelVisualization<NV> extends AbstractVisualiz
   }
 
   /**
-   * Get width of main canvas.
+   * Get the width of main canvas.
    *
    * @return Width
    */
@@ -120,14 +120,29 @@ public abstract class AbstractParallelVisualization<NV> extends AbstractVisualiz
     return size[0];
   }
 
+  /**
+   * Get the height of main canvas.
+   *
+   * @return height
+   */
   protected double getSizeY() {
     return size[1];
   }
 
+  /**
+   * Get the left margin of main canvas.
+   *
+   * @return left margin
+   */
   protected double getMarginLeft() {
     return margins[0];
   }
 
+  /**
+   * Get the right margin of main canvas.
+   *
+   * @return right margin
+   */
   protected double getMarginTop() {
     return margins[1];
   }

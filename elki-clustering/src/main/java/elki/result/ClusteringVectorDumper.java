@@ -144,6 +144,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    * 
    * @param writer Output writer
    * @param c Clustering result
+   * @throws IOException on IO error
    */
   protected void dumpClusteringOutput(Appendable writer, Clustering<?> c) throws IOException {
     DBIDRange ids = null;

@@ -114,6 +114,7 @@ public class CIndex<O> implements Evaluator {
    * Evaluate a single clustering.
    * 
    * @param rel Data relation
+   * @param dq Distance query
    * @param c Clustering
    * @return C-Index
    */
@@ -202,6 +203,18 @@ public class CIndex<O> implements Evaluator {
     return cIndex;
   }
 
+  /**
+   * Process a cluster.
+   * 
+   * @param cluster Cluster to process
+   * @param clusters All clusters
+   * @param i Cluster index
+   * @param dq Distance query
+   * @param maxDists Heap of maximum distances
+   * @param minDists Heap of minimum distances
+   * @param w Number of within-cluster distances for heap sizing
+   * @return cluster theta
+   */
   protected double processCluster(Cluster<?> cluster, List<? extends Cluster<?>> clusters, int i, DistanceQuery<O> dq, DoubleHeap maxDists, DoubleHeap minDists, int w) {
     double theta = 0.;
     for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
@@ -237,6 +250,16 @@ public class CIndex<O> implements Evaluator {
     return theta;
   }
 
+  /**
+   * Process a cluster of singletons (noise).
+   *
+   * @param cluster Cluster to process
+   * @param rel Data relation
+   * @param dq Distance query
+   * @param maxDists Heap of maximum distances
+   * @param minDists Heap of minimum distances
+   * @param w Number of within-cluster distances for heap sizing
+   */
   protected void processSingleton(Cluster<?> cluster, Relation<? extends O> rel, DistanceQuery<O> dq, DoubleHeap maxDists, DoubleHeap minDists, int w) {
     // All other objects are in other clusters!
     for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {

@@ -395,6 +395,8 @@ public class CLARANS<O> implements KMedoidsClustering<O> {
      * @param id Point id
      * @param mnum Medoid number for known distance
      * @param known Known distance
+     * @param snum Second medoid number for known distance
+     * @param sknown Known distance fo second
      * @return cost
      */
     protected double recompute(DBIDRef id, int mnum, double known, int snum, double sknown) {

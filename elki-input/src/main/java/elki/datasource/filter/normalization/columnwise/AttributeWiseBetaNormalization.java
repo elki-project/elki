@@ -81,6 +81,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> extends Attr
    * Constructor.
    *
    * @param estimators Distribution estimators
+   * @param alpha Alpha parameter
    */
   public AttributeWiseBetaNormalization(List<? extends DistributionEstimator<?>> estimators, double alpha) {
     super(estimators);

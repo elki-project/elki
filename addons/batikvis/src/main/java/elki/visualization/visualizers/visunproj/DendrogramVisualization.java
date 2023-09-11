@@ -82,9 +82,12 @@ public class DendrogramVisualization implements VisFactory {
    * @author Erich Schubert
    */
   public enum DrawingStyle {
-    RECTANGULAR, //
-    TRIANGULAR_MAX, //
-    TRIANGULAR, //
+    /** Rectangular */
+    RECTANGULAR,
+    /** Triangular, to maximum */
+    TRIANGULAR_MAX,
+    /** Triangular, direct - may overlap lower levels */
+    TRIANGULAR,
   }
 
   /**
@@ -93,8 +96,10 @@ public class DendrogramVisualization implements VisFactory {
    * @author Erich Schubert
    */
   public enum PositionStyle {
-    HALF_POS, //
-    HALF_WIDTH, //
+    /** Position at half of the data */
+    HALF_POS,
+    /** Position at half of the width */
+    HALF_WIDTH,
   }
 
   /**

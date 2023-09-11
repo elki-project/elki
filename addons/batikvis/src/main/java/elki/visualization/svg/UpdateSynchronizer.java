@@ -37,7 +37,7 @@ public interface UpdateSynchronizer {
   /**
    * Set an update runner to use.
    *
-   * @param updateRunner
+   * @param updateRunner Batik update runner
    */
   void addUpdateRunner(UpdateRunner updateRunner);
 }

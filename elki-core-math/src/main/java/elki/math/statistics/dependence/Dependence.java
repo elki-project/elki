@@ -127,6 +127,7 @@ public interface Dependence {
      * @param adapter Data adapter
      * @param data Data array
      * @param len Length of data
+     * @param <A> Array type
      * @return Array of scores
      */
     public static <A> double[] computeNormalizedRanks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
@@ -156,6 +157,7 @@ public interface Dependence {
      * @param adapter Data adapter
      * @param data Data array
      * @param len Length of data
+     * @param <A> Array type
      * @return Array of scores
      */
     public static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int len) {
@@ -170,6 +172,7 @@ public interface Dependence {
      * @param adapter Data adapter
      * @param data Data array
      * @param idx Data index
+     * @param <A> Array type
      * @return Array of scores
      */
     public static <A> double[] ranks(final NumberArrayAdapter<?, A> adapter, final A data, int[] idx) {
@@ -199,6 +202,7 @@ public interface Dependence {
      * @param data2 Second data set
      * @param <A> First array type
      * @param <B> Second array type
+     * @return Length of the arrays
      */
     public static <A, B> int size(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
       final int len = adapter1.size(data1);
@@ -212,11 +216,12 @@ public interface Dependence {
     }
 
     /**
-     * Validate the length of the two data sets (must be the same, and non-zero)
+     * Validate the length of a set of arrays (must be the same length, and non-zero)
      * 
      * @param adapter Data adapter
      * @param data Data sets
-     * @param <A> First array type
+     * @param <A> Array type
+     * @return Length of the arrays
      */
     public static <A> int size(NumberArrayAdapter<?, A> adapter, Collection<? extends A> data) {
       if(data.size() < 2) {
@@ -241,6 +246,7 @@ public interface Dependence {
      * @param adapter Data adapter
      * @param data Data array
      * @param len Length of data
+     * @param <A> Array type
      * @return Sorted index
      */
     public static <A> int[] sortedIndex(final NumberArrayAdapter<?, A> adapter, final A data, int len) {

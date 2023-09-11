@@ -61,7 +61,7 @@ public interface KNNHeap extends DoubleDBIDHeap {
   /**
    * <b>Disallowed</b>, because {@code max} is fixed.
    *
-   * @throws UnsupportedOperationException
+   * @throws UnsupportedOperationException always
    */
   @Deprecated
   @Override

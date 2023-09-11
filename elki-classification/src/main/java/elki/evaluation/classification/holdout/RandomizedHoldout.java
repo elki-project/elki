@@ -40,6 +40,8 @@ public abstract class RandomizedHoldout extends AbstractHoldout {
 
   /**
    * Sets the parameter seed to the parameterToDescription map.
+   * 
+   * @param random Random generator
    */
   public RandomizedHoldout(RandomFactory random) {
     super();

@@ -93,6 +93,7 @@ public class EvaluationStep implements WorkflowStep {
      * Constructor.
      *
      * @param evaluators Evaluators
+     * @param db Database
      */
     public Evaluation(List<? extends Evaluator> evaluators, Database db) {
       this.evaluators = evaluators;

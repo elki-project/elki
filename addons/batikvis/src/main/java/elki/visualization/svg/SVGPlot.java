@@ -572,6 +572,7 @@ public class SVGPlot {
    * @param width Width of thumbnail
    * @param height Height of thumbnail
    * @return Buffered image
+   * @throws TranscoderException on Batik transcoding errors
    */
   public BufferedImage makeAWTImage(int width, int height) throws TranscoderException {
     ThumbnailTranscoder t = new ThumbnailTranscoder();

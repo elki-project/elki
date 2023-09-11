@@ -66,6 +66,7 @@ public class ConstrainedQuadraticProblemSolver {
    * @param min Lower constraints
    * @param max Upper constraints
    * @param argmaxPoint point with the maximum
+   * @return The maximum function value
    */
   public double solve(double[][] a, double[] b, double c, double[] min, double[] max, double[] argmaxPoint) {
     DimensionState[] dimStates = cache[min.length - 1].dimStates;
@@ -145,7 +146,7 @@ public class ConstrainedQuadraticProblemSolver {
    * @param c c coefficient of the function
    * @param min Lower constraints
    * @param max Upper constraints
-   * @return The maximum Function value
+   * @return The maximum function value
    */
   private double computeMaximumPossibleFuncValue(double[][] a, double[] b, double c, double[] min, double[] max) {
     double fm = evaluateQuadraticFormula(a, b, c, timesEquals(plus(min, max), 0.5));
@@ -168,6 +169,9 @@ public class ConstrainedQuadraticProblemSolver {
    * @param max Upper constraints
    * @param dimensionStates Current calculation state of the dimensions
    * @param cutoffCheck Flag if a cutoff check should be performed
+   * @param result the - so far - argmax
+   * @param resultValue the - so far - max
+   * @return The maximum function value
    */
   private double evaluateConstrainedQuadraticFunction(double[][] a, double[] b, double c, double[] min, double[] max, DimensionState[] dimensionStates, boolean cutoffCheck, double[] result, double resultValue) {
     // case for one dimension
@@ -479,10 +483,14 @@ public class ConstrainedQuadraticProblemSolver {
    * Describes the calculation state of a Dimension
    */
   private static enum DimensionState {
-    LOLIM, // driven to lower bounding box limit
-    UPLIM, // driven to upper bounding box limit
-    UNCONSTR, // constrains lifted (results are ignored if outside of bounds)
-    CONSTR // constrained (not yet visited)
+    /** driven to lower bounding box limit */
+    LOLIM,
+    /** driven to upper bounding box limit */
+    UPLIM,
+    /** constrains lifted (results are ignored if outside of bounds) */
+    UNCONSTR,
+    /** constrained (not yet visited) */
+    CONSTR
   }
 
   /**
@@ -491,14 +499,29 @@ public class ConstrainedQuadraticProblemSolver {
    * just reuse them.
    */
   private static class ProblemData {
+    /** Matrix a */
     double[][] a;
 
-    double[] b, result;
+    /** Vector b */
+    double[] b;
 
-    double[] min, max;
+    /** Result vector */
+    double[] result;
 
+    /** Minimum constraints */
+    double[] min;
+
+    /** Maximum constraints */
+    double[] max;
+
+    /** Dimension states */
     DimensionState[] dimStates;
 
+    /**
+     * Problem constructor
+     * 
+     * @param size Problem size
+     */
     public ProblemData(int size) {
       a = new double[size][size];
       b = new double[size];

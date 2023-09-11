@@ -118,6 +118,7 @@ public class ByLabelClustering implements ClusteringAlgorithm<Clustering<Model>>
    * Run the actual clustering algorithm.
    * 
    * @param relation The data input we use
+   * @return Clustering result
    */
   public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, DBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);

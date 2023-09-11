@@ -194,6 +194,14 @@ public class DaviesBouldinIndex implements Evaluator {
     return daviesBouldinMean;
   }
 
+  /**
+   * Compute the within group distances.
+   * 
+   * @param rel Data relation
+   * @param clusters Clusters
+   * @param centroids Cluster centroids
+   * @return Within-group distances for each cluster
+   */
   public double[] withinGroupDistances(Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids) {
     double[] withinGroupDists = new double[clusters.size()];
     Iterator<? extends Cluster<?>> ci = clusters.iterator();

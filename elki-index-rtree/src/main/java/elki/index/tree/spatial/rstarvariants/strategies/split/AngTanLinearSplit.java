@@ -137,6 +137,8 @@ public class AngTanLinearSplit implements SplitStrategy {
    * @param entries Entries
    * @param getter Entry accessor
    * @param assign Assignment
+   * @param <A> Array type
+   * @param <E> Entry type
    * @return Overlap amount
    */
   protected <E extends SpatialComparable, A> double computeOverlap(A entries, ArrayAdapter<E, A> getter, long[] assign) {

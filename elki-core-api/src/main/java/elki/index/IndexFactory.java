@@ -36,9 +36,10 @@ import elki.database.relation.Relation;
  */
 public interface IndexFactory<V> {
   /**
-   * Sets the database in the distance function of this index (if existing).
+   * Instantiate an index for a given relation.
    * 
    * @param relation the relation to index
+   * @return Index
    */
   Index instantiate(Relation<V> relation);
 

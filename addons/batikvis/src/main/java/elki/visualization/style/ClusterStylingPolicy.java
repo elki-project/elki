@@ -60,6 +60,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
    * @author Erich Schubert
    */
   public static enum IntensityTransform {
+    /** Maximum, absolute */
     MAXLINEAR {
       @Override
       public double transform(double[] probs) {
@@ -71,6 +72,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         return max;
       }
     },
+    /** Scaled linear */
     SCALEDLINEAR {
       @Override
       public double transform(double[] probs) {
@@ -87,6 +89,9 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         return min < max ? (v - min) / (max - min) : 1;
       }
     },
+    /**
+     * Quadratic maximum
+     */
     MAXQUADRATIC {
       @Override
       public double transform(double[] probs) {
@@ -98,6 +103,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         return max * max;
       }
     },
+    /** Ratio of maximum to second largest */
     MAX2QUOTIENT {
       @Override
       public double transform(double[] probs) {
@@ -115,6 +121,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         return 1 - (max2 / max);
       }
     },
+    /** Squared ratio of max to second largest */
     MAX2QUOTIENTQUAD {
       @Override
       public double transform(double[] probs) {
@@ -133,6 +140,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
         return v * v;
       }
     },
+    /** Difference between maximum and second largest */
     MAX2SUBTRACT {
       @Override
       public double transform(double[] probs) {
@@ -165,7 +173,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
      * @param v Value
      * @param min Minimum input
      * @param max Maximum input
-     * @return
+     * @return Scaled value
      */
     public double scale(double v, double min, double max) {
       return v;
@@ -211,6 +219,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
    * Constructor.
    *
    * @param clustering Clustering to use.
+   * @param style Style library.
    */
   public ClusterStylingPolicy(Clustering<?> clustering, StyleLibrary style) {
     super();

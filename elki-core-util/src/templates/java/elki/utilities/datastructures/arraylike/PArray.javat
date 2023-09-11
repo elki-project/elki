@@ -116,7 +116,7 @@ public class ${classname} implements NumberArrayAdapter<${boxedtype}, ${classnam
   /**
    * Grow the current array.
    *
-   * @throws OutOfMemoryError
+   * @throws OutOfMemoryError if the maximum array size of Java is exceeded.
    */
   private void grow() throws OutOfMemoryError {
     if(data.length == MAX_ARRAY_SIZE) {

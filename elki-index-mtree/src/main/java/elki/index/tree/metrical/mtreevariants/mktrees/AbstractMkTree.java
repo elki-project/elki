@@ -100,6 +100,7 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
    *        performed
    * @param ids the ids of the query objects
    * @param kmax Maximum k value
+   * @return Map to query results
    * 
    * @deprecated Change to use by-object NN lookups instead.
    */

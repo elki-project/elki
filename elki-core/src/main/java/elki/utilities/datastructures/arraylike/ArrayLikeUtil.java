@@ -66,6 +66,7 @@ public final class ArrayLikeUtil {
    * Get the static instance.
    *
    * @param prototype Prototype value, for type inference
+   * @param <F> Feature type
    * @return Instance
    */
   @SuppressWarnings("unchecked")
@@ -114,6 +115,7 @@ public final class ArrayLikeUtil {
    *
    * @param array Array-like
    * @param adapter Adapter
+   * @param <A> array type
    * @return primitive double array
    */
   public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
@@ -142,6 +144,7 @@ public final class ArrayLikeUtil {
    *
    * @param array Array-like
    * @param adapter Adapter
+   * @param <A> array type
    * @return primitive float array
    */
   public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
@@ -170,6 +173,7 @@ public final class ArrayLikeUtil {
    *
    * @param array Array-like
    * @param adapter Adapter
+   * @param <A> array type
    * @return primitive double array
    */
   public static <A> int[] toPrimitiveIntegerArray(A array, NumberArrayAdapter<?, ? super A> adapter) {

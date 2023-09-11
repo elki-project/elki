@@ -74,7 +74,8 @@ public class ExportVisualizations implements ResultHandler {
    * @author Erich Schubert
    */
   public enum Format {
-    SVG, PNG, PDF, PS, EPS, JPEG
+    /* SVG */ SVG, /* PNG */ PNG, /* JPEG */ JPEG,
+    /* PDF */ PDF, /* Postscript */ PS, /* Encapsulated Postscript */ EPS
   }
 
   /**

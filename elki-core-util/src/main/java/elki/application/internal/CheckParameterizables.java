@@ -168,13 +168,23 @@ public class CheckParameterizables {
    * @author Erich Schubert
    */
   private enum State {
-    NO_CONSTRUCTOR, //
-    INSTANTIABLE, //
-    DEFAULT_INSTANTIABLE, //
-    ERROR, //
+    /** No constructor usable */
+    NO_CONSTRUCTOR,
+    /** Instantiable */
+    INSTANTIABLE,
+    /** Has parameterless constructor */
+    DEFAULT_INSTANTIABLE,
+    /** Instantiation error */
+    ERROR,
   }
 
-  /** Check for a V3 constructor. */
+  /**
+   * Check for a V3 constructor.
+   *
+   * @param cls Class to check
+   * @param state Current verification state
+   * @return check result state
+   */
   private State checkV3Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
     // check for a V3 Parameterizer class
     for(Class<?> inner : cls.getDeclaredClasses()) {
@@ -198,7 +208,14 @@ public class CheckParameterizables {
     return state;
   }
 
-  /** Check for a default constructor. */
+  /**
+   * Check for a default constructor.
+   * 
+   * @param cls Class to check
+   * @param state Current verification state
+   * @throws NoClassDefFoundError When the class is not found
+   * @return check result state
+   */
   private State checkDefaultConstructor(Class<?> cls, State state) throws NoClassDefFoundError {
     try {
       cls.getConstructor();
@@ -210,6 +227,13 @@ public class CheckParameterizables {
     return state;
   }
 
+  /**
+   * Check a parameterizer.
+   * 
+   * @param cls Class to check
+   * @param par Parameterizer to check
+   * @return {@code true} when the parameterizer is valid.
+   */
   private boolean checkParameterizer(Class<?> cls, Class<? extends Parameterizer> par) {
     int checkResult = 0;
     try {

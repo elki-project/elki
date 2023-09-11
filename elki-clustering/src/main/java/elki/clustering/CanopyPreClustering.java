@@ -109,6 +109,7 @@ public class CanopyPreClustering<O> implements ClusteringAlgorithm<Clustering<Pr
    * Run the canopy clustering algorithm
    *
    * @param relation Relation to process
+   * @return Clustering
    */
   public Clustering<PrototypeModel<O>> run(Relation<O> relation) {
     if(!(t1 >= t2)) {

@@ -36,6 +36,8 @@ public interface SplitStrategy {
    * @param entries Entries to split
    * @param getter Adapter for the entries array
    * @param minEntries Minimum number of entries in each part
+   * @param <A> Array type
+   * @param <E> Entry type
    * @return BitSet containing the assignment.
    */
   <E extends SpatialComparable, A> long[] split(A entries, ArrayAdapter<E, A> getter, int minEntries);

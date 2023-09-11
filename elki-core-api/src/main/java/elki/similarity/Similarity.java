@@ -47,6 +47,8 @@ public interface Similarity<O> {
 
   /**
    * Get the input data type of the function.
+   * 
+   * @return Input type information
    */
   TypeInformation getInputTypeRestriction();
 
@@ -54,6 +56,7 @@ public interface Similarity<O> {
    * Instantiate with a representation to get the actual similarity query.
    * 
    * @param relation Representation to use
+   * @param <T> actual object type
    * @return Actual distance query.
    */
   <T extends O> SimilarityQuery<T> instantiate(Relation<T> relation);

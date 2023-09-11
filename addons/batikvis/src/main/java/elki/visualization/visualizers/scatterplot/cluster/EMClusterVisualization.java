@@ -455,6 +455,8 @@ public class EMClusterVisualization implements VisFactory {
      * @param cent Center
      * @param pre Previous point
      * @param nex Next point
+     * @param oPrev orthogonal to previous point
+     * @param oNext orthogonal to next point
      * @param scale Scaling factor
      */
     private void drawArc(SVGPath path, double[] cent, double[] pre, double[] nex, double[] oPrev, double[] oNext, double scale) {

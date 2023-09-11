@@ -217,6 +217,7 @@ public class BIRCHLloydKMeans implements ClusteringAlgorithm<Clustering<MeanMode
    * @param assignment Cluster assignment
    * @param means Means of clusters
    * @param cfs Clustering features
+   * @param weights Cluster feature weights
    * @return Means of clusters.
    */
   private double[][] means(int[] assignment, double[][] means, ClusteringFeature[] cfs, int[] weights) {

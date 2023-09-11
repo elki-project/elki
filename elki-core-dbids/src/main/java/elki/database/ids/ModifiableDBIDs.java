@@ -67,6 +67,8 @@ public interface ModifiableDBIDs extends DBIDs {
 
   /**
    * Clear this collection.
+   * 
+   * @return {@code this} for call chaining
    */
   ModifiableDBIDs clear();
 

@@ -43,7 +43,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
- *
+ * <p>
  * Note: the current implementation is rather expensive, both memory- and
  * runtime wise. Don't use for large data sets! Instead, have a look at
  * {@link FastMultidimensionalScalingTransform} which uses power iterations
@@ -152,6 +152,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
    * 
    * @param col Input data
    * @param dist Distance function
+   * @param <I> Input data type
    * @return Distance matrix.
    */
   protected static <I> double[][] computeSquaredDistanceMatrix(final List<I> col, PrimitiveDistance<? super I> dist) {

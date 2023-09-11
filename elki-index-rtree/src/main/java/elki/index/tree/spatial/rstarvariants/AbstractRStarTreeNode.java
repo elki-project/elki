@@ -85,6 +85,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Adjusts the parameters of the entry representing this node.
    *
    * @param entry the entry representing this node
+   * @return {@code true} if the MBR has changed
    */
   public boolean adjustEntry(E entry) {
     final SpatialDirectoryEntry se = (SpatialDirectoryEntry) entry;

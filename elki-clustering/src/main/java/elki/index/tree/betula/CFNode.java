@@ -45,7 +45,8 @@ public class CFNode<L extends ClusterFeature> implements AsClusterFeature {
   /**
    * Constructor
    * 
-   * @param capacity Fanout of the Tree
+   * @param cf Cluster feature data
+   * @param capacity Fanout of the tree
    */
   public CFNode(L cf, int capacity) {
     super();

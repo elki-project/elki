@@ -197,6 +197,11 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     }
   }
 
+  /**
+   * Write the CSV header row
+   * 
+   * @param fout Output file
+   */
   private void writeHeader(PrintStream fout) {
     // Write CSV header:
     fout.append(name != null ? "\"Name\"," : "") //
@@ -219,6 +224,13 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         .append('\n');
   }
 
+  /**
+   * Process one row of data.
+   * 
+   * @param fout Output file
+   * @param vec Score vector
+   * @param label Method label
+   */
   private void processRow(PrintStream fout, NumberVector vec, String label) {
     if(checkForNaNs(vec)) {
       LOG.warning("NaN value encountered in vector " + label);

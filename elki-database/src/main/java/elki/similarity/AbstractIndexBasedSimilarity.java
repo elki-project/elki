@@ -50,7 +50,7 @@ public abstract class AbstractIndexBasedSimilarity<O, F extends IndexFactory<O>>
   /**
    * Constructor.
    * 
-   * @param indexFactory
+   * @param indexFactory Index factory to use
    */
   public AbstractIndexBasedSimilarity(F indexFactory) {
     super();

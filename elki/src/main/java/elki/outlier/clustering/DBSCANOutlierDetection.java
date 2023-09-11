@@ -77,6 +77,7 @@ public class DBSCANOutlierDetection implements OutlierAlgorithm {
   /**
    * Runs the algorithm in the timed evaluation part.
    * 
+   * @param db Database
    * @param relation Relation to process
    * @return Outlier result
    */

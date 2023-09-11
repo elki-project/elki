@@ -401,7 +401,7 @@ public class PAM<O> implements KMedoidsClustering<O> {
   }
 
   /**
-   * Get the static class logger.
+   * @return The (static) class logger.
    */
   protected Logging getLogger() {
     return LOG;

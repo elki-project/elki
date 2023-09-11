@@ -115,6 +115,13 @@ public class DistanceStatisticsWithClasses<O> implements Algorithm {
     return TypeUtil.array(distance.getInputTypeRestriction());
   }
 
+  /**
+   * Compute the distance statistics
+   * 
+   * @param database Database
+   * @param relation Data relation
+   * @return Distance histogram per class
+   */
   public HistogramResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;

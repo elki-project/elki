@@ -118,6 +118,7 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
   /**
    * Constructor.
    *
+   * @param indexer Tree index factory
    * @param distance Distance function
    * @param minpts MinPts
    */
@@ -314,6 +315,15 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
     reinsertExpanded(index, p, l - 2, rootEntry, knns);
   }
 
+  /**
+   * Reinsert an expaned node into the processing.
+   *
+   * @param index Index
+   * @param path Current paths
+   * @param pos Position
+   * @param parentEntry Parent entry
+   * @param knns KNN lists
+   */
   private void reinsertExpanded(DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry);
     DeLiCluEntry entry2 = path.get(pos).getEntry();
@@ -380,6 +390,7 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
     /**
      * Creates a new entry with the specified parameters.
      *
+     * @param distance Distance value
      * @param entry1 the first entry of this pair
      * @param entry2 the second entry of this pair
      * @param isExpandable if true, this pair is expandable (a pair of nodes),

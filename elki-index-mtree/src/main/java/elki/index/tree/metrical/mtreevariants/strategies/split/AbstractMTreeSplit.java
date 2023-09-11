@@ -61,6 +61,8 @@ public abstract class AbstractMTreeSplit<E extends MTreeEntry, N extends Abstrac
    * 
    * @param tree Tree
    * @param node Node
+   * @param <E> tree entry type
+   * @param <N> tree node type
    * @return Distance matrix
    */
   protected static <E extends MTreeEntry, N extends AbstractMTreeNode<?, N, E>> double[][] computeDistanceMatrix(AbstractMTree<?, N, E, ?> tree, N node) {

@@ -195,6 +195,12 @@ public class CFTree {
     }
   }
 
+  /**
+   * Estimate the new threshold.
+   * 
+   * @param current Current node
+   * @return Threshold estimate
+   */
   private double estimateThreshold(TreeNode current) {
     ClusteringFeature[] children = current.children;
     double total = 0.;

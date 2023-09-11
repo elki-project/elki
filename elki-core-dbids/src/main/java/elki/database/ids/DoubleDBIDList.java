@@ -62,6 +62,7 @@ public interface DoubleDBIDList extends DBIDs {
    *
    * @param index Position
    * @param var Variable to assign the value to.
+   * @return {@code var} for method chaining.
    */
   DBIDVar assignVar(int index, DBIDVar var);
 

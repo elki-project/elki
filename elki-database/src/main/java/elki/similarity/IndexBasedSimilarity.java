@@ -39,7 +39,7 @@ public interface IndexBasedSimilarity<O> extends Similarity<O> {
   /**
    * Preprocess the database to get the actual distance function.
    * 
-   * @param database
+   * @param database Database to use.
    * @return Actual distance query.
    */
   @Override

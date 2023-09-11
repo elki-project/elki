@@ -132,6 +132,7 @@ public class BIRCHKMeansPlusPlus {
    * Update the weight list.
    *
    * @param latest Latest center
+   * @param x Input vectors
    * @return Weight sum
    */
   private double updateWeights(double[] latest, double[][] x) {

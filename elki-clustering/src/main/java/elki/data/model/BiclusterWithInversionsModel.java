@@ -37,7 +37,10 @@ public class BiclusterWithInversionsModel extends BiclusterModel {
   private DBIDs invertedRows = null;
 
   /**
+   * Constructor
+   * 
    * @param colIDs Col IDs
+   * @param invertedRows Inverted rows
    */
   public BiclusterWithInversionsModel(int[] colIDs, DBIDs invertedRows) {
     super(colIDs);

@@ -68,6 +68,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    *
    * @param id Database ID
    * @param index column index
+   * @param <T> data type (unchecked cast)
    * @return current value
    */
   @SuppressWarnings("unchecked")
@@ -81,6 +82,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    * @param id Database ID
    * @param index column index
    * @param value New value
+   * @param <T> data type (unchecked cast)
    * @return old value
    */
   @SuppressWarnings("unchecked")

@@ -57,7 +57,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    *
-   * @param walpha
+   * @param walpha noise tolerance level for weak eigenvectors
    */
   public DropEigenPairFilter(double walpha) {
     super();

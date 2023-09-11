@@ -38,6 +38,7 @@ public interface StreamFilter extends ObjectFilter, BundleStreamSource {
    * Connect to the previous stream.
    * 
    * @param source Stream source
+   * @return New stream source
    */
   BundleStreamSource init(BundleStreamSource source);
 }

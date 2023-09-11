@@ -140,6 +140,7 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * Constructor.
    *
    * @param cffactory CFTree factory
+   * @param delta Delta parameter
    * @param k Number of clusters
    * @param maxiter Maximum number of iterations
    * @param soft Return soft clustering results
@@ -226,14 +227,10 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     for(int i = 0; i < k; i++) {
       result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
     }
-    if(isSoft()) {
+    if(soft) {
       Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("EM Cluster Probabilities", SOFT_TYPE, relation.getDBIDs(), finalClusterIGivenX));
     }
     return result;
-  }
-
-  private boolean isSoft() {
-    return soft;
   }
 
   /**
@@ -391,6 +388,9 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
      */
     protected boolean soft;
 
+    /**
+     * MAP prior probability
+     */
     protected double prior = 0.;
 
     /**

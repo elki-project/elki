@@ -12,6 +12,7 @@
  * The {@link elki.database.ids.DBIDs DBIDs} hierarchy contains classes for handling groups (sets, arrays) of IDs, that can
  * be seen as a two-dimensional matrix consisting 
  * <table style="border: 1px">
+ * <caption>ELKI DBIDs collection type matrix</caption>
  * <tr>
  * <th></th>
  * <th style="border-bottom: 2px">{@link elki.database.ids.ArrayDBIDs ArrayDBIDs}</th>

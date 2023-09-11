@@ -388,6 +388,9 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
     return algorithm.getInputTypeRestriction();
   }
 
+  /**
+   * @return logger for this class
+   */
   protected abstract Logging getLogger();
 
   /**

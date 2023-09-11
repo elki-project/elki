@@ -35,6 +35,7 @@ import net.jafama.FastMath;
  * @since 0.1
  */
 public class ApproximationLine implements Externalizable {
+  /** Serialization version */
   private static final long serialVersionUID = 1;
 
   /**

@@ -346,6 +346,7 @@ public final class BitsUtil {
    *
    * @param v Buffer
    * @param off Offset to flip
+   * @return new value
    */
   public static long flipC(long v, int off) {
     return v ^ (1L << off);
@@ -358,6 +359,7 @@ public final class BitsUtil {
    *
    * @param v Buffer
    * @param off Offset to flip
+   * @return modified buffer {@code v}
    */
   public static long[] flipI(long[] v, int off) {
     final int wordindex = off >>> LONG_LOG2_SIZE;
@@ -370,6 +372,7 @@ public final class BitsUtil {
    *
    * @param v Buffer
    * @param off Offset to set
+   * @return new value
    */
   public static long setC(long v, int off) {
     return v | (1L << off);
@@ -382,6 +385,7 @@ public final class BitsUtil {
    *
    * @param v Buffer
    * @param off Offset to set
+   * @return modified buffer {@code v}
    */
   public static long[] setI(long[] v, int off) {
     final int wordindex = off >>> LONG_LOG2_SIZE;
@@ -394,7 +398,7 @@ public final class BitsUtil {
    *
    * @param v Primary object
    * @param o data to initialize to.
-   * @return v
+   * @return modified buffer {@code v}
    */
   public static long[] setI(long[] v, long[] o) {
     assert (o.length <= v.length) : "Bit set sizes do not agree.";
@@ -405,8 +409,9 @@ public final class BitsUtil {
   /**
    * Clear bit number "off" in v.
    *
-   * @param v Buffer
+   * @param v input value
    * @param off Offset to clear
+   * @return new value
    */
   public static long clearC(long v, int off) {
     return v & ~(1L << off);
@@ -419,6 +424,7 @@ public final class BitsUtil {
    *
    * @param v Buffer
    * @param off Offset to clear
+   * @return modified buffer {@code v}
    */
   public static long[] clearI(long[] v, int off) {
     final int wordindex = off >>> LONG_LOG2_SIZE;
@@ -427,22 +433,24 @@ public final class BitsUtil {
   }
 
   /**
-   * Set bit number "off" in v.
+   * Get bit number "off" in v.
    *
    * @param v Buffer
    * @param off Offset to set
+   * @return true if set
    */
   public static boolean get(long v, int off) {
     return (v & (1L << off)) != 0;
   }
 
   /**
-   * Set bit number "off" in v.
+   * Get bit number "off" in v.
    * <p>
    * Low-endian layout for the array.
    *
    * @param v Buffer
    * @param off Offset to set
+   * @return true if set
    */
   public static boolean get(long[] v, int off) {
     final int wordindex = off >>> LONG_LOG2_SIZE;
@@ -820,6 +828,7 @@ public final class BitsUtil {
    * @param v Bit string
    * @param shift Number of steps to cycle
    * @param len Length
+   * @return modified buffer {@code v}
    */
   public static long[] cycleRightI(long[] v, int shift, int len) {
     long[] t = copy(v, len, len - shift);
@@ -829,8 +838,9 @@ public final class BitsUtil {
   /**
    * Truncate a bit string to the given length (setting any higher bit to 0).
    *
-   * @param v String to process
+   * @param v Bit string to process
    * @param len Length (in bits) to truncate to
+   * @return modified buffer {@code v}
    */
   public static long[] truncateI(long[] v, int len) {
     final int zap = (v.length * Long.SIZE) - len;
@@ -862,6 +872,7 @@ public final class BitsUtil {
    * @param v Bit string
    * @param shift Number of steps to cycle
    * @param len Length
+   * @return modified buffer {@code v}
    */
   public static long[] cycleLeftI(long[] v, int shift, int len) {
     long[] t = copy(v, len, shift);

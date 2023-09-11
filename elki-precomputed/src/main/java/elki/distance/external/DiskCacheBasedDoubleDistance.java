@@ -72,7 +72,7 @@ public class DiskCacheBasedDoubleDistance extends AbstractDBIDRangeDistance {
    * Constructor.
    *
    * @param matrixfile File name
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public DiskCacheBasedDoubleDistance(Path matrixfile) throws IOException {
     super();

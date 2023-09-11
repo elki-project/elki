@@ -64,7 +64,12 @@ public class DatabaseEventManager {
    * Types for aggregation.
    */
   private enum Type {
-    INSERT, REMOVE, UPDATE
+    /** Insertions */
+    INSERT,
+    /** Removals */
+    REMOVE,
+    /** Updates */
+    UPDATE
   };
 
   /**
@@ -226,7 +231,7 @@ public class DatabaseEventManager {
    * Handles a DataStoreEvent with the specified type. If the current event type
    * is not equal to the specified type, the events accumulated up to now will
    * be fired first.
-   *
+   * <p>
    * The new event will be aggregated and fired on demand if
    * {@link #accumulateDataStoreEvents} is set, otherwise all registered
    * <code>DataStoreListener</code> will be notified immediately that the
@@ -234,6 +239,7 @@ public class DatabaseEventManager {
    *
    * @param objects the objects that have been changed, i.e. inserted, deleted
    *        or updated
+   * @param type the type of the event
    */
   private void fireObjectsChanged(DBIDs objects, Type type) {
     // flush first
@@ -273,7 +279,7 @@ public class DatabaseEventManager {
    * Handles a DataStoreEvent with the specified type. If the current event type
    * is not equal to the specified type, the events accumulated up to now will
    * be fired first.
-   *
+   * <p>
    * The new event will be aggregated and fired on demand if
    * {@link #accumulateDataStoreEvents} is set, otherwise all registered
    * <code>DataStoreListener</code> will be notified immediately that the
@@ -281,6 +287,7 @@ public class DatabaseEventManager {
    *
    * @param object the object that has been changed, i.e. inserted, deleted or
    *        updated
+   * @param type the type of the event
    */
   private void fireObjectChanged(DBIDRef object, Type type) {
     // flush first

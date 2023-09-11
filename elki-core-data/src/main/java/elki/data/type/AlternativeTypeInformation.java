@@ -38,7 +38,7 @@ public class AlternativeTypeInformation implements TypeInformation {
   /**
    * Constructor.
    * 
-   * @param restrictions
+   * @param restrictions Type restrictions for "or" operation.
    */
   public AlternativeTypeInformation(TypeInformation... restrictions) {
     super();

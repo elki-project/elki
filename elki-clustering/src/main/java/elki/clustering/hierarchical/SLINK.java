@@ -105,6 +105,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
    * Performs the SLINK algorithm on the given database.
    *
    * @param relation Data relation to use
+   * @return cluster merge history
    */
   public ClusterMergeHistory run(Relation<O> relation) {
     final Logging log = getLogger(); // To allow CLINK logger override
@@ -312,7 +313,7 @@ public class SLINK<O> implements HierarchicalClusteringAlgorithm {
   }
 
   /**
-   * Get the (static) class logger.
+   * @return The (static) class logger.
    */
   protected Logging getLogger() {
     return LOG;

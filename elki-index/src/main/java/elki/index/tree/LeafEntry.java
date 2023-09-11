@@ -33,6 +33,8 @@ import elki.database.ids.DBID;
 public interface LeafEntry extends Externalizable {
   /**
    * Get the DBID of this leaf entry.
+   * 
+   * @return DBID
    */
   DBID getDBID();
 }

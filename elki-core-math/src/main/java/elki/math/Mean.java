@@ -121,6 +121,7 @@ public class Mean {
    * Add values with weight 1.0
    *
    * @param vals Values
+   * @param weights Weights
    * @return this
    */
   public Mean put(double[] vals, double[] weights) {

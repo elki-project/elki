@@ -112,6 +112,20 @@ public class EvaluationVisualization implements VisFactory {
     });
   }
 
+  /**
+   * Add a bar chart
+   * 
+   * @param svgp SVG plot
+   * @param parent Parent element
+   * @param ypos y position
+   * @param label Label
+   * @param value value
+   * @param minValue minimum value
+   * @param maxValue maximum value
+   * @param baseValue expected value
+   * @param reversed reversed scale, lower is better
+   * @return new y position
+   */
   private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue, boolean reversed) {
     SVGScoreBar barchart = new SVGScoreBar();
     barchart.setFill(value, baseValue == baseValue ? baseValue : minValue, maxValue);
@@ -123,6 +137,15 @@ public class EvaluationVisualization implements VisFactory {
     return ypos;
   }
 
+  /**
+   * Add a header.
+   * 
+   * @param svgp SVG plot
+   * @param parent Parent element
+   * @param ypos y position
+   * @param text Text
+   * @return New y position
+   */
   private double addHeader(SVGPlot svgp, Element parent, double ypos, String text) {
     ypos += .5;
     Element object = svgp.svgText(0, ypos + BARHEIGHT * 0.5, text);

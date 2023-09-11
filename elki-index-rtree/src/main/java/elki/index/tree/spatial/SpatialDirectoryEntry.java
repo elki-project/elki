@@ -151,7 +151,7 @@ public class SpatialDirectoryEntry implements DirectoryEntry, SpatialEntry {
   /**
    * Extend the MBR of this node.
    * 
-   * @param responsibleMBR
+   * @param responsibleMBR Inserted MBR
    * @return true when the MBR changed
    */
   public boolean extendMBR(SpatialComparable responsibleMBR) {

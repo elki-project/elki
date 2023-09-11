@@ -237,6 +237,14 @@ public class ConcordantPairsGammaTau implements Evaluator {
     return wties;
   }
 
+  /**
+   * Compute the within-cluster distances.
+   * 
+   * @param rel Relation
+   * @param clusters Clusters
+   * @param withinPairs Number of within pairs
+   * @return Array of within distances
+   */
   protected double[] computeWithinDistances(Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, int withinPairs) {
     double[] concordant = new double[withinPairs];
     int i = 0;

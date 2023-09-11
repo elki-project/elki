@@ -37,11 +37,11 @@ public interface BundleStreamSource {
    * @author Erich Schubert
    */
   enum Event {
-    // Metadata has changed
+    /** Metadata has changed */
     META_CHANGED,
-    // Next object available
+    /** Next object available */
     NEXT_OBJECT,
-    // Stream ended
+    /** Stream ended */
     END_OF_STREAM,
   };
 

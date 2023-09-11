@@ -11,14 +11,32 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * @since 0.8.0
  */
 public class ByteWeightedArrayDataSet implements DataSet {
+  /**
+   * Wrapped data set
+   */
   DataSet inner;
 
+  /**
+   * Active indexes
+   */
   int[] idx;
 
+  /**
+   * Weights of active objects
+   */
   byte[] weight;
 
+  /**
+   * Size of hot set
+   */
   int size = 0;
 
+  /**
+   * Constructor.
+   * 
+   * @param inner Wrapped data set
+   * @param size Size of hot set to allocate
+   */
   public ByteWeightedArrayDataSet(DataSet inner, int size) {
     this.inner = inner;
     this.idx = new int[size];
@@ -52,6 +70,12 @@ public class ByteWeightedArrayDataSet implements DataSet {
     ArrayUtil.swap(weight, i, j);
   }
 
+  /**
+   * Add a new element to the hot set.
+   * 
+   * @param v Index
+   * @param w Weight
+   */
   public void add(int v, byte w) {
     if(size == idx.length) {
       final int newlen = idx.length << 1;
@@ -62,6 +86,9 @@ public class ByteWeightedArrayDataSet implements DataSet {
     weight[size++] = w;
   }
 
+  /**
+   * Clear the data set
+   */
   public void clear() {
     size = 0;
   }

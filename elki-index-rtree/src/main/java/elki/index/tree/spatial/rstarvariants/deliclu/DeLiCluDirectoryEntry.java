@@ -33,6 +33,7 @@ import elki.index.tree.spatial.SpatialDirectoryEntry;
  * @since 0.1
  */
 public class DeLiCluDirectoryEntry extends SpatialDirectoryEntry implements DeLiCluEntry {
+  /** Serialization version */
   private static final long serialVersionUID = 1;
 
   /**

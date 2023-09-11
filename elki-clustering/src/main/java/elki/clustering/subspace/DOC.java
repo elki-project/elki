@@ -127,6 +127,7 @@ public class DOC implements SubspaceClusteringAlgorithm<SubspaceModel> {
    * cluster size.
    * 
    * @param relation Data relation
+   * @return Clustering
    */
   public Clustering<SubspaceModel> run(Relation<? extends NumberVector> relation) {
     // Dimensionality of our set.

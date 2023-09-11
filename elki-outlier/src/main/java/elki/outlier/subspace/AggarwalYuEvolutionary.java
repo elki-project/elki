@@ -371,6 +371,11 @@ public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
 
     /**
      * Apply the mutation algorithm.
+     * 
+     * @param population Population
+     * @param perc1 Perentage for first mutation type
+     * @param perc2 Perentage for second mutation type
+     * @return Mutated population
      */
     private ArrayList<Individuum> mutation(ArrayList<Individuum> population, double perc1, double perc2) {
       // the Mutations
@@ -398,9 +403,9 @@ public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
           QR[rq] = pr;
           QR[rr] = pq;
         }
-        // Mutation Variant 2
+        // Mutation variant 2
         if(random.nextDouble() <= perc2) {
-          // calc Mutation Spot
+          // calc mutation spot
           int pr = random.nextInt(dim - r) + r;
           // Mutate 1...phi into another 1...phi
           gene[QR[pr]] = (short) (random.nextInt(phi) + GENE_OFFSET);
@@ -423,7 +428,10 @@ public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
     }
 
     /**
-     * method implements the crossover algorithm
+     * The crossover algorithm
+     *
+     * @param population Population
+     * @return mutated population
      */
     private ArrayList<Individuum> crossoverOptimized(ArrayList<Individuum> population) {
       // Crossover Set of population Set
@@ -547,8 +555,14 @@ public class AggarwalYuEvolutionary extends AbstractAggarwalYuOutlier {
    * @author Erich Schubert
    */
   private static class Individuum implements Comparable<Individuum> {
+    /**
+     * Fitness parameter
+     */
     double fitness;
 
+    /**
+     * Gene information
+     */
     short[] gene;
 
     /**

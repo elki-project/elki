@@ -126,6 +126,13 @@ public class AlphaShape {
     return polys;
   }
 
+  /**
+   * Check the neighbors.
+   * 
+   * @param open List of open edge lists, for holes in the polygons
+   * @param visited Mask of visited entries
+   * @param stack Current stack
+   */
   private void checkNeighbors(List<IntegerArray> open, long[] visited, IntegerArray stack) {
     assert stack.size == 12;
     while(!stack.isEmpty()) {

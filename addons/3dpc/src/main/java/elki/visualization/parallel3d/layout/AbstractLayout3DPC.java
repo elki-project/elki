@@ -104,8 +104,14 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    * @author Erich Schubert
    */
   private static class LowerTriangularAdapter implements PrimsMinimumSpanningTree.Adapter<double[]> {
+    /** Dimensionality */
     int dim;
 
+    /**
+     * Constructor.
+     * 
+     * @param dim Dimensionality
+     */
     public LowerTriangularAdapter(int dim) {
       this.dim = dim;
     }
@@ -126,6 +132,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
   /**
    * Build the minimum spanning tree.
    *
+   * @param dim Number of attributes
    * @param mat Similarity matrix
    * @param layout Layout to write to
    * @return Root node id
@@ -153,6 +160,13 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     return rootnode;
   }
 
+  /**
+   * Make a new node in the graph
+   *
+   * @param dim Dimension id
+   * @param children Children
+   * @return node
+   */
   abstract N makeNode(int dim, List<N> children);
 
   /**

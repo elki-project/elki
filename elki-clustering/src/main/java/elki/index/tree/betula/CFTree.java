@@ -328,6 +328,13 @@ public class CFTree<L extends ClusterFeature> {
     }
   }
 
+  /**
+   * Estimate the new threshold from the current tree.
+   * 
+   * @param current current node
+   * @param cfs cluster features
+   * @param thresholds candidate threshold buffer
+   */
   @SuppressWarnings("unchecked")
   private void estimateThreshold(CFNode<L> current, ArrayList<L> cfs, double[] thresholds) {
     int offset = cfs.size();
@@ -871,6 +878,7 @@ public class CFTree<L extends ClusterFeature> {
      *
      * @param ids DBIDs to insert
      * @param relation Data relation
+     * @param storeIds Store object IDs
      * @return New tree
      */
     public CFTree<L> newTree(DBIDs ids, Relation<? extends NumberVector> relation, boolean storeIds) {
