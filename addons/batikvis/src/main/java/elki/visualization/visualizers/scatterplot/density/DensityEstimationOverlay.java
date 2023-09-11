@@ -146,6 +146,12 @@ public class DensityEstimationOverlay implements VisFactory {
       layer.appendChild(itag);
     }
 
+    /**
+     * Initialize the bandwidth for the kernel density estimation using Scotts rule.
+     * 
+     * @param data Projected data
+     * @return Kernel bandwidth
+     */
     @Reference(authors = "D. W. Scott", title = "Multivariate density estimation: Theory, Practice, and Visualization", //
         booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", //
         url = "https://doi.org/10.1002/9780470316849", //
@@ -166,6 +172,7 @@ public class DensityEstimationOverlay implements VisFactory {
       return bandwidth;
     }
 
+    /** Render the density image */
     private void renderImage() {
       // TODO: SAMPLE? Do region queries?
       // Project the data just once, keep a copy.
@@ -241,13 +248,14 @@ public class DensityEstimationOverlay implements VisFactory {
       }
     }
 
+    /**
+     * Unflip the result of a binary search
+     * 
+     * @param binarySearch Binary search result
+     * @return positive index of exact match or insertion point
+     */
     private int unflip(int binarySearch) {
-      if(binarySearch < 0) {
-        return (-binarySearch) - 1;
-      }
-      else {
-        return binarySearch;
-      }
+      return binarySearch < 0 ? (-binarySearch) - 1 : binarySearch;
     }
   }
 }

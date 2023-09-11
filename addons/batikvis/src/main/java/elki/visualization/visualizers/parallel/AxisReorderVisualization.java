@@ -207,6 +207,7 @@ public class AxisReorderVisualization implements VisFactory {
      *
      * @param tag Element to add the listener
      * @param i represented axis
+     * @param j arrow direction
      */
     private void addEventListener(final Element tag, final int i, final SVGArrow.Direction j) {
       EventTarget targ = (EventTarget) tag;

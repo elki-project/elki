@@ -220,6 +220,8 @@ public class ClusterAlphaHullVisualization implements VisFactory {
      * Adds the required CSS-Classes
      *
      * @param svgp SVG-Plot
+     * @param clusterID Cluster ID
+     * @param opac Opacity
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
       final StyleLibrary style = context.getStyleLibrary();

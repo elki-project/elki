@@ -440,6 +440,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
      * Constructor.
      *
      * @param relation Relation to process
+     * @param df Distance function
      * @param means Initial mean
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

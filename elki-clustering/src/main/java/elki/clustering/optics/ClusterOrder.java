@@ -76,6 +76,8 @@ public class ClusterOrder implements OrderingResult {
    * Constructor
    * 
    * @param ids Object IDs included
+   * @param reachability Reachability values
+   * @param predecessor Predecessor IDs
    */
   public ClusterOrder(ArrayModifiableDBIDs ids, WritableDoubleDataStore reachability, WritableDBIDDataStore predecessor) {
     super();
@@ -112,6 +114,8 @@ public class ClusterOrder implements OrderingResult {
 
   /**
    * Get an iterator.
+   * 
+   * @return Iterator
    */
   public DBIDArrayIter iter() {
     return ids.iter();

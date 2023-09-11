@@ -101,6 +101,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   /**
    * Constructor.
    *
+   * @param context Visualization context
    * @param vis Visualizations to use
    * @param ratio Plot ratio
    */
@@ -128,7 +129,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
    * Create a background node. Note: don't call this at arbitrary times - the
    * background may cover already drawn parts of the image!
    *
-   * @param context
+   * @param context Visualization context
    */
   private void addBackground(VisualizerContext context) {
     // Make a background
@@ -146,6 +147,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     getRoot().appendChild(bg);
   }
 
+  /** Initalize the view */
   private void initialize() {
     // Try to keep the area approximately 1.0
     width = Math.sqrt(getRatio());

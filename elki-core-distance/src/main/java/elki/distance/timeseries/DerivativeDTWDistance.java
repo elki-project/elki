@@ -137,6 +137,8 @@ public class DerivativeDTWDistance extends DTWDistance {
    * Given a NumberVector and the position of an element, approximates the
    * gradient of given element.
    * 
+   * @param i Position of element
+   * @param v Number vector
    * @return Derivative as double
    */
   protected double derivative(int i, NumberVector v) {

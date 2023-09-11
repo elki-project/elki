@@ -46,6 +46,8 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
 
   /**
    * Clear the list contents.
+   * 
+   * @return {@code this} for call chaining
    */
   ModifiableDoubleDBIDList clear();
 

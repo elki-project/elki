@@ -38,6 +38,7 @@ public interface DistributionEstimator<D extends Distribution> {
    * 
    * @param data Data set
    * @param adapter Number array adapter
+   * @param <A> array type
    * @return Estimated distribution
    */
   <A> D estimate(A data, NumberArrayAdapter<?, A> adapter);

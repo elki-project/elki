@@ -186,9 +186,10 @@ public abstract class Itemset implements Comparable<Itemset> {
 
   /**
    * Robust compare using the iterators, lexicographical only!
-   *
+   * <p>
    * Note: This does NOT take length into account.
    *
+   * @param a First itemset.
    * @param o Other itemset.
    * @return Comparison result.
    */

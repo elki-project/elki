@@ -51,8 +51,8 @@ public final class DatabaseUtil {
 
   /**
    * Guess a potentially label-like representation, preferring class labels.
-   * 
-   * @param database
+   *
+   * @param database Database
    * @return string representation
    */
   public static Relation<String> guessLabelRepresentation(Database database) {
@@ -88,8 +88,8 @@ public final class DatabaseUtil {
 
   /**
    * Guess a potentially object label-like representation.
-   * 
-   * @param database
+   *
+   * @param database Database
    * @return string representation
    */
   public static Relation<String> guessObjectLabelRepresentation(Database database) {

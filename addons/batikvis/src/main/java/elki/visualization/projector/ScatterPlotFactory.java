@@ -89,6 +89,12 @@ public class ScatterPlotFactory implements ProjectorFactory {
     });
   }
 
+  /**
+   * Dimensionality of a relation.
+   *
+   * @param rel Data relation
+   * @return Dimensionality or 0
+   */
   private int dimensionality(Relation<?> rel) {
     if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
       @SuppressWarnings("unchecked")

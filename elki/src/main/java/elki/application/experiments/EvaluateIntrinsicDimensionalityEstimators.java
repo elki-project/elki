@@ -199,7 +199,10 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
    * @author Erich Schubert
    */
   enum OutputFormat {
-    TABULAR, TSV
+    /** Tabular format */
+    TABULAR,
+    /** Tab separated format */
+    TSV
   }
 
   /**
@@ -406,6 +409,8 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   /**
    * Main method
+   * 
+   * @param args Command line arguments
    */
   public static void main(String[] args) {
     runCLIApplication(EvaluateIntrinsicDimensionalityEstimators.class, args);

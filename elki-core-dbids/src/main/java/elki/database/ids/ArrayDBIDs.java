@@ -48,6 +48,7 @@ public interface ArrayDBIDs extends DBIDs {
    *
    * @param index Position
    * @param var Variable to assign the value to.
+   * @return {@code var} for call chaining
    */
   DBIDVar assignVar(int index, DBIDVar var);
 

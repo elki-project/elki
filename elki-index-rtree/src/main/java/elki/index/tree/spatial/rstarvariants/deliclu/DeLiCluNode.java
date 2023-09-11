@@ -31,6 +31,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  * @navhas - contains - DeLiCluEntry
  */
 public class DeLiCluNode extends AbstractRStarTreeNode<DeLiCluNode, DeLiCluEntry> {
+  /** Serialization version */
   private static final long serialVersionUID = 1;
 
   /**

@@ -61,8 +61,10 @@ public class BetulaGMMWeighted extends BetulaGMM {
    * Constructor.
    *
    * @param cffactory CFTree factory
+   * @param delta Delta parameter
    * @param k Number of clusters
    * @param maxiter Maximum number of iterations
+   * @param soft Return soft clustering results
    * @param initialization Initialization method
    * @param prior MAP prior
    */

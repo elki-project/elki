@@ -698,6 +698,8 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     /**
      * Expand the next node of the priority heap.
+     * 
+     * @return true unless empty
      */
     protected boolean advanceQueue() {
       if(pq.isEmpty()) {

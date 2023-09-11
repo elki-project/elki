@@ -31,6 +31,8 @@ import java.io.Externalizable;
 public interface DirectoryEntry extends Externalizable {
   /**
    * Get the page ID of this directory entry.
+   * 
+   * @return page id
    */
   int getPageID();
 }

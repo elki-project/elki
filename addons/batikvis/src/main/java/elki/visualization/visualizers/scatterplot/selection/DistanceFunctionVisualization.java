@@ -209,13 +209,14 @@ public class DistanceFunctionVisualization implements VisFactory {
    */
   public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
-     * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
-     * etc.
+     * Tags to indicate the type of element. Used in IDs, CSS-Classes etc.
      */
     public static final String KNNMARKER = "kNNMarker";
 
+    /** Tag for distances */
     public static final String KNNDIST = "kNNDist";
 
+    /** Tag for distance function */
     public static final String DISTANCEFUNCTION = "distancefunction";
 
     /**

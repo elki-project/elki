@@ -59,6 +59,8 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
 
   /**
    * Constructor.
+   * 
+   * @param candidates Number of candidates to consider
    */
   public ApproximativeLeastOverlapInsertionStrategy(int candidates) {
     super();

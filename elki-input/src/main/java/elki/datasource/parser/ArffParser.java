@@ -219,6 +219,17 @@ public class ArffParser implements Parser {
     }
   }
 
+  /**
+   * Load a sparse instance from an ARFF file.
+   * 
+   * @param tokenizer Tokenizer
+   * @param targ Target columns
+   * @param dimsize Dimensionalities
+   * @param elkitypes Type information
+   * @param metaLength Metadata length
+   * @return Data array
+   * @throws IOException on IO error
+   */
   private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
     Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>();
     while(true) {
@@ -314,6 +325,16 @@ public class ArffParser implements Parser {
     return data;
   }
 
+  /**
+   * Load a dense instance from an ARFF file
+   * 
+   * @param tokenizer Tokenizer
+   * @param dimsize Dimensionalities of vectors in output
+   * @param etyp Type information
+   * @param outdim Output dimensionality
+   * @return Data array
+   * @throws IOException on IO error
+   */
   private Object[] loadDenseInstance(StreamTokenizer tokenizer, int[] dimsize, TypeInformation[] etyp, int outdim) throws IOException {
     Object[] data = new Object[outdim];
     for(int out = 0; out < outdim; out++) {
@@ -459,7 +480,7 @@ public class ArffParser implements Parser {
    * Read the dataset header part of the ARFF file, to ensure consistency.
    *
    * @param br Buffered Reader
-   * @throws IOException
+   * @throws IOException on IO error
    */
   private void readHeader(BufferedReader br) throws IOException {
     String line;
@@ -487,7 +508,7 @@ public class ArffParser implements Parser {
    * @param br Input
    * @param names List (to fill) of attribute names
    * @param types List (to fill) of attribute types
-   * @throws IOException
+   * @throws IOException on IO error
    */
   private void parseAttributeStatements(BufferedReader br, ArrayList<String> names, ArrayList<String> types) throws IOException {
     String line;
@@ -593,7 +614,7 @@ public class ArffParser implements Parser {
    * Helper function for token handling.
    *
    * @param tokenizer Tokenizer
-   * @throws IOException
+   * @throws IOException on IO error
    */
   private void nextToken(StreamTokenizer tokenizer) throws IOException {
     tokenizer.nextToken();

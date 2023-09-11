@@ -91,6 +91,9 @@ public class AlternateRefinement<O> implements KMedoidsInitialization<O> {
 
   /**
    * Constructor.
+   * 
+   * @param inner Inner initialization
+   * @param maxiter Maximum number of refinement iterations
    */
   public AlternateRefinement(KMedoidsInitialization<O> inner, int maxiter) {
     super();

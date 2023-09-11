@@ -72,7 +72,7 @@ public class DiskCacheBasedFloatDistance extends AbstractDBIDRangeDistance {
    * Constructor.
    *
    * @param matrixfile File name
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   public DiskCacheBasedFloatDistance(Path matrixfile) throws IOException {
     super();

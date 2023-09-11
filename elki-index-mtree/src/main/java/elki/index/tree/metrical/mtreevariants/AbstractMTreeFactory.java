@@ -108,6 +108,11 @@ public abstract class AbstractMTreeFactory<O, N extends AbstractMTreeNode<O, N, 
           .grab(config, x -> settings.insertStrategy = x);
     }
 
+    /**
+     * Make the settings object.
+     * 
+     * @return Settings object for parameterization
+     */
     protected abstract S makeSettings();
 
     @Override

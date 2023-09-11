@@ -50,6 +50,8 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
 
   /**
    * Creates a new PageFile.
+   * 
+   * @param pageSize page size
    */
   protected AbstractStoringPageFile(int pageSize) {
     this.emptyPages = new IntegerArray();

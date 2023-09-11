@@ -117,6 +117,7 @@ public class DCor implements Dependence {
    *
    * @param adapter Data adapter
    * @param data Input data
+   * @param <A> Array type
    * @return Double-centered delta matrix.
    */
   protected static <A> double[] computeDistances(NumberArrayAdapter<?, A> adapter, A data) {

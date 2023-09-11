@@ -72,6 +72,9 @@ public class VisualizationPlot extends SVGPlot {
 
   /**
    * Request a redraw of a visualization.
+   * 
+   * @param task Task to redraw (currently ignored)
+   * @param vis Visualization to redraw
    */
   public void requestRedraw(VisualizationTask task, Visualization vis) {
     updateQueue.add(vis);

@@ -93,6 +93,7 @@ public class ByLabelHierarchicalClustering implements ClusteringAlgorithm<Cluste
    * Run the actual clustering algorithm.
    * 
    * @param relation The data input to use
+   * @return Clustering result
    */
   public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, DBIDs> labelmap = new HashMap<>();

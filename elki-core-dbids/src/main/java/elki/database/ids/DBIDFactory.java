@@ -72,6 +72,7 @@ public interface DBIDFactory {
    *
    * @param var Variable
    * @param val Integer value
+   * @return {@code var} for call chaining
    */
   DBIDVar assignVar(DBIDVar var, int val);
 

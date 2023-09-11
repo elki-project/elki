@@ -73,14 +73,10 @@ public class BIRCHCF implements ClusterFeature {
 
   @Override
   public void addToStatistics(ClusterFeature other) {
-    addToStatistics((BIRCHCF) other);
-  }
-
-  // @Override
-  public void addToStatistics(BIRCHCF other) {
-    n += other.n;
-    VMath.plusEquals(ls, other.ls);
-    ss += other.ss;
+    BIRCHCF o = (BIRCHCF) other;
+    n += o.n;
+    VMath.plusEquals(ls, o.ls);
+    ss += o.ss;
   }
 
   @Override

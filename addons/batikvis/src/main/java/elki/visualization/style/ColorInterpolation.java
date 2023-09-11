@@ -74,9 +74,9 @@ public enum ColorInterpolation {
   /**
    * Interpolate two colors.
    *
-   * @param color
-   * @param neutral
-   * @param intensity
+   * @param color First color
+   * @param neutral Second color
+   * @param intensity Intensitiy of first (0 to 1)
    * @return interpolated color
    */
   public abstract String interpolate(String color, String neutral, double intensity);

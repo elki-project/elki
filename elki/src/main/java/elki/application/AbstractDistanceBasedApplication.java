@@ -48,6 +48,9 @@ public abstract class AbstractDistanceBasedApplication<O> extends AbstractApplic
 
   /**
    * Constructor.
+   * 
+   * @param inputstep Data input step
+   * @param distance Distance function to use
    */
   public AbstractDistanceBasedApplication(InputStep inputstep, Distance<? super O> distance) {
     super();

@@ -92,6 +92,7 @@ public interface AffinityMatrix {
   /**
    * Get the dimension an iterator points to.
    * 
+   * @param x Point to get the neighbors for
    * @param iter Iterator position
    * @return Dimension the iterator refers to
    */
@@ -100,6 +101,7 @@ public interface AffinityMatrix {
   /**
    * Get the value an iterator points to.
    * 
+   * @param x Point to get the neighbors for
    * @param iter Iterator position
    * @return Dimension the iterator refers to
    */
@@ -108,6 +110,7 @@ public interface AffinityMatrix {
   /**
    * Advance the iterator to the next position.
    * 
+   * @param x Point to get the neighbors for
    * @param iter Previous iterator position
    * @return Next iterator position
    */
@@ -116,6 +119,7 @@ public interface AffinityMatrix {
   /**
    * Test the iterator position for validity.
    * 
+   * @param x Point to get the neighbors for
    * @param iter Iterator position
    * @return {@code true} when it refers to a valid position.
    */

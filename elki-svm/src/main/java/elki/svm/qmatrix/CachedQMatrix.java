@@ -82,10 +82,24 @@ public final class CachedQMatrix implements QMatrix {
    */
   private final int[] chain;
 
+  /**
+   * Constructor.
+   * 
+   * @param l LRU size
+   * @param cache_size Cache size in megabytes
+   * @param inner Inner matrix
+   */
   public CachedQMatrix(int l, double cache_size, QMatrix inner) {
     this(l, (long) (cache_size * MEGABYTES), inner);
   }
 
+  /**
+   * Constructor.
+   * 
+   * @param l LRU size
+   * @param size_ Cache size in bytes
+   * @param inner Inner matrix
+   */
   public CachedQMatrix(int l, long size_, QMatrix inner) {
     this.inner = inner;
     chain = new int[l << 1]; // zeros
@@ -185,6 +199,13 @@ public final class CachedQMatrix implements QMatrix {
     len[h] = 0;
   }
 
+  /**
+   * Get the data for a given index
+   * 
+   * @param h Index
+   * @param len Length to get
+   * @return Resulting data in cache
+   */
   float[] get_data(int h, int len) {
     int hlen = this.len[h];
     float[] hdata = data[h];

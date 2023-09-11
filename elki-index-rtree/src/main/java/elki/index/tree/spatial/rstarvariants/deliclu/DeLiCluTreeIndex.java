@@ -75,6 +75,7 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
    * Creates a new leaf entry representing the specified data object.
    * 
    * @param id Object id
+   * @return Leaf entry
    */
   protected DeLiCluLeafEntry createNewLeafEntry(DBID id) {
     return new DeLiCluLeafEntry(id, relation.get(id));

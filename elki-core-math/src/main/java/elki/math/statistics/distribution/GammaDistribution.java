@@ -416,6 +416,7 @@ public class GammaDistribution implements Distribution {
    * @param k K parameter
    * @param theta Theta parameter
    * @param random Random generator
+   * @return random value from this distribution
    */
   @Reference(authors = "J. H. Ahrens, U. Dieter", //
       title = "Computer methods for sampling from gamma, beta, Poisson and binomial distributions", //

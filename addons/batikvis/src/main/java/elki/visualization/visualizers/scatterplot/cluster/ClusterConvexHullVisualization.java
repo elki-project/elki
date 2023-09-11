@@ -195,6 +195,7 @@ public class ClusterConvexHullVisualization implements VisFactory {
      * @param clu Current cluster
      * @param hier Clustering hierarchy
      * @param hulls Hull map
+     * @return Hull polygons
      */
     private DoubleObjPair<Polygon> buildHullsRecursively(Cluster<Model> clu, Hierarchy<Cluster<Model>> hier, Map<Object, DoubleObjPair<Polygon>> hulls) {
       final DBIDs ids = clu.getIDs();
@@ -257,6 +258,8 @@ public class ClusterConvexHullVisualization implements VisFactory {
      * Adds the required CSS-Classes
      *
      * @param svgp SVG-Plot
+     * @param clusterID Cluster ID
+     * @param opac Opacity
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
       final StyleLibrary style = context.getStyleLibrary();

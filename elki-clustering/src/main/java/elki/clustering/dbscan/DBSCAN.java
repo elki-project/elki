@@ -131,6 +131,9 @@ public class DBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
 
   /**
    * Performs the DBSCAN algorithm on the given database.
+   * 
+   * @param relation the database to run the algorithm on
+   * @return Clustering result
    */
   public Clustering<Model> run(Relation<O> relation) {
     final int size = relation.size();

@@ -44,7 +44,7 @@ public interface PageHeader {
    * Read the header from an input file.
    *
    * @param file File to read from
-   * @throws IOException
+   * @throws IOException on IO error
    */
   default void readHeader(FileChannel file) throws IOException {
     readHeader(file.map(MapMode.READ_ONLY, 0, size()));
@@ -61,7 +61,7 @@ public interface PageHeader {
    * Read the header from an input file.
    *
    * @param file File to read from
-   * @throws IOException
+   * @throws IOException on IO error
    */
   default void writeHeader(FileChannel file) throws IOException {
     writeHeader(file.map(MapMode.READ_WRITE, 0, size()));

@@ -133,6 +133,7 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
    * Ensure that we have storage for special values (infinity, NaN)
    * 
    * @param idx Index to return.
+   * @return Special sentinel value
    */
   @SuppressWarnings("unchecked")
   protected T getSpecial(int idx) {

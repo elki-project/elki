@@ -143,7 +143,7 @@ public class ClusterMergeHistoryBuilder {
    * @param source Current object
    * @param distance Link distance
    * @param target Parent
-   * @return
+   * @return New cluster id
    */
   public int strictAdd(int source, double distance, int target) {
     final int n = ids.size();

@@ -245,6 +245,13 @@ public class AssociationRuleGeneration implements Algorithm {
       return result;
     }
 
+    /**
+     * Process subsets
+     *
+     * @param itemset Current itemset
+     * @param len itemset length
+     * @param cur current position
+     */
     private void processSubsets(Itemset itemset, final int len, int cur) {
       // TODO: allow cur == 0, i.e. empty head?
       while(cur >= 0 && scratch1.len > 1) {

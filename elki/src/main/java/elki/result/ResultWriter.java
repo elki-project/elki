@@ -105,6 +105,12 @@ public class ResultWriter implements ResultHandler {
     }
   }
 
+  /**
+   * Open the output stream factory.
+   *
+   * @return Stream factory
+   * @throws IOException on IO errors
+   */
   private StreamFactory openStreamFactory() throws IOException {
     if(out == null) {
       return new SingleStreamOutput();

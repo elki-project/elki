@@ -66,10 +66,11 @@ public interface VisFactory extends VisualizationProcessor {
 
   /**
    * Test whether to do a thumbnail or a full rendering.
-   *
+   * <p>
    * Override this with "false" to disable thumbnails!
    *
    * @param task Task requested
+   * @return true if thumbnails may be used
    */
   default boolean allowThumbnails(VisualizationTask task) {
     return true;

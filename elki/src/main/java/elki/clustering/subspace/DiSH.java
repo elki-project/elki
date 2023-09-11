@@ -169,6 +169,7 @@ public class DiSH implements SubspaceClusteringAlgorithm<SubspaceModel> {
    *
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
+   * @return Clustering
    */
   private Clustering<SubspaceModel> computeClusters(Relation<? extends NumberVector> database, DiSHClusterOrder clusterOrder) {
     final int dimensionality = RelationUtil.dimensionality(database);

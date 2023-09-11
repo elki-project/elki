@@ -52,6 +52,7 @@ public interface OutlierScaling extends ScalingFunction {
    * 
    * @param array Data to process
    * @param adapter Array adapter
+   * @param <A> Array type
    */
   <A> void prepare(A array, NumberArrayAdapter<?, A> adapter);
 }

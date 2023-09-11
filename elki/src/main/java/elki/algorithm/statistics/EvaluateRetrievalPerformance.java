@@ -380,7 +380,7 @@ public class EvaluateRetrievalPerformance<O> implements Algorithm {
      * @param samplesize Sample size
      * @param map MAP value
      * @param auroc AUROC value
-     * @param knnperf
+     * @param knnperf KNN performance data
      */
     public RetrievalPerformanceResult(int samplesize, double map, double auroc, double[] knnperf) {
       super();

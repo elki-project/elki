@@ -232,6 +232,7 @@ public class PrimsMinimumSpanningTree {
     /**
      * Get number of objects in dataset
      * 
+     * @param data Data set
      * @return Size
      */
     int size(T data);

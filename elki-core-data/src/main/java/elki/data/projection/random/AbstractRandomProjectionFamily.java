@@ -45,6 +45,8 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
 
   /**
    * Constructor.
+   * 
+   * @param random Rangom generator
    */
   public AbstractRandomProjectionFamily(RandomFactory random) {
     super();

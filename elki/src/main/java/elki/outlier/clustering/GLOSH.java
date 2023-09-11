@@ -83,6 +83,13 @@ public class GLOSH implements OutlierAlgorithm {
     this.hdbscanExtraction = hdbscanExtraction;
   }
 
+  /**
+   * Run the GLOSH algorithm.
+   * 
+   * @param db Database
+   * @param relation Relation
+   * @return Outlier result
+   */
   public OutlierResult run(Database db, Relation<? extends NumberVector> relation) {
     Clustering<?> hdbscanresult = hdbscanExtraction.autorun(db);
     WritableDoubleDataStore scores = null;

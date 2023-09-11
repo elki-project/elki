@@ -54,6 +54,7 @@ public interface It<O> extends Iter {
    * this method.
    * 
    * @param clz Class filter
+   * @param <T> object type
    * @return Filtered iterator.
    */
   default <T> It<T> filter(Class<? super T> clz) {
@@ -107,6 +108,8 @@ public interface It<O> extends Iter {
    * Collect the output in a colection.
    *
    * @param c Collection
+   * @param <T> object type
+   * @return Collection {@code c } for command chaining.
    */
   default <T extends Collection<? super O>> T collect(T c) {
     while(valid()) {

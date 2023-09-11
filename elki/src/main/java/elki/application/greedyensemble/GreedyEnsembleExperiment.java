@@ -135,10 +135,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * Distance modes.
    */
   public enum Distance {
-    PEARSON, //
-    SQEUCLIDEAN, //
-    EUCLIDEAN, //
-    MANHATTAN, //
+    /** Pearson correlation */
+    PEARSON,
+    /** Squared Euclidean */
+    SQEUCLIDEAN,
+    /** Euclidean */
+    EUCLIDEAN,
+    /** Manhattan */
+    MANHATTAN,
   }
 
   /**
@@ -440,8 +444,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Build a single-element "ensemble".
    *
-   * @param ensemble
-   * @param vec
+   * @param ensemble Output ensemble
+   * @param vec Input vector
    */
   protected void singleEnsemble(final double[] ensemble, final NumberVector vec) {
     double[] buf = new double[1];
@@ -481,6 +485,12 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     return new MaterializedRelation<>("rescaled", relation.getDataTypeInformation(), ids, contents);
   }
 
+  /**
+   * Apply scaling to a vector
+   * 
+   * @param raw Vector to process
+   * @param scaling Scaling function
+   */
   private static void applyScaling(double[] raw, ScalingFunction scaling) {
     if(scaling == null) {
       return;
@@ -497,6 +507,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
   }
 
+  /**
+   * Update the estimation vector.
+   * 
+   * @param outliers Outlier vote counts
+   * @param numoutliers Number of outliers
+   * @param weights Weights
+   * @param truth Estimated truth output vector
+   */
   protected void updateEstimations(final int[] outliers, int numoutliers, final double[] weights, final double[] truth) {
     final double oweight = .5 / numoutliers;
     final double iweight = .5 / (outliers.length - numoutliers);
@@ -515,6 +533,12 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
   }
 
+  /**
+   * Get the distance function for the given weights.
+   * 
+   * @param estimated_weights Estimated weights
+   * @return Distance function
+   */
   private PrimitiveDistance<NumberVector> getDistance(double[] estimated_weights) {
     switch(distance){
     case SQEUCLIDEAN:

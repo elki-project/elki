@@ -37,7 +37,7 @@ public class CombinedTypeInformation implements TypeInformation {
   /**
    * Constructor.
    *
-   * @param restrictions
+   * @param restrictions Type restrictions (for "and" combination)
    */
   public CombinedTypeInformation(TypeInformation... restrictions) {
     super();

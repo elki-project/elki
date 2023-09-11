@@ -750,6 +750,7 @@ public final class DBIDUtil {
    * @param ids Original DBIDs
    * @param p Desired number of partitions.
    * @param rnd Random generator
+   * @return Partitions
    */
   public static ArrayDBIDs[] randomSplit(DBIDs ids, int p, RandomFactory rnd) {
     return randomSplit(ids, p, rnd.getSingleThreadedRandom());
@@ -761,6 +762,7 @@ public final class DBIDUtil {
    * @param oids Original DBIDs
    * @param p Desired number of partitions.
    * @param random Random generator
+   * @return Partitions
    */
   public static ArrayDBIDs[] randomSplit(DBIDs oids, int p, Random random) {
     // Fast, and we're single-threaded here anyway.
@@ -807,7 +809,7 @@ public final class DBIDUtil {
    *
    * @param ids ID range.
    * @return DBID range.
-   * @throws AbortException
+   * @throws AbortException if the ids are not a range.
    */
   public static DBIDRange assertRange(DBIDs ids) {
     if(!(ids instanceof DBIDRange)) {

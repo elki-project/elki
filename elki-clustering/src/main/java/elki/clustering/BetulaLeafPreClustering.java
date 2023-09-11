@@ -98,6 +98,7 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
    * Constructor.
    *
    * @param cffactory CFTree Factory
+   * @param storeIds store object ids
    */
   public BetulaLeafPreClustering(CFTree.Factory<?> cffactory, boolean storeIds) {
     super();

@@ -47,12 +47,12 @@ public class ClipScaling implements StaticScalingFunction {
   /**
    * Field storing the minimum to use
    */
-  private Double min = null;
+  private double min = Double.NaN;
 
   /**
    * Field storing the maximum to use
    */
-  private Double max = null;
+  private double max = Double.NaN;
 
   /**
    * Constructor.
@@ -60,7 +60,7 @@ public class ClipScaling implements StaticScalingFunction {
    * @param min Minimum, may be null
    * @param max Maximum, may be null
    */
-  public ClipScaling(Double min, Double max) {
+  public ClipScaling(double min, double max) {
     super();
     this.min = min;
     this.max = max;
@@ -68,23 +68,19 @@ public class ClipScaling implements StaticScalingFunction {
 
   @Override
   public double getScaled(double value) {
-    if(min != null && value < min) {
-      return min;
-    }
-    if(max != null && value > max) {
-      return max;
-    }
-    return value;
+    return value < min ? min // min=NaN is false, ok
+        : value > max ? max // max=NaN is false, ok
+            : value;
   }
 
   @Override
   public double getMin() {
-    return (min != null) ? min : Double.NEGATIVE_INFINITY;
+    return (min == min /* not NaN */) ? min : Double.NEGATIVE_INFINITY;
   }
 
   @Override
   public double getMax() {
-    return (max != null) ? max : Double.POSITIVE_INFINITY;
+    return (max == max /* not NaN */) ? max : Double.POSITIVE_INFINITY;
   }
 
   /**
@@ -93,9 +89,15 @@ public class ClipScaling implements StaticScalingFunction {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
-    protected Double min = null;
+    /**
+     * Minimum value
+     */
+    protected double min = Double.NaN;
 
-    protected Double max = null;
+    /**
+     * Maximum value
+     */
+    protected double max = Double.NaN;
 
     @Override
     public void configure(Parameterization config) {

@@ -247,6 +247,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
      * Constructor
      * 
      * @param img Image data
+     * @param relation Relation
+     * @param ids IDs
      */
     public SimilarityMatrix(RenderedImage img, Relation<?> relation, ArrayDBIDs ids) {
       super();

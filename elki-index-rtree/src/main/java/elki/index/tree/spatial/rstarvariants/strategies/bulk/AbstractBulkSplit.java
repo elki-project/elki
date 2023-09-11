@@ -48,16 +48,9 @@ public abstract class AbstractBulkSplit implements BulkSplit {
     if(numEntries < minEntries) {
       throw new IllegalArgumentException("numEntries < minEntries!");
     }
-
-    if(numEntries <= maxEntries) {
-      return numEntries;
-    }
-    else if(numEntries < maxEntries + minEntries) {
-      return (numEntries - minEntries);
-    }
-    else {
-      return maxEntries;
-    }
+    return (numEntries <= maxEntries) ? numEntries //
+        : (numEntries - minEntries < maxEntries) ? (numEntries - minEntries) //
+            : maxEntries;
   }
 
   /**
@@ -66,6 +59,7 @@ public abstract class AbstractBulkSplit implements BulkSplit {
    * @param objects Objects to partition
    * @param minEntries Minimum number of objects per page
    * @param maxEntries Maximum number of objects per page.
+   * @param <T> Object type
    * @return List with partitions
    */
   protected <T> List<List<T>> trivialPartition(List<T> objects, int minEntries, int maxEntries) {

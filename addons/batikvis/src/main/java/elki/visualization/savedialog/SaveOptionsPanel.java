@@ -41,14 +41,19 @@ import javax.swing.SpinnerNumberModel;
  * @since 0.2
  */
 public class SaveOptionsPanel extends JPanel {
+  /** String for format choice option */
   private static final String STR_CHOOSE_FORMAT = "Format";
 
+  /** String for image width option */
   private static final String STR_IMAGE_WIDTH = "Width";
 
+  /** String for image height option */
   private static final String STR_IMAGE_HEIGHT = "Height";
 
+  /** String for ratio lock */
   private static final String STR_LOCK_ASPECT_RATIO = "Ratio lock";
 
+  /** String for quality option */
   private static final String STR_JPEG_QUALITY = "Quality";
 
   /**

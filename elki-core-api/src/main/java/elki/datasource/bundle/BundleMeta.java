@@ -50,7 +50,7 @@ public class BundleMeta extends ArrayList<SimpleTypeInformation<?>> {
   /**
    * Constructor.
    * 
-   * @param initialCapacity
+   * @param initialCapacity initial capacity of data structures
    */
   public BundleMeta(int initialCapacity) {
     super(initialCapacity);
@@ -59,7 +59,7 @@ public class BundleMeta extends ArrayList<SimpleTypeInformation<?>> {
   /**
    * Constructor.
    * 
-   * @param types
+   * @param types Data types
    */
   public BundleMeta(SimpleTypeInformation<?>... types) {
     super(Arrays.asList(types));

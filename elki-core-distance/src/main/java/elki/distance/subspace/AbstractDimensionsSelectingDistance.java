@@ -50,7 +50,7 @@ public abstract class AbstractDimensionsSelectingDistance<V extends FeatureVecto
   /**
    * Constructor.
    * 
-   * @param dimensions
+   * @param dimensions Dimension bitset
    */
   public AbstractDimensionsSelectingDistance(long[] dimensions) {
     super();

@@ -55,6 +55,7 @@ public class CorrelationClusterOrder extends ClusterOrder {
   /**
    * Get the correlation dimensionality.
    * 
+   * @param id Object DBID
    * @return Correlation dimensionality
    */
   public int getCorrelationValue(DBIDRef id) {
@@ -64,6 +65,7 @@ public class CorrelationClusterOrder extends ClusterOrder {
   /**
    * Get the Euclidean distance in the orthogonal space.
    * 
+   * @param id Object DBID
    * @return Euclidean distance
    */
   public double getEuclideanValue(DBIDRef id) {

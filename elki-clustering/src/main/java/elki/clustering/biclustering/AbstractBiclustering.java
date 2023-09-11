@@ -99,15 +99,18 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
    * Run the actual biclustering algorithm.
    * <p>
    * This method is supposed to be called only from the method {@link #run}.
+   * 
+   * @return Clustering result
    */
   protected abstract Clustering<M> biclustering();
 
   /**
    * Convert a bitset into integer column ids.
    *
-   * @param cols
+   * @param cols Selected columns
    * @return integer column ids
    */
+  @Deprecated
   protected int[] colsBitsetToIDs(BitSet cols) {
     int[] colIDs = new int[cols.cardinality()];
     int colsIndex = 0;
@@ -121,9 +124,10 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
   /**
    * Convert a bitset into integer row ids.
    *
-   * @param rows
+   * @param rows Selected rows
    * @return integer row ids
    */
+  @Deprecated
   protected ArrayDBIDs rowsBitsetToIDs(BitSet rows) {
     ArrayModifiableDBIDs rowIDs = DBIDUtil.newArray(rows.cardinality());
     DBIDArrayIter iter = this.rowIDs.iter();
@@ -140,6 +144,7 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
    * @param cols the columns included in the Bicluster
    * @return a Bicluster as given by the included rows and columns
    */
+  @Deprecated
   protected Cluster<BiclusterModel> defineBicluster(BitSet rows, BitSet cols) {
     ArrayDBIDs rowIDs = rowsBitsetToIDs(rows);
     int[] colIDs = colsBitsetToIDs(cols);
@@ -192,7 +197,7 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
   /**
    * Convert a bitset into integer column ids.
    *
-   * @param cols
+   * @param cols Columns
    * @return integer column ids
    */
   protected int[] colsBitsetToIDs(long[] cols) {
@@ -217,7 +222,7 @@ public abstract class AbstractBiclustering<M extends BiclusterModel> implements 
   /**
    * Convert a bitset into integer row ids.
    *
-   * @param rows
+   * @param rows Rows
    * @return integer row ids
    */
   protected ArrayDBIDs rowsBitsetToIDs(long[] rows) {

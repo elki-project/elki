@@ -678,6 +678,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to write to
    * @param s String to write
+   * @throws IOException on IO error
    */
   public static void writeString(ByteBuffer buffer, String s) throws IOException {
     if(s == null) {
@@ -745,6 +746,7 @@ public final class ByteArrayUtil {
    *
    * @param s String to encode
    * @return Byte size
+   * @throws IOException on IO error
    */
   public static int getStringSize(String s) throws IOException {
     return STRING_SERIALIZER.getByteSize(s);
@@ -755,6 +757,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to read from
    * @return Integer value
+   * @throws IOException on IO error
    */
   public static int readSignedVarint(ByteBuffer buffer) throws IOException {
     final int raw = readUnsignedVarint(buffer);
@@ -766,6 +769,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to read from
    * @return Integer value
+   * @throws IOException on IO error
    */
   public static int readUnsignedVarint(ByteBuffer buffer) throws IOException {
     int val = 0, bits = 0;
@@ -787,6 +791,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to read from
    * @return long value
+   * @throws IOException on IO error
    */
   public static long readSignedVarintLong(ByteBuffer buffer) throws IOException {
     final long raw = readUnsignedVarintLong(buffer);
@@ -798,6 +803,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to read from
    * @return long value
+   * @throws IOException on IO error
    */
   public static long readUnsignedVarintLong(ByteBuffer buffer) throws IOException {
     long val = 0;
@@ -823,6 +829,7 @@ public final class ByteArrayUtil {
    *
    * @param buffer Buffer to read from.
    * @return Deserialized string
+   * @throws IOException on IO error
    */
   public static String readString(ByteBuffer buffer) throws IOException {
     return STRING_SERIALIZER.fromByteBuffer(buffer);

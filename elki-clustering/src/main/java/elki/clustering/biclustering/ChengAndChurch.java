@@ -317,6 +317,7 @@ public class ChengAndChurch extends AbstractBiclustering<BiclusterWithInversions
      *
      * @param mat Data matrix
      * @param row Row to visit
+     * @param mode Operation mode
      * @param visitor Visitor function
      */
     protected void visitRow(double[][] mat, int row, int mode, CellVisitor visitor) {
@@ -446,6 +447,7 @@ public class ChengAndChurch extends AbstractBiclustering<BiclusterWithInversions
      *
      * Computes the <b>mean column residue</b> of the given <code>col</code>.
      *
+     * @param mat Mask to update
      * @param col The column who's residue should be computed.
      * @return The row residue of the given <code>col</code>um.
      */
@@ -518,8 +520,18 @@ public class ChengAndChurch extends AbstractBiclustering<BiclusterWithInversions
       }
     }
 
-    protected void invertRow(int rnum, boolean b) {
-      BitsUtil.setI(irow, rnum);
+    /**
+     * Invert a row
+     *
+     * @param rnum row number
+     * @param set Value to set
+     */
+    protected void invertRow(int rnum, boolean set) {
+      if(set) {
+        BitsUtil.setI(irow, rnum);
+      } else {
+        BitsUtil.clearI(irow, rnum);
+      }
     }
   }
 

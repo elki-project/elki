@@ -129,6 +129,7 @@ public final class ClassGenericsUtil {
    * before accessing the returned value, since it may be {@code null}
    * unexpectedly otherwise.
    * 
+   * @param par Parameterizer
    * @param config Parameterization
    * @return Instance or {@code null}
    */
@@ -208,6 +209,7 @@ public final class ClassGenericsUtil {
    * Only supports public and parameterless constructors.
    *
    * @param clz Class to instantiate.
+   * @param <T> Class type
    * @return Instance
    */
   public static <T> T instantiateLowlevel(Class<? extends T> clz) {
