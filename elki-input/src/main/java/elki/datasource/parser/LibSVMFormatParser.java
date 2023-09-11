@@ -45,9 +45,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * not always have a constant-0 dimension 0.
  * <p>
  * The libSVM FAQ states that you can also put comments into the file, separated
- * by a hash: <tt>#</tt>, but they must not contain colons and are not
+ * by a hash: <code>#</code>, but they must not contain colons and are not
  * officially supported.<br>
- * ELKI will simply stop parsing a line when encountering a <tt>#</tt>.
+ * ELKI will simply stop parsing a line when encountering a <code>#</code>.
  *
  * @author Erich Schubert
  * @since 0.7.0

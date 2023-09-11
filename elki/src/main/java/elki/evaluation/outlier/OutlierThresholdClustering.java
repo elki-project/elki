@@ -84,6 +84,12 @@ public class OutlierThresholdClustering implements Evaluator {
     }
   }
 
+  /**
+   * Run the discretization of outlier scores.
+   *
+   * @param or Outlier result
+   * @return Clustering result containing clusters for the outliers by threshold.
+   */
   private Clustering<Model> split(OutlierResult or) {
     DoubleRelation scores = or.getScores();
     if(scaling instanceof OutlierScaling) {

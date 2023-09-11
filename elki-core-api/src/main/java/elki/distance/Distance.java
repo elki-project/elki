@@ -77,6 +77,7 @@ public interface Distance<O> {
    * Instantiate with a database to get the actual distance query.
    * 
    * @param relation The representation to use
+   * @param <T> input data type
    * @return Actual distance query.
    */
   <T extends O> DistanceQuery<T> instantiate(Relation<T> relation);

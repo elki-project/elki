@@ -49,11 +49,6 @@ import elki.workflow.OutputStep;
  */
 public class KDDTask {
   /**
-   * The settings used, for settings reporting.
-   */
-  private Collection<TrackedParameter> settings;
-
-  /**
    * The data input step
    */
   private InputStep inputStep;
@@ -74,13 +69,18 @@ public class KDDTask {
   private OutputStep outputStep;
 
   /**
+   * The settings used, for settings reporting.
+   */
+  private Collection<TrackedParameter> settings;
+
+  /**
    * Constructor.
    *
-   * @param inputStep
-   * @param algorithmStep
-   * @param evaluationStep
-   * @param outputStep
-   * @param settings
+   * @param inputStep Input data to load
+   * @param algorithmStep Algorithms to execute
+   * @param evaluationStep Evaluations to run
+   * @param outputStep Output handlers to use
+   * @param settings Parameters used, for reporting
    */
   public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<TrackedParameter> settings) {
     super();
@@ -118,15 +118,30 @@ public class KDDTask {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
+    /**
+     * The data input step
+     */
     InputStep inputStep = null;
 
+    /**
+     * The algorithm (data mining) step.
+     */
     AlgorithmStep algorithmStep = null;
 
+    /**
+     * The evaluation step.
+     */
     EvaluationStep evaluationStep = null;
 
-    Collection<TrackedParameter> settings = null;
-
+    /**
+     * The output/visualization step
+    */
     OutputStep outputStep = null;
+
+    /**
+     * The settings used, for settings reporting.
+     */
+    Collection<TrackedParameter> settings = null;
 
     @Override
     public void configure(Parameterization config) {

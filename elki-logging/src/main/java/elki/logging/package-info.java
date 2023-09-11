@@ -1,6 +1,7 @@
 /**
  * Logging facility for controlling logging behavior of the complete framework.
- * <h3>Logging in ELKI</h3>
+ *
+ * <h1>Logging in ELKI</h1>
  * Logging in ELKI is closely following the {@link java.util.logging.Logger}
  * approach.
  * <p>
@@ -22,7 +23,8 @@
  * </pre>
  * 
  * to set the logging level for the index structure package to FINE.
- * <h3>Logging for Developers:</h3>
+ *
+ * <h1>Logging for Developers:</h1>
  * Developers working in ELKI are encouraged to use the following setup to make
  * configurable logging:
  * <ol>

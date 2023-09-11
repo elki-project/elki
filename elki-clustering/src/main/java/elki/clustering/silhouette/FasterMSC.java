@@ -69,7 +69,7 @@ import elki.utilities.documentation.Reference;
  *
  * @author Erich Schubert
  *
- * @param <O>
+ * @param <O> Input data type
  */
 @Reference(authors = "Lars Lenssen and Erich Schubert", //
     title = "Clustering by Direct Optimization of the Medoid Silhouette", //

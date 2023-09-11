@@ -19,11 +19,11 @@ For background, contact-information, and contributors see
 </i>
 </p>
 
-<h2>Getting started</h2>
+<h1>Getting started</h1>
 <p>The <a href="https://elki-project.github.io/">ELKI website</a> contains additional documentation.
 A <a href="tutorial.html">Tutorial</a> exported is included with this documentation and a good place to start.</p>
 
-<h3>Invocation</h3>
+<h2>Invocation</h2>
 <p>To use the KDD-Framework we recommend an executable .jar-file:
 <a href="../elki.jar">elki.jar</a>. Since release 0.3 it will by default invoke a minimalistic GUI called MiniGUI when
 you call <code>java -jar elki.jar</code>. For command line use (for example for batch processing and scripted operation),
@@ -44,7 +44,7 @@ at <a href="examplecalls.html">example calls</a>.</p>
 <p>A list of related publications, giving details on many implemented algorithms,
 can be found in the <a href="references.html">class article references list</a>.</p>
 
-<h2>Workflow - Where Do Which Objects Go?</h2>
+<h1>Workflow - Where Do Which Objects Go?</h1>
 <p>The database connection manages reading of input files or databases and provides a
 {@link elki.database.Database Database}-Object - including index structures - as a virtual database to the KDDTask.
 The KDDTask applies a specified algorithm on this database and collects the result from the algorithm.
@@ -52,7 +52,7 @@ Finally, KDDTask hands on the obtained result to a {@link elki.result.ResultHand
 The default-handler is  {@link elki.result.ResultWriter ResultWriter}, writing the result to STDOUT or,
 if specified, into a file.</p>
 
-<h3>Database and indexing layer</h3>
+<h2>Database and indexing layer</h2>
 <p>The database and indexing layer is a key component of ELKI.
 This is not just a storage for <code>double[]</code>, as with many other frameworks.
 It can store various types of objects, and the integrated index structures provide access to fast
@@ -92,9 +92,9 @@ initializing low level classes such as an explicit linear scan query.</p>
 <p>For efficiency, try to instantiate the query only once per algorithm run, and avoid running the
 optimization step for every object.</p>
 
-<h2>How to make use of this framework</h2>
+<h1>How to make use of this framework</h1>
 
-<h3>Extension</h3>
+<h2>Extension</h2>
 To provide new applications one is simply to implement the specified interfaces.
 There are interfaces for a broad range of targets of development. Compare the
 <a href="overview-tree.html">tree of interfaces</a> to get an overview
@@ -107,7 +107,7 @@ and see how they are implemented.</p>
 growing amount of documentation. You are also welcome to contribute, of
 course!</p>
 
-<h3>Parameterization API</h3>
+<h2>Parameterization API</h2>
 <p>ELKI is designed for command-line, GUI and Java operation. For command-line and GUI, an extensive
 help functionality is provided along with input assistance. Therefore, you should also support the
 parameterizable API. The requirements are quite different from regular Java constructors, and cannot
@@ -115,7 +115,7 @@ be expressed in terms of a Java API.</p>
 <p>For useful error reporting and input assistance in the GUI we <em>need</em> to have more extensive
 typing than Java uses (for example we might need numerical constraints) and we also want to be able
 to <em>report more than one error at a time</em>. In ELKI 0.4, much of the parameterization was
-refactored to static helper classes usually found as a <tt>public static class Par</tt>
+refactored to static helper classes usually found as a <code>public static class Par</code>
 and instances of
 {@link elki.utilities.optionhandling.Parameterizer Parameterizer}.</p>
 <p><img src="figures/parameterization.png" width="600" height="213" alt="Parameterization" /></p>

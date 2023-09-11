@@ -33,13 +33,13 @@ import net.jafama.FastMath;
 
 /**
  * Log-Normal distribution.
- * 
+ * <p>
  * The parameterization of this class is somewhere inbetween of GNU R and SciPy.
  * Similar to GNU R we use the logmean and logstddev. Similar to Scipy, we also
  * have a location parameter that shifts the distribution.
- * 
+ * <p>
  * Our implementation maps to SciPy's as follows:
- * <tt>scipy.stats.lognorm(logstddev, shift, FastMath.exp(logmean))</tt>
+ * <code>scipy.stats.lognorm(logstddev, shift, FastMath.exp(logmean))</code>
  * 
  * @author Erich Schubert
  * @since 0.5.0
@@ -123,70 +123,84 @@ public class LogNormalDistribution implements Distribution {
 
   /**
    * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi)*sigma*x) * e^(-log(x-mu)^2/2sigma^2)
-   * </pre>
+   * <p>
+   * \[
+   * \frac{1}{\sqrt{2\pi}\log(\sigma) x}
+   * \exp \left(-\frac{(\log (x)-\log (\mu))^2}{2\log (\sigma)^2}\right)
+   * \]
    * 
    * @param x The value.
-   * @param mu The mean.
-   * @param sigma The standard deviation.
-   * @return PDF of the given normal distribution at x.
+   * @param logmu The log mean
+   * @param logsigma The log standard deviation.
+   * @return PDF of the given log normal distribution at x
    */
-  public static double pdf(double x, double mu, double sigma) {
+  public static double pdf(double x, double logmu, double logsigma) {
     if(x <= 0.) {
       return 0.;
     }
-    final double xrel = (FastMath.log(x) - mu) / sigma;
-    return 1 / (MathUtil.SQRTTWOPI * sigma * x) * FastMath.exp(-.5 * xrel * xrel);
+    final double xrel = (FastMath.log(x) - logmu) / logsigma;
+    return 1 / (MathUtil.SQRTTWOPI * logsigma * x) * FastMath.exp(-.5 * xrel * xrel);
   }
 
   /**
-   * Probability density function of the normal distribution.
+   * Log probability density function of the normal distribution.
+   * <p>
+   * \[
+   * \log\left(\frac{1}{\sqrt{2\pi}\sigma x} \exp \left(-\frac{(\log
+   * x-\mu)^2}{2\sigma^2}\right)\right)
+   * \]
+   * \[ =
+   * \log\frac{1}{\sqrt{2\pi}} - \log(\log(\sigma) x) - \frac{1}{2}
+   * \left(\frac{\log (x) - \log (\mu)}{\log(\sigma)}\right)^2
+   * \]
    * 
-   * <pre>
-   * 1/(SQRT(2*pi)*sigma*x) * e^(-log(x-mu)^2/2sigma^2)
-   * </pre>
-   * 
-   * @param x The value.
-   * @param mu The mean.
-   * @param sigma The standard deviation.
-   * @return logPDF of the given normal distribution at x.
+   * @param x The value
+   * @param logmu The log mean
+   * @param logsigma The log standard deviation
+   * @return logPDF of the given log normal distribution at x
    */
-  public static double logpdf(double x, double mu, double sigma) {
+  public static double logpdf(double x, double logmu, double logsigma) {
     if(x <= 0.) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double xrel = (FastMath.log(x) - mu) / sigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma * x) - .5 * xrel * xrel;
+    final double xrel = (FastMath.log(x) - logmu) / logsigma;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(logsigma * x) - .5 * xrel * xrel;
   }
 
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
+   * <p>
+   * \[
+   * \frac{1}{2} \left(1+\text{erf}\left(\frac{\log (x)-\log (\mu)}{\sqrt{2} \log(\sigma)}\right)\right)
+   * \]
    * 
    * @param x value to evaluate CDF at
-   * @param mu Mean value
-   * @param sigma Standard deviation.
-   * @return The CDF of the given normal distribution at x.
+   * @param logmu log mean value
+   * @param logsigma log standard deviation
+   * @return The CDF of the given log normal distribution at x
    */
-  public static double cdf(double x, double mu, double sigma) {
+  public static double cdf(double x, double logmu, double logsigma) {
     if(x <= 0.) {
       return 0.;
     }
-    return .5 * (1 + NormalDistribution.erf((FastMath.log(x) - mu) / (MathUtil.SQRT2 * sigma)));
+    return .5 * (1 + NormalDistribution.erf((FastMath.log(x) - logmu) / (MathUtil.SQRT2 * logsigma)));
   }
 
   /**
    * Inverse cumulative probability density function (probit) of a normal
    * distribution.
+   * <p>
+   * \[
+   * \exp\left(\log (\mu)+\sqrt{2}\log (\sigma) \text{erf}^{-1}(2x-1)\right)
+   * \]
    * 
    * @param x value to evaluate probit function at
-   * @param mu Mean value
-   * @param sigma Standard deviation.
-   * @return The probit of the given normal distribution at x.
+   * @param logmu log mean value
+   * @param logsigma log standard deviation
+   * @return The probit of the given log normal distribution at x
    */
-  public static double quantile(double x, double mu, double sigma) {
-    return FastMath.exp(mu + sigma * NormalDistribution.standardNormalQuantile(x));
+  public static double quantile(double x, double logmu, double logsigma) {
+    return FastMath.exp(logmu + logsigma * NormalDistribution.standardNormalQuantile(x));
   }
 
   @Override

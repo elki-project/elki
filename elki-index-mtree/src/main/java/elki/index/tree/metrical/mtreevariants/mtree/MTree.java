@@ -90,7 +90,7 @@ public abstract class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry
 
   /**
    * @return a new MTreeDirectoryEntry by calling
-   *         <code>new MTreeDirectoryEntry<D>(null, null, 0, null)</code>
+   *         {@code new MTreeDirectoryEntry<D>(null, null, 0, null)}
    */
   @Override
   protected MTreeEntry createRootEntry() {

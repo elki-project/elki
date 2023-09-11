@@ -124,7 +124,8 @@ public interface DistanceBasedIntrinsicDimensionalityEstimator extends Intrinsic
    * @param data Data array
    * @param adapter Adapter class
    * @param end Length
-   * @return Number of leading zero distances.
+   * @param <A> Array type
+   * @return Number of leading zero distances
    */
   static <A> int countLeadingZeros(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
     for(int begin = 0; begin < end; ++begin) {

@@ -735,7 +735,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> im
     /**
      * Build a standard k-means result, with known cluster variance sums.
      * <p>
-     * Note: this expects the <tt>varsum</tt> field to be correct!
+     * Note: this expects the <code>varsum</code> field to be correct!
      *
      * @return Clustering result
      */

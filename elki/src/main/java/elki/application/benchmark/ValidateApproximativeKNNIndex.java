@@ -104,7 +104,7 @@ public class ValidateApproximativeKNNIndex<O> extends AbstractDistanceBasedAppli
    * @param sampling Sampling rate
    * @param random Random factory
    * @param forcelinear Force the use of linear scanning.
-   * @param pattern
+   * @param pattern Filter pattern for query points
    */
   public ValidateApproximativeKNNIndex(InputStep input, Distance<? super O> distance, int k, DatabaseConnection queries, double sampling, boolean forcelinear, RandomFactory random, Pattern pattern) {
     super(input, distance);

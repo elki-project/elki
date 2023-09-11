@@ -48,6 +48,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
    * Constructor.
    * 
    * @param pageSize Page size
+   * @param fileName File name
    */
   public PersistentPageFileFactory(int pageSize, Path fileName) {
     super(pageSize);

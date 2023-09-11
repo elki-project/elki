@@ -1049,7 +1049,7 @@ public final class BitsUtil {
   }
 
   /**
-   * Convert the bitset into a decimal representation, e.g., <tt>0, 3, 5</tt>
+   * Convert the bitset into a decimal representation, e.g., <code>0, 3, 5</code>
    *
    * @param v Value
    * @param sep Value separator

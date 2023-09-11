@@ -1,6 +1,6 @@
 /**
  * Distance functions for use within ELKI.
- * <p>
+ *
  * <h1>Distance functions</h1>
  * <p>There are three basic types of distance functions:
  * <ul>
@@ -9,7 +9,7 @@
  * <li>{@link elki.distance.IndexBasedDistance Index-Based Distance Function}s, that require an indexing/preprocessing step, and are then valid for existing database objects.</li>
  * </ul>
  * These types differ significantly in both implementation and use.
- * <p>
+ *
  * <h1>Using distance functions</h1>
  * <p>
  * As a 'consumer' of distances, you usually do not care about the type of distance function you
@@ -22,7 +22,7 @@
  * Note: instantiating a preprocessor based distance will <em>invoke</em> the preprocessing step.
  * It is recommended to do this as soon as possible, and only instantiate the query <em>once</em>,
  * then pass the query object through the various methods.
- * <p>
+ *
  * <h2>Code example</h2>
  * {@code
  * DistanceQuery<V> distanceQuery = database.getDistanceQuery(EuclideanDistance.STATIC);

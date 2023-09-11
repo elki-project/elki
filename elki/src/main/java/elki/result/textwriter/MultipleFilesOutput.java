@@ -84,7 +84,7 @@ public class MultipleFilesOutput implements StreamFactory {
    * 
    * @param name file name (which will be appended to the base name)
    * @return stream object for the given name
-   * @throws IOException
+   * @throws IOException on IO errors
    */
   private PrintStream newStream(String name) throws IOException {
     if(LOG.isDebuggingFiner()) {

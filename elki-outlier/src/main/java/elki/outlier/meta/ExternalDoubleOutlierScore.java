@@ -63,7 +63,7 @@ import elki.utilities.scaling.outlier.OutlierScaling;
 /**
  * External outlier detection scores, loading outlier scores from an external
  * file. This class is meant to be able to read the default output of ELKI, i.e.
- * one object per line, with the DBID specified as <tt>ID=</tt> and the outlier
+ * one object per line, with the DBID specified as <code>ID=</code> and the outlier
  * score specified with an algorithm-specific prefix.
  *
  * @author Erich Schubert

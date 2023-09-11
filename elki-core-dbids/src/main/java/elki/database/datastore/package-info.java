@@ -1,9 +1,8 @@
 /**
  * General data store layer <em>API</em> (along the lines of
  * {@code Map<DBID, T>} - use everywhere!) for ELKI.
- * <p>
+ *
  * <h2>When to use:</h2>
- * <p>
  * Every time you need to associate a larger number of objects (in form of
  * {@link elki.database.ids.DBID DBID}s) with any kind of value.
  * This can be temporary values such as KNN lists, but also result values such
@@ -11,7 +10,7 @@
  * <p>
  * Basically, {@code DataStore<T> == Map<DBID, T>}. But this API will allow
  * extensions that can do on-disk maps.
- * <p>
+ *
  * <h2>How to use:</h2>
  * {@code
  * // Storage for the outlier score of each ID. 

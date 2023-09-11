@@ -56,13 +56,18 @@ public class EvaluationStep implements WorkflowStep {
   /**
    * Constructor.
    *
-   * @param evaluators
+   * @param evaluators Evaluators to run
    */
   public EvaluationStep(List<? extends Evaluator> evaluators) {
     super();
     this.evaluators = evaluators;
   }
 
+  /**
+   * Run the evaluators on a database.
+   * 
+   * @param db Database to run on
+   */
   public void runEvaluators(Database db) {
     // Currently only serves indication purposes.
     stepresult = new Object();

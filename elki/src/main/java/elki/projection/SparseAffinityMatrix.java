@@ -48,6 +48,13 @@ public class SparseAffinityMatrix implements AffinityMatrix {
    */
   ArrayDBIDs ids;
 
+  /**
+   * Constructor.
+   * 
+   * @param pij Affinity matrix values in sparse row format
+   * @param indices Indices in sparse row format
+   * @param ids Objects indexed
+   */
   public SparseAffinityMatrix(double[][] pij, int[][] indices, ArrayDBIDs ids) {
     this.pij = pij;
     this.indices = indices;

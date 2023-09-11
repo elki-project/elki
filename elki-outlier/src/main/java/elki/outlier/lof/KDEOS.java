@@ -68,15 +68,15 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * This is an outlier detection inspired by LOF, but using kernel density
  * estimation (KDE) from statistics. Unfortunately, for higher dimensional data,
  * kernel density estimation itself becomes difficult. At this point, the
- * <tt>kdeos.idim</tt> parameter can become useful, which allows to either
- * disable dimensionality adjustment completely (<tt>0</tt>) or to set it to a
+ * <code>kdeos.idim</code> parameter can become useful, which allows to either
+ * disable dimensionality adjustment completely (<code>0</code>) or to set it to a
  * lower dimensionality than the data representation. This may sound like a hack
  * at first, but real data is often of lower intrinsic dimensionality, and
  * embedded into a higher data representation. Adjusting the kernel to account
  * for the representation seems to yield worse results than using a lower,
  * intrinsic, dimensionality.
  * <p>
- * If your data set has many duplicates, the <tt>kdeos.kernel.minbw</tt>
+ * If your data set has many duplicates, the <code>kdeos.kernel.minbw</code>
  * parameter sets a minimum kernel bandwidth, which may improve results in these
  * cases, as it prevents kernels from degenerating to single points.
  * <p>

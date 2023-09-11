@@ -156,7 +156,7 @@ public class ApproximationLine implements Externalizable {
   }
 
   /**
-   * Returns true</code> if this object is the same as the o argument;
+   * Returns <code>true</code> if this object is the same as the o argument;
    * <code>false</code> otherwise.
    * 
    * @param o the reference object with which to compare.
