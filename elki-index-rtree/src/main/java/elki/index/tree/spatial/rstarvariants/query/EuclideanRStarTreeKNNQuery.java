@@ -96,6 +96,16 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
     return knnList.toKNNListSqrt();
   }
 
+  /**
+   * Expand a node.
+   * 
+   * @param object Query object
+   * @param knnList KNN heap
+   * @param pq Priority queue
+   * @param maxDist Maximum distance
+   * @param nodeID Current node id
+   * @return Current maximum distance
+   */
   private double expandNode(O object, KNNHeap knnList, DoubleIntegerMinHeap pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node

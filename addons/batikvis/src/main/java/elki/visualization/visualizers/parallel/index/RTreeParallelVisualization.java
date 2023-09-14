@@ -139,7 +139,7 @@ public class RTreeParallelVisualization implements VisFactory {
       super.fullRedraw();
       addCSSClasses(svgp);
       E root = tree.getRootEntry();
-      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
+      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
     }
 
     /**
@@ -186,7 +186,7 @@ public class RTreeParallelVisualization implements VisFactory {
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E, ?> rtree, E entry, int depth, int step) {
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E, ?> rtree, E entry, int depth) {
       final int dim = proj.getVisibleDimensions();
       double[] min = proj.fastProjectDataToRenderSpace(SpatialUtil.getMin(entry));
       double[] max = proj.fastProjectDataToRenderSpace(SpatialUtil.getMax(entry));
@@ -207,7 +207,7 @@ public class RTreeParallelVisualization implements VisFactory {
         for(int i = 0; i < node.getNumEntries(); i++) {
           E child = node.getEntry(i);
           if(!(child instanceof LeafEntry)) {
-            visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1, ++step);
+            visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
           }
         }
       }
@@ -221,6 +221,7 @@ public class RTreeParallelVisualization implements VisFactory {
    * @author Erich Schubert
    */
   public static class Par implements Parameterizer {
+    /** Fill areas */
     protected boolean fill = true;
 
     @Override

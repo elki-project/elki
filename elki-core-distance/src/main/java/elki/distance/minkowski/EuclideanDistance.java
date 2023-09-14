@@ -53,6 +53,15 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     super(2);
   }
 
+  /**
+   * Incomplete squared distance for index start to end only.
+   * 
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @param start Start index
+   * @param end End index
+   * @return Sum of squares
+   */
   private double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
@@ -62,6 +71,15 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     return agg;
   }
 
+  /**
+   * Incomplete squared distance for index start to end only.
+   * 
+   * @param v First vector
+   * @param mbr Bounding box
+   * @param start Start index
+   * @param end End index
+   * @return Sum of squares
+   */
   private double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
@@ -75,6 +93,15 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     return agg;
   }
 
+  /**
+   * Incomplete squared distance for index start to end only.
+   * 
+   * @param mbr1 First bounding box
+   * @param mbr2 Second bounding box
+   * @param start Start index
+   * @param end End index
+   * @return Sum of squares
+   */
   private double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
@@ -87,6 +114,14 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     return agg;
   }
 
+  /**
+   * Incomplete squared norm for index start to end only.
+   * 
+   * @param v Vector
+   * @param start Start index
+   * @param end End index
+   * @return Sum of squares
+   */
   private double preNorm(NumberVector v, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
@@ -96,6 +131,14 @@ public class EuclideanDistance extends LPIntegerNormDistance {
     return agg;
   }
 
+  /**
+   * Incomplete squared norm for index start to end only.
+   * 
+   * @param mbr Bounding box
+   * @param start Start index
+   * @param end End index
+   * @return Sum of squares
+   */
   private double preNormMBR(SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
@@ -154,6 +197,7 @@ public class EuclideanDistance extends LPIntegerNormDistance {
    *
    * @param mbr1 First object
    * @param mbr2 Second object
+   * @return Maximum distance
    */
   public double maxDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();

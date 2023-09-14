@@ -51,11 +51,7 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
 
   @Override
   public FlatRStarTreeIndex<O> instantiate(Relation<O> relation) {
-    return new FlatRStarTreeIndex<>(relation, makePageFile(getNodeClass()), settings);
-  }
-
-  protected Class<FlatRStarTreeNode> getNodeClass() {
-    return FlatRStarTreeNode.class;
+    return new FlatRStarTreeIndex<>(relation, makePageFile(FlatRStarTreeNode.class), settings);
   }
 
   /**

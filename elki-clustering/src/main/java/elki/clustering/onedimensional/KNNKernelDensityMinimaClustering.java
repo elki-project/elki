@@ -67,8 +67,10 @@ public class KNNKernelDensityMinimaClustering implements ClusteringAlgorithm<Clu
    * Estimation mode.
    */
   public enum Mode {
-    BALLOON, // Balloon estimator
-    SAMPLE, // Sample-point estimator
+    /** Balloon estimator */
+    BALLOON,
+    /** Sample-point estimator */
+    SAMPLE,
   }
 
   /**

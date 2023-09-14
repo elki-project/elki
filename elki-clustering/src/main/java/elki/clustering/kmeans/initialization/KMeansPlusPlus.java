@@ -292,11 +292,24 @@ public class KMeansPlusPlus<O> extends AbstractKMeansInitialization implements K
      */
     DistanceQuery<?> distQ;
 
+    /**
+     * Constructor.
+     * 
+     * @param ids Object IDs
+     * @param distQ Distance query
+     * @param rnd Random factory
+     */
     public MedoidsInstance(DBIDs ids, DistanceQuery<?> distQ, RandomFactory rnd) {
       super(ids, rnd);
       this.distQ = distQ;
     }
 
+    /**
+     * Run initialization for k-medoids.
+     * 
+     * @param k Number of clusters to choose
+     * @return Initial medoids
+     */
     public DBIDs run(int k) {
       ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
       // Choose the first object

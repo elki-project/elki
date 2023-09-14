@@ -181,6 +181,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   private static class InternalParsedURLData extends ParsedURLData {
     /**
      * Constructor.
+     * 
+     * @param id ID string
      */
     public InternalParsedURLData(String id) {
       super();

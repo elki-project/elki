@@ -217,6 +217,7 @@ public class EvaluationResult implements TextWriteable, Iterable<EvaluationResul
      * @param name Measurement name
      * @param val Observed value
      * @param min Minimum value
+     * @param max Maximum value
      * @param exp Expected value
      * @param lowerisbetter Flag
      * @return {@code this} (Builder pattern)

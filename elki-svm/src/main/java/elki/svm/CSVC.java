@@ -33,10 +33,22 @@ import elki.svm.solver.Solver;
  * Regularized SVM based classification (C-SVC, C-SVM).
  */
 public class CSVC extends AbstractSVC {
+  /** Class logger */
   private static final Logging LOG = Logging.getLogger(CSVC.class);
 
-  double Cp = 1., Cn = 1.;
+  /** Weight of positives */
+  double Cp = 1.;
 
+  /** Weight of negatives */
+  double Cn = 1.;
+
+  /**
+   * Constructor.
+   * 
+   * @param eps Tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   */
   public CSVC(double eps, boolean shrinking, double cache_size) {
     super(eps, shrinking, cache_size);
   }

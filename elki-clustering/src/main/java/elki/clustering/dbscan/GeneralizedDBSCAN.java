@@ -269,6 +269,7 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
     /**
      * Set-based expand cluster implementation.
      *
+     * @param seed Seed point
      * @param clusterid ID of the current cluster.
      * @param clusterids Current object to cluster mapping.
      * @param neighbors Neighbors acquired by initial getNeighbors call.

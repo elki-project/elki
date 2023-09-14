@@ -31,11 +31,15 @@ package elki.logging.statistics;
 public interface Duration extends Statistic {
   /**
    * Start the timer.
+   * 
+   * @return {@code this} for call chaining
    */
   Duration begin();
 
   /**
    * Finish the timer.
+   * 
+   * @return {@code this} for call chaining
    */
   Duration end();
 

@@ -104,6 +104,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param y position
    * @param style marker style (enumerated)
    * @param size size
+   * @param intensity intensity
    * @return container element
    */
   public Element plotMarker(SVGPlot plot, double x, double y, int style, double size, double intensity) {
@@ -264,6 +265,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param y Y position
    * @param size Size
    * @param color Color string
+   * @return SVG element
    */
   protected Element plotSimple(SVGPlot plot, double x, double y, double size, String color) {
     Element marker = plot.svgCircle(x, y, size * .5);

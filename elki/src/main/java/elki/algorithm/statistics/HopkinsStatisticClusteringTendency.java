@@ -210,6 +210,7 @@ public class HopkinsStatisticClusteringTendency implements Algorithm {
    *
    * @param knnQuery KNN query
    * @param relation Data relation
+   * @param dim Dimensionality
    * @return Aggregated 1NN distances
    */
   protected double computeNNForRealData(final KNNSearcher<DBIDRef> knnQuery, Relation<NumberVector> relation, final int dim) {

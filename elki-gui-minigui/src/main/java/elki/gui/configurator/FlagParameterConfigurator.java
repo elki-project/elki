@@ -39,8 +39,17 @@ import elki.utilities.optionhandling.parameters.Flag;
  * @assoc - - - Flag
  */
 public class FlagParameterConfigurator extends AbstractParameterConfigurator<Flag> implements ActionListener {
+  /**
+   * Swing component.
+   */
   final JCheckBox value;
 
+  /**
+   * Constructor.
+   * 
+   * @param param flag parameter
+   * @param parent parent component
+   */
   public FlagParameterConfigurator(Flag param, JComponent parent) {
     super(param, parent);
 

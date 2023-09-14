@@ -140,6 +140,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O> implements H
    *        representation
    * @param processedIDs the already processed ids
    * @param distQuery Distance query
+   * @param coredists Core distances
    * @param m Data store
    */
   private void step2(DBIDRef id, DBIDs processedIDs, DistanceQuery<? super O> distQuery, DoubleDataStore coredists, WritableDoubleDataStore m) {

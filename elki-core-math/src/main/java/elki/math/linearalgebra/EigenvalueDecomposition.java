@@ -204,6 +204,9 @@ public class EigenvalueDecomposition {
     e[0] = 0.;
   }
 
+  /**
+   * Accumulate transformations.
+   */
   private void tred2AccumulateTransformations() {
     for(int i = 0; i < n - 1; i++) {
       final double[] Vi = V[i];
@@ -272,6 +275,12 @@ public class EigenvalueDecomposition {
     }
   }
 
+  /**
+   * Compute the implicit shift.
+   * 
+   * @param l L offset
+   * @return Shift
+   */
   private double tql2ComputeImplicitShift(int l) {
     final double el = e[l], g = d[l], p = (d[l + 1] - g) / (2. * el);
     final double r = Math.sqrt(p * p + 1.);
@@ -285,6 +294,12 @@ public class EigenvalueDecomposition {
     return h;
   }
 
+  /**
+   * Implicit QL transformation
+   * @param l L offset
+   * @param m M
+   * @param dl1 Divisor
+   */
   private void tql2ImplicitQL(int l, int m, double dl1) {
     double p = d[m], c = 1., c2 = 1., c3 = 1., s = 0., s2 = 0.;
     final double el1 = e[l + 1];
@@ -313,6 +328,9 @@ public class EigenvalueDecomposition {
     d[l] = c * p;
   }
 
+  /**
+   * Sort eigenvalues
+   */
   private void sortEigen() {
     for(int i = 0; i < n - 1; i++) {
       // Find maximum:
@@ -430,7 +448,16 @@ public class EigenvalueDecomposition {
     }
   }
 
-  /** Complex scalar division, writing into buf[off++] */
+  /**
+   * Complex scalar division, writing into buf[off++]
+   * 
+   * @param xr real part of numerator
+   * @param xi imaginary part of numerator
+   * @param yr real part of denominator
+   * @param yi imaginary part of denominator
+   * @param buf buffer to write result into
+   * @param off offset into buffer
+   */
   private static void cdiv(double xr, double xi, double yr, double yi, double[] buf, int off) {
     if(abs(yr) > abs(yi)) {
       final double r = yi / yr, d = yr + r * yi;
@@ -684,12 +711,32 @@ public class EigenvalueDecomposition {
     hqr2BackTransformation(nn, low, high);
   }
 
+  /**
+   * Modify using Q and P
+   * 
+   * @param Hi H_i
+   * @param n N
+   * @param p P
+   * @param q Q
+   */
   private static void modifyQP(final double[] Hi, int n, double p, double q) {
     double tmp = Hi[n - 1];
     Hi[n - 1] = q * tmp + p * Hi[n];
     Hi[n] = q * Hi[n] - p * tmp;
   }
 
+  /**
+   * Modify the QR
+   * 
+   * @param Hi H_i
+   * @param k k
+   * @param notlast Not the last step
+   * @param q Q
+   * @param r R
+   * @param x X
+   * @param y Y
+   * @param z Z
+   */
   private static void modifyQR(final double[] Hi, int k, boolean notlast, double q, double r, double x, double y, double z) {
     double tmp = x * Hi[k] + y * Hi[k + 1];
     if(notlast) {
@@ -700,7 +747,13 @@ public class EigenvalueDecomposition {
     Hi[k + 1] -= tmp * q;
   }
 
-  // Real vector
+  /**
+   * Householder QR backsubstitution for real vectors.
+   * 
+   * @param n N
+   * @param p p
+   * @param norm Norm
+   */
   private void hqr2BacksubstituteReal(int n, double p, double norm) {
     H[n][n] = 1.0;
     double s = 0, z = 0;
@@ -737,7 +790,14 @@ public class EigenvalueDecomposition {
     }
   }
 
-  // Complex vector
+  /**
+   * Householder QR backsubstitution for complex vectors
+   * 
+   * @param n Number of points
+   * @param p P
+   * @param q Q
+   * @param norm Norm
+   */
   private void hqr2BacksubstituteComplex(int n, double p, double q, double norm) {
     final double[] Hn = H[n], Hnm1 = H[n - 1];
     // Last vector component imaginary so matrix is triangular
@@ -803,6 +863,10 @@ public class EigenvalueDecomposition {
 
   /**
    * Back transformation to get eigenvectors of original matrix.
+   * 
+   * @param nn Last N
+   * @param low Low index of range
+   * @param high High index of range
    */
   private void hqr2BackTransformation(int nn, int low, int high) {
     for(int j = nn - 1; j >= low; j--) {

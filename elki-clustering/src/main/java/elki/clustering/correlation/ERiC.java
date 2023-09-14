@@ -125,6 +125,7 @@ public class ERiC implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * Performs the ERiC algorithm on the given database.
    * 
+   * @param database Datebase to process
    * @param relation Relation to process
    * @return Clustering result
    */
@@ -273,6 +274,13 @@ public class ERiC implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
     return clusterMap;
   }
 
+  /**
+   * Build the cluster hierarchy
+   * 
+   * @param clustering Clustering output
+   * @param clusterMap Cluster map
+   * @param npred Neighbor predicate
+   */
   private void buildHierarchy(Clustering<CorrelationModel> clustering, List<List<Cluster<CorrelationModel>>> clusterMap, ERiCNeighborPredicate.Instance npred) {
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
     Hierarchy<Cluster<CorrelationModel>> hier = clustering.getClusterHierarchy();

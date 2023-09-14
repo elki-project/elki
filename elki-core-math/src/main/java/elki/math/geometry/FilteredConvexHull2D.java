@@ -102,6 +102,12 @@ public class FilteredConvexHull2D {
     return inner.getHull();
   }
 
+  /**
+   * Check a candidate point
+   * 
+   * @param point Point
+   * @return {@code true} if outside the box.
+   */
   private boolean checkCandidate(double[] point) {
     double v = point[0];
     return v <= leftx || v >= rightx || (v = point[1]) <= bottomy || v >= topy;

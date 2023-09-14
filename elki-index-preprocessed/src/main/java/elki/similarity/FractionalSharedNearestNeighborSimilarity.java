@@ -78,6 +78,7 @@ public class FractionalSharedNearestNeighborSimilarity<O> extends AbstractIndexB
      *
      * @param database Database
      * @param preprocessor Preprocessor
+     * @param similarityFunction Similarity function
      */
     public Instance(Relation<T> database, SharedNearestNeighborIndex<T> preprocessor, FractionalSharedNearestNeighborSimilarity<? super T> similarityFunction) {
       super(database, preprocessor);

@@ -62,7 +62,7 @@ public class OPTICSHeapEntry implements Comparable<OPTICSHeapEntry> {
    * Indicates whether some other object is "equal to" this one.
    * <p>
    * NOTE: for the use in an UpdatableHeap, only the ID is compared!
-   * <p>
+   *
    * @param o the reference object with which to compare.
    * @return <code>true</code> if this object has the same attribute values as
    *         the o argument; <code>false</code> otherwise.

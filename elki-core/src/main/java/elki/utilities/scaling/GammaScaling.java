@@ -81,6 +81,9 @@ public class GammaScaling implements StaticScalingFunction {
      */
     public static final OptionID GAMMA_ID = new OptionID("scaling.gamma", "Gamma value for scaling.");
 
+    /**
+     * Gamma value.
+     */
     double gamma = 1.0;
 
     @Override

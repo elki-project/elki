@@ -43,8 +43,17 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
  * @assoc - - - EnumParameter
  */
 public class EnumParameterConfigurator extends AbstractSingleParameterConfigurator<EnumParameter<?>> implements ActionListener {
+  /**
+   * Swing combo box
+   */
   final JComboBox<String> value;
 
+  /**
+   * Constructor.
+   * 
+   * @param cp Parameter
+   * @param parent Parent component
+   */
   public EnumParameterConfigurator(EnumParameter<?> cp, JComponent parent) {
     super(cp, parent);
     GridBagConstraints constraints = new GridBagConstraints();

@@ -103,9 +103,9 @@ public class IsolationForest implements OutlierAlgorithm {
   /**
    * Constructor.
    *
-   * @param numTrees
-   * @param subsampleSize
-   * @param rnd
+   * @param numTrees Number of trees
+   * @param subsampleSize Subsampling size
+   * @param rnd Random generator
    */
   public IsolationForest(int numTrees, int subsampleSize, RandomFactory rnd) {
     this.numTrees = numTrees;

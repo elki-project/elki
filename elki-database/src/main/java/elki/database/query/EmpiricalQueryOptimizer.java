@@ -312,6 +312,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return idx.priorityByDBID(distanceQuery, maxrange, flags);
   }
 
+  /**
+   * Make a matrix index (precomputed distances).
+   * 
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distance Distance function
+   * @return Distance matrix index
+   */
   private <O> DistancePriorityIndex<O> makeMatrixIndex(Relation<? extends O> relation, Distance<? super O> distance) {
     // TODO: make sure there is not matrix already!
     if(matrixIndex == null || relation.size() > 65536) {
@@ -342,6 +350,15 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     }
   }
 
+  /**
+   * Make a cover tree index.
+   * 
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distance Distance function
+   * @param leafsize Leaf size
+   * @return Cover tree index
+   */
   private <O> DistancePriorityIndex<O> makeCoverTree(Relation<? extends O> relation, Distance<? super O> distance, int leafsize) {
     // TODO: make sure there is no such cover tree already!
     if(coverIndex == null || !distance.isMetric()) {
@@ -362,6 +379,15 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
+  /**
+   * Make a Vantage-Point index.
+   * 
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distance Distance function
+   * @param leafsize Leaf size
+   * @return VP-Tree index
+   */
   private <O> DistancePriorityIndex<O> makeVPTree(Relation<? extends O> relation, Distance<? super O> distance, int leafsize) {
     // TODO: make sure there is no such VP tree already!
     if(vpIndex == null || !distance.isMetric()) {
@@ -382,6 +408,14 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     return null;
   }
 
+  /**
+   * Make a k-d-tree index.
+   * 
+   * @param <O> Object type
+   * @param relation Data relation
+   * @param distance Distance function
+   * @param k Leaf size
+   */
   private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance, int k) {
     // TODO: make sure there is no such k-d-tree already!
     TypeInformation type = relation.getDataTypeInformation();

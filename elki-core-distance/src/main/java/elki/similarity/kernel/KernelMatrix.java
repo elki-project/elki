@@ -52,7 +52,7 @@ public class KernelMatrix {
 
   /**
    * Map a DBID to its offset
-   * 
+   * <p>
    * TODO: move to shared code.
    * 
    * @author Erich Schubert
@@ -82,8 +82,16 @@ public class KernelMatrix {
    * @hidden
    */
   private static class RangeMap implements DBIDMap {
+    /**
+     * Range of DBIDs in the matrix
+     */
     DBIDRange range;
 
+    /**
+     * Constructor.
+     * 
+     * @param range Range of DBIDs in the matrix
+     */
     public RangeMap(DBIDRange range) {
       super();
       this.range = range;
@@ -107,8 +115,16 @@ public class KernelMatrix {
    * @hidden
    */
   private static class SortedArrayMap implements DBIDMap {
+    /**
+     * DBIDs in the matrix
+     */
     ArrayModifiableDBIDs ids;
 
+    /**
+     * Constructor.
+     * 
+     * @param ids DBIDs in the matrix
+     */
     public SortedArrayMap(DBIDs ids) {
       super();
       this.ids = DBIDUtil.newArray(ids);
@@ -129,6 +145,7 @@ public class KernelMatrix {
   /**
    * Provides a new kernel matrix.
    * 
+   * @param <O> object type
    * @param kernelFunction the kernel function used to compute the kernel matrix
    * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed
@@ -156,6 +173,7 @@ public class KernelMatrix {
   /**
    * Provides a new kernel matrix.
    * 
+   * @param <O> object type
    * @param kernelFunction the kernel function used to compute the kernel matrix
    * @param relation the database that holds the objects
    * @param ids the IDs of those objects for which the kernel matrix is computed

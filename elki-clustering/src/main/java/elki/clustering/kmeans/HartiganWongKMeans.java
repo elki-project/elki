@@ -295,6 +295,8 @@ public class HartiganWongKMeans<V extends NumberVector> extends AbstractKMeans<V
      * see if it should be reallocated to the cluster which it is most likely to
      * be transferred to IC2(I) from its present cluster IC1(I).
      * Loop through the data until no further change is to take place.
+     * 
+     * @return Number of reassigned objects
      */
     private int quickTransfer() {
       // ITRAN(L) is set to zero before entering QTRAN

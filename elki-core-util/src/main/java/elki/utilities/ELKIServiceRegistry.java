@@ -300,7 +300,8 @@ public class ELKIServiceRegistry {
    * relative class name or alias name.
    *
    * @param restrictionClass Restriction class
-   * @param value Class name, relative class name, or nickname.
+   * @param value Class name, relative class name, or nickname
+   * @param <C> Restriction class
    * @return Class found or {@code null}
    */
   @SuppressWarnings("unchecked")

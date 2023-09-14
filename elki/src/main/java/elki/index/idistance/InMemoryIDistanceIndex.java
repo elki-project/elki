@@ -216,6 +216,7 @@ public class InMemoryIDistanceIndex<O> extends AbstractRefiningIndex<O> implemen
    * @param distanceQuery Distance query
    * @param obj Query object
    * @param referencepoints Iterator for reference points
+   * @param <O> object type
    * @return Sorted array.
    */
   protected static <O> DoubleIntPair[] rankReferencePoints(DistanceQuery<O> distanceQuery, O obj, ArrayDBIDs referencepoints) {

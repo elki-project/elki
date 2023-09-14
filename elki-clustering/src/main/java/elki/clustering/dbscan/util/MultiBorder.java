@@ -48,7 +48,8 @@ public class MultiBorder implements Assignment {
   /**
    * Add a new border to the existing borders.
    *
-   * @param border New border.
+   * @param border New border
+   * @return Cluster assignment
    */
   public Assignment update(Border border) {
     Arrays.sort(cs);

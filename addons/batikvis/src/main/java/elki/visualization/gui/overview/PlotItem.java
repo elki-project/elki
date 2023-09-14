@@ -174,14 +174,19 @@ public class PlotItem {
    * @author Erich Schubert
    */
   private static class ItmItr implements Iterator<PlotItem> {
+    /** Next item to return */
     PlotItem next;
 
+    /** Current iterator */
     Iterator<PlotItem> cur;
 
+    /** Subitem iterator */
     Iterator<PlotItem> sub;
 
     /**
      * Constructor.
+     * 
+     * @param start Start item
      */
     public ItmItr(PlotItem start) {
       super();

@@ -27,12 +27,28 @@ import elki.svm.model.ProbabilisticRegressionModel;
 import elki.svm.model.RegressionModel;
 import elki.svm.solver.Solver.SolutionInfo;
 
+/**
+ * Abstract Support Vector Regression Machine
+ */
 public abstract class AbstractSVR extends AbstractSingleSVM {
+  /**
+   * Constructor.
+   * 
+   * @param eps Epsilon tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   */
   public AbstractSVR(double eps, boolean shrinking, double cache_size) {
     super(eps, shrinking, cache_size);
   }
 
-  // Perform cross-validation.
+  /**
+   * Perform cross-validation.
+   * 
+   * @param x Data set
+   * @param nr_fold Number of folds
+   * @param target Predicted values
+   */
   public void cross_validation(DataSet x, int nr_fold, double[] target) {
     final int l = x.size();
     int[] perm = shuffledIndex(new int[l], l);
@@ -56,6 +72,13 @@ public abstract class AbstractSVR extends AbstractSingleSVM {
     }
   }
 
+  /**
+   * SVR probability of a data set.
+   * 
+   * @param x Data set
+   * @param probA Probability output
+   * @return Average probability
+   */
   private double svr_probability(DataSet x, double[] probA) {
     final int l = x.size();
     int nr_fold = 5;
@@ -83,8 +106,15 @@ public abstract class AbstractSVR extends AbstractSingleSVM {
     return mae;
   }
 
+  /** Use probabilities */
   boolean probability = false;
 
+  /**
+   * Train on a data set.
+   * 
+   * @param x Data set
+   * @return Regression model
+   */
   public RegressionModel train(DataSet x) {
     SolutionInfo si = train_one(x);
     RegressionModel model;

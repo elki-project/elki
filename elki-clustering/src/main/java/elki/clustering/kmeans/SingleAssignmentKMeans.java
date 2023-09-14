@@ -73,6 +73,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance funcction
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

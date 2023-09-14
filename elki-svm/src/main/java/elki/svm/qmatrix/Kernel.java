@@ -23,12 +23,25 @@ package elki.svm.qmatrix;
 import elki.svm.data.DataSet;
 import elki.utilities.datastructures.arrays.ArrayUtil;
 
+/**
+ * Kernel wrapper around a data set.
+ */
 public class Kernel implements QMatrix {
+  /**
+   * Data set
+   */
   protected final DataSet x;
 
-  // Diagonal values <x,x>
+  /**
+   * Diagonal values &lt;x,x&gt;
+   */
   private final double[] QD;
 
+  /**
+   * Constructor.
+   * 
+   * @param x Data set
+   */
   public Kernel(DataSet x) {
     super();
     this.x = x;

@@ -140,6 +140,7 @@ public class FastOPTICS<V extends NumberVector> implements OPTICSTypeAlgorithm {
    * Run the algorithm.
    *
    * @param relation Relation
+   * @return Cluster order (use OPTICSXi to extract clusters)
    */
   public ClusterOrder run(Relation<V> relation) {
     DBIDs ids = relation.getDBIDs();

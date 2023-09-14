@@ -136,6 +136,11 @@ public class Segments implements Iterable<Segment> {
     }
   }
 
+  /**
+   * Recursively fill partitions
+   * 
+   * @param cs Clusterings
+   */
   private void recursivelyFill(List<List<? extends Cluster<?>>> cs) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(0).iterator();
@@ -156,6 +161,16 @@ public class Segments implements Iterable<Segment> {
     }
   }
 
+  /**
+   * Recursively fill partitions
+   * 
+   * @param cs Clusterings
+   * @param depth Current depth
+   * @param first First set of IDs
+   * @param second Second set of IDs
+   * @param path Current path
+   * @param objectsegment Object segment, or virtual
+   */
   private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path, boolean objectsegment) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(depth).iterator();
@@ -230,6 +245,13 @@ public class Segments implements Iterable<Segment> {
     }
   }
 
+  /**
+   * Make a new segment or update an existing segment.
+   * 
+   * @param path Partition path
+   * @param ids Object IDs
+   * @param pairsize Number of pairs
+   */
   private void makeOrUpdateSegment(int[] path, DBIDs ids, int pairsize) {
     Segment seg = segments.get(new Segment(path));
     if(seg == null) {
@@ -268,7 +290,7 @@ public class Segments implements Iterable<Segment> {
    * describes a cluster 3 in clustering 1 (index 0) and all clusters 3-x in
    * clustering 2. So we search for all segments 3-x (0 being a wildcard).
    * 
-   * @param unpairedSegment
+   * @param unpairedSegment Unpaired segment
    * @return Segments describing the set of objects that result in an unpaired
    *         segment
    */

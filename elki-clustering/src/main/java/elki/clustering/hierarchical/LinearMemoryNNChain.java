@@ -113,6 +113,14 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
       this.linkage = linkage;
     }
 
+    /**
+     * Run the clustering algorithm.
+     * 
+     * @param ids Object IDs to process
+     * @param relation Data relation
+     * @param builder Cluster hierarchy builder
+     * @return Cluster hierarchy
+     */
     public ClusterMergeHistory run(ArrayDBIDs ids, Relation<O> relation, ClusterMergeHistoryBuilder builder) {
       DBIDArrayIter it = ids.iter();
       final int size = relation.size();
@@ -138,6 +146,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
      * @param aIt Iterator to access relation objects
      * @param aIt2 Iterator to access relation objects
      * @param builder Result builder
+     * @param rel Relation to process
      */
     protected void nnChainCore(double[][] clusters, int[] clustermap, ClusterMergeHistoryBuilder builder) {
       boolean warnedIrreducible = false;

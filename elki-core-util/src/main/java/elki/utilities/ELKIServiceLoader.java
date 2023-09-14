@@ -66,6 +66,8 @@ public class ELKIServiceLoader {
 
   /**
    * Load the service file.
+   * 
+   * @param parent Parent class
    */
   public static void load(Class<?> parent) {
     load(parent, ELKIServiceLoader.class.getClassLoader());
@@ -73,6 +75,9 @@ public class ELKIServiceLoader {
 
   /**
    * Load the service file.
+   * 
+   * @param parent Parent class
+   * @param cl Class loader
    */
   public static void load(Class<?> parent, ClassLoader cl) {
     char[] buf = new char[0x4000];
@@ -128,6 +133,8 @@ public class ELKIServiceLoader {
    *
    * @param parent Parent class
    * @param line Line to read
+   * @param begin Start offset in buffer
+   * @param end End offset in buffer
    */
   private static void parseLine(Class<?> parent, char[] line, int begin, int end) {
     while(begin < end && line[begin] == ' ') {

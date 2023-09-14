@@ -149,6 +149,7 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
    * Performs the P3C algorithm on the given Database.
    * 
    * @param relation Input data
+   * @return Clustering result
    */
   public Clustering<SubspaceModel> run(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
@@ -624,9 +625,10 @@ public class P3C implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * Creates a hard clustering from the specified soft membership matrix.
    * 
-   * @param probClusterIGivenX the membership matrix.
-   * @param dbids mapping matrix row to DBID.
-   * @return a hard clustering based on the matrix.
+   * @param probClusterIGivenX the membership matrix
+   * @param clusterCores Cluster cores
+   * @param dbids mapping matrix row to DBID
+   * @return a hard clustering based on the matrix
    */
   private ArrayList<ClusterCandidate> hardClustering(WritableDataStore<double[]> probClusterIGivenX, List<Signature> clusterCores, DBIDs dbids) {
     final int k = clusterCores.size();

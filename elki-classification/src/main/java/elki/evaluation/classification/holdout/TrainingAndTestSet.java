@@ -51,6 +51,10 @@ public class TrainingAndTestSet {
   /**
    * Provides a pair of training and test data sets out of the given two
    * databases.
+   * 
+   * @param training the training data set
+   * @param test the test data set
+   * @param labels union of all labels present in training and test
    */
   public TrainingAndTestSet(MultipleObjectsBundle training, MultipleObjectsBundle test, ArrayList<ClassLabel> labels) {
     this.training = training;

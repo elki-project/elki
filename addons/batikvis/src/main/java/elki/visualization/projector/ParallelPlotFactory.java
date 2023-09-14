@@ -70,6 +70,12 @@ public class ParallelPlotFactory implements ProjectorFactory {
     });
   }
 
+  /**
+   * Get the dimensionality of a relation.
+   * 
+   * @param rel Relation
+   * @return Dimensionality
+   */
   private int dimensionality(Relation<?> rel) {
     if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
       @SuppressWarnings("unchecked")

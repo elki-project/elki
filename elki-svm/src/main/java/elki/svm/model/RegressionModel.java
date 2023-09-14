@@ -22,7 +22,18 @@ package elki.svm.model;
 
 import elki.svm.data.DataSet;
 
+/**
+ * Support vector regression model
+ */
 public class RegressionModel extends Model {
+  /**
+   * Predict for a single data point.
+   * 
+   * @param x Data set
+   * @param xi Point offset
+   * @param dec_values Decision values output
+   * @return Prediction score
+   */
   public double predict(DataSet x, int xi, double[] dec_values) {
     double[] sv_coef = this.sv_coef[0];
     double sum = -rho[0];
@@ -30,17 +41,22 @@ public class RegressionModel extends Model {
       sum += sv_coef[i] * x.similarity(xi, sv_indices[i]);
     }
     dec_values[0] = sum;
-    // TODO: OneClass classification thresholds this value at 0.
     return sum;
   }
 
+  /**
+   * Predict for a single data point.
+   * 
+   * @param x Data set
+   * @param xi Point offset
+   * @return Prediction score
+   */
   public double predict(DataSet x, int xi) {
     double[] sv_coef = this.sv_coef[0];
     double sum = -rho[0];
     for(int i = 0; i < l; i++) {
       sum += sv_coef[i] * x.similarity(xi, sv_indices[i]);
     }
-    // TODO: OneClass classification thresholds this value at 0.
     return sum;
   }
 }

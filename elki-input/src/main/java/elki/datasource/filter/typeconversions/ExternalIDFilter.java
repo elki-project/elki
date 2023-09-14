@@ -52,7 +52,7 @@ public class ExternalIDFilter implements ObjectFilter {
   /**
    * Constructor.
    * 
-   * @param externalIdIndex
+   * @param externalIdIndex Index of external ids within labels
    */
   public ExternalIDFilter(int externalIdIndex) {
     super();
@@ -124,6 +124,9 @@ public class ExternalIDFilter implements ObjectFilter {
      */
     public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id. The first label is 0; negative indexes are relative to the end.");
 
+    /**
+     * Index of external ids within label columns.
+     */
     int externalIdIndex = -1;
 
     @Override

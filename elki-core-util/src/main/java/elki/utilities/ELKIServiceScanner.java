@@ -171,16 +171,19 @@ public class ELKIServiceScanner {
    * @author Erich Schubert
    */
   private static class DirClassIterator implements Iterator<String> {
+    /** Class file name extension */
     private static final String CLASS_EXT = ".class";
 
+    /** Factory file name extension */
     private static final String FACTORY_FILE_EXT = FACTORY_POSTFIX + CLASS_EXT;
 
-    private static final int CLASS_EXT_LENGTH = CLASS_EXT.length();
-
+    /** Prefix string */
     private String prefix;
 
+    /** Files */
     private ArrayList<String> files = new ArrayList<>(100);
 
+    /** Folders */
     private ArrayList<File> folders = new ArrayList<>(100);
 
     /**
@@ -223,7 +226,7 @@ public class ELKIServiceScanner {
                 continue;
               }
               final String fullname = new File(path, localname).toString();
-              files.add(fullname.substring(prefix.length(), fullname.length() - CLASS_EXT_LENGTH).replace(File.separatorChar, '.'));
+              files.add(fullname.substring(prefix.length(), fullname.length() - CLASS_EXT.length()).replace(File.separatorChar, '.'));
               continue;
             }
             // Recurse into directories

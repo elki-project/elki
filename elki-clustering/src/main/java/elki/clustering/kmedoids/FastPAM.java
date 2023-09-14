@@ -105,7 +105,7 @@ public class FastPAM<O> extends FastPAM1<O> {
    *
    * @param distance distance function
    * @param k k parameter
-   * @param maxiter Maxiter parameter
+   * @param maxiter Maximum number of iterations
    * @param initializer Function to generate the initial means
    */
   public FastPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer) {
@@ -117,7 +117,7 @@ public class FastPAM<O> extends FastPAM1<O> {
    *
    * @param distance distance function
    * @param k k parameter
-   * @param maxiter Maxiter parameter
+   * @param maxiter Maximum number of iterations
    * @param initializer Function to generate the initial means
    * @param fasttol Tolerance for fast swapping
    */
@@ -165,7 +165,7 @@ public class FastPAM<O> extends FastPAM1<O> {
      * Run the PAM optimization phase.
      *
      * @param medoids Medoids list
-     * @param maxiter
+     * @param maxiter Maximum number of iterations
      * @return final cost
      */
     @Override
@@ -245,6 +245,7 @@ public class FastPAM<O> extends FastPAM1<O> {
      * @param bestids Storage for best non-medois
      * @param best Storage for best cost
      * @param cost Scratch space for cost
+     * @param pcost Prior cost
      */
     protected void findBestSwaps(DBIDArrayIter m, ArrayModifiableDBIDs bestids, double[] best, double[] cost, double[] pcost) {
       updatePriorCost(pcost);

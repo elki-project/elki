@@ -81,12 +81,8 @@ public class VIIFeature implements ClusterFeature {
   }
 
   @Override
-  public void addToStatistics(ClusterFeature other) {
-    addToStatistics((VIIFeature) other);
-  }
-
-  // @Override
-  public void addToStatistics(VIIFeature other) {
+  public void addToStatistics(ClusterFeature o) {
+    VIIFeature other = (VIIFeature) o;
     if(this.n == 0) {
       for(int i = 0; i < mean.length; i++) {
         mean[i] = other.mean[i];

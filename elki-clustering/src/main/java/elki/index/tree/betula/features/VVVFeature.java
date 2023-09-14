@@ -94,13 +94,8 @@ public class VVVFeature implements ClusterFeature {
   }
 
   @Override
-  public void addToStatistics(ClusterFeature other) {
-    addToStatistics((VVVFeature) other);
-
-  }
-
-  // @Override
-  public void addToStatistics(VVVFeature other) {
+  public void addToStatistics(ClusterFeature o) {
+    VVVFeature other = (VVVFeature) o;
     if(this.n == 0) {
       for(int i = 0; i < ssd.length; i++) {
         for(int j = 0; j < ssd.length; j++) {

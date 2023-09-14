@@ -559,6 +559,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     /**
      * Insert an itemset into the tree.
      *
+     * @param tree FP tree
      * @param buf Itemset buffer
      * @param i Current index
      * @param l Length

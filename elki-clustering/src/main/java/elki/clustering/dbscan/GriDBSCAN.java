@@ -149,6 +149,9 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
 
   /**
    * Performs the DBSCAN algorithm on the given database.
+   * 
+   * @param relation Relation to cluster
+   * @return Clustering result
    */
   public Clustering<Model> run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
@@ -275,6 +278,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
      * Performs the DBSCAN algorithm on the given database.
      *
      * @param relation Relation to process
+     * @return Clustering result
      */
     public Clustering<Model> run(Relation<V> relation) {
       final DBIDs ids = relation.getDBIDs();
@@ -326,6 +330,16 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
       return buildResult(ids, clusterid);
     }
 
+    /**
+     * Run DBSCAN on a single cell
+     * 
+     * @param cellids objects in the cell
+     * @param relation data relation
+     * @param neighbors neighbor output (recycled object)
+     * @param activeSet active set of cluster seeds
+     * @param clusterid cluster number
+     * @return next cluster id
+     */
     private int runDBSCANOnCell(DBIDs cellids, Relation<V> relation, ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, int clusterid) {
       temporary.clear(); // Reset to "UNPROCESSED"
       ProxyView<V> rel = new ProxyView<>(cellids, relation);
@@ -499,6 +513,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
     /**
      * Set-based expand cluster implementation.
      *
+     * @param seed Seed object
      * @param clusterid ID of the current cluster.
      * @param clusterids Current object to cluster mapping.
      * @param neighbors Neighbors acquired by initial getNeighbors call.

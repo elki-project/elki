@@ -142,6 +142,8 @@ public class EuclideanRStarTreeDistancePrioritySearcher<O extends SpatialCompara
 
   /**
    * Expand the next node of the priority heap.
+   * 
+   * @return {@code true} if successful
    */
   protected boolean advanceQueue() {
     if(pq.isEmpty()) {

@@ -164,6 +164,7 @@ public class SelectionToolAxisRangeVisualization implements VisFactory {
      * @param x2 max x-value
      * @param y1 min y-value
      * @param y2 max y-value
+     * @param ranges HyperBoundingBox for the selected ranges
      */
     private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, ModifiableHyperBoundingBox ranges) {
       final int dims = proj.getVisibleDimensions();

@@ -28,23 +28,52 @@ import elki.svm.data.DataSet;
 import elki.svm.solver.Solver;
 import elki.utilities.datastructures.arrays.ArrayUtil;
 
+/**
+ * Abstract binary Support Vector Machine base class.
+ */
 public abstract class AbstractSingleSVM {
-  protected static final byte ONE = 1, MONE = -1;
+  /** Positive class. Do not change! */
+  protected static final byte ONE = 1;
 
+  /** Negative class. Do not change! */
+  protected static final byte MONE = -1;
+
+  /** Epsilon tolerance */
   protected double eps;
 
+  /** Use shrinking */
   protected boolean shrinking;
 
+  /** Cache size */
   protected double cache_size;
 
+  /**
+   * Constructor.
+   * 
+   * @param eps Epsilon tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   */
   public AbstractSingleSVM(double eps, boolean shrinking, double cache_size) {
     this.eps = eps;
     this.shrinking = shrinking;
     this.cache_size = cache_size;
   }
 
+  /**
+   * Solve the SVM problem for a data set.
+   * 
+   * @param x Data set
+   * @return Solution info
+   */
   abstract protected Solver.SolutionInfo solve(DataSet x);
 
+  /**
+   * Traine one binary SVM.
+   * 
+   * @param x Data set
+   * @return Solution info
+   */
   protected Solver.SolutionInfo train_one(DataSet x) {
     Solver.SolutionInfo si = solve(x);
 
@@ -70,6 +99,12 @@ public abstract class AbstractSingleSVM {
     return si;
   }
 
+  /**
+   * Set the class weights, ignored by default (override in subclasses).
+   *
+   * @param Cp Positive class weight
+   * @param Cn Negative class weight
+   */
   public void set_weights(double Cp, double Cn) {
     // Ignore by default.
   }
@@ -77,10 +112,9 @@ public abstract class AbstractSingleSVM {
   /**
    * Build a shuffled index array.
    * 
-   * @param perm
-   *        Array storing the permutation
-   * @param l
-   *        Size
+   * @param perm Array storing the permutation
+   * @param l Size
+   * @return {@code perm} for convenience
    */
   public static int[] shuffledIndex(int[] perm, int l) {
     Random rand = new Random();
@@ -95,6 +129,13 @@ public abstract class AbstractSingleSVM {
     return perm;
   }
 
+  /**
+   * Make folds for cross-validation.
+   * 
+   * @param l Fold size
+   * @param nr_fold Number of folds
+   * @return Fold start indices
+   */
   public static int[] makeFolds(final int l, int nr_fold) {
     int[] fold_start = new int[nr_fold + 1];
     for(int i = 0; i <= nr_fold; i++) {
@@ -103,6 +144,14 @@ public abstract class AbstractSingleSVM {
     return fold_start;
   }
 
+  /**
+   * Make stratified folds.
+   * 
+   * @param x Data set
+   * @param nr_fold Number of folds
+   * @param perm Data permutation
+   * @return Fold start indices
+   */
   public static int[] stratifiedFolds(DataSet x, int nr_fold, int[] perm) {
     final int l = x.size();
     int[] fold_start = new int[nr_fold + 1];
@@ -151,9 +200,14 @@ public abstract class AbstractSingleSVM {
     return fold_start;
   }
 
-  // label: label name, start: begin of each class, count: #data of classes,
-  // perm: indices to the original data
-  // perm, length l, must be allocated before calling this subroutine
+  /**
+   * Group classes for stratification.
+   * 
+   * @param x Data set
+   * @param group_ret Return: label, start, count into permutation
+   * @param perm Data permutation
+   * @return number of classes
+   */
   protected static int groupClasses(DataSet x, int[][] group_ret, int[] perm) {
     final int l = x.size();
     final int max_nr_class = 16; // Initial allocation
@@ -219,9 +273,16 @@ public abstract class AbstractSingleSVM {
     return nr_class;
   }
 
+  /**
+   * Check if a values is non-zero
+   * 
+   * @param v Input value
+   * @return {@code true} if v &gt; 0 or v &lt; 0
+   */
   public static boolean nonzero(double v) {
     return v > 0. || v < 0.;
   }
 
+  /** Get the class logger */
   abstract protected Logging getLogger();
 }

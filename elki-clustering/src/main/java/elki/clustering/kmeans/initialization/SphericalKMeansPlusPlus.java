@@ -256,6 +256,12 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
       return weightsum;
     }
 
+    /**
+     * Next random double, avoiding some numerical problems with small weights.
+     *
+     * @param weightsum Weight sum
+     * @return Random double
+     */
     protected double nextDouble(double weightsum) {
       double r = random.nextDouble() * weightsum;
       while(r <= 0 && weightsum > Double.MIN_NORMAL) {

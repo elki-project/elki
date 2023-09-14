@@ -75,6 +75,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
    * default value.
    * 
    * @param optionID the unique id of the parameter
+   * @param enumClass enumeration class
    * @param defaultValue the default value of the parameter
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass, E defaultValue) {
@@ -87,6 +88,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<EnumPara
    * default value.
    * 
    * @param optionID the unique id of the parameter
+   * @param enumClass enumeration class
    */
   public EnumParameter(OptionID optionID, Class<E> enumClass) {
     super(optionID);

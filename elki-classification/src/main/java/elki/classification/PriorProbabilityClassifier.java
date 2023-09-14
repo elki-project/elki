@@ -66,9 +66,6 @@ public class PriorProbabilityClassifier extends AbstractClassifier<Object, Void>
     super();
   }
 
-  /**
-   * Learns the prior probability for all classes.
-   */
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labelrep) {
     Object2IntOpenHashMap<ClassLabel> count = new Object2IntOpenHashMap<>();
@@ -92,6 +89,13 @@ public class PriorProbabilityClassifier extends AbstractClassifier<Object, Void>
     }
   }
 
+  /**
+   * Class probabilities.
+   * 
+   * @param instance Instance to classify
+   * @param labels Labels to classify into
+   * @return Probabilities
+   */
   public double[] classProbabilities(Object instance, ArrayList<ClassLabel> labels) {
     return alignLabels(this.labels, distribution, labels);
   }
