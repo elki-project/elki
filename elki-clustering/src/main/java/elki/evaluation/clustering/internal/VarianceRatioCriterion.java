@@ -185,6 +185,7 @@ public class VarianceRatioCriterion implements Evaluator {
    * @param rel Data relation
    * @param clusters Clusters
    * @param centroids Cluster centroids
+   * @param noiseOption Noise handling option
    * @return Number of clusters
    */
   public static int globalCentroid(Centroid overallCentroid, Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids, NoiseHandling noiseOption) {

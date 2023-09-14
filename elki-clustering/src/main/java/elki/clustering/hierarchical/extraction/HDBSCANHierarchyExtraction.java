@@ -298,6 +298,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     /**
      * Recursive flattening of clusters.
      *
+     * @param temp Temporary cluster
      * @param clustering Output clustering
      * @param glosh GLOSH scores output
      * @param cur Current temporary cluster

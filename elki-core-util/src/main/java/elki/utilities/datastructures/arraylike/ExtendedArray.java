@@ -82,6 +82,8 @@ public class ExtendedArray<T> implements ArrayAdapter<T, ExtendedArray<T>> {
   /**
    * Static wrapper that has a nicer generics signature.
    * 
+   * @param <T> Object type
+   * @param <A> Array type
    * @param array Array to extend
    * @param getter Getter for array
    * @param extra Extra element

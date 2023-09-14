@@ -81,12 +81,8 @@ public class VVIFeature implements ClusterFeature {
   }
 
   @Override
-  public void addToStatistics(ClusterFeature other) {
-    addToStatistics((VVIFeature) other);
-  }
-
-  // @Override
-  public void addToStatistics(VVIFeature other) {
+  public void addToStatistics(ClusterFeature o) {
+    VVIFeature other = (VVIFeature) o;
     if(this.n == 0) {
       for(int i = 0; i < ssd.length; i++) {
         ssd[i] = other.ssd[i];
@@ -149,6 +145,7 @@ public class VVIFeature implements ClusterFeature {
   /**
    * Sum of Squared Deviations.
    *
+   * @param i Dimension
    * @return Sum of Squared Deviations.
    */
   public double sumOfSquaredDev(int i) {

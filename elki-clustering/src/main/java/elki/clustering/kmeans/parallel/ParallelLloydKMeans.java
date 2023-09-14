@@ -57,6 +57,8 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
    *
    * @param distance Distance function
    * @param k K parameter
+   * @param maxiter Maximum number of iterations
+   * @param initializer Initialization method
    */
   public ParallelLloydKMeans(NumberVectorDistance<? super V> distance, int k, int maxiter, KMeansInitialization initializer) {
     super(distance, k, maxiter, initializer);

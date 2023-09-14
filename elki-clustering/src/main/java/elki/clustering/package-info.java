@@ -12,8 +12,6 @@
  *
  * @opt include .*elki.data.Clustering
  * @opt include .*elki.data.Model
- *
- * @see elki.algorithm
  */
 /*
  * This file is part of ELKI:

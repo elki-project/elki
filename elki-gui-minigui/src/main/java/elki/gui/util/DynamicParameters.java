@@ -82,12 +82,16 @@ public class DynamicParameters {
    * @author Erich Schubert
    */
   public static class Node {
+    /** Parameter */
     protected Parameter<?> param;
 
+    /** Current value */
     protected String value;
 
+    /** Node flags */
     protected int flags;
 
+    /** Node depth */
     protected int depth;
 
     /**

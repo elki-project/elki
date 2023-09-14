@@ -136,6 +136,12 @@ public class SimpleParallel implements ProjectionParallel {
     return scales[dimOrder[axis]];
   }
 
+  /**
+   * Check if a dimension is hidden
+   * 
+   * @param truedim Original dimension (not display offset)
+   * @return {@code true} if hidden
+   */
   protected boolean isDimHidden(int truedim) {
     return (flags[truedim] & FLAG_HIDDEN) == FLAG_HIDDEN;
   }

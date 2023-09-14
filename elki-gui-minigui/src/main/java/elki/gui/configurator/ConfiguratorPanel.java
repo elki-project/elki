@@ -81,6 +81,7 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**
    * Add parameter to this panel.
    * 
+   * @param owner Owner object
    * @param param Parameter to add
    * @param track Parameter tracking object
    */
@@ -108,6 +109,12 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
     }
   }
 
+  /**
+   * Make a configuration for a parameter
+   * 
+   * @param param Parameter
+   * @return Configurator
+   */
   private ParameterConfigurator makeConfigurator(Parameter<?> param) {
     if(param instanceof Flag) {
       return new FlagParameterConfigurator((Flag) param, this);
@@ -142,14 +149,27 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
     }
   }
 
+  /**
+   * Add a change listener
+   * 
+   * @param listener Listener to add
+   */
   public void addChangeListener(ChangeListener listener) {
     listenerList.add(ChangeListener.class, listener);
   }
 
+  /**
+   * Remove a change listener.
+   * 
+   * @param listener Listener to remove
+   */
   public void removeChangeListener(ChangeListener listener) {
     listenerList.remove(ChangeListener.class, listener);
   }
 
+  /**
+   * Fire a change event.
+   */
   protected void fireValueChanged() {
     ChangeEvent evt = new ChangeEvent(this);
     for(ChangeListener listener : listenerList.getListeners(ChangeListener.class)) {
@@ -157,12 +177,18 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
     }
   }
 
+  /**
+   * Collect the parameters from this panel.
+   * 
+   * @param params Parameters to append to
+   */
   public void appendParameters(ListParameterization params) {
     for(ParameterConfigurator cfg : children) {
       cfg.appendParameters(params);
     }
   }
 
+  /** Clear the panel */
   public void clear() {
     removeAll();
     childconfig.clear();

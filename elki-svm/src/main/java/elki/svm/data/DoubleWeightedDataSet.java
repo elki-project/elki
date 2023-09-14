@@ -11,14 +11,32 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * @since 0.8.0
  */
 public class DoubleWeightedDataSet implements DataSet {
+  /**
+   * Wrapped data set
+   */
   DataSet inner;
 
+  /**
+   * Indexes
+   */
   int[] idx;
 
+  /**
+   * Weights
+   */
   double[] weight;
 
+  /**
+   * Current size
+   */
   int size = 0;
 
+  /**
+   * Constructor.
+   * 
+   * @param inner Inner data set
+   * @param size Maximum size
+   */
   public DoubleWeightedDataSet(DataSet inner, int size) {
     this.inner = inner;
     idx = new int[size];
@@ -52,6 +70,12 @@ public class DoubleWeightedDataSet implements DataSet {
     ArrayUtil.swap(weight, i, j);
   }
 
+  /**
+   * Add point v to the active set.
+   * 
+   * @param v Index to add
+   * @param w Weight
+   */
   public void add(int v, double w) {
     if(size == idx.length) {
       final int newlen = idx.length << 1;
@@ -62,6 +86,9 @@ public class DoubleWeightedDataSet implements DataSet {
     weight[size++] = w;
   }
 
+  /**
+   * Clear the active set
+   */
   public void clear() {
     size = 0;
   }

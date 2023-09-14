@@ -172,6 +172,16 @@ public class MiniMax<O> implements HierarchicalClusteringAlgorithm {
       throw new IllegalStateException("Need prototypes.");
     }
 
+    /**
+     * Run the clustering algorithm.
+     * 
+     * @param ids Object ids
+     * @param mat Cluster distance matrix
+     * @param builder Merge history builder
+     * @param dq Distance query
+     * @param prots Prototype storage
+     * @return Cluster merge history
+     */
     public ClusterPrototypeMergeHistory run(ArrayDBIDs ids, ClusterDistanceMatrix mat, ClusterMergeHistoryBuilder builder, DistanceQuery<?> dq, DBIDArrayMIter prots) {
       final int size = mat.size;
       this.mat = mat;

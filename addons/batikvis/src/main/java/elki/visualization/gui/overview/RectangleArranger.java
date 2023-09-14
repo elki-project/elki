@@ -85,7 +85,7 @@ public class RectangleArranger<T> {
   /**
    * Constructor.
    *
-   * @param ratio
+   * @param ratio Window ratio
    */
   public RectangleArranger(double ratio) {
     this(ratio, 1.0);
@@ -289,11 +289,24 @@ public class RectangleArranger<T> {
     }
   }
 
+  /**
+   * Compute the area increase of a change.
+   * 
+   * @param winc Width increase
+   * @param hinc Height increase
+   * @return Area increase
+   */
   protected double computeIncreaseArea(double winc, double hinc) {
     double inc = Math.max(winc, hinc * ratio);
     return inc * (hinc + inc / ratio + winc / ratio);
   }
 
+  /**
+   * Split a row.
+   * 
+   * @param bestey Row index
+   * @param besthi Row height to split off
+   */
   protected void splitRow(int bestey, double besthi) {
     assert (bestey < heights.size());
     if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
@@ -308,6 +321,12 @@ public class RectangleArranger<T> {
     usage.add(bestey + 1, new ArrayList<>(usage.get(bestey)));
   }
 
+  /**
+   * Split a column.
+   * 
+   * @param bestex Column id
+   * @param bestwi Width to split off
+   */
   protected void splitCol(int bestex, double bestwi) {
     assert (bestex < widths.size());
     if(widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
@@ -326,6 +345,11 @@ public class RectangleArranger<T> {
     assert assertConsistent();
   }
 
+  /**
+   * Resize the canvas by an increment.
+   * 
+   * @param inc Increment to add to the x axis
+   */
   private void resize(double inc) {
     final int cols = widths.size(), rows = heights.size();
     if(LOG.isDebuggingFine()) {

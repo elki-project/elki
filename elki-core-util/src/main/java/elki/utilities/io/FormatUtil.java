@@ -234,6 +234,7 @@ public final class FormatUtil {
   /**
    * Returns a string representation of this vector.
    *
+   * @param v vector
    * @param w column width
    * @param d number of digits after the decimal
    * @return a string representation of this matrix
@@ -637,6 +638,7 @@ public final class FormatUtil {
   /**
    * Returns a string representation of this matrix.
    *
+   * @param m Matrix
    * @param w column width
    * @param d number of digits after the decimal
    * @param pre Row prefix (e.g., " [")
@@ -672,6 +674,7 @@ public final class FormatUtil {
    * Returns a string representation of this matrix. In each line the specified
    * String <code>pre</code> is prefixed.
    *
+   * @param m Matrix
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
@@ -687,6 +690,7 @@ public final class FormatUtil {
   /**
    * returns String-representation of Matrix.
    *
+   * @param m Matrix
    * @param nf NumberFormat to specify output precision
    * @return String representation of this Matrix in precision as specified by
    *         given NumberFormat
@@ -849,8 +853,9 @@ public final class FormatUtil {
   /**
    * Returns a string with the specified number of whitespace.
    *
+   * @param buf String builder to append to
    * @param n the number of whitespace characters
-   * @return a string with the specified number of blanks
+   * @return {@code buf} for chaining
    */
   public static StringBuilder whitespace(StringBuilder buf, int n) {
     while(n >= WHITESPACE_BUFFER_LENGTH) {
@@ -931,6 +936,7 @@ public final class FormatUtil {
    * Formats a time delta in human readable format.
    *
    * @param time time delta in ms
+   * @param sep separator
    * @return Formatted string
    */
   public static String formatTimeDelta(long time, CharSequence sep) {

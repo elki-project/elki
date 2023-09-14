@@ -396,6 +396,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * @param it Plot item
    * @param task Task
    * @param parent Parent element to draw to
+   * @return Visualization
    */
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
     final Visualization vis;

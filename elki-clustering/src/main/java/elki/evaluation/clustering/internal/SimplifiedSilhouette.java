@@ -224,6 +224,7 @@ public class SimplifiedSilhouette implements Evaluator {
    * @param rel Data relation
    * @param clusters Clusters
    * @param centroids Output array for centroids
+   * @param noiseOption Noise handling option
    * @return Number of ignored noise elements.
    */
   public static int centroids(Relation<? extends NumberVector> rel, List<? extends Cluster<?>> clusters, NumberVector[] centroids, NoiseHandling noiseOption) {

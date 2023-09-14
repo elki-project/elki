@@ -218,6 +218,7 @@ public class FeatureBagging implements OutlierAlgorithm {
    * @param alldim Number of total dimensions
    * @param mindim Minimum number to choose
    * @param maxdim Maximum number to choose
+   * @param rand Random generator
    * @return Subspace as bits.
    */
   private long[] randomSubspace(final int alldim, final int mindim, final int maxdim, final Random rand) {

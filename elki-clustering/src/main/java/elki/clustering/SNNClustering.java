@@ -203,8 +203,8 @@ public class SNNClustering<O> implements ClusteringAlgorithm<Clustering<Model>> 
    *
    * @param snnInstance shared nearest neighbors
    * @param startObjectID potential seed of a new potential cluster
-   * @param objprog the progress object to report about the progress of
-   *        clustering
+   * @param objprog object progress bar logger
+   * @param clusprog clustering progress bar logger
    */
   protected void expandCluster(SimilarityQuery<O> snnInstance, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     ArrayModifiableDBIDs seeds = findSNNNeighbors(snnInstance, startObjectID);

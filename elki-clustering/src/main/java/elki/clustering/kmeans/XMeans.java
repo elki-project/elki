@@ -131,8 +131,9 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @param distance Distance function
    * @param k_min k_min parameter - minimum number of result clusters
    * @param k_max k_max parameter - maximum number of result clusters
-   * @param maxiter Maximum number of iterations each.
-   * @param innerKMeans K-Means variant to use inside.
+   * @param maxiter Maximum number of iterations each
+   * @param innerKMeans K-Means variant to use inside
+   * @param initializer Initialization method
    * @param informationCriterion The information criterion used for the
    *        splitting step
    * @param random Random factory

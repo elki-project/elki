@@ -40,6 +40,7 @@ public class EmptyIterator<O> implements It<O> {
   /**
    * Get an empty hierarchy iterator.
    *
+   * @param <O> Object type
    * @return Empty iterator
    */
   @SuppressWarnings("unchecked")

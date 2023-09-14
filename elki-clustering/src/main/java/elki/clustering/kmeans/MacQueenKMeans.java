@@ -96,6 +96,7 @@ public class MacQueenKMeans<V extends NumberVector> extends AbstractKMeans<V, KM
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

@@ -141,6 +141,7 @@ public final class FileUtil {
    * 
    * @param filename File name in system notation
    * @return Input stream
+   * @throws IOException on IO errors
    */
   public static InputStream openSystemFile(String filename) throws IOException {
     try {

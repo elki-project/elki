@@ -131,6 +131,7 @@ public class ExpGammaDistribution implements Distribution {
    * @param x Value
    * @param k Shape k
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param shift Translation offset (location shift)
    * @return cdf value
    */
   public static double cdf(double x, double k, double theta, double shift) {
@@ -153,6 +154,7 @@ public class ExpGammaDistribution implements Distribution {
    * @param x Value
    * @param k Shape k
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @param shift Translation offset (location shift)
    * @return cdf value
    */
   public static double logcdf(double x, double k, double theta, double shift) {
@@ -166,6 +168,7 @@ public class ExpGammaDistribution implements Distribution {
    * @param x query value
    * @param k Alpha
    * @param theta Theta = 1 / Beta
+   * @param shift Translation offset (location shift)
    * @return probability density
    */
   public static double pdf(double x, double k, double theta, double shift) {
@@ -186,6 +189,7 @@ public class ExpGammaDistribution implements Distribution {
    * @param x query value
    * @param k Alpha
    * @param theta Theta = 1 / Beta
+   * @param shift Translation offset (location shift)
    * @return log probability density
    */
   public static double logpdf(double x, double k, double theta, double shift) {

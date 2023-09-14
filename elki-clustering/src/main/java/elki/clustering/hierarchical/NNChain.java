@@ -71,6 +71,7 @@ public class NNChain<O> extends AGNES<O> {
    * Constructor.
    *
    * @param distance Distance function
+   * @param linkage Linkage strategy
    */
   public NNChain(Distance<? super O> distance, Linkage linkage) {
     super(distance, linkage);

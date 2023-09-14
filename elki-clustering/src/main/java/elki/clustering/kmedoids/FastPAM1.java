@@ -126,7 +126,7 @@ public class FastPAM1<O> extends PAM<O> {
      * Run the FastPAM optimization phase.
      *
      * @param medoids Medoids list
-     * @param maxiter
+     * @param maxiter Maximum number of iterations
      * @return cost
      */
     @Override

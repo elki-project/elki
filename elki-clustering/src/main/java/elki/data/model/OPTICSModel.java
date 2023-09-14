@@ -38,8 +38,8 @@ public class OPTICSModel implements Model {
   private int endIndex;
 
   /**
-   * @param startIndex
-   * @param endIndex
+   * @param startIndex Start index in cluster order
+   * @param endIndex End index in cluster order
    */
   public OPTICSModel(int startIndex, int endIndex) {
     super();

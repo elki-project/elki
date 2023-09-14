@@ -564,8 +564,17 @@ public class CFTree {
    * @author Erich Schubert
    */
   public static class TreeNode extends ClusteringFeature {
+    /**
+     * Children of this node
+     */
     ClusteringFeature[] children;
 
+    /**
+     * Constructor.
+     *
+     * @param dim Data dimensionality
+     * @param capacity Fan-out factor
+     */
     public TreeNode(int dim, int capacity) {
       super(dim);
       children = new ClusteringFeature[capacity];

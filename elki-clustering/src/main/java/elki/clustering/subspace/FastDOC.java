@@ -75,6 +75,7 @@ public class FastDOC extends DOC {
    * @param alpha &alpha; relative density threshold.
    * @param beta &beta; balancing parameter for size vs. dimensionality.
    * @param w half width parameter.
+   * @param d_zero D0 parameter, stopping threshold
    * @param random Random factory
    */
   public FastDOC(double alpha, double beta, double w, int d_zero, RandomFactory random) {

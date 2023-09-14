@@ -234,9 +234,10 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      * Add a singleton object, as point or cluster.
      *
      * @param clus Current cluster.
-     * @param id Object to add
+     * @param id Cluster id
+     * @param it Object reference
      * @param dist Distance
-     * @param asCluster Add as cluster (or only as id)
+     * @param asCluster Add as cluster (or only as dbid)
      */
     private void addSingleton(TempCluster clus, int id, DBIDRef it, double dist, boolean asCluster) {
       if(asCluster) {

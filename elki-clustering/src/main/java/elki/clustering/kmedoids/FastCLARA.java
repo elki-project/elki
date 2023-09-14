@@ -108,6 +108,7 @@ public class FastCLARA<V> extends FastPAM<V> {
    * @param k Number of clusters to produce
    * @param maxiter Maximum number of iterations
    * @param initializer Initialization function
+   * @param fasttol Tolerance for fast swapping
    * @param numsamples Number of samples (sampling iterations)
    * @param sampling Sampling rate (absolute or relative)
    * @param keepmed Keep the previous medoids in the next sample

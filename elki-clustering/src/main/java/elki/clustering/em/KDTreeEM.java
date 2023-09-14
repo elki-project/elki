@@ -409,6 +409,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * Calculates the model limits inside this node by translating the Gaussian
    * model into a squared function.
    * 
+   * @param node tree node
    * @param model model to calculate the limits for
    * @param minpnt result array for argmin
    * @param maxpnt result array for argmax

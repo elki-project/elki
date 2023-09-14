@@ -60,6 +60,8 @@ import elki.utilities.documentation.Reference;
  * implementation based on SIMD bitset operations as long as support of an
  * itemset is high, which are not easily accessible in Java.
  * <p>
+ * TODO: implement diffsets
+ * <p>
  * Reference:
  * <p>
  * New Algorithms for Fast Discovery of Association Rules<br>
@@ -139,7 +141,14 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     return result;
   }
 
-  // TODO: implement diffsets.
+  /**
+   * Extract itemsets
+   * 
+   * @param idx Initial index
+   * @param start Start
+   * @param minsupp Minimum support
+   * @param solution Solution output
+   */
   private void extractItemsets(DBIDs[] idx, int start, int minsupp, List<Itemset> solution) {
     int[] buf = new int[idx.length];
     DBIDs iset = idx[start];
@@ -155,6 +164,17 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     }
   }
 
+  /**
+   * Extract sub-itemsets
+   * 
+   * @param iset Itemsets
+   * @param idx Data index
+   * @param buf Buffer
+   * @param depth Depth
+   * @param start Start index
+   * @param minsupp Minimum support
+   * @param solution Solution output
+   */
   private void extractItemsets(DBIDs iset, DBIDs[] idx, int[] buf, int depth, int start, int minsupp, List<Itemset> solution) {
     // TODO: reuse arrays.
     final int depth1 = depth + 1;
@@ -177,6 +197,13 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     }
   }
 
+  /**
+   * Perform a merge join
+   * 
+   * @param first First list, must be sorted
+   * @param second Second list, must be sorted
+   * @return Merge output
+   */
   private DBIDs mergeJoin(DBIDs first, DBIDs second) {
     assert (!(first instanceof HashSetDBIDs));
     assert (!(second instanceof HashSetDBIDs));
@@ -200,6 +227,14 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     return ids;
   }
 
+  /**
+   * Build the initial inverted index
+   * 
+   * @param relation Input data
+   * @param dim Dimensionality
+   * @param minsupp Minimum support
+   * @return Inverted index
+   */
   private DBIDs[] buildIndex(Relation<BitVector> relation, int dim, int minsupp) {
     ArrayModifiableDBIDs[] idx = new ArrayModifiableDBIDs[dim];
     for(int i = 0; i < dim; i++) {

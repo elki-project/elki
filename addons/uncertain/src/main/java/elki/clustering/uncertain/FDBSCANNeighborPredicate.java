@@ -232,6 +232,13 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
       return resultList;
     }
 
+    /**
+     * Check a pair of samples.
+     * 
+     * @param o1 First object
+     * @param o2 Second object
+     * @return {@code true} if close
+     */
     private boolean checkSamples(UncertainObject o1, UncertainObject o2) {
       final SquaredEuclideanDistance distance = SquaredEuclideanDistance.STATIC;
       // Optimization for discrete objects:

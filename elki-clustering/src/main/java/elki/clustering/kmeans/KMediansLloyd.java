@@ -94,6 +94,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {
@@ -108,6 +109,11 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
       return assignToNearestCluster();
     }
 
+    /**
+     * Build the result.
+     * 
+     * @return Clustering result
+     */
     protected Clustering<MeanModel> buildMediansResult() {
       Clustering<MeanModel> result = new Clustering<>();
       Metadata.of(result).setLongName("k-Medians Clustering");

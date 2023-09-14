@@ -118,7 +118,7 @@ public class ReynoldsPAM<O> extends PAM<O> {
      * Run the PAM optimization phase.
      *
      * @param medoids Medoids list
-     * @param maxiter
+     * @param maxiter Maximum number of iterations
      * @return final cost
      */
     @Override

@@ -37,7 +37,7 @@ public final class ExternalID {
   /**
    * Constructor.
    * 
-   * @param name
+   * @param name External identifier
    */
   public ExternalID(String name) {
     super();

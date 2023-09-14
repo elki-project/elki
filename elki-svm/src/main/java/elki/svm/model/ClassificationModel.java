@@ -1,14 +1,47 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2022
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package elki.svm.model;
 
 import elki.svm.data.DataSet;
 
+/**
+ * A SVM classification model.
+ */
 public class ClassificationModel extends Model {
-  public int[] label; // label of each class (label[k])
+  /** Labels of support vectors */
+  public int[] label;
 
-  public int[] nSV; // number of SVs for each class (nSV[k])
+  /** Number of support vectors per class */
+  public int[] nSV;
 
   // nSV[0] + nSV[1] + ... + nSV[k-1] = l
 
+  /**
+   * Predict for a single data point.
+   *
+   * @param x Data set
+   * @param xi Index of data point to predict for
+   * @param dec_values Decision values output
+   * @return Predicted class
+   */
   public int predict(DataSet x, int xi, double[] dec_values) {
     double[] kvalue = new double[l];
     for(int i = 0; i < l; i++) {
@@ -52,6 +85,13 @@ public class ClassificationModel extends Model {
     return label[vote_max_idx];
   }
 
+  /**
+   * Predict for a single data point.
+   *
+   * @param x Data set
+   * @param xi Index of data point to predict for
+   * @return Predicted class
+   */
   public int predict(DataSet x, int xi) {
     double[] kvalue = new double[l];
     for(int i = 0; i < l; i++) {

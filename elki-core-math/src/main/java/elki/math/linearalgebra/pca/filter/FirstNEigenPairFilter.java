@@ -47,7 +47,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    * 
-   * @param n
+   * @param n Number of eigenvectors to keep
    */
   public FirstNEigenPairFilter(int n) {
     super();

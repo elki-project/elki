@@ -109,6 +109,10 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
 
     /**
      * Method to load the external neighbors.
+     * 
+     * @param database Database
+     * @param relation Data relation
+     * @return Data store of neighborhoods
      */
     private DataStore<DBIDs> extendNeighborhood(Database database, Relation<? extends O> relation) {
       NeighborSetPredicate innerinst = inner.instantiate(database, relation);

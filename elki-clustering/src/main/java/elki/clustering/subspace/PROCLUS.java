@@ -702,10 +702,22 @@ public class PROCLUS extends AbstractProjectedClustering<Clustering<SubspaceMode
    * @author Erich Schubert
    */
   private static class DoubleIntInt implements Comparable<DoubleIntInt> {
+    /** Double value for sorting */
     protected double first;
 
-    protected int dimi, dimj;
+    /** First dimension */
+    protected int dimi;
 
+    /** Second dimension */
+    protected int dimj;
+
+    /**
+     * Constructor
+     * 
+     * @param first Double value
+     * @param second Integer dimension
+     * @param third Integer dimension
+     */
     public DoubleIntInt(double first, int second, int third) {
       this.first = first;
       this.dimi = second;

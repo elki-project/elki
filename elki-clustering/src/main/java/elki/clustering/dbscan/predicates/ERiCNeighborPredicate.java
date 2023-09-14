@@ -150,6 +150,7 @@ public class ERiCNeighborPredicate implements NeighborPredicate<DBIDs> {
      * 
      * @param ids IDs this is defined for.
      * @param storage Stored models
+     * @param relation Vector data relation
      */
     public Instance(DBIDs ids, DataStore<PCAFilteredResult> storage, Relation<? extends NumberVector> relation) {
       super(ids, storage);

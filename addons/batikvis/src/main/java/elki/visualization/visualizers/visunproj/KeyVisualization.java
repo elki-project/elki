@@ -88,6 +88,7 @@ public class KeyVisualization implements VisFactory {
   /**
    * Compute the size of the clustering.
    *
+   * @param <M> Model type
    * @param c Clustering
    * @return Array storing the depth and the number of leaf nodes.
    */
@@ -103,6 +104,7 @@ public class KeyVisualization implements VisFactory {
   /**
    * Recursive depth computation.
    *
+   * @param <M> Model type
    * @param hier Hierarchy
    * @param cluster Current cluster
    * @param size Counting array.

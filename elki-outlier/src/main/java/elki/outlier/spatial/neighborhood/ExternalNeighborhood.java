@@ -109,6 +109,10 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
 
     /**
      * Method to load the external neighbors.
+     * 
+     * @param database Database
+     * @param relation Data relation
+     * @return Data store of neighborhoods
      */
     private DataStore<DBIDs> loadNeighbors(Database database, Relation<?> relation) {
       final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);

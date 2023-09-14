@@ -61,6 +61,8 @@ public class PairCounting {
 
   /**
    * Constructor.
+   * 
+   * @param table cluster contingency table
    */
   protected PairCounting(ClusterContingencyTable table) {
     super();

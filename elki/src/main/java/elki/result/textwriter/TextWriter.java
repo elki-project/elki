@@ -200,6 +200,15 @@ public class TextWriter {
     }
   }
 
+  /**
+   * Print a single object.
+   *
+   * @param out Output stream
+   * @param db Database
+   * @param objID Object ID to write
+   * @param ra Relations to write
+   * @throws IOException on IO error
+   */
   private void printObject(TextWriterStream out, Database db, final DBIDRef objID, List<Relation<?>> ra) throws IOException {
     SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
@@ -243,7 +252,18 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, IOException {
+  /**
+   * Write a clustering result, split into clusters.
+   * 
+   * @param db Database
+   * @param streamOpener Output stream factory
+   * @param clustering Clustering
+   * @param clus Cluster to write
+   * @param ra Data relations
+   * @param naming Naming scheme
+   * @throws IOException on IO error
+   */
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws IOException {
     String cname = naming.getNameFor(clus);
     String filename = filenameFromLabel(cname);
 
@@ -276,6 +296,13 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
+  /**
+   * Write an iterable result, in iteration order.
+   * 
+   * @param streamOpener Output stream factory
+   * @param ri Iterable result
+   * @throws IOException on IO error
+   */
   private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(ri, Metadata.of(ri).getLongName()));
     TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
@@ -303,6 +330,15 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
+  /**
+   * Write an ordering result (e.g., outliers ordered by outlierness).
+   * 
+   * @param db Database
+   * @param streamOpener Output stream factory
+   * @param or Ordering result
+   * @param ra Data relations
+   * @throws IOException on IO error
+   */
   private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(or, Metadata.of(or).getLongName()));
     TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
@@ -314,6 +350,13 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
+  /**
+   * Write settings result.
+   * 
+   * @param streamOpener Output stream factory
+   * @param rs Settings to write
+   * @throws IOException on IO error
+   */
   private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws IOException {
     if(rs.isEmpty()) {
       return;
@@ -341,6 +384,13 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
+  /**
+   * Writer other results, fallback.
+   * 
+   * @param streamOpener Output stream factory
+   * @param r Result
+   * @throws IOException on IO error
+   */
   private void writeOtherResult(StreamFactory streamOpener, Object r) throws IOException {
     if(writers.getHandler(r) != null) {
       PrintStream outStream = streamOpener.openStream(getFilename(r, Metadata.of(r).getLongName()));

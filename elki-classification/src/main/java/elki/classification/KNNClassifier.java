@@ -125,6 +125,13 @@ public class KNNClassifier<O> implements Classifier<O> {
     return bestl;
   }
 
+  /**
+   * Class probabilities
+   * 
+   * @param instance Object to classify
+   * @param labels Labels to classify into
+   * @return Class probabilities
+   */
   public double[] classProbabilities(O instance, ArrayList<ClassLabel> labels) {
     int[] occurences = new int[labels.size()];
 

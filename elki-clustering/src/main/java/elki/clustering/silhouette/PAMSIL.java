@@ -326,6 +326,7 @@ public class PAMSIL<O> extends PAM<O> {
       }
     }
 
+    /** @return get the silhouette scores */
     public DoubleDataStore silhouetteScores() {
       return silhouettes;
     }

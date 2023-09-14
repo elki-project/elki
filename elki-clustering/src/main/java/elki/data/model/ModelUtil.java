@@ -121,8 +121,9 @@ public final class ModelUtil {
    * @param model Model
    * @param relation Data relation (for representatives specified per DBID)
    * @param ids Cluster ids (must not be empty.
-   * @return Vector of type V, {@code null} if not supported.
+   * @param factory Vector factory
    * @param <V> desired vector type
+   * @return Vector of type V, {@code null} if not supported.
    */
   public static <V extends NumberVector> V getPrototypeOrCentroid(Model model, Relation<? extends V> relation, DBIDs ids, NumberVector.Factory<V> factory) {
     assert (ids.size() > 0);

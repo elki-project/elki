@@ -44,9 +44,14 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
  */
 public class StratifiedCrossValidation extends AbstractHoldout {
   /**
-   * Holds the number of folds, current fold.
+   * Holds the number of folds
    */
-  protected int nfold, fold;
+  protected int nfold;
+
+  /**
+   * Current fold
+   */
+  protected int fold;
 
   /**
    * Partition assignment, sizes

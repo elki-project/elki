@@ -127,6 +127,7 @@ public class ORCLUS extends AbstractProjectedClustering<Clustering<Model>> {
    * Performs the ORCLUS algorithm on the given database.
    *
    * @param relation Relation
+   * @return Clustering result
    */
   public Clustering<Model> run(Relation<? extends NumberVector> relation) {
     // current dimensionality associated with each seed
@@ -264,6 +265,7 @@ public class ORCLUS extends AbstractProjectedClustering<Clustering<Model>> {
    * @param clusters the set of current seeds
    * @param k_new the new number of seeds
    * @param d_new the new dimensionality of the subspaces for each seed
+   * @param cprogress Clustering progress for logging
    */
   private void merge(Relation<? extends NumberVector> relation, List<ORCLUSCluster> clusters, int k_new, int d_new, IndefiniteProgress cprogress) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<>((clusters.size() * (clusters.size() - 1)) >>> 1);

@@ -178,6 +178,15 @@ public class ISOS<O> implements OutlierAlgorithm {
     return new OutlierResult(meta, scoreres);
   }
 
+  /**
+   * Adjust the distances for ID
+   * 
+   * @param ignore Object to ignore (query object)
+   * @param ki Neighbor iterator
+   * @param max Maximum distance
+   * @param id Intrinsic dimensionality estimate
+   * @param dists Adjusted distances storage (output)
+   */
   protected static void adjustDistances(DBIDRef ignore, DoubleDBIDListIter ki, double max, double id, ModifiableDoubleDBIDList dists) {
     dists.clear();
     double scaleexp = id * .5; // Generate squared distances.

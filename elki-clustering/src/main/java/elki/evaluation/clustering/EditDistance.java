@@ -55,6 +55,11 @@ public class EditDistance {
    */
   int editOperationsBaseline;
 
+  /**
+   * Constructor.
+   * 
+   * @param table Cluster contingency table
+   */
   protected EditDistance(ClusterContingencyTable table) {
     super();
     final int[][] contingency = table.contingency;
