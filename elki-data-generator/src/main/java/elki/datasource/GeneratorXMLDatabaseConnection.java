@@ -82,9 +82,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /** Gamma distribution */
   public static final String TAG_GAMMA = "gamma";
 
-  /**
-   * Halton pseudo uniform distribution.
-   */
+  /** Halton pseudo uniform distribution */
   public static final String TAG_HALTON = "halton";
 
   /** Rotation */
@@ -365,19 +363,17 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
         LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
-
     gen.addCluster(cluster);
   }
 
   /**
    * Process a 'uniform' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementUniform(GeneratorSingleCluster cluster, Node cur) {
-    double min = 0.0;
-    double max = 1.0;
+    double min = 0.0, max = 1.0;
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
     if(minstr != null && minstr.length() > 0) {
@@ -391,7 +387,16 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** new uniform generator
     cluster.addGenerator(new UniformDistribution(min, max), cluster.getNewRandomGenerator());
 
-    // TODO: check for unknown attributes.
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
+  }
+
+  /**
+   * Warn if any child nodes exist.
+   * 
+   * @param cur Current node.
+   */
+  private void warnIfChildNodes(Node cur) {
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while(iter.hasNext()) {
       Node child = iter.next();
@@ -404,12 +409,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Process a 'normal' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementNormal(GeneratorSingleCluster cluster, Node cur) {
-    double mean = 0.0;
-    double stddev = 1.0;
+    double mean = 0.0, stddev = 1.0;
     String meanstr = ((Element) cur).getAttribute(ATTR_MEAN);
     if(meanstr != null && meanstr.length() > 0) {
       mean = ParseUtil.parseDouble(meanstr);
@@ -422,25 +426,18 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** New normal distribution generator
     cluster.addGenerator(new NormalDistribution(mean, stddev), cluster.getNewRandomGenerator());
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
    * Process a 'gamma' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementGamma(GeneratorSingleCluster cluster, Node cur) {
-    double k = 1.0;
-    double theta = 1.0;
+    double k = 1.0, theta = 1.0;
     String kstr = ((Element) cur).getAttribute(ATTR_K);
     if(kstr != null && kstr.length() > 0) {
       k = ParseUtil.parseDouble(kstr);
@@ -453,25 +450,18 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** New normal distribution generator
     cluster.addGenerator(new GammaDistribution(k, theta), cluster.getNewRandomGenerator());
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
    * Process a 'halton' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementHalton(GeneratorSingleCluster cluster, Node cur) {
-    double min = 0.0;
-    double max = 1.0;
+    double min = 0.0, max = 1.0;
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
     if(minstr != null && minstr.length() > 0) {
@@ -487,25 +477,18 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     Distribution generator = new HaltonUniformDistribution(min, max, random);
     cluster.addGenerator(generator, random);
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
    * Process a 'rotate' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementRotate(GeneratorSingleCluster cluster, Node cur) {
-    int axis1 = 0;
-    int axis2 = 0;
+    int axis1 = 0, axis2 = 0;
     double angle = 0.0;
 
     String a1str = ((Element) cur).getAttribute(ATTR_AXIS1);
@@ -533,20 +516,14 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // Add rotation to cluster.
     cluster.addRotation(axis1 - 1, axis2 - 1, Math.toRadians(angle));
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
    * Process a 'translate' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) {
@@ -562,20 +539,14 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** add new translation
     cluster.addTranslation(offset);
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
    * Process a 'clipping' Element in the XML stream.
    *
-   * @param cluster
+   * @param cluster Cluster generator
    * @param cur Current document nod
    */
   private void processElementClipping(GeneratorSingleCluster cluster, Node cur) {
@@ -596,14 +567,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     // *** set clipping
     cluster.setClipping(cmin, cmax);
 
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
@@ -657,15 +622,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
     // *** add new point
     points.add(point);
-
-    // TODO: check for unknown attributes.
-    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
-    while(iter.hasNext()) {
-      Node child = iter.next();
-      if(child.getNodeType() == Node.ELEMENT_NODE) {
-        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
-      }
-    }
+    // TODO: also check for unknown attributes.
+    warnIfChildNodes(cur);
   }
 
   /**
@@ -684,7 +642,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
         d[i] = ParseUtil.parseDouble(entries[i]);
       }
       catch(NumberFormatException e) {
-        throw new AbortException("Could not parse vector.");
+        throw new AbortException("Could not parse vector: " + entries[i]);
       }
     }
     return d;
