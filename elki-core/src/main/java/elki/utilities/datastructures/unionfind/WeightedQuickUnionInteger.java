@@ -76,6 +76,8 @@ public class WeightedQuickUnionInteger {
 
   /**
    * Constructor.
+   * 
+   * @param size Initial size
    */
   public WeightedQuickUnionInteger(int size) {
     weight = new int[size];

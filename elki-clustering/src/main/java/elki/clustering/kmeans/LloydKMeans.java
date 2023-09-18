@@ -100,6 +100,7 @@ public class LloydKMeans<V extends NumberVector> extends AbstractKMeans<V, KMean
      * Constructor.
      *
      * @param relation Relation
+     * @param df Distance function
      * @param means Initial means
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means) {

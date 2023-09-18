@@ -149,6 +149,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param x The value.
    * @param mu The mean.
    * @param sigma The standard deviation.
+   * @param skew The skewness.
    * @return PDF of the given normal distribution at x.
    */
   public static double pdf(double x, double mu, double sigma, double skew) {
@@ -172,6 +173,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param x The value.
    * @param mu The mean.
    * @param sigma The standard deviation.
+   * @param skew The skewness.
    * @return log PDF of the given normal distribution at x.
    */
   public static double logpdf(double x, double mu, double sigma, double skew) {
@@ -195,6 +197,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param x value to evaluate CDF at
    * @param mu Mean value
    * @param sigma Standard deviation.
+   * @param skew The skewness.
    * @return The CDF of the given normal distribution at x.
    */
   public static double cdf(double x, double mu, double sigma, double skew) {
@@ -216,6 +219,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
    * @param x value to evaluate probit function at
    * @param mu Mean value
    * @param sigma Standard deviation.
+   * @param skew The skewness.
    * @return The probit of the given normal distribution at x.
    */
   public static double quantile(double x, double mu, double sigma, double skew) {

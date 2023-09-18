@@ -36,6 +36,7 @@ import elki.index.tree.spatial.SpatialDirectoryEntry;
  * @since 0.1
  */
 public class RdKNNDirectoryEntry extends SpatialDirectoryEntry implements RdKNNEntry {
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

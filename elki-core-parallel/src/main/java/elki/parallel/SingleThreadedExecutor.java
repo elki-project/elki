@@ -89,6 +89,7 @@ public final class SingleThreadedExecutor {
       this.procs = procs;
     }
 
+    /** Run this thread */
     public void run() {
       Processor.Instance[] instances = new Processor.Instance[procs.length];
       for(int i = 0; i < procs.length; i++) {

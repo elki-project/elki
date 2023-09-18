@@ -54,9 +54,7 @@ public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstim
    */
   public static final GeneralizedExtremeValueLMMEstimator STATIC = new GeneralizedExtremeValueLMMEstimator();
 
-  /**
-   * Constants for fast rational approximations.
-   */
+  /** Constants for fast rational approximations. */
   protected static final double //
   A0 = 0.28377530, //
       A1 = -1.21096399, //
@@ -64,11 +62,13 @@ public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstim
       A3 = -1.13455566, //
       A4 = -0.07138022;
 
+  /** Constants for fast rational approximations. */
   protected static final double //
   B1 = 2.06189696, //
       B2 = 1.31912239, //
       B3 = 0.25077104;
 
+  /** Constants for fast rational approximations. */
   protected static final double //
   C1 = 1.59921491, //
       C2 = -0.48832213, //
@@ -76,9 +76,7 @@ public class GeneralizedExtremeValueLMMEstimator implements LMMDistributionEstim
       D1 = -0.64363929, //
       D2 = 0.08985247;
 
-  /**
-   * Euler-Mascheroni constant.
-   */
+  /** Euler-Mascheroni constant. */
   protected static final double EU = 0.57721566490153286;
 
   /** Maximum number of iterations. */

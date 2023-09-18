@@ -163,7 +163,7 @@ public class GrahamScanConvexHull2D {
   /**
    * Get the relative X coordinate to the origin.
    *
-   * @param a
+   * @param a point
    * @param origin origin double[]
    * @return relative X coordinate
    */
@@ -174,7 +174,7 @@ public class GrahamScanConvexHull2D {
   /**
    * Get the relative Y coordinate to the origin.
    *
-   * @param a
+   * @param a point
    * @param origin origin double[]
    * @return relative Y coordinate
    */

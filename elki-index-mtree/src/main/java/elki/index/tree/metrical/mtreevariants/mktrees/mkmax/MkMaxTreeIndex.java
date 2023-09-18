@@ -66,12 +66,12 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
   }
 
   /**
+   * @param id Object
+   * @param parentDistance Distance to parent object
    * @return a new MkMaxLeafEntry representing the specified data object
    */
-  protected MkMaxLeafEntry createNewLeafEntry(DBID id, DBIDRef object, double parentDistance) {
-    KNNList knns = knnq.getKNN(object, getKmax() - 1);
-    double knnDistance = knns.getKNNDistance();
-    return new MkMaxLeafEntry(id, parentDistance, knnDistance);
+  protected MkMaxLeafEntry createNewLeafEntry(DBID id, double parentDistance) {
+    return new MkMaxLeafEntry(id, parentDistance, knnq.getKNN(id, getKmax()).getKNNDistance());
   }
 
   @Override
@@ -82,7 +82,7 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
 
   @Override
   public void insert(DBIDRef id) {
-    insert(createNewLeafEntry(DBIDUtil.deref(id), id, Double.NaN), false);
+    insert(createNewLeafEntry(DBIDUtil.deref(id), Double.NaN), false);
   }
 
   @Override
@@ -90,17 +90,16 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
     List<MkMaxEntry> objs = new ArrayList<>(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      objs.add(createNewLeafEntry(id, id, Double.NaN));
+      objs.add(createNewLeafEntry(id, Double.NaN));
     }
     insertAll(objs);
   }
 
   /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
+   * Throws an NotIplementedException since deletion of objects is not
    * yet supported by an M-Tree.
    *
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
+   * @throws NotIplementedException since deletions are not implemented yet
    */
   @Override
   public final boolean delete(DBIDRef id) {
@@ -108,11 +107,10 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O> implements RangeIndex<O>, KN
   }
 
   /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
+   * Throws an NotIplementedException since deletion of objects is not
    * yet supported by an M-Tree.
    *
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
+   * @throws NotIplementedException since deletions are not implemented yet
    */
   @Override
   public void deleteAll(DBIDs ids) {

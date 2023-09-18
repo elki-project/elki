@@ -58,8 +58,8 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    * 
-   * @param delta
-   * @param absolute
+   * @param delta Delta threshold
+   * @param absolute Flag for absolute or relative threshold
    */
   public LimitEigenPairFilter(double delta, boolean absolute) {
     super();

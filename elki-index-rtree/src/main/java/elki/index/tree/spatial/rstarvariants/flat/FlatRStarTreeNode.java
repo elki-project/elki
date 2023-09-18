@@ -31,9 +31,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  * @since 0.7.0
  */
 public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, SpatialEntry> {
-  /**
-   * Serial version
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

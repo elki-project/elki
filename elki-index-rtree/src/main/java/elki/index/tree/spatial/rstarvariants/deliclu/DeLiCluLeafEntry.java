@@ -33,7 +33,7 @@ import elki.index.tree.spatial.SpatialPointLeafEntry;
  * @since 0.1
  */
 public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEntry {
-  /** Serialization version */
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

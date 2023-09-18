@@ -279,6 +279,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
     /**
      * Constructor.
      *
+     * @param k Number of neighbors to materialize
+     * @param distance Distance function
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate

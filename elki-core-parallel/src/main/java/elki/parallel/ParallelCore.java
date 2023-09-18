@@ -58,6 +58,8 @@ public class ParallelCore {
 
   /**
    * Constructor.
+   * 
+   * @param processors Number of processors/threads to use
    */
   protected ParallelCore(int processors) {
     super();
@@ -85,8 +87,8 @@ public class ParallelCore {
   /**
    * Submit a task to the executor core.
    * 
+   * @param <T> Task type
    * @param task Submitted task
-   * 
    * @return Future to observe completion
    */
   public <T> Future<T> submit(Callable<T> task) {

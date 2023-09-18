@@ -119,6 +119,7 @@ public class LDF<O extends NumberVector> implements OutlierAlgorithm {
    * Constructor.
    *
    * @param k the value of k
+   * @param distance Distance function
    * @param kernel Kernel function
    * @param h Kernel bandwidth scaling
    * @param c Score scaling parameter

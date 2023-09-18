@@ -252,7 +252,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     /**
      * Constructor.
-     * 
+     *
+     * @param distanceQuery Distance query
      * @param inner Inner kNN query.
      */
     public ProjectedKNNByObject(DistanceQuery<O> distanceQuery, KNNSearcher<I> inner) {
@@ -295,7 +296,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     /**
      * Constructor.
-     * 
+     *
+     * @param distanceQuery Distance query
      * @param inner Inner kNN query.
      */
     public ProjectedKNNByDBID(DistanceQuery<O> distanceQuery, KNNSearcher<I> inner) {
@@ -339,8 +341,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     /**
      * Constructor.
-     * 
-     * @param distanceQuery Distance query to use
+     *
+     * @param distanceQuery Distance query
      * @param inner Inner range query
      */
     public ProjectedRangeByObject(DistanceQuery<O> distanceQuery, RangeSearcher<I> inner) {
@@ -388,8 +390,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     /**
      * Constructor.
-     * 
-     * @param distanceQuery Distance query to use
+     *
+     * @param distanceQuery Distance query
      * @param inner Inner range query
      */
     public ProjectedRangeByDBID(DistanceQuery<O> distanceQuery, RangeSearcher<I> inner) {
@@ -439,6 +441,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     /**
      * Constructor.
      * 
+     * @param distanceQuery Distance query
      * @param inner Inner RkNN query.
      */
     public ProjectedRKNNByObject(DistanceQuery<O> distanceQuery, RKNNSearcher<I> inner) {
@@ -483,6 +486,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     /**
      * Constructor.
      * 
+     * @param distanceQuery Distance query
      * @param inner Inner RkNN query.
      */
     public ProjectedRKNNByDBID(DistanceQuery<O> distanceQuery, RKNNSearcher<I> inner) {

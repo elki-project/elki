@@ -211,10 +211,10 @@ public class LogPanel extends JPanel {
 
   /**
    * Add a new progress bar.
-   * 
+   * <p>
    * Protected, so this can be called via invokeLater
    * 
-   * @param pbar
+   * @param pbar Progress bar
    */
   protected void addProgressBar(final JProgressBar pbar) {
     super.add(pbar);
@@ -223,10 +223,10 @@ public class LogPanel extends JPanel {
 
   /**
    * Remove a new progress bar.
-   * 
+   * <p>
    * Protected, so this can be called via invokeLater
    * 
-   * @param pbar
+   * @param pbar Progress bar
    */
   protected void removeProgressBar(final JProgressBar pbar) {
     super.remove(pbar);

@@ -141,7 +141,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * Initialize the data set grid by computing quantiles.
    * 
    * @param relation Data relation
-   * @throws IllegalArgumentException
+   * @throws IllegalArgumentException on invalid number of partitions
    */
   public void setPartitions(Relation<V> relation) throws IllegalArgumentException {
     if((FastMath.log(partitions) / FastMath.log(2)) != (int) (FastMath.log(partitions) / FastMath.log(2))) {

@@ -44,60 +44,88 @@ public final class StockIcon {
     // Do not use.
   }
 
+  /** Dialog error icon */
   public static final String DIALOG_ERROR = "dialog-error";
 
+  /** Dialog information icon */
   public static final String DIALOG_INFORMATION = "dialog-information";
 
+  /** Dialog warning icon */
   public static final String DIALOG_WARNING = "dialog-warning";
 
+  /** Document open icon */
   public static final String DOCUMENT_OPEN = "document-open";
 
+  /** Document properties icon */
   public static final String DOCUMENT_PROPERTIES = "document-properties";
 
+  /** Document save icon */
   public static final String DOCUMENT_SAVE = "document-save";
 
+  /** Edit clear operation icon */
   public static final String EDIT_CLEAR = "edit-clear";
 
+  /** Edit redo operation icon */
   public static final String EDIT_REDO = "edit-redo";
 
+  /** Edit undo operation icon */
   public static final String EDIT_UNDO = "edit-undo";
 
+  /** Edit find icon */
   public static final String EDIT_FIND = "edit-find";
 
+  /** Emblem to show importance */
   public static final String EMBLEM_IMPORTANT = "emblem-important";
 
+  /** Go to bottom */
   public static final String GO_BOTTOM = "go-bottom";
 
+  /** Go down */
   public static final String GO_DOWN = "go-down";
 
+  /** Go to first */
   public static final String GO_FIRST = "go-first";
 
+  /** Go home */
   public static final String GO_HOME = "go-home";
 
+  /** Jump */
   public static final String GO_JUMP = "go-jump";
 
+  /** Go to last */
   public static final String GO_LAST = "go-last";
 
+  /** Go to next */
   public static final String GO_NEXT = "go-next";
 
+  /** Go to previous */
   public static final String GO_PREVIOUS = "go-previous";
 
+  /** Go to top */
   public static final String GO_TOP = "go-top";
 
+  /** Go up */
   public static final String GO_UP = "go-up";
 
+  /** Help browser */
   public static final String HELP_BROWSER = "help-browser";
 
+  /** Add to list */
   public static final String LIST_ADD = "list-add";
 
+  /** Remove from list */
   public static final String LIST_REMOVE = "list-remove";
 
+  /** Package icon */
   public static final String PACKAGE = "package";
 
+  /** Stop the process */
   public static final String PROCESS_STOP = "process-stop";
 
+  /** Search */
   public static final String SYSTEM_SEARCH = "system-search";
 
+  /** Map from strings to icons */
   private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<>();
 
   /**
@@ -115,12 +143,12 @@ public final class StockIcon {
       }
     }
     java.net.URL imgURL = StockIcon.class.getResource(name + ".png");
-    if(imgURL != null) {
-      Icon icon = new ImageIcon(imgURL);
-      iconcache.put(name, new SoftReference<>(icon));
-      return icon;
+    if(imgURL == null) {
+      LoggingUtil.warning("Could not find stock icon: " + name);
+      return null;
     }
-    LoggingUtil.warning("Could not find stock icon: " + name);
-    return null;
+    Icon icon = new ImageIcon(imgURL);
+    iconcache.put(name, new SoftReference<>(icon));
+    return icon;
   }
 }

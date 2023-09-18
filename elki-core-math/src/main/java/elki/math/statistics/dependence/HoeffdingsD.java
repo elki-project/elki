@@ -90,6 +90,8 @@ public class HoeffdingsD implements Dependence {
    * <p>
    * q[i] is the number of objects such that x[j] &lt; x[i] and y[j] &lt; y[i]
    *
+   * @param <A> first array type
+   * @param <B> second array type
    * @param adapter1 First adapter
    * @param data1 First data set
    * @param adapter2 Second adapter
@@ -128,7 +130,7 @@ public class HoeffdingsD implements Dependence {
     return ret;
   }
 
-  // Tabular approximation
+  /** Tabular approximation */
   private final static double[] TABVAL = { //
       0.5297, 0.4918, 0.4565, 0.4236, 0.393, //
       0.3648, 0.3387, 0.3146, 0.2924, 0.2719, // 10
@@ -148,7 +150,7 @@ public class HoeffdingsD implements Dependence {
       0.005, 0.0047, 0.0045, 0.0042, 0.0025, // 80
       0.0014, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001 };
 
-  // Table positions
+  /** Table positions */
   private final static double[] TABPOS = new double[] { //
       1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.55, //
       1.60, 1.65, 1.70, 1.75, 1.80, 1.85, 1.90, 1.95, 2.00, 2.05, //

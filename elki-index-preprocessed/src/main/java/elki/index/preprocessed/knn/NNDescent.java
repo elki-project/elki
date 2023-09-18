@@ -399,6 +399,13 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     return (distance <= newKDistance);
   }
 
+  /**
+   * Add a pair of candidate neighbors, computing the true distance.
+   * 
+   * @param newNeighbors Storage
+   * @param o1 First neighbor
+   * @param o2 Second neighbor
+   */
   private void addpair(WritableDataStore<HashSetModifiableDBIDs> newNeighbors, DBIDRef o1, DBIDRef o2) {
     final double distance = distanceQuery.distance(o1, o2);
     if(add(o1, o2, distance)) {

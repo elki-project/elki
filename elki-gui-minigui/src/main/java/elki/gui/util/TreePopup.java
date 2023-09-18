@@ -167,6 +167,8 @@ public class TreePopup extends JPopupMenu {
 
   /**
    * Creates the scroll pane which houses the scrollable tree.
+   * 
+   * @return scroll pane
    */
   protected JScrollPane createScroller() {
     JScrollPane sp = new JScrollPane(tree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -209,6 +211,16 @@ public class TreePopup extends JPopupMenu {
     tree.requestFocusInWindow();
   }
 
+  /**
+   * Compute the bounds of the popup.
+   *
+   * @param parent Parent component
+   * @param px X position
+   * @param py Y position
+   * @param pw Width
+   * @param ph Height
+   * @return Bounds
+   */
   protected Rectangle computePopupBounds(Component parent, int px, int py, int pw, int ph) {
     Toolkit toolkit = Toolkit.getDefaultToolkit();
     Rectangle screenBounds;

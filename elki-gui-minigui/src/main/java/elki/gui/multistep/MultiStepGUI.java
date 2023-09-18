@@ -180,6 +180,11 @@ public class MultiStepGUI extends AbstractApplication {
     });
   }
 
+  /**
+   * Add the swing panels.
+   * 
+   * @param panels Panel container
+   */
   private void addPanels(JTabbedPane panels) {
     SavedSettingsFile settings = new SavedSettingsFile(MiniGUI.SAVED_SETTINGS_FILENAME);
     try {

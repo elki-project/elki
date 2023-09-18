@@ -499,6 +499,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> implements Distanc
      * @param query Query object
      * @param res kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
+     * @param bounds Current subtree bounds
      * @param rawdist Raw distance to current rectangle (usually squared)
      * @param radius Query radius
      */

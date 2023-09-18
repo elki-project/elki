@@ -126,8 +126,10 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
   /**
    * Constructor.
    *
+   * @param relation Relation to index
    * @param distance Distance function
    * @param m Number of reference points
+   * @param k Condition parameter (can be Integer.MAX_VALUE)
    * @param rng Random generator
    */
   public LAESA(Relation<O> relation, Distance<? super O> distance, int m, int k, RandomFactory rng) {
@@ -546,6 +548,7 @@ public class LAESA<O> implements RangeIndex<O>, KNNIndex<O> {
      *
      * @param distance Distance function
      * @param m Number of reference points
+     * @param k Condition parameter
      * @param rng Random generator
      */
     public Factory(Distance<? super O> distance, int m, int k, RandomFactory rng) {

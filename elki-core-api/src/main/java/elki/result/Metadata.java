@@ -82,6 +82,7 @@ public class Metadata extends WeakReference<Object> {
    * @author Erich Schubert
    */
   private static class CleanerThread extends Thread {
+    /** Constructor of cleanup thread. */
     public CleanerThread() {
       super("ELKI Garbage Collection");
       setDaemon(true); // Don't prevent program termination
@@ -735,6 +736,7 @@ public class Metadata extends WeakReference<Object> {
         return this;
       }
 
+      /** @return true if a next element is available */
       private boolean lookahead() {
         while(true) {
           if(extra != null || (subiter != null && subiter.valid())) {
@@ -813,6 +815,7 @@ public class Metadata extends WeakReference<Object> {
         return this;
       }
 
+      /** @return true if a next element is available */
       private boolean lookahead() {
         while(true) {
           if(extra != null || (subiter != null && subiter.valid())) {

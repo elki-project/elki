@@ -58,6 +58,7 @@ public class MTreeFactory<O> extends AbstractMTreeFactory<O, MTreeNode<O>, MTree
     return new MTreeIndex<>(relation, pagefile, settings);
   }
 
+  /** @return node class cast to add generic &lt;O&gt; */
   protected Class<MTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MTreeNode.class);
   }

@@ -171,6 +171,8 @@ public class RStarTreeDistancePrioritySearcher<O extends SpatialComparable> impl
 
   /**
    * Expand the next node of the priority heap.
+   * 
+   * @return sucess
    */
   protected boolean advanceQueue() {
     if(pq.isEmpty()) {

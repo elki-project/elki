@@ -61,6 +61,7 @@ public class WrongParameterValueException extends ParameterException {
    * Thrown by a Parameterizable object in case of wrong parameter format.
    * 
    * @param parameter the parameter that has a wrong value
+   * @param mid middle string fragment
    * @param parameter2 the second parameter that has a wrong value
    * @param reason detailed error description
    */

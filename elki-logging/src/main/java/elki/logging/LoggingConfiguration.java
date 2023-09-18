@@ -85,6 +85,9 @@ public final class LoggingConfiguration {
 
   /**
    * Configure Java Logging API: {@link java.util.logging.LogManager}
+   * 
+   * @param pkg Package name for the class loader used to locate the file
+   * @param name Logging properties file name
    */
   private LoggingConfiguration(final String pkg, final String name) {
     privateReconfigureLogging(pkg, name);
@@ -93,8 +96,8 @@ public final class LoggingConfiguration {
   /**
    * Reconfigure logging.
    *
-   * @param pkg Package name the configuration file comes from
-   * @param name File name.
+   * @param pkg Package name for the class loader used to locate the file
+   * @param name Logging properties file name
    */
   public static void reconfigureLogging(final String pkg, final String name) {
     config.privateReconfigureLogging(pkg, name);
@@ -103,8 +106,8 @@ public final class LoggingConfiguration {
   /**
    * Reconfigure logging.
    *
-   * @param pkg Package name the configuration file comes from
-   * @param name File name.
+   * @param pkg Package name for the class loader used to locate the file
+   * @param name Logging properties file name
    */
   private void privateReconfigureLogging(String pkg, final String name) {
     LogManager logManager = LogManager.getLogManager();
@@ -148,6 +151,7 @@ public final class LoggingConfiguration {
    *
    * @param filename File name in system notation
    * @return Input stream
+   * @throws IOException on I/O errors
    */
   private static InputStream openSystemFile(String filename) throws IOException {
     try {

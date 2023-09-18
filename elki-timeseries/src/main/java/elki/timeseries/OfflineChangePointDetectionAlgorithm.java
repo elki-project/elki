@@ -112,6 +112,7 @@ public class OfflineChangePointDetectionAlgorithm implements Algorithm {
    *
    * @param confidence Confidence
    * @param bootstrapSteps Steps for bootstrapping
+   * @param rnd Random generator
    */
   public OfflineChangePointDetectionAlgorithm(double confidence, int bootstrapSteps, RandomFactory rnd) {
     this.minConfidence = confidence;
@@ -266,16 +267,18 @@ public class OfflineChangePointDetectionAlgorithm implements Algorithm {
   }
 
   /**
-   * Compute the incremental sum of an array, i.e. the sum of all points up to
-   * the given index.
+   * Compute the incremental sum of an array, i.e., the sum of all points from
+   * begin to end (exclusive).
    *
    * @param data Input data
    * @param out Output array (must be large enough).
+   * @param begin Interval begin
+   * @param end Interval end
    */
   public static void cusum(double[] data, double[] out, int begin, int end) {
     assert (out.length >= data.length);
     // Use Kahan summation for better precision!
-    // FIXME: this should be unit tested.
+    // FIXME: accuracy should be unit tested.
     double m = 0., carry = 0.;
     for(int i = begin; i < end; i++) {
       double v = data[i] - carry; // Compensation

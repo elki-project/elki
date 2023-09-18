@@ -112,7 +112,7 @@ public class SweepHullDelaunay2D {
   /**
    * Run the actual algorithm
    *
-   * @param hullonly
+   * @param hullonly Compute the convex hull only, not the Delauney
    */
   void run(boolean hullonly) {
     if(points.size() < 3) {
@@ -399,7 +399,8 @@ public class SweepHullDelaunay2D {
   /**
    * @param seedid First seed point
    * @param seed2id Second seed point
-   * @param sorti Points
+   * @param sortd Sorting values
+   * @param sorti Sorting indexes
    * @param len Number of points
    * @return Best triangle
    */
@@ -455,6 +456,7 @@ public class SweepHullDelaunay2D {
    * Flip triangles as necessary
    *
    * @param flippedB Bit set to mark triangles as done
+   * @return number of flips
    */
   int flipTriangles(long[] flippedB) {
     final int size = tris.size();
@@ -476,6 +478,7 @@ public class SweepHullDelaunay2D {
    *
    * @param flippedA Bit set for triangles to test
    * @param flippedB Bit set to mark triangles as done
+   * @return number of flips
    */
   int flipTriangles(long[] flippedA, long[] flippedB) {
     int numflips = 0;
@@ -711,13 +714,30 @@ public class SweepHullDelaunay2D {
   }
 
   /**
-   * The possible orientations two triangles can have to each other. (Shared
-   * edges must have different directions!)
+   * The possible orientations two triangles can have to each other.
+   * (Shared edges must have opposite directions!)
    *
    * @author Erich Schubert
    */
   private enum Orientation {
-    ORIENT_AB_BA, ORIENT_AB_CB, ORIENT_AB_AC, ORIENT_BC_BA, ORIENT_BC_CB, ORIENT_BC_AC, ORIENT_CA_BA, ORIENT_CA_CB, ORIENT_CA_AC
+    /** AB=BA */
+    ORIENT_AB_BA,
+    /** AB=CB */
+    ORIENT_AB_CB,
+    /** AB=AC */
+    ORIENT_AB_AC,
+    /** BC=BA */
+    ORIENT_BC_BA,
+    /** BC=CB */
+    ORIENT_BC_CB,
+    /** BC=AC */
+    ORIENT_BC_AC,
+    /** CA=BA */
+    ORIENT_CA_BA,
+    /** CA=CB */
+    ORIENT_CA_CB,
+    /** CA_AC */
+    ORIENT_CA_AC
   }
 
   /**
@@ -749,9 +769,9 @@ public class SweepHullDelaunay2D {
     /**
      * Constructor.
      *
-     * @param x
-     * @param y
-     * @param z
+     * @param x First point
+     * @param y Second point
+     * @param z Third point
      */
     public Triangle(int x, int y, int z) {
       a = x;
@@ -849,20 +869,16 @@ public class SweepHullDelaunay2D {
           return Orientation.ORIENT_CA_AC;
         }
       }
-      if(this.b == oth.b && this.c == oth.a) {
-        return Orientation.ORIENT_BC_BA;
-      }
-      if(this.b == oth.c && this.c == oth.b) {
-        return Orientation.ORIENT_BC_CB;
-      }
-      if(this.b == oth.a && this.c == oth.c) {
-        return Orientation.ORIENT_BC_AC;
-      }
-      return null;
+      return this.b == oth.b && this.c == oth.a ? Orientation.ORIENT_BC_BA : //
+          this.b == oth.c && this.c == oth.b ? Orientation.ORIENT_BC_CB : //
+              this.b == oth.a && this.c == oth.c ? Orientation.ORIENT_BC_AC : //
+                  null;
     }
 
     /**
      * Make the triangle clockwise
+     * 
+     * @param points List of points
      */
     void makeClockwise(List<double[]> points) {
       if(!isClockwise(points)) {
@@ -879,6 +895,9 @@ public class SweepHullDelaunay2D {
 
     /**
      * Verify that the triangle is clockwise
+     * 
+     * @param points List of points
+     * @return true when clockwise
      */
     boolean isClockwise(List<double[]> points) {
       final double[] pa = points.get(a), pb = points.get(b), pc = points.get(c);
@@ -914,6 +933,7 @@ public class SweepHullDelaunay2D {
      * Careful: the midpoint of the circumcircle is <i>not</i> the average of
      * the corners!
      *
+     * @param points List of points
      * @return success
      */
     private boolean updateCircumcircle(List<double[]> points) {

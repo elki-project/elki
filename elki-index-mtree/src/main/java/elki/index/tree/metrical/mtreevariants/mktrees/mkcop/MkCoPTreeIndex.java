@@ -70,13 +70,13 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KN
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
    * 
-   * @param object the data object to be represented by the new entry
+   * @param id the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
+   * @return new leaf entry
    */
-  protected MkCoPEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
-    MkCoPLeafEntry leafEntry = new MkCoPLeafEntry(id, parentDistance, null, null);
-    return leafEntry;
+  protected MkCoPEntry createNewLeafEntry(DBID id, double parentDistance) {
+    return new MkCoPLeafEntry(id, parentDistance, null, null);
   }
 
   @Override
@@ -85,8 +85,7 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O> implements RangeIndex<O>, KN
     List<MkCoPEntry> objs = new ArrayList<>(relation.size());
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter); // FIXME: expensive
-      final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, Double.NaN));
+      objs.add(createNewLeafEntry(id, Double.NaN));
     }
     insertAll(objs);
   }

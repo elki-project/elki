@@ -54,6 +54,11 @@ import elki.utilities.datastructures.iterator.It;
  * @since 0.7.5
  */
 public class GeoIndexing {
+  /**
+   * Main method.
+   *
+   * @param args Command line arguments
+   */
   public static void main(String[] args) {
     // Set the logging level to statistics:
     LoggingConfiguration.setStatistics();

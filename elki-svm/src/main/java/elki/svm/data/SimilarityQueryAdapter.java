@@ -48,6 +48,12 @@ public class SimilarityQueryAdapter implements DataSet {
    */
   DBIDArrayIter i1, i2;
 
+  /**
+   * Constructor.
+   * 
+   * @param sim Similarity query
+   * @param ids Objects
+   */
   public SimilarityQueryAdapter(SimilarityQuery<?> sim, DBIDs ids) {
     this.sim = sim;
     this.ids = DBIDUtil.newArray(ids);
@@ -80,6 +86,11 @@ public class SimilarityQueryAdapter implements DataSet {
     ids.swap(i, j);
   }
 
+  /**
+   * Iterate over the ids.
+   * 
+   * @return iterator
+   */
   public DBIDArrayIter iter() {
     return ids.iter();
   }

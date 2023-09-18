@@ -110,6 +110,16 @@ public class RStarTreeKNNSearcher<O extends SpatialComparable> implements KNNSea
     return knnList.toKNNList();
   }
 
+  /**
+   * Expand a node in the tree
+   * 
+   * @param object Query object
+   * @param knnList KNN heap
+   * @param pq Priority queue for nodes
+   * @param maxDist Maximum distance
+   * @param nodeID Node ID
+   * @return New maximum distance
+   */
   private double expandNode(O object, KNNHeap knnList, DoubleIntegerMinHeap pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node

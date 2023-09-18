@@ -132,10 +132,12 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
    * Process new result combinations of an object type1 (in first hierarchy) and
    * any child of type2 (in second hierarchy)
-   *
+   * <p>
    * This is a bit painful, because we have two hierarchies with different
    * types: results, and visualizations.
    *
+   * @param <A> First type
+   * @param <B> Second type
    * @param context Context
    * @param start Starting point
    * @param type1 First type, in first hierarchy
@@ -167,10 +169,12 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
    * Process new result combinations of an object type1 (in first hierarchy)
    * having a child of type2 (in second hierarchy).
-   *
+   * <p>
    * This is a bit painful, because we have two hierarchies with different
    * types: results, and visualizations.
    *
+   * @param <A> First type
+   * @param <B> Second type
    * @param context Context
    * @param start Starting point
    * @param type1 First type, in first hierarchy

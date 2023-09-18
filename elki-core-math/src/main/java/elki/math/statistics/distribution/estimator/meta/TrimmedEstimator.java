@@ -94,6 +94,7 @@ public class TrimmedEstimator<D extends Distribution> implements DistributionEst
   /**
    * Local copy, see ArrayLikeUtil.toPrimitiveDoubleArray.
    * 
+   * @param <A> array type
    * @param data Data
    * @param adapter Adapter
    * @return Copy of the data, as {@code double[]}

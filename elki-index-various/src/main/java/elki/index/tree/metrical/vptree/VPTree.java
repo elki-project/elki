@@ -706,6 +706,8 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
     /**
      * Expand the next node of the priority heap.
+     * 
+     * @return success
      */
     protected boolean advanceQueue() {
       if(heap.isEmpty()) {
@@ -888,6 +890,11 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
     /**
      * Constructor.
+     * 
+     * @param distFunc distance function
+     * @param random random generator
+     * @param sampleSize sample size
+     * @param truncate maximum leaf size (truncation)
      */
     public Factory(Distance<? super O> distFunc, RandomFactory random, int sampleSize, int truncate) {
       super();

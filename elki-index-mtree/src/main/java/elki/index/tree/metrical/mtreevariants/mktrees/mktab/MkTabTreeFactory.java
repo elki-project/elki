@@ -55,7 +55,8 @@ public class MkTabTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkTabTr
     return new MkTabTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkTabTreeNode<O>> getNodeClass() {
+  /** @return node class cast to add generic &lt;O&gt; */
+  private Class<MkTabTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkTabTreeNode.class);
   }
 

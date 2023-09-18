@@ -59,7 +59,8 @@ public class MkAppTreeFactory<O> extends AbstractMTreeFactory<O, MkAppTreeNode<O
     return new MkAppTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkAppTreeNode<O>> getNodeClass() {
+  /** @return node class cast to add generic &lt;O&gt; */
+  private Class<MkAppTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkAppTreeNode.class);
   }
 

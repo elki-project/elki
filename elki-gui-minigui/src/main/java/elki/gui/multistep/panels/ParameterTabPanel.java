@@ -307,16 +307,29 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     runButton.setEnabled(canRun());
   }
 
+  /**
+   * Fire a panel update event.
+   */
   protected void firePanelUpdated() {
     for(ParameterTabPanel p : listenerList.getListeners(ParameterTabPanel.class)) {
       p.panelUpdated(this);
     }
   }
 
+  /**
+   * Add a panel listener.
+   *
+   * @param o Panel listener
+   */
   public void addPanelListener(ParameterTabPanel o) {
     listenerList.add(ParameterTabPanel.class, o);
   }
 
+  /**
+   * Remove a panel listener.
+   * 
+   * @param o Panel listener
+   */
   public void removePanelListener(ParameterTabPanel o) {
     listenerList.remove(ParameterTabPanel.class, o);
   }

@@ -131,6 +131,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
      *
      * @param relation Relation to index.
      * @param hashfunctions Hash functions.
+     * @param numberOfBuckets Number of buckets to use.
      */
     public Instance(Relation<V> relation, ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions, int numberOfBuckets) {
       super(relation);
@@ -248,7 +249,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
       /**
        * Constructor.
        *
-       * @param distanceQuery
+       * @param distanceQuery Distance query
        */
       public LSHKNNQuery(DistanceQuery<V> distanceQuery) {
         super(distanceQuery);
@@ -277,7 +278,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V> {
       /**
        * Constructor.
        *
-       * @param distanceQuery
+       * @param distanceQuery Distance query
        */
       public LSHRangeQuery(DistanceQuery<V> distanceQuery) {
         super(distanceQuery);

@@ -148,7 +148,7 @@ public class PrecomputeDistancesAsciiApplication<O> extends AbstractApplication 
    * 
    * @param out Output file name.
    * @return Output stream
-   * @throws IOException
+   * @throws IOException on I/O errors
    */
   private static PrintStream openStream(Path out) throws IOException {
     OutputStream os = Files.newOutputStream(out);

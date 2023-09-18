@@ -189,10 +189,16 @@ public class TreeIndexHeader extends DefaultPageHeader {
     this.emptyPagesSize = emptyPagesSize;
   }
 
+  /**
+   * @return Get the largest page id
+   */
   public int getLargestPageID() {
     return largestPageID;
   }
 
+  /**
+   * @param largestPageID the largest page id
+   */
   public void setLargestPageID(int largestPageID) {
     this.largestPageID = largestPageID;
   }

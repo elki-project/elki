@@ -645,6 +645,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     /**
      * Expand the next node of the priority heap.
+     * 
+     * @return true on success
      */
     protected boolean advanceQueue() {
       if(pq.isEmpty()) {

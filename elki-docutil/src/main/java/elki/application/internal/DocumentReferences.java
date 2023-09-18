@@ -53,10 +53,19 @@ import elki.utilities.xml.HTMLUtil;
  * @assoc - - - Reference
  */
 public class DocumentReferences {
+  /**
+   * Prefix for DOI URLs
+   */
   private static final String DOIPREFIX = "https://doi.org/";
 
+  /**
+   * Prefix of DBLP bibtex entries
+   */
   private static final String DBLPPREFIX = "DBLP:";
 
+  /**
+   * Link for DBLP entries
+   */
   private static final String DBLPURL = "https://dblp.org/rec/bibtex/";
 
   /**
@@ -107,24 +116,69 @@ public class DocumentReferences {
    * @param <T> Entry type
    */
   private interface Format<T> {
+    /**
+     * Make a new entry
+     *
+     * @return Entry
+     */
     T newEntry();
 
+    /**
+     * Initialize a new section.
+     * 
+     * @param title Title
+     */
     void init(String title);
 
+    /**
+     * Write a class
+     * 
+     * @param classdt State/Container
+     * @param cls Class
+     */
     void writeClass(T classdt, Class<?> cls);
 
+    /**
+     * Write a package
+     * 
+     * @param classdt State/Container
+     * @param pkg Package
+     */
     void writePackage(T classdt, Package pkg);
 
+    /**
+     * Write a reference
+     * 
+     * @param ref Reference
+     */
     void writeReference(Reference ref);
 
+    /**
+     * Pretty name for a class, removing Factory postfix.
+     * 
+     * @param cls Class
+     * @return simpler name
+     */
     default String nameFor(Class<?> cls) {
       return cls.getName().split("\\$", 2)[0];
     }
 
+    /**
+     * Generate a link for a class
+     * 
+     * @param cls Class
+     * @return Link
+     */
     default String linkFor(Class<?> cls) {
       return nameFor(cls).replace('.', '/') + ".html";
     }
 
+    /**
+     * Generate a link for a package
+     * 
+     * @param name Package
+     * @return Link
+     */
     default String linkFor(Package name) {
       return name.getName().replace('.', '/') + "/package-summary.html";
     }
@@ -136,14 +190,31 @@ public class DocumentReferences {
    * @author Erich Schubert
    */
   private static class HTMLFormat implements Format<Element> {
+    /**
+     * CSS file name
+     */
     private static final String CSSFILE = "stylesheet.css";
 
+    /**
+     * Header string
+     */
     private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
 
-    Document htmldoc;
+    /**
+     * Document element
+     */
+    private Document htmldoc;
 
-    Element maindl;
+    /**
+     * Main definition list
+     */
+    private Element maindl;
 
+    /**
+     * HTML output format
+     * 
+     * @throws IOException on parser configuration errors
+     */
     HTMLFormat() throws IOException {
       DocumentBuilder builder;
       try {
@@ -275,6 +346,12 @@ public class DocumentReferences {
       }
     }
 
+    /**
+     * Write HTML to an output stream
+     * 
+     * @param refstream Output stream
+     * @throws IOException on I/O errors
+     */
     public void writeTo(OutputStream refstream) throws IOException {
       HTMLUtil.writeXHTML(htmldoc, refstream);
     }
@@ -286,10 +363,21 @@ public class DocumentReferences {
    * @author Erich Schubert
    */
   private static class MarkdownFormat implements Format<Void> {
+    /**
+     * Markdown output stream
+     */
     MarkdownDocStream out;
 
+    /**
+     * First in the current entry
+     */
     boolean firstInEntry = false;
 
+    /**
+     * Constructor
+     * 
+     * @param out Output stream
+     */
     public MarkdownFormat(MarkdownDocStream out) {
       this.out = out;
     }
@@ -367,6 +455,16 @@ public class DocumentReferences {
     }
   }
 
+  /**
+   * Document all references.
+   * 
+   * @param <T> Formatter state type
+   * @param <F> Formatter
+   * @param refs References
+   * @param format Formatter
+   * @return Formatter
+   * @throws IOException on IO errors
+   */
   private static <T, F extends Format<T>> F documentReferences(List<Map.Entry<Reference, TreeSet<Object>>> refs, F format) throws IOException {
     format.init("ELKI references overview");
     for(Map.Entry<Reference, TreeSet<Object>> pair : refs) {
@@ -384,9 +482,13 @@ public class DocumentReferences {
     return format;
   }
 
+  /**
+   * Sort references.
+   * 
+   * @return Sorted references
+   */
   private static List<Map.Entry<Reference, TreeSet<Object>>> sortedReferences() {
     Map<Reference, TreeSet<Object>> map = new HashMap<>();
-
     HashSet<Package> packages = new HashSet<>();
     for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true)) {
       inspectClass(cls, map);
@@ -401,6 +503,12 @@ public class DocumentReferences {
     return refs;
   }
 
+  /**
+   * Inspect a class
+   * 
+   * @param cls Class
+   * @param map Output map
+   */
   private static void inspectClass(final Class<?> cls, Map<Reference, TreeSet<Object>> map) {
     if(cls.getSimpleName().equals("package-info")) {
       return;
@@ -423,6 +531,13 @@ public class DocumentReferences {
     }
   }
 
+  /**
+   * Add a reference to the map
+   * 
+   * @param cls Class
+   * @param r Reference
+   * @param map Output map
+   */
   private static void addReference(Object cls, Reference[] r, Map<Reference, TreeSet<Object>> map) {
     for(Reference ref : r) {
       TreeSet<Object> list = map.get(ref);
@@ -445,6 +560,9 @@ public class DocumentReferences {
     }
   };
 
+  /**
+   * Comparator to sort by the first class.
+   */
   private static final Comparator<Map.Entry<Reference, TreeSet<Object>>> SORT_BY_FIRST_CLASS = new Comparator<Map.Entry<Reference, TreeSet<Object>>>() {
     @Override
     public int compare(Map.Entry<Reference, TreeSet<Object>> p1, Map.Entry<Reference, TreeSet<Object>> p2) {
@@ -467,10 +585,8 @@ public class DocumentReferences {
      * @return Order
      */
     private int compareNull(String s1, String s2) {
-      return (s1 == s2) ? 0 //
-          : (s1 == null) ? -1 //
-              : (s2 == null) ? +1 //
-                  : s1.compareToIgnoreCase(s2);
+      return (s1 == s2) ? 0 : (s1 == null) ? -1 : (s2 == null) ? +1 //
+          : s1.compareToIgnoreCase(s2);
     }
   };
 }

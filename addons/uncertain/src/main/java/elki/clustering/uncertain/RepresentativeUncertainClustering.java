@@ -143,6 +143,7 @@ public class RepresentativeUncertainClustering implements ClusteringAlgorithm<Cl
    * @param metaAlgorithm Meta clustering algorithm
    * @param samplesAlgorithm Primary clustering algorithm
    * @param numsamples Number of samples
+   * @param random Random generator
    * @param alpha Alpha confidence
    * @param keep Keep all samples (not only the representative results).
    */

@@ -93,6 +93,7 @@ public class ParameterException extends Exception {
    * Prefix parameters to error message.
    *
    * @param p Parameter
+   * @param mid Middle part
    * @param p2 Parameter
    * @param message Error message
    * @return Combined error message

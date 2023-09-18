@@ -129,6 +129,7 @@ public class XYPlotVisualization implements VisFactory {
   /**
    * Setup the CSS classes for the plot.
    *
+   * @param context Visualizer context
    * @param svgp Plot
    * @param plot Plot to render
    */

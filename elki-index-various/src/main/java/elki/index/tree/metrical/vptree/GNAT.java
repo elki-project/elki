@@ -124,6 +124,8 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
    *
    * @param relation data for tree construction
    * @param distance distance function for tree construction
+   * @param random random generator
+   * @param numberVPs number of vantage points to use in each step
    */
   public GNAT(Relation<O> relation, Distance<? super O> distance, RandomFactory random, int numberVPs) {
     this.relation = relation;
@@ -367,6 +369,11 @@ public class GNAT<O> implements DistancePriorityIndex<O> {
      */
     double[][] lowerBound, upperBound;
 
+    /**
+     * Constructor
+     * 
+     * @param vps Number of vantage points to allocate
+     */
     public Node(int vps) {
       this.vps = DBIDUtil.newArray(vps);
       this.children = new Node[vps];

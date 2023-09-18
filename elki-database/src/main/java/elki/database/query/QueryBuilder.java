@@ -149,6 +149,7 @@ public class QueryBuilder<O> {
    * Constructor.
    *
    * @param relation Relation to query
+   * @param distance Distance function
    */
   public QueryBuilder(Relation<O> relation, Distance<? super O> distance) {
     this.relation = Objects.requireNonNull(relation);
@@ -171,6 +172,7 @@ public class QueryBuilder<O> {
    * Constructor.
    *
    * @param relation Relation to query
+   * @param similarity Similarity function
    */
   public QueryBuilder(Relation<O> relation, Similarity<? super O> similarity) {
     this.relation = Objects.requireNonNull(relation);

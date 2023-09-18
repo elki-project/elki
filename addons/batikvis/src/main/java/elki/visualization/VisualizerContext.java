@@ -369,12 +369,21 @@ public class VisualizerContext implements DataStoreListener {
     }
   }
 
+  /**
+   * Get the visualation tasks for an item.
+   * 
+   * @param item Item
+   * @return Attached visualization tasks
+   */
   public List<VisualizationTask> getVisTasks(VisualizationItem item) {
     List<VisualizationTask> out = new ArrayList<>();
     vistree.iterDescendants(item).filter(VisualizationTask.class).forEach(out::add);
     return out;
   }
 
+  /**
+   * @return visualizer tree
+   */
   public VisualizationTree getVisHierarchy() {
     return vistree;
   }

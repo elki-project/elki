@@ -56,6 +56,7 @@ public class LogClusterSizes implements Evaluator {
   /**
    * Log the cluster sizes of a clustering.
    *
+   * @param <C> cluster model type
    * @param c Clustering ot analyze
    */
   public static <C extends Model> void logClusterSizes(Clustering<C> c) {

@@ -238,6 +238,7 @@ public class HiCS implements OutlierAlgorithm {
    * 
    * @param relation the relation the HiCS should be evaluated for
    * @param subspaceIndex Subspace indexes
+   * @param random Random generator
    * @return a set of high contrast subspaces
    */
   private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector> relation, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
@@ -316,6 +317,7 @@ public class HiCS implements OutlierAlgorithm {
    * @param relation Relation to process
    * @param subspace Subspace
    * @param subspaceIndex Subspace indexes
+   * @param random Random generator
    */
   private void calculateContrast(Relation<? extends NumberVector> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int card = subspace.dimensionality();

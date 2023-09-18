@@ -152,6 +152,11 @@ public class TrackParameters implements Parameterization {
     return new TrackParameters(inner, option, options, parents, children);
   }
 
+  /**
+   * Register a child parameter
+   * 
+   * @param opt Child parameter
+   */
   private void registerChild(Object opt) {
     if(opt == owner) {
       LoggingUtil.exception("Options shouldn't have themselves as parents!", new Throwable());

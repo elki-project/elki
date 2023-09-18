@@ -37,6 +37,7 @@ import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @param <O> object type
  */
 class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry> {
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

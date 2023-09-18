@@ -1684,6 +1684,7 @@ public final class VMath {
   /**
    * Solve A*X = B
    *
+   * @param A left matrix
    * @param B right hand side
    * @return solution if A is square, least squares solution otherwise
    */
@@ -1697,6 +1698,7 @@ public final class VMath {
   /**
    * Solve A*X = b
    *
+   * @param A left matrix
    * @param b right hand side
    * @return solution if A is square, least squares solution otherwise
    */

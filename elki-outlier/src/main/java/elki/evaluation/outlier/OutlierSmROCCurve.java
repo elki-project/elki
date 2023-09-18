@@ -95,6 +95,13 @@ public class OutlierSmROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
+  /**
+   * Compute the SmROC curve for a given result.
+   * 
+   * @param positiveids positive ids
+   * @param or Outlier scoring result
+   * @return SmROC curve
+   */
   private SmROCResult computeSmROCResult(SetDBIDs positiveids, OutlierResult or) {
     DoubleRelation scores = or.getScores();
     final int size = scores.size();

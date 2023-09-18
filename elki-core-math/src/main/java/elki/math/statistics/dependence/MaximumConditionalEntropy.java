@@ -86,6 +86,7 @@ public class MaximumConditionalEntropy implements Dependence {
   /**
    * Partitions an attribute.
    * 
+   * @param <A> Array type
    * @param adapter1 Data adapter
    * @param data1 Data set
    * @param len Length of data

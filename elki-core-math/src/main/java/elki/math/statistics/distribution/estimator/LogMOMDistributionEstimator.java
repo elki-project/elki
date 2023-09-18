@@ -67,6 +67,7 @@ public interface LogMOMDistributionEstimator<D extends Distribution> extends Dis
    * @param data Data array
    * @param adapter Array adapter
    * @param minmin Minimum value for minimum.
+   * @param margin Margin to add to minimum.
    * @return Minimum
    */
   static <A> double min(A data, NumberArrayAdapter<?, A> adapter, double minmin, double margin) {

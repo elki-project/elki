@@ -25,6 +25,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.DoubleRelation;
 import elki.database.relation.RelationUtil;
+import elki.result.Metadata;
 import elki.result.OrderingResult;
 
 /**
@@ -56,15 +57,7 @@ public class OrderingFromRelation implements OrderingResult {
     super();
     this.scores = scores;
     this.ascending = ascending;
-  }
-
-  /**
-   * Ascending constructor.
-   * 
-   * @param scores
-   */
-  public OrderingFromRelation(DoubleRelation scores) {
-    this(scores, false);
+    Metadata.of(this).setLongName(scores.getLongName() + " Order");
   }
 
   @Override
@@ -76,13 +69,8 @@ public class OrderingFromRelation implements OrderingResult {
   public ArrayModifiableDBIDs order(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     sorted.sort(ascending ? //
-    new RelationUtil.AscendingByDoubleRelation(scores) //
-    : new RelationUtil.DescendingByDoubleRelation(scores));
+        new RelationUtil.AscendingByDoubleRelation(scores) //
+        : new RelationUtil.DescendingByDoubleRelation(scores));
     return sorted;
-  }
-
-  // @Override // used to be in Result
-  public String getLongName() {
-    return scores.getLongName() + " Order";
   }
 }

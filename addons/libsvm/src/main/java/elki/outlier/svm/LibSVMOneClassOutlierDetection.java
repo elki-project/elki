@@ -89,11 +89,16 @@ public class LibSVMOneClassOutlierDetection<V extends NumberVector> implements O
    * Kernel functions. Expose as enum for convenience.
    */
   public enum SVMKernel { //
-    LINEAR, // Linear
-    QUADRATIC, // Quadratic
-    CUBIC, // Cubic
-    RBF, // Radial basis functions
-    SIGMOID, // Sigmoid
+    /** Linear */
+    LINEAR,
+    /** Quadratic */
+    QUADRATIC,
+    /** Cubic */
+    CUBIC,
+    /** Radial basis functions */
+    RBF,
+    /** Sigmoid */
+    SIGMOID,
   }
 
   /**

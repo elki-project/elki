@@ -31,9 +31,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @param <O> Object type
  */
 public class MTreeNode<O> extends AbstractMTreeNode<O, MTreeNode<O>, MTreeEntry> {
-  /**
-   * Serial version
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

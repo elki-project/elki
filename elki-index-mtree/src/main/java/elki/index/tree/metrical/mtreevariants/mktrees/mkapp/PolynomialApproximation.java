@@ -36,6 +36,7 @@ import net.jafama.FastMath;
  * @since 0.1
  */
 public class PolynomialApproximation implements Externalizable {
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

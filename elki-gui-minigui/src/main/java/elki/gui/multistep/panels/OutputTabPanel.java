@@ -63,6 +63,7 @@ public class OutputTabPanel extends ParameterTabPanel {
    * Constructor. We depend on an input panel.
    *
    * @param input Input panel to depend on.
+   * @param evals Evaluation panel to depend on.
    */
   public OutputTabPanel(InputTabPanel input, EvaluationTabPanel evals) {
     super();

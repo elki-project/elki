@@ -62,8 +62,14 @@ public class LevenbergMarquardtMethod {
    */
   private double[] x;
 
+  /**
+   * Data to fit the function to
+   */
   private double[] y;
 
+  /**
+   * Confidence of the data
+   */
   private double[] s;
 
   /**
@@ -111,8 +117,14 @@ public class LevenbergMarquardtMethod {
    */
   private double[] paramstry;
 
+  /**
+   * More working buffers
+   */
   private double[] beta;
 
+  /**
+   * More working buffers
+   */
   private double[] deltaparams;
 
   /**

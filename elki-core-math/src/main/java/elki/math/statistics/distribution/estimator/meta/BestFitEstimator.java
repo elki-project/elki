@@ -300,7 +300,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
      * @param test Scratch space for testing (will be overwritten!)
      * @param dist Distribution
      * @return K-S-Test score
-     * @throws ArithmeticException
+     * @throws ArithmeticException on NaN values
      */
     private static double testFit(double[] x, double[] test, Distribution dist) throws ArithmeticException {
       for(int i = 0; i < test.length; i++) {

@@ -74,6 +74,8 @@ public class RTreeSettings {
 
   /**
    * Constructor with default values and bulk loader.
+   * 
+   * @param bulkSplitter Bulk loader to use
    */
   public RTreeSettings(BulkSplit bulkSplitter) {
     this();

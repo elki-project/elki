@@ -36,9 +36,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * @since 0.1
  */
 class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
-  /**
-   * Serialization version ID.
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**
