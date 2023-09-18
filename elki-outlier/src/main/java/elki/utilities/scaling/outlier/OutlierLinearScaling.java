@@ -44,66 +44,63 @@ public class OutlierLinearScaling implements OutlierScaling {
   /**
    * Field storing the Minimum to use
    */
-  protected Double min = null;
+  private double min;
 
   /**
    * Field storing the Maximum value
    */
-  protected Double max = null;
+  private double max;
 
   /**
-   * Scaling factor to use (1/ max - min)
+   * Scaling factor to use 1/(max-min)
    */
-  double factor;
+  private double ifactor;
 
   /**
    * Use the mean for scaling
    */
-  boolean usemean = false;
+  private boolean usemean = false;
 
   /**
    * Ignore zero values
    */
-  boolean nozeros = false;
+  private boolean nozeros = false;
 
   /**
    * Constructor.
    */
   public OutlierLinearScaling() {
-    this(null, null, false, false);
+    this(Double.NaN, Double.NaN, false, false);
   }
 
   /**
    * Constructor.
    * 
-   * @param min
-   * @param max
-   * @param usemean
-   * @param nozeros
+   * @param min Minimum value (may be NaN to get from the data)
+   * @param max Maximum value (may be NaN to get from the data)
+   * @param usemean Use the mean as minimum for scaling
+   * @param nozeros Ignore zero values
    */
-  public OutlierLinearScaling(Double min, Double max, boolean usemean, boolean nozeros) {
+  public OutlierLinearScaling(double min, double max, boolean usemean, boolean nozeros) {
     super();
     this.min = min;
     this.max = max;
     this.usemean = usemean;
     this.nozeros = nozeros;
-    if(min != null && max != null) {
-      this.factor = (max - min);
-    }
+    this.ifactor = (min == min && max == max) ? 1. / (max - min) : Double.NaN;
   }
 
   @Override
   public double getScaled(double value) {
-    assert factor != 0 : "prepare() was not run prior to using the scaling function.";
-    if(factor < 0) {
-      return value >= max ? 0 : Math.min(1, ((value - max) / factor));
-    }
-    return value <= min ? 0 : Math.min(1, ((value - min) / factor));
+    assert ifactor != 0 : "prepare() was not run prior to using the scaling function.";
+    return ifactor < 0 ? //
+        value >= max ? 0 : Math.min(1, ((value - max) * ifactor)) : //
+        value <= min ? 0 : Math.min(1, ((value - min) * ifactor));
   }
 
   @Override
   public void prepare(OutlierResult or) {
-    if(min == null || max == null || usemean) {
+    if(min != min /* NaN */ || max != max /* NaN */ || usemean) {
       double mi = Double.MAX_VALUE, ma = Double.MIN_VALUE, sum = 0;
       int count = 0, skippedzeros = 0;
       DoubleRelation scores = or.getScores();
@@ -121,18 +118,18 @@ public class OutlierLinearScaling implements OutlierScaling {
       if(count == 0 && skippedzeros > 0) {
         sum = mi = ma = 0.; // constant zero data.
       }
-      min = usemean && count > 0 ? (sum / count) : min != null ? min : mi;
-      max = max != null ? max : ma;
+      min = usemean && count > 0 ? (sum / count) : min == min /* not NaN */ ? min : mi;
+      max = max == max /* not NaN */ ? max : ma;
     }
-    factor = max > min ? max - min : 1.;
+    ifactor = max > min ? 1. / (max - min) : 1.;
     if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
-      factor *= -1;
+      ifactor *= -1;
     }
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if(min == null || max == null || usemean) {
+    if(min != min /* NaN */ || max != max /* NaN */ || usemean) {
       double mi = Double.MAX_VALUE, ma = Double.MIN_VALUE, sum = 0;
       int count = 0, skippedzeros = 0;
       final int size = adapter.size(array);
@@ -150,10 +147,10 @@ public class OutlierLinearScaling implements OutlierScaling {
       if(count == 0 && skippedzeros > 0) {
         sum = mi = ma = 0.; // constant zero data.
       }
-      min = usemean && count > 0 ? (sum / count) : min != null ? min : mi;
-      max = max != null ? max : ma;
+      min = usemean && count > 0 ? (sum / count) : min == min /* not NaN */ ? min : mi;
+      max = max == max /* not NaN */ ? max : ma;
     }
-    factor = max > min ? max - min : 1.;
+    ifactor = max > min ? 1. / (max - min) : 1.;
   }
 
   @Override
