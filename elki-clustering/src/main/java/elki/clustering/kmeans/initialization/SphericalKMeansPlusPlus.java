@@ -191,7 +191,7 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
         if(weightsum < Double.MIN_NORMAL) {
           LOG.warning("Could not choose a reasonable mean - to few unique data points?");
         }
-        double r = nextDouble(weightsum);
+        double r = KMeansPlusPlus.Instance.nextDouble(random, weightsum);
         DBIDIter it = relation.iterDBIDs();
         while(it.valid()) {
           if((r -= weights.doubleValue(it)) <= 0) {
@@ -254,20 +254,6 @@ public class SphericalKMeansPlusPlus<O> extends AbstractKMeansInitialization {
         weightsum += weight;
       }
       return weightsum;
-    }
-
-    /**
-     * Next random double, avoiding some numerical problems with small weights.
-     *
-     * @param weightsum Weight sum
-     * @return Random double
-     */
-    protected double nextDouble(double weightsum) {
-      double r = random.nextDouble() * weightsum;
-      while(r <= 0 && weightsum > Double.MIN_NORMAL) {
-        r = random.nextDouble() * weightsum; // Try harder to not choose 0.
-      }
-      return r;
     }
   }
 
