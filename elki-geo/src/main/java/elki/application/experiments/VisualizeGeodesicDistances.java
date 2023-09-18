@@ -114,6 +114,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * Constructor.
    *
    * @param out Output filename
+   * @param resolution Image resolution
    * @param steps Number of steps in the color map
    * @param mode Visualization mode
    * @param model Earth model
@@ -202,14 +203,17 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     }
   }
 
+  /**
+   * Color scaling
+   * 
+   * @param col Color
+   * @param reldist Relative distance
+   * @param ceil Whether to ceil the distance
+   * @return Resulting color
+   */
   private int colorMultiply(int col, double reldist, boolean ceil) {
     if(steps > 0) {
-      if(!ceil) {
-        reldist = FastMath.round(reldist * steps) / steps;
-      }
-      else {
-        reldist = FastMath.ceil(reldist * steps) / steps;
-      }
+      reldist = (ceil ? FastMath.ceil(reldist * steps) : FastMath.round(reldist * steps)) / steps;
     }
     else if(steps < 0 && reldist > 0.) {
       double s = reldist * -steps;

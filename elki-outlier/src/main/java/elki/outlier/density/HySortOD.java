@@ -113,6 +113,13 @@ public class HySortOD implements OutlierAlgorithm {
     this.strategy = minSplit > 0 ? new TreeStrategy(minSplit) : new NaiveStrategy();
   }
 
+  /**
+   * Run the outlier detection algorithm
+   * 
+   * @param db Database
+   * @param relation Data relation
+   * @return Outlier detection scores
+   */
   public OutlierResult run(Database db, Relation<? extends NumberVector> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
@@ -247,22 +254,35 @@ public class HySortOD implements OutlierAlgorithm {
       return str.append(")").toString();
     }
 
+    /**
+     * Get the cell coordinate at a particular dimension.
+     * @param j Dimension
+     * @return coordinate in dimension j
+     */
     public int getCoordAt(int j) {
       return coords[j];
     }
 
+    /** @return the cell coordinates */
     public int[] getCoords() {
       return coords;
     }
 
+    /** @return get the number of dimensions */
     public int getNumDimensions() {
       return coords.length;
     }
 
+    /** @return get the current instance */
     public DBIDs getInstances() {
       return instances;
     }
 
+    /**
+     * Add an object
+     * 
+     * @param instance Instance to add
+     */
     public void add(DBIDRef instance) {
       if(instances == null) {
         instances = DBIDUtil.newArray();
@@ -270,6 +290,7 @@ public class HySortOD implements OutlierAlgorithm {
       instances.add(instance);
     }
 
+    /** @return the density */
     public int getDensity() {
       return instances.size();
     }
@@ -317,7 +338,7 @@ public class HySortOD implements OutlierAlgorithm {
      * 
      * @param hi Hypercube hi
      * @param hk Hypercube hk
-     * @return
+     * @return true if hk is immediate neighbor of hi
      */
     protected boolean isImmediate(Hypercube hi, Hypercube hk) {
       final int[] p = hi.getCoords(), q = hk.getCoords();
@@ -336,7 +357,7 @@ public class HySortOD implements OutlierAlgorithm {
      * @param hi Hypercube hi
      * @param hk Hypercube hk
      * @param col Hypercube coordinate
-     * @return
+     * @return true if hk is immediate neighbor of hi
      */
     protected boolean isProspective(Hypercube hi, Hypercube hk, int col) {
       return Math.abs(hi.getCoordAt(col) - hk.getCoordAt(col)) <= 1;
@@ -406,7 +427,7 @@ public class HySortOD implements OutlierAlgorithm {
     /**
      * Constructor of the tree strategy.
      *
-     * @param minSplit
+     * @param minSplit Minimum split
      */
     public TreeStrategy(int minSplit) {
       // Set the minimum number of rows to allow sub-mapping
@@ -431,7 +452,7 @@ public class HySortOD implements OutlierAlgorithm {
      * Recursive build index.
      * 
      * @param parent Node of the tree strategy
-     * @param col
+     * @param col Column
      */
     private void buildIndex(Node parent, int col) {
       // Stop sub-mapping when the parent node map less than minSplit hypercubes
@@ -536,9 +557,9 @@ public class HySortOD implements OutlierAlgorithm {
       /**
        * Constructor.
        *
-       * @param value
-       * @param begin
-       * @param end
+       * @param value Index value
+       * @param begin Index begin
+       * @param end Index end
        */
       public Node(int value, int begin, int end) {
         this.value = value;

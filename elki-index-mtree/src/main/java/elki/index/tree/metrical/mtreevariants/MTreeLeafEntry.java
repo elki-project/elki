@@ -38,9 +38,7 @@ import elki.index.tree.LeafEntry;
  * @since 0.1
  */
 public class MTreeLeafEntry implements LeafEntry, MTreeEntry {
-  /**
-   * Serialization version ID.
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 3;
 
   /**

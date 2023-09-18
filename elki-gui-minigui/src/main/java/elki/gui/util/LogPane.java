@@ -136,7 +136,7 @@ public class LogPane extends JTextPane {
    * 
    * @param record
    *        Log record
-   * @throws BadLocationException
+   * @throws BadLocationException on error
    */
   protected synchronized void publish(LogRecord record) throws BadLocationException {
     // choose an appropriate formatter

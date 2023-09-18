@@ -202,6 +202,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
   /**
    * Sorts the entries of the specified node according to their minimum distance
    * to the specified object.
+   * <p>
+   * TODO: switch to {@code int[] double[]} for memory efficiency?
    * 
    * @param node the node
    * @param q the id of the object
@@ -209,7 +211,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    */
   protected final List<DoubleIntPair> getSortedEntries(N node, DBID q) {
     List<DoubleIntPair> result = new ArrayList<>();
-
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       double distance = distance(entry.getRoutingObjectID(), q);
@@ -218,7 +219,6 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
       result.add(new DoubleIntPair(minDist, i));
     }
-
     Collections.sort(result);
     return result;
   }

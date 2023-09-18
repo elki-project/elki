@@ -93,6 +93,12 @@ public class MCDEDependence implements Dependence {
 
   /**
    * Constructor.
+   * 
+   * @param m Monte-Carlo iterations
+   * @param alpha Expected share of instances in slice (independent dimensions)
+   * @param beta Expected share of instances in marginal restriction (dependent dimensions)
+   * @param rnd Random generator
+   * @param mcdeTest Test to use
    */
   @SuppressWarnings("unchecked")
   public MCDEDependence(int m, double alpha, double beta, RandomFactory rnd, MCDETest<?> mcdeTest) {

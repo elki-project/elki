@@ -167,7 +167,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
      * @param k k
      * @param distance distance function
      * @param partitions number of partitions
-     * @param rnd
+     * @param rnd random generator
      */
     public Factory(int k, Distance<? super O> distance, int partitions, RandomFactory rnd) {
       super(k, distance);

@@ -265,8 +265,11 @@ public final class QuickSelectDBIDs {
    * Sort a small array using repetitive insertion sort.
    *
    * @param data Data to sort
+   * @param comparator Comparator
    * @param start Interval start
    * @param end Interval end
+   * @param iter1 First scratch iterator
+   * @param iter2 Second scratch iterator
    */
   private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, DBIDArrayIter iter1, DBIDArrayIter iter2) {
     for(int i = start + 1; i < end; i++) {
@@ -475,6 +478,8 @@ public final class QuickSelectDBIDs {
    * @param data Data to sort
    * @param start Interval start
    * @param end Interval end
+   * @param iter1 First scratch iterator
+   * @param iter2 Second scratch iterator
    */
   private static void insertionSort(ModifiableDoubleDBIDList data, int start, int end, DoubleDBIDListIter iter1, DoubleDBIDListIter iter2) {
     for(int i = start + 1; i < end; i++) {

@@ -51,17 +51,21 @@ public class ThumbnailThread extends Thread {
    * Queue a thumbnail task in a global thumbnail thread.
    * 
    * @param callback Callback
+   * @return new Task
    */
   public synchronized static Task queue(Listener callback) {
     final Task task = new Task(callback);
-    // TODO: synchronization?
-    if(THREAD != null && THREAD.isAlive()) {
-      THREAD.queue.add(task);
-      return task;
+    if(THREAD == null || !THREAD.isAlive()) {
+      synchronized(ThumbnailThread.class) {
+        if(THREAD == null || !THREAD.isAlive()) {
+          THREAD = new ThumbnailThread();
+          THREAD.queue.add(task);
+          THREAD.start();
+          return task;
+        }
+      }
     }
-    THREAD = new ThumbnailThread();
     THREAD.queue.add(task);
-    THREAD.start();
     return task;
   }
 
@@ -72,9 +76,7 @@ public class ThumbnailThread extends Thread {
    */
   public static void unqueue(Task task) {
     if(THREAD != null) {
-      synchronized(THREAD) {
-        THREAD.queue.remove(task);
-      }
+      THREAD.queue.remove(task);
     }
   }
 

@@ -189,6 +189,9 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     }
   }
 
+  /**
+   * Refresh a thumbnail
+   */
   private void refreshThumbnail() {
     // Discard an existing thumbnail
     thumbid = -1;

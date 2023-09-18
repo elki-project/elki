@@ -231,8 +231,8 @@ public class OnDiskArray implements AutoCloseable {
    * stored record size within the files header, else the record size is read
    * from the header and used.
    * 
-   * @param validateRecordSize
-   * @throws IOException
+   * @param validateRecordSize flag to validate the record size
+   * @throws IOException on IO errors
    */
   private void validateHeader(boolean validateRecordSize) throws IOException {
     ByteBuffer bbuf = ByteBuffer.allocateDirect(INTERNAL_HEADER_SIZE);
@@ -415,7 +415,7 @@ public class OnDiskArray implements AutoCloseable {
    * Ensure that the file can fit the given number of records.
    * 
    * @param size Size
-   * @throws IOException
+   * @throws IOException on IO error when resizing
    */
   public void ensureSize(int size) throws IOException {
     if(size > getNumRecords()) {

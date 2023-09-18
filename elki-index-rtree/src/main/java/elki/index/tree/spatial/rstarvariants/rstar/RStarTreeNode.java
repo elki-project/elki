@@ -30,6 +30,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  * @since 0.1
  */
 public class RStarTreeNode extends AbstractRStarTreeNode<RStarTreeNode, SpatialEntry> {
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

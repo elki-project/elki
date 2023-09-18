@@ -59,8 +59,9 @@ public class StratifiedCrossValidation extends AbstractHoldout {
   protected int[] assignment, sizes;
 
   /**
-   * Provides a stratified crossvalidation. Setting parameter N_P to the
-   * OptionHandler.
+   * Constructor for stratified crossvalidation.
+   * 
+   * @param nfold Number of folds
    */
   public StratifiedCrossValidation(int nfold) {
     super();

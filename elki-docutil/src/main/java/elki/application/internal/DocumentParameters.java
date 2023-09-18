@@ -64,18 +64,27 @@ import elki.utilities.xml.HTMLUtil;
  * @assoc - - - Parameter
  */
 public class DocumentParameters {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(DocumentParameters.class);
 
+  /** Header string */
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";
 
+  /** Header string */
   private static final String HEADER_DEFAULT_VALUE = "Default: ";
 
+  /** Header string */
   private static final String HEADER_CLASS_RESTRICTION = "Class Restriction: ";
 
+  /** Header string */
   private static final String HEADER_CLASS_RESTRICTION_IMPLEMENTING = "implements ";
 
+  /** Header string */
   private static final String HEADER_CLASS_RESTRICTION_EXTENDING = "extends ";
 
+  /** Header string */
   private static final String HEADER_KNOWN_IMPLEMENTATIONS = "Known implementations: ";
 
   /**
@@ -175,12 +184,24 @@ public class DocumentParameters {
     System.exit(0);
   }
 
+  /**
+   * Create output directories
+   * 
+   * @param parent Parent folder
+   * @throws IOException on IO errors
+   */
   private static void createDirectories(Path parent) throws IOException {
     if(parent != null) {
       Files.createDirectories(parent);
     }
   }
 
+  /**
+   * Build the parameter index maps.
+   * 
+   * @param byclass Index by class
+   * @param byopt Index by option
+   */
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
@@ -279,6 +300,12 @@ public class DocumentParameters {
     }
   }
 
+  /**
+   * Get the constructor of a parameterization class.
+   * 
+   * @param cls Class
+   * @return Constructor
+   */
   protected static Constructor<?> getConstructor(final Class<?> cls) {
     try {
       return cls.getConstructor(Parameterization.class);
@@ -351,25 +378,81 @@ public class DocumentParameters {
    * @author Erich Schubert
    *
    * @hidden
-   * @param <T> State
+   * @param <T> State type (e.g., HTML Elements for HTML output)
    */
   private interface Format<T> {
+    /**
+     * Initialize
+     * 
+     * @param title Title string
+     */
     void init(String title);
 
+    /**
+     * Begin a new definition list
+     * @return State (e.g., container element)
+      */
     T topDList();
 
+    /**
+     * Make a new unordered list
+     * 
+     * @param parent Parent state (e.g., element)
+     * @param header Header string
+     * @return State (e.g., container element)
+     */
     T makeUList(T parent, String header);
 
+    /**
+     * Write a class definition.
+     * 
+     * @param parent Parent state (e.g., element)
+     * @param cls Class to write
+     * @return State (e.g., container element)
+     */
     T writeClassD(T parent, Class<?> cls);
 
+    /**
+     * Write a class entry.
+     * 
+     * @param parent Parent state (e.g., element)
+     * @param cls Class to write
+     * @return State (e.g., container element)
+     */
     T writeClassU(T parent, Class<?> cls);
 
-    T writeOptionD(T parent, Parameter<?> firstopt);
+    /**
+     * Write an option definition.
+     * 
+     * @param parent Parent state (e.g., element)
+     * @param opt First option
+     * @return State (e.g., container element)
+     */
+    T writeOptionD(T parent, Parameter<?> opt);
 
-    T writeOptionU(T parent, Parameter<?> firstopt);
+    /**
+     * Write an option entry.
+     * 
+     * @param parent Parent state (e.g., element)
+     * @param opt First option
+     * @return State (e.g., container element)
+     */
+    T writeOptionU(T parent, Parameter<?> opt);
 
+    /**
+     * Append a class restriction.
+     * 
+     * @param elemdd Container element
+     * @param restriction Class restriction
+     */
     void appendClassRestriction(T elemdd, Class<?> restriction);
 
+    /**
+     * Append known implementations (unless empty).
+     * 
+     * @param elemdd Container element.
+     * @param restriction Class restriction
+     */
     void appendKnownImplementationsIfNonempty(T elemdd, Class<?> restriction);
 
     /**
@@ -387,16 +470,36 @@ public class DocumentParameters {
    * @author Erich Schubert
    */
   private static class HTMLFormat implements Format<Element> {
+    /**
+     * Base class for linking
+     */
     Class<?> base = getBaseClass();
 
+    /**
+     * Stylesheet file
+     */
     private static final String CSSFILE = "stylesheet.css";
 
+    /**
+     * Header string
+     */
     private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";
 
+    /**
+     * Main HTML document
+     */
     Document htmldoc;
 
+    /**
+     * Main DL element containing the definition table
+     */
     Element maindl;
 
+    /**
+     * HTML output format
+     * 
+     * @throws IOException on configuration errors
+     */
     HTMLFormat() throws IOException {
       DocumentBuilder builder;
       try {
@@ -440,6 +543,12 @@ public class DocumentParameters {
       body.appendChild(maindl);
     }
 
+    /**
+     * Write to an output stream
+     * 
+     * @param refstream Output stream to write to
+     * @throws IOException on I/O error
+     */
     public void writeTo(OutputStream refstream) throws IOException {
       HTMLUtil.writeXHTML(htmldoc, refstream);
     }
@@ -547,12 +656,6 @@ public class DocumentParameters {
       }
     }
 
-    /**
-     * Append string containing the default value.
-     *
-     * @param optdd HTML Element
-     * @param par Parameter
-     */
     @Override
     public void appendDefaultValueIfSet(Element optdd, Parameter<?> par) {
       if(!par.hasDefaultValue()) {
@@ -578,6 +681,13 @@ public class DocumentParameters {
       optdd.appendChild(p);
     }
 
+    /**
+     * Make a link for a class name
+     * 
+     * @param cls Class name
+     * @param ref Reference class for name shortening
+     * @return HTML element
+     */
     private Element linkForClassName(Class<?> cls, Class<?> ref) {
       Element a = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
       a.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, cls.getName().replace('.', '/') + ".html");
@@ -586,6 +696,15 @@ public class DocumentParameters {
     }
   }
 
+  /**
+   * Make the by-class overview
+   * 
+   * @param <T> Formatter state
+   * @param <F> Formatter type
+   * @param byclass By-class map
+   * @param format Formatter
+   * @return Formatter
+   */
   private static <T, F extends Format<T>> F makeByClassOverview(Map<Class<?>, List<Parameter<?>>> byclass, F format) {
     format.init("ELKI command line parameter overview");
     for(Class<?> cls : sorted(byclass.keySet(), ELKIServiceScanner.SORT_BY_NAME)) {
@@ -598,6 +717,15 @@ public class DocumentParameters {
     return format;
   }
 
+  /**
+   * Make the by-option overview
+   * 
+   * @param <T> Formatter state
+   * @param <F> Formatter type
+   * @param byopt By option map
+   * @param format Formatter
+   * @return Formatter
+   */
   private static <T, F extends Format<T>> F makeByOptOverview(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt, F format) {
     format.init("ELKI command line parameter overview by option");
     for(OptionID oid : sorted(byopt.keySet(), SORT_BY_OPTIONID)) {
@@ -629,11 +757,25 @@ public class DocumentParameters {
     return format;
   }
 
+  /**
+   * Markdown output format
+   */
   private static class MarkdownFormat implements Format<Void> {
+    /**
+     * Base class for linking
+     */
     Class<?> base = getBaseClass();
 
+    /**
+     * Markdown output stream
+     */
     private MarkdownDocStream out;
 
+    /**
+     * Constructor.
+     * 
+     * @param out Markdown output stream
+     */
     public MarkdownFormat(MarkdownDocStream out) {
       this.out = out;
     }
@@ -757,6 +899,12 @@ public class DocumentParameters {
     }
   }
 
+  /**
+   * Get the restriction class from an option
+   * 
+   * @param opt Option parameter
+   * @return restriction class
+   */
   private static Class<?> getRestrictionClass(Parameter<?> opt) {
     return opt instanceof ClassParameter ? ((ClassParameter<?>) opt).getRestrictionClass() //
         : opt instanceof ClassListParameter ? ((ClassListParameter<?>) opt).getRestrictionClass() //
@@ -808,7 +956,9 @@ public class DocumentParameters {
   /**
    * Sort a collection of classes.
    *
+   * @param <T> Object type
    * @param cls Classes to sort
+   * @param c Comparator
    * @return Sorted list
    */
   private static <T> ArrayList<T> sorted(Collection<T> cls, Comparator<? super T> c) {

@@ -171,6 +171,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> implements KNNI
     }
   }
 
+  /**
+   * Preprocess, materialize the approximate nearest neighbors.
+   */
   protected void preprocess() {
     final long starttime = System.currentTimeMillis();
     final int size = relation.size();

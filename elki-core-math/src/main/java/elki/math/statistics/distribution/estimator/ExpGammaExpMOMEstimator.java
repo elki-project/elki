@@ -63,6 +63,12 @@ public class ExpGammaExpMOMEstimator implements DistributionEstimator<ExpGammaDi
     return estimateFromExpMeanVariance(mv);
   }
 
+  /**
+   * Estimate from mean and variance.
+   * 
+   * @param mv Mean and variance
+   * @return Estimated distribution
+   */
   public ExpGammaDistribution estimateFromExpMeanVariance(MeanVariance mv) {
     final double mu = mv.getMean();
     final double var = mv.getSampleVariance();

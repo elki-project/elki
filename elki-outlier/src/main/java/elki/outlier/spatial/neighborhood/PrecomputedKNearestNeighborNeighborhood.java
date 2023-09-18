@@ -87,6 +87,9 @@ public class PrecomputedKNearestNeighborNeighborhood extends AbstractPrecomputed
 
     /**
      * Factory Constructor
+     * 
+     * @param k Number of neighbors
+     * @param distance Distance function
      */
     public Factory(int k, Distance<? super O> distance) {
       super();

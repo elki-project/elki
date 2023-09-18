@@ -24,13 +24,13 @@ import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
- * Class to precompute / cache Sinus and Cosinus values.
- * 
+ * Class to precompute / cache sine and cosine values.
+ * <p>
  * Note that the functions use integer offsets, not radians.
- * 
+ * <p>
  * TODO: add an interpolation function.
- * 
- * TODO: add caching
+ * <p>
+ * TODO: add caching, initialize with NaNs?
  * 
  * @author Erich Schubert
  * @since 0.5.5
@@ -86,7 +86,7 @@ public abstract class SinCosTable {
     /**
      * Constructor for tables with
      * 
-     * @param steps
+     * @param steps Number of steps in a circle
      */
     public FullTable(int steps) {
       super(steps);
@@ -95,7 +95,7 @@ public abstract class SinCosTable {
       this.sintable = new double[steps];
       double ang = 0.;
       final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
-      for (int i = 0; i < steps; i++, ang += radstep) {
+      for(int i = 0; i < steps; i++, ang += radstep) {
         this.sintable[i] = FastMath.sinAndCos(ang, tmp);
         this.costable[i] = tmp.value;
       }
@@ -122,7 +122,7 @@ public abstract class SinCosTable {
     @Override
     public double sin(int step) {
       step = step % steps;
-      if (step < 0) {
+      if(step < 0) {
         step += steps;
       }
       return sintable[step];
@@ -154,7 +154,7 @@ public abstract class SinCosTable {
     /**
      * Constructor for tables with
      * 
-     * @param steps
+     * @param steps Number of steps in the table
      */
     public HalfTable(int steps) {
       super(steps);
@@ -163,7 +163,7 @@ public abstract class SinCosTable {
       this.costable = new double[halfsteps + 1];
       this.sintable = new double[halfsteps + 1];
       double ang = 0.;
-      for (int i = 0; i < halfsteps + 1; i++, ang += radstep) {
+      for(int i = 0; i < halfsteps + 1; i++, ang += radstep) {
         this.costable[i] = FastMath.cos(ang);
         this.sintable[i] = FastMath.sin(ang);
       }
@@ -180,7 +180,7 @@ public abstract class SinCosTable {
       // Tabularizing cosine is a bit more straightforward than sine
       // As we can just drop the sign here:
       step = Math.abs(step) % steps;
-      if (step < costable.length) {
+      if(step < costable.length) {
         return costable[step];
       }
       // Symmetry at PI:
@@ -196,10 +196,10 @@ public abstract class SinCosTable {
     @Override
     public double sin(int step) {
       step = step % steps;
-      if (step < 0) {
+      if(step < 0) {
         step += steps;
       }
-      if (step < sintable.length) {
+      if(step < sintable.length) {
         return sintable[step];
       }
       // Anti symmetry at PI:
@@ -232,7 +232,7 @@ public abstract class SinCosTable {
     /**
      * Constructor for tables with
      * 
-     * @param steps
+     * @param steps Number of steps in the table
      */
     public QuarterTable(int steps) {
       super(steps);
@@ -241,7 +241,7 @@ public abstract class SinCosTable {
       final double radstep = Math.toRadians(360. / steps);
       this.costable = new double[quarsteps + 1];
       double ang = 0.;
-      for (int i = 0; i < quarsteps + 1; i++, ang += radstep) {
+      for(int i = 0; i < quarsteps + 1; i++, ang += radstep) {
         this.costable[i] = FastMath.cos(ang);
       }
     }
@@ -257,13 +257,13 @@ public abstract class SinCosTable {
       // Tabularizing cosine is a bit more straightforward than sine
       // As we can just drop the sign here:
       step = Math.abs(step) % steps;
-      if (step < costable.length) {
+      if(step < costable.length) {
         return costable[step];
       }
       // Symmetry at PI:
-      if (step > halfsteps) {
+      if(step > halfsteps) {
         step = steps - step;
-        if (step < costable.length) {
+        if(step < costable.length) {
           return costable[step];
         }
       }
@@ -293,12 +293,8 @@ public abstract class SinCosTable {
    * @return Table
    */
   public static SinCosTable make(int steps) {
-    if ((steps & 0x3) == 0) {
-      return new QuarterTable(steps);
-    }
-    if ((steps & 0x1) == 0) {
-      return new HalfTable(steps);
-    }
-    return new FullTable(steps);
+    return (steps & 0x3) == 0 ? new QuarterTable(steps) : //
+        (steps & 0x1) == 0 ? new HalfTable(steps) : //
+            new FullTable(steps);
   }
 }

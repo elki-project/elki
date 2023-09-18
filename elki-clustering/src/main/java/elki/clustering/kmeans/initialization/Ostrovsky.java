@@ -107,6 +107,13 @@ public class Ostrovsky extends AbstractKMeansInitialization {
       super(relation, distance, rnd);
     }
 
+    /**
+     * Choose initial means
+     * 
+     * @param relation Data relation
+     * @param k Number of means to choose
+     * @return Initial means
+     */
     public double[][] run(Relation<? extends NumberVector> relation, int k) {
       // Center and total variance
       MeanVariance[] mv = MeanVariance.of(relation);

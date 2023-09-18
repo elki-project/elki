@@ -15,10 +15,24 @@ import elki.svm.solver.Solver;
  * Note: R2 variant is SVDD with C=2.
  */
 public class SVDD extends AbstractSVR {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(SVDD.class);
 
+  /**
+   * Regularization C
+   */
   private double C;
 
+  /**
+   * Constructor.
+   * 
+   * @param eps Epsilon tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   * @param C Regularization C
+   */
   public SVDD(double eps, boolean shrinking, double cache_size, double C) {
     super(eps, shrinking, cache_size);
     this.C = C;
@@ -85,10 +99,6 @@ public class SVDD extends AbstractSVR {
       LOG.verbose("Warning: R^* = 0 for C <= 1/#instances.");
     }
     return si;
-  }
-
-  public interface RadiusAcceptor{
-    void setRSquare(double r_square);
   }
 
   @Override

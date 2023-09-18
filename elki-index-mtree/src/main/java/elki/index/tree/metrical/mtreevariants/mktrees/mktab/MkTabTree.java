@@ -220,7 +220,6 @@ public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNod
         }
       }
     }
-
     // directory node
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {

@@ -443,6 +443,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @author Erich Schubert
      */
     private class ItrParents implements It<O> {
+      /** Iterator position */
       int pos = 0;
 
       @Override
@@ -469,6 +470,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @author Erich Schubert
      */
     private class ItrParentsReverse implements It<O> {
+      /** Iterator position */
       int pos = nump - 1;
 
       @Override
@@ -495,6 +497,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @author Erich Schubert
      */
     private class ItrChildren implements It<O> {
+      /** Iterator position */
       int pos = 0;
 
       @Override
@@ -521,6 +524,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @author Erich Schubert
      */
     private class ItrChildrenReverse implements It<O> {
+      /** Iterator position */
       int pos = numc - 1;
 
       @Override
@@ -712,6 +716,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    * @author Erich Schubert
    */
   private class ItrAll implements It<O> {
+    /** Iterator position */
     int pos;
 
     @Override

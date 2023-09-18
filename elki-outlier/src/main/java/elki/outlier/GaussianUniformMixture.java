@@ -174,9 +174,9 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
   }
 
   /**
-   * Loglikelihood anomalous objects. Uniform distribution.
+   * Loglikelihood of anomalous objects assuming a uniform distribution.
    *
-   * @param anomalousObjs
+   * @param anomalousObjs Anomalout objects
    * @return loglikelihood for anomalous objects
    */
   private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
@@ -186,9 +186,10 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
   /**
    * Computes the loglikelihood of all normal objects. Gaussian model
    *
-   * @param objids Object IDs for 'normal' objects.
+   * @param objids All object ids
+   * @param anomalous Set of anomalous objects
    * @param builder Covariance matrix builder
-   * @param relation Database
+   * @param relation Data vectors
    * @return loglikelihood for normal objects
    */
   private double loglikelihoodNormal(DBIDs objids, SetDBIDs anomalous, CovarianceMatrix builder, Relation<? extends NumberVector> relation) {

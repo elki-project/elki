@@ -276,6 +276,13 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
     return eval;
   }
 
+  /**
+   * Collect the clusters
+   * 
+   * @param sids object ids
+   * @param uf union find data structure
+   * @return Clusters
+   */
   private ArrayList<ArrayModifiableDBIDs> collectClusters(final StaticDBIDs sids, UnionFind uf) {
     // collect dbids
     ArrayList<ArrayModifiableDBIDs> groups = new ArrayList<>();

@@ -39,9 +39,7 @@ import elki.index.tree.DirectoryEntry;
  * @since 0.1
  */
 public class MTreeDirectoryEntry implements DirectoryEntry, MTreeEntry {
-  /**
-   * Serialization version.
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 3;
 
   /**

@@ -73,13 +73,9 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
   @Override
   public RdKNNTree<O> instantiate(Relation<O> relation) {
-    PageFile<RdKNNNode> pagefile = makePageFile(getNodeClass());
+    PageFile<RdKNNNode> pagefile = makePageFile(RdKNNNode.class);
     RdKNNTree<O> index = new RdKNNTree<>(relation, pagefile, settings);
     return index;
-  }
-
-  protected Class<RdKNNNode> getNodeClass() {
-    return ClassGenericsUtil.uglyCastIntoSubclass(RdKNNNode.class);
   }
 
   /**

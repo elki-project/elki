@@ -415,6 +415,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
    * @param relation Data relation
    * @param distance Distance function
    * @param k Leaf size
+   * @return k-d-tree index
    */
   private <O> DistancePriorityIndex<O> makeKDTree(Relation<? extends O> relation, Distance<? super O> distance, int k) {
     // TODO: make sure there is no such k-d-tree already!

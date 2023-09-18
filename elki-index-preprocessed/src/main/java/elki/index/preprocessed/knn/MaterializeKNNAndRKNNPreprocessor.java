@@ -88,6 +88,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O> extends MaterializeKNNPreproce
    * Materializes the kNNs and RkNNs of the specified object IDs.
    *
    * @param ids the IDs of the objects
+   * @param progress Progress logger (may be null)
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
     // add an empty list to each rknn

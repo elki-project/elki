@@ -42,8 +42,9 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   /**
    * Constructor for a type request without dimensionality constraints.
    * 
-   * @param cls Class constraint
    * @param <V> vector type
+   * @param cls Class constraint
+   * @return type information
    */
   public static <V extends FeatureVector<?>> VectorTypeInformation<V> typeRequest(Class<? super V> cls) {
     return new VectorTypeInformation<>(cls, -1, Integer.MAX_VALUE);
@@ -52,6 +53,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
   /**
    * Constructor for a type request with dimensionality constraints.
    * 
+   * @return type information
    * @param cls Class constraint
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality

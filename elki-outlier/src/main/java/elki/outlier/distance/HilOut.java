@@ -160,6 +160,7 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
   /**
    * Constructor.
    * 
+   * @param distance Distance function
    * @param k Number of Next Neighbors
    * @param n Number of Outlier
    * @param h Number of Bits for precision to use - max 32
@@ -297,7 +298,7 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
    * Scan function performs a squential scan over the data.
    * 
    * @param hf the hilbert features
-   * @param k0
+   * @param k0 k0 value for the scan
    */
   private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
@@ -341,6 +342,7 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
    * innerScan function calculates new upper and lower bounds and inserts the
    * points of the neighborhood the bounds are based on in the NN Set
    * 
+   * @param hf Hibert features to scan
    * @param i position in pf of the feature for which the bounds should be
    *        calculated
    * @param maxcount maximal size of the neighborhood
@@ -622,10 +624,10 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
      * 
      * @param i position in pf of the feature for which the bound should be
      *        calculated
+     * @return fast upper bound
      */
     private double fastUpperBound(int i) {
-      int pre = i;
-      int post = i;
+      int pre = i, post = i;
       while(post - pre < k) {
         int pre_level = (pre - 1 >= 0) ? pf[pre - 1].level : -2;
         int post_level = (post < capital_n - 1) ? pf[post].level : -2;
@@ -640,11 +642,12 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
     }
 
     /**
-     * minDist function calculate the minimal Distance from Vector p to the
+     * minDist function calculate the minimal distance from vector p to the
      * border of the corresponding r-region at the given level
      * 
      * @param id Object ID
      * @param level Level of the corresponding r-region
+     * @return minDist to the border
      */
     private double minDistLevel(DBID id, int level) {
       final NumberVector obj = relation.get(id);
@@ -660,11 +663,12 @@ public class HilOut<O extends NumberVector> implements OutlierAlgorithm {
     }
 
     /**
-     * maxDist function calculate the maximal Distance from Vector p to the
+     * maxDist function calculate the maximal distance from vector p to the
      * border of the corresponding r-region at the given level
      * 
      * @param id Object ID
      * @param level Level of the corresponding r-region
+     * @return maxDist to the border
      */
     private double maxDistLevel(DBID id, int level) {
       final NumberVector obj = relation.get(id);

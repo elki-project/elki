@@ -120,6 +120,7 @@ public final class OptionUtil {
    * @param pcls Parameterizable class to describe
    * @param width Width
    * @return Formatted description
+   * @throws ClassInstantiationException on instantiation errors
    */
   public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width) throws ClassInstantiationException {
     println(buf, width, "Description for class " + pcls.getName());

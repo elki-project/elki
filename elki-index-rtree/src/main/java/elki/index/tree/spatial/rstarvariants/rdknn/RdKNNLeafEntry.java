@@ -37,6 +37,7 @@ import elki.index.tree.spatial.SpatialPointLeafEntry;
  * @since 0.1
  */
 public class RdKNNLeafEntry extends SpatialPointLeafEntry implements RdKNNEntry {
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

@@ -36,9 +36,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * @since 0.1
  */
 class MkAppLeafEntry extends MTreeLeafEntry implements MkAppEntry {
-  /**
-   * Serial Version UID
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

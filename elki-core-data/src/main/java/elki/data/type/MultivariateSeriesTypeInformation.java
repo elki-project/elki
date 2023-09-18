@@ -40,8 +40,9 @@ public class MultivariateSeriesTypeInformation<V extends FeatureVector<?>> exten
   /**
    * Constructor for a type request without dimensionality constraints.
    * 
-   * @param cls Class constraint
    * @param <V> vector type
+   * @param cls Class constraint
+   * @return type information
    */
   public static <V extends FeatureVector<?>> MultivariateSeriesTypeInformation<V> typeRequest(Class<? super V> cls) {
     return new MultivariateSeriesTypeInformation<>(cls, -1, Integer.MAX_VALUE, -1);
@@ -50,10 +51,12 @@ public class MultivariateSeriesTypeInformation<V extends FeatureVector<?>> exten
   /**
    * Constructor for an actual type.
    *
+   * @param <V> vector type
    * @param cls base class
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    * @param multiplicity Number of variates
+   * @return type information
    */
   public MultivariateSeriesTypeInformation(Class<? super V> cls, int mindim, int maxdim, int multiplicity) {
     super(cls, mindim, maxdim);

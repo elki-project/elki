@@ -83,7 +83,12 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * @author Arthur Zimek
    */
   public enum ScalingReference {
-    UNITCUBE, STDDEV, MINMAX
+    /** Unit cube scaling */
+    UNITCUBE,
+    /** Standardizatino */
+    STDDEV,
+    /** Min-max scaling */
+    MINMAX
   }
 
   /**
@@ -92,7 +97,10 @@ public class PerturbationFilter<V extends NumberVector> extends AbstractVectorCo
    * @author Arthur Zimek
    */
   public enum NoiseDistribution {
-    GAUSSIAN, UNIFORM
+    /** Gaussian noise */
+    GAUSSIAN,
+    /** Uniform noise */
+    UNIFORM
   }
 
   /**

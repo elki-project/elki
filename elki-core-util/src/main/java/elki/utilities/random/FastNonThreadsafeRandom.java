@@ -38,13 +38,15 @@ import elki.utilities.documentation.Reference;
  * @since 0.6.0
  */
 public class FastNonThreadsafeRandom extends Random {
-  /**
-   * Serial version number.
-   */
+  /** Serial version number. */
   private static final long serialVersionUID = 1L;
 
-  // These are the same constants as in {@link java.util.Random}
-  // since we want to leave the random sequence unchanged.
+  /**
+   * Constants for the standard Java RNG.
+   * <p>
+   * These are the same constants as in {@link java.util.Random}
+   * since we want to leave the random sequence unchanged.
+   */
   private static final long multiplier = 0x5DEECE66DL, addend = 0xBL,
       mask = (1L << 48) - 1;
 
@@ -118,6 +120,9 @@ public class FastNonThreadsafeRandom extends Random {
    * D. Lemire<br>
    * Fast Random Integer Generation in an Interval<br>
    * ACM Trans. Model. Comput. Simul. 29(1)
+   *
+   * @param n Limit of range (exclusive)
+   * @return Random number
    */
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //
@@ -159,6 +164,9 @@ public class FastNonThreadsafeRandom extends Random {
    * <p>
    * In our experiments, the difference was negligible, as the rejections are
    * quite rare events at least for our use case.
+   * 
+   * @param n Limit of range (exclusive)
+   * @return Random number
    */
   @Reference(authors = "D. Lemire", //
       title = "Fast random shuffling", //

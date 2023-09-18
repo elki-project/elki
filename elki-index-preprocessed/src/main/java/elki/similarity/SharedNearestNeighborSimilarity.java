@@ -107,6 +107,7 @@ public class SharedNearestNeighborSimilarity<O> extends AbstractIndexBasedSimila
      *
      * @param database Database
      * @param preprocessor Index
+     * @param similarityFunction Similarity function
      */
     public Instance(Relation<O> database, SharedNearestNeighborIndex<O> preprocessor, SharedNearestNeighborSimilarity<? super O> similarityFunction) {
       super(database, preprocessor);

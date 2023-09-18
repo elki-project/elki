@@ -55,7 +55,8 @@ public class MkMaxTreeFactory<O> extends AbstractMkTreeUnifiedFactory<O, MkMaxTr
     return new MkMaxTreeIndex<>(relation, pagefile, settings);
   }
 
-  protected Class<MkMaxTreeNode<O>> getNodeClass() {
+  /** @return node class cast to add generic &lt;O&gt; */
+  private Class<MkMaxTreeNode<O>> getNodeClass() {
     return ClassGenericsUtil.uglyCastIntoSubclass(MkMaxTreeNode.class);
   }
 

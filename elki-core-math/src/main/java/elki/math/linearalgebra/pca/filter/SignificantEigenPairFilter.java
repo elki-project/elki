@@ -62,7 +62,7 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    *
-   * @param walpha
+   * @param walpha Tolerance level for weak eigenvectors
    */
   public SignificantEigenPairFilter(double walpha) {
     super();

@@ -31,6 +31,7 @@ import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
  * @navhas - contains - RdKNNEntry
  */
 public class RdKNNNode extends AbstractRStarTreeNode<RdKNNNode, RdKNNEntry> {
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

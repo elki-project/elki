@@ -36,6 +36,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * @since 0.1
  */
 class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

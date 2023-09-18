@@ -289,6 +289,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
    * @param dim Split dimension
    * @param val Split threshold
    * @param iter Iterator
+   * @return true, throw assertion otherwise
    */
   private boolean assertSplitConsistent(int left, int pos, int right, int dim, double val, DBIDArrayMIter iter) {
     for(iter.seek(left); iter.getOffset() < pos; iter.advance()) {
@@ -539,6 +540,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
      * @param query Query object
      * @param res kNN heap
      * @param iter Iterator variable (reduces memory footprint!)
+     * @param bounds current subtree bounds
      * @param rawdist Raw distance to current rectangle (usually squared)
      * @param radius Query radius
      */

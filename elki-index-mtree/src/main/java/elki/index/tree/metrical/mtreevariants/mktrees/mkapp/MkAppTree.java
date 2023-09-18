@@ -39,6 +39,7 @@ import elki.index.tree.LeafEntry;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import elki.index.tree.metrical.mtreevariants.query.MTreeSearchCandidate;
 import elki.logging.Logging;
+import elki.math.linearalgebra.VMath;
 import elki.math.statistics.PolynomialRegression;
 import elki.persistent.PageFile;
 import elki.utilities.datastructures.heap.Heap;
@@ -238,22 +239,23 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
     }
   }
 
+  /**
+   * Get the mean kNN values.
+   * 
+   * @param ids Object ids
+   * @param knnLists kNN lists
+   * @return Mean kNN values
+   */
   private double[] getMeanKNNList(DBIDs ids, Map<DBID, KNNList> knnLists) {
     double[] means = new double[settings.kmax];
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      KNNList knns = knnLists.get(id);
+      KNNList knns = knnLists.get(iter);
       int k = 0;
       for(DoubleDBIDListIter it = knns.iter(); k < settings.kmax && it.valid(); it.advance(), k++) {
         means[k] += it.doubleValue();
       }
     }
-
-    for(int k = 0; k < settings.kmax; k++) {
-      means[k] /= ids.size();
-    }
-
-    return means;
+    return VMath.timesEquals(means, 1./ ids.size());
   }
 
   /**

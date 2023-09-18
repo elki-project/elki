@@ -66,6 +66,8 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
 
   /**
    * Save the current data to the given file.
+   *
+   * @throws IOException on IO errors
    */
   public void save() throws IOException {
     BufferedWriter p = Files.newBufferedWriter(file);

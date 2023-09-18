@@ -46,11 +46,10 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
- * distances) to each database object.
+ * distances) to each database object, using a R-tree-based spatial
+ * approximation.
  * <p>
- * Used for example by {@link elki.outlier.lof.LOF}.
- * <p>
- * TODO correct handling of datastore events
+ * TODO: correct handling of datastore events
  *
  * @author Erich Schubert
  * @since 0.2
@@ -139,7 +138,13 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
   }
 
-  protected AbstractRStarTree<?, SpatialEntry, ?> getSpatialIndex(Relation<O> relation) {
+  /**
+   * Find a spatial index attached to the data
+   * 
+   * @param relation Data relation
+   * @return Spatial index (R-tree only currently)
+   */
+  private AbstractRStarTree<?, SpatialEntry, ?> getSpatialIndex(Relation<O> relation) {
     AbstractRStarTree<?, SpatialEntry, ?> ret = null;
     for(It<AbstractRStarTree<?, SpatialEntry, ?>> iter = Metadata.hierarchyOf(relation).iterDescendants().filter(AbstractRStarTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {

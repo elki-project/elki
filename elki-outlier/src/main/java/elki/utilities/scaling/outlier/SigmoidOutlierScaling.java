@@ -303,6 +303,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
    * H.-T. Lin, C.-J. Lin, R. C. Weng:<br>
    * A Note on Platt’s Probabilistic Outputs for Support Vector Machines
    *
+   * @param <A> Array type
    * @param a A parameter
    * @param b B parameter
    * @param t Bitset containing the assignment

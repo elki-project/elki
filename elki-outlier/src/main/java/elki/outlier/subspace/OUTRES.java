@@ -314,6 +314,7 @@ public class OUTRES implements OutlierAlgorithm {
      * Constructor.
      * 
      * @param relation Relation to apply to
+     * @param eps Epsilon value
      */
     public KernelDensityEstimator(Relation<? extends NumberVector> relation, double eps) {
       super();

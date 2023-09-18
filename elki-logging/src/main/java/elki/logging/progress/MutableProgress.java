@@ -64,8 +64,8 @@ public class MutableProgress extends AbstractProgress {
   /**
    * Modify the total value.
    * 
-   * @param total
-   * @throws IllegalArgumentException
+   * @param total New total value.
+   * @throws IllegalArgumentException when the value is decreased beyond the current progress.
    */
   public void setTotal(int total) throws IllegalArgumentException {
     if(getProcessed() > total) {

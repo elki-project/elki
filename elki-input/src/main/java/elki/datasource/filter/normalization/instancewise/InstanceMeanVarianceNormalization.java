@@ -38,7 +38,7 @@ import elki.utilities.optionhandling.Parameterizer;
  */
 public class InstanceMeanVarianceNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
-   * Multiplicity of the vector.
+   * Multiplicity of the vector (for multivariate time series).
    */
   private int multiplicity;
 
@@ -67,6 +67,12 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
     return factory.newNumberVector(univariateStandardization(raw));
   }
 
+  /**
+   * Perform univariate standardization
+   * 
+   * @param raw Raw vector to modify in-place
+   * @return {@code raw} for method chaining
+   */
   protected double[] univariateStandardization(double[] raw) {
     // Two pass normalization is numerically most stable,
     // And Java should optimize this well enough.
@@ -97,6 +103,12 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
     return raw;
   }
 
+  /**
+   * Perform multivariate scaling
+   * 
+   * @param raw Raw vector to modify in-place
+   * @return {@code raw} for method chaining
+   */
   protected double[] multivariateStandardization(double[] raw) {
     final int len = raw.length / multiplicity;
     if(len <= 1) {

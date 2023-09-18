@@ -170,6 +170,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param <V> Object type
    * @param type Type information
    * @param data Data to add
+   * @return Simple bundle
    */
   public static <V> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V> type, List<? extends V> data) {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
@@ -186,6 +187,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param data1 Data column to add
    * @param type2 Second Type information
    * @param data2 Second data column to add
+   * @return Simple bundle
    */
   public static <V1, V2> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2) {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
@@ -206,6 +208,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    * @param data2 Second data column to add
    * @param type3 Third type information
    * @param data3 Third data column to add
+   * @return Simple bundle
    */
   public static <V1, V2, V3> MultipleObjectsBundle makeSimple(SimpleTypeInformation<? super V1> type1, List<? extends V1> data1, SimpleTypeInformation<? super V2> type2, List<? extends V2> data2, SimpleTypeInformation<? super V3> type3, List<? extends V3> data3) {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();

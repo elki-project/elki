@@ -59,6 +59,7 @@ public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
    * Constructor.
    * 
    * @param samplesize Sampling size
+   * @param rnd Random generator
    */
   public RandomSampleReferencePoints(int samplesize, RandomFactory rnd) {
     super();

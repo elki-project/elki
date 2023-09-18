@@ -60,6 +60,7 @@ public class TokenizedReader extends BufferedLineReader {
    * Read the next line into the tokenizer.
    * 
    * @return The next line, or {@code null}.
+   * @throws IOException on I/O error
    */
   public boolean nextLineExceptComments() throws IOException {
     while(super.nextLine()) {

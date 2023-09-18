@@ -54,7 +54,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    * 
-   * @param alpha
+   * @param alpha Alpha threshold
    */
   public PercentageEigenPairFilter(double alpha) {
     super();

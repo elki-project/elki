@@ -338,9 +338,11 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
    * Computes logarithmic skew (fractal dimension ie. m) and in kappx[0] and
    * kappx[1] the non-logarithmic values of the approximated first and last
    * nearest neighbor distances
+   * <p>
+   * TODO: Spezialbehandlung fuer identische Punkte in DB (insbes. Distanz 0)
    *
-   * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB
-   *        (insbes. Distanz 0)
+   * @param entry Leaf entry
+   * @param knnDistances kNN distances
    */
   private void approximateKnnDistances(MkCoPLeafEntry entry, KNNList knnDistances) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;

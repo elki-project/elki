@@ -87,9 +87,7 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
     }
 
     Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax);
-
     kNNdistanceAdjustment(getRootEntry(), knnLists);
-
     doExtraIntegrityChecks();
   }
 

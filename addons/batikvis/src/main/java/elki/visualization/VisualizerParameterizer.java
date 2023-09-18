@@ -102,7 +102,7 @@ public class VisualizerParameterizer {
 
   /**
    * Random seed for sampling.
-   *
+   * <p>
    * FIXME: make parameterizable.
    */
   private RandomFactory rnd = RandomFactory.DEFAULT;
@@ -110,7 +110,7 @@ public class VisualizerParameterizer {
   /**
    * Constructor.
    *
-   * @param samplesize
+   * @param samplesize Sample size
    * @param stylelib Style library
    * @param factories Factories to use
    * @param showVisualizers Visualizers to force visible (may be null)
@@ -211,10 +211,7 @@ public class VisualizerParameterizer {
    */
   protected static String shortenClassname(String nam, char c) {
     final int lastdot = nam.lastIndexOf(c);
-    if(lastdot >= 0) {
-      nam = nam.substring(lastdot + 1);
-    }
-    return nam;
+    return lastdot >= 0 ? nam.substring(lastdot + 1) : nam;
   }
 
   /**
@@ -311,7 +308,7 @@ public class VisualizerParameterizer {
      * @param filter Filter
      * @return List of all adapters found.
      */
-    private static <O> Collection<VisualizationProcessor> collectFactorys(MergedParameterization config, Pattern filter) {
+    private static Collection<VisualizationProcessor> collectFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<VisualizationProcessor> factories = new ArrayList<>();
       for(Class<?> c : ELKIServiceRegistry.findAllImplementations(VisualizationProcessor.class)) {
         if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {

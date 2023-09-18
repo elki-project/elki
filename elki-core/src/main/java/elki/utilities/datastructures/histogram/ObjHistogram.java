@@ -198,6 +198,11 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
    */
   @FunctionalInterface
   public interface BucketFactory<T> {
+    /**
+     * Allocate a new bucket value for the histogram.
+     * 
+     * @return new empty bucket value
+     */
     T make();
   }
 }

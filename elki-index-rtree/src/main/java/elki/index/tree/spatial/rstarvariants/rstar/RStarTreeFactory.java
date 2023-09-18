@@ -54,12 +54,8 @@ public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
   @Override
   public RStarTreeIndex<O> instantiate(Relation<O> relation) {
-    PageFile<RStarTreeNode> pagefile = makePageFile(getNodeClass());
+    PageFile<RStarTreeNode> pagefile = makePageFile(RStarTreeNode.class);
     return new RStarTreeIndex<>(relation, pagefile, settings);
-  }
-
-  protected Class<RStarTreeNode> getNodeClass() {
-    return RStarTreeNode.class;
   }
 
   /**

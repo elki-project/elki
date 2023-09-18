@@ -38,9 +38,7 @@ import elki.index.tree.LeafEntry;
  * @since 0.1
  */
 public class SpatialPointLeafEntry implements LeafEntry, SpatialEntry, NumberVector {
-  /**
-   * Serial version.
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

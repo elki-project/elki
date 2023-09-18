@@ -114,6 +114,7 @@ public class LineReader implements AutoCloseable {
    *
    * @param buf Buffer.
    * @return {@code true} if some characters have been read.
+   * @throws IOException on read error.
    */
   public boolean readLine(Appendable buf) throws IOException {
     boolean success = false;

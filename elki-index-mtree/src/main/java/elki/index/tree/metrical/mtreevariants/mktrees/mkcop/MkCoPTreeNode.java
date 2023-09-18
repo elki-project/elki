@@ -36,9 +36,7 @@ import net.jafama.FastMath;
  * @param <O> object type
  */
 class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry> {
-  /**
-   * Serial version UID
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

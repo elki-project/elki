@@ -148,6 +148,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> implements KN
     }
   }
 
+  /** Preprocess - approximate the nearest neighbors */
   protected void preprocess() {
     final long starttime = System.nanoTime();
     final int size = relation.size();

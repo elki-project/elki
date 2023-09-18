@@ -43,8 +43,17 @@ import elki.utilities.optionhandling.parameters.Parameter;
 // FIXME: update on focus loss?
 // FIXME: restrictions for number input?
 public class TextParameterConfigurator extends AbstractSingleParameterConfigurator<Parameter<?>> implements ActionListener {
+  /**
+   * Swing text field component
+   */
   final JTextField value;
 
+  /**
+   * Constructor.
+   * 
+   * @param param Parameter to configure
+   * @param parent Parent component
+   */
   public TextParameterConfigurator(Parameter<?> param, JComponent parent) {
     super(param, parent);
 

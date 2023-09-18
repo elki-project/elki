@@ -69,11 +69,12 @@ public class MkAppTreeIndex<O> extends MkAppTree<O> implements RangeIndex<O>, KN
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
    * 
-   * @param object the data object to be represented by the new entry
+   * @param id the data object to be represented by the new entry
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
+   * @return new leaf entry
    */
-  protected MkAppEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
+  protected MkAppEntry createNewLeafEntry(DBID id, double parentDistance) {
     return new MkAppLeafEntry(id, parentDistance, null);
   }
 
@@ -82,9 +83,7 @@ public class MkAppTreeIndex<O> extends MkAppTree<O> implements RangeIndex<O>, KN
     super.initialize();
     List<MkAppEntry> objs = new ArrayList<>(relation.size());
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, Double.NaN));
+      objs.add(createNewLeafEntry(DBIDUtil.deref(iter),  Double.NaN));
     }
     insertAll(objs);
   }

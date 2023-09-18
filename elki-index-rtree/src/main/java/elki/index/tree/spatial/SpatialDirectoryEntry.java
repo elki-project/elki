@@ -39,9 +39,7 @@ import elki.index.tree.DirectoryEntry;
  * @since 0.1
  */
 public class SpatialDirectoryEntry implements DirectoryEntry, SpatialEntry {
-  /**
-   * Serialization version.
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

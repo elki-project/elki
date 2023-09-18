@@ -141,9 +141,13 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
   }
 
   /**
+   * Create a leaf entry
+   * 
+   * @param id Object id
+   * @param parentDistance Distance to parent
    * @return a new MTreeLeafEntry representing the specified data object
    */
-  protected MTreeEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
+  protected MTreeEntry createNewLeafEntry(DBID id, double parentDistance) {
     return new MTreeLeafEntry(id, parentDistance);
   }
 
@@ -155,26 +159,23 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
 
   @Override
   public void insert(DBIDRef id) {
-    insert(createNewLeafEntry(DBIDUtil.deref(id), relation.get(id), Double.NaN), false);
+    insert(createNewLeafEntry(DBIDUtil.deref(id), Double.NaN), false);
   }
 
   @Override
   public void insertAll(DBIDs ids) {
     List<MTreeEntry> objs = new ArrayList<>(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, Double.NaN));
+      objs.add(createNewLeafEntry(DBIDUtil.deref(iter), Double.NaN));
     }
     insertAll(objs);
   }
 
   /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
+   * Throws an NotIplementedException since deletion of objects is not
    * yet supported by an M-Tree.
    *
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
+   * @throws NotIplementedException since deletions are not implemented yet
    */
   @Override
   public final boolean delete(DBIDRef id) {
@@ -182,11 +183,10 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
   }
 
   /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
+   * Throws an NotIplementedException since deletion of objects is not
    * yet supported by an M-Tree.
    *
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
+   * @throws NotIplementedException since deletions are not implemented yet
    */
   @Override
   public void deleteAll(DBIDs ids) {

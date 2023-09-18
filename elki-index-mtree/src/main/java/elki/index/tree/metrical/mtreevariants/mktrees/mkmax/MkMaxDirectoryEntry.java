@@ -36,9 +36,7 @@ import elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
  * @since 0.1
  */
 class MkMaxDirectoryEntry extends MTreeDirectoryEntry implements MkMaxEntry {
-  /**
-   * Serial version UID
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

@@ -77,6 +77,8 @@ public class QuickSelect {
    * QuickSelect is essentially quicksort, except that we only "sort" that half
    * of the array that we are interested in.
    *
+   * @param <T> Array type
+   * @param adapter Array adapter
    * @param data Data to process
    * @param start Interval start
    * @param end Interval end (exclusive)
@@ -180,6 +182,8 @@ public class QuickSelect {
   /**
    * Sort a small array using repetitive insertion sort.
    *
+   * @param <T> Array type
+   * @param adapter Array adapter
    * @param data Data to sort
    * @param start Interval start
    * @param end Interval end
@@ -798,6 +802,7 @@ public class QuickSelect {
    *
    * @param <T> object type
    * @param data Data to sort
+   * @param comparator Comparator
    * @param start Interval start
    * @param end Interval end
    */

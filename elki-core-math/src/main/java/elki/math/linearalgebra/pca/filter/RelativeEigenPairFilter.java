@@ -60,7 +60,7 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    * 
-   * @param ralpha
+   * @param ralpha Relative alpha value
    */
   public RelativeEigenPairFilter(double ralpha) {
     super();

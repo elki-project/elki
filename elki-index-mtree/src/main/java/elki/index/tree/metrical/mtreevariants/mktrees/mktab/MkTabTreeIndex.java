@@ -67,12 +67,13 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
    * Creates a new leaf entry representing the specified data object in the
    * specified subtree.
    * 
-   * @param object the data object to be represented by the new entry
+   * @param id Object id
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
+   * @return new leaf entry
    */
-  protected MkTabEntry createNewLeafEntry(DBID id, DBIDRef object, double parentDistance) {
-    return new MkTabLeafEntry(id, parentDistance, knnDistances(object));
+  protected MkTabEntry createNewLeafEntry(DBID id, double parentDistance) {
+    return new MkTabLeafEntry(id, parentDistance, knnDistances(id));
   }
 
   /**
@@ -96,8 +97,8 @@ public class MkTabTreeIndex<O> extends MkTabTree<O> implements RangeIndex<O>, KN
     super.initialize();
     List<MkTabEntry> objs = new ArrayList<>(relation.size());
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = DBIDUtil.deref(iter);
-      objs.add(createNewLeafEntry(id, id, Double.NaN));
+      // Deref, as we need to store this in the tree
+      objs.add(createNewLeafEntry(DBIDUtil.deref(iter), Double.NaN));
     }
     insertAll(objs);
   }

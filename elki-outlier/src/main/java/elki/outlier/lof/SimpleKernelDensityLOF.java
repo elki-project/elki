@@ -92,6 +92,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> implements OutlierAl
    * Constructor.
    *
    * @param k number of neighbors
+   * @param distance Distance function
    * @param kernel Kernel function
    */
   public SimpleKernelDensityLOF(int k, Distance<? super O> distance, KernelDensityFunction kernel) {

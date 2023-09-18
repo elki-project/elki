@@ -350,11 +350,23 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     return factory;
   }
 
+  /**
+   * Cast the current result (ugly hack).
+   *
+   * @param <R> Result type
+   * @return Result
+   */
   @SuppressWarnings("unchecked")
   public <R> R getResult() {
     return (R) result;
   }
 
+  /**
+   * Cast the data relation (ugly hack).
+   * 
+   * @param <R> Relation type
+   * @return Relation
+   */
   @SuppressWarnings("unchecked")
   public <R extends Relation<?>> R getRelation() {
     return (R) relation;

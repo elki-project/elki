@@ -256,6 +256,7 @@ public class XYCurveVisualization implements VisFactory {
   /**
    * Setup the CSS classes for the plot.
    *
+   * @param context Visualizer context
    * @param svgp Plot
    */
   private void setupCSS(VisualizerContext context, SVGPlot svgp) {

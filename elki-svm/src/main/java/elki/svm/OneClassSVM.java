@@ -33,10 +33,24 @@ import elki.svm.solver.Solver;
  * One-class classification is similar to regression.
  */
 public class OneClassSVM extends AbstractSVR {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(OneClassSVM.class);
 
+  /**
+   * Nu regularization
+   */
   protected double nu;
 
+  /**
+   * Constructor.
+   * 
+   * @param eps Epsilon tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   * @param nu Nu regularization
+   */
   public OneClassSVM(double eps, boolean shrinking, double cache_size, double nu) {
     super(eps, shrinking, cache_size);
     this.nu = nu;

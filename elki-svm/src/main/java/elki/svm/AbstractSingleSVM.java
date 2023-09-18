@@ -283,6 +283,6 @@ public abstract class AbstractSingleSVM {
     return v > 0. || v < 0.;
   }
 
-  /** Get the class logger */
+  /** @return Get the class logger */
   abstract protected Logging getLogger();
 }

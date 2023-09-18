@@ -35,9 +35,7 @@ import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  */
 class MkMaxTreeNode<O> extends AbstractMTreeNode<O, MkMaxTreeNode<O>, MkMaxEntry> {
-  /**
-   * Serial version
-   */
+  /** Serial version UID */
   private static final long serialVersionUID = 1;
 
   /**

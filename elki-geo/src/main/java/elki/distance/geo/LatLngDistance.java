@@ -66,6 +66,8 @@ public class LatLngDistance implements SpatialPrimitiveDistance<NumberVector>, N
 
   /**
    * Constructor.
+   * 
+   * @param model Earth model to use.
    */
   public LatLngDistance(EarthModel model) {
     super();

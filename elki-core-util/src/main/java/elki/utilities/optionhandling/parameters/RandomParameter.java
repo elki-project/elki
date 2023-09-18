@@ -35,6 +35,9 @@ import elki.utilities.random.RandomFactory;
  * @since 0.5.5
  */
 public class RandomParameter extends AbstractParameter<RandomParameter, RandomFactory> {
+  /**
+   * String for the default RNG
+   */
   private static final String GLOBAL_RANDOM_STR = "global random";
 
   /**

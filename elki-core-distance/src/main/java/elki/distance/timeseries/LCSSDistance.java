@@ -118,7 +118,16 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
     return 1. - sim;
   }
 
-  public double getRange(NumberVector v1, final int dim1, NumberVector v2, final int dim2) {
+  /**
+   * Get the range of values in two vectors.
+   * 
+   * @param v1 First vector
+   * @param dim1 Dimensionality of first vector
+   * @param v2 Second vector
+   * @param dim2 Dimensionality of second vector
+   * @return Range of values
+   */
+  private double getRange(NumberVector v1, final int dim1, NumberVector v2, final int dim2) {
     double min = v1.doubleValue(0), max = min;
     for(int i = 1; i < dim1; i++) {
       final double v = v1.doubleValue(i);
@@ -130,8 +139,7 @@ public class LCSSDistance extends AbstractNumberVectorDistance {
       min = (v < min) ? v : min;
       max = (v > max) ? v : max;
     }
-    final double range = max - min;
-    return range;
+    return max - min;
   }
 
   @Override

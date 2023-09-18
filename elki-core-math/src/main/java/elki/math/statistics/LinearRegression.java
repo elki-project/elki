@@ -25,15 +25,18 @@ import java.util.List;
 import elki.utilities.pairs.DoubleDoublePair;
 
 /**
+ * Simple linear regression on two-dimensional data.
+ * <p>
+ * TODO: rather use double[] x, double[] y?
  * 
  * @author Arthur Zimek
  * @since 0.1
  */
-// TODO: arthur comment
-// TODO: use covariance matrix, add incremental API?
 public class LinearRegression {
+  /** Intercept */
   private double t;
 
+  /** Slope */
   private double m;
 
   /**
@@ -61,14 +64,14 @@ public class LinearRegression {
   }
 
   /**
-   * @return m
+   * @return slope m
    */
   public double getM() {
     return this.m;
   }
 
   /**
-   * @return t
+   * @return intercept t
    */
   public double getT() {
     return this.t;

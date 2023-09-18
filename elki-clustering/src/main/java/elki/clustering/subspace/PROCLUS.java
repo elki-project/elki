@@ -119,7 +119,9 @@ public class PROCLUS extends AbstractProjectedClustering<Clustering<SubspaceMode
   /**
    * Performs the PROCLUS algorithm on the given database.
    *
+   * @param <V> Vector type
    * @param relation Relation to process
+   * @return Clustering result
    */
   public <V extends NumberVector> Clustering<SubspaceModel> run(Relation<V> relation) {
     if(RelationUtil.dimensionality(relation) < l) {
@@ -320,6 +322,7 @@ public class PROCLUS extends AbstractProjectedClustering<Clustering<SubspaceMode
    *
    * @param medoids the ids of the medoids
    * @param distance the distance function
+   * @param rangeQuery range query
    * @return a mapping of the medoid's id to its locality
    */
   private DataStore<DBIDs> getLocalities(DBIDs medoids, DistanceQuery<? extends NumberVector> distance, RangeSearcher<DBIDRef> rangeQuery) {
@@ -354,6 +357,7 @@ public class PROCLUS extends AbstractProjectedClustering<Clustering<SubspaceMode
    * @param medoids the set of medoids
    * @param relation the relation containing the objects
    * @param distance the distance function
+   * @param rangeQuery range query
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */

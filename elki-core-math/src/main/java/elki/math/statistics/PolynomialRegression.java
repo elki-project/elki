@@ -58,6 +58,13 @@ public class PolynomialRegression extends MultipleLinearRegression {
     this.p = p;
   }
 
+  /**
+   * Compute the polynomial matrix X.
+   * 
+   * @param x Input data
+   * @param p Order of the polynomial
+   * @return Materialized matrix
+   */
   private static double[][] xMatrix(double[] x, int p) {
     int n = x.length;
 

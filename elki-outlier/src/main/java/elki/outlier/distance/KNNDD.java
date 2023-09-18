@@ -116,6 +116,7 @@ public class KNNDD<O> implements OutlierAlgorithm {
    * Runs the algorithm in the timed evaluation part.
    *
    * @param relation Data relation
+   * @return Outlier detection scores
    */
   public OutlierResult run(Relation<O> relation) {
     KNNSearcher<DBIDRef> knnQuery = new QueryBuilder<>(relation, distance).kNNByDBID(kplus);

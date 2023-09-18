@@ -106,6 +106,14 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     }
   }
 
+  /**
+   * Compute the precision at k curve.
+   * 
+   * @param size size of the relation
+   * @param positiveids positive ids
+   * @param order Ordering of objects
+   * @return 2D curve
+   */
   private XYCurve computePrecisionResult(int size, SetDBIDs positiveids, DBIDs order) {
     if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");

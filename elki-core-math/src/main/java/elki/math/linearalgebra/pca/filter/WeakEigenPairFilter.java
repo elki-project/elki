@@ -52,7 +52,7 @@ public class WeakEigenPairFilter implements EigenPairFilter {
   /**
    * Constructor.
    * 
-   * @param walpha
+   * @param walpha Tolerance level
    */
   public WeakEigenPairFilter(double walpha) {
     super();

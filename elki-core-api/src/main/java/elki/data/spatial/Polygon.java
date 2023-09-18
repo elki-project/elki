@@ -109,6 +109,7 @@ public class Polygon implements SpatialComparable, Iterable<double[]> {
    * Append the polygon to the buffer.
    * 
    * @param buf Buffer to append to
+   * @return {@code buf} for chaining
    */
   public StringBuilder appendToBuffer(StringBuilder buf) {
     Iterator<double[]> iter = points.iterator();

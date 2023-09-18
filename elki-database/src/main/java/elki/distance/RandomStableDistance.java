@@ -38,11 +38,13 @@ import elki.utilities.optionhandling.Parameterizer;
  * This is a dummy distance providing random values (obviously not metrical),
  * useful mostly for unit tests and baseline evaluations: obviously this
  * distance provides no benefit whatsoever.
- * 
+ * <p>
  * This distance is based on the combined hash codes of the two objects queried,
  * if they are different. Extra caution is done to ensure symmetry and objects
  * with the same ID will have a distance of 0. Obviously this distance is not
  * metrical.
+ * <p>
+ * TODO: Make the random seed parameterizable.
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -61,6 +63,8 @@ public class RandomStableDistance extends AbstractDatabaseDistance<DBID> impleme
 
   /**
    * Constructor. Usually it is preferred to use the static instance!
+   * 
+   * @param seed Random seed
    */
   public RandomStableDistance(long seed) {
     super();

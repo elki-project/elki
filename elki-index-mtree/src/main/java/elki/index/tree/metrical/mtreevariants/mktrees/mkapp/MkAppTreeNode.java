@@ -39,6 +39,7 @@ import elki.utilities.io.FormatUtil;
  * @param <O> object type
  */
 class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry> {
+  /** Serial version UID */
   private static final long serialVersionUID = 2;
 
   /**

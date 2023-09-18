@@ -35,8 +35,9 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   /**
    * Constructor for a type request without dimensionality constraints.
    *
-   * @param cls Class constraint
    * @param <V> vector type
+   * @param cls Class constraint
+   * @return type information
    */
   public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls) {
     return new VectorFieldTypeInformation<>(cls, -1, Integer.MAX_VALUE);
@@ -45,10 +46,11 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   /**
    * Constructor for a type request with dimensionality constraints.
    *
+   * @param <V> vector type
    * @param cls Class constraint
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
-   * @param <V> vector type
+   * @return type information
    */
   public static <V extends FeatureVector<?>> VectorFieldTypeInformation<V> typeRequest(Class<? super V> cls, int mindim, int maxdim) {
     return new VectorFieldTypeInformation<>(cls, mindim, maxdim);
