@@ -308,18 +308,35 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
 
   /**
    * Class for tracking Partial VA file statistics.
-   * 
+   * <p>
    * TODO: refactor into a common statistics API
    */
   public static class Statistics {
+    /**
+     * Bytes IO counter
+     */
     private Counter scannedBytes;
 
+    /**
+     * Query time counter
+     */
     private Counter queryTime;
 
+    /**
+     * Query number counter
+     */
     private Counter issuedQueries;
 
+    /**
+     * Refinement counter
+     */
     private Counter refinements;
 
+    /**
+     * Constructor
+     * 
+     * @param parent Parent for naming
+     */
     protected Statistics(String parent) {
       scannedBytes = LOG.isStatistics() ? LOG.newCounter(parent + ".scannedBytes") : null;
       queryTime = LOG.isStatistics() ? LOG.newCounter(parent + ".queryTime") : null;
@@ -327,6 +344,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       refinements = LOG.isStatistics() ? LOG.newCounter(parent + ".refinements") : null;
     }
 
+    /** Log statistics output */
     public void logStatistics() {
       if(scannedBytes != null) {
         LOG.statistics(scannedBytes);
@@ -342,24 +360,36 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       }
     }
 
+    /**
+     * Increment IO
+     *
+     * @param bytes Bytes read
+     */
     protected void incrementScannedBytes(long bytes) {
       if(scannedBytes != null) {
         scannedBytes.increment(bytes);
       }
     }
 
+    /**
+     * Increment the query time
+     *
+     * @param time query time
+     */
     protected void incrementQueryTime(long time) {
       if(queryTime != null) {
         queryTime.increment(time);
       }
     }
 
+    /** Count a query */
     protected void incrementIssuedQueries() {
       if(issuedQueries != null) {
         issuedQueries.increment();
       }
     }
 
+    /** Count a refinement */
     protected void incrementRefinements() {
       if(refinements != null) {
         refinements.increment();
@@ -638,6 +668,17 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       return result;
     }
 
+    /**
+     * Filter by one dimension
+     * 
+     * @param k Number of neighbors
+     * @param reducedDims reduced dimensionality
+     * @param daFiles Index files
+     * @param queryApprox Query approximation
+     * @param subspaceDims Subspace dimension
+     * @param dist Distance
+     * @return Candidates
+     */
     private LinkedList<PartialVACandidate> filter1(int k, int reducedDims, List<DAFile> daFiles, VectorApproximation queryApprox, int subspaceDims, VALPNormDistance dist) {
       LinkedList<PartialVACandidate> candidates1 = new LinkedList<>();
       DoubleMaxHeap minmaxdist = new DoubleMaxHeap(k + 1);
@@ -710,6 +751,15 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       return result;
     }
 
+    /**
+     * Retrieve the accurate distances
+     * 
+     * @param sortedCandidates Candidates, sorted
+     * @param k number of neighbors
+     * @param subspace subspace mask
+     * @param query query vector
+     * @return KNN list
+     */
     protected KNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, long[] subspace, V query) {
       KNNHeap result = DBIDUtil.newHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
@@ -730,8 +780,16 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * Compare DAfiles by their worst case distance.
    */
   protected static class WorstCaseDistComparator implements Comparator<DAFile> {
+    /**
+     * Distance function
+     */
     private VALPNormDistance dist;
 
+    /**
+     * Constructor.
+     * 
+     * @param dist Distance function
+     */
     public WorstCaseDistComparator(VALPNormDistance dist) {
       this.dist = dist;
     }

@@ -393,6 +393,11 @@ public class RectangleArranger<T> {
     return v.clone();
   }
 
+  /**
+   * Assert that the layout is consistent.
+   * 
+   * @return true when consistent, assertion failure otherwise.
+   */
   private boolean assertConsistent() {
     final int cols = widths.size(), rows = heights.size();
     double wsum = 0.0;
