@@ -156,7 +156,15 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     doExtraIntegrityChecks();
   }
 
-  public DoubleDBIDList reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistance<? super O> distance) {
+  /**
+   * Reverse k nearest neighbor query.
+   * 
+   * @param oid Query object
+   * @param k Number of forward neighbors
+   * @param distance Distance function
+   * @return Reverse k nearest neighbors
+   */
+  public DoubleDBIDList reverseKNNQuery(DBIDRef oid, int k, SpatialPrimitiveDistance<? super O> distance) {
     checkDistance(distance);
     if(k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
@@ -327,7 +335,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * @param oid the id of the object for which the rknn query is performed
    * @param result the list containing the query results
    */
-  private void doReverseKNN(RdKNNNode node, DBID oid, ModifiableDoubleDBIDList result) {
+  private void doReverseKNN(RdKNNNode node, DBIDRef oid, ModifiableDoubleDBIDList result) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry entry = (RdKNNLeafEntry) node.getEntry(i);
@@ -424,7 +432,6 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * Throws an IllegalArgumentException if the specified distance function is
    * not an instance of the distance function used by this index.
    *
-   * @throws IllegalArgumentException
    * @param distance the distance function to be checked
    */
   private void checkDistance(SpatialPrimitiveDistance<? super O> distance) {
@@ -433,6 +440,12 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
     }
   }
 
+  /**
+   * Create a new leaf node.
+   * 
+   * @param id Object id
+   * @return new leaf node
+   */
   protected RdKNNLeafEntry createNewLeafEntry(DBID id) {
     return new RdKNNLeafEntry(id, relation.get(id), Double.NaN);
   }

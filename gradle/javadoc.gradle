@@ -59,12 +59,14 @@ subprojects {
         footer += """ built at $buildTime"""
       }
       bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a><!-- so we get to know what people search for: --><script>if(window.location.hostname=="elki-project.github.io"||window.location.hostname=="jitpack.io"||window.location.hostname=="javadoc.io"){(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create","UA-87792924-1","auto");ga("send","pageview");}</script>"""
+      // We have cross-package references, and we allow missing javadoc in private classes.
+      addBooleanOption('Xdoclint:all,-reference', true)
       // Java 8 was very fragile with respect to HTML
       if(JavaVersion.current().isJava8()) addBooleanOption('Xdoclint:none', true)
       // Add --allow-script-in-comments if available (some 1.8 versions only)
-      if(JavaVersion.current().isJava8Compatible()) { addBooleanOption('-allow-script-in-comments').value = true }
+      if(JavaVersion.current().isJava8Compatible()) addBooleanOption('-allow-script-in-comments', true)
       if(JavaVersion.current().isJava9()) addBooleanOption('html4', true)
-      if(JavaVersion.current().isJava11()) { addBooleanOption('-no-module-directories').value = true }
+      if(JavaVersion.current().isJava11()) addBooleanOption('-no-module-directories', true)
       // UmlDoclet is optional - needs graphviz installed
       if (useuml) {
         docletpath = configurations.umlDoclet.files.asType(List)

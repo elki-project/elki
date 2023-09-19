@@ -40,7 +40,7 @@ import net.jafama.FastMath;
  * @since 0.5.0
  */
 // TODO: implement SpatialDistance
-public class SparseLPNormDistance implements PrimitiveDistance<SparseNumberVector>, Norm<SparseNumberVector> {
+public class SparseLPNormDistance implements Norm<SparseNumberVector> {
   /**
    * Parameter and its inverse.
    */
@@ -48,6 +48,8 @@ public class SparseLPNormDistance implements PrimitiveDistance<SparseNumberVecto
 
   /**
    * Constructor.
+   * 
+   * @param p Power parameter
    */
   public SparseLPNormDistance(double p) {
     super();

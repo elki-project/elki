@@ -54,7 +54,7 @@ public class SubspaceLPNormDistance extends AbstractDimensionsSelectingDistance<
    * Constructor.
    * 
    * @param dimensions Selected dimensions
-   * @param p p value
+   * @param p power parameter
    */
   public SubspaceLPNormDistance(double p, long[] dimensions) {
     super(dimensions);
@@ -80,6 +80,13 @@ public class SubspaceLPNormDistance extends AbstractDimensionsSelectingDistance<
     return FastMath.pow(sqrDist, 1. / p);
   }
 
+  /**
+   * Min distance to a bounding box
+   * 
+   * @param mbr Bounding box
+   * @param v Vector
+   * @return lower bound of distance
+   */
   protected double minDistObject(SpatialComparable mbr, NumberVector v) {
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {

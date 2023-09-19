@@ -199,6 +199,11 @@ public class ExportVisualizations implements ResultHandler {
     }
   }
 
+  /**
+   * Process one visualization item
+   * 
+   * @param item Item
+   */
   private void processItem(PlotItem item) {
     // Descend into subitems
     for(Iterator<PlotItem> iter = item.subitems.iterator(); iter.hasNext();) {

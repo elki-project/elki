@@ -40,6 +40,8 @@ public class WeightedCanberraDistance extends AbstractNumberVectorDistance imple
 
   /**
    * Constructor.
+   * 
+   * @param weights Weight array
    */
   public WeightedCanberraDistance(double[] weights) {
     super();

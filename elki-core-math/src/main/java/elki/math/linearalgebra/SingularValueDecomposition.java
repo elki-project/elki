@@ -245,6 +245,12 @@ public class SingularValueDecomposition {
     }
   }
 
+  /**
+   * Generate U
+   * 
+   * @param nu limit
+   * @param nct start
+   */
   private void generateU(int nu, int nct) {
     for(int j = nct; j < nu; j++) {
       for(int i = 0; i < m; i++) {
@@ -254,13 +260,14 @@ public class SingularValueDecomposition {
     }
     for(int k = nct - 1; k >= 0; k--) {
       if(s[k] != 0.0) {
+        final double[] U_k = U[k];
         for(int j = k + 1; j < nu; j++) {
           double t = 0;
           for(int i = k; i < m; i++) {
             final double[] Ui = U[i];
             t += Ui[k] * Ui[j];
           }
-          t /= -U[k][k];
+          t /= -U_k[k];
           for(int i = k; i < m; i++) {
             final double[] Ui = U[i];
             Ui[j] += t * Ui[k];
@@ -270,7 +277,7 @@ public class SingularValueDecomposition {
           final double[] Ui = U[i];
           Ui[k] = -Ui[k];
         }
-        U[k][k] = 1.0 + U[k][k];
+        U_k[k] = 1.0 + U_k[k];
         for(int i = 0; i < k - 1; i++) {
           U[i][k] = 0.0;
         }
@@ -284,6 +291,13 @@ public class SingularValueDecomposition {
     }
   }
 
+  /**
+   * Generate V
+   * 
+   * @param nu limit
+   * @param e Vector
+   * @param nrt limit
+   */
   private void generateV(int nu, double[] e, int nrt) {
     for(int k = n - 1; k >= 0; k--) {
       if((k < nrt) && (e[k] != 0.0)) {
@@ -307,6 +321,14 @@ public class SingularValueDecomposition {
     }
   }
 
+  /**
+   * Deflate
+   * 
+   * @param e Vector
+   * @param p Index
+   * @param k Index
+   * @param wantv Update V
+   */
   private void deflate(double[] e, int p, int k, boolean wantv) {
     double f = e[p - 2];
     e[p - 2] = 0.0;
@@ -329,6 +351,14 @@ public class SingularValueDecomposition {
     }
   }
 
+  /**
+   * Split
+   * 
+   * @param e Vector
+   * @param p Index
+   * @param k Index
+   * @param wantu Update U
+   */
   private void split(double[] e, int p, int k, boolean wantu) {
     double f = e[k - 1];
     e[k - 1] = 0.0;
@@ -349,6 +379,15 @@ public class SingularValueDecomposition {
     }
   }
 
+  /**
+   * Perform a Q-R-Step
+   * 
+   * @param e Vector
+   * @param p index
+   * @param k index
+   * @param wantu Update U
+   * @param wantv Update V
+   */
   private void qrStep(double[] e, int p, int k, boolean wantu, boolean wantv) {
     // Calculate the shift.
     double scale = Math.max(Math.max(Math.max(Math.max(Math.abs(s[p - 1]), Math.abs(s[p - 2])), Math.abs(e[p - 2])), Math.abs(s[k])), Math.abs(e[k]));
@@ -406,6 +445,15 @@ public class SingularValueDecomposition {
     e[p - 2] = f;
   }
 
+  /**
+   * Convergence step for a subproblem
+   * 
+   * @param k Current vector
+   * @param pp Remaining
+   * @param wantu Update U
+   * @param wantv Update V
+   * @return Number of values
+   */
   private int convergence(int k, int pp, boolean wantu, boolean wantv) {
     // Make the singular values positive.
     if(s[k] <= 0.0) {

@@ -310,8 +310,16 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     entry.setConservativeKnnDistanceApproximation(approx);
   }
 
-  /*
+  /**
    * auxiliary function for approxKdist methods.
+   * 
+   * @param k0 Starting k
+   * @param kmax Maximum k
+   * @param logk log of ks
+   * @param log_kDist log of distances to k nearest neighbors
+   * @param m slope
+   * @param t intercept
+   * @return deviation
    */
   private double ssqerr(int k0, int kmax, double[] logk, double[] log_kDist, double m, double t) {
     int k = kmax - k0;
@@ -324,8 +332,18 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     return result;
   }
 
-  /*
-   * auxiliary function for approxKdist methods.
+  /**
+   * Auxiliary function for approxKdist methods.
+   * 
+   * @param k0 Starting k
+   * @param kmax Maximum k
+   * @param sumx linear sum
+   * @param sumx2 sum of squares
+   * @param xp x power
+   * @param yp y power
+   * @param sumxy sum of x times y
+   * @param sumy linear sum of y
+   * @return slope
    */
   private double optimize(int k0, int kmax, double sumx, double sumx2, double xp, double yp, double sumxy, double sumy) {
     int k = kmax - k0 + 1;
@@ -443,10 +461,14 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
   /**
    * Approximates the lower hull.
    *
-   * @param convexHull
-   * @param log_kDist
-   * @param sum_log_kDist
-   * @param sum_log_k_kDist
+   * @param convexHull Convex hull
+   * @param log_k logs of the k values
+   * @param sum_log_k sum of the logs of the k values
+   * @param sum_log_k2 sum of the log(k)²
+   * @param log_kDist logs of the distances to the knn
+   * @param sum_log_kDist sum of the log distances
+   * @param sum_log_k_kDist sum of log(k) * log(d)
+   * @return Approximation line
    */
   private ApproximationLine approximateLowerHull(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
     // StringBuilder msg = new StringBuilder(1000);
@@ -500,6 +522,14 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     return new ApproximationLine(k_0, low_m, low_t);
   }
 
+  /**
+   * Approximate the upper hull
+   * 
+   * @param convexHull convex hull
+   * @param log_k log of k
+   * @param log_kDist log of kdist
+   * @return Approximation line
+   */
   private ApproximationLine approximateUpperHull(ConvexHull convexHull, double[] log_k, double[] log_kDist) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;
 
@@ -548,6 +578,18 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     return approx;
   }
 
+  /**
+   * Approximate the upper hull, as in the paper
+   * 
+   * @param convexHull Convex hull
+   * @param log_k logs of the k values
+   * @param sum_log_k sum of the logs of the k values
+   * @param sum_log_k2 sum of the log(k)²
+   * @param log_kDist logs of the distances to the knn
+   * @param sum_log_kDist sum of the log distances
+   * @param sum_log_k_kDist sum of log(k) * log(d)
+   * @return Approximation line
+   */
   private ApproximationLine approximateUpperHullPaper(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder(1000) : null;
 
@@ -635,6 +677,18 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     return null;
   }
 
+  /**
+   * Approximate the upper hull
+   * 
+   * @param convexHull Convex hull
+   * @param log_k logs of the k values
+   * @param sum_log_k sum of the logs of the k values
+   * @param sum_log_k2 sum of the log(k)²
+   * @param log_kDist logs of the distances to the knn
+   * @param sum_log_kDist sum of the log distances
+   * @param sum_log_k_kDist sum of log(k) * log(d)
+   * @return Approximation line
+   */
   // TODO: cleanup.
   @SuppressWarnings("unused")
   private ApproximationLine approximateUpperHullOld(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
@@ -684,45 +738,22 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     return new ApproximationLine(k_0, upp_m, upp_t);
   }
 
-  /**
-   * Creates a new leaf node with the specified capacity.
-   *
-   * @return a new leaf node
-   */
   @Override
   protected MkCoPTreeNode<O> createNewLeafNode() {
     return new MkCoPTreeNode<>(leafCapacity, true);
   }
 
-  /**
-   * Creates a new directory node with the specified capacity.
-   *
-   * @return a new directory node
-   */
   @Override
   protected MkCoPTreeNode<O> createNewDirectoryNode() {
     return new MkCoPTreeNode<>(dirCapacity, false);
   }
 
-  /**
-   * Creates a new directory entry representing the specified node.
-   *
-   * @param node the node to be represented by the new entry
-   * @param routingObjectID the id of the routing object of the node
-   * @param parentDistance the distance from the routing object of the node to
-   *        the routing object of the parent node
-   */
   @Override
   protected MkCoPEntry createNewDirectoryEntry(MkCoPTreeNode<O> node, DBID routingObjectID, double parentDistance) {
     return new MkCoPDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), null);
     // node.conservativeKnnDistanceApproximation(k_max));
   }
 
-  /**
-   * Creates an entry representing the root node.
-   *
-   * @return an entry representing the root node
-   */
   @Override
   protected MkCoPEntry createRootEntry() {
     return new MkCoPDirectoryEntry(null, 0., 0, 0., null);
