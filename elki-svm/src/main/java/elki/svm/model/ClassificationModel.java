@@ -43,6 +43,7 @@ public class ClassificationModel extends Model {
    * @return Predicted class
    */
   public int predict(DataSet x, int xi, double[] dec_values) {
+    final int l = sv_indices.length;
     double[] kvalue = new double[l];
     for(int i = 0; i < l; i++) {
       kvalue[i] = x.similarity(xi, sv_indices[i]);
@@ -93,6 +94,7 @@ public class ClassificationModel extends Model {
    * @return Predicted class
    */
   public int predict(DataSet x, int xi) {
+    final int l = sv_indices.length;
     double[] kvalue = new double[l];
     for(int i = 0; i < l; i++) {
       kvalue[i] = x.similarity(xi, sv_indices[i]);

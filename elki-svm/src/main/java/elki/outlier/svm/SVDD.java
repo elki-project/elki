@@ -43,7 +43,7 @@ import elki.result.outlier.OutlierScoreMeta;
 import elki.similarity.PrimitiveSimilarity;
 import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.svm.data.SimilarityQueryAdapter;
-import elki.svm.model.RegressionModel;
+import elki.svm.model.OneClassModel;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -60,6 +60,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * D. M. J. Tax and R. P. W. Duin<br>
  * Support Vector Data Description<br>
  * Mach. Learn. 54(1): 45-66
+ * <p>
+ * TODO: allow scoring points (standard) instead of using the SV weights,
+ * although the latter appear to work better.
  * 
  * @author Erich Schubert
  * @since 0.8.0
@@ -118,9 +121,9 @@ public class SVDD<V> implements OutlierAlgorithm {
       LOG.verbose("Training one-class SVM...");
     }
     SimilarityQueryAdapter adapter = new SimilarityQueryAdapter(sim, ids);
-    elki.svm.SVDD svm = new elki.svm.SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size());
-    RegressionModel model = svm.train(adapter);
-    LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.l));
+    elki.svm.SVDD svm = new elki.svm.SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size(), false);
+    OneClassModel model = svm.train(adapter);
+    LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.numSV()));
 
     if(LOG.isVerbose()) {
       LOG.verbose("Predicting...");
@@ -131,7 +134,7 @@ public class SVDD<V> implements OutlierAlgorithm {
     int nextidx = 0;
     for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double score = 0;
-      if(nextidx < model.l && iter.getOffset() == model.sv_indices[nextidx]) {
+      if(nextidx < model.numSV() && iter.getOffset() == model.sv_indices[nextidx]) {
         score = model.sv_coef[0][nextidx++];
       }
       scores.putDouble(iter, score);

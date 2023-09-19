@@ -10,15 +10,30 @@ import elki.svm.qmatrix.R2_Qq;
 import elki.svm.solver.Solver;
 
 /**
- * R2q variant
+ * R^2 L2SVM variant, similar to SVDD.
  */
-public class R2q extends AbstractSVR {
+public class R2q extends AbstractOCSV {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(R2q.class);
 
+  /**
+   * Regularization
+   */
   private double C;
 
-  public R2q(double eps, boolean shrinking, double cache_size, double C) {
-    super(eps, shrinking, cache_size);
+  /**
+   * Constructor.
+   * 
+   * @param tol Optimizer tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   * @param C Regularization parameter
+   * @param probability Estimate probabilities
+   */
+  public R2q(double tol, boolean shrinking, double cache_size, double C, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.C = C;
   }
 
@@ -40,7 +55,7 @@ public class R2q extends AbstractSVR {
       linear_term[i] = -0.5 * linear_term[i]; // 1./C is already in QD.
     }
 
-    Solver.SolutionInfo si = new Solver().solve(l, Q, linear_term, ones, alpha, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, eps, shrinking);
+    Solver.SolutionInfo si = new Solver().solve(l, Q, linear_term, ones, alpha, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, tol, shrinking);
 
     LOG.verbose("R^2 = " + (-2 * si.obj));
     return si;

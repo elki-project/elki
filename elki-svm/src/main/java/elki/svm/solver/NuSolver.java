@@ -37,12 +37,17 @@
  */
 package elki.svm.solver;
 
-//
-// Solver for nu-svm classification and regression
-//
-// additional constraint: e^T \alpha = constant
-//
+/**
+ * Solver for nu-svm classification and regression
+ * <p>
+ * additional constraint: e^T \alpha = constant
+ */
 public class NuSolver extends Solver {
+  /**
+   * r
+   * <p>
+   * TODO: move this into SolutionInfo.
+   */
   public double r;
 
   @Override
@@ -135,6 +140,16 @@ public class NuSolver extends Solver {
     return false;
   }
 
+  /**
+   * Check if we should shrink i.
+   * 
+   * @param i Index
+   * @param Gmax1 Gmax for upper bound +1 instances
+   * @param Gmax2 Gmax for lower bound +1 instances
+   * @param Gmax3 Gmax for upper bound -1 instances
+   * @param Gmax4 Gmax for lower bound -1 instances
+   * @return true if we should shrink
+   */
   private boolean be_shrunk(int i, double Gmax1, double Gmax2, double Gmax3, double Gmax4) {
     return is_upper_bound(i) ? (y[i] == +1 ? -G[i] > Gmax1 : -G[i] > Gmax4) //
         : is_lower_bound(i) ? (y[i] == +1 ? G[i] > Gmax2 : G[i] > Gmax3) : false;

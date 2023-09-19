@@ -69,75 +69,175 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * @since 0.8.0
  */
 public class Solver {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(Solver.class);
 
+  /**
+   * Active set size
+   */
   int active_size;
 
+  /**
+   * Class labels, -1 or +1
+   */
   byte[] y;
 
-  double[] G; // gradient of objective function
+  /**
+   * Gradient of objective function
+   */
+  double[] G;
 
+  /** At lower bound */
   static final byte LOWER_BOUND = 0;
 
+  /** At upper bound */
   static final byte UPPER_BOUND = 1;
 
+  /** Free */
   static final byte FREE = 2;
 
+  /**
+   * Status flag for optimizer
+   */
   byte[] alpha_status; // LOWER_BOUND, UPPER_BOUND, FREE
 
+  /**
+   * Laplacian alpha values
+   */
   double[] alpha;
 
+  /**
+   * Q matrix
+   */
   QMatrix Q;
 
+  /**
+   * Tolerance level for convergence
+   */
   double eps;
 
+  /**
+   * Current regularization C for positive and negative class.
+   */
   double Cp, Cn;
 
+  /**
+   * Current values
+   */
   double[] p;
 
-  int[] active_set;
-
-  double[] G_bar; // gradient, if we treat free variables as 0
-
-  float[] Q_i, Q_j;
-
+  /**
+   * Size of data set
+   */
   int l;
 
-  boolean unshrink; // XXX
+  /**
+   * Current active set
+   */ 
+  int[] active_set;
 
+  /**
+   * Gradient G_bar, if we treat free variables as 0
+   */ 
+  double[] G_bar;
+
+  /**
+   * Current rows Q[i] and Q[j]
+   */ 
+  float[] Q_i, Q_j;
+
+  /**
+   * Needs unshrink
+   */
+  boolean unshrink;
+
+  /**
+   * Get C for instance i (Cp or Cn)
+   * 
+   * @param i Index
+   * @return Cp or Cn
+   */
   double get_C(int i) {
     return (y[i] > 0) ? Cp : Cn;
   }
 
+  /**
+   * Update the status
+   * 
+   * @param i Index
+   */
   void update_alpha_status(int i) {
     final double alpha_i = alpha[i];
     alpha_status[i] = (alpha_i >= get_C(i)) ? UPPER_BOUND //
         : (alpha_i <= 0) ? LOWER_BOUND : FREE;
   }
 
+  /**
+   * Check if a variable is at the upper bound.
+   * 
+   * @param i Index
+   * @return true if upper bound
+   */
   boolean is_upper_bound(int i) {
     return alpha_status[i] == UPPER_BOUND;
   }
 
+  /**
+   * Check if a variable is at the lower bound.
+   * 
+   * @param i Index
+   * @return true if lower bound
+   */
   boolean is_lower_bound(int i) {
     return alpha_status[i] == LOWER_BOUND;
   }
 
+  /**
+   * Check if a variable is free.
+   * 
+   * @param i index
+   * @return true if free
+   */
   boolean is_free(int i) {
     return alpha_status[i] == FREE;
   }
 
-  // All the information returned
+  /**
+   * SVM solution information
+   */
   public static class SolutionInfo {
-    public double obj, rho;
+    /**
+     * Objective
+     */
+    public double obj;
 
+    /**
+     * Rho value
+     */
+    public double rho;
+
+    /**
+     * Upper bound for positives and negative classes
+     */
     public double upper_bound_p, upper_bound_n;
 
+    /**
+     * Alphas
+     */
     public double[] alpha;
-    
-    public double r_square; // Only SVDD
+
+    /** R², for SVDD only */
+    public double r_square;
   }
 
+  /**
+   * Swap two indexes in all data structures, for maintaining the hot set.
+   * 
+   * @param i First index
+   * @param j Second index
+   */
   void swap_index(int i, int j) {
     // This will also swap QD:
     Q.swap_index(i, j);
@@ -150,8 +250,10 @@ public class Solver {
     ArrayUtil.swap(G_bar, i, j);
   }
 
+  /**
+   * Reconstruct inactive elements of G from G_bar and free variables
+   */
   void reconstruct_gradient() {
-    // reconstruct inactive elements of G from G_bar and free variables
     if(active_size == l) {
       return;
     }
@@ -194,6 +296,20 @@ public class Solver {
     }
   }
 
+  /**
+   * Solve the SVM problem.
+   * 
+   * @param l Number of (virtual) instances
+   * @param Q Q matrix
+   * @param p_ Starting values
+   * @param y_ Class labels
+   * @param alpha_ Alphas
+   * @param Cp C for positive class
+   * @param Cn C for negative class
+   * @param eps Convergence tolerance (not the epsilon-insensitive loss)
+   * @param shrinking Use shrinking
+   * @return Solution information
+   */
   public SolutionInfo solve(int l, QMatrix Q, double[] p_, byte[] y_, double[] alpha_, double Cp, double Cn, double eps, boolean shrinking) {
     this.l = l;
     this.Q = Q;
@@ -346,6 +462,14 @@ public class Solver {
     return buildSolutionInfo(l, Cp, Cn);
   }
 
+  /**
+   * Build the output solution information.
+   * 
+   * @param l active set size
+   * @param Cp positive upper bound
+   * @param Cn negative upper bound
+   * @return Solution info
+   */
   SolutionInfo buildSolutionInfo(int l, double Cp, double Cn) {
     SolutionInfo si = new SolutionInfo();
     // calculate rho
@@ -386,6 +510,14 @@ public class Solver {
     active_size = l;
   }
 
+  /**
+   * Update G
+   * 
+   * @param i First index
+   * @param j Second index
+   * @param old_alpha_i Old alpha[i]
+   * @param old_alpha_j Old alpha[j]
+   */
   private void update_G(int i, int j, double old_alpha_i, double old_alpha_j) {
     final double delta_alpha_i = alpha[i] - old_alpha_i;
     final double delta_alpha_j = alpha[j] - old_alpha_j;
@@ -394,12 +526,21 @@ public class Solver {
     }
   }
 
+  /**
+   * Update G bar
+   * 
+   * @param C_i Regularization C
+   * @param Q_i Row Q[i]
+   */
   private void update_G_bar(double C_i, float[] Q_i) {
     for(int k = 0; k < l; k++) {
       G_bar[k] += C_i * Q_i[k];
     }
   }
 
+  /**
+   * Initialize the gradients G.
+   */
   public void initializeGradient() {
     G = Arrays.copyOf(p, l);
     G_bar = new double[l];
@@ -419,6 +560,11 @@ public class Solver {
     }
   }
 
+  /**
+   * Calculate the objective
+   * 
+   * @return Objective
+   */
   protected double calculate_obj() {
     double v = 0.;
     for(int i = 0; i < l; i++) {
@@ -427,19 +573,36 @@ public class Solver {
     return v * .5;
   }
 
+  /**
+   * Ensure a value is never zero, use 1e-12 otherwise.
+   * 
+   * @param d Double
+   * @return max(d, 1e-12)
+   */
   protected static double nonzero(double d) {
     return d > 0 ? d : 1e-12;
   }
 
-  // @return true if already optimal
+  /**
+   * Check if the working set needs to be updated.
+   * 
+   * @param working_set Current working set
+   * @return true if already optimal
+   */
   boolean select_working_set(int[] working_set) {
     final double Gmax = maxViolating(working_set);
     final double Gmax2 = minViolating(working_set, Gmax);
     return (Gmax + Gmax2 < eps) || Gmax2 != Gmax2;
   }
 
-  // Classic SMO
-  // i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
+  /**
+   * Classic Sequential Minimal Optimization (SMO).
+   * <p>
+   * i: maximizes -y_i * grad(f)_i, i in I_up(\alpha)
+   * 
+   * @param working_set Working set
+   * @return Objective
+   */
   protected double maxViolating(int[] working_set) {
     double Gmax = Double.NEGATIVE_INFINITY;
     int Gmax_idx = -1;
@@ -466,15 +629,21 @@ public class Solver {
     return Gmax;
   }
 
-  // LibSVM enhancement to SMO.
-  //
-  // Exploits that we need the kernel values with respect to the
-  // previously chosen i (working_set[0]) anyway. So we can compute
-  // them now, and use them to choose a better candidate.
-  //
-  // j: minimizes the decrease of obj value
-  // (if quadratic coefficient <= 0, replace it with tau)
-  // -y_j*grad(f)_j < -y_i*grad(f)_i, j in I_low(\alpha)
+  /**
+   * LibSVM enhancement to SMO.
+   * <p>
+   * Exploits that we need the kernel values with respect to the
+   * previously chosen i (working_set[0]) anyway. So we can compute
+   * them now, and use them to choose a better candidate.
+   * <p>
+   * j: minimizes the decrease of obj value
+   * (if quadratic coefficient &lt;= 0, replace it with tau)
+   * -y_j*grad(f)_j &lt; -y_i*grad(f)_i, j in I_low(\alpha)
+   * 
+   * @param working_set Working set
+   * @param Gi Gradient at i
+   * @return G[j] max
+   */
   protected double minViolating(int[] working_set, double Gi) {
     final int i = working_set[0];
     double[] QD = Q.get_QD();
@@ -525,11 +694,14 @@ public class Solver {
     return Gjmax;
   }
 
+  /**
+   * Perform the shrinking operation
+   */
   void do_shrinking() {
-    double Gmax1 = Double.NEGATIVE_INFINITY; // max { -y_i * grad(f)_i | i
-    // in I_up(\alpha) }
-    double Gmax2 = Double.NEGATIVE_INFINITY; // max { y_i * grad(f)_i | i in
-    // I_low(\alpha) }
+    // max { -y_i * grad(f)_i | i in I_up(\alpha) }
+    double Gmax1 = Double.NEGATIVE_INFINITY;
+    // max { y_i * grad(f)_i | i inI_low(\alpha) }
+    double Gmax2 = Double.NEGATIVE_INFINITY;
 
     // find maximal violating pair first
     for(int i = 0; i < active_size; i++) {
@@ -570,11 +742,24 @@ public class Solver {
     }
   }
 
+  /**
+   * Check if we should shrink i.
+   * 
+   * @param i Index
+   * @param Gmax1 Gmax for upper bound +1 instances, lower bound -1 instances
+   * @param Gmax2 Gmax for upper bound -1 instances, lower bound +1 instances
+   * @return true if we should shrink
+   */
   private boolean be_shrunk(int i, double Gmax1, double Gmax2) {
     return is_upper_bound(i) ? (y[i] == +1 ? -G[i] > Gmax1 : -G[i] > Gmax2) : //
         is_lower_bound(i) ? (y[i] == +1 ? G[i] > Gmax2 : G[i] > Gmax1) : false;
   }
 
+  /**
+   * Calculate rho
+   * 
+   * @return rho
+   */
   double calculate_rho() {
     int nr_free = 0;
     double ub = Double.POSITIVE_INFINITY, lb = Double.NEGATIVE_INFINITY,

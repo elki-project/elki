@@ -12,9 +12,9 @@ import elki.svm.solver.Solver;
 /**
  * Support Vector Data Description.
  * <p>
- * Note: R2 variant is SVDD with C=2.
+ * Note: R^2 L1SVM variant is SVDD with C=2.
  */
-public class SVDD extends AbstractSVR {
+public class SVDD extends AbstractOCSV {
   /**
    * Class logger
    */
@@ -28,13 +28,14 @@ public class SVDD extends AbstractSVR {
   /**
    * Constructor.
    * 
-   * @param eps Epsilon tolerance
+   * @param tol Optimizer tolerance
    * @param shrinking Use shrinking
    * @param cache_size Cache size
    * @param C Regularization C
+   * @param probability Estimate probabilities
    */
-  public SVDD(double eps, boolean shrinking, double cache_size, double C) {
-    super(eps, shrinking, cache_size);
+  public SVDD(double tol, boolean shrinking, double cache_size, double C, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.C = C;
   }
 
@@ -62,7 +63,7 @@ public class SVDD extends AbstractSVR {
       }
       byte[] ones = new byte[l];
       Arrays.fill(ones, ONE);
-      si = new Solver().solve(l, Q, linear_term, ones, alpha, C, C, eps, shrinking);
+      si = new Solver().solve(l, Q, linear_term, ones, alpha, C, C, tol, shrinking);
 
       // \bar{R} = 2(obj-rho) + sum K_{ii}*alpha_i
       // because rho = (a^Ta - \bar{R})/2

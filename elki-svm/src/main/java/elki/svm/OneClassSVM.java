@@ -32,7 +32,7 @@ import elki.svm.solver.Solver;
 /**
  * One-class classification is similar to regression.
  */
-public class OneClassSVM extends AbstractSVR {
+public class OneClassSVM extends AbstractOCSV {
   /**
    * Class logger
    */
@@ -46,13 +46,14 @@ public class OneClassSVM extends AbstractSVR {
   /**
    * Constructor.
    * 
-   * @param eps Epsilon tolerance
+   * @param tol Optimizer tolerance
    * @param shrinking Use shrinking
    * @param cache_size Cache size
    * @param nu Nu regularization
+   * @param probability Estimate probabilities
    */
-  public OneClassSVM(double eps, boolean shrinking, double cache_size, double nu) {
-    super(eps, shrinking, cache_size);
+  public OneClassSVM(double tol, boolean shrinking, double cache_size, double nu, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.nu = nu;
   }
 
@@ -71,7 +72,7 @@ public class OneClassSVM extends AbstractSVR {
 
     QMatrix Q = new CachedQMatrix(l, cache_size, new Kernel(x));
     Q.initialize();
-    return new Solver().solve(l, Q, zeros, ones, alpha, 1.0, 1.0, eps, shrinking);
+    return new Solver().solve(l, Q, zeros, ones, alpha, 1.0, 1.0, tol, shrinking);
   }
 
   @Override

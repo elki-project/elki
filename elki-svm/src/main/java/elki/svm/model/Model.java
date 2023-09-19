@@ -20,21 +20,27 @@
  */
 package elki.svm.model;
 
+/**
+ * Simple SVM model class.
+ */
 public class Model {
-  public int nr_class; // number of classes, = 2 in regression/one class svm
+  /**
+   * Number of classes, = 2 in regression/one class svm
+   */
+  public int nr_class;
 
-  public int l; // total #SV
+  /**
+   * Indexes of support vectors (length is l)
+   */
+  public int[] sv_indices;
 
-  // public ArrayList<?> SV; // SVs (SV[l])
-
+  /**
+   * Support vector coefficients, k-1 by l
+   */
   public double[][] sv_coef; // coefficients for SVs in decision functions
-  // (sv_coef[k-1][l])
 
-  public double[] rho; // constants in decision functions (rho[k*(k-1)/2])
-
-  public int[] sv_indices; // sv_indices[0,...,nSV-1] are values in
-  // [0,...,num_traning_data-1] to indicate SVs in
-  // the training set
-  
-  public double r_square; // For SVDD
+  /**
+   * Constants in decision functions (rho[k*(k-1)/2])
+   */
+  public double[] rho;
 };

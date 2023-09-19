@@ -29,8 +29,17 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * Q matrix used by {@link CSVC} and {@link NuSVC} classification.
  */
 public class SVC_Q extends Kernel {
+  /**
+   * Class labels encoded as sign
+   */
   private byte[] y;
 
+  /**
+   * Constructor.
+   * 
+   * @param x Data set
+   * @param y Labels (-1 and +1 only)
+   */
   public SVC_Q(DataSet x, final byte[] y) {
     super(x);
     this.y = y.clone(); // Because we reorder y.

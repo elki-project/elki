@@ -36,18 +36,22 @@ import net.jafama.FastMath;
  */
 public abstract class AbstractSVC extends AbstractSingleSVM {
   /**
+   * Estimate probabilities
+   */
+  boolean probability = false;
+
+  /**
    * Constructor.
    * 
-   * @param eps Epsilon tolerance
+   * @param tol Optimizer tolerance
    * @param shrinking Use shrinking
    * @param cache_size Cache size
+   * @param probability Estimate probabilities
    */
-  public AbstractSVC(double eps, boolean shrinking, double cache_size) {
-    super(eps, shrinking, cache_size);
+  public AbstractSVC(double tol, boolean shrinking, double cache_size, boolean probability) {
+    super(tol, shrinking, cache_size);
+    this.probability = probability;
   }
-
-  /** Use probabilities */
-  boolean probability = false;
 
   /**
    * Train on a data set
@@ -131,12 +135,14 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
             nonzero[m] = true;
           }
         }
-        LOG.verbose("Trained " + (p + 1) + " of " + ((nr_class * (nr_class - 1)) >>> 1) + " 1vs1 SVMs");
+        if (LOG.isVerbose()) {
+          // TODO: use a progress logger
+          LOG.verbose("Trained " + (p + 1) + " of " + ((nr_class * (nr_class - 1)) >>> 1) + " 1vs1 SVMs");
+        }
       }
     }
 
     // build output
-
     ClassificationModel model;
     if(probability) {
       ProbabilisticClassificationModel pmodel = new ProbabilisticClassificationModel();
@@ -168,13 +174,9 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
 
     LOG.verbose("Total nSV = " + nnz);
 
-    model.l = nnz;
-    // model.SV = new ArrayList<Object>(nnz);
     model.sv_indices = new int[nnz];
-
     for(int i = 0, p = 0; i < l; i++) {
       if(nonzero[i]) {
-        // model.SV.add(x.get(perm[i]));
         model.sv_indices[p++] = perm[i];
       }
     }

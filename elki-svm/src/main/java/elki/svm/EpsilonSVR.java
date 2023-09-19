@@ -50,14 +50,15 @@ public class EpsilonSVR extends AbstractSVR {
   /**
    * Constructor.
    * 
-   * @param eps Optimizer tolerance (<b>not</b> the epsilon in the loss function)
+   * @param tol Optimizer tolerance
    * @param shrinking Use shrinking
    * @param cache_size Cache size
    * @param C Regularization parameter
    * @param p Epsilon in epsilon-loss function
+   * @param probability Estimate probabilities
    */
-  public EpsilonSVR(double eps, boolean shrinking, double cache_size, double C, double p) {
-    super(eps, shrinking, cache_size);
+  public EpsilonSVR(double tol, boolean shrinking, double cache_size, double C, double p, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.p = p;
     this.C = C;
   }
@@ -77,7 +78,7 @@ public class EpsilonSVR extends AbstractSVR {
 
     QMatrix Q = new SVR_Q(x, cache_size);
     Q.initialize();
-    Solver.SolutionInfo si = new Solver().solve(l2, Q, linear_term, y, alpha2, C, C, eps, shrinking);
+    Solver.SolutionInfo si = new Solver().solve(l2, Q, linear_term, y, alpha2, C, C, tol, shrinking);
 
     // Update alpha
     double sum_alpha = 0;

@@ -39,7 +39,7 @@ public abstract class AbstractSingleSVM {
   protected static final byte MONE = -1;
 
   /** Epsilon tolerance */
-  protected double eps;
+  protected double tol;
 
   /** Use shrinking */
   protected boolean shrinking;
@@ -50,12 +50,12 @@ public abstract class AbstractSingleSVM {
   /**
    * Constructor.
    * 
-   * @param eps Epsilon tolerance
+   * @param tol Optimizer tolerance
    * @param shrinking Use shrinking
    * @param cache_size Cache size
    */
-  public AbstractSingleSVM(double eps, boolean shrinking, double cache_size) {
-    this.eps = eps;
+  public AbstractSingleSVM(double tol, boolean shrinking, double cache_size) {
+    this.tol = tol;
     this.shrinking = shrinking;
     this.cache_size = cache_size;
   }
