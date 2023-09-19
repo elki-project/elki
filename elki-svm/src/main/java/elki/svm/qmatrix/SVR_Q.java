@@ -36,19 +36,35 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * To save memory, we cache inside, to avoid duplication.
  */
 public class SVR_Q implements QMatrix {
-  private final int l;
-
+  /**
+   * Sign of current hot set
+   */
   private final byte[] sign;
 
+  /**
+   * Object indexes of current hot set
+   */
   private final int[] index;
 
+  /**
+   * Cache matrix
+   */
   private CachedQMatrix inner;
 
+  /**
+   * Squared diagonal
+   */
   private final double[] QD;
 
+  /**
+   * Q-Matrix for Support Vector Regression
+   * 
+   * @param x Data set
+   * @param cache_size Cache size
+   */
   public SVR_Q(DataSet x, double cache_size) {
     super();
-    this.l = x.size();
+    final int l = x.size();
     this.inner = new CachedQMatrix(l, cache_size, new Kernel(x));
     final int l2 = l << 1;
     sign = new byte[l2];
@@ -65,6 +81,7 @@ public class SVR_Q implements QMatrix {
   public void initialize() {
     // This would initialize the inner QD: inner.initialize();
     // Initialize our QD.
+    final int l = sign.length >> 1;
     double[] QD = this.QD;
     for(int k = 0, k2 = l; k < l; k++, k2++) {
       QD[k2] = QD[k] = similarity(k, k);
@@ -87,6 +104,7 @@ public class SVR_Q implements QMatrix {
 
   @Override
   public void get_Q(int i, int len, float[] out) {
+    final int l = sign.length >> 1;
     final int real_i = index[i];
     // From cache, not reordered; always get all l values!
     float[] data = inner.get_data(real_i, l);

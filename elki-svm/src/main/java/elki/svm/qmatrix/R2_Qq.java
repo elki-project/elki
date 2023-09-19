@@ -23,11 +23,20 @@ package elki.svm.qmatrix;
 import elki.svm.data.DataSet;
 
 /**
- * Q matrix used by SVDD
+ * Q matrix used by SVDD variant R^2 L2SVM
  */
 public class R2_Qq extends Kernel {
+  /**
+   * Inverse regularization parameter
+   */
   final double invC;
 
+  /**
+   * Constructor.
+   * 
+   * @param x Data set
+   * @param C Regularization term, 1/C is added to the diagonal
+   */
   public R2_Qq(DataSet x, double C) {
     super(x);
     this.invC = 1. / C;

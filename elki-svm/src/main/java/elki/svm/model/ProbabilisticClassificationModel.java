@@ -5,16 +5,28 @@ import elki.svm.data.DataSet;
 
 import net.jafama.FastMath;
 
+/**
+ * Probabilistic classification model
+ */
 public class ProbabilisticClassificationModel extends ClassificationModel {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(ProbabilisticClassificationModel.class);
 
-  public double[] probA; // pairwise probability information
+  /**
+   * Pairwise probability information.
+   */
+  public double[] probA, probB;
 
-  public double[] probB;
-
+  /**
+   * Predict the class probabilities
+   * 
+   * @param x Data set
+   * @param xi Object id
+   * @param prob_estimates Probability estimates output
+   * @return Classification label (argmax)
+   */
   public int predict_prob(DataSet x, int xi, double[] prob_estimates) {
     double[] dec_values = new double[nr_class * (nr_class - 1) / 2];
     super.predict(x, xi, dec_values);
@@ -45,6 +57,14 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
     return label[prob_max_idx];
   }
 
+  /**
+   * Prediction helper
+   * 
+   * @param decision_value Decision value
+   * @param A Prior A
+   * @param B Prior B
+   * @return Probability
+   */
   private static double sigmoid_predict(double decision_value, double A, double B) {
     final double fApB = decision_value * A + B;
     if(fApB >= 0) {
@@ -56,7 +76,13 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
     }
   }
 
-  // Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+  /**
+   * Method 2 from the multiclass_prob paper by Wu, Lin, and Weng
+   * 
+   * @param k Number of iterations
+   * @param r Pairwise probabilities
+   * @param p Probability estimate output
+   */
   private static void multiclass_probability(int k, double[][] r, double[] p) {
     final int max_iter = Math.max(100, k);
     double[][] Q = new double[k][k];
@@ -64,26 +90,29 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
     double pQp, eps = 0.005 / k;
 
     for(int t = 0; t < k; t++) {
-      p[t] = 1. / k; // Valid if k = 1
-      Q[t][t] = 0.;
+      p[t] = 1. / k; // Valid if k >= 1
+      double[] Q_t = Q[t], r_t = r[t];
+      Q_t[t] = 0.;
       for(int j = 0; j < t; j++) {
-        Q[t][t] += r[j][t] * r[j][t];
-        Q[t][j] = Q[j][t];
+        Q_t[t] += r[j][t] * r[j][t];
+        Q_t[j] = Q[j][t];
       }
       for(int j = t + 1; j < k; j++) {
-        Q[t][t] += r[j][t] * r[j][t];
-        Q[t][j] = -r[j][t] * r[t][j];
+        Q_t[t] += r[j][t] * r[j][t];
+        Q_t[j] = -r[j][t] * r_t[j];
       }
     }
     for(int iter = 0; iter < max_iter; iter++) {
       // stopping condition, recalculate QP,pQP for numerical accuracy
       pQp = 0.;
       for(int t = 0; t < k; t++) {
-        Qp[t] = 0.;
+        double[] Q_t = Q[t];
+        double Qp_t = 0.;
         for(int j = 0; j < k; j++) {
-          Qp[t] += Q[t][j] * p[j];
+          Qp_t += Q_t[j] * p[j];
         }
-        pQp += p[t] * Qp[t];
+        Qp[t] = Qp_t;
+        pQp += p[t] * Qp_t;
       }
       double max_error = 0.;
       for(int t = 0; t < k; t++) {
@@ -97,11 +126,12 @@ public class ProbabilisticClassificationModel extends ClassificationModel {
       }
 
       for(int t = 0; t < k; t++) {
-        double diff = (-Qp[t] + pQp) / Q[t][t];
+        double[] Q_t = Q[t];
+        double diff = (-Qp[t] + pQp) / Q_t[t];
         p[t] += diff;
-        pQp = (pQp + diff * (diff * Q[t][t] + 2 * Qp[t])) / (1 + diff) / (1 + diff);
+        pQp = (pQp + diff * (diff * Q_t[t] + 2 * Qp[t])) / (1 + diff) / (1 + diff);
         for(int j = 0; j < k; j++) {
-          Qp[j] = (Qp[j] + diff * Q[t][j]) / (1 + diff);
+          Qp[j] = (Qp[j] + diff * Q_t[j]) / (1 + diff);
           p[j] /= (1 + diff);
         }
       }

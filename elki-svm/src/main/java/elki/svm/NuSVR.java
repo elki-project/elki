@@ -8,13 +8,39 @@ import elki.svm.qmatrix.SVR_Q;
 import elki.svm.solver.NuSolver;
 import elki.svm.solver.Solver;
 
+/**
+ * Nu Support Vector Regression Machine.
+ * <p>
+ * Here, nu replaces the epsilon-insensitive loss (parameter p in {@link EpsilonSVR}}).
+ */
 public class NuSVR extends AbstractSVR {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(NuSVR.class);
 
-  protected double nu, C;
+  /**
+   * Nu regularization parameter
+   */
+  protected double nu;
 
-  public NuSVR(double eps, boolean shrinking, double cache_size, double C, double nu) {
-    super(eps, shrinking, cache_size);
+  /**
+   * Classic regularization
+   */
+  protected double C;
+
+  /**
+   * Constructor.
+   * 
+   * @param tol Optimizer tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   * @param C Regularization parameter
+   * @param nu Nu regularization
+   * @param probability Estimate probabilities
+   */
+  public NuSVR(double tol, boolean shrinking, double cache_size, double C, double nu, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.nu = nu;
     this.C = C;
   }
@@ -37,7 +63,7 @@ public class NuSVR extends AbstractSVR {
     SVR_Q Q = new SVR_Q(x, cache_size);
     Q.initialize();
     NuSolver solver = new NuSolver();
-    Solver.SolutionInfo si = solver.solve(l2, Q, linear_term, y, alpha2, C, C, eps, shrinking);
+    Solver.SolutionInfo si = solver.solve(l2, Q, linear_term, y, alpha2, C, C, tol, shrinking);
 
     LOG.verbose("epsilon = " + (-solver.r));
 

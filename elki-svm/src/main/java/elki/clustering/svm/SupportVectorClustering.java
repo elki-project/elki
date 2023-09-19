@@ -43,7 +43,7 @@ import elki.similarity.PrimitiveSimilarity;
 import elki.similarity.kernel.RadialBasisFunctionKernel;
 import elki.svm.SVDD;
 import elki.svm.data.SimilarityQueryAdapter;
-import elki.svm.model.RegressionModel;
+import elki.svm.model.OneClassModel;
 import elki.utilities.datastructures.unionfind.UnionFind;
 import elki.utilities.datastructures.unionfind.UnionFindUtil;
 import elki.utilities.documentation.Reference;
@@ -143,9 +143,9 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
       LOG.verbose("Training one-class SVM...");
     }
     SimilarityQueryAdapter adapter = new SimilarityQueryAdapter(sim, ids);
-    SVDD svm = new SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size());
-    RegressionModel model = svm.train(adapter);
-    LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.l));
+    SVDD svm = new SVDD(1e-4, true, 1000 /* MB */, C > 0 ? C : 20. / ids.size(), false);
+    OneClassModel model = svm.train(adapter);
+    LOG.statistics(new LongStatistic(getClass().getCanonicalName() + ".numsv", model.numSV()));
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Connectivity checks", sids.size(), LOG) : null;
     final double r_square = model.r_square;
@@ -215,7 +215,7 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
    * @param r_squared squared radius of trained model
    * @return true if connected, false if not
    */
-  private boolean checkConnectivity(Relation<NumberVector> relation, double[] start, DBIDRef destRef, RegressionModel model, double fixed, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim, double r_squared) {
+  private boolean checkConnectivity(Relation<NumberVector> relation, double[] start, DBIDRef destRef, OneClassModel model, double fixed, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim, double r_squared) {
     NumberVector jvec = relation.get(destRef);
     double[] dest = jvec.toArray();
     double[] step = VMath.timesEquals(VMath.minus(dest, start), 1.0 / lsz);
@@ -246,7 +246,7 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
    * @param r_square squared radius
    * @return true iff point is inside sphere
    */
-  private boolean accept(NumberVector cur, RegressionModel model, double fixed, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim, double r_square) {
+  private boolean accept(NumberVector cur, OneClassModel model, double fixed, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim, double r_square) {
     final double l = sim.similarity(cur, cur);
     double sum = 0;
     DBIDArrayIter iter = ids.iter();
@@ -264,7 +264,7 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
    * @param sim kernel similarity query
    * @return fixed part of evaluation
    */
-  private double calcfixedpart(RegressionModel model, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim) {
+  private double calcfixedpart(OneClassModel model, ArrayDBIDs ids, SimilarityQuery<NumberVector> sim) {
     double eval = 0;
     DBIDArrayIter iter = ids.iter(), iter2 = ids.iter();
     for(int i = 0; i < model.sv_indices.length; i++) {

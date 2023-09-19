@@ -8,13 +8,34 @@ import elki.svm.qmatrix.SVC_Q;
 import elki.svm.solver.NuSolver;
 import elki.svm.solver.Solver;
 
+/**
+ * Nu Support Vector Classification Machine.
+ * <p>
+ * Nu-SVM are a slightly different regularization method, where the nu parameter
+ * controls the desired amount of support vectors.
+ */
 public class NuSVC extends AbstractSVC {
+  /**
+   * Class logger
+   */
   private static final Logging LOG = Logging.getLogger(NuSVC.class);
 
+  /**
+   * Nu regularization parameter
+   */
   protected double nu;
 
-  public NuSVC(double eps, boolean shrinking, double cache_size, double nu) {
-    super(eps, shrinking, cache_size);
+  /**
+   * Constructor.
+   * 
+   * @param tol Optimizer tolerance
+   * @param shrinking Use shrinking
+   * @param cache_size Cache size
+   * @param nu Nu regularization parameter
+   * @param probability Estimate probabilities
+   */
+  public NuSVC(double tol, boolean shrinking, double cache_size, double nu, boolean probability) {
+    super(tol, shrinking, cache_size, probability);
     this.nu = nu;
   }
 
@@ -44,7 +65,7 @@ public class NuSVC extends AbstractSVC {
     QMatrix Q = new CachedQMatrix(l, cache_size, new SVC_Q(x, y));
     Q.initialize();
     NuSolver solver = new NuSolver();
-    Solver.SolutionInfo si = solver.solve(l, Q, zeros, y, alpha, 1., 1., eps, shrinking);
+    Solver.SolutionInfo si = solver.solve(l, Q, zeros, y, alpha, 1., 1., tol, shrinking);
     final double ir = 1 / solver.r;
     LOG.verbose("C = " + ir);
 
