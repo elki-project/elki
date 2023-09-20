@@ -76,7 +76,7 @@ public class ConstrainedQuadraticProblemSolver {
 
   /**
    * Find the first dimension where the partial derivative wrt. that dimension
-   * is nonnegative or nonpositive. If the derivative is nonnegative (lo &geq;0) it
+   * is nonnegative or nonpositive. If the derivative is nonnegative (lo &gt;= 0) it
    * will be driven to the upper limit and vice versa.
    * <p>
    * This does NOT mean that the non-found dimensions are not driven to a limit.

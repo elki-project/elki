@@ -54,8 +54,8 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
  * <br>
  * \[y^T \alpha = \delta\]
  * \[y_i = \pm 1\]
- * \[0 &leq; alpha_i &leq; Cp \text{for} y_i = 1\]
- * \[0 &leq; alpha_i &leq; Cn \text{for} y_i = -1\]
+ * \[0 &lt;= alpha_i &lt;= Cp \text{for} y_i = +1\]
+ * \[0 &lt;= alpha_i &lt;= Cn \text{for} y_i = -1\]
  * <br>
  * Given:
  * <br>

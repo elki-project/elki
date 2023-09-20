@@ -142,6 +142,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    * Hack: Get/Create the style result.
    *
    * @param r Result object
+   * @param stylelib Style library
    * @return Style result
    */
   public StylingPolicy getStylePolicy(Object r, StyleLibrary stylelib) {
