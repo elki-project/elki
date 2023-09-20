@@ -88,6 +88,7 @@ public final class SVGSimpleLinearAxis {
    * 
    * @param owner Owner of the CSS classes
    * @param manager Manager to register the classes with
+   * @param style Style library
    * @throws CSSNamingConflict when a name clash occurs
    */
   private static void setupCSSClasses(Object owner, CSSClassManager manager, StyleLibrary style) throws CSSNamingConflict {

@@ -200,7 +200,7 @@ public class SelectionToolDotVisualization implements VisFactory {
      * Updates the selection in the context.<br>
      *
      * @param mode Input mode
-     * @param proj
+     * @param proj Projection
      * @param p1 first point of the selected rectangle
      * @param p2 second point of the selected rectangle
      */

@@ -191,7 +191,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath drawTo(double x, double y) {
     return !isStarted() ? moveTo(x, y) : lineTo(x, y);
@@ -204,7 +204,7 @@ public class SVGPath {
    * remaining.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath drawTo(double[] xy) {
     return !isStarted() ? moveTo(xy[0], xy[1]) : lineTo(xy[0], xy[1]);
@@ -224,7 +224,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath lineTo(double x, double y) {
     return append(PATH_LINE_TO).append(x).append(y);
@@ -234,7 +234,7 @@ public class SVGPath {
    * Draw a line to the given coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath lineTo(double[] xy) {
     return lineTo(xy[0], xy[1]);
@@ -245,7 +245,7 @@ public class SVGPath {
    *
    * @param x relative coordinates
    * @param y relative coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeLineTo(double x, double y) {
     return append(PATH_LINE_TO_RELATIVE).append(x).append(y);
@@ -255,7 +255,7 @@ public class SVGPath {
    * Draw a line to the given relative coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeLineTo(double[] xy) {
     return relativeLineTo(xy[0], xy[1]);
@@ -265,7 +265,7 @@ public class SVGPath {
    * Draw a horizontal line to the given x coordinate.
    *
    * @param x new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath horizontalLineTo(double x) {
     return append(PATH_HORIZONTAL_LINE_TO).append(x);
@@ -275,7 +275,7 @@ public class SVGPath {
    * Draw a horizontal line to the given relative x coordinate.
    *
    * @param x new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeHorizontalLineTo(double x) {
     return append(PATH_HORIZONTAL_LINE_TO_RELATIVE).append(x);
@@ -285,7 +285,7 @@ public class SVGPath {
    * Draw a vertical line to the given y coordinate.
    *
    * @param y new coordinate
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath verticalLineTo(double y) {
     return append(PATH_VERTICAL_LINE_TO).append(y);
@@ -295,7 +295,7 @@ public class SVGPath {
    * Draw a vertical line to the given relative y coordinate.
    *
    * @param y new coordinate
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeVerticalLineTo(double y) {
     return append(PATH_VERTICAL_LINE_TO_RELATIVE).append(y);
@@ -306,7 +306,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath moveTo(double x, double y) {
     return append(PATH_MOVE).append(x).append(y);
@@ -316,7 +316,7 @@ public class SVGPath {
    * Move to the given coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath moveTo(double[] xy) {
     return moveTo(xy[0], xy[1]);
@@ -327,7 +327,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeMoveTo(double x, double y) {
     return append(PATH_MOVE_RELATIVE).append(x).append(y);
@@ -337,7 +337,7 @@ public class SVGPath {
    * Move to the given relative coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeMoveTo(double[] xy) {
     return relativeMoveTo(xy[0], xy[1]);
@@ -352,7 +352,7 @@ public class SVGPath {
    * @param c2y second control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath cubicTo(double c1x, double c1y, double c2x, double c2y, double x, double y) {
     return append(PATH_CUBIC_TO).append(c1x).append(c1y).append(c2x).append(c2y).append(x).append(y);
@@ -364,7 +364,7 @@ public class SVGPath {
    * @param c1xy first control point
    * @param c2xy second control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath cubicTo(double[] c1xy, double[] c2xy, double[] xy) {
     return append(PATH_CUBIC_TO).append(c1xy[0]).append(c1xy[1]).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
@@ -379,7 +379,7 @@ public class SVGPath {
    * @param c2y second control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeCubicTo(double c1x, double c1y, double c2x, double c2y, double x, double y) {
     return append(PATH_CUBIC_TO_RELATIVE).append(c1x).append(c1y).append(c2x).append(c2y).append(x).append(y);
@@ -391,7 +391,7 @@ public class SVGPath {
    * @param c1xy first control point
    * @param c2xy second control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeCubicTo(double[] c1xy, double[] c2xy, double[] xy) {
     return append(PATH_CUBIC_TO_RELATIVE).append(c1xy[0]).append(c1xy[1]).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
@@ -404,7 +404,7 @@ public class SVGPath {
    * @param c2y second control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath smoothCubicTo(double c2x, double c2y, double x, double y) {
     return append(PATH_SMOOTH_CUBIC_TO).append(c2x).append(c2y).append(x).append(y);
@@ -415,7 +415,7 @@ public class SVGPath {
    *
    * @param c2xy second control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath smoothCubicTo(double[] c2xy, double[] xy) {
     return append(PATH_SMOOTH_CUBIC_TO).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
@@ -428,7 +428,7 @@ public class SVGPath {
    * @param c2y second control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeSmoothCubicTo(double c2x, double c2y, double x, double y) {
     return append(PATH_SMOOTH_CUBIC_TO_RELATIVE).append(c2x).append(c2y).append(x).append(y);
@@ -439,7 +439,7 @@ public class SVGPath {
    *
    * @param c2xy second control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeSmoothCubicTo(double[] c2xy, double[] xy) {
     return append(PATH_SMOOTH_CUBIC_TO_RELATIVE).append(c2xy[0]).append(c2xy[1]).append(xy[0]).append(xy[1]);
@@ -452,7 +452,7 @@ public class SVGPath {
    * @param c1y first control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath quadTo(double c1x, double c1y, double x, double y) {
     return append(PATH_QUAD_TO).append(c1x).append(c1y).append(x).append(y);
@@ -463,7 +463,7 @@ public class SVGPath {
    *
    * @param c1xy first control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath quadTo(double[] c1xy, double[] xy) {
     return append(PATH_QUAD_TO).append(c1xy[0]).append(c1xy[1]).append(xy[0]).append(xy[1]);
@@ -476,7 +476,7 @@ public class SVGPath {
    * @param c1y first control point y
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeQuadTo(double c1x, double c1y, double x, double y) {
     return append(PATH_QUAD_TO_RELATIVE).append(c1x).append(c1y).append(x).append(y);
@@ -487,7 +487,7 @@ public class SVGPath {
    *
    * @param c1xy first control point
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeQuadTo(double[] c1xy, double[] xy) {
     return append(PATH_QUAD_TO_RELATIVE).append(c1xy[0]).append(c1xy[1]).append(xy[0]).append(xy[1]);
@@ -498,7 +498,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath smoothQuadTo(double x, double y) {
     return append(PATH_SMOOTH_QUAD_TO).append(x).append(y);
@@ -508,7 +508,7 @@ public class SVGPath {
    * Smooth quadratic Bezier line to the given coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath smoothQuadTo(double[] xy) {
     return append(PATH_SMOOTH_QUAD_TO).append(xy[0]).append(xy[1]);
@@ -519,7 +519,7 @@ public class SVGPath {
    *
    * @param x new coordinates
    * @param y new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeSmoothQuadTo(double x, double y) {
     return append(PATH_SMOOTH_QUAD_TO_RELATIVE).append(x).append(y);
@@ -529,7 +529,7 @@ public class SVGPath {
    * Smooth quadratic Bezier line to the given relative coordinates.
    *
    * @param xy new coordinates
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeSmoothQuadTo(double[] xy) {
     return append(PATH_SMOOTH_QUAD_TO_RELATIVE).append(xy[0]).append(xy[1]);
@@ -545,6 +545,7 @@ public class SVGPath {
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param x new coordinates
    * @param y new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
     return append(PATH_ARC).append(rx).append(ry).append(ar).append(la).append(sp).append(x).append(y);
@@ -559,6 +560,7 @@ public class SVGPath {
    * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath ellipticalArc(double rx, double ry, double ar, double la, double sp, double[] xy) {
     return append(PATH_ARC).append(rx).append(ry).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
@@ -572,6 +574,7 @@ public class SVGPath {
    * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath ellipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
     return append(PATH_ARC).append(rxy[0]).append(rxy[1]).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
@@ -587,6 +590,7 @@ public class SVGPath {
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param x new coordinates
    * @param y new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeEllipticalArc(double rx, double ry, double ar, double la, double sp, double x, double y) {
     return append(PATH_ARC_RELATIVE).append(rx).append(ry).append(ar).append(la).append(sp).append(x).append(y);
@@ -601,6 +605,7 @@ public class SVGPath {
    * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeEllipticalArc(double rx, double ry, double ar, double la, double sp, double[] xy) {
     return append(PATH_ARC_RELATIVE).append(rx).append(ry).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
@@ -614,6 +619,7 @@ public class SVGPath {
    * @param la large arc flag, if angle &gt;= 180 deg
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
+   * @return {@code this}, for call chaining
    */
   public SVGPath relativeEllipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
     return append(PATH_ARC_RELATIVE).append(rxy[0]).append(rxy[1]).append(ar).append(la).append(sp).append(xy[0]).append(xy[1]);
@@ -623,6 +629,7 @@ public class SVGPath {
    * Append an action to the current path.
    *
    * @param action Current action
+   * @return {@code this}, for call chaining
    */
   private SVGPath append(char action) {
     assert lastaction != 0 || action == PATH_MOVE : "Paths must begin with a move to the initial position!";
@@ -637,6 +644,7 @@ public class SVGPath {
    * Append a value to the current path.
    *
    * @param x coordinate.
+   * @return {@code this}, for call chaining
    */
   private SVGPath append(double x) {
     if(!Double.isFinite(x)) {
@@ -658,7 +666,7 @@ public class SVGPath {
   /**
    * Close the path.
    *
-   * @return path object, for compact syntax.
+   * @return {@code this}, for call chaining
    */
   public SVGPath close() {
     assert lastaction != 0 : "Paths must begin with a move to the initial position!";

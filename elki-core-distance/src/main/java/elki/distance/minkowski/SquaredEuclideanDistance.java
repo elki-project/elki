@@ -145,6 +145,10 @@ public class SquaredEuclideanDistance extends AbstractNumberVectorDistance imple
 
   /**
    * Special version for double arrays.
+   * 
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @return squared Euclidean distance
    */
   public double distance(double[] v1, double[] v2) {
     final int dim1 = v1.length, dim2 = v2.length;

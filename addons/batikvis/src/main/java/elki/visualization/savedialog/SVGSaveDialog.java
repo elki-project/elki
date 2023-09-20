@@ -216,6 +216,7 @@ public final class SVGSaveDialog {
    * {@link JOptionPane#showMessageDialog(java.awt.Component, Object)}.
    *
    * @param parent The parent component for the popup.
+   * @param title The title of the popup.
    * @param msg The message to be displayed.
    */
   private static void showError(Component parent, String title, String msg) {

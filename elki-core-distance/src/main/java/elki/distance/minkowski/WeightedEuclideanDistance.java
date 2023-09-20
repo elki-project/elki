@@ -40,7 +40,7 @@ public class WeightedEuclideanDistance extends WeightedLPNormDistance {
   /**
    * Constructor.
    * 
-   * @param weights
+   * @param weights Weights
    */
   public WeightedEuclideanDistance(double[] weights) {
     super(2.0, weights);

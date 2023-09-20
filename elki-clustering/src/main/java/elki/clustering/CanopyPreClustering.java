@@ -174,14 +174,14 @@ public class CanopyPreClustering<O> implements ClusteringAlgorithm<Clustering<Pr
     /**
      * Parameter for the inclusion threshold of canopy clustering.
      * <p>
-     * Note: t1 >= t2
+     * Note: t1 &gt;= t2
      */
     public static final OptionID T1_ID = new OptionID("canopy.t1", "Inclusion threshold for canopy clustering. t1 >= t2!");
 
     /**
      * Parameter for the removal threshold of canopy clustering.
      * <p>
-     * Note: t1 >= t2
+     * Note: t1 &gt;= t2
      */
     public static final OptionID T2_ID = new OptionID("canopy.t2", "Removal threshold for canopy clustering. t1 >= t2!");
 

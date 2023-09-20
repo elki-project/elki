@@ -52,6 +52,7 @@ public final class OPTICSCut {
   /**
    * Compute an OPTICS cut clustering
    *
+   * @param <E> Cluster order type
    * @param co Cluster order result
    * @param epsilon Epsilon value for cut
    * @return New partitioning clustering

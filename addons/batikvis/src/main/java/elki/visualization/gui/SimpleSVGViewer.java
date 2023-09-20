@@ -60,7 +60,7 @@ public class SimpleSVGViewer extends JFrame {
   /**
    * Constructor.
    * 
-   * @throws HeadlessException
+   * @throws HeadlessException when no screen is available
    */
   public SimpleSVGViewer() throws HeadlessException {
     super();
