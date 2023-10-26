@@ -22,7 +22,6 @@
 package elki.clustering.kmeans.covertree;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.covertree.KMeansCoverTree.Node;
@@ -38,7 +37,6 @@ import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
-import elki.math.MathUtil;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;

@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2021
+ * Copyright (C) 2023
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,8 @@ import elki.logging.statistics.LongStatistic;
 /**
  * Abstract base class for cover tree variants.
  * 
- * @author
+ * @author Erich Schubert
+ * @author Andreas Lang
  *
  * @param <V> vector datatype
  */
@@ -71,12 +72,10 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         this.meanstat = meanstat;
     }
 
-    // public KMeansCoverTree(Relation<V> relation, Distance<? super V>
-    // distance, boolean meanstat) {
-    // super(relation, distance, 1.3, 10);
-    // this.meanstat = meanstat;
-    // }
-
+    /**
+     * 
+     * @return Root node of the tree
+     */
     protected Node getRoot() {
         return root;
     }
@@ -85,6 +84,7 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
      * Node object.
      *
      * @author Erich Schubert
+     * @author Andreas Lang
      */
     static final class Node implements DBIDRef {
         /**
@@ -103,8 +103,14 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
          */
         double parentDist = 0.;
 
+        /**
+         * Sum of represented data points
+         */
         double[] meansum;
 
+        /**
+         * Number of Data points represented by the node
+         */
         int size;
 
         /**
@@ -147,6 +153,14 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
             this.parentDist = parentDist;
         }
 
+        /**
+         * Constructor for leaf node.
+         *
+         * @param r          Reference object
+         * @param parentDist Distance from parent
+         * @param mean       Mean Value of the node
+         * @param weight     Number of Datapoints in the subtree
+         */
         public Node(DBIDRef r, double parentDist, double[] mean, int weight) {
             this.children = Collections.emptyList();
             this.singletons = DBIDUtil.newDistanceDBIDList(1);
@@ -198,6 +212,11 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         }
     }
 
+    /**
+     * Bulk-load the index.
+     *
+     * @param ids IDs to load
+     */
     private void bulkLoad(DBIDs ids) {
         if(ids.isEmpty()) {
             return;
@@ -213,6 +232,18 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         root = bulkConstruct(first, Integer.MAX_VALUE, Double.POSITIVE_INFINITY, candidates);
     }
 
+    /**
+     * Bulk-load the cover tree.
+     * <p>
+     * This bulk-load is slightly simpler than the one used in the original
+     * cover-tree source: We do not look back into the "far" set of candidates.
+     *
+     * @param cur        Current routing object
+     * @param maxScale   Maximum scale
+     * @param parentDist Distance to parent element
+     * @param elems      Candidates
+     * @return Root node of subtree
+     */
     protected Node bulkConstruct(DBIDRef cur, int maxScale, double parentDist, ModifiableDoubleDBIDList elems) {
         final double max = maxDistance(elems);
         final int scale = Math.min(distToScale(max) - 1, maxScale);
@@ -266,6 +297,12 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         return node;
     }
 
+    /**
+     * Collect Samples that belong to the subtree represented by this node
+     * 
+     * @param cur     Node whose samples should be added
+     * @param collect Collector List the Samples are added
+     */
     public void collectSubtree(Node cur, ModifiableDBIDs collect) {
         // ModifiableDBIDs collect = DBIDUtil.newHashSet(100); // TODO fix size
         DBIDIter it = cur.singletons.iter();
@@ -287,6 +324,12 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
         return LOG;
     }
 
+    /**
+     * Calculates the mean value of a Node
+     * 
+     * @param cur      Node
+     * @param relation underlying relation
+     */
     public void calculateMeans(Node cur, Relation<? extends NumberVector> relation) {
         DBIDIter it = cur.singletons.iter();
         NumberVector fv = relation.get(it);
