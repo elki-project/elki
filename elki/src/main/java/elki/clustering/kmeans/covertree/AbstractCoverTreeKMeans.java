@@ -45,8 +45,10 @@ import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * TODO
+ * TODO Add references
  *
+ * Abstract class for all Variants of 
+ * 
  * @author Andreas Lang
  *
  * @navassoc - - - KMeansModel
@@ -60,10 +62,26 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
      */
     protected boolean varstat = false;
 
+    /**
+     * Expansion factor for the cover tree
+     */
     protected double expansion = 1.3;
 
+    /**
+     * Truncate threshold for the cover tree
+     */
     protected int trunc = 10;
 
+    /**
+     * Constructor
+     * 
+     * @param k number of clusters
+     * @param maxiter maximum number of iterations
+     * @param initializer k-means initializer
+     * @param varstat Flag for Variance statistics at the end
+     * @param expansion Tree expansion factor
+     * @param trunc Tree truncate threshold
+     */
     public AbstractCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
         super(SquaredEuclideanDistance.STATIC, k, maxiter, initializer);
         this.varstat = varstat;
@@ -71,31 +89,58 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
         this.trunc = trunc;
     }
 
+    /**
+     * Inner Class for Cover Tree k-means
+     * 
+     * @author Andreas Lang
+     */
     protected abstract static class Instance extends AbstractKMeans.Instance {
         KMeansCoverTree<? extends NumberVector> tree;
 
+        /**
+         * inter cluster distances
+         */
         double[][] cdist;
 
+        /**
+         * squared inter cluster distances
+         */
         double[][] scdist;
 
+        /**
+         * Statistic for pruning at singleton level
+         */
         long singletonstatPrune;
 
+        /**
+         * Statistic for filtering at singleton level
+         */
         long singletonstatFilter;
 
+        /**
+         * Statistic for filtering with inter cluster distances at singleton level
+         */
         long singletonstatIcDist;
 
+        /**
+         * Statistic for pruning at node level
+         */
         long nodestatPrune;
 
+        /**
+         * Statistic for filtering at node level
+         */
         long nodestatFilter;
 
+        /**
+         * Statistic for filtering with inter cluster distances at node level
+         */
         long nodestatIcDist;
 
-        NodeManager nodeManager;
-
         /**
-         * Cluster candidate indexes
+         * Node Manager class for managing cluster assignments of nodes
          */
-        // int[] cand;
+        NodeManager nodeManager;
 
         /**
          * Constructor.
@@ -112,6 +157,15 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             nodeManager = new NodeManager(k, means[0].length, clusters, assignment, tree, relation);
         }
 
+        /**
+         * Prune cluster candidates
+         * 
+         * @param dists distance of Node to clusters
+         * @param cand List of candidates
+         * @param nodeUpper Upper bound on distances
+         * @param alive number of valid candidates
+         * @return new number of valid candidates
+         */
         protected int pruneD(double[] dists, int[] cand, double nodeUpper, int alive) {
             // candidate 0 and 1 are the neaest and can not be pruned
             for(int i = 2; i < alive;) {
@@ -127,12 +181,27 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return alive;
         }
 
+        /**
+         * Swap cluster candidates
+         * 
+         * @param i index candidate a
+         * @param j index candidate b
+         * @param cand array with cluster candidates
+         */
         protected void swap(int i, int j, int[] cand) {
             final int swap = cand[i];
             cand[i] = cand[j];
             cand[j] = swap;
         }
 
+        /**
+         * Swap cluster candidates and distances to them
+         * 
+         * @param dists array with distances to cluster centers
+         * @param i index candidate a
+         * @param j index candidate b
+         * @param cand array with cluster candidates
+         */
         protected void swap(double[] dists, int i, int j, int[] cand) {
             final int swap = cand[i];
             cand[i] = cand[j];
@@ -182,11 +251,18 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
         }
 
+        /**
+         * Add all emements to the cluster list.
+         */
         public void generateCover() {
             Node root = tree.getRoot();
             generateCover(root);
         }
 
+        /**
+         * Adds all Elements of a Node to the cluster list
+         * @param cur Current Node
+         */
         public void generateCover(Node cur) {
             int clu = nodeManager.get(cur);
             if(clu >= 0) {
@@ -206,6 +282,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
         }
 
+        /**
+         * materialize Clusters from assignment
+         */
         public void materializeClusters() {
             for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
                 clusters.get(assignment.intValue(it)).add(it);
@@ -230,6 +309,13 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             }
         }
 
+        /**
+         * Add Node to cluster
+         * 
+         * @param n Node
+         * @param cluster Cluster
+         * @return number of changed Nodes
+         */
         protected int addNode(Node n, int cluster) {
             int changed = 0;
             ModifiableDBIDs collect = DBIDUtil.newHashSet(100); // size
@@ -247,6 +333,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return changed;
         }
 
+        /** 
+         * Validate that every point is assigned to a cluster (expensive)
+         */
         public boolean testSizes() {
             int count = 0;
             for(int i = 0; i < k; i++) {
@@ -256,6 +345,13 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return count == size;
         }
 
+        /**
+         * Test upper bounds
+         * 
+         * @param id Element
+         * @param u upper boudn
+         * @return Number of invalid elements
+         */
         public int testUpper(DBIDRef id, double u) {
             int invalid = 0;
             double b = Double.MAX_VALUE;
@@ -272,6 +368,16 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return invalid;
         }
 
+
+        /**
+         * Test lower bounds 
+         * 
+         * @param id Element
+         * @param u upper bound
+         * @param l lower bound
+         * @param clu cluster
+         * @return Number of invalid elements
+         */
         public int testLower(DBIDRef id, double u, double l, int clu) {
             int invalid = 0;
             double b = Double.MAX_VALUE;
@@ -288,6 +394,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return invalid;
         }
 
+        /**
+         * Print statistics on cover tree pruning
+         */
         public void printLog() {
             Logging log = getLogger();
             log.statistics(new LongStatistic(key + ".Singleton.filter", singletonstatFilter));
@@ -316,8 +425,14 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
          */
         public static final OptionID EXPANSION_ID = new OptionID("covertree.expansionrate", "Expansion rate of the tree (Default: 1.3).");
 
+        /**
+         * Expansion factor of the cover tree
+         */
         double expansion = 1.4;
 
+        /**
+         * Truncate threshold for the cover tree
+         */
         int trunc = 10;
 
         @Override
@@ -325,6 +440,11 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
             return true;
         }
 
+        /**
+         * Get the cover tree parameters
+         * 
+         * @param config Parametrization
+         */
         protected void getParameterSlack(Parameterization config) {
             new DoubleParameter(EXPANSION_ID, 1.3) //
                     .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE) //

@@ -198,6 +198,13 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
 
     }
 
+    /**
+     * Collects statistics on the tree
+     * 
+     * @param cur current node
+     * @param counts accumulator for statistics
+     * @param depth current depth
+     */
     private void checkCoverTree(Node cur, int[] counts, int depth) {
         counts[0] += 1; // Node count
         counts[1] += depth; // Sum of depth
