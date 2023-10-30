@@ -37,12 +37,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
         tree.initialize();
         Instance instance = new Instance(relation, distance, initialMeans(relation), tree, switchover);
         instance.run(maxiter);
-        if(instance.flat) {
-            instance.materializeClusters();
-        }
-        else {
-            instance.generateCover();
-        }
+        instance.generateCover();
         instance.printLog();
         return instance.buildResult(varstat, relation);
     }

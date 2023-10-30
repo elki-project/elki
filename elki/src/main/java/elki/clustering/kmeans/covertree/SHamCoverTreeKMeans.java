@@ -24,7 +24,7 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKMeans<V> {
+public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans<V> {
 
     int switchover;
 
@@ -54,7 +54,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
         return LOG;
     }
 
-    protected static class Instance extends FastCoverTreeKMeans.Instance {
+    protected static class Instance extends CoverTreeKMeans.Instance {
 
         /**
          * Upper bounds
@@ -424,7 +424,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends FastCoverTreeKM
      *
      * @author Erich Schubert
      */
-    public static class Par<V extends NumberVector> extends FastCoverTreeKMeans.Par<V> {
+    public static class Par<V extends NumberVector> extends CoverTreeKMeans.Par<V> {
 
         public static final OptionID SWITCH_ID = new OptionID("covertree.switch", "Switches from covertree to Hamerly.");
 

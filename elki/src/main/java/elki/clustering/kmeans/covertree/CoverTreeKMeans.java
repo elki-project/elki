@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2021
+ * Copyright (C) 2023
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import elki.math.MathUtil;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Uses squared inter cluster distances for singleton distance calc and sqrt
+ * Uses squared inter cluster distances for singleton distance calc and non squared
  * inter cluster distances for node distance calc.
  *
  * @author Andreas Lang
@@ -45,16 +45,16 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @param <V> vector datatype
  */
-public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKMeans<V> {
+public class CoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKMeans<V> {
 
-    public FastCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
+    public CoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
         super(k, maxiter, initializer, varstat, expansion, trunc);
     }
 
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(FastCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(CoverTreeKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -72,8 +72,12 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
         return LOG;
     }
 
+    /**
+     * Inner Class for Cover Tree k-means
+     * 
+     * @author Andreas Lang
+     */
     protected static class Instance extends AbstractCoverTreeKMeans.Instance {
-        public boolean flat = false;
 
         /**
          * Constructor.
@@ -107,6 +111,11 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             return assignNode(root, k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
         }
 
+        /**
+         * Computes the initial Assignment of all points
+         * 
+         * @return Number of assigned Points
+         */
         protected int initialAssignToNearestCluster() {
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
@@ -114,6 +123,17 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             return assignNode(root, k, -2, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
         }
 
+        /**
+         * Assignes the Current Node to the closest cluster by recursively assigning the subtree if necessary
+         * 
+         * @param cur Current node
+         * @param alive Number of cluster candidates for that node
+         * @param oldass Old assignment of that node
+         * @param radius Radius of the Parent node
+         * @param parentdists Distances from the parent node to the cluster candidates
+         * @param cand list with the cluster candidates. closest first, 2nd closest second
+         * @return Number of elements that changed assignment
+         */
         protected int assignNode(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
@@ -236,6 +256,18 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
             return changed;
         }
 
+        /**
+         * Assignes all singleton elements of a  node to their closest cluster
+         * 
+         * @param cur Node
+         * @param oldass old assignment of the node
+         * @param fastbound distance bound for direct assignmen
+         * @param it Singleton iterator
+         * @param dists distances from node routing object to 
+         * @param cand Candidate clusters
+         * @param alive number of candidate clusters
+         * @return Number of elements that changed assignment
+         */
         protected int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
             int changed = 0;
             for(int j = 1; it.valid(); it.advance(), j++) {
@@ -297,8 +329,8 @@ public class FastCoverTreeKMeans<V extends NumberVector> extends AbstractCoverTr
         }
 
         @Override
-        public FastCoverTreeKMeans<V> make() {
-            return new FastCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc);
+        public CoverTreeKMeans<V> make() {
+            return new CoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc);
         }
     }
 }
