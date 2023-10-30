@@ -1,3 +1,24 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2023
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package elki.clustering.kmeans.covertree;
 
 import java.util.Arrays;
@@ -20,16 +41,34 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
-public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<V> {
+/**
+ * Combines Cover Tree k-means with the Shallot algorithm
+ *
+ * @author Andreas Lang
+ *
+ * @param <V> vector datatype
+ */
+public class HybShaCovKMeans<V extends NumberVector> extends HybExpCovKMeans<V> {
 
-    public ShaCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
+    /**
+     * Constructor
+     * 
+     * @param k           Number of clusters
+     * @param maxiter     maximum number of iterations
+     * @param initializer k-means initialization
+     * @param varstat     variance
+     * @param expansion   expansion factor of cover tree
+     * @param trunc       truncate theshold for cover tree
+     * @param switchover  Iteration for switching strategies
+     */
+    public HybShaCovKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
     }
 
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(ShaCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(HybShaCovKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -47,6 +86,11 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
         return LOG;
     }
 
+    /**
+     * Inner Class for k-means
+     * 
+     * @author Andreas Lang
+     */
     protected static class Instance extends HybExpCovKMeans.Instance {
 
         /**
@@ -54,6 +98,15 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
          */
         WritableIntegerDataStore second;
 
+        /**
+         * Constructor
+         * 
+         * @param relation   Relation
+         * @param df         distance function
+         * @param means      cluster centers
+         * @param tree       cover tree
+         * @param switchover point of strategy switch
+         */
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
             super(relation, df, means, tree, switchover);
             second = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
@@ -85,6 +138,17 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
             return assignPointsToNearestCluster();
         }
 
+        /**
+         * Assign node to cluster (recursively) and add bounds + store id of second closest cluster
+         * 
+         * @param cur         Node
+         * @param alive       Number of cluster candidates for the nodes
+         * @param oldass      old assignment of the node
+         * @param radius      radius of parent
+         * @param parentdists distances from parent to candidates
+         * @param cand        list of candidate clusters
+         * @return Number of newly assigned elements
+         */
         protected int assignNodeBounds(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
@@ -209,6 +273,21 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
             return changed;
         }
 
+        /**
+         * Assign Singleton points and set bounds + store i of second closest cluster
+         * 
+         * @param cur       Current Node
+         * @param oldass    Parent old assignment when applicable
+         * @param fastbound bound for assignment
+         * @param it        singleton iterator
+         * @param dists     distances from parent to cluster candidates
+         * @param cand      list of cluster candidates
+         * @param alive     number of cluster candidates
+         * @param min1      distance from parent to the closest cluster center
+         * @param min2      distance from parent to the second closest cluster
+         *                  center
+         * @return number of reassigned points
+         */
         protected int assignSingletonsBounds(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive, double min1, double min2) {
             int changed = 0;
             for(int j = 1; it.valid(); it.advance(), j++) {
@@ -261,6 +340,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
             return changed;
         }
 
+        @Override
         protected int assignPointsToNearestCluster() {
             recomputeSeperation(sep, cdist);
             nearestMeans(cdist, cnum);
@@ -348,6 +428,17 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
             return changed;
         }
 
+        /**
+         * Add Node to cluster and sore bounds + id of second closest cluster
+         * 
+         * @param n Node 
+         * @param oldass Old assignment
+         * @param clu closest cluster
+         * @param clu2 second closest cluster
+         * @param u upper bound 
+         * @param l lower bound
+         * @return number of changed elements
+         */
         protected int addBound(Node n, int oldass, int clu, int clu2, double u, double l) {
             // nodemanager first
             int changed = nodeManager.change(n, oldass, clu);
@@ -367,6 +458,18 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
             return changed;
         }
 
+        /**
+         * Add Element to Cluster, and store bounds, and sore id of second closest cluster
+         * 
+         * @param id     Element Id
+         * @param fv     Object
+         * @param oldass old assignment
+         * @param clu    closest cluster
+         * @param clu2   second closest cluster
+         * @param u      upper bound
+         * @param l      lower bound
+         * @return       1 if assignment changed else 0
+         */
         protected int addBound(DBIDRef id, NumberVector fv, int oldass, int clu, int clu2, double u, double l) {
             int changed = nodeManager.change(id, fv, oldass, clu);
             if(l == Double.POSITIVE_INFINITY) {
@@ -390,7 +493,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<V extends NumberVector> extends HybExpCovKMeans.Par<V> {
 
@@ -400,8 +503,8 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<
         }
 
         @Override
-        public ShaCoverTreeKMeans<V> make() {
-            return new ShaCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
+        public HybShaCovKMeans<V> make() {
+            return new HybShaCovKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
         }
     }
 
