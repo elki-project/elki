@@ -47,6 +47,16 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  */
 public class CoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKMeans<V> {
 
+    /**
+     * Constructor
+     * 
+     * @param k Number of clusters
+     * @param maxiter maximum number of iterations
+     * @param initializer k-means initializer
+     * @param varstat variance statistic at the end ?
+     * @param expansion expansion factor of cover tree
+     * @param trunc truncate threshold for cover tree
+     */
     public CoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
         super(k, maxiter, initializer, varstat, expansion, trunc);
     }

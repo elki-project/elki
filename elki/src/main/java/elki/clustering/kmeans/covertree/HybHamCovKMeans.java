@@ -1,3 +1,23 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2023
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package elki.clustering.kmeans.covertree;
 
 import java.util.Arrays;
@@ -24,11 +44,34 @@ import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
-public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans<V> {
+/**
+ * Combines Cover Tree k-means with the Hamerly algorithm
+ *
+ * @author Andreas Lang
+ *
+ * @navassoc - - - KMeansModel
+ *
+ * @param <V> vector datatype
+ */
+public class HybHamCovKMeans<V extends NumberVector> extends CoverTreeKMeans<V> {
 
+    /**
+     * stores iteration of th estrategy switch
+     */
     int switchover;
 
-    public SHamCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
+    /**
+     * Constructor
+     * 
+     * @param k Number of clusters
+     * @param maxiter maximum number of iterations
+     * @param initializer k-means initialization
+     * @param varstat variance 
+     * @param expansion expansion factor of cover tree
+     * @param trunc truncate theshold for cover tree
+     * @param switchover Iteration for switching strategies
+     */
+    public HybHamCovKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc);
         this.switchover = switchover;
     }
@@ -36,7 +79,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(SHamCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(HybHamCovKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -54,6 +97,11 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
         return LOG;
     }
 
+    /**
+     * Inner Class for k-means
+     * 
+     * @author Andreas Lang
+     */
     protected static class Instance extends CoverTreeKMeans.Instance {
 
         /**
@@ -66,6 +114,9 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
          */
         WritableDoubleDataStore lower;
 
+        /**
+         * tmp storage for calc of new mean
+         */
         double[][] newmeans;
 
         /**
@@ -73,8 +124,20 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
          */
         double[] sep;
 
+        /**
+         * iteration for switch of strategy
+         */
         int switchover;
 
+        /**
+         * Constructor
+         * 
+         * @param relation Relation
+         * @param df distance function
+         * @param means cluster centers
+         * @param tree cover tree
+         * @param switchover point of strategy switch
+         */
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
             super(relation, df, means, tree);
             this.switchover = switchover;
@@ -110,12 +173,28 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return assignPointsToNearestCluster();
         }
 
+        /**
+         * K-means iteration on the tree with assignment of bounds for Hamerly's algorithm
+         * 
+         * @return Number of points that switched clusters
+         */
         protected int assignToClusterBounds() {
             combinedSeperation(cdist, scdist);
             Node root = tree.getRoot();
             return assignNodeBounds(root, k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
         }
 
+        /**
+         * Assign node to cluster (recursively) and add bounds
+         * 
+         * @param cur Node
+         * @param alive Number of cluster candidates for the nodes
+         * @param oldass old assignment of the node
+         * @param radius radius of parent
+         * @param parentdists distances from parent to candidates
+         * @param cand list of candidate clusters
+         * @return Number of newly assigned elements
+         */
         protected int assignNodeBounds(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
             if(oldass == -1) {
                 oldass = nodeManager.get(cur);
@@ -240,6 +319,20 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return changed;
         }
 
+        /**
+         * Assign Singleton points and set bounds
+         * 
+         * @param cur Current Node
+         * @param oldass Parent old assignment when applicable 
+         * @param fastbound bound for assignment
+         * @param it singleton iterator
+         * @param dists distances from parent to cluster candidates
+         * @param cand list of cluster candidates
+         * @param alive number of cluster candidates
+         * @param min1 distance from parent to the closest cluster center
+         * @param min2 distance from parent to the second closest cluster center
+         * @return number of reassigned points
+         */
         protected int assignSingletonsBounds(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive, double min1, double min2) {
             int changed = 0;
             for(int j = 1; it.valid(); it.advance(), j++) {
@@ -288,6 +381,11 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return changed;
         }
 
+        /**
+         * Hamerly's algorithm on all elements
+         * 
+         * @return Number of reassigned points
+         */
         protected int assignPointsToNearestCluster() {
             recomputeSeperation(sep);
             int changed = 0;
@@ -336,6 +434,16 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return changed;
         }
 
+        /**
+         * Add Node to Cluster and set bound
+         * 
+         * @param n Node
+         * @param oldass Old Assignment
+         * @param clu target cluster
+         * @param u upper bound
+         * @param l lower bound
+         * @return return number of changed elements
+         */
         protected int addBound(Node n, int oldass, int clu, double u, double l) {
             // nodemanager first
             int changed = nodeManager.change(n, oldass, clu);
@@ -354,6 +462,17 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return changed;
         }
 
+        /**
+         * Add Element to Cluster and store bounds
+         * 
+         * @param id Element Id
+         * @param fv Object
+         * @param oldass old assignment
+         * @param clu target cluster
+         * @param u upper bound
+         * @param l lower bound
+         * @return 1 if assignment changed else 0
+         */
         protected int addBound(DBIDRef id, NumberVector fv, int oldass, int clu, double u, double l) {
             int changed = nodeManager.change(id, fv, oldass, clu);
             if(l == Double.POSITIVE_INFINITY) {
@@ -366,6 +485,11 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
             return changed;
         }
 
+        /**
+         * Update Bounds based on cluser movement
+         * 
+         * @param move The distances all cluster centers moved
+         */
         protected void updateBounds(double[] move) {
             // Find the maximum and second largest movement.
             int most = 0;
@@ -422,7 +546,7 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<V extends NumberVector> extends CoverTreeKMeans.Par<V> {
 
@@ -448,8 +572,8 @@ public class SHamCoverTreeKMeans<V extends NumberVector> extends CoverTreeKMeans
         }
 
         @Override
-        public SHamCoverTreeKMeans<V> make() {
-            return new SHamCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
+        public HybHamCovKMeans<V> make() {
+            return new HybHamCovKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
         }
     }
 

@@ -11,7 +11,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
-public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKMeans<V> {
+public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans<V> {
 
     public SExpCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
@@ -38,7 +38,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKM
         return LOG;
     }
 
-    protected static class Instance extends SHamCoverTreeKMeans.Instance {
+    protected static class Instance extends HybHamCovKMeans.Instance {
 
         int[] cnum[];
 
@@ -135,7 +135,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends SHamCoverTreeKM
      *
      * @author Erich Schubert
      */
-    public static class Par<V extends NumberVector> extends SHamCoverTreeKMeans.Par<V> {
+    public static class Par<V extends NumberVector> extends HybHamCovKMeans.Par<V> {
 
         @Override
         public void configure(Parameterization config) {
