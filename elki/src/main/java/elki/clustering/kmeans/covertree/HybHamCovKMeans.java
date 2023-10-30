@@ -49,8 +49,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Andreas Lang
  *
- * @navassoc - - - KMeansModel
- *
  * @param <V> vector datatype
  */
 public class HybHamCovKMeans<V extends NumberVector> extends CoverTreeKMeans<V> {
@@ -382,7 +380,7 @@ public class HybHamCovKMeans<V extends NumberVector> extends CoverTreeKMeans<V> 
         }
 
         /**
-         * Hamerly's algorithm on all elements
+         * Use of the hybrid strategy for all emements
          * 
          * @return Number of reassigned points
          */

@@ -20,7 +20,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
-public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMeans<V> {
+public class ShaCoverTreeKMeans<V extends NumberVector> extends HybExpCovKMeans<V> {
 
     public ShaCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
@@ -47,7 +47,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
         return LOG;
     }
 
-    protected static class Instance extends SExpCoverTreeKMeans.Instance {
+    protected static class Instance extends HybExpCovKMeans.Instance {
 
         /**
          * Second nearest cluster.
@@ -392,7 +392,7 @@ public class ShaCoverTreeKMeans<V extends NumberVector> extends SExpCoverTreeKMe
      *
      * @author Erich Schubert
      */
-    public static class Par<V extends NumberVector> extends SExpCoverTreeKMeans.Par<V> {
+    public static class Par<V extends NumberVector> extends HybExpCovKMeans.Par<V> {
 
         @Override
         public void configure(Parameterization config) {

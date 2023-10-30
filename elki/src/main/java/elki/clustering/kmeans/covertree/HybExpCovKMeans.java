@@ -1,3 +1,24 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2023
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package elki.clustering.kmeans.covertree;
 
 import elki.clustering.kmeans.initialization.KMeansInitialization;
@@ -11,16 +32,34 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
-public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans<V> {
+/**
+ * Combines Cover Tree k-means with the Exponion algorithm
+ *
+ * @author Andreas Lang
+ *
+ * @param <V> vector datatype
+ */
+public class HybExpCovKMeans<V extends NumberVector> extends HybHamCovKMeans<V> {
 
-    public SExpCoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
+  /**
+   * Constructor
+   * 
+   * @param k           Number of clusters
+   * @param maxiter     maximum number of iterations
+   * @param initializer k-means initialization
+   * @param varstat     variance
+   * @param expansion   expansion factor of cover tree
+   * @param trunc       truncate theshold for cover tree
+   * @param switchover  Iteration for switching strategies
+   */
+    public HybExpCovKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
         super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
     }
 
     /**
      * The logger for this class.
      */
-    private static final Logging LOG = Logging.getLogger(SExpCoverTreeKMeans.class);
+    private static final Logging LOG = Logging.getLogger(HybExpCovKMeans.class);
 
     @Override
     public Clustering<KMeansModel> run(Relation<V> relation) {
@@ -38,10 +77,27 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans
         return LOG;
     }
 
+    /**
+     * Inner Class for k-means
+     * 
+     * @author Andreas Lang
+     */
     protected static class Instance extends HybHamCovKMeans.Instance {
 
+        /**
+       * Sorted neighbors
+       */
         int[] cnum[];
 
+        /**
+         * Constructor
+         * 
+         * @param relation   Relation
+         * @param df         distance function
+         * @param means      cluster centers
+         * @param tree       cover tree
+         * @param switchover point of strategy switch
+         */
         public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
             super(relation, df, means, tree, switchover);
             cnum = new int[k][k - 1];
@@ -73,6 +129,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans
             return assignPointsToNearestCluster();
         }
 
+        @Override
         protected int assignPointsToNearestCluster() {
             recomputeSeperation(sep, cdist);
             nearestMeans(cdist, cnum);
@@ -133,7 +190,7 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<V extends NumberVector> extends HybHamCovKMeans.Par<V> {
 
@@ -143,8 +200,8 @@ public class SExpCoverTreeKMeans<V extends NumberVector> extends HybHamCovKMeans
         }
 
         @Override
-        public SExpCoverTreeKMeans<V> make() {
-            return new SExpCoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
+        public HybExpCovKMeans<V> make() {
+            return new HybExpCovKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
         }
     }
 
