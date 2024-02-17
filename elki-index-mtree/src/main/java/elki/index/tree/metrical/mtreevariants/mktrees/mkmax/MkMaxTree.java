@@ -21,18 +21,9 @@
 package elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
 
 import java.util.List;
-import java.util.Map;
 
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.datastore.DataStore;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
@@ -99,15 +90,14 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
     for (DBIDIter candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
       candidateIDs.add(candidate);
     }
-    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), candidateIDs, k);
+    DataStore<KNNList> knnLists = batchNN(getNode(getRootID()), candidateIDs, k);
 
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
-      DBID cid = DBIDUtil.deref(iter);
-      KNNList cands = knnLists.get(cid);
+      KNNList cands = knnLists.get(iter);
       for (DoubleDBIDListIter iter2 = cands.iter(); iter2.valid(); iter2.advance()) {
         if (DBIDUtil.equal(id, iter2)) {
-          result.add(iter2.doubleValue(), cid);
+          result.add(iter2.doubleValue(), iter);
           break;
         }
       }
@@ -134,7 +124,7 @@ public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNod
    * Adjusts the knn distance in the subtree of the specified root entry.
    */
   @Override
-  protected void kNNdistanceAdjustment(MkMaxEntry entry, Map<DBID, KNNList> knnLists) {
+  protected void kNNdistanceAdjustment(MkMaxEntry entry, DataStore<KNNList> knnLists) {
     MkMaxTreeNode<O> node = getNode(entry);
     double knnDist_node = 0.;
     if (node.isLeaf()) {

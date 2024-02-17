@@ -180,6 +180,11 @@ public final class ClassTree {
     public String getPackageName() {
       return pkgname;
     }
+
+    @Override
+    public Object clone() {
+      return super.clone(); // no deep copy necessary
+    }
   }
 
   /**
@@ -216,6 +221,11 @@ public final class ClassTree {
      */
     public String getClassName() {
       return clsname;
+    }
+
+    @Override
+    public Object clone() {
+      return super.clone(); // no deep copy necessary
     }
   }
 }

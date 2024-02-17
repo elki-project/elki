@@ -20,15 +20,8 @@
  */
 package elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
-import java.util.Map;
-
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.datastore.DataStore;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
@@ -131,7 +124,7 @@ public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNod
   }
 
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry entry, Map<DBID, KNNList> knnLists) {
+  protected void kNNdistanceAdjustment(MkTabEntry entry, DataStore<KNNList> knnLists) {
     MkTabTreeNode<O> node = getNode(entry);
     double[] knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {

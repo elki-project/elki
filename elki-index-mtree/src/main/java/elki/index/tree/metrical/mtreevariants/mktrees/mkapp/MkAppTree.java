@@ -21,19 +21,9 @@
 package elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
 
 import java.util.List;
-import java.util.Map;
 
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.datastore.DataStore;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -45,6 +35,7 @@ import elki.persistent.PageFile;
 import elki.utilities.datastructures.heap.Heap;
 import elki.utilities.datastructures.heap.UpdatableHeap;
 import elki.utilities.io.ByteArrayUtil;
+
 import net.jafama.FastMath;
 
 /**
@@ -120,7 +111,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
       super.insert(entry, false);
     }
 
-    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax + 1);
+    DataStore<KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax + 1);
 
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
     doExtraIntegrityChecks();
@@ -246,7 +237,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
    * @param knnLists kNN lists
    * @return Mean kNN values
    */
-  private double[] getMeanKNNList(DBIDs ids, Map<DBID, KNNList> knnLists) {
+  private double[] getMeanKNNList(DBIDs ids, DataStore<KNNList> knnLists) {
     double[] means = new double[settings.kmax];
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList knns = knnLists.get(iter);
@@ -264,7 +255,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry entry, Map<DBID, KNNList> knnLists) {
+  private void adjustApproximatedKNNDistances(MkAppEntry entry, DataStore<KNNList> knnLists) {
     MkAppTreeNode<O> node = getNode(entry);
 
     if(node.isLeaf()) {
