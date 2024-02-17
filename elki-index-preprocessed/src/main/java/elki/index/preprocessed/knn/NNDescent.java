@@ -25,9 +25,6 @@ import java.util.Random;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.WritableDataStore;
 import elki.database.ids.*;
-import elki.database.query.QueryBuilder;
-import elki.database.query.distance.DistanceQuery;
-import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
@@ -465,12 +462,6 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   @Override
   protected Logging getLogger() {
     return LOG;
-  }
-
-  @Override
-  public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
-    return (flags & QueryBuilder.FLAG_EXACT_ONLY) != 0 ? null : // approximate
-        super.kNNByObject(distanceQuery, maxk, flags);
   }
 
   /**
