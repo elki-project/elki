@@ -147,9 +147,9 @@ public final class ParseUtil {
       return Double.NaN;
     }
     // Match sign
-    boolean isNegative = (cur == '-');
+    boolean isNegative = cur == '-';
     // Carefully consume the - character, update c and i:
-    if((isNegative || (cur == '+')) && (++pos < end)) {
+    if((isNegative || cur == '+') && ++pos < end) {
       cur = str[pos];
     }
     if(matchInf(str, cur, pos, end)) {
@@ -158,7 +158,7 @@ public final class ParseUtil {
 
     final int realstart = pos;
     // Begin parsing real numbers!
-    if(((cur < '0') || (cur > '9')) && (cur != '.')) {
+    if((cur < '0' || cur > '9') && cur != '.') {
       throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
@@ -167,7 +167,7 @@ public final class ParseUtil {
     int decimalPoint = -1;
     while(true) {
       final int digit = cur - '0';
-      if((digit >= 0) && (digit <= 9)) {
+      if(digit >= 0 && digit <= 9) {
         final long tmp = (decimal << 3) + (decimal << 1) + digit;
         if(tmp >= decimal) {
           decimal = tmp; // Otherwise, silently ignore the extra digits.
@@ -176,7 +176,7 @@ public final class ParseUtil {
           throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
       }
-      else if((cur == '.') && (decimalPoint < 0)) {
+      else if(cur == '.' && decimalPoint < 0) {
         decimalPoint = pos;
       }
       else { // No more digits, or a second dot.
@@ -197,13 +197,13 @@ public final class ParseUtil {
 
     // Reads exponent.
     int exp = 0;
-    if((pos + 1 < end) && ((cur == 'E') || (cur == 'e'))) {
+    if(pos + 1 < end && (cur == 'E' || cur == 'e')) {
       cur = str[++pos];
       final boolean isNegativeExp = (cur == '-');
-      if((isNegativeExp || (cur == '+')) && (++pos < end)) {
+      if((isNegativeExp || cur == '+') && ++pos < end) {
         cur = str[pos];
       }
-      if((cur < '0') || (cur > '9')) { // At least one digit required.
+      if(cur < '0' || cur > '9') { // At least one digit required.
         throw LOG.isDebuggingFine() ? new NumberFormatException(INVALID_EXPONENT.getMessage()) : INVALID_EXPONENT;
       }
       while(true) {
@@ -272,9 +272,9 @@ public final class ParseUtil {
       return Double.NaN;
     }
     // Match sign
-    boolean isNegative = (cur == '-');
+    boolean isNegative = cur == '-';
     // Carefully consume the - character, update c and i:
-    if((isNegative || (cur == '+')) && (++pos < end)) {
+    if((isNegative || cur == '+') && ++pos < end) {
       cur = str.charAt(pos);
     }
     if(matchInf(str, cur, pos, end)) {
@@ -283,7 +283,7 @@ public final class ParseUtil {
 
     final int realstart = pos;
     // Begin parsing real numbers!
-    if(((cur < '0') || (cur > '9')) && (cur != '.')) {
+    if((cur < '0' || cur > '9') && cur != '.') {
       throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
@@ -301,7 +301,7 @@ public final class ParseUtil {
           throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
         }
       }
-      else if((cur == '.') && (decimalPoint < 0)) {
+      else if(cur == '.' && decimalPoint < 0) {
         decimalPoint = pos;
       }
       else { // No more digits, or a second dot.
@@ -322,13 +322,13 @@ public final class ParseUtil {
 
     // Reads exponent.
     int exp = 0;
-    if((pos + 1 < end) && ((cur == 'E') || (cur == 'e'))) {
+    if(pos + 1 < end && (cur == 'E' || cur == 'e')) {
       cur = str.charAt(++pos);
-      final boolean isNegativeExp = (cur == '-');
-      if((isNegativeExp || (cur == '+')) && (++pos < end)) {
+      final boolean isNegativeExp = cur == '-';
+      if((isNegativeExp || cur == '+') && ++pos < end) {
         cur = str.charAt(pos);
       }
-      if((cur < '0') || (cur > '9')) { // At least one digit required.
+      if(cur < '0' || cur > '9') { // At least one digit required.
         throw LOG.isDebuggingFine() ? new NumberFormatException(INVALID_EXPONENT.getMessage()) : INVALID_EXPONENT;
       }
       while(true) {
@@ -383,14 +383,14 @@ public final class ParseUtil {
     char cur = str.charAt(pos);
 
     // Match sign
-    boolean isNegative = (cur == '-');
+    boolean isNegative = cur == '-';
     // Carefully consume the - character, update c and i:
-    if((isNegative || (cur == '+')) && (++pos < end)) {
+    if((isNegative || cur == '+') && ++pos < end) {
       cur = str.charAt(pos);
     }
 
     // Begin parsing real numbers!
-    if((cur < '0') || (cur > '9')) {
+    if(cur < '0' || cur > '9') {
       throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
@@ -398,20 +398,18 @@ public final class ParseUtil {
     long decimal = 0;
     while(true) {
       final int digit = cur - '0';
-      if((digit >= 0) && (digit <= 9)) {
-        final long tmp = (decimal << 3) + (decimal << 1) + digit;
-        if(tmp < decimal) {
-          // Special case, Long.MIN_VALUE only.
-          if(isNegative && tmp == 0x8000000000000000L && pos + 1 == end) {
-            return Long.MIN_VALUE;
-          }
-          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
+      if(digit < 0 || digit > 9) {
+        break; // No more digits
+      }
+      final long tmp = (decimal << 3) + (decimal << 1) + digit;
+      if(tmp < decimal) {
+        // Special case, Long.MIN_VALUE only.
+        if(isNegative && tmp == Long.MIN_VALUE && pos + 1 == end) {
+          return Long.MIN_VALUE;
         }
-        decimal = tmp;
+        throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
       }
-      else { // No more digits
-        break;
-      }
+      decimal = tmp;
       if(++pos >= end) {
         break;
       }
@@ -420,7 +418,6 @@ public final class ParseUtil {
     if(pos != end) {
       throw LOG.isDebuggingFine() ? new NumberFormatException(TRAILING_CHARACTERS.getMessage()) : TRAILING_CHARACTERS;
     }
-
     return isNegative ? -decimal : decimal;
   }
 
@@ -451,14 +448,14 @@ public final class ParseUtil {
     char cur = str.charAt(pos);
 
     // Match sign
-    boolean isNegative = (cur == '-');
+    boolean isNegative = cur == '-';
     // Carefully consume the - character, update c and i:
-    if((isNegative || (cur == '+')) && (++pos < end)) {
+    if((isNegative || cur == '+') && ++pos < end) {
       cur = str.charAt(pos);
     }
 
     // Begin parsing real numbers!
-    if((cur < '0') || (cur > '9')) {
+    if(cur < '0' || cur > '9') {
       throw LOG.isDebuggingFine() ? new NumberFormatException(NOT_A_NUMBER.getMessage()) : NOT_A_NUMBER;
     }
 
@@ -466,20 +463,18 @@ public final class ParseUtil {
     int decimal = 0;
     while(true) {
       final int digit = cur - '0';
-      if((digit >= 0) && (digit <= 9)) {
-        final int tmp = (decimal << 3) + (decimal << 1) + digit;
-        if(tmp < decimal) {
-          // Special case, Integer.MIN_VALUE only.
-          if(isNegative && tmp == 0x80000000 && pos + 1 == end) {
-            return Integer.MIN_VALUE;
-          }
-          throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
+      if(digit < 0 || digit > 9) {
+        break; // No more digits
+      }
+      final int tmp = (decimal << 3) + (decimal << 1) + digit;
+      if(tmp < decimal) {
+        // Special case, Integer.MIN_VALUE only.
+        if(isNegative && tmp == Integer.MIN_VALUE && pos + 1 == end) {
+          return Integer.MIN_VALUE;
         }
-        decimal = tmp;
+        throw LOG.isDebuggingFine() ? new NumberFormatException(PRECISION_OVERFLOW.getMessage()) : PRECISION_OVERFLOW;
       }
-      else { // No more digits
-        break;
-      }
+      decimal = tmp;
       if(++pos >= end) {
         break;
       }
@@ -507,8 +502,7 @@ public final class ParseUtil {
     if(len == 3 && firstchar == -0x1E && str[start + 1] == -0x78 && str[start + 2] == -0x62) {
       return true;
     }
-    if((len != 3 && len != INFINITY_LENGTH) //
-        || (firstchar != 'I' && firstchar != 'i')) {
+    if((len != 3 && len != INFINITY_LENGTH) || (firstchar != 'I' && firstchar != 'i')) {
       return false;
     }
     for(int i = 1, j = INFINITY_LENGTH + 1; i < INFINITY_LENGTH; i++, j++) {
@@ -538,8 +532,7 @@ public final class ParseUtil {
     if(len == 1 && firstchar == '\u221E') {
       return true;
     }
-    if((len != 3 && len != INFINITY_LENGTH) //
-        || (firstchar != 'I' && firstchar != 'i')) {
+    if((len != 3 && len != INFINITY_LENGTH) || (firstchar != 'I' && firstchar != 'i')) {
       return false;
     }
     for(int i = 1, j = INFINITY_LENGTH + 1; i < INFINITY_LENGTH; i++, j++) {
