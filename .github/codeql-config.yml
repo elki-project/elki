@@ -20,3 +20,5 @@ query-filters:
     id: java/class-name-matches-super-class # Par, Instance, Factory...
 - exclude:
     id: java/comparison-of-identical-expressions # NaN checks
+- exclude:
+    id: java/uncontrolled-arithmetic # many false reports

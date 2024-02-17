@@ -22,17 +22,9 @@ package elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DoubleDBIDList;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.datastore.DataStore;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
@@ -43,7 +35,6 @@ import elki.utilities.datastructures.heap.ComparableMinHeap;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.io.ByteArrayUtil;
 import elki.utilities.io.FormatUtil;
-import net.jafama.FastMath;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -122,7 +113,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       super.insert(entry, false);
     }
 
-    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax);
+    DataStore<KNNList> knnLists = batchNN(getNode(getRootID()), ids, settings.kmax);
 
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
     doExtraIntegrityChecks();
@@ -147,7 +138,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     doReverseKNNQuery(k, id, result, candidates);
 
     // refinement of candidates
-    Map<DBID, KNNList> knnLists = batchNN(getNode(getRootID()), candidates, k);
+    DataStore<KNNList> knnLists = batchNN(getNode(getRootID()), candidates, k);
 
     result.sort();
     // Collections.sort(candidates);
@@ -157,11 +148,10 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     // rkNNStatistics.addTrueHits(result.size());
 
     for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-      DBID cid = DBIDUtil.deref(iter);
-      KNNList cands = knnLists.get(cid);
+      KNNList cands = knnLists.get(iter);
       for(DoubleDBIDListIter iter2 = cands.iter(); iter2.valid(); iter2.advance()) {
         if(DBIDUtil.equal(id, iter2)) {
-          result.add(iter2.doubleValue(), cid);
+          result.add(iter2.doubleValue(), iter);
           break;
         }
       }
@@ -290,9 +280,8 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry entry, Map<DBID, KNNList> knnLists) {
+  private void adjustApproximatedKNNDistances(MkCoPEntry entry, DataStore<KNNList> knnLists) {
     MkCoPTreeNode<O> node = getNode(entry);
-
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkCoPLeafEntry leafEntry = (MkCoPLeafEntry) node.getEntry(i);
@@ -305,7 +294,6 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
         adjustApproximatedKNNDistances(dirEntry, knnLists);
       }
     }
-
     ApproximationLine approx = node.conservativeKnnDistanceApproximation(settings.kmax);
     entry.setConservativeKnnDistanceApproximation(approx);
   }

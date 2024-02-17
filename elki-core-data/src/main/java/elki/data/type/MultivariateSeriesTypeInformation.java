@@ -51,7 +51,6 @@ public class MultivariateSeriesTypeInformation<V extends FeatureVector<?>> exten
   /**
    * Constructor for an actual type.
    *
-   * @param <V> vector type
    * @param cls base class
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
