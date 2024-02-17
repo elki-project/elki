@@ -26,8 +26,6 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Uniform distribution.
  * 
@@ -85,7 +83,7 @@ public class UniformDistribution implements Distribution {
   public double logpdf(double val) {
     return !(val >= min) || val > max ? //
         (val == val ? Double.NEGATIVE_INFINITY : Double.NaN) //
-        : len > 0. ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
+        : len > 0. ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override

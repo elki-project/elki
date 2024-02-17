@@ -71,7 +71,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
     }
     final double k = dof * .5;
     return (Math.abs(k - 1.0) < Double.MIN_NORMAL) ? FastMath.exp(-x * 2.0) * 2.0 : //
-        FastMath.exp((k - 1.0) * FastMath.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
+        FastMath.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
   }
 
   /**
@@ -91,7 +91,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
     final double k = dof * .5;
     final double twox = x * 2.0;
     return twox == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY : //
-        (k - 1.0) * FastMath.log(twox) - twox - logGamma(k) + MathUtil.LOG2;
+        (k - 1.0) * Math.log(twox) - twox - logGamma(k) + MathUtil.LOG2;
   }
 
   /**

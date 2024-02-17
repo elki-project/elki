@@ -140,7 +140,7 @@ public class PoissonDistribution implements Distribution {
 
   @Override
   public double logpdf(double x) {
-    return FastMath.log(pmf(x, n, p));
+    return Math.log(pmf(x, n, p));
   }
 
   /**
@@ -174,11 +174,11 @@ public class PoissonDistribution implements Distribution {
     if(x == 0) {
       return p < .1 ? //
           FastMath.exp(-devianceTerm(n, n * q) - n * p) : //
-          FastMath.exp(n * FastMath.log(q));
+          FastMath.exp(n * Math.log(q));
     }
     if(x == n) {
       return p > .9 ? //
-          FastMath.exp(-devianceTerm(n, n * p) - n * q) : FastMath.exp(n * FastMath.log(p));
+          FastMath.exp(-devianceTerm(n, n * p) - n * q) : FastMath.exp(n * Math.log(p));
     }
     final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
     final double f = (MathUtil.TWOPI * x * (n - x)) / n;
@@ -212,16 +212,16 @@ public class PoissonDistribution implements Distribution {
     if(x == 0) {
       return p < .1 ? //
           -devianceTerm(n, n * q) - n * p : //
-          n * FastMath.log(q);
+          n * Math.log(q);
     }
     if(x == n) {
       return p > .9 ? //
           -devianceTerm(n, n * p) - n * q : //
-          n * FastMath.log(p);
+          n * Math.log(p);
     }
     final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
     final double f = (MathUtil.TWOPI * x * (n - x)) / n;
-    return lc - .5 * FastMath.log(f);
+    return lc - .5 * Math.log(f);
   }
 
   @Override
@@ -281,7 +281,7 @@ public class PoissonDistribution implements Distribution {
     }
     return lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14 ? //
         -lambda - GammaDistribution.logGamma(x_plus_1) : //
-        rawLogProbability(x_plus_1, lambda) + FastMath.log(x_plus_1 / lambda);
+        rawLogProbability(x_plus_1, lambda) + Math.log(x_plus_1 / lambda);
   }
 
   /**
@@ -325,9 +325,9 @@ public class PoissonDistribution implements Distribution {
     if(n < 16.0) {
       // Our table has a step size of 0.5
       final double n2 = 2.0 * n;
-      return FastMath.floor(n2) == n2 ? // Exact match
+      return Math.floor(n2) == n2 ? // Exact match
           STIRLING_EXACT_ERROR[(int) n2] : //
-          GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * FastMath.log(n) + n - MathUtil.LOGSQRTTWOPI;
+          GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * Math.log(n) + n - MathUtil.LOGSQRTTWOPI;
     }
     final double nn = n * n;
     return n > 500.0 ? (S0 - S1 / nn) / n : //
@@ -362,7 +362,7 @@ public class PoissonDistribution implements Distribution {
         s = s1;
       }
     }
-    return x * FastMath.log(x / np) + np - x;
+    return x * Math.log(x / np) + np - x;
   }
 
   /**
@@ -387,7 +387,7 @@ public class PoissonDistribution implements Distribution {
       return FastMath.exp(-lambda);
     }
     if(lambda < x * Double.MIN_NORMAL) {
-      return FastMath.exp(-lambda + x * FastMath.log(lambda) - GammaDistribution.logGamma(x + 1));
+      return FastMath.exp(-lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1));
     }
     final double f = MathUtil.TWOPI * x;
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
@@ -416,11 +416,11 @@ public class PoissonDistribution implements Distribution {
       return -lambda;
     }
     if(lambda < x * Double.MIN_NORMAL) {
-      return -lambda + x * FastMath.log(lambda) - GammaDistribution.logGamma(x + 1);
+      return -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
     }
     final double f = MathUtil.TWOPI * x;
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
-    return -0.5 * FastMath.log(f) + y;
+    return -0.5 * Math.log(f) + y;
   }
 
   @Override

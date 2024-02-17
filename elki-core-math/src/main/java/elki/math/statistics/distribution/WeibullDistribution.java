@@ -141,7 +141,7 @@ public class WeibullDistribution implements Distribution {
       return Double.NEGATIVE_INFINITY;
     }
     double xl = (x - theta) / lambda;
-    return FastMath.log(k / lambda) + (k - 1) * FastMath.log(xl) - FastMath.pow(xl, k);
+    return Math.log(k / lambda) + (k - 1) * Math.log(xl) - FastMath.pow(xl, k);
   }
 
   /**
@@ -184,7 +184,7 @@ public class WeibullDistribution implements Distribution {
       return Double.POSITIVE_INFINITY;
     }
     else {
-      return theta + lambda * FastMath.pow(-FastMath.log(1.0 - val), 1.0 / k);
+      return theta + lambda * FastMath.pow(-Math.log(1.0 - val), 1.0 / k);
     }
   }
 
@@ -195,7 +195,7 @@ public class WeibullDistribution implements Distribution {
 
   @Override
   public double nextRandom(Random random) {
-    return theta + lambda * FastMath.pow(-FastMath.log(1 - random.nextDouble()), 1. / k);
+    return theta + lambda * FastMath.pow(-Math.log(1 - random.nextDouble()), 1. / k);
   }
 
   @Override

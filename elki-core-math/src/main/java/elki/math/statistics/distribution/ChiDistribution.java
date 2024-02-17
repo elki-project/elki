@@ -81,7 +81,7 @@ public class ChiDistribution implements Distribution {
       return 0.0;
     }
     final double k = dof * .5;
-    return FastMath.exp((dof - 1.0) * FastMath.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.);
+    return FastMath.exp((dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class ChiDistribution implements Distribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double k = dof * .5;
-    return (dof - 1.0) * FastMath.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.;
+    return (dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.;
   }
 
   @Override

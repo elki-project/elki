@@ -402,7 +402,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
         acc += v < max ? FastMath.exp(v - max) : 1.;
       }
     }
-    return acc > 1. ? (max + FastMath.log(acc)) : max;
+    return acc > 1. ? (max + Math.log(acc)) : max;
   }
 
   /**
@@ -413,7 +413,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @return Result
    */
   protected static double logSumExp(double a, double b) {
-    return (a > b ? a : b) + FastMath.log(a > b ? FastMath.exp(b - a) + 1 : FastMath.exp(a - b) + 1);
+    return (a > b ? a : b) + Math.log(a > b ? FastMath.exp(b - a) + 1 : FastMath.exp(a - b) + 1);
   }
 
   /**

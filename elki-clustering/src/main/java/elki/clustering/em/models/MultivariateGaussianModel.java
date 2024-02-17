@@ -28,7 +28,6 @@ import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
-import net.jafama.FastMath;
 
 /**
  * Model for a single multivariate Gaussian cluster with arbitrary rotation.
@@ -108,7 +107,7 @@ public class MultivariateGaussianModel implements BetulaClusterModel {
     this.priormatrix = covariance != null ? covariance : null;
     this.wsum = 0.;
     this.chol = updateCholesky(this.covariance, null);
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
+    this.logNormDet = Math.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
   }
 
   @Override
@@ -176,7 +175,7 @@ public class MultivariateGaussianModel implements BetulaClusterModel {
       }
     }
     this.chol = updateCholesky(covariance, null);
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
+    this.logNormDet = Math.log(weight) - .5 * logNorm - getHalfLogDeterminant(this.chol);
     if(prior > 0 && priormatrix == null) {
       priormatrix = copy(covariance);
     }
@@ -221,10 +220,10 @@ public class MultivariateGaussianModel implements BetulaClusterModel {
    */
   protected static double getHalfLogDeterminant(CholeskyDecomposition chol) {
     double[][] l = chol.getL();
-    double logdet = FastMath.log(l[0][0]);
+    double logdet = Math.log(l[0][0]);
     for(int i = 1; i < l.length; i++) {
       // We get half the log(det), because we did not square values here.
-      logdet += FastMath.log(l[i][i]);
+      logdet += Math.log(l[i][i]);
     }
     return logdet;
   }
@@ -284,7 +283,7 @@ public class MultivariateGaussianModel implements BetulaClusterModel {
       }
     }
     CholeskyDecomposition cchol = updateCholesky(combinedCov, chol);
-    double clogNormDet = FastMath.log(cf.getWeight() + wsum) - 0.5 * logNorm - getHalfLogDeterminant(cchol);
+    double clogNormDet = Math.log(cf.getWeight() + wsum) - 0.5 * logNorm - getHalfLogDeterminant(cchol);
     return -0.5 * squareSum(chol.solveLInplace(delta)) + clogNormDet;
   }
 

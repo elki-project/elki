@@ -24,7 +24,6 @@ import elki.math.MeanVariance;
 import elki.math.StatisticalMoments;
 import elki.math.statistics.distribution.Distribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import net.jafama.FastMath;
 
 /**
  * Estimators that work on Mean and Variance only (i.e. the first two moments
@@ -63,7 +62,7 @@ public interface LogMeanVarianceEstimator<D extends Distribution> extends LogMOM
       if(Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
         continue;
       }
-      mv.put(FastMath.log(val));
+      mv.put(Math.log(val));
     }
     if(!(mv.getCount() > 1.)) {
       throw new ArithmeticException("Too small sample size to estimate variance.");

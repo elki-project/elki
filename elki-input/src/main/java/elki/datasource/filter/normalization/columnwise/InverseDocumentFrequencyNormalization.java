@@ -30,7 +30,6 @@ import elki.logging.Logging;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import net.jafama.FastMath;
 
 /**
  * Normalization for text frequency (TF) vectors, using the inverse document
@@ -92,7 +91,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
     // Compute IDF values
     for(ObjectIterator<Int2DoubleMap.Entry> iter = idf.int2DoubleEntrySet().fastIterator(); iter.hasNext();) {
       Int2DoubleMap.Entry entry = iter.next();
-      entry.setValue(FastMath.log(dbsize / entry.getDoubleValue()));
+      entry.setValue(Math.log(dbsize / entry.getDoubleValue()));
     }
   }
 

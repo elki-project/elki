@@ -143,7 +143,7 @@ public class ORCLUS extends AbstractProjectedClustering<Clustering<Model>> {
     // pick k0 > k points from the database
     List<ORCLUSCluster> clusters = initialSeeds(relation, k_c);
 
-    double beta = FastMath.exp(-FastMath.log(dim_c / (double) l) * FastMath.log(1 / alpha) / FastMath.log(k_c / (double) k));
+    double beta = FastMath.exp(-Math.log(dim_c / (double) l) * Math.log(1 / alpha) / Math.log(k_c / (double) k));
 
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
 

@@ -190,7 +190,7 @@ public class LogGammaDistribution implements Distribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double log1px = FastMath.log1p(x);
-    return k * FastMath.log(theta) - GammaDistribution.logGamma(k) - (theta + 1.) * log1px + (k - 1) * FastMath.log(log1px);
+    return k * Math.log(theta) - GammaDistribution.logGamma(k) - (theta + 1.) * log1px + (k - 1) * Math.log(log1px);
   }
 
   /**

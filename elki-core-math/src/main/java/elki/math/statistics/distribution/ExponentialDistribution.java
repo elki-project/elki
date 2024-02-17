@@ -90,7 +90,7 @@ public class ExponentialDistribution implements Distribution {
 
   @Override
   public double logpdf(double val) {
-    return val < location ? Double.NEGATIVE_INFINITY : FastMath.log(rate) - rate * (val - location);
+    return val < location ? Double.NEGATIVE_INFINITY : Math.log(rate) - rate * (val - location);
   }
 
   /**
@@ -112,7 +112,7 @@ public class ExponentialDistribution implements Distribution {
    * @return probability density
    */
   public static double logpdf(double val, double rate) {
-    return val < 0. ? Double.NEGATIVE_INFINITY : FastMath.log(rate) - rate * val;
+    return val < 0. ? Double.NEGATIVE_INFINITY : Math.log(rate) - rate * val;
   }
 
   @Override
@@ -133,7 +133,7 @@ public class ExponentialDistribution implements Distribution {
 
   @Override
   public double quantile(double val) {
-    return val >= 0 && val <= 1 ? -FastMath.log(1 - val) / rate + location : Double.NaN;
+    return val >= 0 && val <= 1 ? -Math.log(1 - val) / rate + location : Double.NaN;
   }
 
   /**
@@ -144,7 +144,7 @@ public class ExponentialDistribution implements Distribution {
    * @return Quantile
    */
   public static double quantile(double val, double rate) {
-    return val >= 0 && val <= 1 ? -FastMath.log(1 - val) / rate : Double.NaN;
+    return val >= 0 && val <= 1 ? -Math.log(1 - val) / rate : Double.NaN;
   }
 
   /**
@@ -158,7 +158,7 @@ public class ExponentialDistribution implements Distribution {
    */
   @Override
   public double nextRandom(Random random) {
-    return -FastMath.log(random.nextDouble()) / rate + location;
+    return -Math.log(random.nextDouble()) / rate + location;
   }
 
   @Override

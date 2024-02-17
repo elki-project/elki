@@ -120,7 +120,7 @@ public class RayleighDistribution implements Distribution {
       return x == x ? Double.NEGATIVE_INFINITY : Double.NaN;
     }
     final double xs = x / sigma, xs2 = xs * xs;
-    return xs2 < Double.POSITIVE_INFINITY ? FastMath.log(xs / sigma) - .5 * xs2 : Double.NEGATIVE_INFINITY;
+    return xs2 < Double.POSITIVE_INFINITY ? Math.log(xs / sigma) - .5 * xs2 : Double.NEGATIVE_INFINITY;
   }
 
   @Override
@@ -165,12 +165,12 @@ public class RayleighDistribution implements Distribution {
     if(val == 1.) {
       return Double.POSITIVE_INFINITY;
     }
-    return sigma * Math.sqrt(-2. * FastMath.log(1. - val));
+    return sigma * Math.sqrt(-2. * Math.log(1. - val));
   }
 
   @Override
   public double nextRandom(Random random) {
-    return mu + sigma * Math.sqrt(-2. * FastMath.log(random.nextDouble()));
+    return mu + sigma * Math.sqrt(-2. * Math.log(random.nextDouble()));
   }
 
   @Override

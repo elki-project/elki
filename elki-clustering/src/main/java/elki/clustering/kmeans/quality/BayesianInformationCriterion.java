@@ -27,8 +27,6 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
  * SBIC) for the use with evaluating k-means results.
@@ -59,7 +57,7 @@ public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<N
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     return logLikelihood(relation, clustering, distance) //
-        - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
+        - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
   }
 
   @Override

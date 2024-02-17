@@ -212,7 +212,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     for(int j = 0; j < dist_i.length; j++) {
       sum += dist_i[j] * (pij_i[j] *= s);
     }
-    return FastMath.log(sumP) - mbeta * sum;
+    return Math.log(sumP) - mbeta * sum;
   }
 
   /**

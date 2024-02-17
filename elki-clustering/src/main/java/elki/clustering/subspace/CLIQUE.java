@@ -53,8 +53,6 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.pairs.Pair;
 
-import net.jafama.FastMath;
-
 /**
  * Implementation of the CLIQUE algorithm, a grid-based algorithm to identify
  * dense clusters in subspaces of maximum dimensionality.
@@ -438,20 +436,18 @@ public class CLIQUE implements SubspaceClusteringAlgorithm<SubspaceModel> {
    *         selected set I, the second value is the mean of the pruned set P.
    */
   private int[][] computeMeans(List<CLIQUESubspace> denseSubspaces) {
-    int n = denseSubspaces.size() - 1;
-
-    int[] mi = new int[n + 1], mp = new int[n + 1];
+    final int n = denseSubspaces.size() - 1;
+    final int[] mi = new int[n + 1], mp = new int[n + 1];
     double resultMI = 0, resultMP = 0;
 
     for(int i = 0; i < denseSubspaces.size(); i++) {
       resultMI += denseSubspaces.get(i).getCoverage();
       resultMP += denseSubspaces.get(n - i).getCoverage();
-      mi[i] = (int) FastMath.ceil(resultMI / (i + 1));
+      mi[i] = (int) Math.ceil(resultMI / (i + 1));
       if(i != n) {
-        mp[n - 1 - i] = (int) FastMath.ceil(resultMP / (i + 1));
+        mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
       }
     }
-
     return new int[][] { mi, mp };
   }
 
@@ -469,7 +465,7 @@ public class CLIQUE implements SubspaceClusteringAlgorithm<SubspaceModel> {
    *         value is the difference from the mean of the pruned set P.
    */
   private double[][] computeDiffs(List<CLIQUESubspace> denseSubspaces, int[] mi, int[] mp) {
-    int n = denseSubspaces.size() - 1;
+    final int n = denseSubspaces.size() - 1;
 
     double[] diff_mi = new double[n + 1], diff_mp = new double[n + 1];
     double resultMI = 0, resultMP = 0;

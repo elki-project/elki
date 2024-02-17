@@ -109,7 +109,7 @@ public class LogNormalLMMEstimator implements LMMDistributionEstimator<LogNormal
     // Estimate logNormal from generalized normal:
     final double sigma = -shape;
     final double expmu = scale / sigma;
-    return new LogNormalDistribution(FastMath.log(expmu), Math.max(sigma, Double.MIN_NORMAL), location - expmu);
+    return new LogNormalDistribution(Math.log(expmu), Math.max(sigma, Double.MIN_NORMAL), location - expmu);
   }
 
   @Override

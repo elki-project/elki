@@ -32,7 +32,6 @@ import elki.database.relation.RelationUtil;
 import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
-import net.jafama.FastMath;
 
 /**
  * Different version of the BIC criterion.
@@ -57,7 +56,7 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     return logLikelihoodZhao(relation, clustering, distance) //
-        - (.5 * clustering.getAllClusters().size()) * FastMath.log(numPoints(clustering)) * (dim + 1);
+        - (.5 * clustering.getAllClusters().size()) * Math.log(numPoints(clustering)) * (dim + 1);
   }
 
   /**
@@ -98,9 +97,9 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
     double logLikelihood = 0.;
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i] / (double) n) // ni log ni/n
+      logLikelihood += n_i[i] * Math.log(n_i[i] / (double) n) // ni log ni/n
           - n_i[i] * dim * .5 * MathUtil.LOGTWOPI // ni*d/2 log2pi
-          - n_i[i] * .5 * FastMath.log(d_i[i]) // ni/2 log sigma_i
+          - n_i[i] * .5 * Math.log(d_i[i]) // ni/2 log sigma_i
           - (n_i[i] - m) * .5; // (ni-m)/2
     }
     return logLikelihood;

@@ -29,8 +29,6 @@ import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
  * by assuming a Gamma distribution on the data and evaluating the Gamma CDF.
@@ -70,7 +68,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   @Override
   protected double preScale(double score) {
     assert (max > 0) : "prepare() was not run prior to using the scaling function.";
-    return -FastMath.log(score / max) / mlogmax;
+    return -Math.log(score / max) / mlogmax;
   }
 
   @Override
@@ -86,7 +84,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
       }
     }
     max = mm.getMax();
-    mlogmax = -FastMath.log(mm.getMin() / max);
+    mlogmax = -Math.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {

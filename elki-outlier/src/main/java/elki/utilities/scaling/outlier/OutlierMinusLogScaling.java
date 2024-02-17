@@ -26,7 +26,6 @@ import elki.math.DoubleMinMax;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
-import net.jafama.FastMath;
 
 /**
  * Scaling function to invert values by computing -log(x)
@@ -71,7 +70,7 @@ public class OutlierMinusLogScaling implements OutlierScaling {
   @Override
   public double getScaled(double value) {
     assert (max != 0) : "prepare() was not run prior to using the scaling function.";
-    return -FastMath.log(value / max) / mlogmax;
+    return -Math.log(value / max) / mlogmax;
   }
 
   @Override
@@ -95,7 +94,7 @@ public class OutlierMinusLogScaling implements OutlierScaling {
       }
     }
     max = mm.getMax();
-    mlogmax = -FastMath.log(mm.getMin() / max);
+    mlogmax = -Math.log(mm.getMin() / max);
   }
 
   @Override
@@ -109,6 +108,6 @@ public class OutlierMinusLogScaling implements OutlierScaling {
       }
     }
     max = mm.getMax();
-    mlogmax = -FastMath.log(mm.getMin() / max);
+    mlogmax = -Math.log(mm.getMin() / max);
   }
 }

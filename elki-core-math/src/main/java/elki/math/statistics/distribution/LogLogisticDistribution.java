@@ -127,11 +127,11 @@ public class LogLogisticDistribution implements Distribution {
       return Double.NEGATIVE_INFINITY;
     }
     val = (val - location) / scale;
-    final double lval = FastMath.log(val);
+    final double lval = Math.log(val);
     if(lval == Double.POSITIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
-    return FastMath.log(shape / scale) + (shape - 1.) * lval //
+    return Math.log(shape / scale) + (shape - 1.) * lval //
         - 2. * FastMath.log1p(FastMath.exp(lval * shape));
   }
 

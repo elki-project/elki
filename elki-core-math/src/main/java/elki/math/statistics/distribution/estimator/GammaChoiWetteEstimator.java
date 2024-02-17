@@ -25,8 +25,6 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Estimate distribution parameters using the method by Choi and Wette.
  * <p>
@@ -69,20 +67,20 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
       if(val <= 0 || Double.isInfinite(val) || Double.isNaN(val)) {
         continue;
       }
-      final double logx = (val > 0) ? FastMath.log(val) : meanlogx;
+      final double logx = (val > 0) ? Math.log(val) : meanlogx;
       final double deltax = val - meanx;
       final double deltalogx = logx - meanlogx;
       meanx += deltax / (i + 1.);
       meanlogx += deltalogx / (i + 1.);
     }
     // Initial approximation
-    final double logmeanx = (meanx > 0) ? FastMath.log(meanx) : meanlogx;
+    final double logmeanx = (meanx > 0) ? Math.log(meanx) : meanlogx;
     final double diff = logmeanx - meanlogx;
     double k = (3 - diff + Math.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
 
     // Refine via newton iteration, based on Choi and Wette equation
     while(true) {
-      double kdelta = (FastMath.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
+      double kdelta = (Math.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
       if(Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
         break;
       }

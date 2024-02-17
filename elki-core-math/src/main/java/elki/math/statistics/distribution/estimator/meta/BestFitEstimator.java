@@ -35,8 +35,6 @@ import elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * A meta estimator that will try a number of (inexpensive) estimations, then
  * choose whichever works best.
@@ -178,7 +176,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     double shift = Math.min(0., min - (max - min) * 1e-10);
     for(int i = 0; i < len; i++) {
       double val = x[i] - shift;
-      val = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
+      val = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
       logx[i] = val;
       if(Double.NEGATIVE_INFINITY < val && val < Double.POSITIVE_INFINITY) {
         logmom.put(val);

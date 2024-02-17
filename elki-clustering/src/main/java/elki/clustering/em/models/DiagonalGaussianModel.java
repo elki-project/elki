@@ -28,7 +28,6 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
-import net.jafama.FastMath;
 
 /**
  * Simpler model for a single Gaussian cluster, without covariances.
@@ -94,7 +93,7 @@ public class DiagonalGaussianModel implements BetulaClusterModel {
     final int dim = mean.length;
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm;
+    this.logNormDet = Math.log(weight) - .5 * logNorm;
     this.nmea = new double[dim];
     if(vars == null) {
       Arrays.fill(this.variances = new double[dim], 1.);
@@ -154,17 +153,17 @@ public class DiagonalGaussianModel implements BetulaClusterModel {
       final double f2 = 1. / (wsum + prior * (nu + dim + 2));
       for(int i = 0; i < dim; i++) {
         final double v = variances[i] + prior * priordiag[i];
-        logDet += FastMath.log(variances[i] = v > 0 ? v * f2 : SINGULARITY_CHEAT);
+        logDet += Math.log(variances[i] = v > 0 ? v * f2 : SINGULARITY_CHEAT);
       }
     }
     else { // MLE
       final double f = wsum > 0 ? 1. / wsum : 1;
       for(int i = 0; i < dim; i++) {
         final double v = variances[i];
-        logDet += FastMath.log(variances[i] = v > 0 ? v * f : SINGULARITY_CHEAT);
+        logDet += Math.log(variances[i] = v > 0 ? v * f : SINGULARITY_CHEAT);
       }
     }
-    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
+    logNormDet = Math.log(weight) - .5 * (logNorm + logDet);
     if(prior > 0 && priordiag == null) {
       priordiag = copy(variances);
     }
@@ -228,7 +227,7 @@ public class DiagonalGaussianModel implements BetulaClusterModel {
       agg += diff / (variances[i] + cf.variance(i)) * diff;
     }
     for(int i = 0; i < mean.length; i++) {
-      agg += FastMath.log(variances[i] + cf.variance(i));
+      agg += Math.log(variances[i] + cf.variance(i));
     }
     return -.5 * agg;
   }

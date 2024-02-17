@@ -123,7 +123,7 @@ public class CauchyDistribution implements Distribution {
    */
   public static double logpdf(double x, double location, double shape) {
     final double v = (x - location) / shape;
-    return -FastMath.log(Math.PI * shape * (1 + v * v));
+    return -Math.log(Math.PI * shape * (1 + v * v));
   }
 
   /**

@@ -359,7 +359,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
       return; // Disabled
     }
     LOG.verbose("Running " + prefix);
-    final int digits = (int) FastMath.ceil(FastMath.log10(krange.getMax() + 1));
+    final int digits = (int) Math.ceil(FastMath.log10(krange.getMax() + 1));
     final String format = "%s-%0" + digits + "d";
     try {
       krange.forEach(k -> {

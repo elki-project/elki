@@ -122,7 +122,7 @@ public class Entropy {
       LoggingUtil.warning("Entropy measure are not well defined for overlapping and incomplete clusterings. The number of elements are: " + table.contingency[table.size1][table.size2 + 1] + " != " + table.contingency[table.size1 + 1][table.size2] + " elements.");
     }
     // 1/N and -log(N)
-    final double byn = 1.0 / n, mlogn = -FastMath.log(n);
+    final double byn = 1.0 / n, mlogn = -Math.log(n);
     // We compute EMI values only for small clusterings.
     if(n <= 10000) {
       // Maximum cluster size, and cluster sizes:
@@ -186,7 +186,7 @@ public class Entropy {
     this.mutualInformation = mi;
     this.variationOfInformation = vi;
     this.expectedMutualInformation = 0.;
-    this.vibound = Math.min(-mlogn, 2 * FastMath.log(Math.max(r, c)));
+    this.vibound = Math.min(-mlogn, 2 * Math.log(Math.max(r, c)));
   }
 
   /**
@@ -251,7 +251,7 @@ public class Entropy {
     this.mutualInformation = mi;
     this.variationOfInformation = vi;
     this.expectedMutualInformation = emi;
-    this.vibound = Math.min(-mlogn, 2 * FastMath.log(Math.max(r, c)));
+    this.vibound = Math.min(-mlogn, 2 * Math.log(Math.max(r, c)));
   }
 
   /**
@@ -266,10 +266,10 @@ public class Entropy {
       return 0.;
     }
     if(i - 2 >= logs.length) {
-      return FastMath.log(i);
+      return Math.log(i);
     }
     final double v = logs[i - 2];
-    return v > 0 ? v : (logs[i - 2] = FastMath.log(i));
+    return v > 0 ? v : (logs[i - 2] = Math.log(i));
   }
 
   /**
@@ -290,7 +290,7 @@ public class Entropy {
     // Note: we require the cache to be prefilled by at least 1 element,
     // and to be sized large enough.
     final double p = lfac[i - 3];
-    return lfac[i - 2] = p > 0 ? p + FastMath.log(i) : logGamma(i + 1.);
+    return lfac[i - 2] = p > 0 ? p + Math.log(i) : logGamma(i + 1.);
   }
 
   /**

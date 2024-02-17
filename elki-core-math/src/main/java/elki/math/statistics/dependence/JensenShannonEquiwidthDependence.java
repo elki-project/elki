@@ -24,8 +24,6 @@ import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Jensen-Shannon Divergence is closely related to mutual information.
  * <p>
@@ -54,7 +52,7 @@ public class JensenShannonEquiwidthDependence implements Dependence {
   @Override
   public <A, B> double dependence(NumberArrayAdapter<?, A> adapter1, A data1, NumberArrayAdapter<?, B> adapter2, B data2) {
     final int len = Utils.size(adapter1, data1, adapter2, data2);
-    final int bins = (int) FastMath.round(Math.sqrt(len));
+    final int bins = (int) Math.round(Math.sqrt(len));
     final int maxbin = bins - 1;
 
     double min1 = adapter1.getDouble(data1, 0), max1 = min1;
@@ -81,8 +79,8 @@ public class JensenShannonEquiwidthDependence implements Dependence {
     int[] margin1 = new int[bins], margin2 = new int[bins];
     int[][] counts = new int[bins][bins];
     for(int i = 0; i < len; i++) {
-      int bin1 = (int) FastMath.floor((adapter1.getDouble(data1, i) - min1) * scale1);
-      int bin2 = (int) FastMath.floor((adapter2.getDouble(data2, i) - min2) * scale2);
+      int bin1 = (int) Math.floor((adapter1.getDouble(data1, i) - min1) * scale1);
+      int bin2 = (int) Math.floor((adapter2.getDouble(data2, i) - min2) * scale2);
       bin1 = bin1 < bins ? bin1 : maxbin;
       bin2 = bin2 < bins ? bin2 : maxbin;
       margin1[bin1]++;
@@ -110,8 +108,8 @@ public class JensenShannonEquiwidthDependence implements Dependence {
           double pXY = cell / (double) len;
           final double pXpY = pX * sum2 / len;
           final double iavg = 2. / (pXY + pXpY);
-          e += pXY > 0. ? pXY * FastMath.log(pXY * iavg) : 0.;
-          e += pXpY * FastMath.log(pXpY * iavg);
+          e += pXY > 0. ? pXY * Math.log(pXY * iavg) : 0.;
+          e += pXpY * Math.log(pXpY * iavg);
         }
       }
     }
@@ -122,7 +120,7 @@ public class JensenShannonEquiwidthDependence implements Dependence {
     // pXY: e += log(b*2/(b+1)) = log(b) + log(2/(b+1))
     // pXpY1: e += 1/b*log(2/(b+1)) = 1/b*log(2/(b+1))
     // pXpY2: e += (b-1)/b*log(2) = (b-1)/b*log(2)
-    final double exp = FastMath.log(bins) + (1. + 1. / bins) * FastMath.log(2. / (bins + 1)) + (bins - 1.) / bins * MathUtil.LOG2;
+    final double exp = Math.log(bins) + (1. + 1. / bins) * Math.log(2. / (bins + 1)) + (bins - 1.) / bins * MathUtil.LOG2;
     // e *= .5; // Average, but we need to adjust exp then, too!
     return e / exp;
   }

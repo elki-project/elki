@@ -26,8 +26,6 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.similarity.NormalizedSimilarity;
 
-import net.jafama.FastMath;
-
 /**
  * Adapter from a normalized similarity function to a distance function using
  * <code>-log(sim)</code>.
@@ -76,7 +74,7 @@ public class LnSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
 
     @Override
     public double transform(double similarity) {
-      return -FastMath.log(similarity);
+      return -Math.log(similarity);
     }
   }
 

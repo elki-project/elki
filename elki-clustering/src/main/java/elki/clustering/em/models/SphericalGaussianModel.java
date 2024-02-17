@@ -28,8 +28,6 @@ import elki.data.model.EMModel;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.math.MathUtil;
 
-import net.jafama.FastMath;
-
 /**
  * Simple spherical Gaussian cluster (scaled identity matrixes).
  * 
@@ -93,7 +91,7 @@ public class SphericalGaussianModel implements BetulaClusterModel {
     this.weight = weight;
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm;
+    this.logNormDet = Math.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
     this.variance = var > 0 ? var : SINGULARITY_CHEAT;
     this.priorvar = this.variance;
@@ -144,8 +142,8 @@ public class SphericalGaussianModel implements BetulaClusterModel {
       variance /= dim * wsum; // variance sum -> average variance
     } // else: variance must be 0
     // Note: for dim dimenions, we have dim times the variance
-    double logDet = dim * FastMath.log(MathUtil.max(variance, SINGULARITY_CHEAT));
-    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
+    double logDet = dim * Math.log(MathUtil.max(variance, SINGULARITY_CHEAT));
+    logNormDet = Math.log(weight) - .5 * (logNorm + logDet);
     if(prior > 0 && priorvar == 0) {
       priorvar = variance;
     }
@@ -210,7 +208,7 @@ public class SphericalGaussianModel implements BetulaClusterModel {
       final double diff = cf.centroid(i) - mean[i];
       agg += diff / v * diff;
     }
-    return -.5 * (agg + logNorm + FastMath.log(v) * dim);
+    return -.5 * (agg + logNorm + Math.log(v) * dim);
   }
 
   @Override

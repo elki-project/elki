@@ -68,7 +68,6 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.jafama.FastMath;
 
 /**
  * Using Grid for Accelerating Density-Based Clustering.
@@ -395,7 +394,7 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
         if(mi == Double.NEGATIVE_INFINITY || ma == Double.POSITIVE_INFINITY || mi != mi || ma != ma) {
           throw new IncompatibleDataException("Dimension " + d + " contains non-finite values.");
         }
-        int c = cells[d] = Math.max(1, (int) FastMath.ceil(wi / gridwidth));
+        int c = cells[d] = Math.max(1, (int) Math.ceil(wi / gridwidth));
         offset[d] = mi - (c * gridwidth - wi) * .5;
         assert (offset[d] <= mi) || (offset[d] + c * gridwidth >= ma) : "Grid inconsistent.";
         total *= c;
@@ -456,8 +455,8 @@ public class GriDBSCAN<V extends NumberVector> implements ClusteringAlgorithm<Cl
     private void insertIntoGrid(DBIDRef id, V obj, int d, int v) {
       final int cn = cells[d]; // Number of cells in this dimension
       final int nd = d + 1; // Next dimension
-      int mi = Math.max(0, (int) FastMath.floor((obj.doubleValue(d) - offset[d] - epsilon) / gridwidth));
-      int ma = Math.min(cn - 1, (int) FastMath.floor((obj.doubleValue(d) - offset[d] + epsilon) / gridwidth));
+      int mi = Math.max(0, (int) Math.floor((obj.doubleValue(d) - offset[d] - epsilon) / gridwidth));
+      int ma = Math.min(cn - 1, (int) Math.floor((obj.doubleValue(d) - offset[d] + epsilon) / gridwidth));
       assert (mi <= ma) : "Grid inconsistent.";
       for(int i = mi; i <= ma; i++) {
         int c = v * cn + i;

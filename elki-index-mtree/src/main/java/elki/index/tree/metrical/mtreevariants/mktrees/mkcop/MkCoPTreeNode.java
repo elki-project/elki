@@ -23,7 +23,6 @@ package elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
 import elki.database.ids.DBID;
 import elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import net.jafama.FastMath;
 
 /**
  * Represents a node in an MkCop-Tree.
@@ -92,8 +91,8 @@ class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry
     }
 
     // determine m and t
-    double m = (y_kmax - y_1) / (FastMath.log(k_max) - FastMath.log(k_0));
-    double t = y_1 - m * FastMath.log(k_0);
+    double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
+    double t = y_1 - m * Math.log(k_0);
 
     return new ApproximationLine(k_0, m, t);
   }
@@ -130,9 +129,8 @@ class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry
     }
 
     // determine m and t
-    double m = (y_kmax - y_1) / (FastMath.log(k_max) - FastMath.log(k_0));
-    double t = y_1 - m * FastMath.log(k_0);
-
+    double m = (y_kmax - y_1) / (Math.log(k_max) - Math.log(k_0));
+    double t = y_1 - m * Math.log(k_0);
     return new ApproximationLine(k_0, m, t);
   }
 

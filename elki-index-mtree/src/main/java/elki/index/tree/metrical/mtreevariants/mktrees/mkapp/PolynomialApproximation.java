@@ -26,7 +26,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import elki.utilities.io.FormatUtil;
-import net.jafama.FastMath;
 
 /**
  * Provides an polynomial approximation bo + b1*k + b2*k^2 + ... + bp*k^p
@@ -100,7 +99,7 @@ public class PolynomialApproximation implements Externalizable {
    */
   public double getValueAt(int k) {
     double result = 0.;
-    double log_k = FastMath.log(k), acc = 1.;
+    double log_k = Math.log(k), acc = 1.;
     for (int p = 0; p < b.length; p++) {
       result += b[p] * acc;
       acc *= log_k;

@@ -109,10 +109,7 @@ public class ApproximationLine implements Externalizable {
    * @return the function value of the approximation line at the specified k
    */
   public double getValueAt(int k) {
-    if (k < k_0) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return m * FastMath.log(k) + t;
+    return k < k_0 ? Double.POSITIVE_INFINITY : m * Math.log(k) + t;
   }
 
   /**
@@ -122,10 +119,7 @@ public class ApproximationLine implements Externalizable {
    * @return the approximated knn-distance at the specified k
    */
   public double getApproximatedKnnDistance(int k) {
-    if (k < k_0) {
-      return 0.;
-    }
-    return FastMath.exp(getValueAt(k));
+    return k < k_0 ? 0. : FastMath.exp(getValueAt(k));
   }
 
   /**
@@ -174,7 +168,6 @@ public class ApproximationLine implements Externalizable {
     }
 
     final ApproximationLine that = (ApproximationLine) o;
-
     return Double.compare(that.m, m) == 0 && Double.compare(that.t, t) == 0;
   }
 

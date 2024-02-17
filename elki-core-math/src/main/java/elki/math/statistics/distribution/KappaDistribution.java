@@ -131,7 +131,7 @@ public class KappaDistribution implements Distribution {
     if(Double.isInfinite(val)) {
       return Double.NEGATIVE_INFINITY;
     }
-    return -val - FastMath.log(scale) + logc * (1. - shape2);
+    return -val - Math.log(scale) + logc * (1. - shape2);
   }
 
   @Override
@@ -258,17 +258,17 @@ public class KappaDistribution implements Distribution {
       else {
         return loc + (shape1 != 0. //
             ? scale / shape1 * (1. - FastMath.pow(shape2, -shape1)) //
-            : scale * FastMath.log(shape2));
+            : scale * Math.log(shape2));
       }
     }
     if(val == 1.) {
       return shape1 <= 0. ? Double.NEGATIVE_INFINITY : loc + scale / shape1;
     }
-    val = -FastMath.log(val);
+    val = -Math.log(val);
     if(shape2 != 0.) {
       val = (1 - FastMath.exp(-shape2 * val)) / shape2;
     }
-    val = -FastMath.log(val);
+    val = -Math.log(val);
     if(shape1 != 0.) {
       val = (1 - FastMath.exp(-shape1 * val)) / shape1;
     }

@@ -42,8 +42,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Compute the affinity matrix for SNE and tSNE.
  * <p>
@@ -124,7 +122,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    */
   protected static double[][] computePij(double[][] dist, double perplexity, double initialScale) {
     final int size = dist.length;
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = Math.log(perplexity);
     double[][] pij = new double[size][size];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Optimizing perplexities", size, LOG) : null;
     Duration timer = LOG.newDuration(PerplexityAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin();

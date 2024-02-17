@@ -89,15 +89,15 @@ public class BetaDistribution implements Distribution {
     return (val < 0. || val > 1.) ? 0. : //
         val == 0. ? (alpha > 1. ? 0. : alpha < 1. ? Double.POSITIVE_INFINITY : beta) : //
             val == 1. ? (beta > 1. ? 0. : beta < 1. ? Double.POSITIVE_INFINITY : alpha) : //
-                FastMath.exp(-logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
+                FastMath.exp(-logbab + Math.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   @Override
   public double logpdf(double val) {
     return (val < 0. || val > 1.) ? Double.NEGATIVE_INFINITY : //
-        val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : FastMath.log(beta)) : //
-            val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : FastMath.log(alpha)) : //
-                -logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
+        val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : Math.log(beta)) : //
+            val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : Math.log(alpha)) : //
+                -logbab + Math.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   @Override
@@ -150,7 +150,7 @@ public class BetaDistribution implements Distribution {
         (val < 0. || val > 1.) ? 0. : //
             val == 0. ? (alpha > 1. ? 0. : alpha < 1. ? Double.POSITIVE_INFINITY : beta) : //
                 val == 1. ? (beta > 1. ? 0. : beta < 1. ? Double.POSITIVE_INFINITY : alpha) : //
-                    FastMath.exp(-logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
+                    FastMath.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   /**
@@ -164,9 +164,9 @@ public class BetaDistribution implements Distribution {
   public static double logpdf(double val, double alpha, double beta) {
     return (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) ? Double.NaN : //
         (val < 0. || val > 1.) ? Double.NEGATIVE_INFINITY : //
-            val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : FastMath.log(beta)) //
-                : val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : FastMath.log(alpha)) //
-                    : -logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
+            val == 0. ? (alpha > 1. ? Double.NEGATIVE_INFINITY : alpha < 1. ? Double.POSITIVE_INFINITY : Math.log(beta)) //
+                : val == 1. ? (beta > 1. ? Double.NEGATIVE_INFINITY : beta < 1. ? Double.POSITIVE_INFINITY : Math.log(alpha)) //
+                    : -logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   /**
@@ -202,7 +202,7 @@ public class BetaDistribution implements Distribution {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = FastMath.exp(-logBeta(alpha, beta) + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
+    double bt = FastMath.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * FastMath.log1p(-x));
     return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
         ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
         : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
@@ -231,7 +231,7 @@ public class BetaDistribution implements Distribution {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = FastMath.exp(-logbab + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
+    double bt = FastMath.exp(-logbab + alpha * Math.log(x) + beta * FastMath.log1p(-x));
     return (x < (alpha + 1.0) / (alpha + beta + 2.0)) //
         ? bt * regularizedIncBetaCF(alpha, beta, x) / alpha //
         : 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
@@ -298,7 +298,7 @@ public class BetaDistribution implements Distribution {
   protected static double regularizedIncBetaQuadrature(double alpha, double beta, double x) {
     final double alphapbeta = alpha + beta, a1 = alpha - 1.0, b1 = beta - 1.0;
     final double mu = alpha / alphapbeta;
-    final double lnmu = FastMath.log(mu), lnmuc = FastMath.log1p(-mu);
+    final double lnmu = Math.log(mu), lnmuc = FastMath.log1p(-mu);
     double t = Math.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
     final double xu;
     if(x > alpha / alphapbeta) {
@@ -316,7 +316,7 @@ public class BetaDistribution implements Distribution {
     double sum = 0.0;
     for(int i = 0; i < GAUSSLEGENDRE_Y.length; i++) {
       t = x + (xu - x) * GAUSSLEGENDRE_Y[i];
-      sum += GAUSSLEGENDRE_W[i] * FastMath.exp(a1 * (FastMath.log(t) - lnmu) + b1 * (FastMath.log1p(-t) - lnmuc));
+      sum += GAUSSLEGENDRE_W[i] * FastMath.exp(a1 * (Math.log(t) - lnmu) + b1 * (FastMath.log1p(-t) - lnmuc));
     }
     double ans = sum * (xu - x) * FastMath.exp(a1 * lnmu - GammaDistribution.logGamma(alpha) + b1 * lnmuc - GammaDistribution.logGamma(beta) + GammaDistribution.logGamma(alphapbeta));
     return ans > 0 ? 1.0 - ans : -ans;
@@ -348,7 +348,7 @@ public class BetaDistribution implements Distribution {
    */
   protected static double rawQuantile(double p, double alpha, double beta, final double logbeta) {
     // Very fast approximation of y.
-    final double tmp = Math.sqrt(-2 * FastMath.log(p));
+    final double tmp = Math.sqrt(-2 * Math.log(p));
     double ya = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
 
     // Initial estimate for x
@@ -364,11 +364,11 @@ public class BetaDistribution implements Distribution {
       final double a = 1. - t + ya * Math.sqrt(t);
       t = r * a * a * a;
       if(t <= 0.) {
-        x = 1. - FastMath.exp((FastMath.log1p(-p) + FastMath.log(beta) + logbeta) / beta);
+        x = 1. - FastMath.exp((FastMath.log1p(-p) + Math.log(beta) + logbeta) / beta);
       }
       else {
         t = (4. * alpha + r - 2.) / t;
-        x = t <= 1 ? FastMath.exp((FastMath.log(p * alpha) + logbeta) / alpha) //
+        x = t <= 1 ? FastMath.exp((Math.log(p * alpha) + logbeta) / alpha) //
             : 1. - 2. / (t + 1.);
       }
     }
@@ -391,7 +391,7 @@ public class BetaDistribution implements Distribution {
         return Double.NaN;
       }
       // Error gradient
-      ynew = (ynew - p) * FastMath.exp(logbeta + ialpha * FastMath.log(x) + ibeta * FastMath.log1p(-x));
+      ynew = (ynew - p) * FastMath.exp(logbeta + ialpha * Math.log(x) + ibeta * FastMath.log1p(-x));
       if(ynew * y <= 0.) {
         prevstep = Math.max(Math.abs(stepsize), 3e-308);
       }

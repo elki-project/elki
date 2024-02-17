@@ -28,7 +28,6 @@ import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Compute a mutual information based dependence measure using a nested means
@@ -73,7 +72,7 @@ public class MaximumConditionalEntropy implements Dependence {
     // Check: for 10000 this should give 4, for 150 it gives 1.
     int power = Math.max(1, (int) Math.floor(p * .5));
     int gridsize = 1 << power;
-    double loggrid = FastMath.log((double) gridsize);
+    double loggrid = Math.log((double) gridsize);
 
     ArrayList<int[]> parts1 = buildPartitions(adapter1, data1, len, power);
     ArrayList<int[]> parts2 = buildPartitions(adapter2, data2, len, power);
@@ -234,10 +233,10 @@ public class MaximumConditionalEntropy implements Dependence {
         double py = mat[j][i] / sumy;
 
         if(px > 0.) {
-          mx[i] -= px * FastMath.log(px);
+          mx[i] -= px * Math.log(px);
         }
         if(py > 0.) {
-          my[i] -= py * FastMath.log(py);
+          my[i] -= py * Math.log(py);
         }
       }
     }

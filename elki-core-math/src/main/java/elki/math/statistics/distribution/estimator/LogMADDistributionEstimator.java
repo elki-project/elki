@@ -24,8 +24,6 @@ import elki.math.statistics.distribution.Distribution;
 import elki.utilities.datastructures.QuickSelect;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
-import net.jafama.FastMath;
-
 /**
  * Distribuition estimators that use the method of moments (MOM) in logspace.
  * 
@@ -54,7 +52,7 @@ public interface LogMADDistributionEstimator<D extends Distribution> extends Dis
     double[] x = new double[len];
     for(int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
-      x[i] = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
+      x[i] = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
       if(Double.isNaN(x[i])) {
         throw new ArithmeticException("NaN value.");
       }

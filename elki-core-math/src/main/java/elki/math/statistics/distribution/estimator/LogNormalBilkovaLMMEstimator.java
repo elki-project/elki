@@ -24,6 +24,7 @@ import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.distribution.NormalDistribution;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -82,7 +83,7 @@ public class LogNormalBilkovaLMMEstimator implements LMMDistributionEstimator<Lo
     final double z2 = z * z;
     final double sigma = 0.999281 * z - 0.006118 * z * z2 + 0.000127 * z * z2 * z2;
     final double sigmasqhalf = sigma * sigma * .5;
-    final double logmu = FastMath.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;
+    final double logmu = Math.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;
     return new LogNormalDistribution(logmu, Math.max(sigma, Double.MIN_NORMAL), xmom[0] - FastMath.exp(logmu + sigmasqhalf));
   }
 

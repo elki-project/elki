@@ -29,8 +29,6 @@ import elki.math.statistics.distribution.NormalDistribution;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
  * <p>
@@ -68,7 +66,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    final double mlogv = -FastMath.log(value);
+    final double mlogv = -Math.log(value);
     return mlogv < mean || Double.isNaN(mlogv) ? 0. : //
         Math.max(0.0, NormalDistribution.erf((mlogv - mean) / factor));
   }
@@ -79,7 +77,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       MeanVariance mv = new MeanVariance();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -FastMath.log(scores.doubleValue(id));
+        double val = -Math.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -92,7 +90,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       Mean sqsum = new Mean();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -FastMath.log(scores.doubleValue(id));
+        double val = -Math.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum.put((val - mean) * (val - mean));
         }

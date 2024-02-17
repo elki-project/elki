@@ -24,8 +24,6 @@ import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Discounted Cumulative Gain.
  * <p>
@@ -79,7 +77,7 @@ public class DCGEvaluation implements ScoreEvaluation {
     double sum = 0.;
     // Iterate e + 1 .. s + 1, descending for better precision
     for(int i = e + 1; i > s; i--) {
-      sum += 1. / FastMath.log(i);
+      sum += 1. / Math.log(i);
     }
     return sum;
   }
@@ -107,7 +105,7 @@ public class DCGEvaluation implements ScoreEvaluation {
       while(adapter.valid() && adapter.tiedToPrevious());
       // We only support binary labeling, and can ignore negative weight.
       if(positive > 0) {
-        sum += tied == 1 ? 1. / FastMath.log(i + 1) : //
+        sum += tied == 1 ? 1. / Math.log(i + 1) : //
             DCGEvaluation.sumInvLog1p(i - tied + 1, i) * positive / (double) tied;
       }
       positive = 0;

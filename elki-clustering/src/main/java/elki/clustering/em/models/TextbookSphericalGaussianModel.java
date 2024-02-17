@@ -26,8 +26,6 @@ import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.math.MathUtil;
 
-import net.jafama.FastMath;
-
 /**
  * Simple spherical Gaussian cluster.
  * 
@@ -86,7 +84,7 @@ public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVect
     this.weight = weight;
     this.mean = mean;
     this.logNorm = MathUtil.LOGTWOPI * mean.length;
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm;
+    this.logNormDet = Math.log(weight) - .5 * logNorm;
     this.nmea = new double[mean.length];
     this.variance = var > 0 ? var : 1e-10;
     this.priorvar = this.variance;
@@ -134,7 +132,7 @@ public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVect
         newvar += (variance - mean[i] * mean[i] * wsum + prior * priorvar) * f2;
       }
       variance = newvar;
-      logDet = FastMath.log(variance); // * dim ?
+      logDet = Math.log(variance); // * dim ?
     }
     else if(wsum > 0.) { // MLE
       double newvar = 0.;
@@ -143,9 +141,9 @@ public class TextbookSphericalGaussianModel implements EMClusterModel<NumberVect
         newvar += (variance * wf - (mean[i] * mean[i]));
       }
       variance = newvar / dim;
-      logDet = FastMath.log(variance) * dim;
+      logDet = Math.log(variance) * dim;
     } // Else degenerate
-    logNormDet = FastMath.log(weight) - .5 * (logNorm + logDet);
+    logNormDet = Math.log(weight) - .5 * (logNorm + logDet);
   }
 
   /**

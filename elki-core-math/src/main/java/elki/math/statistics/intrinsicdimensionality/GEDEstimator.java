@@ -70,12 +70,12 @@ public class GEDEstimator implements DistanceBasedIntrinsicDimensionalityEstimat
     }
     // We only consider pairs with k < i, to avoid redundant computations.
     for(int k = 0; k < last; k++) {
-      final double logdk = FastMath.log(adapter.getDouble(data, begin + k));
+      final double logdk = Math.log(adapter.getDouble(data, begin + k));
       double log1pk = ilogs[k];
       int p = k; // k values are already occupied!
       // We only consider pairs with k < i, to avoid redundant computations.
       for(int i = k + 1; i <= last; i++) {
-        final double logdi = FastMath.log(adapter.getDouble(data, begin + i));
+        final double logdi = Math.log(adapter.getDouble(data, begin + i));
         if(logdk == logdi) { // Would yield a division by 0.
           continue;
         }

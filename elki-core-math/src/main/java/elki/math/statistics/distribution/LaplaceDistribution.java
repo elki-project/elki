@@ -103,7 +103,7 @@ public class LaplaceDistribution implements Distribution {
 
   @Override
   public double logpdf(double val) {
-    return FastMath.log(.5 * rate) - rate * Math.abs(val - location);
+    return Math.log(.5 * rate) - rate * Math.abs(val - location);
   }
 
   /**
@@ -114,7 +114,7 @@ public class LaplaceDistribution implements Distribution {
    * @return probability density
    */
   public static double logpdf(double val, double rate) {
-    return FastMath.log(.5 * rate) - rate * Math.abs(val);
+    return Math.log(.5 * rate) - rate * Math.abs(val);
   }
 
   @Override
@@ -138,10 +138,10 @@ public class LaplaceDistribution implements Distribution {
   @Override
   public double quantile(double val) {
     if(val < .5) {
-      return FastMath.log(2 * val) / rate + location;
+      return Math.log(2 * val) / rate + location;
     }
     else {
-      return -FastMath.log(2. - 2. * val) / rate + location;
+      return -Math.log(2. - 2. * val) / rate + location;
     }
   }
 
@@ -155,10 +155,10 @@ public class LaplaceDistribution implements Distribution {
    */
   public static double quantile(double val, double rate, double location) {
     if(val < .5) {
-      return FastMath.log(2 * val) / rate + location;
+      return Math.log(2 * val) / rate + location;
     }
     else {
-      return -FastMath.log(2. - 2. * val) / rate + location;
+      return -Math.log(2. - 2. * val) / rate + location;
     }
   }
 
@@ -170,10 +170,10 @@ public class LaplaceDistribution implements Distribution {
   public double nextRandom(Random random) {
     double val = random.nextDouble();
     if(val < .5) {
-      return FastMath.log(2 * val) / rate + location;
+      return Math.log(2 * val) / rate + location;
     }
     else {
-      return -FastMath.log(2. - 2. * val) / rate + location;
+      return -Math.log(2. - 2. * val) / rate + location;
     }
   }
 

@@ -27,8 +27,6 @@ import elki.data.model.EMModel;
 import elki.math.MathUtil;
 import elki.math.linearalgebra.CholeskyDecomposition;
 
-import net.jafama.FastMath;
-
 /**
  * Model for a single Gaussian cluster, using two-passes for slightly better
  * numerics.
@@ -101,7 +99,7 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
     this.priormatrix = covariance != null ? covariance : null;
     this.wsum = 0.;
     this.chol = MultivariateGaussianModel.updateCholesky(this.covariance, null);
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
+    this.logNormDet = Math.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
   }
 
   @Override
@@ -195,7 +193,7 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
       }
     }
     this.chol = MultivariateGaussianModel.updateCholesky(covariance, null);
-    this.logNormDet = FastMath.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
+    this.logNormDet = Math.log(weight) - .5 * logNorm - MultivariateGaussianModel.getHalfLogDeterminant(this.chol);
     if(prior > 0 && priormatrix == null) {
       priormatrix = copy(covariance);
     }

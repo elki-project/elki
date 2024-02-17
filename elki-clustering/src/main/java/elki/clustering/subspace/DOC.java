@@ -38,6 +38,7 @@ import elki.distance.subspace.SubspaceMaximumDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.IndefiniteProgress;
+import elki.math.MathUtil;
 import elki.math.linearalgebra.Centroid;
 import elki.result.Metadata;
 import elki.utilities.datastructures.BitsUtil;
@@ -137,11 +138,11 @@ public class DOC implements SubspaceClusteringAlgorithm<SubspaceModel> {
     ArrayModifiableDBIDs S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
-    double r = Math.abs(FastMath.log(2. * d) / FastMath.log(beta * .5));
+    double r = Math.abs(Math.log(2. * d) / Math.log(beta * .5));
     // Outer loop count.
     int n = (int) (2. / alpha);
     // Inner loop count.
-    int m = (int) (FastMath.pow(2. / alpha, r) * FastMath.log(4));
+    int m = (int) (FastMath.pow(2. / alpha, r) * MathUtil.LOG4);
     m = Math.min(m, Math.min(1000000, d * d)); // TODO: FastDOC only?
 
     // Minimum size for a cluster for it to be accepted.

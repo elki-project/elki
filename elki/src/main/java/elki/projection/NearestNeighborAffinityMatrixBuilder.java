@@ -80,7 +80,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    */
   public NearestNeighborAffinityMatrixBuilder(Distance<? super O> distance, double perplexity) {
     super(distance, perplexity);
-    this.numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
+    this.numberOfNeighbours = (int) Math.ceil(3 * perplexity);
   }
 
   /**
@@ -128,7 +128,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    */
   protected void computePij(DBIDRange ids, KNNSearcher<DBIDRef> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
     Duration timer = LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin();
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = Math.log(perplexity);
     // Scratch arrays, resizable
     DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
     IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
@@ -223,7 +223,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @return beta
    */
   protected static double computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
-    double max = pij_row.get((int) FastMath.ceil(perplexity)) / Math.E;
+    double max = pij_row.get((int) Math.ceil(perplexity)) / Math.E;
     double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
     double diff = computeH(pij_row, pij_i, -beta) - log_perp;
     double betaMin = 0.;
@@ -267,7 +267,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     for(int j = 0; j < len; j++) {
       sum += dist_i.get(j) * (pij_row[j] *= s);
     }
-    return FastMath.log(sumP) - mbeta * sum;
+    return Math.log(sumP) - mbeta * sum;
   }
 
   /**

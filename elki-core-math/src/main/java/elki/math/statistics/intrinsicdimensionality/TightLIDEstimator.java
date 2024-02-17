@@ -30,8 +30,6 @@ import elki.database.query.range.RangeSearcher;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * TightLID Estimator (TLE) of the intrinsic dimensionality (maximum likelihood
  * estimator for ID using auxiliary distances).
@@ -94,12 +92,12 @@ public class TightLIDEstimator implements IntrinsicDimensionalityEstimator<Objec
         double T = Di2 + Z2 - Dj2;
         T = (Math.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
         if(T > 0) {
-          sum += 2 * (FastMath.log(T) + FastMath.log(S));
+          sum += 2 * (Math.log(T) + Math.log(S));
           valid += 2;
         }
       }
       // Square cancels out with taking this twice.
-      sum += FastMath.log(Di2 / r2);
+      sum += Math.log(Di2 / r2);
       ++valid;
     }
     // TODO: there are still some special cases missing?
@@ -142,12 +140,12 @@ public class TightLIDEstimator implements IntrinsicDimensionalityEstimator<Objec
         double T = Di2 + Z2 - Dj2;
         T = (Math.sqrt(T * T + 2 * Z2 * r2mDi2) - T) * ir2mDi2;
         if(T > 0) {
-          sum += 2 * (FastMath.log(T) + FastMath.log(S));
+          sum += 2 * (Math.log(T) + Math.log(S));
           valid += 2;
         }
       }
       // Square cancels out with taking this twice.
-      sum += FastMath.log(Di2 / r2);
+      sum += Math.log(Di2 / r2);
       ++valid;
     }
     // TODO: there are still some special cases missing?
