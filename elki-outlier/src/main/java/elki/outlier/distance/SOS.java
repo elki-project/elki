@@ -123,7 +123,7 @@ public class SOS<O> implements OutlierAlgorithm {
    */
   public OutlierResult run(Relation<O> relation) {
     DistanceQuery<O> dq = new QueryBuilder<>(relation, distance).distanceQuery();
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = Math.log(perplexity);
 
     ModifiableDoubleDBIDList dlist = DBIDUtil.newDistanceDBIDList(relation.size() - 1);
     DoubleDBIDListMIter di = dlist.iter();
@@ -301,7 +301,7 @@ public class SOS<O> implements OutlierAlgorithm {
     for(int j = 0; it.valid(); j++, it.advance()) {
       sum += it.doubleValue() * (p[j] *= s);
     }
-    return FastMath.log(sumP) - mbeta * sum;
+    return Math.log(sumP) - mbeta * sum;
   }
 
   /**

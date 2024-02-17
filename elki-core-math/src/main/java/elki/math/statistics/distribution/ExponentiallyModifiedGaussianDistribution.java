@@ -99,7 +99,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
   @Override
   public double nextRandom(Random random) {
     double no = mean + random.nextGaussian() * stddev;
-    double ex = -FastMath.log(random.nextDouble()) / lambda;
+    double ex = -Math.log(random.nextDouble()) / lambda;
     return no + ex;
   }
 
@@ -158,7 +158,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return erfc > 0 ? FastMath.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : (x == x) ? Double.NEGATIVE_INFINITY : Double.NaN;
+    return erfc > 0 ? Math.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : (x == x) ? Double.NEGATIVE_INFINITY : Double.NaN;
   }
 
   /**
@@ -180,7 +180,7 @@ public class ExponentiallyModifiedGaussianDistribution implements Distribution {
     final double u = lambda * (x - mu);
     final double v = lambda * sigma;
     final double v2 = v * v;
-    final double logphi = FastMath.log(NormalDistribution.cdf(u, v2, v));
+    final double logphi = Math.log(NormalDistribution.cdf(u, v2, v));
     return NormalDistribution.cdf(u, 0., v) - FastMath.exp(-u + v2 * .5 + logphi);
   }
 

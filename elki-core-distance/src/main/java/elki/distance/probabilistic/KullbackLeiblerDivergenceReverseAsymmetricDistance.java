@@ -25,7 +25,6 @@ import elki.distance.AbstractNumberVectorDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Kullback-Leibler divergence, also known as relative entropy, information
@@ -78,7 +77,7 @@ public class KullbackLeiblerDivergenceReverseAsymmetricDistance extends Abstract
         return Double.POSITIVE_INFINITY;
       }
       if(yd > 0.) {
-        agg += yd * FastMath.log(yd / xd);
+        agg += yd * Math.log(yd / xd);
       }
     }
     return agg;

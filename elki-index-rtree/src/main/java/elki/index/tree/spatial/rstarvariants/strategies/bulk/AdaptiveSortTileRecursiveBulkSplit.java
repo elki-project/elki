@@ -55,7 +55,7 @@ public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
   @Override
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
     final int dims = spatialObjects.get(0).getDimensionality();
-    final int p = (int) FastMath.ceil(spatialObjects.size() / (double) maxEntries);
+    final int p = (int) Math.ceil(spatialObjects.size() / (double) maxEntries);
     List<List<T>> ret = new ArrayList<>(p);
     strPartition(spatialObjects, 0, spatialObjects.size(), 0, dims, maxEntries, new SpatialSingleMeanComparator(0), ret);
     return ret;
@@ -75,7 +75,7 @@ public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * @param <T> data type
    */
   protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, SpatialSingleMeanComparator c, List<List<T>> ret) {
-    final int p = (int) FastMath.ceil((end - start) / (double) maxEntries);
+    final int p = (int) Math.ceil((end - start) / (double) maxEntries);
 
     // Compute min and max:
     double[] mm = new double[dims * 2];
@@ -111,9 +111,9 @@ public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
     // Chose the number of partitions:
     final int s;
     if (maxex > 0. && depth + 1 < dims) {
-      s = (int) FastMath.ceil(FastMath.pow(p, 1.0 / (dims - depth)) * (dims - depth) * maxex / extsum);
+      s = (int) Math.ceil(FastMath.pow(p, 1.0 / (dims - depth)) * (dims - depth) * maxex / extsum);
     } else {
-      s = (int) FastMath.ceil(FastMath.pow(p, 1.0 / (dims - depth)));
+      s = (int) Math.ceil(FastMath.pow(p, 1.0 / (dims - depth)));
     }
 
     final double len = end - start; // double intentional!

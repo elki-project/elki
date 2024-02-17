@@ -22,8 +22,6 @@ package elki.math.statistics;
 
 import elki.math.statistics.kernelfunctions.KernelDensityFunction;
 
-import net.jafama.FastMath;
-
 /**
  * Estimate density given an array of points.
  * <p>
@@ -69,7 +67,7 @@ public class KernelDensityEstimator {
   public KernelDensityEstimator(double[] data, KernelDensityFunction kernel, double epsilon) {
     this(data, data[0], data[data.length - 1], kernel,
         // Heuristic for choosing the window size:
-        1 + (int) FastMath.log(data.length), epsilon);
+        1 + (int) Math.log(data.length), epsilon);
   }
 
   /**

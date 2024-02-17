@@ -367,7 +367,7 @@ public class CASH implements ClusteringAlgorithm<Clustering<Model>> {
 
     double d_min = minMax[0], d_max = minMax[1];
     double dIntervalLength = d_max - d_min;
-    int numDIntervals = (int) FastMath.ceil(dIntervalLength / jitter);
+    int numDIntervals = (int) Math.ceil(dIntervalLength / jitter);
     double dIntervalSize = dIntervalLength / numDIntervals;
     double[] d_mins = new double[numDIntervals],
         d_maxs = new double[numDIntervals];

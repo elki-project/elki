@@ -135,9 +135,19 @@ public final class MathUtil {
   public static final double LOG3 = Math.log(3.);
 
   /**
+   * Logarithm of 4 to the basis e, for logarithm conversion.
+   */
+  public static final double LOG4 = Math.log(4.);
+
+  /**
    * Natural logarithm of 10.
    */
   public static final double LOG10 = Math.log(10.);
+
+  /**
+   * Log(0.5).
+   */
+  public static final double LOG_HALF = Math.log(0.5);
 
   /**
    * log(PI).
@@ -193,7 +203,7 @@ public final class MathUtil {
    * @return Logarithm base 2.
    */
   public static double log2(double x) {
-    return FastMath.log(x) * ONE_BY_LOG2;
+    return Math.log(x) * ONE_BY_LOG2;
   }
 
   /**
@@ -511,13 +521,13 @@ public final class MathUtil {
   }
 
   /**
-   * More stable than {@code FastMath.log(1 - FastMath.exp(x))}
+   * More stable than {@code Math.log(1 - FastMath.exp(x))}
    *
    * @param x Value
    * @return log(1-exp(x))
    */
   public static double log1mexp(double x) {
-    return (x > -LOG2) ? FastMath.log(-FastMath.expm1(x)) : FastMath.log1p(-exp(x));
+    return (x > -LOG2) ? Math.log(-FastMath.expm1(x)) : FastMath.log1p(-exp(x));
   }
 
   /**

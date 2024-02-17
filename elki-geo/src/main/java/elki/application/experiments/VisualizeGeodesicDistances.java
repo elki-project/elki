@@ -42,8 +42,6 @@ import elki.utilities.optionhandling.parameters.EnumParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Visualization function for Cross-track, Along-track, and minimum distance
  * function.
@@ -213,11 +211,11 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    */
   private int colorMultiply(int col, double reldist, boolean ceil) {
     if(steps > 0) {
-      reldist = (ceil ? FastMath.ceil(reldist * steps) : FastMath.round(reldist * steps)) / steps;
+      reldist = (ceil ? Math.ceil(reldist * steps) : Math.round(reldist * steps)) / steps;
     }
     else if(steps < 0 && reldist > 0.) {
       double s = reldist * -steps;
-      double off = Math.abs(s - FastMath.round(s));
+      double off = Math.abs(s - Math.round(s));
       double factor = -steps * 1. / 1000; // height;
       if(off < factor) { // Blend with black:
         factor = (off / factor);

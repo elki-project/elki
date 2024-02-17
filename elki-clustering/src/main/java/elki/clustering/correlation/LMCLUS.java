@@ -413,7 +413,7 @@ public class LMCLUS implements ClusteringAlgorithm<Clustering<Model>> {
     }
 
     for(int i = 0; i < n; i++) {
-      jt[i] = 1.0 + 2 * (p1[i] * (FastMath.log(sigma1[i]) - FastMath.log(p1[i])) + p2[i] * (FastMath.log(sigma2[i]) - FastMath.log(p2[i])));
+      jt[i] = 1.0 + 2 * (p1[i] * (Math.log(sigma1[i]) - Math.log(p1[i])) + p2[i] * (Math.log(sigma2[i]) - Math.log(p2[i])));
     }
 
     int bestpos = -1;

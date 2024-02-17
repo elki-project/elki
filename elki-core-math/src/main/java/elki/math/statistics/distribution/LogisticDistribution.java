@@ -107,7 +107,7 @@ public class LogisticDistribution implements Distribution {
   public static double logpdf(double val, double loc, double scale) {
     val = Math.abs((val - loc) / scale);
     double f = 1.0 + FastMath.exp(-val);
-    return -val - FastMath.log(scale * f * f);
+    return -val - Math.log(scale * f * f);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class LogisticDistribution implements Distribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale) {
-    return loc + scale * FastMath.log(val / (1. - val));
+    return loc + scale * Math.log(val / (1. - val));
   }
 
   /**
@@ -185,7 +185,7 @@ public class LogisticDistribution implements Distribution {
   @Override
   public double nextRandom(Random random) {
     double u = random.nextDouble();
-    return location + scale * FastMath.log(u / (1. - u));
+    return location + scale * Math.log(u / (1. - u));
   }
 
   @Override

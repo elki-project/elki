@@ -65,7 +65,7 @@ public class HillEstimator implements DistanceBasedIntrinsicDimensionalityEstima
       if(!(v > 0.)) {
         continue;
       }
-      sum += v < halfw ? FastMath.log(v / w) : FastMath.log1p((v - w) / w);
+      sum += v < halfw ? Math.log(v / w) : FastMath.log1p((v - w) / w);
       ++valid;
     }
     if(valid < 1) {

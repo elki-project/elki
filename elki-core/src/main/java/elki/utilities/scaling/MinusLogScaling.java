@@ -20,8 +20,6 @@
  */
 package elki.utilities.scaling;
 
-import net.jafama.FastMath;
-
 /**
  * Scaling function to invert values by computing -1 * Math.log(x)
  * 
@@ -31,7 +29,7 @@ import net.jafama.FastMath;
 public class MinusLogScaling implements StaticScalingFunction {
   @Override
   public double getScaled(double value) {
-    return -FastMath.log(value);
+    return -Math.log(value);
   }
 
   @Override

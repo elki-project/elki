@@ -27,7 +27,6 @@ import elki.distance.SpatialPrimitiveDistance;
 import elki.utilities.Alias;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Jeffrey Divergence for {@link NumberVector}s is a symmetric, smoothened
@@ -114,8 +113,8 @@ public class JeffreyDivergenceDistance extends AbstractNumberVectorDistance impl
       if(!(md > 0.)) {
         continue;
       }
-      agg += (xd > 0 ? xd * FastMath.log(xd / md) : 0) //
-          + (yd > 0 ? yd * FastMath.log(yd / md) : 0);
+      agg += (xd > 0 ? xd * Math.log(xd / md) : 0) //
+          + (yd > 0 ? yd * Math.log(yd / md) : 0);
     }
     return agg;
   }
@@ -130,8 +129,8 @@ public class JeffreyDivergenceDistance extends AbstractNumberVectorDistance impl
       if(!(md > 0.)) {
         continue;
       }
-      agg += (min1 > 0 ? min1 * FastMath.log(min1 / md) : 0) //
-          + (min2 > 0 ? min2 * FastMath.log(min2 / md) : 0);
+      agg += (min1 > 0 ? min1 * Math.log(min1 / md) : 0) //
+          + (min2 > 0 ? min2 * Math.log(min2 / md) : 0);
     }
     return agg > 0 ? agg : 0;
   }

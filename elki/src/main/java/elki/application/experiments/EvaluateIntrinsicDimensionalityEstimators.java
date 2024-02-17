@@ -122,7 +122,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     estimators.add(PWM2Estimator.STATIC);
 
     PrintStream out = System.out; // TODO: add output file parameter?
-    final int digits = (int) FastMath.ceil(FastMath.log10(maxk + 1));
+    final int digits = (int) Math.ceil(FastMath.log10(maxk + 1));
     switch(format){
     case TABULAR:
       out.append(String.format("%" + digits + "s", "k"));
@@ -371,7 +371,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
         double[] ret = new double[quants.length];
         for(int i = 0; i < quants.length; i++) {
           final double dleft = (l - 1) * quants[i];
-          final int ileft = (int) FastMath.floor(dleft);
+          final int ileft = (int) Math.floor(dleft);
           final double err = dleft - ileft;
           if(err < Double.MIN_NORMAL) {
             ret[i] = data[ileft];

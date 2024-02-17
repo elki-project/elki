@@ -30,7 +30,6 @@ import elki.math.statistics.distribution.LogNormalDistribution;
 import elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Distribution parameter estimation using Levenberg-Marquardt iterative
@@ -72,16 +71,14 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
       if(!(val > 0)) {
         throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
       }
-      x[i] = FastMath.log(val);
-      mv.put(x[i]);
+      mv.put(x[i] = Math.log(val));
     }
     // Sort our copy.
     Arrays.sort(x);
     double median = (x[len >> 1] + x[(len + 1) >> 1]) * .5;
 
     // Height = density, via KDE.
-    KernelDensityEstimator de = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL, 1e-6);
-    double[] y = de.getDensity();
+    double[] y = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL, 1e-6).getDensity();
 
     // Weights:
     double[] s = new double[len];

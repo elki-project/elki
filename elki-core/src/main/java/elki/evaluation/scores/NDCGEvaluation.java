@@ -23,8 +23,6 @@ package elki.evaluation.scores;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Normalized Discounted Cumulative Gain.
  * <p>
@@ -91,7 +89,7 @@ public class NDCGEvaluation implements ScoreEvaluation {
       while(adapter.valid() && adapter.tiedToPrevious());
       // We only support binary labeling, and can ignore negative weight.
       if(positive > 0) {
-        sum += tied == 1 ? 1. / FastMath.log(i + 1) : //
+        sum += tied == 1 ? 1. / Math.log(i + 1) : //
             DCGEvaluation.sumInvLog1p(i - tied + 1, i) * positive / (double) tied;
         totalpos += positive;
       }

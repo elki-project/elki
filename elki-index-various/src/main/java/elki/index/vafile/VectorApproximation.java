@@ -25,8 +25,6 @@ import java.util.Arrays;
 import elki.database.ids.DBIDRef;
 import elki.math.MathUtil;
 
-import net.jafama.FastMath;
-
 /**
  * Object in a VA approximation.
  * 
@@ -96,6 +94,6 @@ public class VectorApproximation implements DBIDRef {
    */
   public static int byteOnDisk(int numberOfDimensions, int numberOfPartitions) {
     // (partition*dimension+id) alles in Bit 32bit für 4 byte id
-    return numberOfDimensions * ((int) Math.ceil(FastMath.log(numberOfPartitions) * MathUtil.ONE_BY_LOG2) + 4);
+    return numberOfDimensions * ((int) Math.ceil(Math.log(numberOfPartitions) * MathUtil.ONE_BY_LOG2) + 4);
   }
 }

@@ -106,7 +106,7 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
       if(k * x > 1) {
         return 0.;
       }
-      double t = FastMath.log(1 - k * x);
+      double t = Math.log(1 - k * x);
       return t == Double.NEGATIVE_INFINITY ? 1. / sigma //
           : t == Double.POSITIVE_INFINITY ? 0. //
               : FastMath.exp((1 - k) * t / k - FastMath.exp(t / k)) / sigma;
@@ -139,13 +139,13 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
       if(k * x > 1) {
         return Double.NEGATIVE_INFINITY;
       }
-      double t = FastMath.log(1 - k * x);
-      return t == Double.NEGATIVE_INFINITY ? -FastMath.log(sigma) //
+      double t = Math.log(1 - k * x);
+      return t == Double.NEGATIVE_INFINITY ? -Math.log(sigma) //
           : t == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY //
-              : (1 - k) * t / k - FastMath.exp(t / k) - FastMath.log(sigma);
+              : (1 - k) * t / k - FastMath.exp(t / k) - Math.log(sigma);
     }
     else { // Gumbel case:
-      return -x - FastMath.exp(-x) - FastMath.log(sigma);
+      return -x - FastMath.exp(-x) - Math.log(sigma);
     }
   }
 
@@ -169,7 +169,7 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
       if(k * x > 1) {
         return k > 0 ? 1 : 0;
       }
-      return FastMath.exp(-FastMath.exp(FastMath.log(1 - k * x) / k));
+      return FastMath.exp(-FastMath.exp(Math.log(1 - k * x) / k));
     }
     else { // Gumbel case:
       return FastMath.exp(-FastMath.exp(-x));
@@ -195,13 +195,13 @@ public class GeneralizedExtremeValueDistribution implements Distribution {
       return Double.NaN;
     }
     if(k < 0) {
-      return mu + sigma * Math.max((1. - FastMath.pow(-FastMath.log(val), k)) / k, 1. / k);
+      return mu + sigma * Math.max((1. - FastMath.pow(-Math.log(val), k)) / k, 1. / k);
     }
     else if(k > 0) {
-      return mu + sigma * Math.min((1. - FastMath.pow(-FastMath.log(val), k)) / k, 1. / k);
+      return mu + sigma * Math.min((1. - FastMath.pow(-Math.log(val), k)) / k, 1. / k);
     }
     else { // Gumbel
-      return mu + sigma * FastMath.log(1. / FastMath.log(1. / val));
+      return mu + sigma * Math.log(1. / Math.log(1. / val));
     }
   }
 

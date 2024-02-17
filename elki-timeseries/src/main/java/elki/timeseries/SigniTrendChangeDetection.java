@@ -35,6 +35,7 @@ import elki.database.relation.MaterializedDoubleRelation;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.math.DoubleMinMax;
+import elki.math.MathUtil;
 import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
@@ -111,7 +112,7 @@ public class SigniTrendChangeDetection implements Algorithm {
    */
   public SigniTrendChangeDetection(double halflife, double bias, double minsigma) {
     // Compute alpha from half-life parameter:
-    this.alpha = 1. - FastMath.exp(FastMath.log(0.5) / halflife);
+    this.alpha = 1. - FastMath.exp(MathUtil.LOG_HALF / halflife);
     this.bias = bias;
     this.minsigma = minsigma;
   }

@@ -25,8 +25,6 @@ import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Compute the area under the precision-recall curve (AUPRC).
  * <p>
@@ -105,7 +103,7 @@ public class AUPRCEvaluation implements ScoreEvaluation {
         double ipol = prevpos + f * i;
         curve.addAndSimplify(ipol, ipol / (double) (prevrank + i));
       }
-      final double l = FastMath.log(rank) - FastMath.log(prevrank);
+      final double l = Math.log(rank) - Math.log(prevrank);
       double integral = l * prevpos / (double) newpos - (l * prevrank / (double) ties - 1);
       acc += integral / (double) ties * newpos;
     }
@@ -147,7 +145,7 @@ public class AUPRCEvaluation implements ScoreEvaluation {
         acc = newpos / (double) ties * newpos;
         continue;
       }
-      final double l = FastMath.log(rank) - FastMath.log(prevrank);
+      final double l = Math.log(rank) - Math.log(prevrank);
       double integral = l * prevpos / (double) newpos - (l * prevrank / (double) ties - 1);
       acc += integral / (double) ties * newpos;
     }

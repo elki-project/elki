@@ -81,7 +81,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     // init log k
     log_k = new double[settings.kmax];
     for(int k = 1; k <= settings.kmax; k++) {
-      log_k[k - 1] = FastMath.log(k);
+      log_k[k - 1] = Math.log(k);
     }
   }
 
@@ -387,7 +387,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
 
     iter.seek(k_0);
     for(int i = 0; iter.valid(); iter.advance(), i++) {
-      final double logd = log_kDist[i] = FastMath.log(iter.doubleValue());
+      final double logd = log_kDist[i] = Math.log(iter.doubleValue());
       sum_log_kDist += logd;
       sum_log_k_kDist += logd * log_k[i];
     }

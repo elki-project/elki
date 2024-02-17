@@ -158,7 +158,7 @@ public class InverseGaussianDistribution implements Distribution {
       return x == x ? Double.NEGATIVE_INFINITY : Double.NaN;
     }
     final double v = (x - mu) / mu;
-    return v < Double.MAX_VALUE ? 0.5 * FastMath.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
+    return v < Double.MAX_VALUE ? 0.5 * Math.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
   }
 
   /**

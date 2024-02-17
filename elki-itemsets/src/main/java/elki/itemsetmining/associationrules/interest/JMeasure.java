@@ -23,8 +23,6 @@ package elki.itemsetmining.associationrules.interest;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * J-Measure interestingness measure.
  * \(P(X\cap Y)\log\tfrac{P(Y|X)}{P(Y)}
@@ -60,6 +58,6 @@ public class JMeasure implements InterestingnessMeasure {
     double pXnotY = sXnotY / (double) t;
     double pnotY_X = sXnotY / (double) sX;
     double pnotY = 1. - pY;
-    return (pXY * FastMath.log(pY_X / pY) + pXnotY * FastMath.log(pnotY_X / pnotY)) * MathUtil.ONE_BY_LOG2;
+    return (pXY * Math.log(pY_X / pY) + pXnotY * Math.log(pnotY_X / pnotY)) * MathUtil.ONE_BY_LOG2;
   }
 }

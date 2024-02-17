@@ -176,7 +176,7 @@ public class IsolationForest implements OutlierAlgorithm {
    * @return Expected average
    */
   protected static double c(double n) {
-    return n <= 1.0 ? 0 : 2 * (FastMath.log(n - 1) + MathUtil.EULERMASCHERONI) - (2. * (n - 1) / n);
+    return n <= 1.0 ? 0 : 2 * (Math.log(n - 1) + MathUtil.EULERMASCHERONI) - (2. * (n - 1) / n);
   }
 
   /**
@@ -255,7 +255,7 @@ public class IsolationForest implements OutlierAlgorithm {
       this.relation = relation;
       final int dim = RelationUtil.dimensionality(relation);
       this.subsampleSize = subsampleSize;
-      this.maxheight = (int) FastMath.ceil(FastMath.log2(subsampleSize));
+      this.maxheight = (int) Math.ceil(FastMath.log2(subsampleSize));
       this.min = new double[dim];
       this.max = new double[dim];
       this.active = new int[dim];

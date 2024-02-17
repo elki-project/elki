@@ -54,8 +54,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import net.jafama.FastMath;
-
 /**
  * kNN-based adaption of Stochastic Outlier Selection.
  * <p>
@@ -141,7 +139,7 @@ public class KNNSOS<O> implements OutlierAlgorithm {
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(k1);
-    final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
+    final double logPerp = perplexity > 1. ? Math.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("KNNSOS scores", relation.size(), LOG) : null;

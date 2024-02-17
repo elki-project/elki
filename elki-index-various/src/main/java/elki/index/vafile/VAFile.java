@@ -41,6 +41,7 @@ import elki.index.KNNIndex;
 import elki.index.RangeIndex;
 import elki.logging.Logging;
 import elki.logging.statistics.LongStatistic;
+import elki.math.MathUtil;
 import elki.persistent.AbstractPageFileFactory;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
@@ -144,7 +145,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * @throws IllegalArgumentException on invalid number of partitions
    */
   public void setPartitions(Relation<V> relation) throws IllegalArgumentException {
-    if((FastMath.log(partitions) / FastMath.log(2)) != (int) (FastMath.log(partitions) / FastMath.log(2))) {
+    if((Math.log(partitions) * MathUtil.ONE_BY_LOG2) != (int) (Math.log(partitions) * MathUtil.ONE_BY_LOG2)) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 

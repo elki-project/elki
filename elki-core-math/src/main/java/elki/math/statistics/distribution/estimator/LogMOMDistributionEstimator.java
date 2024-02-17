@@ -24,8 +24,6 @@ import elki.math.StatisticalMoments;
 import elki.math.statistics.distribution.Distribution;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
-import net.jafama.FastMath;
-
 /**
  * Distribution estimators that use the method of moments (MOM) in logspace,
  * i.e. that only need the statistical moments of a data set after logarithms.
@@ -55,7 +53,7 @@ public interface LogMOMDistributionEstimator<D extends Distribution> extends Dis
       if(Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
         continue;
       }
-      mv.put(FastMath.log(val));
+      mv.put(Math.log(val));
     }
     return estimateFromLogStatisticalMoments(mv, min);
   }

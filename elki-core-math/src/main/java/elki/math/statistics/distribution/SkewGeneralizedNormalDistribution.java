@@ -182,13 +182,13 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
     }
     x = (x - mu) / sigma;
     if(skew == 0.) {
-      return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma) - .5 * x * x;
+      return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) - .5 * x * x;
     }
-    double y = -FastMath.log(1. - skew * x) / skew;
+    double y = -Math.log(1. - skew * x) / skew;
     if(y != y || y == Double.NEGATIVE_INFINITY || y == Double.NEGATIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
-    return -.5 * y * y - FastMath.log(MathUtil.ONE_BY_SQRTTWOPI * sigma * (1 - skew * x));
+    return -.5 * y * y - Math.log(MathUtil.ONE_BY_SQRTTWOPI * sigma * (1 - skew * x));
   }
 
   /**
@@ -207,7 +207,7 @@ public class SkewGeneralizedNormalDistribution implements Distribution {
       if(tmp < 1e-15) {
         return (skew < 0.) ? 0. : 1.;
       }
-      x = -FastMath.log(tmp) / skew;
+      x = -Math.log(tmp) / skew;
     }
     return .5 + .5 * NormalDistribution.erf(x * MathUtil.SQRTHALF);
   }

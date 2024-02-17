@@ -49,8 +49,6 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
-import net.jafama.FastMath;
-
 /**
  * Outlier detection algorithm using a mixture model approach. The data is
  * modeled as a mixture of two distributions, a Gaussian distribution for
@@ -105,8 +103,8 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
    */
   public GaussianUniformMixture(double l, double c) {
     super();
-    this.logl = FastMath.log(l);
-    this.logml = FastMath.log(1 - l);
+    this.logl = Math.log(l);
+    this.logml = Math.log(1 - l);
     this.c = c;
   }
 
@@ -180,7 +178,7 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
    * @return loglikelihood for anomalous objects
    */
   private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
-    return anomalousObjs.isEmpty() ? 0 : anomalousObjs.size() * -FastMath.log(anomalousObjs.size());
+    return anomalousObjs.isEmpty() ? 0 : anomalousObjs.size() * -Math.log(anomalousObjs.size());
   }
 
   /**
@@ -197,7 +195,7 @@ public class GaussianUniformMixture implements OutlierAlgorithm {
     final LUDecomposition lu = new LUDecomposition(builder.makeSampleMatrix());
     double[][] covInv = lu.inverse();
     // for each object compute probability and sum
-    double prob = (objids.size() - anomalous.size()) * -FastMath.log(Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * lu.det()));
+    double prob = (objids.size() - anomalous.size()) * -Math.log(Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * lu.det()));
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
       if(!anomalous.contains(iter)) {
         double[] xcent = minusEquals(relation.get(iter).toArray(), mean);

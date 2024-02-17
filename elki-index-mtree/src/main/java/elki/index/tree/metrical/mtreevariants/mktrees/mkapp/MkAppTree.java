@@ -340,8 +340,8 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
 
     for(int k = 0; k < settings.kmax - k_0; k++) {
       if(settings.log) {
-        x[k] = FastMath.log(k + k_0);
-        y[k] = FastMath.log(knnDistances[k + k_0]);
+        x[k] = Math.log(k + k_0);
+        y[k] = Math.log(knnDistances[k + k_0]);
       }
       else {
         x[k] = k + k_0;

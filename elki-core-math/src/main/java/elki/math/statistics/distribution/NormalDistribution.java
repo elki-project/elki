@@ -318,9 +318,9 @@ public class NormalDistribution implements Distribution {
       bibkey = "web/Ooura96")
   public static double erfcinv(double y) {
     final double z = (y > 1) ? 2 - y : y;
-    final double w = 0.916461398268964 - FastMath.log(z);
+    final double w = 0.916461398268964 - Math.log(z);
     double u = Math.sqrt(w);
-    double s = (FastMath.log(u) + 0.488826640273108) / w;
+    double s = (Math.log(u) + 0.488826640273108) / w;
     double t = 1 / (u + 0.231729200323405);
     double x = u * (1 - s * (s * 0.124610454613712 + 0.5)) //
         - ((((-0.0728846765585675 * t //
@@ -386,7 +386,7 @@ public class NormalDistribution implements Distribution {
    */
   public static double logpdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma) - .5 * x * x;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) - .5 * x * x;
   }
 
   /**

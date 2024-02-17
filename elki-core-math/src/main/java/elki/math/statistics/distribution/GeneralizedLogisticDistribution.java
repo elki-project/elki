@@ -106,7 +106,7 @@ public class GeneralizedLogisticDistribution implements Distribution {
   public static double logpdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     double e = FastMath.exp(-val);
-    return -(val + (shape + 1.0) * FastMath.log1p(e)) + FastMath.log(shape);
+    return -(val + (shape + 1.0) * FastMath.log1p(e)) + Math.log(shape);
   }
 
   @Override
@@ -154,7 +154,7 @@ public class GeneralizedLogisticDistribution implements Distribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    return loc - scale * FastMath.log(FastMath.exp(FastMath.log(val) / -shape) - 1);
+    return loc - scale * Math.log(FastMath.exp(Math.log(val) / -shape) - 1);
   }
 
   @Override
@@ -165,7 +165,7 @@ public class GeneralizedLogisticDistribution implements Distribution {
   @Override
   public double nextRandom(Random random) {
     double u = random.nextDouble();
-    return location - scale * FastMath.log(FastMath.exp(FastMath.log(u) / -shape) - 1);
+    return location - scale * Math.log(FastMath.exp(Math.log(u) / -shape) - 1);
   }
 
   @Override

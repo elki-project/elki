@@ -107,7 +107,7 @@ public class GumbelDistribution implements Distribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double z = (x - mu) / beta;
-    return -z - FastMath.exp(-z) - FastMath.log(beta);
+    return -z - FastMath.exp(-z) - Math.log(beta);
   }
 
   @Override
@@ -141,7 +141,7 @@ public class GumbelDistribution implements Distribution {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double mu, double beta) {
-    return mu - beta * FastMath.log(-FastMath.log(val));
+    return mu - beta * Math.log(-Math.log(val));
   }
 
   @Override
@@ -151,7 +151,7 @@ public class GumbelDistribution implements Distribution {
 
   @Override
   public double nextRandom(Random random) {
-    return mu - beta * FastMath.log(-FastMath.log(random.nextDouble()));
+    return mu - beta * Math.log(-Math.log(random.nextDouble()));
   }
 
   @Override

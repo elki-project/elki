@@ -36,8 +36,6 @@ import elki.distance.NumberVectorDistance;
 import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 
-import net.jafama.FastMath;
-
 /**
  * Base class for evaluating clusterings by information criteria (such as AIC or
  * BIC). Provides helper functions (e.g., max likelihood calculation) to its
@@ -165,15 +163,15 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
     final int dim = RelationUtil.dimensionality(relation);
     // Total variance (corrected for bias)
-    final double logv = FastMath.log(d > 0 ? d / ((n - m) * dim) : Double.MIN_NORMAL);
+    final double logv = Math.log(d > 0 ? d / ((n - m) * dim) : Double.MIN_NORMAL);
 
     // log likelihood of this clustering
     double logLikelihood = 0.;
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i]);
+      logLikelihood += n_i[i] * Math.log(n_i[i]);
     }
-    logLikelihood -= n * FastMath.log(n) //
+    logLikelihood -= n * Math.log(n) //
         + n * dim * .5 * (MathUtil.LOGTWOPI + logv) //
         + (n - m) * dim * .5;
     return logLikelihood;

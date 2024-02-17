@@ -131,7 +131,7 @@ public class ISOS<O> implements OutlierAlgorithm {
     final int k1 = k + 1; // Query size
     final double perplexity = k / 3.;
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(k1);
-    final double logPerp = perplexity > 1. ? FastMath.log(perplexity) : .1;
+    final double logPerp = perplexity > 1. ? Math.log(perplexity) : .1;
 
     double[] p = new double[k + 10];
     ModifiableDoubleDBIDList dists = DBIDUtil.newDistanceDBIDList(k + 10);

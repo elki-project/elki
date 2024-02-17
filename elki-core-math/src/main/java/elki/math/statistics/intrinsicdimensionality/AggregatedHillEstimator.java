@@ -23,7 +23,6 @@ package elki.math.statistics.intrinsicdimensionality;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Estimator using the weighted average of multiple hill estimators.
@@ -58,7 +57,7 @@ public class AggregatedHillEstimator implements DistanceBasedIntrinsicDimensiona
       // The next observation:
       final double v = adapter.getDouble(data, i++);
       if(v > 0) {
-        sum = FastMath.log(v);
+        sum = Math.log(v);
         valid++;
         break;
       }
@@ -66,8 +65,8 @@ public class AggregatedHillEstimator implements DistanceBasedIntrinsicDimensiona
     while(i < end) {
       // The next observation:
       final double v = adapter.getDouble(data, i++);
-      assert (v > 0);
-      final double logv = FastMath.log(v);
+      assert v > 0;
+      final double logv = Math.log(v);
       // Aggregate hill estimations:
       hsum += sum / valid++ - logv;
       // Update sum for next hill.

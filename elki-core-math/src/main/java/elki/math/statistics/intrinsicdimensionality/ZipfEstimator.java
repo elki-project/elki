@@ -23,7 +23,6 @@ package elki.math.statistics.intrinsicdimensionality;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Zipf estimator (qq-estimator) of the intrinsic dimensionality.
@@ -84,8 +83,8 @@ public class ZipfEstimator implements DistanceBasedIntrinsicDimensionalityEstima
     for(int i = begin; i < end; ++i) {
       final double v = adapter.getDouble(data, i);
       assert (v > 0.);
-      final double logv = FastMath.log(v);
-      final double weight = FastMath.log(nplus1 / (i - begin + bias));
+      final double logv = Math.log(v);
+      final double weight = Math.log(nplus1 / (i - begin + bias));
       wls += weight * logv;
       ws += weight;
       ls += logv;

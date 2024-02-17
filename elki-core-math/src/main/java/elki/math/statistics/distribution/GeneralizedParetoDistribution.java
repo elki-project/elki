@@ -119,7 +119,7 @@ public class GeneralizedParetoDistribution implements Distribution {
     if(xi == 0) {
       return Double.POSITIVE_INFINITY;
     }
-    return ((xi == -1) ? 0. : FastMath.log(1 + xi * x) * (-1 / xi - 1)) - FastMath.log(sigma);
+    return ((xi == -1) ? 0. : Math.log(1 + xi * x) * (-1 / xi - 1)) - Math.log(sigma);
   }
 
   @Override
@@ -167,7 +167,7 @@ public class GeneralizedParetoDistribution implements Distribution {
       return Double.NaN;
     }
     if(xi == 0.) {
-      return mu - sigma * FastMath.log(1 - val);
+      return mu - sigma * Math.log(1 - val);
     }
     return mu - sigma / xi * (1 - FastMath.pow(1 - val, -xi));
   }

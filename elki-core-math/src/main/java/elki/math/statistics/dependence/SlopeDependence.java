@@ -23,7 +23,6 @@ package elki.math.statistics.dependence;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
-import net.jafama.FastMath;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
@@ -62,7 +61,7 @@ public class SlopeDependence implements Dependence {
   /**
    * Precision for entropy normalization.
    */
-  protected final static double LOG_PRECISION = FastMath.log(PRECISION);
+  protected final static double LOG_PRECISION = Math.log(PRECISION);
 
   /**
    * Scaling factor.
@@ -123,7 +122,7 @@ public class SlopeDependence implements Dependence {
     for(int l = 0; l < PRECISION; l++) {
       if(angles[l] > 0) {
         final double p = angles[l] / (double) len;
-        entropy += p * FastMath.log(p);
+        entropy += p * Math.log(p);
       }
     }
     return 1 + entropy / LOG_PRECISION;

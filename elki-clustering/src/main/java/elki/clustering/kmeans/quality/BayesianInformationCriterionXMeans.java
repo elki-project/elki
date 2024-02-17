@@ -34,8 +34,6 @@ import elki.math.MathUtil;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
 
-import net.jafama.FastMath;
-
 /**
  * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
  * SBIC) for the use with evaluating k-means results.
@@ -64,7 +62,7 @@ public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMea
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistance<? super V> distance, Relation<V> relation) {
     return logLikelihoodXMeans(relation, clustering, distance) //
-        - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
+        - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
   }
 
   /**
@@ -105,7 +103,7 @@ public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMea
     }
 
     // Total variance (corrected for bias)
-    final double logv = FastMath.log(d / (n - m));
+    final double logv = Math.log(d / (n - m));
 
     final int dim = RelationUtil.dimensionality(relation);
     // log likelihood of this clustering
@@ -113,11 +111,11 @@ public class BayesianInformationCriterionXMeans extends AbstractKMeansQualityMea
 
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Post. entropy Rn log Rn
+      logLikelihood += n_i[i] * Math.log(n_i[i]) // Post. entropy Rn log Rn
           - n_i[i] * .5 * MathUtil.LOGTWOPI // Rn/2 log2pi
           - n_i[i] * dim * .5 * logv // Rn M/2 log sigma^2
           - (d_i[i] - m) * .5 // (Rn-K)/2
-          - n_i[i] * FastMath.log(n); // Prior entropy, sum_i Rn log R
+          - n_i[i] * Math.log(n); // Prior entropy, sum_i Rn log R
     }
     return logLikelihood;
   }

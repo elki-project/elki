@@ -138,7 +138,7 @@ public class LogNormalDistribution implements Distribution {
     if(x <= 0.) {
       return 0.;
     }
-    final double xrel = (FastMath.log(x) - logmu) / logsigma;
+    final double xrel = (Math.log(x) - logmu) / logsigma;
     return 1 / (MathUtil.SQRTTWOPI * logsigma * x) * FastMath.exp(-.5 * xrel * xrel);
   }
 
@@ -163,8 +163,8 @@ public class LogNormalDistribution implements Distribution {
     if(x <= 0.) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double xrel = (FastMath.log(x) - logmu) / logsigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(logsigma * x) - .5 * xrel * xrel;
+    final double xrel = (Math.log(x) - logmu) / logsigma;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(logsigma * x) - .5 * xrel * xrel;
   }
 
   /**
@@ -183,7 +183,7 @@ public class LogNormalDistribution implements Distribution {
     if(x <= 0.) {
       return 0.;
     }
-    return .5 * (1 + NormalDistribution.erf((FastMath.log(x) - logmu) / (MathUtil.SQRT2 * logsigma)));
+    return .5 * (1 + NormalDistribution.erf((Math.log(x) - logmu) / (MathUtil.SQRT2 * logsigma)));
   }
 
   /**

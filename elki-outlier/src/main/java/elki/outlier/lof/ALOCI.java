@@ -62,8 +62,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
-import net.jafama.FastMath;
-
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
  * <p>
@@ -470,7 +468,7 @@ public class ALOCI<V extends NumberVector> implements OutlierAlgorithm {
     private double getShiftedDim(NumberVector obj, int dim, int level) {
       double pos = obj.doubleValue(dim) + shift[dim];
       pos = (pos - min[dim]) / width[dim] * (1 + level);
-      return pos - FastMath.floor(pos);
+      return pos - Math.floor(pos);
     }
 
     /**

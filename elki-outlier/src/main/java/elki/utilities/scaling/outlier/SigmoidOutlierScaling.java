@@ -212,7 +212,7 @@ public class SigmoidOutlierScaling implements OutlierScaling {
 
     // Reset, or continue with previous values?
     // a = 0.0;
-    // b = FastMath.log((prior0 + 1.0) / (prior1 + 1.0));
+    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
     DBIDArrayIter iter = ids.iter();
     for(int i = 0; i < ids.size(); i++, iter.advance()) {
@@ -220,10 +220,10 @@ public class SigmoidOutlierScaling implements OutlierScaling {
       final double fApB = val * a + b;
       final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
       if(fApB >= 0) {
-        fval += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
+        fval += ti * fApB + FastMath.log1p(FastMath.exp(-fApB));
       }
       else {
-        fval += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
+        fval += (ti - 1) * fApB + FastMath.log1p(FastMath.exp(fApB));
       }
     }
     for(int it = 0; it < maxiter; it++) {
@@ -271,10 +271,10 @@ public class SigmoidOutlierScaling implements OutlierScaling {
           final double fApB = val * newA + newB;
           final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
           if(fApB >= 0) {
-            newf += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
+            newf += ti * fApB + FastMath.log1p(FastMath.exp(-fApB));
           }
           else {
-            newf += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
+            newf += (ti - 1) * fApB + FastMath.log1p(FastMath.exp(fApB));
           }
         }
         if(newf < fval + 0.0001 * stepsize * gd) {
@@ -326,17 +326,17 @@ public class SigmoidOutlierScaling implements OutlierScaling {
 
     // Reset, or continue with previous values?
     // a = 0.0;
-    // b = FastMath.log((prior0 + 1.0) / (prior1 + 1.0));
+    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
     for(int i = 0; i < size; i++) {
       final double val = adapter.getDouble(array, i);
       final double fApB = val * a + b;
       final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
       if(fApB >= 0) {
-        fval += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
+        fval += ti * fApB + FastMath.log1p(FastMath.exp(-fApB));
       }
       else {
-        fval += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
+        fval += (ti - 1) * fApB + FastMath.log1p(FastMath.exp(fApB));
       }
     }
     for(int it = 0; it < maxiter; it++) {
@@ -382,10 +382,10 @@ public class SigmoidOutlierScaling implements OutlierScaling {
           final double fApB = val * newA + newB;
           final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
           if(fApB >= 0) {
-            newf += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
+            newf += ti * fApB + FastMath.log1p(FastMath.exp(-fApB));
           }
           else {
-            newf += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
+            newf += (ti - 1) * fApB + FastMath.log1p(FastMath.exp(fApB));
           }
         }
         if(newf < fval + 0.0001 * stepsize * gd) {

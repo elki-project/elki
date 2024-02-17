@@ -100,7 +100,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
 
   @Override
   public <T extends O> AffinityMatrix computeAffinityMatrix(Relation<T> relation, double initialScale) {
-    final int numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
+    final int numberOfNeighbours = (int) Math.ceil(3 * perplexity);
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(numberOfNeighbours + 1);
     if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
@@ -133,7 +133,7 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
   @Override
   protected void computePij(DBIDRange ids, KNNSearcher<DBIDRef> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
     Duration timer = LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin();
-    final double logPerp = FastMath.log(perplexity);
+    final double logPerp = Math.log(perplexity);
     // Scratch arrays, resizable
     DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
     IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);

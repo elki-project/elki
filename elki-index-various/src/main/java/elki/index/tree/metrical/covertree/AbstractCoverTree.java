@@ -106,8 +106,8 @@ public abstract class AbstractCoverTree<O> implements Index {
     this.distanceQuery = distance.instantiate(relation);
     this.truncate = truncate;
     this.expansion = expansion;
-    this.invLogExpansion = 1. / FastMath.log(expansion);
-    this.scaleBottom = (int) Math.ceil(FastMath.log(Double.MIN_NORMAL) * invLogExpansion);
+    this.invLogExpansion = 1. / Math.log(expansion);
+    this.scaleBottom = (int) Math.ceil(Math.log(Double.MIN_NORMAL) * invLogExpansion);
   }
 
   /**
@@ -127,7 +127,7 @@ public abstract class AbstractCoverTree<O> implements Index {
    * @return Scaling bound
    */
   protected final int distToScale(double d) {
-    return (int) Math.ceil(FastMath.log(d) * invLogExpansion);
+    return (int) Math.ceil(Math.log(d) * invLogExpansion);
   }
 
   /**

@@ -85,7 +85,7 @@ public class AndersonDarlingTest {
   /**
    * Cut-off for extreme values.
    */
-  private static final double SMALL = FastMath.log(0.00000001);
+  private static final double SMALL = Math.log(0.00000001);
 
   /**
    * Test a <i>sorted</i> data set against the standard normal distribution.
@@ -106,8 +106,8 @@ public class AndersonDarlingTest {
     double A2 = 0.;
     for(int i = 0; i < l; ++i) {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
-      final double logx = x > 0.00000001 ? FastMath.log(x) : SMALL;
-      final double log1mx = x < 0.99999999 ? FastMath.log(1 - x) : SMALL;
+      final double logx = x > 0.00000001 ? Math.log(x) : SMALL;
+      final double log1mx = x < 0.99999999 ? Math.log(1 - x) : SMALL;
       A2 += ((i << 1) + 1.) / l * logx + (((l - i) << 1) - 1.) / l * log1mx;
     }
     return -l - A2;
@@ -138,8 +138,8 @@ public class AndersonDarlingTest {
     double A2 = 0.;
     for(int i = 0; i < l; ++i) {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
-      final double logx = x > 0.00000001 ? FastMath.log(x) : SMALL;
-      final double log1mx = x < 0.99999999 ? FastMath.log(1 - x) : SMALL;
+      final double logx = x > 0.00000001 ? Math.log(x) : SMALL;
+      final double log1mx = x < 0.99999999 ? Math.log(1 - x) : SMALL;
       A2 += ((i << 1) + 1.) / l * logx + (((l - i) << 1) - 1.) / l * log1mx;
     }
     return -l - A2;

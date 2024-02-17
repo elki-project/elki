@@ -103,7 +103,7 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
   public static double pdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     if(shape != 0.) {
-      val = -FastMath.log(1 - shape * val) / shape;
+      val = -Math.log(1 - shape * val) / shape;
     }
     double f = 1. + FastMath.exp(-val);
     return FastMath.exp(-val * (1 - shape)) / (scale * f * f);
@@ -126,10 +126,10 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
   public static double logpdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     if(shape != 0.) {
-      val = -FastMath.log(1 - shape * val) / shape;
+      val = -Math.log(1 - shape * val) / shape;
     }
     double f = 1. + FastMath.exp(-val);
-    return -val * (1 - shape) - FastMath.log(scale * f * f);
+    return -val * (1 - shape) - Math.log(scale * f * f);
   }
 
   @Override
@@ -153,7 +153,7 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
       if(tmp < 1e-15) {
         return (shape < 0) ? 0 : 1;
       }
-      val = -FastMath.log(tmp) / shape;
+      val = -Math.log(tmp) / shape;
     }
     return 1. / (1. + FastMath.exp(-val));
   }
@@ -173,10 +173,8 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    if(shape == 0.) {
-      return loc - scale * FastMath.log((1 - val) / val);
-    }
-    return loc + scale * (1 - FastMath.pow((1 - val) / val, shape)) / shape;
+    return shape == 0. ? loc - scale * Math.log((1 - val) / val) : //
+        loc + scale * (1 - FastMath.pow((1 - val) / val, shape)) / shape;
   }
 
   @Override
@@ -186,8 +184,7 @@ public class GeneralizedLogisticAlternateDistribution implements Distribution {
 
   @Override
   public double nextRandom(Random random) {
-    double u = random.nextDouble();
-    return quantile(u, location, scale, shape);
+    return quantile(random.nextDouble(), location, scale, shape);
   }
 
   @Override

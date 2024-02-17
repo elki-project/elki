@@ -292,7 +292,7 @@ public abstract class AbstractSVC extends AbstractSingleSVM {
     double[] t = new double[l];
 
     // Initial Point and Initial Fun Value
-    double A = 0., B = FastMath.log((prior0 + 1.) / (prior1 + 1.));
+    double A = 0., B = Math.log((prior0 + 1.) / (prior1 + 1.));
     double fval = 0.;
 
     for(int i = 0; i < l; i++) {

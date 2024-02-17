@@ -101,7 +101,7 @@ public class StudentsTDistribution implements Distribution {
    */
   public static double logpdf(double val, int v) {
     return GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5) //
-        - .5 * FastMath.log(v * Math.PI) + FastMath.log1p(val * val / v) * -.5 * (v + 1);
+        - .5 * Math.log(v * Math.PI) + FastMath.log1p(val * val / v) * -.5 * (v + 1);
   }
 
   /**
