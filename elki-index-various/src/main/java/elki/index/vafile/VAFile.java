@@ -46,13 +46,11 @@ import elki.persistent.AbstractPageFileFactory;
 import elki.utilities.datastructures.heap.DoubleMaxHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
-
-import net.jafama.FastMath;
 
 /**
  * Vector-approximation file (VAFile)

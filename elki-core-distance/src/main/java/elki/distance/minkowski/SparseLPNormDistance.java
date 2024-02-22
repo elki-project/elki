@@ -23,11 +23,11 @@ package elki.distance.minkowski;
 import elki.data.SparseNumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.Norm;
-import elki.distance.PrimitiveDistance;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -116,7 +116,7 @@ public class SparseLPNormDistance implements Norm<SparseNumberVector> {
 
   @Override
   public boolean isMetric() {
-    return (p >= 1.);
+    return p >= 1.;
   }
 
   /**
@@ -139,16 +139,10 @@ public class SparseLPNormDistance implements Norm<SparseNumberVector> {
 
     @Override
     public SparseLPNormDistance make() {
-      if(p == 2.) {
-        return SparseEuclideanDistance.STATIC;
-      }
-      if(p == 1.) {
-        return SparseManhattanDistance.STATIC;
-      }
-      if(p == Double.POSITIVE_INFINITY) {
-        return SparseMaximumDistance.STATIC;
-      }
-      return new SparseLPNormDistance(p);
+      return p == 2. ? SparseEuclideanDistance.STATIC : //
+          p == 1. ? SparseManhattanDistance.STATIC : //
+              p == Double.POSITIVE_INFINITY ? SparseMaximumDistance.STATIC : //
+                  new SparseLPNormDistance(p);
     }
   }
 }

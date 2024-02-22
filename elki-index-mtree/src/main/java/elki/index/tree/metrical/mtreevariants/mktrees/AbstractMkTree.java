@@ -20,9 +20,6 @@
  */
 package elki.index.tree.metrical.mtreevariants.mktrees;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
