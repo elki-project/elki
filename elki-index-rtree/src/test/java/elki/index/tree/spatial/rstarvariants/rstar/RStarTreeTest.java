@@ -70,7 +70,7 @@ public class RStarTreeTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testRStarTreeFast() {
-    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<>(RStarTreeFactory.class) //
+    RStarTreeFactory<NumberVector> factory = new ELKIBuilder<RStarTreeFactory<NumberVector>>(RStarTreeFactory.class) //
         .with(AbstractPageFileFactory.Par.PAGE_SIZE_ID, 300) //
         .with(AbstractRStarTreeFactory.Par.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class) //
         .with(ApproximativeLeastOverlapInsertionStrategy.Par.INSERTION_CANDIDATES_ID, 1) //

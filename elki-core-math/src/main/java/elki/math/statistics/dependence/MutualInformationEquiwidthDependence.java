@@ -23,8 +23,6 @@ package elki.math.statistics.dependence;
 import elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import elki.utilities.optionhandling.Parameterizer;
 
-import net.jafama.FastMath;
-
 /**
  * Mutual Information (MI) dependence measure by dividing each attribute into
  * equal-width bins. MI can be seen as Kullback–Leibler divergence of the joint

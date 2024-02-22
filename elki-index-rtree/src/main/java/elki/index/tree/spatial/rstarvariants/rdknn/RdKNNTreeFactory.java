@@ -27,7 +27,6 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import elki.persistent.PageFile;
 import elki.persistent.PageFileFactory;
-import elki.utilities.ClassGenericsUtil;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
