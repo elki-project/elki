@@ -60,7 +60,7 @@ public class NearestNeighborConsistency<O> implements Evaluator {
       elementLoop: for(DBIDIter clusterElement = clusterIDs.iter(); clusterElement.valid(); clusterElement.advance()) {
         KNNList neighbors = knnQuery.getKNN(clusterElement, kPlus1);
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(!DBIDUtil.equal(clusterElement, neighbor) || !clusterIDs.contains(neighbor)) {
+          if(!DBIDUtil.equal(clusterElement, neighbor) && !clusterIDs.contains(neighbor)) {
             continue elementLoop;
           }
         }

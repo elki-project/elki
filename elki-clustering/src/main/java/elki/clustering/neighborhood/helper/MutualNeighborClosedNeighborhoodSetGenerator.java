@@ -7,18 +7,29 @@ import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.helper.MutualNeighborQuery;
-import elki.helper.MutualNeighborQueryBuilder;
 import elki.logging.Logging;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * 
+ * Mutual nearest neighbors set generator.
+ * <p>
+ * Reference:
+ * <p>
+ * C. H. Q. Ding, X. He<br>
+ * K-nearest-neighbor consistency in data clustering: incorporating local
+ * information into global optimization<br>
+ * Proc. Symposium on Applied Computing (SAC) 2004
+ *
  * @author Niklas Strahmann
  */
+@Reference(authors = "C. H. Q. Ding, X. He", //
+    title = "K-nearest-neighbor consistency in data clustering: incorporating local information into global optimization", //
+    booktitle = "Proc. Symposium on Applied Computing (SAC) 2004", //
+    url = "https://doi.org/10.1145/967900.968021", bibkey = "DBLP:conf/sac/DingH04")
 public class MutualNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
   /**
    * Class logger

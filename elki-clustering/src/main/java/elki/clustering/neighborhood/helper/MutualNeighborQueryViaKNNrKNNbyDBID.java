@@ -1,4 +1,4 @@
-package elki.helper;
+package elki.clustering.neighborhood.helper;
 
 import elki.database.ids.*;
 import elki.database.query.knn.KNNSearcher;

@@ -13,15 +13,28 @@ import elki.database.query.rknn.RKNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
+ * Nearest-neighbors set generator.
+ * <p>
+ * Reference:
+ * <p>
+ * C. H. Q. Ding, X. He<br>
+ * K-nearest-neighbor consistency in data clustering: incorporating local
+ * information into global optimization<br>
+ * Proc. Symposium on Applied Computing (SAC) 2004
  * 
  * @author Niklas Strahmann
  */
+@Reference(authors = "C. H. Q. Ding, X. He", //
+    title = "K-nearest-neighbor consistency in data clustering: incorporating local information into global optimization", //
+    booktitle = "Proc. Symposium on Applied Computing (SAC) 2004", //
+    url = "https://doi.org/10.1145/967900.968021", bibkey = "DBLP:conf/sac/DingH04")
 public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
   /**
    * Class logger
@@ -60,7 +73,7 @@ public class NearestNeighborClosedNeighborhoodSetGenerator<O> extends AbstractCl
 
   @Override
   protected DBIDs getNeighbors(DBIDRef element) {
-    ModifiableDBIDs neighbors = DBIDUtil.newArray(2 * k);
+    ModifiableDBIDs neighbors = DBIDUtil.newArray(k << 1);
     neighbors.addDBIDs(knn.getKNN(element, kPlus));
     neighbors.addDBIDs(rknn.getRKNN(element, kPlus));
     return neighbors;

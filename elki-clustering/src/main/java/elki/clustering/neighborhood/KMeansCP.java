@@ -50,7 +50,7 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
   /**
    * Neighborhood generator
    */
-  private final ClosedNeighborhoodSetGenerator<? super V> closedNeighborhoodSetGenerator;
+  protected final ClosedNeighborhoodSetGenerator<? super V> closedNeighborhoodSetGenerator;
 
   /**
    * Constructor.
@@ -109,15 +109,11 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
     @Override
     protected int iterate(int iteration) {
       means = iteration == 1 ? means : means(clusters, means, relation);
-      return assignCNSToBestCluster();
+      return assignToNearestCluster();
     }
 
-    /**
-     * Assign closed neighborhoods to clusters.
-     * 
-     * @return Number of reassignments for termination
-     */
-    protected int assignCNSToBestCluster() {
+    @Override
+    protected int assignToNearestCluster() {
       int changed = 0;
       Arrays.fill(varsum, 0.);
       for(ModifiableDBIDs cluster : clusters) {
@@ -126,35 +122,21 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
 
       for(DBIDs cns : closedNeighborhoods) {
         int minIndex = 0;
-        double minDist = sumOfCNSDistance(cns, means[0]);
+        double minDist = distanceSum(cns, means[0]);
         for(int i = 1; i < k; i++) {
-          double currentDistance = sumOfCNSDistance(cns, means[i]);
+          double currentDistance = distanceSum(cns, means[i]);
           if(currentDistance < minDist) {
             minDist = currentDistance;
             minIndex = i;
           }
         }
         varsum[minIndex] += isSquared ? minDist : (minDist * minDist);
-        clusters.get(minIndex).addDBIDs(cns);
-
-        changed += assignCNS(cns, minIndex);
-      }
-      return changed;
-    }
-
-    /**
-     * Assign all elements from a neighborhood set to a cluster.
-     * 
-     * @param cns Neighborhood set
-     * @param clusterIndex Cluster index
-     * @return Number of changed elements
-     */
-    protected int assignCNS(DBIDs cns, int clusterIndex) {
-      int changed = 0;
-      for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
-        if(assignment.putInt(element, clusterIndex) != clusterIndex) {
-          changed++;
+        for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
+          if(assignment.putInt(element, minIndex) != minIndex) {
+            changed++;
+          }
         }
+        clusters.get(minIndex).addDBIDs(cns);
       }
       return changed;
     }
@@ -166,7 +148,7 @@ public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansMo
      * @param mean Cluster mean
      * @return Distance sum
      */
-    protected double sumOfCNSDistance(DBIDs cns, double[] mean) {
+    protected double distanceSum(DBIDs cns, double[] mean) {
       double distanceSum = 0;
       for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
         distanceSum += distance(relation.get(element), mean);
