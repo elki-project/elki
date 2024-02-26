@@ -136,9 +136,8 @@ public class ERiC implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
 
     // Run Generalized DBSCAN
     LOG.beginStep(stepprog, 1, "Preprocessing local correlation dimensionalities and partitioning data");
-    // FIXME: how to ensure we are running on the same relation?
     ERiCNeighborPredicate.Instance npred = new ERiCNeighborPredicate(settings).instantiate(relation);
-    CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
+    CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate();
     Clustering<Model> copacResult = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
 
     // extract correlation clusters

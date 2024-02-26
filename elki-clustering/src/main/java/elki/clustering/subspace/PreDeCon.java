@@ -24,6 +24,7 @@ import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.PreDeConCorePredicate;
 import elki.clustering.dbscan.predicates.PreDeConNeighborPredicate;
+import elki.data.NumberVector;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -60,7 +61,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04)", //
     url = "https://doi.org/10.1109/ICDM.2004.10087", //
     bibkey = "DBLP:conf/icdm/BohmKKK04")
-public class PreDeCon extends GeneralizedDBSCAN {
+public class PreDeCon extends GeneralizedDBSCAN<NumberVector> {
   /**
    * Constructor.
    * 

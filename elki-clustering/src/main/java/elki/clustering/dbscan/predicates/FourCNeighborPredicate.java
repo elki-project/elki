@@ -29,7 +29,6 @@ import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
@@ -109,8 +108,7 @@ public class FourCNeighborPredicate extends AbstractRangeQueryNeighborPredicate<
   }
 
   @Override
-  public Instance instantiate(Database database) {
-    Relation<NumberVector> relation = database.getRelation(getInputTypeRestriction());
+  public Instance instantiate(Relation<? extends NumberVector> relation) {
     RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, distance).rangeByDBID(epsilon);
     mvSize.reset();
     mvSize2.reset();

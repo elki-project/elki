@@ -23,6 +23,7 @@ package elki.clustering.uncertain;
 import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.MinPtsCorePredicate;
+import elki.data.uncertain.UncertainObject;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -60,7 +61,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)", //
     url = "https://doi.org/10.1145/1081870.1081955", //
     bibkey = "DBLP:conf/kdd/KriegelP05")
-public class FDBSCAN extends GeneralizedDBSCAN {
+public class FDBSCAN extends GeneralizedDBSCAN<UncertainObject> {
   /**
    * Constructor that initialized GeneralizedDBSCAN.
    *

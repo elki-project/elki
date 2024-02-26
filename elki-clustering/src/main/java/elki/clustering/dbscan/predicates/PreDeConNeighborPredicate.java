@@ -23,7 +23,6 @@ package elki.clustering.dbscan.predicates;
 import elki.clustering.subspace.PreDeCon;
 import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
-import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
@@ -85,8 +84,7 @@ public class PreDeConNeighborPredicate extends AbstractRangeQueryNeighborPredica
   }
 
   @Override
-  public Instance instantiate(Database database) {
-    Relation<? extends NumberVector> relation = database.getRelation(distance.getInputTypeRestriction());
+  public Instance instantiate(Relation<? extends NumberVector> relation) {
     RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, distance).rangeByDBID(epsilon);
     mvSize.reset();
     mvVar.reset();

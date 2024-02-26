@@ -31,7 +31,6 @@ import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.uncertain.DiscreteUncertainObject;
 import elki.data.uncertain.UncertainObject;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDUtil;
@@ -78,7 +77,7 @@ import elki.utilities.random.RandomFactory;
     booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD)", //
     url = "https://doi.org/10.1145/1081870.1081955", //
     bibkey = "DBLP:conf/kdd/KriegelP05")
-public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
+public class FDBSCANNeighborPredicate implements NeighborPredicate<UncertainObject, DBIDs> {
   /**
    * Epsilon radius
    */
@@ -117,8 +116,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
   }
 
   @Override
-  public Instance instantiate(Database database) {
-    Relation<? extends UncertainObject> relation = database.getRelation(UncertainObject.UNCERTAIN_OBJECT_FIELD);
+  public Instance instantiate(Relation<? extends UncertainObject> relation) {
     return new Instance(epsilon, sampleSize, threshold, relation, rand);
   }
 

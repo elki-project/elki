@@ -55,7 +55,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <M> model type
  * @param <N> neighborhood type
  */
-public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements NeighborPredicate<N> {
+public abstract class AbstractRangeQueryNeighborPredicate<O, M, N> implements NeighborPredicate<O, N> {
   /**
    * Range to query with.
    */

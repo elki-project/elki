@@ -97,6 +97,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @has - - - Instance
  * @composed - - - CorePredicate
  * @composed - - - NeighborPredicate
+ * 
+ * @param <O> Input data type
  */
 @Reference(prefix = "closely related", //
     authors = "M. Patwary, D. Palsetia, A. Agrawal, W. K. Liao, F. Manne, A. Choudhary", //
@@ -104,7 +106,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "IEEE Int. Conf. for High Performance Computing, Networking, Storage and Analysis (SC)", //
     url = "https://doi.org/10.1109/SC.2012.9", //
     bibkey = "DBLP:conf/sc/PatwaryPALMC12")
-public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>> {
+public class ParallelGeneralizedDBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -113,7 +115,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
   /**
    * The neighborhood predicate factory.
    */
-  protected NeighborPredicate<?> npred;
+  protected NeighborPredicate<? super O, ?> npred;
 
   /**
    * The core predicate factory.
@@ -132,7 +134,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
    * @param corepred Core point predicate.
    * @param coremodel Keep track of core points.
    */
-  public ParallelGeneralizedDBSCAN(NeighborPredicate<?> npred, CorePredicate<?> corepred, boolean coremodel) {
+  public ParallelGeneralizedDBSCAN(NeighborPredicate<? super O, ?> npred, CorePredicate<?> corepred, boolean coremodel) {
     super();
     this.npred = npred;
     this.corepred = corepred;
@@ -168,8 +170,10 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
    *
    * @composed - - - CorePredicate.Instance
    * @composed - - - NeighborPredicate.Instance
+   *
+   * @param <O> Object type
    */
-  public static class Instance<T> implements Processor {
+  public static class Instance<O, T> implements Processor {
     /**
      * The neighborhood predicate
      */
@@ -213,7 +217,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
     /**
      * Factory for neighbor predicates.
      */
-    private NeighborPredicate<? extends T> npreds;
+    private NeighborPredicate<? super O, ? extends T> npreds;
 
     /**
      * Progress logger.
@@ -228,12 +232,12 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
      * @param corepred Core object predicate
      * @param coremodel Keep track of core points.
      */
-    public Instance(Database database, NeighborPredicate<T> npreds, CorePredicate<? super T> corepred, boolean coremodel) {
+    public Instance(Database database, NeighborPredicate<? super O, T> npreds, CorePredicate<? super T> corepred, boolean coremodel) {
       super();
-      this.npred = npreds.instantiate(database);
+      this.npred = npreds.instantiate(database.getRelation(npreds.getInputTypeRestriction()));
       this.database = database;
       this.npreds = npreds;
-      this.corepred = corepred.instantiate(database);
+      this.corepred = corepred.instantiate();
       this.coremodel = coremodel;
       this.clusterids = DataStoreUtil.makeStorage(npred.getIDs(), DataStoreFactory.HINT_TEMP, Assignment.class);
       this.cores = new Core[100];
@@ -363,7 +367,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
 
     @Override
     public Mapper instantiate(Executor executor) {
-      NeighborPredicate.Instance<? extends T> inst = npreds.instantiate(database);
+      NeighborPredicate.Instance<? extends T> inst = npreds.instantiate(database.getRelation(npreds.getInputTypeRestriction()));
       return new Mapper(inst);
     }
 
@@ -403,8 +407,10 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
    * Parameterization class
    *
    * @author Erich Schubert
+   * 
+   * @param <O> Object type
    */
-  public static class Par implements Parameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for neighborhood predicate.
      */
@@ -426,7 +432,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
     /**
      * Neighborhood predicate.
      */
-    protected NeighborPredicate<?> npred = null;
+    protected NeighborPredicate<? super O, ?> npred = null;
 
     /**
      * Core point predicate.
@@ -441,7 +447,7 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
     @Override
     public void configure(Parameterization config) {
       // Neighborhood predicate
-      new ObjectParameter<NeighborPredicate<?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
+      new ObjectParameter<NeighborPredicate<? super O, ?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
           .grab(config, x -> npred = x);
       // Core point predicate
       ObjectParameter<CorePredicate<?>> corepredP = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
@@ -458,8 +464,8 @@ public class ParallelGeneralizedDBSCAN implements ClusteringAlgorithm<Clustering
     }
 
     @Override
-    public ParallelGeneralizedDBSCAN make() {
-      return new ParallelGeneralizedDBSCAN(npred, corepred, coremodel);
+    public ParallelGeneralizedDBSCAN<O> make() {
+      return new ParallelGeneralizedDBSCAN<>(npred, corepred, coremodel);
     }
   }
 }

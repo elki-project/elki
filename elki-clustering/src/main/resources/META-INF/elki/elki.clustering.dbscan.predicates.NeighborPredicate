@@ -1,5 +1,7 @@
-elki.clustering.dbscan.predicates.EpsilonNeighborPredicate
+elki.clustering.dbscan.predicates.EpsilonNeighborPredicate range radius
 elki.clustering.dbscan.predicates.SimilarityNeighborPredicate
+elki.clustering.dbscan.predicates.NearestNeighborPredicate knn nn
+elki.clustering.dbscan.predicates.MutualNearestNeighborPredicate mknn mnn
 elki.clustering.dbscan.predicates.COPACNeighborPredicate
 elki.clustering.dbscan.predicates.ERiCNeighborPredicate
 elki.clustering.dbscan.predicates.FourCNeighborPredicate
