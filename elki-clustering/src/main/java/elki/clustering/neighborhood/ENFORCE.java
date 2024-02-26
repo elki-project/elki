@@ -4,7 +4,7 @@ import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
 import elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator;
-import elki.clustering.neighborhood.helper.NearestNeighborClosedNeighborhoodSetGenerator;
+import elki.clustering.neighborhood.helper.MutualNeighborClosedNeighborhoodSetGenerator;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;
@@ -147,7 +147,7 @@ public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<ClosedNeighborhoodSetGenerator<? super O>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, NearestNeighborClosedNeighborhoodSetGenerator.class) //
+      new ObjectParameter<ClosedNeighborhoodSetGenerator<? super O>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class) //
           .grab(config, x -> closedNeighborhoodSetGenerator = x);
       new ObjectParameter<ClusteringAlgorithm<?>>(Utils.ALGORITHM_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> baseAlgorithm = x);

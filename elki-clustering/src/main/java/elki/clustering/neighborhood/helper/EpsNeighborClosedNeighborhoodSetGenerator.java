@@ -10,15 +10,27 @@ import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
+ * Radius-based neighborhoods, to measure consistency in a DBSCAN-like fashion.
+ * <p>
+ * Reference:
+ * <p>
+ * Lars Lenssen, Niklas Strahmann, Erich Schubert<br>
+ * Fast k-Nearest-Neighbor-Consistent Clustering<br>
+ * Lernen, Wissen, Daten, Analysen (LWDA), 2023
  * 
  * @author Niklas Strahmann
  */
+@Reference(authors = "Lars Lenssen, Niklas Strahmann, Erich Schubert", //
+    title = "Fast k-Nearest-Neighbor-Consistent Clustering", //
+    booktitle = "Lernen, Wissen, Daten, Analysen (LWDA)", //
+    url = "https://ceur-ws.org/Vol-3630/LWDA2023-paper34.pdf", bibkey = "DBLP:conf/lwa/LenssenSS23")
 public class EpsNeighborClosedNeighborhoodSetGenerator<O> extends AbstractClosedNeighborhoodSetGenerator<O> {
   /**
    * Class logger

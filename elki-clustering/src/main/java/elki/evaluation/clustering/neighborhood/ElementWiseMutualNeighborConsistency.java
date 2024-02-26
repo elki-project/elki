@@ -1,5 +1,7 @@
 package elki.evaluation.clustering.neighborhood;
 
+import elki.clustering.neighborhood.helper.MutualNeighborQuery;
+import elki.clustering.neighborhood.helper.MutualNeighborQueryBuilder;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.database.Database;
@@ -11,8 +13,6 @@ import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.evaluation.Evaluator;
-import elki.helper.MutualNeighborQuery;
-import elki.helper.MutualNeighborQueryBuilder;
 import elki.result.EvaluationResult;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
