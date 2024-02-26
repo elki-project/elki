@@ -14,58 +14,53 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
+/**
+ * Test mutual nearest neighbor CNS.
+ *
+ * @author Niklas Strahmann
+ */
 public class MutualClosedNeighborhoodSetGeneratorTest {
-    final static String DATASET = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
+  final static String DATASET = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
-    @Test
-    public void testAmountOfClosedNeighborhoodSets2MN(){
-        int kNeighbors = 2;
-        NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
+  @Test
+  public void testAmountOfClosedNeighborhoodSets2MN() {
+    int kNeighbors = 2;
+    NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
+    ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
+    List<DBIDs> result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    assertEquals("An unexpected amount of neighborhood sets were found.", 6, result.size());
+  }
 
-        Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
+  @Test
+  public void testAmountOfClosedNeighborhoodSets3MN() {
+    int kNeighbors = 3;
+    NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
+    ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
+    List<DBIDs> result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    assertEquals("An unexpected amount of neighborhood sets were found.", 4, result.size());
+  }
 
-        DBIDs[] result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+  @Test
+  public void testAmountOfClosedNeighborhoodSets4MN() {
+    int kNeighbors = 4;
+    NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
+    ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
+    List<DBIDs> result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    assertEquals("An unexpected amount of neighborhood sets were found.", 3, result.size());
+  }
 
-        assertEquals("An unexpected amount of neighborhood sets were found.",6, result.length);
-    }
-
-    @Test
-    public void testAmountOfClosedNeighborhoodSets3MN(){
-        int kNeighbors = 3;
-        NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
-
-        Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
-
-        DBIDs[] result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
-
-        assertEquals("An unexpected amount of neighborhood sets were found.",4, result.length);
-    }
-
-    @Test
-    public void testAmountOfClosedNeighborhoodSets4MN(){
-        int kNeighbors = 4;
-        NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
-
-        Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
-
-        DBIDs[] result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
-
-        assertEquals("An unexpected amount of neighborhood sets were found.",3, result.length);
-    }
-
-    @Test
-    public void testAmountOfClosedNeighborhoodSets5MN(){
-        int kNeighbors = 5;
-        NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
-        ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator =  new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
-
-        Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
-
-        DBIDs[] result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
-
-        assertEquals("An unexpected amount of neighborhood sets were found.",2, result.length);
-    }
+  @Test
+  public void testAmountOfClosedNeighborhoodSets5MN() {
+    int kNeighbors = 5;
+    NumberVectorDistance<NumberVector> distance = EuclideanDistance.STATIC;
+    ClosedNeighborhoodSetGenerator<DoubleVector> ncsGenerator = new MutualNeighborClosedNeighborhoodSetGenerator<>(kNeighbors, distance);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(DATASET, 20);
+    List<DBIDs> result = ncsGenerator.getClosedNeighborhoods(db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD_2D));
+    assertEquals("An unexpected amount of neighborhood sets were found.", 2, result.size());
+  }
 }

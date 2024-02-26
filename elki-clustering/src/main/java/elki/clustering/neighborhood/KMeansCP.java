@@ -1,5 +1,8 @@
 package elki.clustering.neighborhood;
 
+import java.util.Arrays;
+import java.util.List;
+
 import elki.clustering.kmeans.AbstractKMeans;
 import elki.clustering.kmeans.initialization.KMeansInitialization;
 import elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator;
@@ -13,137 +16,193 @@ import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.logging.Logging;
-import elki.logging.statistics.Duration;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import java.util.Arrays;
-
 /**
- * Create neighborhood consistent clusterings by calculating closed neighborhood sets and run lloyd-iteration for these sets.
+ * Create neighborhood consistent clusterings by calculating closed neighborhood
+ * sets and running standard k-means iterations for these sets of points.
+ * <p>
+ * This is a "naive" implementation of the basic algorithm, for a version that
+ * exploits properties of squared Euclidean distance, see {@link FastKMeansCP}
+ * instead.
+ * <p>
+ * Reference:
+ * <p>
+ * C. H. Q. Ding, X. He<br>
+ * K-nearest-neighbor consistency in data clustering: incorporating local
+ * information into global optimization<br>
+ * Proc. Symposium on Applied Computing (SAC) 2004
+ * 
+ * @author Niklas Strahmann
  */
+@Reference(authors = "C. H. Q. Ding, X. He", //
+    title = "K-nearest-neighbor consistency in data clustering: incorporating local information into global optimization", //
+    booktitle = "Proc. Symposium on Applied Computing (SAC) 2004", //
+    url = "https://doi.org/10.1145/967900.968021", bibkey = "DBLP:conf/sac/DingH04")
 public class KMeansCP<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(KMeansCP.class);
 
-    private static final Logging LOG = Logging.getLogger(KMeansCP.class);
-    private final ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
+  /**
+   * Neighborhood generator
+   */
+  private final ClosedNeighborhoodSetGenerator<? super V> closedNeighborhoodSetGenerator;
 
-    public KMeansCP(int kCluster, int maxiter, KMeansInitialization initializer, ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator) {
-        super(kCluster, maxiter, initializer);
-        this.closedNeighborhoodSetGenerator = closedNeighborhoodSetGenerator;
+  /**
+   * Constructor.
+   *
+   * @param kCluster Number of clusters
+   * @param maxiter Maximum number of iterations
+   * @param initializer Initialization method
+   * @param closedNeighborhoodSetGenerator Neighborhood generator
+   */
+  public KMeansCP(int kCluster, int maxiter, KMeansInitialization initializer, ClosedNeighborhoodSetGenerator<? super V> closedNeighborhoodSetGenerator) {
+    super(kCluster, maxiter, initializer);
+    this.closedNeighborhoodSetGenerator = closedNeighborhoodSetGenerator;
+  }
+
+  @Override
+  public Clustering<KMeansModel> run(Relation<V> rel) {
+    Instance instance = new Instance(rel, distance, initialMeans(rel));
+    instance.run(maxiter);
+    return instance.buildResult();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
+  /**
+   * Instance for a particular data set
+   * 
+   * @author Niklas Strahmann
+   */
+  protected class Instance extends AbstractKMeans.Instance {
+    /**
+     * Neighborhoods
+     */
+    protected List<DBIDs> closedNeighborhoods;
+
+    /**
+     * Constructor.
+     *
+     * @param relation Relation to process
+     * @param df Distance function
+     * @param means Initial mean
+     */
+    public Instance(Relation<? extends V> relation, NumberVectorDistance<?> df, double[][] means) {
+      super(relation, df, means);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void run(int maxiter) {
+      closedNeighborhoods = closedNeighborhoodSetGenerator.getClosedNeighborhoods((Relation<? extends V>) relation);
+      super.run(maxiter);
+    }
+
+    @Override
+    protected int iterate(int iteration) {
+      means = iteration == 1 ? means : means(clusters, means, relation);
+      return assignCNSToBestCluster();
+    }
+
+    /**
+     * Assign closed neighborhoods to clusters.
+     * 
+     * @return Number of reassignments for termination
+     */
+    protected int assignCNSToBestCluster() {
+      int changed = 0;
+      Arrays.fill(varsum, 0.);
+      for(ModifiableDBIDs cluster : clusters) {
+        cluster.clear();
+      }
+
+      for(DBIDs cns : closedNeighborhoods) {
+        int minIndex = 0;
+        double minDist = sumOfCNSDistance(cns, means[0]);
+        for(int i = 1; i < k; i++) {
+          double currentDistance = sumOfCNSDistance(cns, means[i]);
+          if(currentDistance < minDist) {
+            minDist = currentDistance;
+            minIndex = i;
+          }
+        }
+        varsum[minIndex] += isSquared ? minDist : (minDist * minDist);
+        clusters.get(minIndex).addDBIDs(cns);
+
+        changed += assignCNS(cns, minIndex);
+      }
+      return changed;
+    }
+
+    /**
+     * Assign all elements from a neighborhood set to a cluster.
+     * 
+     * @param cns Neighborhood set
+     * @param clusterIndex Cluster index
+     * @return Number of changed elements
+     */
+    protected int assignCNS(DBIDs cns, int clusterIndex) {
+      int changed = 0;
+      for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
+        if(assignment.putInt(element, clusterIndex) != clusterIndex) {
+          changed++;
+        }
+      }
+      return changed;
+    }
+
+    /**
+     * Compute the distance sum for one neighborhood set.
+     *
+     * @param cns Closed neighborhood set
+     * @param mean Cluster mean
+     * @return Distance sum
+     */
+    protected double sumOfCNSDistance(DBIDs cns, double[] mean) {
+      double distanceSum = 0;
+      for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
+        distanceSum += distance(relation.get(element), mean);
+      }
+      return distanceSum;
     }
 
     @Override
     protected Logging getLogger() {
-        return LOG;
+      return LOG;
+    }
+  }
+
+  /**
+   * Class parameterizer
+   * 
+   * @author Niklas Strahmann
+   *
+   * @param <V> Vector type
+   */
+  public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
+    /**
+     * Neighborhood generator
+     */
+    protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
+
+    @Override
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class) //
+          .grab(config, x -> closedNeighborhoodSetGenerator = x);
     }
 
     @Override
-    public Clustering<KMeansModel> run(Relation<V> rel) {
-        Instance instance = new Instance(rel, distance, initialMeans(rel));
-        instance.run(maxiter);
-        return instance.buildResult();
+    public KMeansCP<V> make() {
+      return new KMeansCP<>(k, maxiter, initializer, closedNeighborhoodSetGenerator);
     }
-
-    protected DBIDs[] getCNS(Relation<V> relation){
-        Duration cnsTime = LOG.newDuration(closedNeighborhoodSetGenerator.getClass().getName() + ".time").begin();
-        DBIDs[] dbids = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
-        LOG.statistics(cnsTime.end());
-        return dbids;
-    }
-
-
-    protected class Instance extends AbstractKMeans.Instance {
-
-        protected DBIDs[] CNSs;
-
-        /**
-         * Constructor.
-         *
-         * @param relation Relation to process
-         * @param df Distance function
-         * @param means    Initial mean
-         */
-        public Instance(Relation<V> relation, NumberVectorDistance<?> df, double[][] means) {
-            super(relation, df, means);
-            CNSs = getCNS(relation);
-        }
-
-        @Override
-        protected int iterate(int iteration) {
-            means =  iteration == 1 ? means : means(clusters, means, relation);
-            return assignCNSToBestCluster();
-        }
-
-        protected int assignCNSToBestCluster(){
-            int changed = 0;
-            Arrays.fill(varsum, 0.);
-
-            for(ModifiableDBIDs cluster : clusters){
-                cluster.clear();
-            }
-
-            for(DBIDs cns : CNSs){
-                int minIndex = 0;
-                double minDist = sumOfCNSDistance(cns, means[0]);
-                for(int i = 1; i < k; i++){
-                    double currentDistance = sumOfCNSDistance(cns, means[i]);
-                    if(currentDistance < minDist){
-                        minDist = currentDistance;
-                        minIndex = i;
-                    }
-                }
-                varsum[minIndex] += isSquared ? minDist : (minDist * minDist);
-                clusters.get(minIndex).addDBIDs(cns);
-
-                changed += assignCNS(cns, minIndex);
-            }
-            return changed;
-
-        }
-
-        protected int assignCNS(DBIDs cns, int clusterIndex){
-            int changed = 0;
-            for(DBIDIter element = cns.iter(); element.valid(); element.advance()) {
-                if (assignment.putInt(element, clusterIndex) != clusterIndex){
-                    changed++;
-                }
-            }
-            return  changed;
-        }
-
-        protected double sumOfCNSDistance(DBIDs cns, double[] mean){
-            double distanceSum = 0;
-
-            for(DBIDIter element = cns.iter(); element.valid();element.advance()){
-                distanceSum += distance(relation.get(element), mean);
-            }
-            return distanceSum;
-        }
-
-        @Override
-        protected Logging getLogger() {
-            return LOG;
-        }
-    }
-
-    public static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
-
-        protected ClosedNeighborhoodSetGenerator<V> closedNeighborhoodSetGenerator;
-
-        @Override
-        public void configure(Parameterization config){
-            super.configure(config);
-
-            new ObjectParameter<ClosedNeighborhoodSetGenerator<V>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class)
-                    .grab(config, x -> closedNeighborhoodSetGenerator = x);
-
-            config.descend(Utils.DISTANCE_FUNCTION_ID);
-
-        }
-
-        @Override
-        public KMeansCP<V> make() {
-            return new KMeansCP<>( k, maxiter, initializer, closedNeighborhoodSetGenerator);
-        }
-    }
+  }
 }
