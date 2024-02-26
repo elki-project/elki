@@ -25,101 +25,106 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 import java.util.List;
 
+/**
+ * 
+ * @author Niklas Strahmann
+ */
 public class ElementWiseMutualNeighborConsistency<O> implements Evaluator {
+  private final Distance<? super O> distance;
 
-    private final Distance<? super O> distance;
+  protected int k;
 
-    protected int k;
-    int kplus;
+  int kplus;
 
-    public ElementWiseMutualNeighborConsistency(Distance<? super O> distance, int k) {
-        super();
-        this.distance = distance;
-        this.k = k;
-        this.kplus = k+1;
+  public ElementWiseMutualNeighborConsistency(Distance<? super O> distance, int k) {
+    super();
+    this.distance = distance;
+    this.k = k;
+    this.kplus = k + 1;
+  }
+
+  public double evaluateClustering(Clustering<?> clustering, Relation<O> relation) {
+    WritableDoubleDataStore elementKMNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
+    List<? extends Cluster<?>> clusters = clustering.getAllClusters();
+    MutualNeighborQuery<DBIDRef> kmnQuery = new MutualNeighborQueryBuilder<>(relation, distance).precomputed().byDBID(kplus);
+
+    double kMNc = 0.0;
+
+    for(Cluster<?> cluster : clusters) {
+      DBIDs clusterElementIds = cluster.getIDs();
+
+      for(DBIDIter clusterElement = clusterElementIds.iter(); clusterElement.valid(); clusterElement.advance()) {
+        int neighborsInCluster = 0;
+        DBIDs neighbors = kmnQuery.getMutualNeighbors(clusterElement, kplus);
+
+        if(neighbors.size() == 0) {
+          elementKMNConsistency.put(clusterElement, 1.);
+          kMNc += 1.;
+        }
+        else {
+          for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+            if(clusterElementIds.contains(neighbor)) {
+              neighborsInCluster++;
+            }
+          }
+          double fractionalKNNc = (double) neighborsInCluster / (neighbors.size());
+          elementKMNConsistency.put(clusterElement, fractionalKNNc);
+          kMNc += fractionalKNNc;
+        }
+      }
     }
 
-    public double evaluateClustering(Clustering<?> clustering, Relation<O> relation){
+    kMNc = kMNc / relation.size();
 
-        WritableDoubleDataStore elementKMNConsistency = DataStoreFactory.FACTORY.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_DB, 0.);
-        List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-        MutualNeighborQuery<DBIDRef> kmnQuery = new MutualNeighborQueryBuilder<>(relation, distance).precomputed().byDBID(kplus);
+    EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
+    EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
+    g.addMeasure("EW " + k + "-MN Consistency", kMNc, 0, 1., false);
+    if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
+      Metadata.of(ev).notifyChanged();
+    }
+    Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW " + k + "-MN Consistency", relation.getDBIDs(), elementKMNConsistency));
+    return kMNc;
+  }
 
-        double kMNc = 0.0;
+  @Override
+  public void processNewResult(Object result) {
+    List<Clustering<?>> clusters = Clustering.getClusteringResults(result);
+    if(clusters.isEmpty()) {
+      return;
+    }
+    Database db = ResultUtil.findDatabase(result);
+    assert db != null;
+    Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
+    for(Clustering<?> cluster : clusters) {
+      evaluateClustering(cluster, relation);
+    }
+  }
 
-        for(Cluster<?> cluster: clusters){
-            DBIDs clusterElementIds = cluster.getIDs();
+  /**
+   * 
+   * @author Niklas Strahmann
+   */
+  public static class Par<O> implements Parameterizer {
+    public static final OptionID DISTANCE_ID = new OptionID("kmnc.distance", "Distance function to use for computing the kmnc.");
 
-            for(DBIDIter clusterElement = clusterElementIds.iter(); clusterElement.valid(); clusterElement.advance()){
-                int neighborsInCluster = 0;
-                DBIDs neighbors = kmnQuery.getMutualNeighbors(clusterElement, kplus);
+    public static final OptionID NUMBER_K = new OptionID("kmnc.k", "Number of Neighbors checked.");
 
-                if(neighbors.size() == 0){
-                    elementKMNConsistency.put(clusterElement, 1.);
-                    kMNc += 1.;
-                }else {
+    private Distance<? super O> distance;
 
-                    for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-                        if (clusterElementIds.contains(neighbor)) {
-                            neighborsInCluster++;
-                        }
-                    }
-                    double fractionalKNNc = (double) neighborsInCluster / (neighbors.size() );
-                    elementKMNConsistency.put(clusterElement, fractionalKNNc);
-                    kMNc += fractionalKNNc;
-                }
-            }
+    private int k;
 
-        }
-
-        kMNc  = kMNc/ relation.size();
-
-        EvaluationResult ev = EvaluationResult.findOrCreate(clustering, "Clustering Evaluation");
-        EvaluationResult.MeasurementGroup g = ev.findOrCreateGroup("Distance-based");
-        g.addMeasure("EW " + k + "-MN Consistency", kMNc, 0, 1., false);
-        if(!Metadata.hierarchyOf(clustering).addChild(ev)) {
-            Metadata.of(ev).notifyChanged();
-        }
-        Metadata.hierarchyOf(clustering).addChild(new MaterializedDoubleRelation("EW " + k + "-MN Consistency", relation.getDBIDs(), elementKMNConsistency));
-
-        return kMNc;
+    @Override
+    public void configure(Parameterization config) {
+      new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class) //
+          .grab(config, x -> distance = x);
+      new IntParameter(NUMBER_K) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .grab(config, x -> k = x);
     }
 
     @Override
-    public void processNewResult(Object result) {
-        List<Clustering<?>> clusters = Clustering.getClusteringResults(result);
-        if(clusters.isEmpty()){
-            return;
-        }
-        Database db = ResultUtil.findDatabase(result);
-        assert db != null;
-        Relation<O> relation = db.getRelation(distance.getInputTypeRestriction());
-        for(Clustering<?> cluster : clusters){
-            evaluateClustering(cluster, relation);
-        }
-
-
+    public ElementWiseMutualNeighborConsistency<O> make() {
+      return new ElementWiseMutualNeighborConsistency<>(distance, k);
     }
-
-    public static class Par<O> implements Parameterizer {
-
-        public static final OptionID DISTANCE_ID = new OptionID("kmnc.distance", "Distance function to use for computing the kmnc.");
-
-        public static final OptionID NUMBER_K = new OptionID("kmnc.k", "Number of Neighbors checked.");
-        private Distance<? super O> distance;
-        private int k;
-
-        @Override
-        public void configure(Parameterization config) {
-            new ObjectParameter<Distance<? super O>>(DISTANCE_ID, Distance.class, EuclideanDistance.class).grab(config, x-> distance = x);
-            new IntParameter(NUMBER_K)
-                    .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT)
-                    .grab(config, x -> k = x);
-        }
-
-        @Override
-        public ElementWiseMutualNeighborConsistency<O> make() {
-            return new ElementWiseMutualNeighborConsistency<>(distance, k);
-        }
-    }
+  }
 }
