@@ -27,7 +27,6 @@ import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -69,7 +68,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
     booktitle = "Proc. 19th Int. Conf. Scientific and Statistical Database Management (SSDBM 2007)", //
     url = "https://doi.org/10.1109/SSDBM.2007.21", //
     bibkey = "DBLP:conf/ssdbm/AchtertBKKZ07")
-public class ERiCNeighborPredicate implements NeighborPredicate<DBIDs> {
+public class ERiCNeighborPredicate implements NeighborPredicate<NumberVector, DBIDs> {
   /**
    * The logger for this class.
    */
@@ -97,16 +96,6 @@ public class ERiCNeighborPredicate implements NeighborPredicate<DBIDs> {
   }
 
   @Override
-  public Instance instantiate(Database database) {
-    return instantiate(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
-  }
-
-  /**
-   * Full instantiation interface.
-   *
-   * @param relation Relation
-   * @return Instance
-   */
   public Instance instantiate(Relation<? extends NumberVector> relation) {
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(settings.k);
     WritableDataStore<PCAFilteredResult> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);

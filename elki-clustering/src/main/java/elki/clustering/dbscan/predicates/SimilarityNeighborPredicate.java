@@ -23,7 +23,6 @@ package elki.clustering.dbscan.predicates;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.*;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeSearcher;
@@ -60,7 +59,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96)", //
     url = "http://www.aaai.org/Library/KDD/1996/kdd96-037.php", //
     bibkey = "DBLP:conf/kdd/EsterKSX96")
-public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleDBIDList> {
+public class SimilarityNeighborPredicate<O> implements NeighborPredicate<O, DoubleDBIDList> {
   /**
    * Range to query with
    */
@@ -84,8 +83,7 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<DoubleD
   }
 
   @Override
-  public Instance instantiate(Database database) {
-    Relation<O> relation = database.getRelation(simFunc.getInputTypeRestriction());
+  public Instance instantiate(Relation<? extends O> relation) {
     RangeSearcher<DBIDRef> rq = new QueryBuilder<>(relation, simFunc).similarityRangeByDBID(epsilon);
     return new Instance(epsilon, rq, relation.getDBIDs());
   }

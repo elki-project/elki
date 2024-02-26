@@ -21,7 +21,6 @@
 package elki.clustering.dbscan.predicates;
 
 import elki.data.type.SimpleTypeInformation;
-import elki.database.Database;
 import elki.database.ids.DBIDRef;
 
 /**
@@ -41,10 +40,9 @@ public interface CorePredicate<T> {
   /**
    * Instantiate for a database.
    * 
-   * @param database Database to instantiate for
    * @return Instance
    */
-  Instance<T> instantiate(Database database);
+  Instance<T> instantiate();
 
   /**
    * Test whether the neighborhood type T is accepted by this predicate.

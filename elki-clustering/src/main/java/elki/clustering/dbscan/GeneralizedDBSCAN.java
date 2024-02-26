@@ -75,13 +75,15 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
  * @has - - - Instance
  * @composed - - - CorePredicate
  * @composed - - - NeighborPredicate
+ * 
+ * @param <O> Object type
  */
 @Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", //
     title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
     booktitle = "Data Mining and Knowledge Discovery", //
     url = "https://doi.org/10.1023/A:1009745219419", //
     bibkey = "DBLP:journals/datamine/SanderEKX98")
-public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>> {
+public class GeneralizedDBSCAN<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -90,7 +92,7 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
   /**
    * The neighborhood predicate factory.
    */
-  protected NeighborPredicate<?> npred;
+  protected NeighborPredicate<? super O, ?> npred;
 
   /**
    * The core predicate factory.
@@ -109,7 +111,7 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
    * @param corepred Core point predicate.
    * @param coremodel Keep track of core points.
    */
-  public GeneralizedDBSCAN(NeighborPredicate<?> npred, CorePredicate<?> corepred, boolean coremodel) {
+  public GeneralizedDBSCAN(NeighborPredicate<? super O, ?> npred, CorePredicate<?> corepred, boolean coremodel) {
     super();
     this.npred = npred;
     this.corepred = corepred;
@@ -130,7 +132,8 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
     if(!cp.acceptsType(npred.getOutputType())) {
       throw new AbortException("Core predicate and neighbor predicate are not compatible.");
     }
-    return new Instance<>(npred.instantiate(database), cp.instantiate(database), coremodel).run();
+    NeighborPredicate.Instance<?> npredi = npred.instantiate(database.getRelation(npred.getInputTypeRestriction()));
+    return new Instance<>(npredi, cp.instantiate(), coremodel).run();
   }
 
   @Override
@@ -328,8 +331,10 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
    * Parameterization class
    *
    * @author Erich Schubert
+   * 
+   * @param <O> Input object type
    */
-  public static class Par implements Parameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Parameter for neighborhood predicate.
      */
@@ -351,7 +356,7 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
     /**
      * Neighborhood predicate.
      */
-    protected NeighborPredicate<?> npred = null;
+    protected NeighborPredicate<? super O, ?> npred = null;
 
     /**
      * Core point predicate.
@@ -366,7 +371,7 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
     @Override
     public void configure(Parameterization config) {
       // Neighborhood predicate
-      new ObjectParameter<NeighborPredicate<?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
+      new ObjectParameter<NeighborPredicate<? super O, ?>>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class) //
           .grab(config, x -> npred = x);
       // Core point predicate
       ObjectParameter<CorePredicate<?>> corepredP = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
@@ -383,8 +388,8 @@ public class GeneralizedDBSCAN implements ClusteringAlgorithm<Clustering<Model>>
     }
 
     @Override
-    public GeneralizedDBSCAN make() {
-      return new GeneralizedDBSCAN(npred, corepred, coremodel);
+    public GeneralizedDBSCAN<O> make() {
+      return new GeneralizedDBSCAN<>(npred, corepred, coremodel);
     }
   }
 }

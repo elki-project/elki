@@ -23,7 +23,6 @@ package elki.clustering.dbscan.predicates;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
 import elki.logging.Logging;
@@ -76,7 +75,7 @@ public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
   }
 
   @Override
-  public Instance instantiate(Database database) {
+  public Instance instantiate() {
     return new Instance(minpts);
   }
 

@@ -23,7 +23,6 @@ package elki.clustering.dbscan.predicates;
 import elki.clustering.correlation.FourC;
 import elki.clustering.dbscan.predicates.PreDeConNeighborPredicate.PreDeConModel;
 import elki.data.type.SimpleTypeInformation;
-import elki.database.Database;
 import elki.database.ids.DBIDRef;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -65,7 +64,7 @@ public class FourCCorePredicate implements CorePredicate<PreDeConModel> {
   }
 
   @Override
-  public Instance instantiate(Database database) {
+  public Instance instantiate() {
     return new Instance(settings);
   }
 

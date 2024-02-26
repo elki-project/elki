@@ -24,6 +24,7 @@ import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
 import elki.clustering.dbscan.predicates.FourCCorePredicate;
 import elki.clustering.dbscan.predicates.FourCNeighborPredicate;
+import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
@@ -64,7 +65,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2004)", //
     url = "https://doi.org/10.1145/1007568.1007620", //
     bibkey = "DBLP:conf/sigmod/BohmKKZ04")
-public class FourC extends GeneralizedDBSCAN {
+public class FourC extends GeneralizedDBSCAN<NumberVector> {
   /**
    * Constructor.
    *

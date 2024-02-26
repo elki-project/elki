@@ -108,7 +108,7 @@ public class COPAC implements ClusteringAlgorithm<Clustering<DimensionModel>> {
    */
   public Clustering<DimensionModel> run(Database database, Relation<? extends NumberVector> relation) {
     COPACNeighborPredicate.Instance npred = new COPACNeighborPredicate(settings).instantiate(relation);
-    CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate(database);
+    CorePredicate.Instance<DBIDs> cpred = new MinPtsCorePredicate(settings.minpts).instantiate();
     Clustering<Model> dclusters = new GeneralizedDBSCAN.Instance<>(npred, cpred, false).run();
     // Re-wrap the detected clusters for COPAC:
     Clustering<DimensionModel> result = new Clustering<>();

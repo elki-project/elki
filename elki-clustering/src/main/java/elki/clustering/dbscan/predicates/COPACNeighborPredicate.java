@@ -28,7 +28,6 @@ import elki.data.NumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.Database;
 import elki.database.datastore.DataStore;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
@@ -71,7 +70,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
     booktitle = "Proc. 7th SIAM Int. Conf. on Data Mining (SDM'07)", //
     url = "https://doi.org/10.1137/1.9781611972771.37", //
     bibkey = "DBLP:conf/sdm/AchtertBKKZ07")
-public class COPACNeighborPredicate implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
+public class COPACNeighborPredicate implements NeighborPredicate<NumberVector, COPACNeighborPredicate.COPACModel> {
   /**
    * The logger for this class.
    */
@@ -99,17 +98,7 @@ public class COPACNeighborPredicate implements NeighborPredicate<COPACNeighborPr
   }
 
   @Override
-  public NeighborPredicate.Instance<COPACModel> instantiate(Database database) {
-    return instantiate(database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
-  }
-
-  /**
-   * Full instantiation method.
-   * 
-   * @param relation Vector relation
-   * @return Instance
-   */
-  public COPACNeighborPredicate.Instance instantiate(Relation<? extends NumberVector> relation) {
+  public Instance instantiate(Relation<? extends NumberVector> relation) {
     KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, EuclideanDistance.STATIC).kNNByDBID(settings.k);
     WritableDataStore<COPACModel> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, COPACModel.class);
 

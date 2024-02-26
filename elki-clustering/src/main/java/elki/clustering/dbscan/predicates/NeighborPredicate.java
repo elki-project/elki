@@ -22,10 +22,10 @@ package elki.clustering.dbscan.predicates;
 
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
-import elki.database.Database;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
+import elki.database.relation.Relation;
 
 /**
  * Get the neighbors of an object
@@ -37,16 +37,17 @@ import elki.database.ids.DBIDs;
  * 
  * @has - - - Instance
  * 
+ * @param <O> Input object type
  * @param <T> Data type of neighborhoods
  */
-public interface NeighborPredicate<T> {
+public interface NeighborPredicate<O, T> {
   /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
    * @return Instance
    */
-  Instance<T> instantiate(Database database);
+  Instance<T> instantiate(Relation<? extends O> database);
 
   /**
    * Input data type restriction.
