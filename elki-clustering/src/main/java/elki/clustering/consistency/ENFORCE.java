@@ -1,10 +1,30 @@
-package elki.clustering.neighborhood;
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2024
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package elki.clustering.consistency;
 
 import java.util.List;
 
 import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.neighborhood.helper.ClosedNeighborhoodSetGenerator;
-import elki.clustering.neighborhood.helper.MutualNeighborClosedNeighborhoodSetGenerator;
+import elki.clustering.dbscan.predicates.MutualNearestNeighborPredicate;
+import elki.clustering.dbscan.predicates.NeighborPredicate;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;
@@ -15,8 +35,11 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
 import elki.database.relation.Relation;
+import elki.logging.Logging;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -41,24 +64,29 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1145/967900.968021", bibkey = "DBLP:conf/sac/DingH04")
 public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(ENFORCE.class);
+
+  /**
    * Base clustering algorithm.
    */
   private final ClusteringAlgorithm<?> baseAlgorithm;
 
   /**
-   * Closed neighborhood set generator
+   * Neighbor predicate
    */
-  private final ClosedNeighborhoodSetGenerator<? super O> closedNeighborhoodSetGenerator;
+  NeighborPredicate<? super O, ?> predicate;
 
   /**
    * Constructor.
    *
    * @param baseAlgorithm Base algorithm
-   * @param closedNeighborhoodSetGenerator Neighborhood generator
+   * @param predicate Neighbor predicate
    */
-  public ENFORCE(ClusteringAlgorithm<?> baseAlgorithm, ClosedNeighborhoodSetGenerator<? super O> closedNeighborhoodSetGenerator) {
+  public ENFORCE(ClusteringAlgorithm<?> baseAlgorithm, NeighborPredicate<? super O, ?> predicate) {
     this.baseAlgorithm = baseAlgorithm;
-    this.closedNeighborhoodSetGenerator = closedNeighborhoodSetGenerator;
+    this.predicate = predicate;
   }
 
   /**
@@ -70,8 +98,8 @@ public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
   public Clustering<Model> run(Database db) {
     Clustering<?> baseResult = baseAlgorithm.autorun(db);
 
-    Relation<O> relation = db.getRelation(closedNeighborhoodSetGenerator.getInputTypeRestriction());
-    List<DBIDs> closedNeighborhoods = closedNeighborhoodSetGenerator.getClosedNeighborhoods(relation);
+    Relation<O> relation = db.getRelation(predicate.getInputTypeRestriction());
+    List<DBIDs> closedNeighborhoods = ClosedNeighborhoods.getClosedNeighborhoods(predicate, relation, LOG, this.getClass().getName());
 
     int clusterAmount = baseResult.getAllClusters().size();
     ModifiableDBIDs[] finalCluster = new ModifiableDBIDs[clusterAmount];
@@ -82,7 +110,6 @@ public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
     for(DBIDs closedNeighborhood : closedNeighborhoods) {
       int[] clusterCounter = new int[clusterAmount];
       int clusterIndex = 0;
-
       for(It<? extends Cluster<?>> cluster = baseResult.iterToplevelClusters(); cluster.valid(); cluster.advance()) {
         DBIDs clusterDBIDs = cluster.get().getIDs();
         for(DBIDIter cnsElement = closedNeighborhood.iter(); cnsElement.valid(); cnsElement.advance()) {
@@ -92,35 +119,16 @@ public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
         }
         clusterIndex++;
       }
-
-      int modeClusterIndex = argmax(clusterCounter);
-      finalCluster[modeClusterIndex].addDBIDs(closedNeighborhood);
+      finalCluster[VMath.argmax(clusterCounter)].addDBIDs(closedNeighborhood);
     }
 
     Clustering<Model> clustering = new Clustering<>();
     for(int i = 0; i < clusterAmount; i++) {
-      if(finalCluster[i].size() > 0) {
+      if(!finalCluster[i].isEmpty()) {
         clustering.addToplevelCluster(new Cluster<>(finalCluster[i]));
       }
     }
     return clustering;
-  }
-
-  /**
-   * Find the index of the maximum.
-   * 
-   * @param values Counts
-   * @return Index
-   */
-  private int argmax(int[] values) {
-    int maxIndex = 0, maxValue = values[0];
-    for(int i = 1; i < values.length; i++) {
-      if(values[i] > maxValue) {
-        maxIndex = i;
-        maxValue = values[i];
-      }
-    }
-    return maxIndex;
   }
 
   @Override
@@ -136,26 +144,31 @@ public class ENFORCE<O> implements ClusteringAlgorithm<Clustering<Model>> {
    */
   public static class Par<O> implements Parameterizer {
     /**
+     * Option ID for parameterization
+     */
+    public static final OptionID PREDICATE_ID = ClosedNeighborhoods.Par.PREDICATE_ID;
+
+    /**
      * Underlying base clustering algorithm.
      */
     protected ClusteringAlgorithm<?> baseAlgorithm;
 
     /**
-     * Neighborhood generator for enforcement.
+     * Neighbor predicate
      */
-    protected ClosedNeighborhoodSetGenerator<? super O> closedNeighborhoodSetGenerator;
+    NeighborPredicate<? super O, ?> predicate;
 
     @Override
     public void configure(Parameterization config) {
-      new ObjectParameter<ClosedNeighborhoodSetGenerator<? super O>>(ClosedNeighborhoodSetGenerator.CNS_GENERATOR_ID, ClosedNeighborhoodSetGenerator.class, MutualNeighborClosedNeighborhoodSetGenerator.class) //
-          .grab(config, x -> closedNeighborhoodSetGenerator = x);
       new ObjectParameter<ClusteringAlgorithm<?>>(Utils.ALGORITHM_ID, ClusteringAlgorithm.class) //
           .grab(config, x -> baseAlgorithm = x);
+      new ObjectParameter<NeighborPredicate<? super O, ?>>(PREDICATE_ID, NeighborPredicate.class, MutualNearestNeighborPredicate.class) //
+          .grab(config, (p) -> predicate = p);
     }
 
     @Override
     public ENFORCE<O> make() {
-      return new ENFORCE<>(baseAlgorithm, closedNeighborhoodSetGenerator);
+      return new ENFORCE<>(baseAlgorithm, predicate);
     }
   }
 }

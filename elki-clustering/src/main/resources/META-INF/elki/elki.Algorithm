@@ -82,11 +82,6 @@ elki.clustering.kmedoids.FastCLARANS
 elki.clustering.kmedoids.SingleAssignmentKMedoids
 elki.clustering.Leader
 elki.clustering.NaiveMeanShiftClustering
-elki.clustering.neighborhood.ENFORCE
-elki.clustering.neighborhood.KMeansCP
-elki.clustering.neighborhood.FastKMeansCP
-elki.clustering.neighborhood.FasterKMeansCP
-elki.clustering.neighborhood.CNSClustering
 elki.clustering.optics.OPTICSXi
 elki.clustering.optics.OPTICSHeap
 elki.clustering.optics.OPTICSList
@@ -97,6 +92,10 @@ elki.clustering.silhouette.PAMSIL
 elki.clustering.silhouette.PAMMEDSIL
 elki.clustering.SNNClustering
 elki.clustering.biclustering.ChengAndChurch
+elki.clustering.consistency.ENFORCE
+elki.clustering.consistency.KMeansCP
+elki.clustering.consistency.FastKMeansCP
+elki.clustering.consistency.ClosedNeighborhoods
 elki.clustering.correlation.COPAC
 elki.clustering.correlation.ERiC
 elki.clustering.correlation.FourC
