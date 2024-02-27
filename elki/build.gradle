@@ -1,4 +1,5 @@
 description = 'ELKI - Main Module'
+eclipse.project.name = 'elki'
 dependencies {
   api project(':elki-clustering')
   api project(':elki-outlier')
