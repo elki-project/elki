@@ -112,6 +112,15 @@ public class NearestNeighborPredicate<O> implements NeighborPredicate<O, KNNList
   }
 
   /**
+   * Return a name for pretty display.
+   *
+   * @return name
+   */
+  public String getLongName() {
+    return (kplus1 - 1) + "-Nearest-Neighbors";
+  }
+
+  /**
    * Instance for a particular data set.
    *
    * @author Erich Schubert
