@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.data.NumberVector;
 import elki.data.spatial.SpatialUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -111,7 +110,7 @@ public class RTreeParallelVisualization implements VisFactory {
    * @param <N> Tree node type
    * @param <E> Tree entry type
    */
-  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector> {
     /**
      * The tree we visualize
      */

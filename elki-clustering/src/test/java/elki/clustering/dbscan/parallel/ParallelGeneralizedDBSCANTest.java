@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import org.junit.Test;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.DBSCAN;
 import elki.data.Clustering;
+import elki.data.DoubleVector;
 import elki.data.model.Model;
 import elki.database.Database;
 import elki.utilities.ELKIBuilder;
@@ -46,7 +47,7 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   @Test
   public void testParallelDBSCANResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
-    Clustering<Model> result = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<ParallelGeneralizedDBSCAN<DoubleVector>>(ParallelGeneralizedDBSCAN.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.04) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .build().autorun(db);
@@ -61,7 +62,7 @@ public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest 
   @Test
   public void testDBSCANOnSingleLinkDataset() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-    Clustering<Model> result = new ELKIBuilder<>(ParallelGeneralizedDBSCAN.class) //
+    Clustering<Model> result = new ELKIBuilder<ParallelGeneralizedDBSCAN<DoubleVector>>(ParallelGeneralizedDBSCAN.class) //
         .with(DBSCAN.Par.EPSILON_ID, 11.5) //
         .with(DBSCAN.Par.MINPTS_ID, 120) //
         .build().autorun(db);

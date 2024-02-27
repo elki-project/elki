@@ -28,7 +28,6 @@ import elki.database.query.DistanceSimilarityQuery;
 import elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
-import elki.distance.PrimitiveDistance;
 import elki.similarity.NormalizedPrimitiveSimilarity;
 import elki.utilities.documentation.Reference;
 
@@ -58,7 +57,7 @@ import elki.utilities.documentation.Reference;
     booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles", //
     url = "http://data.rero.ch/01-R241574160", //
     bibkey = "journals/misc/Jaccard1902")
-public class JaccardSimilarityDistance extends AbstractSetDistance<FeatureVector<?>> implements NormalizedPrimitiveSimilarity<FeatureVector<?>>, NumberVectorDistance<FeatureVector<?>>, PrimitiveDistance<FeatureVector<?>> {
+public class JaccardSimilarityDistance extends AbstractSetDistance<FeatureVector<?>> implements NormalizedPrimitiveSimilarity<FeatureVector<?>>, NumberVectorDistance<FeatureVector<?>> {
   /**
    * Constructor. No parameters.
    */

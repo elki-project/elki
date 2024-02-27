@@ -20,15 +20,13 @@
  */
 package elki.data.model;
 
-import elki.result.textwriter.TextWriteable;
-
 /**
  * Cluster model that stores a mean for the cluster.
  * 
  * @author Erich Schubert
  * @since 0.3
  */
-public class MeanModel extends SimplePrototypeModel<double[]> implements TextWriteable {
+public class MeanModel extends SimplePrototypeModel<double[]> {
   /**
    * Constructor with mean
    * 

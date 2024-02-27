@@ -29,7 +29,6 @@ import elki.data.ModifiableHyperBoundingBox;
 import elki.data.spatial.SpatialComparable;
 import elki.data.spatial.SpatialUtil;
 import elki.index.tree.AbstractNode;
-import elki.index.tree.Node;
 import elki.index.tree.spatial.SpatialDirectoryEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.SpatialPointLeafEntry;
@@ -44,7 +43,7 @@ import elki.index.tree.spatial.SpatialPointLeafEntry;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<E> implements Node<E> {
+public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractNode<E> {
   /**
    * Empty constructor for Externalizable interface.
    */

@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
@@ -96,7 +95,7 @@ public class SelectionLineVisualization implements VisFactory {
    *
    * @navhas - visualizes - DBIDSelection
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> {
     /**
      * CSS Class for the range marker
      */

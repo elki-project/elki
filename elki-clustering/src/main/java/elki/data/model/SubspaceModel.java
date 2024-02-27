@@ -21,7 +21,6 @@
 package elki.data.model;
 
 import elki.data.Subspace;
-import elki.result.textwriter.TextWriteable;
 import elki.result.textwriter.TextWriterStream;
 
 /**
@@ -33,7 +32,7 @@ import elki.result.textwriter.TextWriterStream;
  * 
  * @composed - - - Subspace
  */
-public class SubspaceModel extends MeanModel implements TextWriteable {
+public class SubspaceModel extends MeanModel {
   /**
    * The subspace of the cluster.
    */

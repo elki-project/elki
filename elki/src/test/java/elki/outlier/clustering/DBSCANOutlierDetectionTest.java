@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import elki.clustering.dbscan.DBSCAN;
 import elki.clustering.dbscan.GeneralizedDBSCAN;
+import elki.data.DoubleVector;
 import elki.database.Database;
 import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.outlier.OutlierResult;
@@ -39,7 +40,7 @@ public class DBSCANOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testDBSCANOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-    OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection>(DBSCANOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection<DoubleVector>>(DBSCANOutlierDetection.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.04) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .build().autorun(db);
@@ -51,7 +52,7 @@ public class DBSCANOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testDBSCANOutlierDetectionWithCoreObjects() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
-    OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection>(DBSCANOutlierDetection.class) //
+    OutlierResult result = new ELKIBuilder<DBSCANOutlierDetection<DoubleVector>>(DBSCANOutlierDetection.class) //
         .with(DBSCAN.Par.EPSILON_ID, 0.04) //
         .with(DBSCAN.Par.MINPTS_ID, 20) //
         .with(GeneralizedDBSCAN.Par.COREMODEL_ID) //

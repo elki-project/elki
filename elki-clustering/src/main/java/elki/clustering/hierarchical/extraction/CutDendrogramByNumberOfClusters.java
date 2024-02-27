@@ -20,9 +20,8 @@
  */
 package elki.clustering.hierarchical.extraction;
 
-import elki.clustering.ClusteringAlgorithm;
-import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import elki.data.Clustering;
 import elki.data.model.DendrogramModel;
 import elki.logging.Logging;
@@ -41,7 +40,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  * @assoc - - - HierarchicalClusteringAlgorithm
  * @assoc - - - PointerHierarchyResult
  */
-public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
+public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram {
   /**
    * Class logger.
    */

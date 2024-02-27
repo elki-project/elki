@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.clustering.optics.ClusterOrder;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
@@ -96,7 +95,7 @@ public class ClusterOrderVisualization implements VisFactory {
    * @navhas - visualizes - ClusterOrder
    */
   // TODO: listen for CLUSTER ORDER changes.
-  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * CSS class name
      */

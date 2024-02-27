@@ -27,7 +27,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.logging.LoggingUtil;
@@ -46,7 +45,7 @@ import elki.visualization.svg.SVGUtil;
  * @since 0.4.0
  */
 // TODO: can we improve performance by not adding as many hovers?
-public abstract class AbstractTooltipVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public abstract class AbstractTooltipVisualization extends AbstractScatterplotVisualization {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */

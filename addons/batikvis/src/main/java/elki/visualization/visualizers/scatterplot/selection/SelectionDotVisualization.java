@@ -24,7 +24,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
@@ -93,7 +92,7 @@ public class SelectionDotVisualization implements VisFactory {
    *
    * @navhas - visualizes - DBIDSelection
    */
-  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -20,7 +20,10 @@
  */
 package elki.database.relation;
 
-import java.util.*;
+import java.util.AbstractCollection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import elki.data.FeatureVector;
 import elki.data.NumberVector;
@@ -254,7 +257,7 @@ public final class RelationUtil {
    *
    * @author Erich Schubert
    */
-  public static class CollectionFromRelation<O> extends AbstractCollection<O> implements Collection<O> {
+  public static class CollectionFromRelation<O> extends AbstractCollection<O> {
     /**
      * The database we query.
      */

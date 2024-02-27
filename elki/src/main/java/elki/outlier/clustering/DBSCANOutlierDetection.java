@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -42,6 +42,7 @@ import elki.result.Metadata;
 import elki.result.outlier.BasicOutlierScoreMeta;
 import elki.result.outlier.OutlierResult;
 import elki.result.outlier.OutlierScoreMeta;
+import elki.utilities.ClassGenericsUtil;
 import elki.utilities.documentation.Title;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -57,20 +58,21 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * @since 0.7.5
  * 
  * @has - - - GeneralizedDBSCAN
+ * @param <O> Object type
  */
 @Title("DBSCAN Outlier Detection: Outlier Detection based on the Generalized DBSCAN clustering")
-public class DBSCANOutlierDetection implements OutlierAlgorithm {
+public class DBSCANOutlierDetection<O> implements OutlierAlgorithm {
   /**
    * Inner algorithm.
    */
-  private GeneralizedDBSCAN clusterer;
+  private GeneralizedDBSCAN<O> clusterer;
 
   /**
    * Constructor with an existing Genearalized DBSCAN clustering algorithm.
    * 
    * @param clusterer Generalized DBSCAN clustering algorithm to use.
    */
-  public DBSCANOutlierDetection(GeneralizedDBSCAN clusterer) {
+  public DBSCANOutlierDetection(GeneralizedDBSCAN<O> clusterer) {
     this.clusterer = clusterer;
   }
 
@@ -133,21 +135,24 @@ public class DBSCANOutlierDetection implements OutlierAlgorithm {
    * Parameterizer.
    *
    * @author Braulio V.S. Vinces
+   *
+   * @param <O> Object type
    */
-  public static class Par implements Parameterizer {
+  public static class Par<O> implements Parameterizer {
     /**
      * Generalized DBSCAN clustering algorithm to run.
      */
-    protected GeneralizedDBSCAN clusterer;
+    protected GeneralizedDBSCAN<O> clusterer;
 
     @Override
     public void configure(Parameterization config) {
-      clusterer = config.tryInstantiate(GeneralizedDBSCAN.class);
+      Class<GeneralizedDBSCAN<O>> clz = ClassGenericsUtil.uglyCastIntoSubclass(GeneralizedDBSCAN.class);
+      clusterer = config.tryInstantiate(clz);
     }
 
     @Override
-    public DBSCANOutlierDetection make() {
-      return new DBSCANOutlierDetection(clusterer);
+    public DBSCANOutlierDetection<O> make() {
+      return new DBSCANOutlierDetection<>(clusterer);
     }
   }
 }

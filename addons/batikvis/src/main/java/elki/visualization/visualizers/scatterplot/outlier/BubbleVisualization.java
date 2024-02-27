@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
@@ -146,7 +145,7 @@ public class BubbleVisualization implements VisFactory {
    *
    * @navhas - visualizes - OutlierResult
    */
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance extends AbstractScatterplotVisualization {
     /**
      * The outlier result to visualize
      */
