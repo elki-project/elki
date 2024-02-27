@@ -171,6 +171,16 @@ public class WeightedQuickUnionInteger {
   }
 
   /**
+   * Get the weight of a component.
+   * 
+   * @param component id
+   * @return Weight
+   */
+  public int size(int component) {
+    return weight[component];
+  }
+
+  /**
    * Number of allocated indexes.
    *
    * @return Index number.
