@@ -62,4 +62,12 @@ public interface UnionFind {
    * @return Component id
    */
   int find(DBIDRef p);
+
+  /**
+   * Get the size of a component.
+   * 
+   * @param component Component id
+   * @return Size
+   */
+  int size(int component);
 }

@@ -144,4 +144,9 @@ public class WeightedQuickUnionStaticDBIDs implements UnionFind {
     }
     return roots;
   }
+
+  @Override
+  public int size(int component) {
+    return weight[component];
+  }
 }

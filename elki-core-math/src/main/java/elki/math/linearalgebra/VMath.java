@@ -688,6 +688,38 @@ public final class VMath {
    * @param v Vector
    * @return Position of maximum
    */
+  public static int argmax(int[] v) {
+    return argmax(v, 0, v.length);
+  }
+
+  /**
+   * Find the maximum value.
+   *
+   * @param v Vector
+   * @param start First to consider
+   * @param end End of range (exclusive)
+   * @return Position of maximum, beginning at array index 0
+   */
+  public static int argmax(int[] v, int start, int end) {
+    assert v.length > 0;
+    int maxIndex = start;
+    double currentMax = v[start];
+    for(int i = start + 1; i < end; i++) {
+      final double x = v[i];
+      if(x > currentMax) {
+        maxIndex = i;
+        currentMax = x;
+      }
+    }
+    return maxIndex;
+  }
+
+  /**
+   * Find the maximum value.
+   *
+   * @param v Vector
+   * @return Position of maximum
+   */
   public static int argmax(double[] v) {
     return argmax(v, 0, v.length);
   }
@@ -712,6 +744,38 @@ public final class VMath {
       }
     }
     return maxIndex;
+  }
+
+  /**
+   * Find the minimum value.
+   *
+   * @param v Vector
+   * @return Position of minimum
+   */
+  public static int argmin(int[] v) {
+    return argmin(v, 0, v.length);
+  }
+
+  /**
+   * Find the minimum value.
+   *
+   * @param v Vector
+   * @param start First to consider
+   * @param end End of range (exclusive)
+   * @return Position of minimum, beginning at array index 0
+   */
+  public static int argmin(int[] v, int start, int end) {
+    assert v.length > 0;
+    int minIndex = start;
+    double currentMin = v[start];
+    for(int i = start + 1; i < end; i++) {
+      final double x = v[i];
+      if(x < currentMin) {
+        minIndex = i;
+        currentMin = x;
+      }
+    }
+    return minIndex;
   }
 
   /**
