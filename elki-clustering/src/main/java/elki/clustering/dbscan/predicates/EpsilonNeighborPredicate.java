@@ -25,7 +25,11 @@ import elki.clustering.dbscan.DBSCAN;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.DoubleDBIDList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
@@ -100,6 +104,15 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate<O, DoubleD
   @Override
   public TypeInformation getInputTypeRestriction() {
     return distance.getInputTypeRestriction();
+  }
+
+  /**
+   * Return a name for pretty display.
+   *
+   * @return name
+   */
+  public String getLongName() {
+    return epsilon + "-Neighbors";
   }
 
   /**

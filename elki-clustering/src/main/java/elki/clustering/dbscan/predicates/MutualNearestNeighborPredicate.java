@@ -114,6 +114,15 @@ public class MutualNearestNeighborPredicate<O> implements NeighborPredicate<O, D
   }
 
   /**
+   * Return a name for pretty display.
+   *
+   * @return name
+   */
+  public String getLongName() {
+    return "Mutual-" + (kplus1 - 1) + "-Nearest-Neighbors";
+  }
+
+  /**
    * Instance for a particular data set.
    *
    * @author Erich Schubert

@@ -23,14 +23,18 @@ package elki.clustering.dbscan.predicates;
 import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.DoubleDBIDList;
 import elki.database.query.QueryBuilder;
 import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.similarity.Similarity;
 import elki.utilities.documentation.Reference;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -96,6 +100,15 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate<O, Doub
   @Override
   public TypeInformation getInputTypeRestriction() {
     return simFunc.getInputTypeRestriction();
+  }
+
+  /**
+   * Return a name for pretty display.
+   *
+   * @return name
+   */
+  public String getLongName() {
+    return epsilon + "-Neighbors";
   }
 
   /**
