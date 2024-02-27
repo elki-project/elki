@@ -465,9 +465,6 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       KNNIndex<O> idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
       LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
       idx.initialize();
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
-        Metadata.hierarchyOf(relation).addWeakChild(idx);
-      }
       return idx;
     }
     catch(InstantiationException | IllegalAccessException

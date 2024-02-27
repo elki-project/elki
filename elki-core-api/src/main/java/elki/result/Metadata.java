@@ -384,6 +384,9 @@ public class Metadata extends WeakReference<Object> {
       }
       for(int i = 0; i < nump; i++) {
         if(parent == parents[i] || p == parents[i].get()) {
+          if(LOG.isDebugging()) {
+            LOG.debug("Parent " + p + " already added", new Throwable());
+          }
           return false; // Exists already.
         }
       }
@@ -409,7 +412,10 @@ public class Metadata extends WeakReference<Object> {
         return true;
       }
       for(int i = 0; i < numc; i++) {
-        if(child.equals(children[i])) {
+        if(child.equals(children[i]) || children[i] instanceof Reference && child.equals(((Reference<?>) children[i]).get())) {
+          if(LOG.isDebugging()) {
+            LOG.debug("Child " + child + " already added", new Throwable());
+          }
           return false; // Exists already
         }
       }
