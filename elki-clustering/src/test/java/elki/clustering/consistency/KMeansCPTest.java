@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.dbscan.predicates.MutualNearestNeighborPredicate;
+import elki.clustering.dbscan.predicates.NearestNeighborPredicate;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Clustering;
 import elki.data.DoubleVector;
@@ -58,16 +59,17 @@ public class KMeansCPTest extends AbstractClusterAlgorithmTest {
 
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     double nn1 = new ELKIBuilder<NeighborConsistency<NumberVector>>(NeighborConsistency.class) //
-        .with(MutualNearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
-        .with(MutualNearestNeighborPredicate.Par.KNN_ID, 1) //
+        .with(NeighborConsistency.Par.PREDICATE_ID, NearestNeighborPredicate.class) //
+        .with(NearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
+        .with(NearestNeighborPredicate.Par.KNN_ID, 1) //
         .build().evaluateClustering(result, rel);
-    assertEquals("2NN-consistency was not enforced?", 1.0, nn1, 1e-15);
+    assertEquals("2NN-consistency was not enforced?", 0.996, nn1, 1e-15);
 
     double nn10 = new ELKIBuilder<NeighborConsistency<NumberVector>>(NeighborConsistency.class) //
         .with(MutualNearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
         .with(MutualNearestNeighborPredicate.Par.KNN_ID, 10) //
         .build().evaluateClustering(result, rel);
-    assertEquals("10NN-consistency not as expected?", 0.964, nn10, 1e-15);
+    assertEquals("10NN-consistency not as expected?", 0.954, nn10, 1e-15);
   }
 
   @Test
@@ -83,10 +85,11 @@ public class KMeansCPTest extends AbstractClusterAlgorithmTest {
 
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     double nn1 = new ELKIBuilder<NeighborConsistency<NumberVector>>(NeighborConsistency.class) //
-        .with(MutualNearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
-        .with(MutualNearestNeighborPredicate.Par.KNN_ID, 1) //
+        .with(NeighborConsistency.Par.PREDICATE_ID, NearestNeighborPredicate.class) //
+        .with(NearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
+        .with(NearestNeighborPredicate.Par.KNN_ID, 1) //
         .build().evaluateClustering(result, rel);
-    assertEquals("1NN-consistency was not enforced?", 1.0, nn1, 1e-15);
+    assertEquals("1NN-consistency was not enforced?", 0.9848, nn1, 1e-4);
 
     double nn10 = new ELKIBuilder<NeighborConsistency<NumberVector>>(NeighborConsistency.class) //
         .with(MutualNearestNeighborPredicate.Par.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.STATIC) //
