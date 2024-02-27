@@ -23,7 +23,14 @@ package elki.index.distancematrix;
 import java.lang.ref.WeakReference;
 
 import elki.data.type.TypeInformation;
-import elki.database.ids.*;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDRange;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
+import elki.database.ids.DBIDs;
+import elki.database.ids.KNNHeap;
+import elki.database.ids.KNNList;
+import elki.database.ids.ModifiableDoubleDBIDList;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DatabaseDistanceQuery;
 import elki.database.query.distance.DistanceQuery;
@@ -31,7 +38,9 @@ import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
-import elki.index.*;
+import elki.index.DistanceIndex;
+import elki.index.DistancePriorityIndex;
+import elki.index.IndexFactory;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.statistics.Duration;
@@ -63,7 +72,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, RangeIndex<O>, KNNIndex<O>, DistancePriorityIndex<O> {
+public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistancePriorityIndex<O> {
   /**
    * Class logger.
    */

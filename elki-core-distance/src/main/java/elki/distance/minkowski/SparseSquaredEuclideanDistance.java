@@ -23,7 +23,6 @@ package elki.distance.minkowski;
 import elki.data.SparseNumberVector;
 import elki.data.type.SimpleTypeInformation;
 import elki.distance.Norm;
-import elki.distance.PrimitiveDistance;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
@@ -38,7 +37,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * @author Erich Schubert
  * @since 0.7.5
  */
-public class SparseSquaredEuclideanDistance implements PrimitiveDistance<SparseNumberVector>, Norm<SparseNumberVector> {
+public class SparseSquaredEuclideanDistance implements Norm<SparseNumberVector> {
   /**
    * Static instance
    */

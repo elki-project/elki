@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.data.spatial.SpatialComparable;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDRef;
 import elki.database.ids.DBIDs;
@@ -98,7 +97,7 @@ public class BoundingBoxVisualization implements VisFactory {
    *
    * @author Robert Rödler
    */
-  public class Instance extends AbstractParallelVisualization<SpatialComparable> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<SpatialComparable> {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -30,7 +30,6 @@ import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.data.model.PrototypeModel;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.ids.DBIDRef;
 import elki.database.relation.Relation;
@@ -103,7 +102,7 @@ public class ClusterParallelMeanVisualization implements VisFactory {
    * @author Robert Rödler
    *
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

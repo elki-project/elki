@@ -29,7 +29,6 @@ import elki.data.Clustering;
 import elki.data.NumberVector;
 import elki.data.model.Model;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
@@ -118,7 +117,7 @@ public class ClusterOutlineVisualization implements VisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

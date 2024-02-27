@@ -153,7 +153,7 @@ public class ObjHistogram<T> extends AbstractStaticHistogram {
    * 
    * @author Erich Schubert
    */
-  public class Iter extends AbstractStaticHistogram.Iter implements Histogram.Iter {
+  public class Iter extends AbstractStaticHistogram.Iter {
     /**
      * Get the value of the bin.
      * 

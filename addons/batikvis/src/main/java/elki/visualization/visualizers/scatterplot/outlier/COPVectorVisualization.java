@@ -23,13 +23,12 @@ package elki.visualization.visualizers.scatterplot.outlier;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.outlier.COP;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBIDIter;
 import elki.database.relation.Relation;
 import elki.math.linearalgebra.VMath;
+import elki.outlier.COP;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -113,7 +112,7 @@ public class COPVectorVisualization implements VisFactory {
    *
    * @author Erich Schubert
    */
-  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

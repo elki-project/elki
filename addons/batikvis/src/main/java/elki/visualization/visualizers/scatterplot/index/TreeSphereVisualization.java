@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.ids.DBID;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
@@ -162,7 +161,7 @@ public class TreeSphereVisualization implements VisFactory {
    * @param <E> Tree entry type
    */
   // TODO: listen for tree changes!
-  public class Instance<N extends AbstractMTreeNode<?, N, E>, E extends MTreeEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance<N extends AbstractMTreeNode<?, N, E>, E extends MTreeEntry> extends AbstractScatterplotVisualization {
     protected double p;
 
     /**

@@ -24,15 +24,14 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import elki.data.spatial.SpatialComparable;
-import elki.database.datastore.DataStoreListener;
 import elki.index.tree.LeafEntry;
 import elki.index.tree.spatial.SpatialEntry;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import elki.utilities.datastructures.BitsUtil;
-import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.visualization.VisualizationTask;
@@ -114,7 +113,7 @@ public class TreeMBRVisualization implements VisFactory {
    * @param <E> Tree entry type
    */
   // TODO: listen for tree changes instead of data changes?
-  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractScatterplotVisualization {
     /**
      * The tree we visualize
      */

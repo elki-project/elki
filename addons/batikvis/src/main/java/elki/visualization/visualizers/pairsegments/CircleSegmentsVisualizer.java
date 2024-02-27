@@ -38,7 +38,6 @@ import elki.evaluation.clustering.pairsegments.Segment;
 import elki.evaluation.clustering.pairsegments.Segments;
 import elki.logging.Logging;
 import elki.math.MathUtil;
-import elki.result.ResultListener;
 import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Reference;
 import elki.utilities.exceptions.AbortException;
@@ -132,7 +131,7 @@ public class CircleSegmentsVisualizer implements VisFactory {
    * @assoc - - - Segments
    * @has - - - SegmentsStylingPolicy
    */
-  public static class Instance extends AbstractVisualization implements ResultListener {
+  public static class Instance extends AbstractVisualization {
     /** Minimum width (radian) of Segment */
     private static final double SEGMENT_MIN_ANGLE = 0.01;
 

@@ -20,7 +20,14 @@
  */
 package elki.visualization.visualizers.scatterplot.selection;
 
-import static elki.math.linearalgebra.VMath.*;
+import static elki.math.linearalgebra.VMath.euclideanLength;
+import static elki.math.linearalgebra.VMath.minus;
+import static elki.math.linearalgebra.VMath.minusEquals;
+import static elki.math.linearalgebra.VMath.plusEquals;
+import static elki.math.linearalgebra.VMath.plusTimes;
+import static elki.math.linearalgebra.VMath.plusTimesEquals;
+import static elki.math.linearalgebra.VMath.scalarProduct;
+import static elki.math.linearalgebra.VMath.timesEquals;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -28,9 +35,11 @@ import org.w3c.dom.Element;
 import elki.data.NumberVector;
 import elki.data.VectorUtil;
 import elki.data.type.TypeUtil;
-import elki.database.datastore.DataStoreListener;
 import elki.database.datastore.ObjectNotFoundException;
-import elki.database.ids.*;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDs;
+import elki.database.ids.DoubleDBIDListIter;
+import elki.database.ids.KNNList;
 import elki.database.relation.Relation;
 import elki.distance.ArcCosineDistance;
 import elki.distance.CosineDistance;
@@ -57,7 +66,6 @@ import elki.visualization.svg.SVGUtil;
 import elki.visualization.visualizers.VisFactory;
 import elki.visualization.visualizers.Visualization;
 import elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-
 import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
@@ -207,7 +215,7 @@ public class DistanceFunctionVisualization implements VisFactory {
    *
    * @navhas - visualizes - DBIDSelection
    */
-  public static class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public static class Instance extends AbstractScatterplotVisualization {
     /**
      * Tags to indicate the type of element. Used in IDs, CSS-Classes etc.
      */

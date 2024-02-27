@@ -32,7 +32,7 @@ import elki.database.ids.KNNList;
  * @author Erich Schubert
  * @since 0.6.0
  */
-class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements KNNList, DoubleIntegerDBIDList {
+class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDArrayList implements KNNList {
   /**
    * The k value this list was generated for.
    */

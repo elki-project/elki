@@ -25,13 +25,11 @@ import java.awt.image.BufferedImage;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import elki.database.datastore.DataStoreListener;
 import elki.logging.Logging;
 import elki.logging.LoggingUtil;
 import elki.result.SamplingResult;
 import elki.result.SelectionResult;
 import elki.visualization.VisualizationItem;
-import elki.visualization.VisualizationListener;
 import elki.visualization.VisualizationTask;
 import elki.visualization.VisualizationTask.UpdateFlag;
 import elki.visualization.VisualizerContext;
@@ -53,7 +51,7 @@ import elki.visualization.visualizers.Visualization;
  *
  * @assoc - - - ThumbnailThread
  */
-public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener, VisualizationListener {
+public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener {
   /**
    * Visualizer factory
    */
