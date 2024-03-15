@@ -75,7 +75,7 @@ shadowJar {
   from jar.outputs.files // To include the bundle jar with above notices!
   //configurations = [ project.configurations.implementation ]
   destinationDirectory = project.parent.rootDir
-  classifier = null
+  archiveClassifier = null
   manifest {
     attributes("Class-Path" : "")
   }

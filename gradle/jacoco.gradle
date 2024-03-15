@@ -17,9 +17,9 @@ if(project.hasProperty('jacoco')) {
     executionData.setFrom(project.fileTree(".") { include("**/build/jacoco/test.exec") })
 
     reports {
-      html.enabled = true
-      xml.enabled = true
-      csv.enabled = false
+      html.required = true
+      xml.required = true
+      csv.required = false
       xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
     }
   }
