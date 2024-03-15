@@ -142,6 +142,29 @@ public class IntegerVector implements NumberVector {
   }
 
   /**
+   * Copy a double array into a new vector.
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static IntegerVector copy(int[] vals) {
+    return new IntegerVector(vals);
+  }
+
+  /**
+   * Wrap a double array as vector (without copying).
+   * <p>
+   * Note: modifying the array afterwards can lead to problems if the data has,
+   * e.g., been added to an index, which relies on them being immutable!
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static IntegerVector wrap(int[] vals) {
+    return new IntegerVector(vals, true);
+  }
+
+  /**
    * Factory for integer vectors.
    * 
    * @author Erich Schubert
