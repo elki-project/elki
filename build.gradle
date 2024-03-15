@@ -13,8 +13,9 @@ allprojects  {
   group = 'io.github.elki-project'
   version = '0.8.1-SNAPSHOT'
 
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  tasks.withType(JavaCompile) {
+    options.release = 17
+  }
   compileJava.options.encoding = 'UTF-8'
 
   ext.vendor = "ELKI Development Team"

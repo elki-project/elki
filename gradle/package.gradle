@@ -52,13 +52,13 @@ subprojects {
   }
   // Build source jars:
   task sourceJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
   }
   artifacts.archives sourceJar
   // Build javadoc jars:
   task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
   }
   artifacts.archives javadocJar
