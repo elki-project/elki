@@ -172,6 +172,7 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
     try (FileChannel channel = FileChannel.open(path)) {
       Duration loadingTime = LOG.newDuration(getClass().getName() + ".loadtime").begin();
       MultipleObjectsBundle result = readNumpy(channel);
+      LOG.statistics(loadingTime.end());
       return result;
     }
     catch(IOException e) {
