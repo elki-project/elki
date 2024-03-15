@@ -129,6 +129,29 @@ public class FloatVector implements NumberVector {
   }
 
   /**
+   * Copy a float array into a new vector.
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static FloatVector copy(float[] vals) {
+    return new FloatVector(vals);
+  }
+
+  /**
+   * Wrap a double array as vector (without copying).
+   * <p>
+   * Note: modifying the array afterwards can lead to problems if the data has,
+   * e.g., been added to an index, which relies on them being immutable!
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static FloatVector wrap(float[] vals) {
+    return new FloatVector(vals, true);
+  }
+
+  /**
    * Factory for float vectors.
    * 
    * @author Erich Schubert
