@@ -108,13 +108,20 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       if(dtype.endsWith("f4")) {
         List<FloatVector> vectors = new ArrayList<>(rows);
         System.out.println("float32");
-        long columnSize = 4 * cols;
+        int columnSize = 4 * cols;
         float[][] data = new float[rows][cols];
-        for(int i = 0;i < rows;i++){
+        int remaining = rows;
+        int i = 0;
+        while(remaining > 0) {
+          int read = Math.min(Integer.MAX_VALUE / (2 * columnSize), remaining);
           buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
-          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-          buffer.asFloatBuffer().get(data[i]);
-          vectors.add(FloatVector.wrap(data[i]));
+          remaining -= read;
+          for(int j = 0; j < read; j++) {
+            buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+            buffer.asFloatBuffer().get(data[i]);
+            vectors.add(FloatVector.wrap(data[i++]));
+          }
+          System.gc();
         }
         VectorFieldTypeInformation<FloatVector> type = new VectorFieldTypeInformation<>(FloatVector.FACTORY, cols);
         System.out.println("reading Numpy Array Successfull");
@@ -123,13 +130,20 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       else if(dtype.endsWith("f8")) {
         List<DoubleVector> vectors = new ArrayList<>(rows);
         System.out.println("float64");
-        long columnSize = 8 * cols;
+        int columnSize = 8 * cols;
         double[][] data = new double[rows][cols];
-        for(int i = 0;i < rows;i++){
+        int remaining = rows;
+        int i = 0;
+        while(remaining > 0) {
+          int read = Math.min(Integer.MAX_VALUE / (2 * columnSize), remaining);
           buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
-          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-          buffer.asDoubleBuffer().get(data[i]);
-          vectors.add(DoubleVector.wrap(data[i]));
+          remaining -= read;
+          for(int j = 0; j < read; j++) {
+            buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+            buffer.asDoubleBuffer().get(data[i]);
+            vectors.add(DoubleVector.wrap(data[i++]));
+          }
+          System.gc();
         }
         VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, cols);
         System.out.println("reading Numpy Array Succressfull");
@@ -143,14 +157,15 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         int remaining = rows;
         int i = 0;
         while(remaining >0){
-          int read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
+          int read = Math.min(Integer.MAX_VALUE / (2* columnSize), remaining);
+          buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
             buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
             buffer.asIntBuffer().get(data[i]);
             vectors.add(IntegerVector.wrap(data[i++]));
           }
+          System.gc();
         }
         VectorFieldTypeInformation<IntegerVector> type = new VectorFieldTypeInformation<>(IntegerVector.STATIC, cols);
         System.out.println("reading Numpy Array Succressfull");
@@ -173,6 +188,8 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       Duration loadingTime = LOG.newDuration(getClass().getName() + ".loadtime").begin();
       MultipleObjectsBundle result = readNumpy(channel);
       LOG.statistics(loadingTime.end());
+      channel.close();
+      System.gc();
       return result;
     }
     catch(IOException e) {

@@ -78,6 +78,11 @@ public class ResultWriter implements ResultHandler {
   private Pattern filter = null;
 
   /**
+   * only prints the cluster information and not the data itself
+   */
+  private boolean clusterOverviewOnly = false;
+
+  /**
    * Constructor.
    *
    * @param out Output file
@@ -85,12 +90,13 @@ public class ResultWriter implements ResultHandler {
    * @param warnoverwrite Warn before overwriting files
    * @param filter Filter pattern
    */
-  public ResultWriter(Path out, boolean gzip, boolean warnoverwrite, Pattern filter) {
+  public ResultWriter(Path out, boolean gzip, boolean warnoverwrite, Pattern filter, boolean clusterOverviewOnly) {
     super();
     this.out = out;
     this.gzip = gzip;
     this.warnoverwrite = warnoverwrite;
     this.filter = filter;
+    this.clusterOverviewOnly = clusterOverviewOnly;
   }
 
   @Override
@@ -98,7 +104,7 @@ public class ResultWriter implements ResultHandler {
     TextWriter writer = new TextWriter();
 
     try (StreamFactory output = openStreamFactory()) {
-      writer.output(ResultUtil.findDatabase(result), result, output, filter);
+      writer.output(ResultUtil.findDatabase(result), result, output, filter, clusterOverviewOnly);
     }
     catch(IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);
@@ -157,6 +163,11 @@ public class ResultWriter implements ResultHandler {
     public static final OptionID FILTER_PATTERN_ID = new OptionID("out.filter", "Filter pattern for output selection. Only output streams that match the given pattern will be written.");
 
     /**
+     * 
+     */
+    public static OptionID SHORTEN_CLUSTER_ID = new OptionID("out.overviewonly", "Only print cluster information, not the data itself.");
+
+    /**
      * Holds the file to print results to.
      */
     private Path out = null;
@@ -176,6 +187,11 @@ public class ResultWriter implements ResultHandler {
      */
     private Pattern filter = null;
 
+    /**
+     * only prints the cluster information and not the data itself
+     */
+    private boolean clusterOverviewOnly = false;
+
     @Override
     public void configure(Parameterization config) {
       new FileParameter(OutputStep.Par.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE) //
@@ -188,11 +204,12 @@ public class ResultWriter implements ResultHandler {
       new PatternParameter(FILTER_PATTERN_ID) //
           .setOptional(true) //
           .grab(config, x -> filter = x);
+      new Flag(SHORTEN_CLUSTER_ID).grab(config, x -> clusterOverviewOnly = x);
     }
 
     @Override
     public ResultWriter make() {
-      return new ResultWriter(out, gzip, warnoverwrite, filter);
+      return new ResultWriter(out, gzip, warnoverwrite, filter, clusterOverviewOnly);
     }
   }
 }

@@ -139,7 +139,7 @@ public class TextWriter {
    * @throws IOException on IO error
    */
   @SuppressWarnings("unchecked")
-  public void output(Database db, Object r, StreamFactory streamOpener, Pattern filter) throws IOException {
+  public void output(Database db, Object r, StreamFactory streamOpener, Pattern filter, boolean clusterOverviewOnly) throws IOException {
     List<Relation<?>> ra = new LinkedList<>();
     List<OrderingResult> ro = new LinkedList<>();
     List<Clustering<?>> rc = new LinkedList<>();
@@ -188,7 +188,7 @@ public class TextWriter {
     for(Clustering<?> c : rc) {
       NamingScheme naming = new SimpleEnumeratingScheme(c);
       for(Cluster<?> clus : c.getAllClusters()) {
-        writeClusterResult(db, streamOpener, (Clustering<Model>) c, (Cluster<Model>) clus, ra, naming);
+        writeClusterResult(db, streamOpener, (Clustering<Model>) c, (Cluster<Model>) clus, ra, naming, clusterOverviewOnly);
       }
     }
     for(OrderingResult ror : ro) {
@@ -262,7 +262,7 @@ public class TextWriter {
    * @param naming Naming scheme
    * @throws IOException on IO error
    */
-  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws IOException {
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming, boolean clusterOverviewOnly) throws IOException {
     String cname = naming.getNameFor(clus);
     String filename = filenameFromLabel(cname);
 
@@ -272,24 +272,26 @@ public class TextWriter {
     // Write cluster information
     out.commentPrintLn("Cluster: " + cname);
     clus.writeToText(out, null);
-    if(clustering.getClusterHierarchy().numParents(clus) > 0) {
-      StringBuilder buf = new StringBuilder(100).append("Parents:");
-      for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
-        buf.append(' ').append(naming.getNameFor(iter.get()));
+    if(!clusterOverviewOnly){
+      if(clustering.getClusterHierarchy().numParents(clus) > 0) {
+        StringBuilder buf = new StringBuilder(100).append("Parents:");
+        for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
+          buf.append(' ').append(naming.getNameFor(iter.get()));
+        }
+        out.commentPrintLn(buf.toString());
       }
-      out.commentPrintLn(buf.toString());
-    }
-    if(clustering.getClusterHierarchy().numChildren(clus) > 0) {
-      StringBuilder buf = new StringBuilder(100).append("Children:");
-      for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
-        buf.append(' ').append(naming.getNameFor(iter.get()));
+      if(clustering.getClusterHierarchy().numChildren(clus) > 0) {
+        StringBuilder buf = new StringBuilder(100).append("Children:");
+        for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
+          buf.append(' ').append(naming.getNameFor(iter.get()));
+        }
+        out.commentPrintLn(buf.toString());
       }
-      out.commentPrintLn(buf.toString());
-    }
-    out.flush();
+      out.flush();
 
-    for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-      printObject(out, db, iter, ra);
+      for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
+        printObject(out, db, iter, ra);
+      }
     }
     out.flush();
     streamOpener.closeStream(outStream);
