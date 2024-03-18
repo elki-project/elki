@@ -115,10 +115,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         while(remaining > 0) {
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
+          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-            buffer.asFloatBuffer().get(data[i]);
+            buffer.asFloatBuffer().get(j,data[i]);
             vectors.add(FloatVector.wrap(data[i++]));
           }
           System.gc();
@@ -137,10 +137,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         while(remaining > 0) {
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
+          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-            buffer.asDoubleBuffer().get(data[i]);
+            buffer.asDoubleBuffer().get(j, data[i]);
             vectors.add(DoubleVector.wrap(data[i++]));
           }
           System.gc();
@@ -159,10 +159,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         while(remaining >0){
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
+          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
-            buffer.asIntBuffer().get(data[i]);
+            buffer.asIntBuffer().get(j, data[i]);
             vectors.add(IntegerVector.wrap(data[i++]));
           }
           System.gc();
