@@ -108,13 +108,13 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       if(dtype.endsWith("f4")) {
         List<FloatVector> vectors = new ArrayList<>(rows);
         System.out.println("float32");
-        int columnSize = 4 * cols;
+        long columnSize = 4 * cols;
         float[][] data = new float[rows][cols];
         int remaining = rows;
         int i = 0;
         while(remaining > 0) {
-          int read = Math.min(Integer.MAX_VALUE / (2 * columnSize), remaining);
-          buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
+          long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
+          buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           remaining -= read;
           for(int j = 0; j < read; j++) {
             buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
@@ -130,13 +130,13 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       else if(dtype.endsWith("f8")) {
         List<DoubleVector> vectors = new ArrayList<>(rows);
         System.out.println("float64");
-        int columnSize = 8 * cols;
+        long columnSize = 8 * cols;
         double[][] data = new double[rows][cols];
         int remaining = rows;
         int i = 0;
         while(remaining > 0) {
-          int read = Math.min(Integer.MAX_VALUE / (2 * columnSize), remaining);
-          buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
+          long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
+          buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           remaining -= read;
           for(int j = 0; j < read; j++) {
             buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
@@ -152,13 +152,13 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       else if(dtype.endsWith("i4")){
         List<IntegerVector> vectors = new ArrayList<>(rows);
         System.out.println("int32");
-        int columnSize = 8 * cols;
+        long columnSize = 8 * cols;
         int[][] data = new int[rows][cols];
         int remaining = rows;
         int i = 0;
         while(remaining >0){
-          int read = Math.min(Integer.MAX_VALUE / (2* columnSize), remaining);
-          buffer = file.map(MapMode.READ_ONLY, 10 + len + i * columnSize, columnSize);
+          long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
+          buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           remaining -= read;
           for(int j = 0; j < read; j++) {
             buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
