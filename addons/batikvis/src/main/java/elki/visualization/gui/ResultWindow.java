@@ -591,7 +591,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       String filtertext = optionsPanel.filterField.getText();
       try {
         Pattern filter = filtertext.isEmpty() ? null : Pattern.compile(filtertext);
-        new ResultWriter(file, gzip, false, filter).processNewResult(context.getBaseResult());
+        new ResultWriter(file, gzip, false, filter, false).processNewResult(context.getBaseResult());
       }
       catch(PatternSyntaxException e) {
         JOptionPane.showMessageDialog(this, "Filter pattern was not a valid regular expression.", //
