@@ -42,10 +42,11 @@ public class EMModel extends MeanModel {
    * Constructor.
    * 
    * @param mean Mean vector
+   * @param weight Weight
    * @param covarianceMatrix Covariance matrix
    */
-  public EMModel(double[] mean, double[][] covarianceMatrix) {
-    super(mean);
+  public EMModel(double[] mean, double weight, double[][] covarianceMatrix) {
+    super(mean, weight);
     this.covarianceMatrix = covarianceMatrix;
   }
 
