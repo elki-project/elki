@@ -104,6 +104,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
       headerString = headerString.substring(1).split("}")[0];
       System.out.println("header: " + headerString);
       String dtype = headerString.split("'descr':")[1].split("'")[1];
+      boolean fOrder = Boolean.parseBoolean(headerString.split("'fortran_order':")[1].split(",")[0]);
+      if(fOrder) {
+        throw new IOException("Fortran order not supported");
+      }
       String shape = headerString.split("'shape':\\(")[1];
       shape = shape.split("\\)")[0];
       int rows = Integer.parseInt(shape.split(",")[0]);
@@ -208,7 +212,7 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           }
           System.gc();
         }
-        throw new IOException("Invalid dtype" + dtype);
+        throw new IOException("String format not yet supported" + dtype);
         // VectorFieldTypeInformation<IntegerVector> type = new VectorFieldTypeInformation<>(IntegerVector.STATIC, cols);
         // System.out.println("reading Numpy Array Succressfull");
         // return MultipleObjectsBundle.makeSimple(type, vectors);
