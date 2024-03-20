@@ -196,7 +196,9 @@ public class SphericalGaussianModel implements BetulaClusterModel {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
+    double [][] v = new double[1][1];
+    v[0][0] = variance;
+    return new EMModel(mean, weight, v);
   }
 
   @Override
