@@ -23,7 +23,10 @@ package elki.datasource;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -118,7 +121,6 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           FloatBuffer floatBuffer = buffer.asFloatBuffer();
-          
           remaining -= read;
           for(int j = 0; j < read; j++) {
             floatBuffer.get(data[i], 0, cols);
@@ -141,9 +143,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+          DoubleBuffer doubleBuffer = buffer.asDoubleBuffer();
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.asDoubleBuffer().get(data[i],0,cols);
+            doubleBuffer.get(data[i],0,cols);
             vectors.add(DoubleVector.wrap(data[i++]));
           }
           System.gc();
@@ -163,9 +166,10 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+          IntBuffer intBuffer = buffer.asIntBuffer();
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.asIntBuffer().get(data[i], 0, cols);
+            intBuffer.get(data[i], 0, cols);
             vectors.add(IntegerVector.wrap(data[i++]));
           }
           System.gc();
@@ -173,6 +177,41 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         VectorFieldTypeInformation<IntegerVector> type = new VectorFieldTypeInformation<>(IntegerVector.STATIC, cols);
         System.out.println("reading Numpy Array Succressfull");
         return MultipleObjectsBundle.makeSimple(type, vectors);
+      }
+      else if (dtype.contains("U")){
+        Charset scs = null;
+        if(littleEndian){
+          scs = Charset.forName("UTF-32LE");
+        } else {
+          scs = Charset.forName("UTF-32BE");
+        }
+        int size = Integer.parseInt(dtype.split("U")[1]);
+        System.out.println("Char"+size);
+        long columnSize = 2 * size * cols;
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        char[] char_data = new char[size];
+        int remaining = rows;
+        int i = 0;
+        while(remaining > 0) {
+          long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
+          buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
+          buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+          CharBuffer charBuffer = scs.decode(buffer);
+          remaining -= read;
+          for(int j = 0; j < read; j++) {
+            ArrayList<String> row = new ArrayList<>();
+            for(int c = 0; c < cols ; c++){
+              charBuffer.get(char_data, 0, size);
+              row.add(new String(char_data));
+            }
+            data.add(row);
+          }
+          System.gc();
+        }
+        throw new IOException("Invalid dtype" + dtype);
+        // VectorFieldTypeInformation<IntegerVector> type = new VectorFieldTypeInformation<>(IntegerVector.STATIC, cols);
+        // System.out.println("reading Numpy Array Succressfull");
+        // return MultipleObjectsBundle.makeSimple(type, vectors);
       }
       // else if(dtype.endsWith("i8") {
       //   System.out.println("int64");
