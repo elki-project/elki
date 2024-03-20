@@ -226,6 +226,6 @@ public class TwoPassMultivariateGaussianModel implements EMClusterModel<NumberVe
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, covariance);
+    return new EMModel(mean, weight, covariance);
   }
 }

@@ -19,6 +19,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package elki.data.model;
+import elki.result.textwriter.TextWriterStream;
 
 /**
  * Cluster model that stores a mean for the cluster.
@@ -27,6 +28,9 @@ package elki.data.model;
  * @since 0.3
  */
 public class MeanModel extends SimplePrototypeModel<double[]> {
+  boolean weighted = false;
+  double weight;
+
   /**
    * Constructor with mean
    * 
@@ -36,6 +40,25 @@ public class MeanModel extends SimplePrototypeModel<double[]> {
     super(mean);
   }
 
+  /**
+   * Constructor with mean and weight
+   * 
+   * @param mean Cluster mean
+   * @param weight Weight
+   */
+  public MeanModel(double[] mean, double weight) {
+    super(mean);
+    this.weighted = true;
+    this.weight = weight;
+  }
+  
+    @Override
+  public void writeToText(TextWriterStream out, String label) {
+    super.writeToText(out, label);
+    if (weighted) {
+      out.commentPrintLn("weight: " + weight);
+    }
+  }
   /**
    * Get the mean.
    * 

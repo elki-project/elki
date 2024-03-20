@@ -43,6 +43,18 @@ public class KMeansModel extends MeanModel {
     super(mean);
     this.varsum = varsum;
   }
+  
+  /**
+   * Constructor with mean and weight.
+   * 
+   * @param mean Mean vector.
+   * @param weight Weight.
+   * @param varsum Variance sum.
+   */
+  public KMeansModel(double[] mean, double weight, double varsum) {
+    super(mean, weight);
+    this.varsum = varsum;
+  }
 
   /**
    * Get the variance contribution of the cluster (sum of variances)

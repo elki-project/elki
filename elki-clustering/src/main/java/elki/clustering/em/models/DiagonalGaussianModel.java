@@ -216,7 +216,9 @@ public class DiagonalGaussianModel implements BetulaClusterModel {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, diagonal(variances));
+    double[][] var = new double[1][];
+    var[0] = variances;
+    return new EMModel(mean, weight, var);
   }
 
   @Override

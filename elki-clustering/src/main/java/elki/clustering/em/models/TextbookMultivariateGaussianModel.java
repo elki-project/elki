@@ -226,7 +226,7 @@ public class TextbookMultivariateGaussianModel implements EMClusterModel<NumberV
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, covariance);
+    return new EMModel(mean, weight, covariance);
   }
 
   /**
