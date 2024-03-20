@@ -23,6 +23,7 @@ package elki.datasource;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -116,9 +117,11 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           long read = Math.min(Integer.MAX_VALUE / columnSize, remaining);
           buffer = file.map(MapMode.READ_ONLY, 10L + len + i * columnSize, read * columnSize);
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+          FloatBuffer floatBuffer = buffer.asFloatBuffer();
+          
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.asFloatBuffer().get(j,data[i]);
+            floatBuffer.get(data[i], 0, cols);
             vectors.add(FloatVector.wrap(data[i++]));
           }
           System.gc();
@@ -140,7 +143,7 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.asDoubleBuffer().get(j, data[i]);
+            buffer.asDoubleBuffer().get(data[i],0,cols);
             vectors.add(DoubleVector.wrap(data[i++]));
           }
           System.gc();
@@ -162,7 +165,7 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
           buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
           remaining -= read;
           for(int j = 0; j < read; j++) {
-            buffer.asIntBuffer().get(j, data[i]);
+            buffer.asIntBuffer().get(data[i], 0, cols);
             vectors.add(IntegerVector.wrap(data[i++]));
           }
           System.gc();
@@ -172,7 +175,7 @@ public class NumpyArrayReader extends AbstractDatabaseConnection {
         return MultipleObjectsBundle.makeSimple(type, vectors);
       }
       // else if(dtype.endsWith("i8") {
-      //   System.out.println("int32");
+      //   System.out.println("int64");
       // }
       else {
         throw new IOException("Invalid dtype" + dtype);
