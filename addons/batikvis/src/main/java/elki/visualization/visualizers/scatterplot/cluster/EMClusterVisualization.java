@@ -189,14 +189,13 @@ public class EMClusterVisualization implements VisFactory {
       for(int cnum = 0; cnum < clusters.size(); cnum++) {
         Cluster<Model> clus = ci.next();
         DBIDs ids = clus.getIDs();
-        if(ids.size() <= 0) {
-          continue;
-        }
         if(!(clus.getModel() instanceof EMModel)) {
           continue;
         }
         EMModel model = (EMModel) clus.getModel();
-
+        if(ids.size() <= 0 && model.getWeight() <= 0) {
+          continue;
+        }
         // Add cluster style
         final String sname = EMBORDER + "_" + cnum;
         if(!svgp.getCSSClassManager().contains(sname)) {
@@ -215,6 +214,13 @@ public class EMClusterVisualization implements VisFactory {
 
         double[][] covmat = model.getCovarianceMatrix();
         double[] centroid = model.getMean();
+        if (covmat.length < centroid.length) {
+          if (covmat[0].length < centroid.length) {
+            covmat = timesEquals(identity(centroid.length, centroid.length), covmat[0][0]);
+          }else{
+            covmat = diagonal(covmat[0]);
+          }
+        }
         double[] cent = proj.fastProjectDataToRenderSpace(centroid);
 
         // Compute the eigenvectors
