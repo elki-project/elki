@@ -32,7 +32,12 @@ import elki.data.Clustering;
 import elki.data.type.NoSupportedDataTypeException;
 import elki.database.Database;
 import elki.evaluation.clustering.EvaluateClustering;
-import elki.evaluation.outlier.*;
+import elki.evaluation.outlier.ComputeOutlierHistogram;
+import elki.evaluation.outlier.OutlierPrecisionAtKCurve;
+import elki.evaluation.outlier.OutlierPrecisionRecallCurve;
+import elki.evaluation.outlier.OutlierPrecisionRecallGainCurve;
+import elki.evaluation.outlier.OutlierROCCurve;
+import elki.evaluation.outlier.OutlierRankingEvaluation;
 import elki.logging.Logging;
 import elki.result.Metadata;
 import elki.result.ResultUtil;
@@ -139,7 +144,13 @@ public class AutomaticEvaluation implements Evaluator {
       LOG.debug("Number of new clustering results: " + clusterings.size());
     }
     for(Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
-      if(c.next() instanceof ReferenceClustering) {
+      Clustering<?> cn = c.next();
+      if(cn instanceof ReferenceClustering) {
+        c.remove();
+        continue;
+      }
+      int total_points =  cn.getAllClusters().stream().mapToInt( x -> x.getIDs().size()).sum();
+      if(total_points == 0) {
         c.remove();
       }
     }
