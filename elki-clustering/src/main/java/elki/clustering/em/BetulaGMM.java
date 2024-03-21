@@ -20,8 +20,6 @@
  */
 package elki.clustering.em;
 
-import static elki.math.linearalgebra.VMath.argmax;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +50,7 @@ import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
+import static elki.math.linearalgebra.VMath.argmax;
 import elki.result.Metadata;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
@@ -61,7 +60,6 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.jafama.FastMath;
 
@@ -206,29 +204,35 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     }
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".iterations", it));
     LOG.statistics(modeltime.end());
-
-    // fill result with clusters and models
-    List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
-      hardClusters.add(DBIDUtil.newArray());
-    }
-
-    WritableDataStore<double[]> finalClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
-    loglikelihood = assignProbabilitiesToInstances(relation, models, finalClusterIGivenX);
-    LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", loglikelihood));
-
-    // provide a hard clustering
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      hardClusters.get(argmax(finalClusterIGivenX.get(iditer))).add(iditer);
-    }
     Clustering<EMModel> result = new Clustering<>();
     Metadata.of(result).setLongName("EM Clustering");
-    // provide models within the result
-    for(int i = 0; i < k; i++) {
-      result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
+    if (tree.isModelOnly()){
+      for(int i = 0; i < k; i++) {
+        result.addToplevelCluster(new Cluster<>(DBIDUtil.newArray(1), models.get(i).finalizeCluster()));
+      }
     }
-    if(soft) {
-      Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("EM Cluster Probabilities", SOFT_TYPE, relation.getDBIDs(), finalClusterIGivenX));
+    else {
+      // fill result with clusters and models
+      List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
+      for(int i = 0; i < k; i++) {
+        hardClusters.add(DBIDUtil.newArray());
+      }
+
+      WritableDataStore<double[]> finalClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
+      loglikelihood = assignProbabilitiesToInstances(relation, models, finalClusterIGivenX);
+      LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".loglikelihood", loglikelihood));
+
+      // provide a hard clustering
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        hardClusters.get(argmax(finalClusterIGivenX.get(iditer))).add(iditer);
+      }
+      // provide models within the result
+      for(int i = 0; i < k; i++) {
+        result.addToplevelCluster(new Cluster<>(hardClusters.get(i), models.get(i).finalizeCluster()));
+      }
+      if(soft) {
+        Metadata.hierarchyOf(result).addChild(new MaterializedRelation<>("EM Cluster Probabilities", SOFT_TYPE, relation.getDBIDs(), finalClusterIGivenX));
+      }
     }
     return result;
   }

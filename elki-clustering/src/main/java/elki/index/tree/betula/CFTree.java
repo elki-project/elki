@@ -49,6 +49,7 @@ import elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
 import elki.utilities.optionhandling.parameters.EnumParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -205,6 +206,11 @@ public class CFTree<L extends ClusterFeature> {
   Map<ClusterFeature, ArrayModifiableDBIDs> idmap;
 
   /**
+   * Omits the calculation of final assignmens for the results.
+   */
+  boolean modelOnly = false;
+
+  /**
    * Constructor.
    *
    * @param factory Cluster feature factory
@@ -216,7 +222,7 @@ public class CFTree<L extends ClusterFeature> {
    * @param maxleaves Maximum number of leaves
    * @param storeIds Store object ids
    */
-  public CFTree(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int capacity, Threshold tCriterium, int maxleaves, boolean storeIds) {
+  public CFTree(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int capacity, Threshold tCriterium, int maxleaves, boolean storeIds, boolean modelOnly) {
     super();
     this.factory = factory;
     this.dist = dist;
@@ -225,6 +231,7 @@ public class CFTree<L extends ClusterFeature> {
     this.capacity = capacity;
     this.tCriterium = tCriterium;
     this.maxleaves = maxleaves;
+    this.modelOnly = modelOnly;
     this.idmap = storeIds ? new Reference2ObjectOpenHashMap<ClusterFeature, ArrayModifiableDBIDs>(maxleaves) : null;
   }
 
@@ -812,6 +819,15 @@ public class CFTree<L extends ClusterFeature> {
   }
 
   /**
+  * Omit the calculation of final assignmens for the results?
+  *
+  * @return if only the model shoudl be calculated
+  */
+  public boolean isModelOnly() {
+    return modelOnly;
+  }
+
+  /**
    * CF-Tree Factory.
    *
    * @author Erich Schubert
@@ -853,6 +869,11 @@ public class CFTree<L extends ClusterFeature> {
     Threshold tCriterium;
 
     /**
+    * Omits the calculation of final assignmens for the results.
+    */
+    boolean modelOnly = false;
+
+    /**
      * Constructor.
      *
      * @param factory Cluster feature factory
@@ -863,7 +884,7 @@ public class CFTree<L extends ClusterFeature> {
      * @param maxleaves Maximum number of leaves
      * @param tCriterium threshold adjustment rule
      */
-    public Factory(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int branchingFactor, double maxleaves, Threshold tCriterium) {
+    public Factory(ClusterFeature.Factory<L> factory, CFDistance dist, CFDistance abs, double threshold, int branchingFactor, double maxleaves, Threshold tCriterium, boolean modelOnly) {
       this.factory = factory;
       this.dist = dist;
       this.abs = abs;
@@ -871,6 +892,7 @@ public class CFTree<L extends ClusterFeature> {
       this.branchingFactor = branchingFactor;
       this.maxleaves = maxleaves;
       this.tCriterium = tCriterium;
+      this.modelOnly = modelOnly;
     }
 
     /**
@@ -885,7 +907,7 @@ public class CFTree<L extends ClusterFeature> {
       final String prefix = CFTree.class.getName();
       Duration buildtime = LOG.newDuration(prefix + ".buildtime").begin();
       final int max = (int) (maxleaves <= 1 ? maxleaves * ids.size() : maxleaves);
-      CFTree<L> tree = new CFTree<>(factory, dist, abs, threshold, branchingFactor, tCriterium, max, storeIds);
+      CFTree<L> tree = new CFTree<>(factory, dist, abs, threshold, branchingFactor, tCriterium, max, storeIds, modelOnly);
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         tree.insert(relation.get(it), it);
@@ -943,6 +965,11 @@ public class CFTree<L extends ClusterFeature> {
        */
       public static final OptionID MAXLEAVES_ID = new OptionID("cftree.maxleaves", "Maximum number of leaves (if less than 1, the values is assumed to be relative)");
 
+        /**
+       * Omit the calculation of final assignmens for the results.
+       */
+      public static final OptionID MODELONLY_ID = new OptionID("cftree.modelonly", "Omit the calculation of final assignmens for the results.");
+
       /**
        * Cluster feature factory
        */
@@ -978,6 +1005,11 @@ public class CFTree<L extends ClusterFeature> {
        */
       Threshold tCriterium;
 
+      /**
+       * Return and evaluate only the model.
+       */
+      boolean modelOnly = false;
+
       @Override
       public void configure(Parameterization config) {
         new ObjectParameter<ClusterFeature.Factory<L>>(FEATURES_ID, ClusterFeature.Factory.class, VIIFeature.Factory.class) //
@@ -1001,11 +1033,13 @@ public class CFTree<L extends ClusterFeature> {
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
             .setDefaultValue(0.05) //
             .grab(config, x -> maxleaves = x);
+          new Flag(MODELONLY_ID) //
+            .grab(config, x -> modelOnly = x);
       }
 
       @Override
       public CFTree.Factory<L> make() {
-        return new CFTree.Factory<L>(factory, dist, abs, threshold, branchingFactor, maxleaves, tCriterium);
+        return new CFTree.Factory<L>(factory, dist, abs, threshold, branchingFactor, maxleaves, tCriterium, modelOnly);
       }
     }
   }

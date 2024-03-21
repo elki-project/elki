@@ -135,11 +135,17 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     double[][] means = kmeans(cfs, assignment, weights, tree);
     LOG.statistics(modeltime.end());
     ModifiableDBIDs[] ids = new ModifiableDBIDs[k];
-    for(int i = 0; i < k; i++) {
-      ids[i] = DBIDUtil.newArray(weights[i]);
-    }
     double[] varsum = new double[k];
-    if(storeIds) {
+
+    if (tree.isModelOnly()){
+      for(int i = 0; i < k; i++) {
+        ids[i] = DBIDUtil.newArray(1);
+      }
+    }
+    else if(storeIds) {
+      for(int i = 0; i < k; i++) {
+        ids[i] = DBIDUtil.newArray(weights[i]);
+      }
       for(int i = 0; i < assignment.length; i++) {
         ClusterFeature cfsi = cfs.get(i);
         final double[] mean = means[assignment[i]];
@@ -153,6 +159,9 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       }
     }
     else {
+      for(int i = 0; i < k; i++) {
+        ids[i] = DBIDUtil.newArray(weights[i]);
+      }
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         NumberVector fv = relation.get(iter);
         double mindist = distance(fv, means[0]);
@@ -172,8 +181,8 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
     LOG.statistics(new DoubleStatistic(getClass().getName() + ".variance-sum", VMath.sum(varsum)));
     Clustering<KMeansModel> result = new Clustering<>();
     for(int i = 0; i < ids.length; i++) {
-      KMeansModel model = new KMeansModel(means[i], varsum[i]);
-      result.addToplevelCluster(new Cluster<KMeansModel>(ids[i], model));
+      KMeansModel model = new KMeansModel(means[i], weights[i], varsum[i]);
+      result.addToplevelCluster(new Cluster<>(ids[i], model));
     }
     Metadata.of(result).setLongName("BIRCH k-Means Clustering");
     return result;
