@@ -20,8 +20,6 @@
  */
 package elki.clustering;
 
-import static elki.math.linearalgebra.VMath.diagonal;
-
 import java.util.Map;
 
 import elki.clustering.em.BetulaGMM;
@@ -42,6 +40,8 @@ import elki.database.relation.RelationUtil;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.CFTree.LeafIterator;
 import elki.index.tree.betula.features.ClusterFeature;
+import elki.index.tree.betula.features.VVIFeature;
+import elki.index.tree.betula.features.VVVFeature;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.result.Metadata;
@@ -51,7 +51,6 @@ import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
-
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 
 /**
@@ -121,7 +120,12 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
     final int dim = RelationUtil.dimensionality(relation);
     CFTree<?> tree = cffactory.newTree(relation.getDBIDs(), relation, storeIds);
     Map<ClusterFeature, DBIDs> idmap = new Reference2ObjectOpenHashMap<>(tree.numLeaves());
-    if(storeIds) {
+    if (tree.isModelOnly()){
+      for(LeafIterator<?> it = tree.leafIterator(); it.valid(); it.advance()) {
+        idmap.put(it.get(), DBIDUtil.newArray(1));
+      }
+    }
+    else if(storeIds) {
       for(LeafIterator<?> it = tree.leafIterator(); it.valid(); it.advance()) {
         idmap.put(it.get(), tree.getDBIDs(it.get()));
       }
@@ -141,10 +145,19 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
     for(Map.Entry<ClusterFeature, DBIDs> ent : idmap.entrySet()) {
       ClusterFeature leaf = ent.getKey();
       double[] center = leaf.toArray();
-      double[][] variance = new double[1][dim];
-      for(int i = 0; i < dim; i++) {
-        variance[0][i] = leaf.variance(i);
+      double[][] variance;
+      if (leaf instanceof VVVFeature){
+        variance = leaf.covariance();
+      } else if(leaf instanceof VVIFeature){
+        variance = new double[1][dim];
+        for(int i = 0; i < dim; i++) {
+          variance[0][i] = leaf.variance(i);
+        }
+      } else {
+        variance = new double[1][1];
+        variance[0][0] = leaf.variance(0);
       }
+
       result.addToplevelCluster(new Cluster<>(ent.getValue(), new EMModel(center, leaf.getWeight(), variance)));
     }
     DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".varsum");
