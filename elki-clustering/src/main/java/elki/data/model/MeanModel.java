@@ -68,6 +68,15 @@ public class MeanModel extends SimplePrototypeModel<double[]> {
     return prototype;
   }
 
+  /**
+   * Get the weight.
+   * 
+   * @return weight
+   */
+  public double getWeight() {
+    return weight;
+  }
+
   @Override
   public String getPrototypeType() {
     return "Mean";
