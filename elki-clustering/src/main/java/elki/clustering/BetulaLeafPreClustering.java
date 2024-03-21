@@ -141,11 +141,11 @@ public class BetulaLeafPreClustering implements ClusteringAlgorithm<Clustering<M
     for(Map.Entry<ClusterFeature, DBIDs> ent : idmap.entrySet()) {
       ClusterFeature leaf = ent.getKey();
       double[] center = leaf.toArray();
-      double[] variance = new double[dim];
+      double[][] variance = new double[1][dim];
       for(int i = 0; i < dim; i++) {
-        variance[i] = leaf.variance(i);
+        variance[0][i] = leaf.variance(i);
       }
-      result.addToplevelCluster(new Cluster<>(ent.getValue(), new EMModel(center, diagonal(variance))));
+      result.addToplevelCluster(new Cluster<>(ent.getValue(), new EMModel(center, leaf.getWeight(), variance)));
     }
     DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".varsum");
     double varsum = 0.;
