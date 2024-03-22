@@ -58,6 +58,7 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.DoubleParameter;
+import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -130,6 +131,10 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
   public static final SimpleTypeInformation<double[]> SOFT_TYPE = new SimpleTypeInformation<>(double[].class);
 
   /**
+   * Use argmax for assignment in every iteration
+   */
+  private boolean argmax = false;
+  /**
    * Maximum number of iterations.
    */
   BetulaClusterModelFactory<?> initializer;
@@ -144,8 +149,9 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * @param soft Return soft clustering results
    * @param initialization Initialization method
    * @param prior MAP prior
+   * @param argmax hard assignment in iterations
    */
-  public BetulaGMM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, BetulaClusterModelFactory<?> initialization, double prior) {
+  public BetulaGMM(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, BetulaClusterModelFactory<?> initialization, double prior, boolean argmax) {
     super();
     this.cffactory = cffactory;
     this.delta = delta;
@@ -154,6 +160,7 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     this.soft = soft;
     this.initializer = initialization;
     this.prior = prior;
+    this.argmax = argmax;
   }
 
   @Override
@@ -180,7 +187,13 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     // Initialize EM Model
     List<? extends BetulaClusterModel> models = initializer.buildInitialModels(cfs, k, tree);
     Map<ClusterFeature, double[]> probClusterIGivenX = new Reference2ObjectOpenHashMap<>(cfs.size());
-    double loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
+    double loglikelihood;
+    if (argmax){
+      loglikelihood =assignInstancesHard(cfs, models, probClusterIGivenX);
+    }
+    else{
+      loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
+    }
     DoubleStatistic likestat = new DoubleStatistic(this.getClass().getName() + ".modelloglikelihood");
     LOG.statistics(likestat.setDouble(loglikelihood));
 
@@ -191,7 +204,12 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
       final double oldloglikelihood = loglikelihood;
       recomputeCovarianceMatrices(cfs, probClusterIGivenX, models, prior, tree.getRoot().getCF().getWeight());
       // reassign probabilities
-      loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
+      if(argmax) {
+        loglikelihood = assignInstancesHard(cfs, models, probClusterIGivenX);
+      }
+      else {
+        loglikelihood = assignProbabilitiesToInstances(cfs, models, probClusterIGivenX);
+      }
 
       LOG.statistics(likestat.setDouble(loglikelihood));
       if(loglikelihood - bestloglikelihood > delta) {
@@ -250,7 +268,6 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * @return the expectation value of the current mixture of distributions
    */
   public double assignProbabilitiesToInstances(ArrayList<? extends ClusterFeature> cfs, List<? extends BetulaClusterModel> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
-    final int k = models.size();
     double emSum = 0.;
     int n = 0;
     for(int i = 0; i < cfs.size(); i++) {
@@ -303,6 +320,40 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     return emSum / relation.size();
   }
 
+
+    /**
+   * Assigns the current probability values to the instances in the database and
+   * compute the expectation value of the current mixture of distributions.
+   * <p>
+   * Computed as the sum of the logarithms of the prior probability of each
+   * instance.
+   * 
+   * @param cfs the cluster features to evaluate
+   * @param models Cluster models
+   * @param probClusterIGivenX Output storage for cluster probabilities
+   * @return the expectation value of the current mixture of distributions
+   */
+  public double assignInstancesHard(ArrayList<? extends ClusterFeature> cfs, List<? extends BetulaClusterModel> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
+    double emSum = 0.;
+    int n = 0;
+    for(int i = 0; i < cfs.size(); i++) {
+      ClusterFeature cfsi = cfs.get(i);
+      double[] probs = new double[k];
+      for(int j = 0; j < k; j++) {
+        final double v = models.get(j).estimateLogDensity((NumberVector) cfsi);
+        probs[j] = v > MIN_LOGLIKELIHOOD ? v : MIN_LOGLIKELIHOOD;
+      }
+      final double logP = EM.logSumExp(probs);
+      int best = argmax(probs);
+      for(int j = 0; j < k; j++) {
+        probs[j] = j == best ? 1. : 0.;
+      }
+      probClusterIGivenX.put(cfsi, probs);
+      emSum += logP * cfsi.getWeight();
+      n += cfsi.getWeight();
+    }
+    return emSum / n;
+  }
   /**
    * Recompute the covariance matrixes.
    * 
@@ -368,6 +419,11 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     public static final OptionID PRIOR_ID = new OptionID("em.map.prior", "Regularization factor for MAP estimation.");
 
     /**
+     * Hard assignment for all iteratios
+     */
+    public static final OptionID ARGMAX_ID = new OptionID("em.argmax", "Use Argmax for assignment in every iteration.");
+
+    /**
      * CFTree factory.
      */
     CFTree.Factory<?> cffactory;
@@ -398,6 +454,11 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
     protected double prior = 0.;
 
     /**
+     * Use argmax for assignment in every iteration
+     */
+    protected boolean argmax = false;
+
+    /**
      * initialization method
      */
     protected BetulaClusterModelFactory<?> initialization;
@@ -421,11 +482,13 @@ public class BetulaGMM implements ClusteringAlgorithm<Clustering<EMModel>> {
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> maxiter = x);
+      new Flag(ARGMAX_ID) //
+          .grab(config, x -> argmax = x);
     }
 
     @Override
     public BetulaGMM make() {
-      return new BetulaGMM(cffactory, delta, k, maxiter, soft, initialization, prior);
+      return new BetulaGMM(cffactory, delta, k, maxiter, soft, initialization, prior, argmax);
     }
   }
 }
