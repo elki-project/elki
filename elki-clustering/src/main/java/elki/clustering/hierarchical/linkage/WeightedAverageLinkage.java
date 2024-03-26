@@ -56,7 +56,7 @@ import elki.utilities.optionhandling.Parameterizer;
     title = "A statistical method for evaluating systematic relationship", //
     booktitle = "University of Kansas science bulletin 28", //
     url = "https://archive.org/details/cbarchive_33927_astatisticalmethodforevaluatin1902", //
-    bibkey = "journals/kansas/SokalM1902")
+    bibkey = "journals/kansas/SokalM1958")
 @Alias({ "wpgma", "WPGMA" })
 @Priority(Priority.DEFAULT - 1)
 public class WeightedAverageLinkage implements Linkage {
