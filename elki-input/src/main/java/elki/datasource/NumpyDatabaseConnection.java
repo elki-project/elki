@@ -203,6 +203,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
         }
         throw e;
       }
+      bundle.appendColumn(new VectorFieldTypeInformation<>(FloatVector.FACTORY, cols), vectors);
     }
     else if(dtype.contains("U")) {
       final int size = Integer.parseInt(dtype.split("U")[1]);
