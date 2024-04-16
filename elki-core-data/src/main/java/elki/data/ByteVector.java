@@ -39,7 +39,7 @@ public class ByteVector implements NumberVector {
   /**
    * Static instance (object factory).
    */
-  public static final ByteVector.Factory STATIC = new ByteVector.Factory();
+  public static final ByteVector.Factory FACTORY = new ByteVector.Factory();
 
   /**
    * Serializer for up to 127 dimensions.
@@ -141,6 +141,29 @@ public class ByteVector implements NumberVector {
   }
 
   /**
+   * Copy a byte array into a new vector.
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static ByteVector copy(byte[] vals) {
+    return new ByteVector(vals);
+  }
+
+  /**
+   * Wrap a byte array as vector (without copying).
+   * <p>
+   * Note: modifying the array afterwards can lead to problems if the data has,
+   * e.g., been added to an index, which relies on them being immutable!
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static ByteVector wrap(byte[] vals) {
+    return new ByteVector(vals, true);
+  }
+
+  /**
    * Factory for Byte vectors.
    * 
    * @author Erich Schubert
@@ -186,7 +209,7 @@ public class ByteVector implements NumberVector {
     public static class Par implements Parameterizer {
       @Override
       public ByteVector.Factory make() {
-        return STATIC;
+        return FACTORY;
       }
     }
   }

@@ -28,15 +28,15 @@ import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import elki.data.DoubleVector;
-import elki.data.FloatVector;
-import elki.data.IntegerVector;
-import elki.data.LabelList;
+import elki.data.*;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
 import elki.datasource.bundle.MultipleObjectsBundle;
@@ -53,15 +53,11 @@ import elki.utilities.optionhandling.parameters.FileParameter;
  * <p>
  * This currently only supports C order only (no Fortran order), and the data
  * types <tt>f4</tt> (float), <tt>f8</tt> (double), <tt>i4</tt> (signed int),
- * <tt>i8</tt> (signed long, but limited to the integer value range, as we
- * currently do not have LongVector data type in ELKI),
- * <tt>U</tt> (unicode string).
+ * <tt>i8</tt> (signed long), <tt>U</tt> (unicode string).
  * <p>
  * Both endianesses should be supported. But since Java does not have unsigned
- * primitives, we currently do not support these.
- * <p>
- * Adding support for <tt>i1</tt>, <tt>i2</tt> and full support for <tt>i8</tt>
- * is primarily a matter of copy and pasting code.
+ * primitives, we currently do not support these. It would be possible to
+ * up-cast them to the next larger signed type, for example.
  * <p>
  * For further information, please see the
  * <a href="https://numpy.org/doc/stable/reference/arrays.interface.html">Numpy
@@ -154,7 +150,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     // Load in data mode:
     if(dtype.endsWith("f4")) {
       List<FloatVector> vectors = new ArrayList<>(rows);
-      loadFloats(rows, cols, file, start, littleEndian, (buf) -> {
+      loadFloats(rows, cols, file, start, littleEndian, buf -> {
         float[] f = new float[cols];
         buf.get(f, 0, cols);
         vectors.add(FloatVector.wrap(f));
@@ -163,47 +159,48 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     }
     else if(dtype.endsWith("f8")) {
       List<DoubleVector> vectors = new ArrayList<>(rows);
-      loadDoubles(rows, cols, file, start, littleEndian, (buf) -> {
+      loadDoubles(rows, cols, file, start, littleEndian, buf -> {
         double[] f = new double[cols];
         buf.get(f, 0, cols);
         vectors.add(DoubleVector.wrap(f));
       });
-      bundle.appendColumn(new VectorFieldTypeInformation<>(FloatVector.FACTORY, cols), vectors);
+      bundle.appendColumn(new VectorFieldTypeInformation<>(DoubleVector.FACTORY, cols), vectors);
+    }
+    else if(dtype.endsWith("i1")) {
+      List<ByteVector> vectors = new ArrayList<>(rows);
+      loadBytes(rows, cols, file, start, buf -> {
+        byte[] f = new byte[cols];
+        buf.get(f, 0, cols);
+        vectors.add(ByteVector.wrap(f));
+      });
+      bundle.appendColumn(new VectorFieldTypeInformation<>(ByteVector.FACTORY, cols), vectors);
+    }
+    else if(dtype.endsWith("i2")) {
+      List<ShortVector> vectors = new ArrayList<>(rows);
+      loadShorts(rows, cols, file, start, littleEndian, buf -> {
+        short[] f = new short[cols];
+        buf.get(f, 0, cols);
+        vectors.add(ShortVector.wrap(f));
+      });
+      bundle.appendColumn(new VectorFieldTypeInformation<>(ShortVector.FACTORY, cols), vectors);
     }
     else if(dtype.endsWith("i4")) {
       List<IntegerVector> vectors = new ArrayList<>(rows);
-      loadIntegers(rows, cols, file, start, littleEndian, (buf) -> {
+      loadIntegers(rows, cols, file, start, littleEndian, buf -> {
         int[] f = new int[cols];
         buf.get(f, 0, cols);
         vectors.add(IntegerVector.wrap(f));
       });
-      bundle.appendColumn(new VectorFieldTypeInformation<>(FloatVector.FACTORY, cols), vectors);
+      bundle.appendColumn(new VectorFieldTypeInformation<>(IntegerVector.FACTORY, cols), vectors);
     }
     else if(dtype.endsWith("i8")) {
-      List<IntegerVector> vectors = new ArrayList<>(rows);
-      LOG.warning("ELKI currently does not have vectors of int64, trying to convert to int32");
-      long[] f = new long[cols];
-      try {
-        loadLongs(rows, cols, file, start, littleEndian, (buf) -> {
-          int[] i = new int[cols];
-          buf.get(f, 0, cols);
-          for(int k = 0; k < cols; k++) {
-            if(f[k] > Integer.MAX_VALUE || f[k] < Integer.MIN_VALUE) {
-              throw new RuntimeException(new IOException("Long value outside of int32 range."));
-            }
-            i[k] = (int) f[k];
-          }
-          vectors.add(IntegerVector.wrap(i));
-        });
-      }
-      catch(RuntimeException e) {
-        // Unbox the exception thrown in lambda
-        if(e.getCause() instanceof IOException) {
-          throw (IOException) e.getCause();
-        }
-        throw e;
-      }
-      bundle.appendColumn(new VectorFieldTypeInformation<>(FloatVector.FACTORY, cols), vectors);
+      List<LongVector> vectors = new ArrayList<>(rows);
+      loadLongs(rows, cols, file, start, littleEndian, buf -> {
+        long[] f = new long[cols];
+        buf.get(f, 0, cols);
+        vectors.add(LongVector.wrap(f));
+      });
+      bundle.appendColumn(new VectorFieldTypeInformation<>(LongVector.FACTORY, cols), vectors);
     }
     else if(dtype.contains("U")) {
       final int size = Integer.parseInt(dtype.split("U")[1]);
@@ -212,7 +209,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
         columns.add(new ArrayList<>(rows));
       }
       char[] char_data = new char[size];
-      loadStrings(rows, cols, size, file, start, littleEndian, (buf) -> {
+      loadStrings(rows, cols, size, file, start, littleEndian, buf -> {
         for(int c = 0; c < cols; c++) {
           buf.get(char_data, 0, size);
           int nonzero = 0;
@@ -290,7 +287,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     if(dtype.endsWith("f4")) {
       ArrayList<LabelList> labellist = new ArrayList<>();
       float[] f = new float[cols];
-      loadFloats(rows, cols, file, start, littleEndian, (buf) -> {
+      loadFloats(rows, cols, file, start, littleEndian, buf -> {
         buf.get(f, 0, cols);
         labellist.add(LabelList.make(IntStream.range(0, f.length) //
             .mapToObj(i -> Float.toString(f[i])).collect(Collectors.toList())));
@@ -301,7 +298,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     else if(dtype.endsWith("f8")) {
       ArrayList<LabelList> labellist = new ArrayList<>();
       double[] f = new double[cols];
-      loadDoubles(rows, cols, file, start, littleEndian, (buf) -> {
+      loadDoubles(rows, cols, file, start, littleEndian, buf -> {
         buf.get(f, 0, cols);
         labellist.add(LabelList.make(IntStream.range(0, f.length) //
             .mapToObj(i -> Double.toString(f[i])).collect(Collectors.toList())));
@@ -309,13 +306,35 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
       bundle.appendColumn(TypeUtil.LABELLIST, labellist);
       return;
     }
+    else if(dtype.endsWith("i1")) {
+      ArrayList<LabelList> labellist = new ArrayList<>();
+      byte[] f = new byte[cols];
+      loadBytes(rows, cols, file, start, buf -> {
+        buf.get(f, 0, cols);
+        labellist.add(LabelList.make(IntStream.range(0, f.length) //
+            .mapToObj(i -> Byte.toString(f[i])).collect(Collectors.toList())));
+      });
+      bundle.appendColumn(TypeUtil.LABELLIST, labellist);
+      return;
+    }
+    else if(dtype.endsWith("i2")) {
+      ArrayList<LabelList> labellist = new ArrayList<>();
+      short[] f = new short[cols];
+      loadShorts(rows, cols, file, start, littleEndian, buf -> {
+        buf.get(f, 0, cols);
+        labellist.add(LabelList.make(IntStream.range(0, f.length) //
+            .mapToObj(i -> Short.toString(f[i])).collect(Collectors.toList())));
+      });
+      bundle.appendColumn(TypeUtil.LABELLIST, labellist);
+      return;
+    }
     else if(dtype.endsWith("i4")) {
       ArrayList<LabelList> labellist = new ArrayList<>();
       int[] f = new int[cols];
-      loadIntegers(rows, cols, file, start, littleEndian, (buf) -> {
+      loadIntegers(rows, cols, file, start, littleEndian, buf -> {
         buf.get(f, 0, cols);
-        labellist.add(LabelList.make(Arrays.asList(f).stream() //
-            .map(Object::toString).collect(Collectors.toList())));
+        labellist.add(LabelList.make(IntStream.range(0, f.length) //
+            .mapToObj(i -> Integer.toString(f[i])).collect(Collectors.toList())));
       });
       bundle.appendColumn(TypeUtil.LABELLIST, labellist);
       return;
@@ -323,7 +342,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     else if(dtype.endsWith("i8")) {
       ArrayList<LabelList> labellist = new ArrayList<>();
       long[] f = new long[cols];
-      loadLongs(rows, cols, file, start, littleEndian, (buf) -> {
+      loadLongs(rows, cols, file, start, littleEndian, buf -> {
         buf.get(f, 0, cols);
         labellist.add(LabelList.make(IntStream.range(0, f.length) //
             .mapToObj(i -> Long.toString(f[i])).collect(Collectors.toList())));
@@ -335,7 +354,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
       final int size = Integer.parseInt(dtype.split("U")[1]);
       ArrayList<LabelList> labellist = new ArrayList<>();
       char[] char_data = new char[size];
-      loadStrings(rows, cols, size, file, start, littleEndian, (buf) -> {
+      loadStrings(rows, cols, size, file, start, littleEndian, buf -> {
         List<String> row = new ArrayList<>(cols);
         for(int c = 0; c < cols; c++) {
           buf.get(char_data, 0, size);
@@ -528,6 +547,58 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
       ByteBuffer buffer = file.map(MapMode.READ_ONLY, start, read * columnSize);
       buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
       IntBuffer intBuffer = buffer.asIntBuffer();
+      for(int j = 0; j < read; j++) {
+        callback.accept(intBuffer);
+      }
+      System.gc();
+      start += read * columnSize;
+      rows -= read;
+    }
+  }
+
+  /**
+   * Read bytes data, using chunked memory maps.
+   * 
+   * @param rows Number of rows
+   * @param cols Number of columns
+   * @param file File to map
+   * @param start Start offset
+   * @param littleEndian Endianess
+   * @param callback Callback, with a temporary buffer
+   * @throws IOException on IO Errors
+   */
+  private static void loadBytes(int rows, int cols, FileChannel file, long start, Consumer<ByteBuffer> callback) throws IOException {
+    int columnSize = Integer.BYTES * cols;
+    while(rows > 0) {
+      long read = Math.min(Integer.MAX_VALUE / columnSize, rows);
+      ByteBuffer buffer = file.map(MapMode.READ_ONLY, start, read * columnSize);
+      for(int j = 0; j < read; j++) {
+        callback.accept(buffer);
+      }
+      System.gc();
+      start += read * columnSize;
+      rows -= read;
+    }
+  }
+
+  /**
+   * Read short data, using chunked memory maps.
+   * 
+   * @param rows Number of rows
+   * @param cols Number of columns
+   * @param file File to map
+   * @param start Start offset
+   * @param littleEndian Endianess
+   * @param callback Callback, with a temporary buffer
+   * @throws IOException on IO Errors
+   */
+  private static void loadShorts(int rows, int cols, FileChannel file, long start, boolean littleEndian, Consumer<ShortBuffer> callback) throws IOException {
+    int columnSize = Short.BYTES * cols;
+    while(rows > 0) {
+      long read = Math.min(Integer.MAX_VALUE / columnSize, rows);
+      ByteBuffer buffer = file.map(MapMode.READ_ONLY, start, read * columnSize);
+      buffer.order(littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+      ShortBuffer intBuffer = buffer.asShortBuffer();
       for(int j = 0; j < read; j++) {
         callback.accept(intBuffer);
       }

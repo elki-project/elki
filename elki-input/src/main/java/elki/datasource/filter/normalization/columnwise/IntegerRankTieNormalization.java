@@ -74,7 +74,7 @@ public class IntegerRankTieNormalization implements ObjectFilter {
       final List<? extends NumberVector> castColumn = (List<? extends NumberVector>) column;
       // Get the replacement type information
       final int dim = ((VectorFieldTypeInformation<?>) type).getDimensionality();
-      final VectorFieldTypeInformation<IntegerVector> outType = new VectorFieldTypeInformation<>(IntegerVector.STATIC, dim);
+      final VectorFieldTypeInformation<IntegerVector> outType = new VectorFieldTypeInformation<>(IntegerVector.FACTORY, dim);
 
       // Output vectors
       int[][] posvecs = new int[len][dim];
