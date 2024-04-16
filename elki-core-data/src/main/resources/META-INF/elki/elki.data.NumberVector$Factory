@@ -4,6 +4,7 @@ elki.data.FloatVector$Factory
 elki.data.IntegerVector$Factory
 elki.data.ShortVector$Factory
 elki.data.ByteVector$Factory
+elki.data.LongVector$Factory
 elki.data.OneDimensionalDoubleVector$Factory
 elki.data.SparseFloatVector$Factory
 elki.data.SparseDoubleVector$Factory

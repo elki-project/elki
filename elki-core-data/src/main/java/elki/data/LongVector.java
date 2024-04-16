@@ -30,36 +30,36 @@ import elki.utilities.io.ByteBufferSerializer;
 import elki.utilities.optionhandling.Parameterizer;
 
 /**
- * Vector type using {@code int[]} storage.
+ * Vector type using {@code long[]} storage.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class IntegerVector implements NumberVector {
+public class LongVector implements NumberVector {
   /**
    * Static instance (object factory).
    */
-  public static final IntegerVector.Factory FACTORY = new IntegerVector.Factory();
+  public static final LongVector.Factory FACTORY = new LongVector.Factory();
 
   /**
    * Serializer for up to 127 dimensions.
    */
-  public static final ByteBufferSerializer<IntegerVector> BYTE_SERIALIZER = new SmallSerializer();
+  public static final ByteBufferSerializer<LongVector> BYTE_SERIALIZER = new SmallSerializer();
 
   /**
    * Serializer for up to 2^15-1 dimensions.
    */
-  public static final ByteBufferSerializer<IntegerVector> SHORT_SERIALIZER = new ShortSerializer();
+  public static final ByteBufferSerializer<LongVector> SHORT_SERIALIZER = new ShortSerializer();
 
   /**
    * Serializer using varint encoding.
    */
-  public static final ByteBufferSerializer<IntegerVector> VARIABLE_SERIALIZER = new VariableSerializer();
+  public static final ByteBufferSerializer<LongVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
    * Keeps the values of the real vector.
    */
-  private final int[] values;
+  private final long[] values;
 
   /**
    * Private constructor. NOT for public use.
@@ -67,22 +67,16 @@ public class IntegerVector implements NumberVector {
    * @param values Value data
    * @param nocopy Flag to use without copying.
    */
-  private IntegerVector(int[] values, boolean nocopy) {
-    if(nocopy) {
-      this.values = values;
-    }
-    else {
-      this.values = new int[values.length];
-      System.arraycopy(values, 0, this.values, 0, values.length);
-    }
+  private LongVector(long[] values, boolean nocopy) {
+    this.values = nocopy ? values : values.clone();
   }
 
   /**
-   * Create an IntegerVector consisting of the given integer values.
+   * Create an LongVector consisting of the given integer values.
    * 
-   * @param values the values to be set as values of the IntegerVector
+   * @param values the values to be set as values of the LongVector
    */
-  public IntegerVector(int[] values) {
+  public LongVector(long[] values) {
     this.values = values.clone();
   }
 
@@ -101,8 +95,8 @@ public class IntegerVector implements NumberVector {
    */
   @Override
   @Deprecated
-  public Integer getValue(int dimension) {
-    return Integer.valueOf(values[dimension]);
+  public Long getValue(int dimension) {
+    return Long.valueOf(values[dimension]);
   }
 
   @Override
@@ -117,7 +111,7 @@ public class IntegerVector implements NumberVector {
 
   @Override
   public int intValue(int dimension) {
-    return values[dimension];
+    return (int) values[dimension];
   }
 
   @Override
@@ -142,17 +136,17 @@ public class IntegerVector implements NumberVector {
   }
 
   /**
-   * Copy an integer array into a new vector.
+   * Copy a double array into a new vector.
    * 
    * @param vals Values
    * @return Wrapped vector
    */
-  public static IntegerVector copy(int[] vals) {
-    return new IntegerVector(vals);
+  public static LongVector copy(long[] vals) {
+    return new LongVector(vals);
   }
 
   /**
-   * Wrap an integer array as vector (without copying).
+   * Wrap a double array as vector (without copying).
    * <p>
    * Note: modifying the array afterwards can lead to problems if the data has,
    * e.g., been added to an index, which relies on them being immutable!
@@ -160,46 +154,46 @@ public class IntegerVector implements NumberVector {
    * @param vals Values
    * @return Wrapped vector
    */
-  public static IntegerVector wrap(int[] vals) {
-    return new IntegerVector(vals, true);
+  public static LongVector wrap(long[] vals) {
+    return new LongVector(vals, true);
   }
 
   /**
-   * Factory for integer vectors.
+   * Factory for long vectors.
    * 
    * @author Erich Schubert
    * 
-   * @has - - - IntegerVector
+   * @has - - - LongVector
    */
-  public static class Factory implements NumberVector.Factory<IntegerVector> {
+  public static class Factory implements NumberVector.Factory<LongVector> {
     @Override
-    public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
+    public <A> LongVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);
-      int[] values = new int[dim];
+      long[] values = new long[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.get(array, i).intValue();
+        values[i] = adapter.get(array, i).longValue();
       }
-      return new IntegerVector(values, true);
+      return new LongVector(values, true);
     }
 
     @Override
-    public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    public <A> LongVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
-      int[] values = new int[dim];
+      long[] values = new long[dim];
       for(int i = 0; i < dim; i++) {
-        values[i] = adapter.getInteger(array, i);
+        values[i] = adapter.getLong(array, i);
       }
-      return new IntegerVector(values, true);
+      return new LongVector(values, true);
     }
 
     @Override
-    public ByteBufferSerializer<IntegerVector> getDefaultSerializer() {
+    public ByteBufferSerializer<LongVector> getDefaultSerializer() {
       return VARIABLE_SERIALIZER;
     }
 
     @Override
-    public Class<? super IntegerVector> getRestrictionClass() {
-      return IntegerVector.class;
+    public Class<? super LongVector> getRestrictionClass() {
+      return LongVector.class;
     }
 
     /**
@@ -209,7 +203,7 @@ public class IntegerVector implements NumberVector {
      */
     public static class Par implements Parameterizer {
       @Override
-      public IntegerVector.Factory make() {
+      public LongVector.Factory make() {
         return FACTORY;
       }
     }
@@ -221,72 +215,72 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @assoc - serializes - IntegerVector
+   * @assoc - serializes - LongVector
    */
-  public static class SmallSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class SmallSerializer implements ByteBufferSerializer<LongVector> {
     @Override
-    public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    public LongVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
-      final int[] values = new int[dimensionality];
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_LONG * dimensionality);
+      final long[] values = new long[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
-        values[i] = buffer.getInt();
+        values[i] = buffer.getLong();
       }
-      return new IntegerVector(values, true);
+      return new LongVector(values, true);
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, IntegerVector vec) throws IOException {
+    public void toByteBuffer(ByteBuffer buffer, LongVector vec) throws IOException {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * vec.values.length);
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_LONG * vec.values.length);
       buffer.put((byte) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
-        buffer.putInt(vec.values[i]);
+        buffer.putLong(vec.values[i]);
       }
     }
 
     @Override
-    public int getByteSize(IntegerVector vec) {
+    public int getByteSize(LongVector vec) {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
-      return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
+      return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_LONG * vec.getDimensionality();
     }
   }
 
   /**
-   * Serialization class for dense integer vectors with up to
+   * Serialization class for dense long vectors with up to
    * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
    * dimensionality.
    * 
    * @author Erich Schubert
    * 
-   * @assoc - serializes - IntegerVector
+   * @assoc - serializes - LongVector
    */
-  public static class ShortSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class ShortSerializer implements ByteBufferSerializer<LongVector> {
     @Override
-    public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    public LongVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
-      final int[] values = new int[dimensionality];
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_LONG * dimensionality);
+      final long[] values = new long[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
-        values[i] = buffer.getInt();
+        values[i] = buffer.getLong();
       }
-      return new IntegerVector(values, true);
+      return new LongVector(values, true);
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, IntegerVector vec) throws IOException {
+    public void toByteBuffer(ByteBuffer buffer, LongVector vec) throws IOException {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * vec.values.length);
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_LONG * vec.values.length);
       buffer.putShort((short) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
-        buffer.putInt(vec.values[i]);
+        buffer.putLong(vec.values[i]);
       }
     }
 
     @Override
-    public int getByteSize(IntegerVector vec) {
+    public int getByteSize(LongVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
-      return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
+      return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_LONG * vec.getDimensionality();
     }
   }
 
@@ -295,35 +289,35 @@ public class IntegerVector implements NumberVector {
    * 
    * @author Erich Schubert
    * 
-   * @assoc - serializes - IntegerVector
+   * @assoc - serializes - LongVector
    */
-  public static class VariableSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<LongVector> {
     @Override
-    public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+    public LongVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_INT * dimensionality);
-      final int[] values = new int[dimensionality];
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_LONG * dimensionality);
+      final long[] values = new long[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
-        values[i] = ByteArrayUtil.readSignedVarint(buffer);
+        values[i] = ByteArrayUtil.readSignedVarintLong(buffer);
       }
-      return new IntegerVector(values, true);
+      return new LongVector(values, true);
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, IntegerVector vec) throws IOException {
+    public void toByteBuffer(ByteBuffer buffer, LongVector vec) throws IOException {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
-        ByteArrayUtil.writeSignedVarint(buffer, vec.values[i]);
+        ByteArrayUtil.writeSignedVarintLong(buffer, vec.values[i]);
       }
     }
 
     @Override
-    public int getByteSize(IntegerVector vec) {
+    public int getByteSize(LongVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       int len = ByteArrayUtil.getUnsignedVarintSize(vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
-        len += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
+        len += ByteArrayUtil.getSignedVarintLongSize(vec.values[i]);
       }
       return len;
     }
