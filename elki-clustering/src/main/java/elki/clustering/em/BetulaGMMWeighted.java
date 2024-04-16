@@ -59,18 +59,18 @@ import net.jafama.FastMath;
 public class BetulaGMMWeighted extends BetulaGMM {
   /**
    * Constructor.
-   *
    * @param cffactory CFTree factory
-   * @param delta Delta parameter
-   * @param k Number of clusters
-   * @param maxiter Maximum number of iterations
-   * @param soft Return soft clustering results
    * @param initialization Initialization method
+   * @param k Number of clusters
+   * @param delta Delta parameter
+   * @param miniter Minimum number of iterations
+   * @param maxiter Maximum number of iterations
+   * @param hard hard assignment in iterations
+   * @param soft Return soft clustering results
    * @param prior MAP prior
-   * @param argmax hard assignment in iterations
    */
-  public BetulaGMMWeighted(CFTree.Factory<?> cffactory, double delta, int k, int maxiter, boolean soft, BetulaClusterModelFactory<?> initialization, double prior, boolean argmax) {
-    super(cffactory, delta, k, maxiter, soft, initialization, prior, argmax);
+  public BetulaGMMWeighted(CFTree.Factory<?> cffactory, BetulaClusterModelFactory<?> initialization, int k, double delta, int miniter, int maxiter, boolean hard, boolean soft, double prior) {
+    super(cffactory, initialization, k, delta, miniter, maxiter, hard, soft, prior);
   }
 
   @Override
@@ -95,6 +95,7 @@ public class BetulaGMMWeighted extends BetulaGMM {
     }
     return emSum / n;
   }
+
   @Override
   public double assignInstancesHard(ArrayList<? extends ClusterFeature> cfs, List<? extends BetulaClusterModel> models, Map<ClusterFeature, double[]> probClusterIGivenX) {
     double emSum = 0.;
@@ -126,7 +127,7 @@ public class BetulaGMMWeighted extends BetulaGMM {
   public static class Par extends BetulaGMM.Par {
     @Override
     public BetulaGMMWeighted make() {
-      return new BetulaGMMWeighted(cffactory, delta, k, maxiter, soft, initialization, prior, argmax);
+      return new BetulaGMMWeighted(cffactory, initialization, k, delta, miniter, maxiter, hard, soft, prior);
     }
   }
 }

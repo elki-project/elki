@@ -20,9 +20,6 @@
  */
 package elki.clustering.em.models;
 
-import static elki.math.linearalgebra.VMath.identity;
-import static elki.math.linearalgebra.VMath.timesEquals;
-
 import elki.data.NumberVector;
 import elki.data.model.EMModel;
 import elki.index.tree.betula.features.ClusterFeature;

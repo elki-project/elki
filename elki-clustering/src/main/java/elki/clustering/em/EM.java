@@ -47,6 +47,7 @@ import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
+import elki.math.linearalgebra.VMath;
 import elki.result.Metadata;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Description;
@@ -66,6 +67,17 @@ import net.jafama.FastMath;
 /**
  * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
  * Mixture Modeling (GMM), with optional MAP regularization.
+ * <p>
+ * In <em>soft mode</em> (default), cluster responsibilities are distributed
+ * according to
+ * the probabilities. In <em>hard assignment</em> mode, every point will be
+ * assigned to the most likely cluster during optimization.
+ * Independent of this choice, the algorithm will always output a hard cluster
+ * assignment at the end for API compatibility, and the cluster probabilities
+ * are attached to the result for further analysis if the "soft" option is set.
+ * <p>
+ * In hard assignment, clusters can become empty, and it is advisable to enable
+ * MAP regularization (which can also help prevent other result degradation).
  * <p>
  * Reference:
  * <p>
@@ -144,6 +156,11 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   protected double prior = 0.;
 
   /**
+   * Use hard assignments (hard) during optimization.
+   */
+  protected boolean hard;
+
+  /**
    * Retain soft assignments.
    */
   protected boolean soft;
@@ -160,62 +177,26 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
   /**
    * Constructor.
-   *
+   * 
+   * @param mfactory EM cluster model factory
    * @param k k parameter
    * @param delta delta parameter
-   * @param mfactory EM cluster model factory
-   */
-  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory) {
-    this(k, delta, mfactory, -1, 0., false);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param k k parameter
-   * @param delta delta parameter
-   * @param mfactory EM cluster model factory
-   * @param maxiter Maximum number of iterations
-   * @param soft Include soft assignments
-   */
-  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int maxiter, boolean soft) {
-    this(k, delta, mfactory, maxiter, 0., soft);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param k k parameter
-   * @param delta delta parameter
-   * @param mfactory EM cluster model factory
-   * @param maxiter Maximum number of iterations
-   * @param prior MAP prior
-   * @param soft Include soft assignments
-   */
-  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int maxiter, double prior, boolean soft) {
-    this(k, delta, mfactory, 1, maxiter, prior, soft);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param k k parameter
-   * @param delta delta parameter
-   * @param mfactory EM cluster model factory
    * @param miniter Minimum number of iterations
    * @param maxiter Maximum number of iterations
-   * @param prior MAP prior
+   * @param hard Use hard assignments during optimization
    * @param soft Include soft assignments
+   * @param prior MAP prior
    */
-  public EM(int k, double delta, EMClusterModelFactory<? super O, M> mfactory, int miniter, int maxiter, double prior, boolean soft) {
+  public EM(EMClusterModelFactory<? super O, M> mfactory, int k, double delta, int miniter, int maxiter, boolean hard, boolean soft, double prior) {
     super();
+    this.mfactory = mfactory;
     this.k = k;
     this.delta = delta;
-    this.mfactory = mfactory;
     this.miniter = miniter;
     this.maxiter = maxiter;
-    this.prior = prior;
+    this.hard = hard;
     this.soft = soft;
+    this.prior = prior;
   }
 
   @Override
@@ -234,7 +215,7 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<M> run(Relation<O> relation) {
+  public Clustering<M> run(Relation<? extends O> relation) {
     if(relation.size() == 0) {
       throw new IllegalArgumentException("database empty: must contain elements");
     }
@@ -247,12 +228,15 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
 
     // iteration unless no change
     int it = 0, lastimprovement = 0;
-    double bestloglikelihood = Double.NEGATIVE_INFINITY;// loglikelihood; // For
-                                                        // detecting
-                                                        // instabilities.
+    double bestloglikelihood = Double.NEGATIVE_INFINITY;
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
-      recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
+      if(hard) {
+        recomputeModelsHard(relation, probClusterIGivenX, models, prior);
+      }
+      else {
+        recomputeModels(relation, probClusterIGivenX, models, prior);
+      }
       // reassign probabilities
       loglikelihood = assignProbabilitiesToInstances(relation, models, probClusterIGivenX, null);
 
@@ -293,15 +277,15 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
   }
 
   /**
-   * Recompute the covariance matrixes.
+   * Recompute the cluster models (covariance matrixes).
    * 
+   * @param <O> Object type
    * @param relation Vector data
    * @param probClusterIGivenX Object probabilities
    * @param models Cluster models to update
    * @param prior MAP prior (use 0 for MLE)
-   * @param <O> Object type
    */
-  public static <O> void recomputeCovarianceMatrices(Relation<? extends O> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<? super O, ?>> models, double prior) {
+  public static <O> void recomputeModels(Relation<? extends O> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<? super O, ?>> models, double prior) {
     final int k = models.size();
     boolean needsTwoPass = false;
     for(EMClusterModel<?, ?> m : models) {
@@ -335,6 +319,45 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
         }
         wsum[i] += prob;
       }
+    }
+    for(int i = 0; i < k; i++) {
+      // MLE / MAP
+      final double weight = prior <= 0. ? wsum[i] / relation.size() : (wsum[i] + prior - 1) / (relation.size() + prior * k - k);
+      models.get(i).finalizeEStep(weight, prior);
+    }
+  }
+
+  /**
+   * Recompute the cluster models (covariance matrixes) with hard assignment.
+   * 
+   * @param <O> Object type
+   * @param relation Vector data
+   * @param probClusterIGivenX Object probabilities
+   * @param models Cluster models to update
+   * @param prior MAP prior (use 0 for MLE)
+   */
+  public static <O> void recomputeModelsHard(Relation<? extends O> relation, WritableDataStore<double[]> probClusterIGivenX, List<? extends EMClusterModel<? super O, ?>> models, double prior) {
+    final int k = models.size();
+    boolean needsTwoPass = false;
+    for(EMClusterModel<?, ?> m : models) {
+      m.beginEStep();
+      needsTwoPass |= m.needsTwoPass();
+    }
+    // First pass, only for two-pass models.
+    if(needsTwoPass) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        int argmax = VMath.argmax(probClusterIGivenX.get(iditer));
+        models.get(argmax).firstPassE(relation.get(iditer), 1.);
+      }
+      for(EMClusterModel<?, ?> m : models) {
+        m.finalizeFirstPassE();
+      }
+    }
+    double[] wsum = new double[k];
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      int argmax = VMath.argmax(probClusterIGivenX.get(iditer));
+      models.get(argmax).updateE(relation.get(iditer), 1.);
+      wsum[argmax] += 1.;
     }
     for(int i = 0; i < k; i++) {
       // MLE / MAP
@@ -455,9 +478,14 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     public static final OptionID PRIOR_ID = new OptionID("em.map.prior", "Regularization factor for MAP estimation.");
 
     /**
+     * Parameter to use hard assignments during optimization
+     */
+    public static final OptionID HARD_ID = new OptionID("em.hard", "Use hard (k-means-style hard) cluster assignments during optimization.");
+
+    /**
      * Parameter to specify the saving of soft assignments
      */
-    public static final OptionID SOFT_ID = new OptionID("em.soft", "Retain soft assignment of clusters.");
+    public static final OptionID SOFT_ID = new OptionID("em.soft", "Return soft assignment of clusters.");
 
     /**
      * Number of clusters.
@@ -485,22 +513,27 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
     protected int maxiter = -1;
 
     /**
-     * Prior to enable MAP estimation (use 0 for MLE)
+     * Prior to enable MAP estimation (use 0 for MLE).
      */
     double prior = 0.;
 
     /**
-     * Retain soft assignments?
+     * Use hard assignments during optimization.
+     */
+    boolean hard = false;
+
+    /**
+     * Return soft assignments?
      */
     boolean soft = false;
 
     @Override
     public void configure(Parameterization config) {
+      new ObjectParameter<EMClusterModelFactory<O, M>>(MODEL_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
+          .grab(config, x -> mfactory = x);
       new IntParameter(K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<EMClusterModelFactory<O, M>>(MODEL_ID, EMClusterModelFactory.class, MultivariateGaussianModelFactory.class) //
-          .grab(config, x -> mfactory = x);
       new DoubleParameter(DELTA_ID, 1e-7)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
           .grab(config, x -> delta = x);
@@ -512,17 +545,19 @@ public class EM<O, M extends MeanModel> implements ClusteringAlgorithm<Clusterin
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
           .setOptional(true) //
           .grab(config, x -> maxiter = x);
+      new Flag(HARD_ID) //
+          .grab(config, x -> hard = x);
+      new Flag(SOFT_ID) //
+          .grab(config, x -> soft = x);
       new DoubleParameter(PRIOR_ID) //
           .setOptional(true) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
           .grab(config, x -> prior = x);
-      new Flag(SOFT_ID) //
-          .grab(config, x -> soft = x);
     }
 
     @Override
     public EM<O, M> make() {
-      return new EM<>(k, delta, mfactory, miniter, maxiter, prior, soft);
+      return new EM<>(mfactory, k, delta, miniter, maxiter, hard, soft, prior);
     }
   }
 }
