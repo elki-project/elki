@@ -42,7 +42,7 @@ public class MultivariateGaussianModelTest extends AbstractClusterAlgorithmTest 
   public void testHierarchicalMLE() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 4) //
+        .with(KMeans.SEED_ID, 4) // high dependence on seed!
         .with(EM.Par.K_ID, 6) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .build().autorun(db);
@@ -54,7 +54,7 @@ public class MultivariateGaussianModelTest extends AbstractClusterAlgorithmTest 
   public void testHierarchicalMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 4) //
+        .with(KMeans.SEED_ID, 4) // high dependence on seed!
         .with(EM.Par.K_ID, 5) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, 10) //
@@ -64,10 +64,23 @@ public class MultivariateGaussianModelTest extends AbstractClusterAlgorithmTest 
   }
 
   @Test
+  public void testHierarchicalHard() {
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+    Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
+        .with(KMeans.SEED_ID, 2) // high dependence on seed!
+        .with(EM.Par.K_ID, 6) //
+        .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
+        .with(EM.Par.HARD_ID) //
+        .build().autorun(db);
+    assertFMeasure(db, result, 0.92377);
+    assertClusterSizes(result, new int[] { 6, 30, 96, 102, 200, 276 });
+  }
+
+  @Test
   public void testConstantMLE() {
     Database db = makeSimpleDatabase(UNITTEST + "constant-attribute.csv.gz", 200);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 0) // high dependence on seed!
         .with(EM.Par.K_ID, 2) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .build().autorun(db);
@@ -79,7 +92,7 @@ public class MultivariateGaussianModelTest extends AbstractClusterAlgorithmTest 
   public void testConstantMAP() {
     Database db = makeSimpleDatabase(UNITTEST + "constant-attribute.csv.gz", 200);
     Clustering<?> result = new ELKIBuilder<EM<DoubleVector, ?>>(EM.class) //
-        .with(KMeans.SEED_ID, 0) //
+        .with(KMeans.SEED_ID, 0) // high dependence on seed!
         .with(EM.Par.K_ID, 2) //
         .with(EM.Par.MODEL_ID, MultivariateGaussianModelFactory.class) //
         .with(EM.Par.PRIOR_ID, .1) //

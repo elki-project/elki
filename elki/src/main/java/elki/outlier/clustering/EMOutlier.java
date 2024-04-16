@@ -112,15 +112,14 @@ public class EMOutlier<V extends NumberVector> implements OutlierAlgorithm {
 
   /**
    * Constructor.
-   *
+   * @param mfactory EM cluster model factory
    * @param k k parameter
    * @param delta delta parameter
-   * @param mfactory EM cluster model factory
    * @param miniter Minimum number of iterations
    * @param maxiter Maximum number of iterations
    * @param prior MAP prior
    */
-  public EMOutlier(int k, double delta, EMClusterModelFactory<? super V, ?> mfactory, int miniter, int maxiter, double prior) {
+  public EMOutlier(EMClusterModelFactory<? super V, ?> mfactory, int k, double delta, int miniter, int maxiter, double prior) {
     super();
     this.k = k;
     this.delta = delta;
@@ -158,7 +157,7 @@ public class EMOutlier<V extends NumberVector> implements OutlierAlgorithm {
     double bestloglikelihood = Double.NEGATIVE_INFINITY;
     for(++it; it < maxiter || maxiter < 0; it++) {
       final double oldloglikelihood = loglikelihood;
-      EM.recomputeCovarianceMatrices(relation, probClusterIGivenX, models, prior);
+      EM.recomputeModels(relation, probClusterIGivenX, models, prior);
       // reassign probabilities
       loglikelihood = EM.assignProbabilitiesToInstances(relation, models, probClusterIGivenX, loglikelihoods);
 
@@ -246,7 +245,7 @@ public class EMOutlier<V extends NumberVector> implements OutlierAlgorithm {
 
     @Override
     public EMOutlier<V> make() {
-      return new EMOutlier<>(k, delta, mfactory, miniter, maxiter, prior);
+      return new EMOutlier<>(mfactory, k, delta, miniter, maxiter, prior);
     }
   }
 }

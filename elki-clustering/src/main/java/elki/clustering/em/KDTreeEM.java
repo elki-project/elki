@@ -412,7 +412,7 @@ public class KDTreeEM implements ClusteringAlgorithm<Clustering<EMModel>> {
    * @param node tree node
    * @param model model to calculate the limits for
    * @param minpnt result array for argmin
-   * @param maxpnt result array for argmax
+   * @param maxpnt result array for hard
    * @param ret Return array
    */
   private void calculateModelLimits(KDTree node, TextbookMultivariateGaussianModel model, double[] minpnt, double[] maxpnt, double[] ret) {
