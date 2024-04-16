@@ -1,4 +1,5 @@
 elki.datasource.FileBasedDatabaseConnection
+elki.datasource.NumpyDatabaseConnection
 elki.datasource.BundleDatabaseConnection
 elki.datasource.RandomDoubleVectorDatabaseConnection
 elki.datasource.DBIDRangeDatabaseConnection
