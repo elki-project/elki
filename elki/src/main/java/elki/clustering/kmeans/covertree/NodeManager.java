@@ -459,7 +459,7 @@ public class NodeManager {
      */
     public int testAssign(Node n, int clu, double[][] means) {
         int invalid = 0;
-        ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size);
+        ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size); // TODO try to use List instead
         tree.collectSubtree(n, collect);
         for(DBIDIter it = collect.iter(); it.valid(); it.advance()) {
             NumberVector fv = relation.get(it);
@@ -491,7 +491,8 @@ public class NodeManager {
      */
     public int testExclude(Node n, int clu, double[][] means) {
         int invalid = 0;
-        ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size);
+        // TODO try to use List instead
+        ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size); 
         tree.collectSubtree(n, collect);
         for(DBIDIter it = collect.iter(); it.valid(); it.advance()) {
             NumberVector fv = relation.get(it);

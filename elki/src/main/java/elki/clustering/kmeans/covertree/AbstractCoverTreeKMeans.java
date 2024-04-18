@@ -318,6 +318,7 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
          */
         protected int addNode(Node n, int cluster) {
             int changed = 0;
+            // TODO try to use List instead
             ModifiableDBIDs collect = DBIDUtil.newHashSet(100); // size
             tree.collectSubtree(n, collect);
 

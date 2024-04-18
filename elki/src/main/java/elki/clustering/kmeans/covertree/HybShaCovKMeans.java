@@ -442,6 +442,7 @@ public class HybShaCovKMeans<V extends NumberVector> extends HybExpCovKMeans<V> 
         protected int addBound(Node n, int oldass, int clu, int clu2, double u, double l) {
             // nodemanager first
             int changed = nodeManager.change(n, oldass, clu);
+            // TODO try to use List instead
             ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size); // size
             tree.collectSubtree(n, collect);
             if(l == Double.POSITIVE_INFINITY) {

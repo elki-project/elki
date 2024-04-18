@@ -445,6 +445,7 @@ public class HybHamCovKMeans<V extends NumberVector> extends CoverTreeKMeans<V> 
         protected int addBound(Node n, int oldass, int clu, double u, double l) {
             // nodemanager first
             int changed = nodeManager.change(n, oldass, clu);
+            // TODO try to use List instead
             ModifiableDBIDs collect = DBIDUtil.newHashSet(n.size); // size
             tree.collectSubtree(n, collect);
             if(l == Double.POSITIVE_INFINITY) {

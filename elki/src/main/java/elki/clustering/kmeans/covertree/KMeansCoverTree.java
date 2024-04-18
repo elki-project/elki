@@ -310,18 +310,18 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
      * @param cur     Node whose samples should be added
      * @param collect Collector List the Samples are added
      */
-    public void collectSubtree(Node cur, ModifiableDBIDs collect) {
+    protected void collectSubtree(Node cur, ModifiableDBIDs collect) {
         // ModifiableDBIDs collect = DBIDUtil.newHashSet(100); // TODO fix size
         DBIDIter it = cur.singletons.iter();
         // DBIDRef cid = DBIDUtil.deref(it); // check if id is already in the
         // collection
-        collect.add(it);
+        if(!cur.children.isEmpty()) {
+            it.advance();
+        }
         for(; it.valid(); it.advance()) {
             collect.add(it);
         }
-        Iterator<Node> nit = cur.children.iterator();
-        while(nit.hasNext()) {
-            Node next = nit.next();
+        for(Node next : cur.children) {
             collectSubtree(next, collect);
         }
     }
