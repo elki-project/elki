@@ -36,6 +36,10 @@ import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.distance.CFDistance;
+import elki.index.tree.betula.distance.VarianceIncreaseDistance;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.optionhandling.OptionID;
@@ -43,40 +47,10 @@ import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.index.tree.betula.CFTree;
-import elki.index.tree.betula.distance.CFDistance;
-import elki.index.tree.betula.distance.VarianceIncreaseDistance;
-import elki.index.tree.betula.features.ClusterFeature;
 
 /**
- * This is a modification of the classic AGNES algorithm for hierarchical
- * clustering using a nearest-neighbor heuristic for acceleration.
- * <p>
- * Instead of scanning the matrix (with cost O(n²)) to find the minimum, the
- * nearest neighbor of each object is remembered. On the downside, we need to
- * check these values at every merge, and it may now cost O(n²) to perform a
- * merge, so there is no worst-case advantage to this approach. The average case
- * however improves from O(n³) to O(n²), which yields a considerable
- * improvement in running time.
- * 
- * This version uses Betula for data aggregation.
- * 
- * <p>
- * This optimization is attributed to M. R. Anderberg.
- * <p>
- * Reference:
- * <p>
- * M. R. Anderberg<br>
- * Hierarchical Clustering Methods<br>
- * Cluster Analysis for Applications<br>
- * ISBN: 0120576503
- *
  * @author Andreas Lang
  *
- * @composed - - - LinkageMethod
- * @composed - - - ClusterMergeHistoryBuilder
- *
- * @param <O> Object type
  */
 public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     /**
@@ -109,6 +83,8 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
      *
      * @param distance Distance function to use
      * @param linkage Linkage method
+     * @param cffactory
+     * @param ignoreWeight
      * @param
      * @param
      */
@@ -189,9 +165,8 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     /**
      * Initialize a distance matrix.
      *
-     * @param mat Matrix
+     * @param cfs
      * @param df Distance function
-     * @param linkage Linkage method
      * @return cluster distance matrix
      */
     protected static ClusterDistanceMatrix initializeDistanceMatrix(ArrayList<? extends ClusterFeature> cfs, CFDistance df) {

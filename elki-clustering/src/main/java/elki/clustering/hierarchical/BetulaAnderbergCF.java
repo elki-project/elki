@@ -22,37 +22,26 @@ package elki.clustering.hierarchical;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.ListIterator;
 
 import elki.Algorithm;
-import elki.clustering.hierarchical.linkage.CentroidLinkage;
-import elki.clustering.hierarchical.linkage.Linkage;
-import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.NumberVector;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.database.ids.ArrayDBIDs;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.distance.Distance;
-import elki.distance.minkowski.EuclideanDistance;
-import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.index.tree.betula.CFTree;
+import elki.index.tree.betula.distance.CFDistance;
+import elki.index.tree.betula.distance.CentroidEuclideanDistance;
+import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
-import elki.index.tree.betula.CFTree;
-import elki.index.tree.betula.distance.CFDistance;
-import elki.index.tree.betula.distance.CentroidEuclideanDistance;
-import elki.index.tree.betula.features.ClusterFeature;
 
 /**
  * TODO
@@ -66,6 +55,22 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
      * CFTree factory.
      */
     CFTree.Factory<?> cffactory;
+
+    protected int end;
+
+    /**
+     * Cache: best distance
+     */
+    protected double[] bestd;
+
+    /**
+     * Cache: index of best distance
+     */
+    protected int[] besti;
+
+    ClusterDistanceMatrix mat;
+
+    ClusterMergeHistoryBuilder builder;
 
     /**
      * Distance function used.
@@ -83,6 +88,7 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
      * Constructor.
      *
      * @param cffactory CFTree Factory
+     * @param distance distance function
      */
     public BetulaAnderbergCF(CFTree.Factory<?> cffactory, CFDistance distance) {
         super();
@@ -117,26 +123,26 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
             i++;
         }
 
-        ClusterDistanceMatrix mat = BetulaAnderberg.initializeDistanceMatrix(cfs, distance);
-        ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, mat.clustermap, false);
+        this.mat = BetulaAnderberg.initializeDistanceMatrix(cfs, distance);
+        this.end = cfs.size();
+        this.builder = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, mat.clustermap, false);
+        this.end = cfs.size();
+        this.bestd = new double[cfs.size()];
+        this.besti = new int[cfs.size()];
 
-        // Arrays used for caching:
-        double[] bestd = new double[cfs.size()];
-        int[] besti = new int[cfs.size()];
         initializeNNCache(mat.matrix, bestd, besti);
 
         // Repeat until everything merged into 1 cluster
         FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", cfs.size() - 1, LOG) : null;
         // Use end to shrink the matrix virtually as the tailing objects
         // disappear
-        for(int j = 1, end = cfs.size(); j < cfs.size(); j++) {
-            end = shrinkActiveSet(mat.clustermap, end, //
-                    findMerge(end, mat, bestd, besti, cmhb, distance));
+        for(int j = 1; j < cfs.size(); j++) {
+            end = shrinkActiveSet(mat.clustermap, end, findMerge());
             LOG.incrementProcessed(prog);
         }
         LOG.ensureCompleted(prog);
 
-        return cmhb.complete();
+        return builder.complete();
     }
 
     protected static int shrinkActiveSet(int[] clustermap, int end, int x) {
@@ -181,12 +187,9 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
     /**
      * Perform the next merge step in AGNES.
      *
-     * @param end Active set size
-     * @param mat Matrix storage
-     * @param builder Pointer representation builder
      * @return the index that has disappeared, for shrinking the working set
      */
-    private int findMerge(int end, ClusterDistanceMatrix mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, CFDistance dist) {
+    private int findMerge() {
         double mindist = Double.POSITIVE_INFINITY;
         int x = -1, y = -1;
         for(int cx = 1; cx < end; cx++) {
@@ -204,21 +207,18 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
             }
         }
         assert 0 <= y && y < x;
-        merge(end, mat, bestd, besti, builder, mindist, x, y, dist);
+        merge(mindist, x, y);
         return x;
     }
 
     /**
      * Execute the cluster merge.
      *
-     * @param end Active set size
-     * @param mat Matrix paradigm
-     * @param builder Hierarchy builder
      * @param mindist Distance that was used for merging
      * @param x First matrix position
      * @param y Second matrix position
      */
-    protected void merge(int end, ClusterDistanceMatrix mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, double mindist, int x, int y, CFDistance dist) {
+    protected void merge(double mindist, int x, int y) {
         // Avoid allocating memory, by reusing existing iterators:
         if(LOG.isDebuggingFine()) {
             LOG.debugFine("Merging: " + cfs.get(x) + " -> " + cfs.get(y) + " " + mindist);
@@ -226,13 +226,14 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
         // Perform merge in data structure: x -> y
         assert (y < x);
         final int xx = mat.clustermap[x], yy = mat.clustermap[y];
-        final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
+        // final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
         // Since y < x, prefer keeping y, dropping x.
         int zz = builder.strictAdd(xx, mindist, yy);
         mat.clustermap[y] = zz;
         mat.clustermap[x] = besti[x] = -1; // Deactivate removed cluster.
         // Update cluster size for y:
-        updateMatrix(end, mat, bestd, besti, builder, x, y, dist);
+        cfs.get(y).addToStatistics(cfs.get(x));
+        updateMatrix( x, y);
         if(y > 0) {
             findBest(mat.matrix, bestd, besti, y);
         }
@@ -250,11 +251,10 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
      * @param sizex Old size of first cluster
      * @param sizey Old size of second cluster
      */
-    private void updateMatrix(int end, ClusterDistanceMatrix mat, double[] bestd, int[] besti, ClusterMergeHistoryBuilder builder, int x, int y, CFDistance dist) {
+    private void updateMatrix(int x, int y) {
         // Update distance matrix. Note: y < x
         final int ybase = ClusterDistanceMatrix.triangleSize(y);
         double[] scratch = mat.matrix;
-
         // Write to (y, j), with j < y
         int j = 0;
         for(; j < y; j++) {
@@ -263,7 +263,7 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
             }
             assert (j < y); // Otherwise, ybase + j is the wrong position!
             final int yb = ybase + j;
-            final double d = scratch[yb] = dist.squaredDistance(cfs.get(y), cfs.get(j));
+            final double d = scratch[yb] = distance.squaredDistance(cfs.get(y), cfs.get(j));
             updateCache(scratch, bestd, besti, x, y, j, d);
         }
         j++; // Skip y
@@ -274,7 +274,7 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
                 continue;
             }
             final int jb = jbase + y;
-            final double d = scratch[jb] = dist.squaredDistance(cfs.get(y), cfs.get(j));
+            final double d = scratch[jb] = distance.squaredDistance(cfs.get(y), cfs.get(j));
             updateCache(scratch, bestd, besti, x, y, j, d);
         }
         jbase += j++; // Skip x
@@ -284,7 +284,7 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
                 continue;
             }
             final int jb = jbase + y;
-            final double d = scratch[jb] = dist.squaredDistance(cfs.get(y), cfs.get(j));
+            final double d = scratch[jb] = distance.squaredDistance(cfs.get(y), cfs.get(j));
             updateCache(scratch, bestd, besti, x, y, j, d);
         }
     }
@@ -366,12 +366,12 @@ public class BetulaAnderbergCF implements HierarchicalClusteringAlgorithm {
         /**
          * Ignore weight
          */
-        boolean ignoreWeight = false;
+        // boolean ignoreWeight = false;
 
         @Override
         public void configure(Parameterization config) {
             cffactory = config.tryInstantiate(CFTree.Factory.class);
-            new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);
+            // new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);
             new ObjectParameter<CFDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, CFDistance.class, CentroidEuclideanDistance.class) //
                     .grab(config, x -> distance = x);
         }
