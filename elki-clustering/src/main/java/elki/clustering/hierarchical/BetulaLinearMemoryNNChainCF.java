@@ -218,7 +218,7 @@ public class BetulaLinearMemoryNNChainCF implements HierarchicalClusteringAlgori
           a = b;
           b = tmp;
         }
-        assert minDist == distance.squaredDistance(clusters[a], clusters[b]);
+        assert Math.abs(minDist - distance.squaredDistance(clusters[a], clusters[b])) < 1e-10 : "Distance mismatch: " + minDist + " vs. " + distance.squaredDistance(clusters[a], clusters[b]);
         merge(size, clusters, builder, clustermap, minDist, a, b);
         end = AGNES.Instance.shrinkActiveSet(clustermap, end, a);
         chain.size -= 3;

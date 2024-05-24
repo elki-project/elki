@@ -77,6 +77,7 @@ public class BetulaAnderbergTest extends AbstractClusterAlgorithmTest{
           .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
           .with(Algorithm.Utils.ALGORITHM_ID, BetulaAnderberg.class) //
           .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, AverageInterclusterDistance.class) //
+          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, AverageInterclusterDistance.class) //
           .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
           .with(MAXLEAVES_ID, 800) //
           .build().autorun(db);
