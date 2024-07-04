@@ -46,8 +46,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Reference:
  * <p>
  * F. Murtagh<br>
- * Multidimensional Clustering Algorithms, 1985<br>
- * http://www.multiresolutions.com/strule/MClA/
+ * Multidimensional Clustering Algorithms, 1985
  *
  * @author Erich Schubert, Robert Gehde
  * @since 0.8.0
@@ -57,7 +56,6 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "F. Murtagh", //
     booktitle = "Multidimensional Clustering Algorithms", //
     title = "Multidimensional Clustering Algorithms", //
-    url = "http://www.multiresolutions.com/strule/MClA/", //
     bibkey = "books/Murtagh85")
 public class LinearMemoryNNChain<O extends NumberVector> implements HierarchicalClusteringAlgorithm {
   /**
