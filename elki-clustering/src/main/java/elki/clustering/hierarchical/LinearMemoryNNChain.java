@@ -31,6 +31,7 @@ import elki.database.ids.DBIDUtil;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.logging.statistics.LongStatistic;
 import elki.math.MathUtil;
 import elki.utilities.datastructures.arraylike.IntegerArray;
 import elki.utilities.documentation.Reference;
@@ -63,6 +64,11 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
    */
   private static final Logging LOG = Logging.getLogger(LinearMemoryNNChain.class);
 
+  /**
+   * Key for statistics logging.
+   */
+  private final static String KEY = LinearMemoryNNChain.class.getName();
+  
   /**
    * Linkage method.
    */
@@ -103,6 +109,11 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
     private GeometricLinkage linkage;
 
     /**
+     * Number of distance computations
+     */
+    private long distanceComputations = 0L;
+
+    /**
      * Constructor.
      *
      * @param linkage Linkage
@@ -122,6 +133,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
     public ClusterMergeHistory run(ArrayDBIDs ids, Relation<O> relation, ClusterMergeHistoryBuilder builder) {
       DBIDArrayIter it = ids.iter(), it2 = ids.iter();
       nnChainCore(it, it2, builder, relation);
+      LOG.statistics(new LongStatistic(KEY + ".distance-computations", distanceComputations));
       builder.optimizeOrder();
       return builder.complete();
     }
@@ -138,7 +150,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
       final int size = rel.size();
       boolean warnedIrreducible = false;
       // The maximum chain size = number of ids + 1, but usually much less
-      IntegerArray chain = new IntegerArray(size << 1);
+      IntegerArray chain = new IntegerArray(size + 1);
       int[] clustermap = MathUtil.sequence(0, size);
 
       // Instead of a distance matrix we have an array of points
@@ -177,14 +189,16 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           chain.size--; // Remove b
         }
         // For ties, always prefer the second-last element b:
-        final int bSize = builder.getSize(b);
-        double minDist = linkage.distance(clusters[a], builder.getSize(a), clusters[b], bSize);
+        final int bSize = builder.getSize(clustermap[b]);
+        double minDist = linkage.distance(clusters[a], builder.getSize(clustermap[a]), clusters[b], bSize);
+        distanceComputations++;
         do {
-          final int aSize = builder.getSize(a);
+          final int aSize = builder.getSize(clustermap[a]);
           int c = b;
           for(int i = 0; i < end; i++) {
             if(i != a && i != b && clustermap[i] >= 0) {
-              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(i));
+              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(clustermap[i]));
+              distanceComputations++;
               if(dist < minDist) {
                 minDist = dist;
                 c = i;
@@ -203,7 +217,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           a = b;
           b = tmp;
         }
-        assert minDist == linkage.distance(clusters[a], builder.getSize(a), clusters[b], builder.getSize(b));
+        assert minDist == linkage.distance(clusters[a], builder.getSize(clustermap[a]), clusters[b], builder.getSize(clustermap[b]));
         merge(size, clusters, builder, clustermap, minDist, a, b);
         end = AGNES.Instance.shrinkActiveSet(clustermap, end, a);
         chain.size -= 3;
