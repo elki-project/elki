@@ -90,4 +90,11 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
 
   @Override
   DoubleDBIDListMIter iter();
+
+  /**
+   * Poll elements from a kNN heap.
+   *
+   * @param knn heap
+   */
+  void insertFrom(KNNHeap knn);
 }
