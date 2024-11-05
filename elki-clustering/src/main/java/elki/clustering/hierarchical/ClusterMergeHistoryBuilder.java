@@ -99,11 +99,37 @@ public class ClusterMergeHistoryBuilder {
   }
 
   /**
+   * Get the cluster id of an object (union-find).
+   * <p>
+   * TODO: further optimize the union-find?
+   * 
+   * @param i Cluster id
+   * @return Parent cluster id
+   */
+  public int get(int i) {
+    if(parent == null) {
+      return i;
+    }
+    // Follow i to its parent.
+    int p = parent[i];
+    if (p == i) {
+      return i;
+    }
+    while(true) {
+      final int pp = parent[p];
+      if (p == pp) {
+        return p;
+      }
+      parent[i] = pp; // path halving
+      i = p;
+      p = pp;
+    }
+  }
+
+  /**
    * A more robust "add" operation (involving a union-find) where we may use
    * arbitrary objects i and j to refer to clusters, not only the largest ID
    * in each cluster.
-   * <p>
-   * TODO: further improve the union-find used here?
    * 
    * @param i First cluster
    * @param dist Link distance
@@ -111,28 +137,13 @@ public class ClusterMergeHistoryBuilder {
    * @return new cluster id
    */
   public int add(int i, double dist, int j) {
+    i = get(i); // Follow i to its parent.
+    j = get(j); // Follow j to its parent.
     if(parent == null) {
       assert mergecount == 0;
       parent = MathUtil.sequence(0, (ids.size() << 1) - 1);
     }
-    int t = mergecount + ids.size(); // next
-    // Follow i to its parent.
-    for(int p = parent[i]; i != p;) {
-      final int tmp = parent[p];
-      parent[i] = t;
-      i = p;
-      p = tmp;
-    }
-    // Follow j to its parent.
-    for(int p = parent[j]; j != p;) {
-      final int tmp = parent[p];
-      parent[j] = t;
-      j = p;
-      p = tmp;
-    }
-    int t2 = parent[i] = parent[j] = strictAdd(i, dist, j);
-    assert t == t2;
-    return t2;
+    return parent[i] = parent[j] = strictAdd(i, dist, j);
   }
 
   /**
