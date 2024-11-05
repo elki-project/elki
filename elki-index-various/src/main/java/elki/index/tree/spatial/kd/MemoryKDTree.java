@@ -793,7 +793,7 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
   @Alias({ "kd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O> {
     /**
-     * Split stragegy
+     * Split strategy
      */
     SplitStrategy split;
 

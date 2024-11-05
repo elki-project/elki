@@ -331,6 +331,11 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
     double threshold;
 
     /**
+     * Lower bound
+     */
+    double skipThreshold = 0.;
+
+    /**
      * Object indexes
      */
     int[] idx = new int[ids.size()];
@@ -344,6 +349,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
     public PrioritySearcher<DBIDRef> search(DBIDRef query) {
       off = 0;
       threshold = Double.POSITIVE_INFINITY;
+      skipThreshold = 0.;
       int x = ids.getOffset(query);
       int pos = triangleSize(x);
       // Initialize ids:
@@ -374,6 +380,18 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
       if(sorted < target) {
         lbsorted = target - 1;
         upsorted = target;
+        if(skipThreshold > 0) {
+          assert off >= sorted;
+          // skip elements below the threshold without sorting
+          for(int pos = off; pos < target; pos++) {
+            if(dists[pos] < threshold) {
+              swap(this, pos, off++);
+              if (target < dists.length) {
+                target++;
+              }
+            }
+          }
+        }
         // FIXME: improve this by merging QuickSelect and QuickSort into a
         // full-blown PartialQuickSort that can guarantee any subset to be
         // sorted correctly.
@@ -388,6 +406,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
 
     @Override
     public PrioritySearcher<DBIDRef> advance() {
+      // TODO: check skipThreshold?
       if(++off >= sorted) {
         partialSort(Math.min(sorted == 1 ? 10 : sorted + (sorted >>> 1), dists.length));
       }
@@ -402,6 +421,12 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
     @Override
     public PrioritySearcher<DBIDRef> decreaseCutoff(double threshold) {
       this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public PrioritySearcher<DBIDRef> increaseSkip(double threshold) {
+      this.skipThreshold = threshold;
       return this;
     }
 

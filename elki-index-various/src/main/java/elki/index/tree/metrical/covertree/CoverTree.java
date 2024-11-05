@@ -603,6 +603,11 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
     double threshold = Double.POSITIVE_INFINITY;
 
     /**
+     * Lower bound
+     */
+    private double skipThreshold = 0.;
+
+    /**
      * Temporary storage.
      */
     private DBIDVar tmp = DBIDUtil.newVar();
@@ -649,6 +654,7 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
      */
     protected PrioritySearcher<Q> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
+      this.skipThreshold = 0.;
       this.candidates = DoubleDBIDListIter.EMPTY;
       pq.clear();
       pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
@@ -658,8 +664,15 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
 
     @Override
     public PrioritySearcher<Q> decreaseCutoff(double threshold) {
-      assert threshold <= this.threshold;
+      assert threshold <= this.threshold : "Thresholds must only decrease.";
       this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public PrioritySearcher<Q> increaseSkip(double threshold) {
+      assert threshold >= this.skipThreshold : "Skip thresholds must only increase.";
+      this.skipThreshold = threshold;
       return this;
     }
 
@@ -687,7 +700,10 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         while(candidates.valid()) {
           // Pruning with lower bound:
           if(Math.abs(routingDist - candidates.doubleValue()) <= threshold) {
-            return this;
+            // Pruning with upper bound, if set:
+            if(skipThreshold == 0. || routingDist + candidates.doubleValue() >= skipThreshold) {
+              return this;
+            }
           }
           candidates.advance(); // Skip
         }
@@ -722,11 +738,14 @@ public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriori
         // This pruning rule very rarely works, unfortunately
         if(Math.abs(routingDist - c.parentDist) - c.maxDist <= threshold) {
           // Reuse distance if the previous routing object is the same:
-          double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
-              ? routingDist : queryDistance(tmp)) //
-              - c.maxDist; // Minimum distance
+          final double dist = DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
+              ? routingDist : queryDistance(tmp);
+          double newprio = dist - c.maxDist; // Minimum distance
           if(newprio <= threshold) {
-            pq.add(newprio, c);
+            // Pruning with upper bound, if set:
+            if(skipThreshold == 0. || dist + c.maxDist >= skipThreshold) {
+              pq.add(newprio, c);
+            }
           }
         }
       }

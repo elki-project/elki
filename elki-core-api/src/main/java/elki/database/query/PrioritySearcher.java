@@ -106,6 +106,26 @@ public interface PrioritySearcher<O> extends KNNSearcher<O>, RangeSearcher<O>, D
   PrioritySearcher<O> decreaseCutoff(double threshold);
 
   /**
+   * Increase the skip threshold to skip over explored nearby results.
+   * <p>
+   * This is an <em>optional</em> operation, and only advisory. It allows
+   * indexes to skip subtrees or avoid sorting of elements that are to be
+   * discarded, but the cost should be kept low. As the priority searcher does
+   * not refine distances, results returned may be below this threshold!
+   * <p>
+   * The cutoff must not be decreased, as the search may have pruned some
+   * results automatically.
+   * <p>
+   * TODO: add support for increaseSkip to more indexes.
+   *
+   * @param threshold Threshold parameter
+   * @return this, for chaining
+   */
+  default PrioritySearcher<O> increaseSkip(double threshold) {
+    return this;
+  }
+
+  /**
    * Compute the <em>exact</em> distance to the current candidate.
    * <p>
    * The searcher may or may not have this value already.

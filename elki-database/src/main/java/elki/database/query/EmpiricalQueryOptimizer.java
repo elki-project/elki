@@ -341,6 +341,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, (DBIDRange) relation.getDBIDs(), distance);
       LOG.verbose("Optimizer: automatically adding a distance matrix.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -370,6 +371,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance, leafsize);
       LOG.verbose("Optimizer: automatically adding a cover tree index.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -399,6 +401,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) vpIndex.newInstance(relation, distance, leafsize);
       LOG.verbose("Optimizer: automatically adding a VP tree index.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -431,6 +434,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, k > 0 ? k : 0);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -465,6 +469,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       KNNIndex<O> idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
       LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
