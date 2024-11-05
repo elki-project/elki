@@ -3,4 +3,4 @@ dependencies {
   api project(':elki-core')
   testFixturesApi(testFixtures(project(path: ':elki-test-core')))
 }
-
+eclipse.classpath.containsTestFixtures = true

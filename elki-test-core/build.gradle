@@ -4,3 +4,4 @@ dependencies {
   testFixturesRuntimeOnly project(':elki-core-dbids-int')
   testFixturesApi group: 'junit', name: 'junit', version:'[4.8,)'
 }
+eclipse.classpath.containsTestFixtures = true
