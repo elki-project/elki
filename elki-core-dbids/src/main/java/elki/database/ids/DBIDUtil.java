@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ import elki.utilities.random.FastNonThreadsafeRandom;
 import elki.utilities.random.RandomFactory;
 
 /**
- * DBID Utility functions.
+ * DBID utility functions.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -377,9 +377,9 @@ public final class DBIDUtil {
       symmetricIntersection(second, first, secondonly, intersection, firstonly);
       return;
     }
-    assert (firstonly.size() == 0) : "OUTPUT set should be empty!";
-    assert (intersection.size() == 0) : "OUTPUT set should be empty!";
-    assert (secondonly.size() == 0) : "OUTPUT set should be empty!";
+    assert firstonly.isEmpty() : "OUTPUT set should be empty!";
+    assert intersection.isEmpty() : "OUTPUT set should be empty!";
+    assert secondonly.isEmpty() : "OUTPUT set should be empty!";
     // Initialize with second
     secondonly.addDBIDs(second);
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
@@ -426,6 +426,16 @@ public final class DBIDUtil {
   }
 
   /**
+   * Wrap an existing DBIDs collection to be unmodifiable.
+   *
+   * @param existing Existing collection
+   * @return Unmodifiable collection
+   */
+  public static ArrayStaticDBIDs makeUnmodifiable(ArrayDBIDs existing) {
+    return DBIDFactory.FACTORY.makeUnmodifiable(existing);
+  }
+
+  /**
    * Ensure that the given DBIDs are array-indexable.
    *
    * @param ids IDs
@@ -433,6 +443,17 @@ public final class DBIDUtil {
    */
   public static ArrayDBIDs ensureArray(DBIDs ids) {
     return ids instanceof ArrayDBIDs ? (ArrayDBIDs) ids : newArray(ids);
+  }
+
+  /**
+   * Ensure that the given DBIDs are mappable to itnegers.
+   *
+   * @param ids IDs
+   * @return DBID enumeration
+   */
+  public static DBIDEnum ensureEnum(DBIDs ids) {
+    return ids instanceof DBIDEnum ? (DBIDEnum) ids : //
+        new DBIDArrayEnum(makeUnmodifiable(ensureArray(ids)));
   }
 
   /**
@@ -816,5 +837,19 @@ public final class DBIDUtil {
       throw new AbortException("This class may currently only be used with static databases and DBID ranges.");
     }
     return (DBIDRange) ids;
+  }
+
+  /**
+   * Assert that the presented ids are unmodifiable.
+   *
+   * @param ids Ids
+   * @return ids
+   * @throws AbortException if the ids are not unmodifiable.
+   */
+  public static StaticDBIDs assertUnmodifiable(DBIDs ids) {
+    if(!(ids instanceof StaticDBIDs)) {
+      throw new AbortException("This class may currently only be used with static databases.");
+    }
+    return (StaticDBIDs) ids;
   }
 }

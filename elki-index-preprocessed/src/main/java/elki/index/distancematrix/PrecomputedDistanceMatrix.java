@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,14 +23,7 @@ package elki.index.distancematrix;
 import java.lang.ref.WeakReference;
 
 import elki.data.type.TypeInformation;
-import elki.database.ids.DBIDArrayIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDs;
-import elki.database.ids.KNNHeap;
-import elki.database.ids.KNNList;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.distance.DatabaseDistanceQuery;
 import elki.database.query.distance.DistanceQuery;
@@ -96,7 +89,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
   /**
    * DBID range.
    */
-  private DBIDRange ids;
+  private DBIDEnum ids;
 
   /**
    * Constructor.
@@ -105,7 +98,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
    * @param range DBID range
    * @param distance Distance function
    */
-  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDRange range, Distance<? super O> distance) {
+  public PrecomputedDistanceMatrix(Relation<O> relation, DBIDEnum range, Distance<? super O> distance) {
     super();
     this.refrelation = new WeakReference<>(relation);
     this.ids = range;
@@ -214,7 +207,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
   public class PrecomputedDistanceQuery implements DatabaseDistanceQuery<O> {
     @Override
     public double distance(DBIDRef id1, DBIDRef id2) {
-      final int x = ids.getOffset(id1), y = ids.getOffset(id2);
+      final int x = ids.index(id1), y = ids.index(id2);
       return (x != y) ? matrix[getOffset(x, y)] : 0.;
     }
 
@@ -243,7 +236,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
     @Override
     public ModifiableDoubleDBIDList getRange(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
       result.add(0., id);
-      final int x = ids.getOffset(id);
+      final int x = ids.index(id);
       // Case y < x: triangleSize(x) + y
       int pos = triangleSize(x);
       for(int y = 0; y < x; y++, pos++) {
@@ -281,7 +274,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
       KNNHeap heap = DBIDUtil.newHeap(k);
       heap.insert(0., id);
       double max = Double.POSITIVE_INFINITY;
-      final int x = ids.getOffset(id);
+      final int x = ids.index(id);
       // Case y < x: triangleSize(x) + y
       int pos = triangleSize(x);
       for(int y = 0; y < x; y++, pos++) {
@@ -350,7 +343,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
       off = 0;
       threshold = Double.POSITIVE_INFINITY;
       skipThreshold = 0.;
-      int x = ids.getOffset(query);
+      int x = ids.index(query);
       int pos = triangleSize(x);
       // Initialize ids:
       idx[0] = x;
@@ -386,7 +379,7 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
           for(int pos = off; pos < target; pos++) {
             if(dists[pos] < threshold) {
               swap(this, pos, off++);
-              if (target < dists.length) {
+              if(target < dists.length) {
                 target++;
               }
             }
@@ -516,11 +509,9 @@ public class PrecomputedDistanceMatrix<O> implements DistanceIndex<O>, DistanceP
 
     @Override
     public PrecomputedDistanceMatrix<O> instantiate(Relation<O> relation) {
-      DBIDs rids = relation.getDBIDs();
-      if(!(rids instanceof DBIDRange)) {
-        throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases; not on modifiable databases) for performance reasons (Patches welcome).");
-      }
-      return new PrecomputedDistanceMatrix<>(relation, (DBIDRange) rids, distance);
+      DBIDUtil.assertUnmodifiable(relation.getDBIDs());
+      DBIDEnum rids = DBIDUtil.ensureEnum(relation.getDBIDs());
+      return new PrecomputedDistanceMatrix<>(relation, rids, distance);
     }
 
     @Override

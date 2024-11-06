@@ -287,4 +287,12 @@ public interface DBIDFactory {
    * @return Immutable version
    */
   StaticDBIDs makeUnmodifiable(DBIDs existing);
+
+  /**
+   * Make DBIDs immutable.
+   *
+   * @param existing Existing DBIDs
+   * @return Immutable version
+   */
+  ArrayStaticDBIDs makeUnmodifiable(ArrayDBIDs existing);
 }

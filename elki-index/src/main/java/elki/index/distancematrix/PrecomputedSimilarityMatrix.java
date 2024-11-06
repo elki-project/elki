@@ -85,7 +85,7 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
   /**
    * DBID range.
    */
-  private DBIDRange ids;
+  private DBIDEnum ids;
 
   /**
    * Size of DBID range.
@@ -96,10 +96,12 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
    * Constructor.
    *
    * @param relation Data relation
+   * @param ids IDs
    * @param similarityFunction Similarity function
    */
-  public PrecomputedSimilarityMatrix(Relation<O> relation, Similarity<? super O> similarityFunction) {
+  public PrecomputedSimilarityMatrix(Relation<O> relation, DBIDEnum ids, Similarity<? super O> similarityFunction) {
     this.relation = relation;
+    this.ids = ids;
     this.similarityFunction = similarityFunction;
     if(!similarityFunction.isSymmetric()) {
       throw new AbortException("Similarity matrixes currently only support symmetric similarity functions (Patches welcome).");
@@ -108,11 +110,6 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
 
   @Override
   public void initialize() {
-    DBIDs rids = relation.getDBIDs();
-    if(!(rids instanceof DBIDRange)) {
-      throw new AbortException("Similarity matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
-    }
-    ids = (DBIDRange) rids;
     size = ids.size();
     if(size > 65536) {
       throw new AbortException("Similarity matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
@@ -190,7 +187,7 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
   private class PrecomputedSimilarityQuery implements SimilarityQuery<O> {
     @Override
     public double similarity(DBIDRef id1, DBIDRef id2) {
-      final int x = ids.getOffset(id1), y = ids.getOffset(id2);
+      final int x = ids.index(id1), y = ids.index(id2);
       return (x != y) ? matrix[getOffset(x, y)] : 0.;
     }
 
@@ -231,7 +228,7 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
       result.add(0., id);
       DBIDArrayIter it = ids.iter();
 
-      final int x = ids.getOffset(id);
+      final int x = ids.index(id);
       // Case y < x: triangleSize(x) + y
       int pos = triangleSize(x);
       for(int y = 0; y < x; y++) {
@@ -282,7 +279,9 @@ public class PrecomputedSimilarityMatrix<O> implements SimilarityIndex<O>, Simil
 
     @Override
     public PrecomputedSimilarityMatrix<O> instantiate(Relation<O> relation) {
-      return new PrecomputedSimilarityMatrix<>(relation, similarityFunction);
+      DBIDUtil.assertUnmodifiable(relation.getDBIDs());
+      DBIDEnum ids = DBIDUtil.ensureEnum(relation.getDBIDs());
+      return new PrecomputedSimilarityMatrix<>(relation, ids, similarityFunction);
     }
 
     @Override

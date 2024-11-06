@@ -22,18 +22,18 @@ package elki.outlier.distance;
 
 import org.junit.Test;
 
-import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.data.DoubleVector;
 import elki.data.NumberVector;
 import elki.data.type.TypeUtil;
 import elki.database.Database;
-import elki.database.ids.DBIDRange;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.relation.Relation;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.distancematrix.PrecomputedDistanceMatrix;
 import elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import elki.outlier.AbstractOutlierAlgorithmTest;
 import elki.result.Metadata;
 import elki.result.outlier.OutlierResult;
 import elki.utilities.ELKIBuilder;
@@ -82,7 +82,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     // This is a bit of a hack to make a range-only index.
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistance.STATIC) {
+    PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, DBIDUtil.ensureEnum(rel.getDBIDs()), EuclideanDistance.STATIC) {
       @Override
       public KNNSearcher<NumberVector> kNNByObject(DistanceQuery<NumberVector> distanceQuery, int maxk, int flags) {
         return null; // Disable kNN queries, to force range queries to be tested.

@@ -215,9 +215,9 @@ public class ORLibBenchmark extends AbstractApplication {
       // Verify cluster cost.
       double cost = 0.;
       for(Cluster<MedoidModel> cl : clustering.getAllClusters()) {
-        int medoid = ids.getOffset(cl.getModel().getMedoid());
+        int medoid = ids.index(cl.getModel().getMedoid());
         for(DBIDIter iter = cl.getIDs().iter(); iter.valid(); iter.advance()) {
-          int ob = ids.getOffset(iter);
+          int ob = ids.index(iter);
           cost += medoid != ob ? mat[computeOffset(medoid, ob)] : 0.;
         }
       }

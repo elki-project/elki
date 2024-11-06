@@ -55,7 +55,7 @@ public class KNNListTest {
     assertEquals("2NN distance wrong", 1., list.subList(2).getKNNDistance(), 0.);
     assertEquals("1NN distance wrong", 0., list.subList(1).getKNNDistance(), 0.);
     for(DoubleDBIDListIter it = list.iter(); it.valid(); it.advance()) {
-      assertEquals("Distance wrong @" + it.getOffset(), dists[range.getOffset(it)], it.doubleValue(), 0.);
+      assertEquals("Distance wrong @" + it.getOffset(), dists[range.index(it)], it.doubleValue(), 0.);
     }
   }
 }

@@ -31,24 +31,19 @@ import elki.data.Clustering;
 import elki.data.model.Model;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DBIDs;
-import elki.database.ids.HashSetModifiableDBIDs;
-import elki.database.ids.ModifiableDBIDs;
-import elki.database.ids.StaticDBIDs;
+import elki.database.ids.*;
 import elki.database.relation.Relation;
 import elki.logging.Logging;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.LongStatistic;
 import elki.utilities.datastructures.unionfind.UnionFind;
-import elki.utilities.datastructures.unionfind.UnionFindUtil;
+import elki.utilities.datastructures.unionfind.WeightedQuickUnionDBIDs;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -113,7 +108,7 @@ public class ClosedNeighborhoods<O> implements ClusteringAlgorithm<Clustering<Mo
     HashSetModifiableDBIDs visited = DBIDUtil.newHashSet(ids.size());
     ModifiableDBIDs open = DBIDUtil.newArray();
     DBIDVar cur = DBIDUtil.newVar();
-    UnionFind uf = UnionFindUtil.make(ids);
+    UnionFind uf = new WeightedQuickUnionDBIDs(ids);
     for(DBIDIter element = relation.iterDBIDs(); element.valid(); element.advance()) {
       if(!visited.add(element)) {
         continue;

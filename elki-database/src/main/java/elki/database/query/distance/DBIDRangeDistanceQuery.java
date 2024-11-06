@@ -62,7 +62,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
 
   @Override
   public double distance(DBIDRef id1, DBIDRef id2) {
-    return distanceFunction.distance(range.getOffset(id1), range.getOffset(id2));
+    return distanceFunction.distance(range.index(id1), range.index(id2));
   }
 
   @Override

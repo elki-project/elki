@@ -20,9 +20,9 @@
  */
 package elki.database.datastore.memory;
 
-import elki.database.datastore.DataStoreIDMap;
 import elki.database.datastore.WritableDataStore;
 import elki.database.datastore.WritableRecordStore;
+import elki.database.ids.DBIDEnum;
 import elki.database.ids.DBIDRef;
 
 /**
@@ -31,7 +31,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @composed - - - DataStoreIDMap
+ * @composed - - - DBIDEnum
  * @navhas - projectsTo - ArrayRecordStore.StorageAccessor
  */
 public class ArrayRecordStore implements WritableRecordStore {
@@ -43,7 +43,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   /**
    * DBID to index map
    */
-  private final DataStoreIDMap idmap;
+  private final DBIDEnum idmap;
 
   /**
    * Constructor with existing data
@@ -51,7 +51,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    * @param data Existing data
    * @param idmap Map for array offsets
    */
-  public ArrayRecordStore(Object[][] data, DataStoreIDMap idmap) {
+  public ArrayRecordStore(Object[][] data, DBIDEnum idmap) {
     super();
     this.data = data;
     this.idmap = idmap;
@@ -73,7 +73,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
-    return (T) data[idmap.mapDBIDToOffset(id)][index];
+    return (T) data[idmap.index(id)][index];
   }
 
   /**
@@ -87,8 +87,8 @@ public class ArrayRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
-    T ret = (T) data[idmap.mapDBIDToOffset(id)][index];
-    data[idmap.mapDBIDToOffset(id)][index] = value;
+    T ret = (T) data[idmap.index(id)][index];
+    data[idmap.index(id)][index] = value;
     return ret;
   }
 

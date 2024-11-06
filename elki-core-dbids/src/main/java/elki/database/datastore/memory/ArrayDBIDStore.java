@@ -20,13 +20,8 @@
  */
 package elki.database.datastore.memory;
 
-import elki.database.datastore.DataStoreIDMap;
 import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.ids.ArrayModifiableDBIDs;
-import elki.database.ids.DBID;
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDUtil;
-import elki.database.ids.DBIDVar;
+import elki.database.ids.*;
 
 /**
  * A class to answer representation queries using the stored Array.
@@ -34,7 +29,7 @@ import elki.database.ids.DBIDVar;
  * @author Erich Schubert
  * @since 0.5.5
  *
- * @composed - - - elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DBIDEnum
  */
 public class ArrayDBIDStore implements WritableDBIDDataStore {
   /**
@@ -45,16 +40,16 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   /**
    * DBID to index map
    */
-  private DataStoreIDMap idmap;
+  private DBIDEnum idmap;
 
   /**
    * Constructor.
    *
-   * @param size Size
    * @param idmap ID map
    */
-  public ArrayDBIDStore(int size, DataStoreIDMap idmap) {
+  public ArrayDBIDStore(DBIDEnum idmap) {
     super();
+    final int size = idmap.size();
     this.data = DBIDUtil.newArray(size);
     // Initialize
     DBIDRef inv = DBIDUtil.invalid();
@@ -67,18 +62,18 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   @Override
   @Deprecated
   public DBID get(DBIDRef id) {
-    return data.get(idmap.mapDBIDToOffset(id));
+    return data.get(idmap.index(id));
   }
 
   @Override
   public DBIDVar assignVar(DBIDRef id, DBIDVar var) {
-    return data.assignVar(idmap.mapDBIDToOffset(id), var);
+    return data.assignVar(idmap.index(id), var);
   }
 
   @Override
   @Deprecated
   public DBID put(DBIDRef id, DBID value) {
-    final int off = idmap.mapDBIDToOffset(id);
+    final int off = idmap.index(id);
     DBID ret = data.get(off);
     data.set(off, value);
     return ret;
@@ -86,12 +81,12 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
 
   @Override
   public void putDBID(DBIDRef id, DBIDRef value) {
-    data.set(idmap.mapDBIDToOffset(id), value);
+    data.set(idmap.index(id), value);
   }
 
   @Override
   public void put(DBIDRef id, DBIDRef value) {
-    data.set(idmap.mapDBIDToOffset(id), value);
+    data.set(idmap.index(id), value);
   }
 
   @Override
@@ -115,7 +110,7 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   public void delete(DBIDRef id) {
     put(id, DBIDUtil.invalid());
   }
-  
+
   @Override
   public String toString() {
     return data.toString();

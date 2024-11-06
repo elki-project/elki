@@ -20,19 +20,14 @@
  */
 package elki.database.datastore.memory;
 
-import elki.database.datastore.DataStoreFactory;
-import elki.database.datastore.WritableDBIDDataStore;
-import elki.database.datastore.WritableDataStore;
-import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.datastore.WritableIntegerDataStore;
-import elki.database.datastore.WritableRecordStore;
-import elki.database.ids.DBIDRange;
+import elki.database.datastore.*;
+import elki.database.ids.DBIDEnum;
 import elki.database.ids.DBIDs;
 
 /**
  * Simple factory class that will store all data in memory using object arrays
  * or hashmaps.
- * 
+ * <p>
  * Hints are currently not used by this implementation, since everything is
  * in-memory.
  * 
@@ -49,86 +44,63 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   @SuppressWarnings("unchecked")
   @Override
   public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
-    if (Double.class.equals(dataclass)) {
+    if(Double.class.equals(dataclass)) {
       return (WritableDataStore<T>) makeDoubleStorage(ids, hints);
     }
-    if (Integer.class.equals(dataclass)) {
+    if(Integer.class.equals(dataclass)) {
       return (WritableDataStore<T>) makeIntegerStorage(ids, hints);
     }
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      Object[] data = new Object[range.size()];
-      return new ArrayStore<>(data, range);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayStore<>(new Object[ids.size()], (DBIDEnum) ids);
     }
-    else {
-      return new MapIntegerDBIDStore<>(ids.size());
-    }
+    return new MapIntegerDBIDStore<>(ids.size());
   }
 
   @Override
   public WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      return new ArrayDBIDStore(range.size(), range);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayDBIDStore((DBIDEnum) ids);
     }
-    else {
-      return new MapIntegerDBIDDBIDStore(ids.size());
-    }
+    return new MapIntegerDBIDDBIDStore(ids.size());
   }
 
   @Override
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      return new ArrayDoubleStore(range.size(), range);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayDoubleStore((DBIDEnum) ids);
     }
-    else {
-      return new MapIntegerDBIDDoubleStore(ids.size());
-    }
+    return new MapIntegerDBIDDoubleStore(ids.size());
   }
 
   @Override
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      return new ArrayDoubleStore(range.size(), range, def);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayDoubleStore((DBIDEnum) ids, def);
     }
-    else {
-      return new MapIntegerDBIDDoubleStore(ids.size(), def);
-    }
+    return new MapIntegerDBIDDoubleStore(ids.size(), def);
   }
 
   @Override
   public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      return new ArrayIntegerStore(range.size(), range);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayIntegerStore((DBIDEnum) ids);
     }
-    else {
-      return new MapIntegerDBIDIntegerStore(ids.size());
-    }
+    return new MapIntegerDBIDIntegerStore(ids.size());
   }
 
   @Override
   public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      return new ArrayIntegerStore(range.size(), range, def);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayIntegerStore((DBIDEnum) ids, def);
     }
-    else {
-      return new MapIntegerDBIDIntegerStore(ids.size(), def);
-    }
+    return new MapIntegerDBIDIntegerStore(ids.size(), def);
   }
 
   @Override
   public WritableRecordStore makeRecordStorage(DBIDs ids, int hints, Class<?>... dataclasses) {
-    if(ids instanceof DBIDRange) {
-      DBIDRange range = (DBIDRange) ids;
-      Object[][] data = new Object[range.size()][dataclasses.length];
-      return new ArrayRecordStore(data, range);
+    if(ids instanceof DBIDEnum) {
+      return new ArrayRecordStore(new Object[ids.size()][dataclasses.length], (DBIDEnum) ids);
     }
-    else {
-      return new MapIntegerDBIDRecordStore(ids.size(), dataclasses.length);
-    }
+    return new MapIntegerDBIDRecordStore(ids.size(), dataclasses.length);
   }
 }

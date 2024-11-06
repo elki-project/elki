@@ -24,12 +24,12 @@ import elki.database.ids.DBIDRange;
 
 /**
  * Distance functions valid in a <em>static</em> database context only
- * (i.e. for DBIDRanges)
- *
+ * (i.e., for DBIDRanges)
+ * <p>
  * For any "distance" that cannot be computed for arbitrary objects, only those
  * that exist in the database and referenced by their ID. Furthermore, the IDs
  * must be contiguous.
- *
+ * <p>
  * Example: external precomputed distances
  *
  * @author Erich Schubert

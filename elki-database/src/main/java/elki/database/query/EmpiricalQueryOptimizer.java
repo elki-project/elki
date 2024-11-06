@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import elki.data.type.FieldTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
@@ -91,7 +90,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     Constructor<? extends DistanceIndex<?>> matrixIndex = null;
     try {
       Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.distancematrix.PrecomputedDistanceMatrix");
-      matrixIndex = (Constructor<? extends DistanceIndex<?>>) cls.getConstructor(Relation.class, DBIDRange.class, Distance.class);
+      matrixIndex = (Constructor<? extends DistanceIndex<?>>) cls.getConstructor(Relation.class, DBIDEnum.class, Distance.class);
     }
     catch(ClassNotFoundException e) {
       LOG.verbose("PrecomputedDistanceMatrix is not available, and cannot be automatically used for optimization.");
@@ -210,7 +209,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if(idx == null) { // cover tree is cheap and fast
       idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
@@ -255,7 +254,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if(idx == null) {
       idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
@@ -300,7 +299,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
       idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
@@ -331,14 +330,13 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       LOG.warning("An automatic distance matrix would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
       return null;
     }
-    if(!(relation.getDBIDs() instanceof DBIDRange)) {
-      LOG.warning("Optimizer: Precomputed distance matrixes can currently only be generated for a fixed DBID range - performance may be suboptimal.");
-      // TODO: add an automatic distance cache instead, c.f., CLARA?
+    if(!(relation.getDBIDs() instanceof StaticDBIDs)) {
+      LOG.warning("Optimizer: Precomputed distance matrixes can currently only be generated for static DBIDs - performance may be suboptimal.");
       return null;
     }
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, (DBIDRange) relation.getDBIDs(), distance);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, DBIDUtil.ensureEnum(relation.getDBIDs()), distance);
       LOG.verbose("Optimizer: automatically adding a distance matrix.");
       idx.initialize();
       idx.logStatistics();
