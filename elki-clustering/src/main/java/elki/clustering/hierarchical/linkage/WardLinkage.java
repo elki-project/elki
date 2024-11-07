@@ -127,7 +127,7 @@ public class WardLinkage implements GeometricLinkage {
 
   @Override
   public double distance(double[] x, int sizex, double[] y, int sizey) {
-    return sizex * (double) sizey / (double) (sizex + sizey) * SquaredEuclideanDistance.STATIC.distance(x, y);
+    return 0.5 * sizex * (double) sizey / (double) (sizex + sizey) * SquaredEuclideanDistance.STATIC.distance(x, y);
   }
 
   /**

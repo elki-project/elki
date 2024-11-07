@@ -20,14 +20,29 @@
  */
 package elki.clustering.hierarchical.linkage;
 
+import elki.utilities.documentation.Reference;
+
 /**
  * Geometric linkages, in addition to the combination with
  * Lance-Williams-Equations, these linkages can also be computed by aggregating
- * data points (for vector data only).
+ * data points (for vector data only). For this they <em>rely</em> on properties
+ * of squared Euclidean distances and the arithmetic mean of vectors.
+ * <p>
+ * Reference:
+ * <p>
+ * Erich Schubert:<br>
+ * Hierarchical Clustering Without Pairwise Distances by Incremental Similarity
+ * Search<br>
+ * Int. Conf. on Similarity Search and Applications (SISAP 2024)
  * 
  * @author Robert Gehde
+ * @author Erich Schubert
  * @since 0.8.0
  */
+@Reference(authors = "Erich Schubert", //
+    title = "Hierarchical Clustering Without Pairwise Distances by Incremental Similarity Search", //
+    booktitle = "Int. Conf. on Similarity Search and Applications (SISAP 2024)", //
+    bibkey = "DBLP:conf/sisap/Schubert24", url = "https://doi.org/10.1007/978-3-031-75823-2_20")
 public interface GeometricLinkage extends Linkage {
   /**
    * Merge the aggregated vectors.
