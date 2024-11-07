@@ -107,8 +107,8 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
   public ClusterMergeHistory run(Relation<O> relation) {
     DBIDEnum ids = DBIDUtil.ensureEnum(relation.getDBIDs());
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, true);
-    // TODO: ensure we have good page size!
-    PrioritySearcher<O> pq = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC).priorityByObject();
+    PrioritySearcher<O> pq = new QueryBuilder<>(relation, SquaredEuclideanDistance.STATIC) //
+        .lowSelectivity().priorityByObject();
     if(pq instanceof LinearScanPrioritySearcher || pq instanceof LinearScanEuclideanPrioritySearcher) {
       throw new UnsupportedOperationException("No index acceleration available. This will be very slow.");
     }

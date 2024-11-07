@@ -101,8 +101,8 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
     DBIDEnum ids = DBIDUtil.ensureEnum(relation.getDBIDs());
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
     // Create one for testing we have a suitable index.
-    // TODO: enforce a well-tuned VP-tree?
-    PrioritySearcher<DBIDRef> pq = new QueryBuilder<>(relation, distance).priorityByDBID();
+    PrioritySearcher<DBIDRef> pq = new QueryBuilder<>(relation, distance) //
+        .lowSelectivity().priorityByDBID();
     if(pq instanceof LinearScanPrioritySearcher || pq instanceof LinearScanEuclideanPrioritySearcher) {
       throw new UnsupportedOperationException("No index acceleration available. This will be very slow.");
     }

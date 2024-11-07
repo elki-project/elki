@@ -95,8 +95,6 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
   public ClusterMergeHistory run(Relation<O> relation) {
     DBIDEnum ids = DBIDUtil.ensureEnum(relation.getDBIDs());
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
-    // Create one for testing we have a suitable index.
-    // TODO: enforce a well-tuned VP-tree?
     PrioritySearcher<DBIDRef> pq = new QueryBuilder<>(relation, distance).priorityByDBID();
     if(pq instanceof LinearScanPrioritySearcher || pq instanceof LinearScanEuclideanPrioritySearcher) {
       throw new UnsupportedOperationException("No index acceleration available. This will be very slow.");
@@ -213,7 +211,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
         if(builder.getSize(ca) > 1) {
           continue; // duplicate
         }
-        DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap((int) Math.sqrt(ids.size()));
+        DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
         double t = Double.POSITIVE_INFINITY;
         for(pq.search(ita); pq.valid() && pq.allLowerBound() < t; pq.advance()) {
           final int b = ids.index(pq);
@@ -229,7 +227,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
             continue outer;
           }
           h.add(d, b);
-          t = h.peekKey();
+          pq.decreaseCutoff(t = h.peekKey());
         }
         if(!h.isEmpty()) {
           heap.add(t, a);
@@ -257,7 +255,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           continue;
         }
         h.add(pq.computeExactDistance(), b);
-        t = h.peekKey();
+        pq.decreaseCutoff(t = h.peekKey());
       }
       threshold[a] = pq.allLowerBound();
     }
