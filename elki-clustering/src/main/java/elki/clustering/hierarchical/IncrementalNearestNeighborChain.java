@@ -149,7 +149,7 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
     private DBIDArrayIter iter;
 
     /**
-     * Seacher
+     * Searcher
      */
     private PrioritySearcher<O> pq;
 
@@ -206,11 +206,10 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
 
       // Instead of a distance matrix we have merged clusters
       this.clusters = new double[rel.size() - 1][];
-      int maxcluster = 1;
 
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running LinearMemoryNNChain", size - 1, LOG) : null;
       for(int k = 1; k < size; k++) {
-        if(!growChain(chain, maxcluster)) {
+        if(!growChain(chain)) {
           k--; // retry
           continue;
         }
@@ -221,9 +220,6 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
         assert a != b;
         int ab = builder.add(a, linkage.restoreLinkage(minLink, builder.isSquared), b);
         assert builder.getSize(ab) == na + nb;
-        if(na + nb > maxcluster) {
-          maxcluster = na + nb;
-        }
         // update the cluster center
         clusters[ab - ids.size()] = linkage.merge(getCenter(a), na, getCenter(b), nb);
         chain.size -= 3;
@@ -236,7 +232,7 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
       return builder.complete();
     }
 
-    private boolean growChain(IntegerArray chain, int maxcluster) {
+    private boolean growChain(IntegerArray chain) {
       int a = -1, b = -1;
       if(chain.size() < 2) {
         a = findUnlinked(-1, builder);
@@ -282,7 +278,8 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
           // Note: compared to the reference paper, the Ward linkages in this
           // implementation are scaled so that they capture variances and not
           // distances 4 * 0.5 = 2. see WardLinkage#restoreLinkage
-          f = 4 * 0.5 * (na + maxcluster) / na;
+          // original bound of the paper: f = 4 * 0.5 * (na + maxcluster) / na;
+          f = 4 + 4. / na; // new bound
         }
         for(pq.search(qv, f * minLink); pq.valid(); pq.advance()) {
           final int i = builder.get(ids.index(pq));
