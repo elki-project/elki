@@ -91,8 +91,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
    */
   public ClusterMergeHistory run(Relation<O> relation) {
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-    ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, true);
-    return new Instance<O>(linkage).run(ids, relation, builder);
+    return new Instance<O>(linkage).run(ids, relation, new ClusterMergeHistoryBuilder(ids, true));
   }
 
   /**
@@ -190,14 +189,14 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
         }
         // For ties, always prefer the second-last element b:
         final int bSize = builder.getSize(clustermap[b]);
-        double minDist = linkage.distance(clusters[a], builder.getSize(clustermap[a]), clusters[b], bSize);
+        double minDist = linkage.linkage(clusters[a], builder.getSize(clustermap[a]), clusters[b], bSize);
         distanceComputations++;
         do {
           final int aSize = builder.getSize(clustermap[a]);
           int c = b;
           for(int i = 0; i < end; i++) {
             if(i != a && i != b && clustermap[i] >= 0) {
-              double dist = linkage.distance(clusters[a], aSize, clusters[i], builder.getSize(clustermap[i]));
+              double dist = linkage.linkage(clusters[a], aSize, clusters[i], builder.getSize(clustermap[i]));
               distanceComputations++;
               if(dist < minDist) {
                 minDist = dist;
@@ -217,7 +216,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           a = b;
           b = tmp;
         }
-        assert minDist == linkage.distance(clusters[a], builder.getSize(clustermap[a]), clusters[b], builder.getSize(clustermap[b]));
+        assert minDist == linkage.linkage(clusters[a], builder.getSize(clustermap[a]), clusters[b], builder.getSize(clustermap[b]));
         merge(size, clusters, builder, clustermap, minDist, a, b);
         end = AGNES.Instance.shrinkActiveSet(clustermap, end, a);
         chain.size -= 3;
@@ -242,7 +241,7 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
       assert x >= 0 && y >= 0;
       final int xx = clustermap[x], yy = clustermap[y];
       final int sizex = builder.getSize(xx), sizey = builder.getSize(yy);
-      int zz = builder.strictAdd(xx, linkage.restore(mindist, builder.isSquared), yy);
+      int zz = builder.strictAdd(xx, linkage.restoreLinkage(mindist, builder.isSquared), yy);
       assert builder.getSize(zz) == sizex + sizey;
       clustermap[y] = zz;
       clustermap[x] = -1; // deactivate

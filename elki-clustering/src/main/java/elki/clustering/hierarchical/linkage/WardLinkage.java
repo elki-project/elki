@@ -54,7 +54,7 @@ import elki.utilities.optionhandling.Parameterizer;
  * <p>
  * Because the resulting distances are squared, when used with a non-squared
  * distance, ELKI implementations will apply the square root before returning
- * the final result. This is statistically somewhat questionable, but usually
+ * the final result. This is statistically somewhat debatable, but usually
  * yields more interpretable distances that &mdash; roughly &mdash; correspond
  * to the increase in standard deviation. With ELKI, you can get both behavior:
  * Either choose squared Euclidean distance, or regular Euclidean distance.
@@ -126,8 +126,13 @@ public class WardLinkage implements GeometricLinkage {
   }
 
   @Override
-  public double distance(double[] x, int sizex, double[] y, int sizey) {
-    return 0.5 * sizex * (double) sizey / (double) (sizex + sizey) * SquaredEuclideanDistance.STATIC.distance(x, y);
+  public double linkage(double[] x, int sizex, double[] y, int sizey) {
+    return .5 * sizex * (double) sizey / (double) (sizex + sizey) * SquaredEuclideanDistance.STATIC.distance(x, y);
+  }
+
+  @Override
+  public double restoreLinkage(double d, boolean issquare) {
+    return issquare ? 4 * d : 2 * Math.sqrt(d);
   }
 
   /**

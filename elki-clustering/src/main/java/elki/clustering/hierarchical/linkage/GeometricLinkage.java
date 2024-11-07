@@ -64,5 +64,20 @@ public interface GeometricLinkage extends Linkage {
    * @param sizey Weight of the second cluster
    * @return Distance
    */
-  public double distance(double[] x, int sizex, double[] y, int sizey);
+  public double linkage(double[] x, int sizex, double[] y, int sizey);
+
+  /**
+   * Restore a linkage to the original scale.
+   * <p>
+   * For Ward linkage, this differs from {@link #restore} by a factor of 2.
+   * This is because in terms of variance, the variance of two points is only
+   * half the distance.
+   *
+   * @param d Distance
+   * @param issquare Flag to indicate the output domain is squared
+   * @return Linkage value
+   */
+  default double restoreLinkage(double d, boolean issquare) {
+    return d;
+  }
 }

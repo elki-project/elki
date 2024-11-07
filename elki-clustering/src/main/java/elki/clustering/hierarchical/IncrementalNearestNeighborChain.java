@@ -217,9 +217,9 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
         int a = builder.get(chain.get(chain.size - 2));
         int b = builder.get(chain.get(chain.size - 1));
         int na = builder.getSize(a), nb = builder.getSize(b);
-        double minLink = linkage.distance(getCenter(a), na, getCenter(b), nb);
+        double minLink = linkage.linkage(getCenter(a), na, getCenter(b), nb);
         assert a != b;
-        int ab = builder.add(a, linkage.restore(minLink, builder.isSquared), b);
+        int ab = builder.add(a, linkage.restoreLinkage(minLink, builder.isSquared), b);
         assert builder.getSize(ab) == na + nb;
         if(na + nb > maxcluster) {
           maxcluster = na + nb;
@@ -268,7 +268,7 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
       // For ties, always prefer the second-last element b:
       double[] va = getCenter(a), vb = getCenter(b);
       int na = builder.getSize(a), nb = builder.getSize(b);
-      double minLink = linkage.distance(va, na, vb, nb);
+      double minLink = linkage.linkage(va, na, vb, nb);
       distanceComputations++;
       do {
         Arrays.fill(visited, (byte) 0);
@@ -279,25 +279,28 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
         double[] vc = vb;
         double f = 1;
         if(linkage.getClass() == WardLinkage.class) {
-          // Note: compared to the reference paper, the Ward distances in this
-          // implementation are scaled, so that they capture variances not
-          // distances.
-          f = (na + maxcluster) * 0.25 / na;
+          // Note: compared to the reference paper, the Ward linkages in this
+          // implementation are scaled so that they capture variances and not
+          // distances 4 * 0.5 = 2. see WardLinkage#restoreLinkage
+          f = 4 * 0.5 * (na + maxcluster) / na;
         }
         for(pq.search(qv, f * minLink); pq.valid(); pq.advance()) {
           final int i = builder.get(ids.index(pq));
           if(i != a && i != b && (i < rel.size() || visited[i - rel.size()] == 0)) {
             final double[] vi = getCenter(i);
             final int ni = builder.getSize(i);
-            if(linkage.getClass() != WardLinkage.class || pq.getLowerBound() / (na + ni) * na * ni <= minLink) {
-              double link = linkage.distance(va, na, vi, ni);
+            // pq.lowerBound is point distance, not variance, additional factor
+            // of 4 - see WardLinkage#restoreLinkage
+            final double fi = 4 * (na + (double) ni) / (na * (double) ni);
+            if(linkage.getClass() != WardLinkage.class || pq.getLowerBound() <= fi * minLink) {
+              double link = linkage.linkage(va, na, vi, ni);
               distanceComputations++;
               if(link < minLink) {
                 minLink = link;
                 c = i;
                 vc = vi;
                 nc = ni;
-                pq.decreaseCutoff(f * link);
+                pq.decreaseCutoff(f * link); // worst case f again
               }
             }
             if(i >= rel.size()) {
