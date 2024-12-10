@@ -106,7 +106,7 @@ public class LabeledPAM<O> extends FastPAM1<O> {
 
     public Clustering<MedoidModel> run(Database database) {
         Relation<O> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
-        return run(relation, database.getRelation(TypeUtil.LABELLIST), k, new QueryBuilder<>(relation, distance).precomputed().distanceQuery());
+        return run(relation, database.getRelation(TypeUtil.LABELLIST));
     }
 
     @Override
@@ -115,8 +115,9 @@ public class LabeledPAM<O> extends FastPAM1<O> {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public Clustering<MedoidModel> run(Relation<O> relation, Relation<LabelList> labels, int k, DistanceQuery<? super O> distQ) {
+    public Clustering<MedoidModel> run(Relation<O> relation, Relation<LabelList> labels) {
         DBIDs ids = relation.getDBIDs();
+        DistanceQuery<? super O> distQ = new QueryBuilder<>(relation, distance).precomputed().distanceQuery();
         // remove this as a propery of an algo
         this.pointLabelMap = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0);
         int noLabels = saveLabels(labels);
