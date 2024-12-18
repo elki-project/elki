@@ -108,7 +108,7 @@ public class FasterPAM<O> extends FastPAM<O> {
    *
    * @author Erich Schubert
    */
-  protected static class Instance extends FastPAM.Instance {
+  public static class Instance extends FastPAM.Instance {
     /**
      * Constructor.
      *
@@ -128,7 +128,7 @@ public class FasterPAM<O> extends FastPAM<O> {
      * @return final cost
      */
     @Override
-    protected double run(ArrayModifiableDBIDs medoids, int maxiter) {
+    public double run(ArrayModifiableDBIDs medoids, int maxiter) {
       final int k = medoids.size();
       // Initial assignment to nearest medoids
       // TODO: reuse distance information, from the build phase, when possible?

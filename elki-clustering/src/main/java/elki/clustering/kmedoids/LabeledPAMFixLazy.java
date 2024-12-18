@@ -21,6 +21,7 @@
 package elki.clustering.kmedoids;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDArrayMIter;
 import elki.database.ids.DBIDIter;
@@ -66,13 +67,13 @@ public class LabeledPAMFixLazy<O> extends LabeledPAM<O> {
      * @param maxiter Maxiter parameter
      * @param initializer Function to generate the initial means
      */
-    public LabeledPAMFixLazy(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer, RandomFactory rnd) {
-        super(distance, k, maxiter, initializer, rnd);
+    public LabeledPAMFixLazy(Distance<? super O> distance, int k, int maxiter, SemiSupervisedKMedoidsInitialization<O> initializer) {
+        super(distance, k, maxiter, initializer);
     }
 
     @Override
-    protected Instance instanceWrapper(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
-      return new Instance(relation, distQ, ids, assignment, pointLabelMap, clusterLabel, noLabels);
+    Instance instanceWrapper(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
+      return new Instance(distQ, ids, assignment, labelsMaps, clusterLabel, noLabels);
     }
 
     /**
@@ -93,8 +94,8 @@ public class LabeledPAMFixLazy<O> extends LabeledPAM<O> {
          * @param ids IDs to process
          * @param assignment Cluster assignment
          */
-        public Instance(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
-            super(relation, distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
+        public Instance(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
+            super(distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
         }
 
         @Override
@@ -180,7 +181,7 @@ public class LabeledPAMFixLazy<O> extends LabeledPAM<O> {
 
         @Override
         public LabeledPAMFixLazy<O> make() {
-            return new LabeledPAMFixLazy<>(distance, k, maxiter, initializer, rnd);
+            return new LabeledPAMFixLazy<>(distance, k, maxiter, initializer);
         }
     }
 }

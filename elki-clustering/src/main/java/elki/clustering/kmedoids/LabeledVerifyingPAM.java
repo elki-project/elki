@@ -3,6 +3,7 @@ package elki.clustering.kmedoids;
 import java.util.Arrays;
 
 import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDArrayMIter;
 import elki.database.ids.DBIDIter;
@@ -43,13 +44,13 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
      * @param initializer Function to generate the initial means
      * @param rnd
      */
-    public LabeledVerifyingPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer, RandomFactory rnd) {
-        super(distance, k, maxiter, initializer, rnd);
+    public LabeledVerifyingPAM(Distance<? super O> distance, int k, int maxiter, SemiSupervisedKMedoidsInitialization<O> initializer) {
+        super(distance, k, maxiter, initializer);
     }
 
     @Override
-    protected Instance instanceWrapper(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
-        return new Instance(relation, distQ, ids, assignment, pointLabelMap, clusterLabel, noLabels);
+    Instance instanceWrapper(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
+      return new Instance(distQ, ids, assignment, labelsMaps, clusterLabel, noLabels);
     }
 
     /**
@@ -68,8 +69,8 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
          * @param ids IDs to process
          * @param assignment Cluster assignment
          */
-        public Instance(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
-            super(relation, distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
+        public Instance(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
+            super(distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
         }
 
         @Override
@@ -202,7 +203,7 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
 
         @Override
         public LabeledVerifyingPAM<O> make() {
-            return new LabeledVerifyingPAM<>(distance, k, maxiter, initializer, rnd);
+            return new LabeledVerifyingPAM<>(distance, k, maxiter, initializer);
         }
     }
 }

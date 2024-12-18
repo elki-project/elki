@@ -2,7 +2,7 @@ package elki.clustering.kmedoids;
 
 import java.util.Arrays;
 
-import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
+import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDArrayMIter;
@@ -12,14 +12,12 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.random.RandomFactory;
 
 /**
  * @author Miriama Janosova
@@ -45,13 +43,13 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
      * @param initializer Function to generate the initial means
      * @param rnd
      */
-    public LabeledOptimizedPAM(Distance<? super O> distance, int k, int maxiter, KMedoidsInitialization<O> initializer, RandomFactory rnd) {
-        super(distance, k, maxiter, initializer, rnd);
+    public LabeledOptimizedPAM(Distance<? super O> distance, int k, int maxiter, SemiSupervisedKMedoidsInitialization<O> initializer) {
+        super(distance, k, maxiter, initializer);
     }
 
     @Override
-    protected Instance instanceWrapper(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
-        return new Instance(relation, distQ, ids, assignment, pointLabelMap, clusterLabel, noLabels);
+    Instance instanceWrapper(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
+      return new Instance(distQ, ids, assignment, labelsMaps, clusterLabel, noLabels);
     }
 
     /**
@@ -70,8 +68,8 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
          * @param ids IDs to process
          * @param assignment Cluster assignment
          */
-        public Instance(Relation<?> relation, DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
-            super(relation, distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
+        public Instance(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
+            super(distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
         }
 
         @Override
@@ -360,7 +358,7 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
 
         @Override
         public LabeledOptimizedPAM<O> make() {
-            return new LabeledOptimizedPAM<>(distance, k, maxiter, initializer, rnd);
+            return new LabeledOptimizedPAM<>(distance, k, maxiter, initializer);
         }
     }
 }
