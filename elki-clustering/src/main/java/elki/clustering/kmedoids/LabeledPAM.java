@@ -113,7 +113,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
             super(distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
             this.countLabelledPointsInCluster = new int[clusterLabel.length];
             this.potentialSwaps = 0;
-            this.numberOfClustersWithLabel = new int[numberOfLabels];
+            this.numberOfClustersWithLabel = new int[numberOfLabels+1];
             for(int i = 0; i < clusterLabel.length; i++) {
                 numberOfClustersWithLabel[clusterLabel[i]] += 1;
             }
@@ -184,7 +184,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                     // Initialize with medoid removal cost:
                     System.arraycopy(pcost, 0, cost, 0, pcost.length);
                     // The cost we get back by making the non-medoid h medoid.
-                    double[][] acc = new double[k][numberOfLabels];
+                    double[][] acc = new double[k][numberOfLabels+1];
                     computeLabeledReassignmentCost(h, cost, acc);
                     int[] new_col = updateCosts(h, acc,cost,k);
                     int min = VMath.argmin(cost);

@@ -114,11 +114,11 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
 
                     // Compute Reassignment costs
                     //Old
-                    double[][] acc = new double[k][numberOfLabels];
+                    double[][] acc = new double[k][numberOfLabels + 1];
                     computeLabeledReassignmentCost(h, costOld, acc);
 
                     //new
-                    double[] colAcc = new double[numberOfLabels];
+                    double[] colAcc = new double[numberOfLabels + 1];
                     double[] lossCor = new double[k];
                     computeLabeledReassignmentCostNew(h, cost, colAcc, lossCor);
 

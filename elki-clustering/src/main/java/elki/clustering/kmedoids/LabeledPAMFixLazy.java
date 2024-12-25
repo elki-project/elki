@@ -130,7 +130,7 @@ public class LabeledPAMFixLazy<O> extends LabeledPAM<O> {
                       }
                     }
                     // The cost we get back by making the non-medoid h medoid.
-                    double[][] acc = new double[k][numberOfLabels];
+                    double[][] acc = new double[k][numberOfLabels + 1];
                     computeLabeledReassignmentCost(h, cost, acc);
                     int[] new_col = updateCosts(h, acc,cost,k);
                     int min = VMath.argmin(cost);

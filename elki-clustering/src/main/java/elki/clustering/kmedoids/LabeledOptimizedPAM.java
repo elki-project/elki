@@ -106,7 +106,7 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                     // Initialize with medoid removal cost:
                     System.arraycopy(pcost, 0, cost, 0, pcost.length);
                     // The cost we get back by making the non-medoid h medoid.
-                    double[] colAcc = new double[numberOfLabels];
+                    double[] colAcc = new double[numberOfLabels + 1];
                     double[] lossCor = new double[k];
                     computeLabeledReassignmentCostNew(h, cost, colAcc, lossCor);
 

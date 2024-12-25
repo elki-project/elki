@@ -47,7 +47,6 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
 
 
     protected static class Instance extends SemiSupervisedKMedoids.Instance {
-        private WritableIntegerDataStore labelsMaps;
         private int[] countLabelledInCl;
 
         /**
@@ -195,7 +194,7 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
         }
 
         private boolean validObjClusterPair(DBIDRef objIdx, int clusterId) {
-            if (labelsMaps.intValue(objIdx) == -1){
+            if (pointLabelMap.intValue(objIdx) == -1){
                 return true; // object does not have a label, so we do not care where its clustered
             }
             if (clusterLabels[clusterId] == -1){
@@ -203,7 +202,7 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
                 return true;
             }
             // both object and cluster have labels, so we compare if they are the same
-            return labelsMaps.intValue(objIdx) == clusterLabels[clusterId];
+            return pointLabelMap.intValue(objIdx) == clusterLabels[clusterId];
         }
 
         protected double assignToNearestCluster(ArrayDBIDs medoids) {
@@ -229,7 +228,7 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
                 if (minindx < 0) {
                     throw new AbortException("Too many infinite distances. Cannot assign objects.");
                 }
-                int objLabel = labelsMaps.intValue(iditer);
+                int objLabel = pointLabelMap.intValue(iditer);
                 countLabelledInCl[minindx] += objLabel == -1 ? 0 : 1;
                 assignment.put(iditer, minindx);
                 // if cluster does not have label, and object does, then update clusterLabel

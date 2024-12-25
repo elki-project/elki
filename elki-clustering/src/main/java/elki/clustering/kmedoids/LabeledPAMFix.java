@@ -127,7 +127,7 @@ public class LabeledPAMFix<O> extends LabeledPAM<O> {
                     System.arraycopy(pcost, 0, cost, 0, pcost.length);
                     // Compare object to its own medoid.
                     // The cost we get back by making the non-medoid h medoid.
-                    double[][] acc = new double[k][numberOfLabels];
+                    double[][] acc = new double[k][numberOfLabels + 1];
                     computeLabeledReassignmentCost(h, cost, acc);
                     int[] new_col = updateCosts(h, acc,cost,k);
                     int min = VMath.argmin(cost);
@@ -250,7 +250,7 @@ public class LabeledPAMFix<O> extends LabeledPAM<O> {
 
         private double[][] findFixes(int k) {
           // for h labelled it can be reduced to 1 x k
-          double[][] acc = new double[k][numberOfLabels];
+          double[][] acc = new double[k][numberOfLabels + 1];
           // Compute costs of reassigning other objects o:
           for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
             final int jColor = this.pointLabelMap.intValue(j);
