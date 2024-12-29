@@ -194,10 +194,10 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
         }
 
         private boolean validObjClusterPair(DBIDRef objIdx, int clusterId) {
-            if (pointLabelMap.intValue(objIdx) == -1){
+            if (pointLabelMap.intValue(objIdx) == 0){
                 return true; // object does not have a label, so we do not care where its clustered
             }
-            if (clusterLabels[clusterId] == -1){
+            if (clusterLabels[clusterId] == 0){
                 // the cluster itself has no label, so we can assign the object here
                 return true;
             }
@@ -229,10 +229,10 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
                     throw new AbortException("Too many infinite distances. Cannot assign objects.");
                 }
                 int objLabel = pointLabelMap.intValue(iditer);
-                countLabelledInCl[minindx] += objLabel == -1 ? 0 : 1;
+                countLabelledInCl[minindx] += objLabel == 0 ? 0 : 1;
                 assignment.put(iditer, minindx);
                 // if cluster does not have label, and object does, then update clusterLabel
-                if (clusterLabels[minindx] == -1 && objLabel != -1) {
+                if (clusterLabels[minindx] == 0 && objLabel != 0) {
                     clusterLabels[minindx] = objLabel;
                 }
                 cost += mindist;
@@ -240,7 +240,7 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             for (int i = 0; i < clusterLabels.length; i++){
                 // nullify the label of the cluster
                 if (countLabelledInCl[i] == 0){
-                    clusterLabels[i] = -1;
+                    clusterLabels[i] = 0;
                 }
             }
             return cost;
