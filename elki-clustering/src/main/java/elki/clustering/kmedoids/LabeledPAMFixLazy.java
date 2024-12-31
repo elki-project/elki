@@ -38,6 +38,8 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.random.RandomFactory;
 
+import java.util.Arrays;
+
 /**
  * @author Miriama Janosova and Andreas Lang
  *
@@ -143,6 +145,10 @@ public class LabeledPAMFixLazy<O> extends LabeledPAM<O> {
                     lastswap.set(h); // x_c .. so we make the swap
                     updateAssignment(m, h, min, new_col[min]);
                     updatePriorCost(pcost, m);
+                    Arrays.fill(numberOfClustersWithLabel, 0);
+                    for(int i = 0; i < k; i++) {
+                      numberOfClustersWithLabel[clusterLabels[i]]++;
+                    }
                     tc += bestcost;
                     assert tc >= 0;
                     if(LOG.isStatistics()) {

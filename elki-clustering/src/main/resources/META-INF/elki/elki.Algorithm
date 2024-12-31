@@ -86,6 +86,8 @@ elki.clustering.kmedoids.FastCLARANS
 elki.clustering.kmedoids.SingleAssignmentKMedoids
 elki.clustering.kmedoids.LabeledOptimizedPAM
 elki.clustering.kmedoids.COPKmedoids
+elki.clustering.kmedoids.LabeledPAMFixLazy
+elki.clustering.kmedoids.LabeledPAMFix
 elki.clustering.Leader
 elki.clustering.NaiveMeanShiftClustering
 elki.clustering.optics.OPTICSXi

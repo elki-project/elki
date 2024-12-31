@@ -36,6 +36,8 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 
+import java.util.Arrays;
+
 /**
  * @author Miriama Janosova and Andreas Lang
  *
@@ -141,6 +143,10 @@ public class LabeledPAMFix<O> extends LabeledPAM<O> {
                     updateAssignment(m, h, min, new_col[min]);
                     tc += applyFixes( m, k);
                     updatePriorCost(pcost, m);
+                    Arrays.fill(numberOfClustersWithLabel, 0);
+                    for(int i = 0; i < k; i++) {
+                      numberOfClustersWithLabel[clusterLabels[i]]++;
+                    }
                     tc += bestcost;
                     assert tc >= 0;
                     if(LOG.isStatistics()) {

@@ -227,7 +227,7 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                         continue;
                     }
                     loss[i] += colAcc[hLabel] + colAcc[0];
-                    if (bestCol == clusterLabel){
+                    if (hLabel == clusterLabel){
                         loss[i] += lossCor[i];
                     }
                     new_col[i] = hLabel;
