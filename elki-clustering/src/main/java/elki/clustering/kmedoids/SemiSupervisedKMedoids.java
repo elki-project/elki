@@ -152,7 +152,7 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
     Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     instanceWrapper(distQ, ids, assignment, labels, clusterLabels, l).run(medoids, k);
     getLogger().statistics(optd.end());
-    return PAM.wrapResult(ids, assignment, medoids, "PAM Clustering");
+    return PAM.wrapResult(ids, assignment, medoids, "MED_Clustering");
   }
 
   protected List<String> createLabelMap(Relation<LabelList> labels, WritableIntegerDataStore labelsMaps){
