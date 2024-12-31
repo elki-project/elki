@@ -300,7 +300,7 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<SemiSupervisedKMedoidsInitialization<O>>(KMeans.INIT_ID, SemiSupervisedKMedoidsInitialization.class, defaultInitializer()) //
+      new ObjectParameter<SemiSupervisedKMedoidsInitialization<O>>(KMeans.INIT_ID, SemiSupervisedKMedoidsInitialization.class) //
           .grab(config, x -> initializer = x);
       new IntParameter(KMeans.MAXITER_ID, 0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //

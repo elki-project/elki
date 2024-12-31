@@ -40,6 +40,7 @@ import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 import elki.utilities.exceptions.AbortException;
+import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * @author Miriama Janosova
@@ -655,6 +656,11 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
      * @author Erich Schubert
      */
     public static class Par<O> extends SemiSupervisedKMedoids.Par<O> {
+
+      @Override
+      public void configure(Parameterization config) {
+        super.configure(config);
+      }
 
         @Override
         public LabeledPAM<O> make() {

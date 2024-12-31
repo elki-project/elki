@@ -230,10 +230,9 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
     }
 
     @Override
-    public UnsupervisedInitialization<?> make() {
-      return new UnsupervisedInitialization<>(rnd, initializer);
+    public PreclusteredInitialization<?> make() {
+      return new PreclusteredInitialization<>(rnd, initializer);
     }
-
 
   }
 }

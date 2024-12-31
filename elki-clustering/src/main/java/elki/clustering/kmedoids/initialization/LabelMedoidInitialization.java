@@ -3,8 +3,6 @@ package elki.clustering.kmedoids.initialization;
 import java.util.HashMap;
 import java.util.Map;
 
-import elki.clustering.kmeans.KMeans;
-import elki.clustering.kmeans.initialization.RandomlyChosen;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.ArrayModifiableDBIDs;
@@ -16,16 +14,12 @@ import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
 import elki.utilities.optionhandling.parameterization.Parameterization;
-import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.random.RandomFactory;
 
 public class LabelMedoidInitialization<O> extends SemiSupervisedKMedoidsInitialization<O> {
 
-  KMedoidsInitialization<O> initializer;
-
-  public LabelMedoidInitialization(RandomFactory rnd, KMedoidsInitialization<O> initializer) {
+  public LabelMedoidInitialization(RandomFactory rnd) {
     super(rnd);
-    this.initializer = initializer;
   }
 
   @Override
@@ -101,22 +95,15 @@ public class LabelMedoidInitialization<O> extends SemiSupervisedKMedoidsInitiali
    */
   public static class Par<O> extends SemiSupervisedKMedoidsInitialization.Par {
 
-    /**
-     * Method to choose means without looking at labels.
-     */
-    protected KMedoidsInitialization<O> initializer;
-
 
     @Override
     public void configure(Parameterization config) {
       super.configure(config);
-      new ObjectParameter<KMedoidsInitialization<O>>(KMeans.INIT_ID, KMedoidsInitialization.class, RandomlyChosen.class) //
-          .grab(config, x -> initializer = x);
     }
 
     @Override
-    public UnsupervisedInitialization<?> make() {
-      return new UnsupervisedInitialization<>(rnd, initializer);
+    public LabelMedoidInitialization<?> make() {
+      return new LabelMedoidInitialization<>(rnd);
     }
 
 
