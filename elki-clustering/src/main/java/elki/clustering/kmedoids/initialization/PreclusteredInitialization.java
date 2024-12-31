@@ -43,11 +43,11 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
         medoids.addDBIDs(initialMedoids);
         DBIDArrayMIter miter = medoids.iter();
         int[] clusterLabels = new int[k];
-        int[] labelCount = new int[noLabels];
+        int[] labelCount = new int[noLabels + 1];
         int[][] preColors = new int[k][];
 
         for(int i = 0; i < k; miter.advance(), i++) {
-          preColors[i] = clustercolors(clusters[i], labels, noLabels);
+          preColors[i] = clusterColors(clusters[i], labels, noLabels);
           final int label = labels.intValue(miter);
           // // color based on medoid
           // if (label !=0){
@@ -78,7 +78,7 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
         // not every label is neccessarily the most frequent
         // find clusters for the remaining labels
         boolean allLabels = true;
-        for(int i = 1; i < noLabels; i++) {
+        for(int i = 1; i < noLabels + 1; i++) {
           if(labelCount[i] == 0) {
             allLabels = false;
             break;
@@ -90,13 +90,13 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
 
         // find labels with multiple Clusters
         ArrayList<Integer> multiColor = new ArrayList<>();
-        for(int j = 1; j < noLabels; j++) {
+        for(int j = 1; j < noLabels + 1; j++) {
           if(labelCount[j] > 1) {
             multiColor.add(j);
           }
         }
 
-        for(int i = 1; i < noLabels; i++) {
+        for(int i = 1; i < noLabels + 1; i++) {
           if (labelCount[i] > 0){
             continue;
           }
@@ -174,15 +174,15 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
         return clusterLabels;
   }
 
-      private int[] clustercolors(DBIDs ids, WritableIntegerDataStore labels, int noLabels){
-      int[] colors = new int[noLabels];
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
-        colors[labels.intValue(iter)] += 1;
-      }
-      int[] sortedIndices = IntStream.range(0, colors.length)
-                .boxed().sorted((i, j) -> Integer.compare(colors[j], colors[i])) // sort desc
-                .mapToInt(ele -> ele).filter( id -> colors[id] > 0).toArray();
-      return sortedIndices;
+      private int[] clusterColors(DBIDs ids, WritableIntegerDataStore labels, int noLabels){
+        int[] colors = new int[noLabels + 1];
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
+          colors[labels.intValue(iter)] += 1;
+        }
+        int[] sortedIndices = IntStream.range(0, colors.length)
+                  .boxed().sorted((i, j) -> Integer.compare(colors[j], colors[i])) // sort desc
+                  .mapToInt(ele -> ele).filter( id -> colors[id] > 0).toArray();
+        return sortedIndices;
     }
 
     protected DBIDs filterForColor(DBIDs ids, WritableIntegerDataStore labels, int color) {
