@@ -15,3 +15,6 @@ elki.clustering.kmeans.initialization.SphericalKMeansPlusPlus
 elki.clustering.kmedoids.initialization.BUILD
 elki.clustering.kmedoids.initialization.LAB
 elki.clustering.kmedoids.initialization.ParkJun
+elki.clustering.kmedoids.initialization.PreclusteredInitialization
+elki.clustering.kmedoids.initialization.UnsupervisedInitialization
+elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization

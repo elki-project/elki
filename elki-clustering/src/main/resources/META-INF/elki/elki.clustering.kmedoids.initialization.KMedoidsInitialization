@@ -8,4 +8,6 @@ elki.clustering.kmeans.initialization.FarthestPoints
 elki.clustering.kmeans.initialization.FarthestSumPoints
 elki.clustering.kmeans.initialization.FirstK
 elki.clustering.kmeans.initialization.KMeansPlusPlus
-elki.clustering.kmeans.initialization.RandomlyChosen
+elki.clustering.kmedoids.initialization.PreclusteredInitialization
+elki.clustering.kmedoids.initialization.UnsupervisedInitialization
+elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization
