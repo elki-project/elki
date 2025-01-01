@@ -33,22 +33,22 @@ public class UnsupervisedInitialization<O> extends SemiSupervisedKMedoidsInitial
       labelCount[label] += 1; 
     }
 
-    int l = 1;
+    int l = 0;
     int p = 0;
     labelloop:
     for (int i = 1; i < noLabels + 1; i++) {
       if (labelCount[i] == 0) {
-        if(labelCount[0]>0){
-          labelCount[0]-=1;
-          labelCount[i]+=1;
-          for(;p<k;p++){
-            if (clusterLabels[p] == 0) {
-              clusterLabels[p] = i;
-              continue labelloop;
-            }
-          }
-        }
-        while(labelCount[l]<2){
+        // if(labelCount[0]>0){
+        //   labelCount[0]-=1;
+        //   labelCount[i]+=1;
+        //   for(;p<k;p++){
+        //     if (clusterLabels[p] == 0) {
+        //       clusterLabels[p] = i;
+        //       continue labelloop;
+        //     }
+        //   }
+        // }
+        while(labelCount[l]<2 && l > 0 || labelCount[l]==0){
           l++;
           p=0;
         }
@@ -58,7 +58,9 @@ public class UnsupervisedInitialization<O> extends SemiSupervisedKMedoidsInitial
         for(;p<k;p++){
           if (clusterLabels[p] == l) {
             clusterLabels[p] = i;
-            medoids.set(p, findPointOfColor(ids, l, medoids, labels));
+            if(l != 0){
+              medoids.set(p, findPointOfColor(ids, l, medoids, labels));
+            }
             continue labelloop;
           }
         }
