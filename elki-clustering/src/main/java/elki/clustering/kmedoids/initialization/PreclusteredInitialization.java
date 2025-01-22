@@ -51,7 +51,7 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
           final int label = labels.intValue(miter);
           // // color based on medoid
           // if (label !=0){
-          //   clusterLabel[i] = label;
+          //   clusterLabels[i] = label;
           //   labelCount[label] += 1;
           //   continue;
           // }
@@ -141,7 +141,7 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
               }
             }
             DBIDRef closestMedoid = findClosestPoint(possibleMedoids, miter.seek(best), distance);
-            DBIDRef clostestPoint = findClosestPoint(coloredPoints, closestMedoid, distance);
+            DBIDRef clostestPoint = findClosestPointNonMedoid(coloredPoints, medoids, closestMedoid, distance);
 
             int closestOffset = -1;
             for (miter.seek(0); miter.valid(); miter.advance()){
@@ -168,7 +168,7 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
           }
           clusterLabels[best_redundant] = i;
           DBIDs candidates = filterForColor(clusters[best_redundant], labels, i);
-          DBIDRef closest = findClosestPoint(candidates, miter.seek(best_redundant), distance);
+          DBIDRef closest = findClosestPointNonMedoid(candidates, medoids, miter.seek(best_redundant), distance);
           miter.setDBID(closest);
         }
         return clusterLabels;
@@ -201,6 +201,19 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
         double dist = distQ.distance(ref, iter);
         if(dist < minDist && !DBIDUtil.equal(ref, iter)){
+          minDist = dist;
+          closest.set(iter);
+        }
+      }
+      return closest;
+    }
+
+    protected DBIDRef findClosestPointNonMedoid(DBIDs ids, DBIDs meds, DBIDRef ref, DistanceQuery<? super O> distQ) {
+      DBIDVar closest = DBIDUtil.newVar();
+      double minDist = Double.MAX_VALUE;
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        double dist = distQ.distance(ref, iter);
+        if(dist < minDist && !DBIDUtil.equal(ref, iter) && !meds.contains(iter)) {
           minDist = dist;
           closest.set(iter);
         }

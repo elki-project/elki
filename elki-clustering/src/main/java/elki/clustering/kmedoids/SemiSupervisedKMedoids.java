@@ -148,6 +148,8 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
     DBIDs ids = relation.getDBIDs();
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(k); 
     int[] clusterLabels = initialMedoids(distQ, ids, labels, l, k, medoids); // add labels
+    // assert that each medoid is unique
+    assert checkMedoidUnique(medoids);
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
     instanceWrapper(distQ, ids, assignment, labels, clusterLabels, l).run(medoids, k);
@@ -170,6 +172,17 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
       labelsMaps.put(iter, labelIndex);
     }
     return labelList;
+  }
+
+  private boolean checkMedoidUnique(ArrayModifiableDBIDs medoids){
+    for (int i = 0; i < medoids.size(); i++) {
+      for (int j = i+1; j < medoids.size(); j++) {
+        if (DBIDUtil.equal(medoids.get(i), medoids.get(j))) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
     /**

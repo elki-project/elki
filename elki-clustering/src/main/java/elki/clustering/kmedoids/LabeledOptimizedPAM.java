@@ -156,12 +156,12 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
             for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
                 int n = assignment.intValue(j) & 0x7FFF;
                 int s = assignment.intValue(j) >> 16;
-                assert second.doubleValue(j) > 0 || s == n;
+                assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                 if (s == n){
-                    if (canUncolor(k, pointLabelMap.intValue(j))){
+                    if (canUncolor(k, pointLabelMap.intValue(j)) || pointLabelMap.intValue(j) == 0){
                         s = updateSecondNearest(j, mIter, s, Double.POSITIVE_INFINITY, n);
                         assignment.putInt(j, n | (s << 16));
-                        assert second.doubleValue(j) > 0 || s == n;
+                        assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                     }
                 }else if (!isValidObjSndMedPair(j, s)) {
                     // second closest was coloured at some point after j was
@@ -169,12 +169,13 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                     // there, thus we need to look for a new one
                     s = updateSecondNearest(j, mIter, s, Double.POSITIVE_INFINITY, n);
                     assignment.putInt(j, n | (s << 16));
-                    assert second.doubleValue(j) > 0 || s == n;
+                    assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                 }
-                assert second.doubleValue(j) > 0 || s == n;
+                assert (second.doubleValue(j) > 0 && s!=n) || (s == n && second.doubleValue(j) == 0)|| distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                 // cost of removing the medoid + reassigning objects to the
                 // second_closest
                 pcost[n] += second.doubleValue(j) - nearest.doubleValue(j);
+                assert this.pointLabelMap.intValue(j) > 0 || s != n;
             }
         }
 
@@ -293,7 +294,6 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                 }
                 final double dh = distQ.distance(h, j);
                 assert ds != Double.POSITIVE_INFINITY;
-                assert ds != 0 || s == n;
                 if(sValid) {
                     // Cluster can be replaced with a medoid of any color.
                     if(dh < dn) {
@@ -330,7 +330,8 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                     continue;
                 }
                 // Cluster needs to keep the same color
-                assert hColor == jColor || hColor == 0;
+                assert hColor == jColor || hColor == 0: "hColor: " + hColor + " jColor: " + jColor;
+                assert !sValid;
                 assert ds == 0;
                 // Colors are compatible otherwise Case 0
                 // cluster color can not be changed
