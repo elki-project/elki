@@ -62,7 +62,12 @@ public abstract class SemiSupervisedKMedoidsInitialization<O> {
 
   protected DBIDRef findPointOfColor(DBIDs ids, int label, ArrayModifiableDBIDs medoids, WritableIntegerDataStore labels){
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
-      if((labels.intValue(iter) == label || labels.intValue(iter) == 0) && !medoids.contains(iter)){
+      if((labels.intValue(iter) == label) && !medoids.contains(iter)){
+        return iter;
+      }
+    }
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if((labels.intValue(iter) == label || labels.intValue(iter) == 0) && !medoids.contains(iter)) {
         return iter;
       }
     }
