@@ -31,15 +31,15 @@ import elki.data.type.SimpleTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
 import elki.data.type.VectorFieldTypeInformation;
-import elki.database.Database;
-import elki.database.StaticArrayDatabase;
+import elki.database.ProxyDatabase;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.*;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDIter;
+import elki.database.ids.DBIDRange;
+import elki.database.ids.DBIDUtil;
 import elki.database.relation.*;
-import elki.datasource.ArrayAdapterDatabaseConnection;
-import elki.datasource.DatabaseConnection;
 import elki.math.DoubleMinMax;
 import elki.outlier.OutlierAlgorithm;
 import elki.result.outlier.InvertedOutlierScoreMeta;
@@ -101,6 +101,9 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
    * Constructor with parameters.
    * 
    * @param hdbscanExtraction HDBSCAN* extraction to use
+   * @param alpha Weighting of size vs. dimensionality
+   * @param subspaces Number of random subspaces to use
+   * @param rnd Random generator
    */
   public OutRankS1HDBSCAN(HDBSCANHierarchyExtraction hdbscanExtraction, double alpha, int subspaces, RandomFactory rnd) {
     super();
@@ -135,19 +138,9 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         vrelation.insert(it, projection.project(relation.get(it)));
       }
+      Clustering<?> clustering = hdbscanExtraction.autorun(new ProxyDatabase(ids, vrelation));
 
-      double[][] data = RelationUtil.relationAsMatrix(vrelation, DBIDUtil.ensureArray(vrelation.getDBIDs()));
-      // Adapter to load data from an existing array
-      DatabaseConnection dbc = new ArrayAdapterDatabaseConnection(data);
-      // Create a database (which may contain multiple relations!)
-      Database database = new StaticArrayDatabase(dbc);
-      // Load the data into the database (do NOT forget to initialize...)
-      database.initialize();
-
-      // Run the clustering algorithm
-      Clustering<?> clustering = hdbscanExtraction.autorun(database);
-
-      int maxdim = projdims, maxsize = 0;
+      int maxsize = 0;
       // Find maximum dimensionality and cluster size
       for(Cluster<?> cluster : clustering.getAllClusters()) {
         maxsize = Math.max(maxsize, cluster.size());
@@ -156,13 +149,10 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
       // Iterate over all clusters:
       for(Cluster<?> cluster : clustering.getAllClusters()) {
         double relsize = cluster.size() / (double) maxsize;
-        double reldim = projdims / (double) maxdim;
+        double reldim = projdims / (double) projdims;
         // Process objects in the cluster
         for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-          final int offset = ids.index(iter) - (ids.size() * (subspace + 1));
-          double oldscore = score[offset];
-          double newscore = oldscore + (alpha * relsize + (1 - alpha) * reldim);
-          score[offset] = newscore;
+          score[ids.index(iter)] += alpha * relsize + (1 - alpha) * reldim;
         }
       }
     }
