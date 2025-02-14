@@ -20,7 +20,6 @@
  */
 package elki.outlier.subspace;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import elki.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
@@ -37,10 +36,7 @@ import elki.database.StaticArrayDatabase;
 import elki.database.datastore.DataStoreFactory;
 import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
-import elki.database.ids.DBIDFactory;
-import elki.database.ids.DBIDIter;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDUtil;
+import elki.database.ids.*;
 import elki.database.relation.*;
 import elki.datasource.ArrayAdapterDatabaseConnection;
 import elki.datasource.DatabaseConnection;
@@ -117,16 +113,14 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
   /**
    * Run the clustering algorithm.
    *
-   * @param db Database
    * @param relation Relation
    * @return Outlier result
    */
-  public OutlierResult run(Database db, Relation<? extends NumberVector> relation) {
-    final int n = relation.size();
+  public OutlierResult run(Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
+    final DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
     SimpleTypeInformation<NumberVector> type;
-    double[] score = new double[n];
-    Arrays.fill(score, 0.);
+    double[] score = new double[ids.size()];
     for(int subspace = 0; subspace < subspaces; subspace++) {
       // Features selection for subspace
       final Random random = rnd.getSingleThreadedRandom();
@@ -135,11 +129,10 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
       NumericalFeatureSelection<NumberVector> projection = new NumericalFeatureSelection<>(subspacedims);
       projection.initialize(relation.getDataTypeInformation());
 
-      // Build virtual relation
+      // Build the projected data set
       type = VectorFieldTypeInformation.typeRequest(NumberVector.class, projdims, projdims);
-      DBIDRange vids = DBIDFactory.FACTORY.generateStaticDBIDRange(1, relation.size());
-      MaterializedRelation<NumberVector> vrelation = new MaterializedRelation<>(type, vids);
-      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      MaterializedRelation<NumberVector> vrelation = new MaterializedRelation<>(type, ids);
+      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         vrelation.insert(it, projection.project(relation.get(it)));
       }
 
@@ -166,7 +159,7 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
         double reldim = projdims / (double) maxdim;
         // Process objects in the cluster
         for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
-          final int offset = DBIDUtil.asInteger(iter) - 1 - (n * (subspace + 1));
+          final int offset = ids.index(iter) - (ids.size() * (subspace + 1));
           double oldscore = score[offset];
           double newscore = oldscore + (alpha * relsize + (1 - alpha) * reldim);
           score[offset] = newscore;
@@ -176,9 +169,9 @@ public class OutRankS1HDBSCAN implements OutlierAlgorithm {
 
     DoubleMinMax minmax = new DoubleMinMax();
     type = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-    WritableDoubleDataStore meanscore = DataStoreUtil.makeDoubleStorage(db.getRelation(type).getDBIDs(), DataStoreFactory.HINT_HOT);
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      double newscore = score[DBIDUtil.asInteger(iter) - 1] / (double) subspaces;
+    WritableDoubleDataStore meanscore = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
+    for(DBIDArrayIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      double newscore = score[iter.getOffset()] / (double) subspaces;
       meanscore.put(iter, newscore);
       minmax.put(newscore);
     }
