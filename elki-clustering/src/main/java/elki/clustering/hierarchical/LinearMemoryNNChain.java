@@ -152,8 +152,8 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
     /**
      * Core function of NNChain.
      * 
-     * @param clusters Iterator to access relation objects
-     * @param clustermap Iterator to access relation objects
+     * @param clusters Array of points / clusters
+     * @param clustermap Maps objects to clusters
      * @param builder Result builder
      * @param rel Relation to process
      */
