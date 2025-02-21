@@ -2,4 +2,6 @@ description = 'ELKI - Clustering Algorithms'
 dependencies {
   api project(':elki-core')
   testFixturesApi(testFixtures(project(path: ':elki-test-core')))
+  testRuntimeOnly project(path: ':elki-index-various')
 }
+eclipse.classpath.containsTestFixtures = true

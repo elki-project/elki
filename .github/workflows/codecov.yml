@@ -21,4 +21,7 @@ jobs:
     - name: Code coverage
       run: ./gradlew --no-daemon clean test :codeCoverageReport -Pjacoco
     - name: Upload coverage to codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: elki-project/elki

@@ -5,7 +5,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify

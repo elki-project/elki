@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,11 +39,11 @@ import elki.database.ids.DBIDUtil;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class WeightedQuickUnionRangeDBIDsTest {
+public class WeightedQuickUnionDBIDsTest {
   @Test
   public void testTree() {
     DBIDRange range = DBIDUtil.generateStaticDBIDRange(8);
-    UnionFind uf = new WeightedQuickUnionRangeDBIDs(range);
+    UnionFind uf = new WeightedQuickUnionDBIDs(range);
     DBIDArrayIter i1 = range.iter(), i2 = range.iter();
     assertFalse(uf.isConnected(i1.seek(0), i2.seek(7)));
     uf.union(i1.seek(0), i2.seek(1));
@@ -70,7 +70,7 @@ public class WeightedQuickUnionRangeDBIDsTest {
     final int size = 100;
     DBIDRange range = DBIDUtil.generateStaticDBIDRange(size);
 
-    UnionFind uf = new WeightedQuickUnionRangeDBIDs(range);
+    UnionFind uf = new WeightedQuickUnionDBIDs(range);
     DBIDArrayIter i1 = range.iter(), i2 = range.iter();
 
     int[] c = new int[size];
@@ -105,7 +105,7 @@ public class WeightedQuickUnionRangeDBIDsTest {
   @Test
   public void testWorstCase() {
     DBIDRange range = DBIDUtil.generateStaticDBIDRange(10);
-    UnionFind uf = new WeightedQuickUnionRangeDBIDs(range);
+    UnionFind uf = new WeightedQuickUnionDBIDs(range);
     DBIDArrayIter i1 = range.iter(), i2 = range.iter();
     assertFalse(uf.isConnected(i1.seek(0), i2.seek(1)));
     uf.union(i1.seek(0), i2.seek(1));
@@ -133,7 +133,7 @@ public class WeightedQuickUnionRangeDBIDsTest {
   @Test
   public void testRoots() {
     DBIDRange range = DBIDUtil.generateStaticDBIDRange(8);
-    UnionFind uf = new WeightedQuickUnionRangeDBIDs(range);
+    UnionFind uf = new WeightedQuickUnionDBIDs(range);
     DBIDArrayIter i1 = range.iter(), i2 = range.iter();
     uf.union(i1.seek(0), i2.seek(1));
     uf.union(i1.seek(2), i2.seek(3));

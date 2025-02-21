@@ -20,11 +20,7 @@
  */
 package elki.database.ids.integer;
 
-import elki.database.ids.DBIDRef;
-import elki.database.ids.DBIDVar;
-import elki.database.ids.DoubleDBIDListIter;
-import elki.database.ids.DoubleDBIDPair;
-import elki.database.ids.ModifiableDoubleDBIDList;
+import elki.database.ids.*;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 
 /**
@@ -157,6 +153,30 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
     System.arraycopy(oids, 0, ids, 0, oids.length);
   }
 
+  /**
+   * Grow the data storage.
+   * 
+   * @param minsize Minimum size
+   */
+  protected void ensureSize(int minsize) {
+    final int len = dists.length;
+    if(minsize <= len) {
+      return;
+    }
+    if(dists == EMPTY_DISTS) {
+      dists = new double[minsize];
+      ids = new int[minsize];
+      return;
+    }
+    final int newlength = Math.max(minsize, len + (len >> 1) + 1);
+    double[] odists = dists;
+    dists = new double[newlength];
+    System.arraycopy(odists, 0, dists, 0, odists.length);
+    int[] oids = ids;
+    ids = new int[newlength];
+    System.arraycopy(oids, 0, ids, 0, oids.length);
+  }
+
   @Override
   public void add(double dist, DBIDRef id) {
     addInternal(dist, id.internalGetIndex());
@@ -250,6 +270,22 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
   @Override
   public DoubleIntegerDBIDList slice(int begin, int end) {
     return begin == 0 && end == size ? this : new DoubleIntegerDBIDSubList(this, begin, end);
+  }
+
+  @Override
+  public void insertFrom(KNNHeap knn) {
+    final int newsize = size + knn.size();
+    ensureSize(newsize);
+    assert dists.length >= newsize;
+    int p = newsize;
+    while(--p >= size && !knn.isEmpty()) {
+      assert p < newsize;
+      dists[p] = knn.peekKey();
+      ids[p] = knn.internalGetIndex();
+      knn.poll();
+    }
+    assert p == size - 1 && knn.isEmpty();
+    size = newsize;
   }
 
   @Override

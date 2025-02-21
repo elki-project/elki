@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @has - - - DataStoreIDMap
+ * @has - - - DBIDEnum
  *
  * @param <T> Data type
  */

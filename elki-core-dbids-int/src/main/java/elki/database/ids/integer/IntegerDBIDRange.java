@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -69,13 +69,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   @Override
   public boolean contains(DBIDRef o) {
     int oid = o.internalGetIndex();
-    if(oid < start) {
-      return false;
-    }
-    if(oid >= start + len) {
-      return false;
-    }
-    return true;
+    return oid >= start && oid < start + len;
   }
 
   @Override
@@ -84,17 +78,6 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
       throw new ArrayIndexOutOfBoundsException();
     }
     return DBIDFactory.FACTORY.importInteger(start + i);
-  }
-
-  /**
-   * For storage array offsets.
-   *
-   * @param dbid ID reference
-   * @return array offset
-   */
-  @Override
-  public int getOffset(DBIDRef dbid) {
-    return dbid.internalGetIndex() - start;
   }
 
   @Override
@@ -106,11 +89,9 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
       ((IntegerDBIDVar) var).internalSetIndex(start + index);
       return var;
     }
-    else {
-      // Much less efficient:
-      var.set(get(index));
-      return var;
-    }
+    // Fallback, much less efficient:
+    var.set(get(index));
+    return var;
   }
 
   @Override
@@ -120,10 +101,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
       return -1;
     }
     final int off = keyid - start;
-    if(off < len) {
-      return off;
-    }
-    return -(len + 1);
+    return off < len ? off : -(len + 1);
   }
 
   @Override
@@ -132,7 +110,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   }
 
   @Override
-  public int mapDBIDToOffset(DBIDRef dbid) {
+  public int index(DBIDRef dbid) {
     return dbid.internalGetIndex() - start;
   }
 

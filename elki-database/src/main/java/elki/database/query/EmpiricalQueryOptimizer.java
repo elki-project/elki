@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -26,19 +26,22 @@ import java.lang.reflect.InvocationTargetException;
 import elki.data.type.FieldTypeInformation;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.DBIDRange;
-import elki.database.ids.DBIDRef;
+import elki.database.ids.*;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
 import elki.database.query.range.RangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.distance.minkowski.LPNormDistance;
 import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.*;
 import elki.logging.Logging;
+import elki.math.MathUtil;
 import elki.result.Metadata;
 import elki.utilities.Alias;
+
+import static elki.database.query.QueryBuilder.*;
 
 /**
  * Class to automatically add indexes to a database.
@@ -91,7 +94,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     Constructor<? extends DistanceIndex<?>> matrixIndex = null;
     try {
       Class<?> cls = this.getClass().getClassLoader().loadClass("elki.index.distancematrix.PrecomputedDistanceMatrix");
-      matrixIndex = (Constructor<? extends DistanceIndex<?>>) cls.getConstructor(Relation.class, DBIDRange.class, Distance.class);
+      matrixIndex = (Constructor<? extends DistanceIndex<?>>) cls.getConstructor(Relation.class, DBIDEnum.class, Distance.class);
     }
     catch(ClassNotFoundException e) {
       LOG.verbose("PrecomputedDistanceMatrix is not available, and cannot be automatically used for optimization.");
@@ -156,11 +159,11 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
 
   @Override
   public <O> DistanceQuery<O> getDistanceQuery(Relation<? extends O> relation, Distance<? super O> distance, int flags) {
-    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+    if((flags & FLAG_PRECOMPUTE) != 0) {
       @SuppressWarnings("unchecked")
       DistanceIndex<O> idx = (DistanceIndex<O>) makeMatrixIndex(relation, distance);
       if(idx != null) {
-        if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+        if((flags & FLAG_NO_CACHE) == 0) {
           Metadata.hierarchyOf(relation).addWeakChild(idx);
         }
         return ((DistanceIndex<O>) idx).getDistanceQuery(distance);
@@ -173,20 +176,26 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> KNNSearcher<O> kNNByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
     KNNIndex<O> idx = null;
     // Try adding a preprocessor if requested:
-    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
-      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
+    if((flags & FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~FLAG_PRECOMPUTE);
     }
     if(idx == null) { // try k-d-tree
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 3 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 5 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // cover tree is cheap and fast
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx != null) {
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+      if((flags & FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
       return idx.kNNByObject(distanceQuery, maxk, flags);
@@ -198,23 +207,29 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> KNNSearcher<DBIDRef> kNNByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, int maxk, int flags) {
     KNNIndex<O> idx = null;
     // Try adding a preprocessor if requested:
-    if((flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
-      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~QueryBuilder.FLAG_PRECOMPUTE);
+    if((flags & FLAG_PRECOMPUTE) != 0) {
+      idx = makeKnnPreprocessor(relation, distanceQuery, maxk, flags & ~FLAG_PRECOMPUTE);
     }
     if(idx == null) { // try k-d-tree
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 3 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 5 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // cover tree is cheap and fast
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
+    if(idx == null && (flags & FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx != null) {
-      if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+      if((flags & FLAG_NO_CACHE) == 0) {
         Metadata.hierarchyOf(relation).addWeakChild(idx);
       }
       return idx.kNNByDBID(distanceQuery, maxk, flags);
@@ -226,18 +241,24 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> RangeSearcher<O> rangeByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     RangeIndex<O> idx = null;
     if(idx == null) { // Try k-d-tree
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 3 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 5 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
       return null;
     }
-    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+    if((flags & FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
     return idx.rangeByObject(distanceQuery, maxrange, flags);
@@ -247,21 +268,27 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> RangeSearcher<DBIDRef> rangeByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     RangeIndex<O> idx = null;
     if(idx == null) { // Try k-d-tree
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 3 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 3 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 5 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 5 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof DBIDRange) {
+    if(idx == null && (flags & FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
       return null;
     }
-    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+    if((flags & FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
     return idx.rangeByDBID(distanceQuery, maxrange, flags);
@@ -271,18 +298,24 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> PrioritySearcher<O> priorityByObject(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     DistancePriorityIndex<O> idx = null;
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 8 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* empirical */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 10 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
       return null;
     }
-    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+    if((flags & FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
     return idx.priorityByObject(distanceQuery, maxrange, flags);
@@ -292,21 +325,27 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
   public <O> PrioritySearcher<DBIDRef> priorityByDBID(Relation<? extends O> relation, DistanceQuery<O> distanceQuery, double maxrange, int flags) {
     DistancePriorityIndex<O> idx = null;
     if(idx == null) { // VP tree is cheap and fast
-      idx = makeVPTree(relation, distanceQuery.getDistance(), 8 /* needs optimization and benchmark */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 8 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeVPTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) {
-      idx = makeCoverTree(relation, distanceQuery.getDistance(), 20 /* needs optimization and benchmark */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 20 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeCoverTree(relation, distanceQuery.getDistance(), leafsize);
     }
     if(idx == null) { // Try k-d-tree for squared Euclidean mostly
-      idx = makeKDTree(relation, distanceQuery.getDistance(), 10 /* needs optimization and benchmark */);
+      // TODO: better heuristics, more benchmarks
+      int leafsize = (flags & FLAG_LOW_SELECTIVITY) == 0 ? 10 : 3 * (int) (1 + MathUtil.log2(relation.size()));
+      idx = makeKDTree(relation, distanceQuery.getDistance(), leafsize);
     }
-    if(idx == null && (flags & QueryBuilder.FLAG_PRECOMPUTE) != 0) {
+    if(idx == null && (flags & FLAG_PRECOMPUTE) != 0 && relation.getDBIDs() instanceof StaticDBIDs) {
       idx = makeMatrixIndex(relation, distanceQuery.getDistance());
     }
     if(idx == null) {
       return null;
     }
-    if((flags & QueryBuilder.FLAG_NO_CACHE) == 0) {
+    if((flags & FLAG_NO_CACHE) == 0) {
       Metadata.hierarchyOf(relation).addWeakChild(idx);
     }
     return idx.priorityByDBID(distanceQuery, maxrange, flags);
@@ -331,16 +370,16 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       LOG.warning("An automatic distance matrix would need about " + formatMemory(msize) + " memory, only " + formatMemory(freeMemory) + " are available.");
       return null;
     }
-    if(!(relation.getDBIDs() instanceof DBIDRange)) {
-      LOG.warning("Optimizer: Precomputed distance matrixes can currently only be generated for a fixed DBID range - performance may be suboptimal.");
-      // TODO: add an automatic distance cache instead, c.f., CLARA?
+    if(!(relation.getDBIDs() instanceof StaticDBIDs)) {
+      LOG.warning("Optimizer: Precomputed distance matrixes can currently only be generated for static DBIDs - performance may be suboptimal.");
       return null;
     }
     try {
       @SuppressWarnings("unchecked")
-      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, (DBIDRange) relation.getDBIDs(), distance);
+      DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) matrixIndex.newInstance(relation, DBIDUtil.ensureEnum(relation.getDBIDs()), distance);
       LOG.verbose("Optimizer: automatically adding a distance matrix.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -370,6 +409,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) coverIndex.newInstance(relation, distance, leafsize);
       LOG.verbose("Optimizer: automatically adding a cover tree index.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -389,7 +429,12 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
    * @return VP-Tree index
    */
   private <O> DistancePriorityIndex<O> makeVPTree(Relation<? extends O> relation, Distance<? super O> distance, int leafsize) {
-    // TODO: make sure there is no such VP tree already!
+    // We can support squared Euclidean via proxy.
+    if(distance.getClass() == SquaredEuclideanDistance.class) {
+      @SuppressWarnings("unchecked")
+      final Distance<? super O> eucl = (Distance<? super O>) EuclideanDistance.STATIC;
+      distance = eucl;
+    }
     if(vpIndex == null || !distance.isMetric()) {
       return null;
     }
@@ -397,8 +442,9 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
     try {
       @SuppressWarnings("unchecked")
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) vpIndex.newInstance(relation, distance, leafsize);
-      LOG.verbose("Optimizer: automatically adding a VP tree index.");
+      LOG.verbose("Optimizer: automatically adding a VP tree index with leaf size " + leafsize);
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -431,6 +477,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       DistancePriorityIndex<O> idx = (DistancePriorityIndex<O>) kdIndex.newInstance(relation, k > 0 ? k : 0);
       LOG.verbose("Optimizer: automatically adding a k-d-tree index.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException
@@ -465,6 +512,7 @@ public class EmpiricalQueryOptimizer implements QueryOptimizer {
       KNNIndex<O> idx = (KNNIndex<O>) knnIndex.newInstance(relation, distanceQuery, maxk, true);
       LOG.verbose("Optimizer: Automatically adding a knn preprocessor.");
       idx.initialize();
+      idx.logStatistics();
       return idx;
     }
     catch(InstantiationException | IllegalAccessException

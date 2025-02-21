@@ -181,7 +181,7 @@ public class ClustersWithNoiseExtraction implements ClusteringAlgorithm<Clusteri
         LOG.warning("Could not find a result with exactly " + numCl + " clusters (+ noise), generating " + bestCl + " clusters instead.");
       }
 
-      progress = LOG.isVerbose() ? new FiniteProgress("Performing cluster merges", bestOff, LOG) : null;
+      progress = LOG.isVerbose() ? new FiniteProgress("Performing cluster merges", bestOff + 1, LOG) : null;
       Int2IntOpenHashMap leafMap = new Int2IntOpenHashMap(merges.size());
       leafMap.defaultReturnValue(-1);
       ArrayList<ModifiableDBIDs> clusterMembers = new ArrayList<>(merges.size() - bestCl + 2);

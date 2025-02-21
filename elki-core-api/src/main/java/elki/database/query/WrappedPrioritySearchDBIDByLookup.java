@@ -90,6 +90,12 @@ public class WrappedPrioritySearchDBIDByLookup<O> implements PrioritySearcher<DB
   }
 
   @Override
+  public PrioritySearcher<DBIDRef> increaseSkip(double threshold) {
+    inner.increaseSkip(threshold);
+    return this;
+  }
+
+  @Override
   public int internalGetIndex() {
     return inner.internalGetIndex();
   }

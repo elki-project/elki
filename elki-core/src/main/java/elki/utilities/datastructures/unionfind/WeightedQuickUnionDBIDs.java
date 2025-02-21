@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,8 @@ import elki.database.ids.*;
 import elki.utilities.documentation.Reference;
 
 /**
- * Union-find algorithm for {@link DBIDRange} only, with optimizations.
- * <p>
- * To instantiate, use {@link UnionFindUtil#make}. This version is optimized for
- * {@link DBIDRange}s.
- * <p>
- * This is the weighted quick union approach, weighted by count and using
- * path-halving for optimization.
+ * Union-find using the weighted quick union approach, weighted by count and
+ * using path-halving for optimization.
  * <p>
  * Reference:
  * <p>
@@ -48,11 +43,11 @@ import elki.utilities.documentation.Reference;
     title = "Algorithms in C, Parts 1-4", //
     booktitle = "", //
     bibkey = "DBLP:books/daglib/0004943")
-public class WeightedQuickUnionRangeDBIDs implements UnionFind {
+public class WeightedQuickUnionDBIDs implements UnionFind {
   /**
    * Object ID range.
    */
-  private DBIDRange ids;
+  private DBIDEnum ids;
 
   /**
    * Parent element
@@ -65,15 +60,15 @@ public class WeightedQuickUnionRangeDBIDs implements UnionFind {
   private int[] weight;
 
   /**
-   * Constructor (package private, use {@link UnionFindUtil#make}).
+   * Constructor.
    *
    * @param ids Range to use
    */
-  WeightedQuickUnionRangeDBIDs(DBIDRange ids) {
-    this.ids = ids;
-    weight = new int[ids.size()];
+  public WeightedQuickUnionDBIDs(StaticDBIDs ids) {
+    this.ids = DBIDUtil.ensureEnum(ids);
+    weight = new int[this.ids.size()];
     Arrays.fill(weight, 1);
-    parent = new int[ids.size()];
+    parent = new int[this.ids.size()];
     for(int i = 0; i < parent.length; i++) {
       parent[i] = i;
     }
@@ -81,7 +76,7 @@ public class WeightedQuickUnionRangeDBIDs implements UnionFind {
 
   @Override
   public int find(DBIDRef element) {
-    int cur = ids.getOffset(element);
+    int cur = ids.index(element);
     assert (cur >= 0 && cur < ids.size());
     int p = parent[cur], tmp;
     while(cur != p) {

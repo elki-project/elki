@@ -130,7 +130,7 @@ public class ExactPrioritySearcher<O> implements PrioritySearcher<O> {
     double ebound = exact.isEmpty() ? Double.POSITIVE_INFINITY : exact.peekKey();
     // Get new candidates from the nested query
     while(inner.valid() && inner.allLowerBound() < ebound) {
-      double u = inner.getLowerBound(), l = inner.getUpperBound();
+      double l = inner.getLowerBound(), u = inner.getUpperBound();
       ebound = exact.insert(u == l ? u : inner.computeExactDistance(), inner);
       inner.advance();
     }

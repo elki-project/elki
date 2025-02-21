@@ -549,6 +549,11 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
     double threshold = Double.POSITIVE_INFINITY;
 
     /**
+     * Lower bound
+     */
+    private double skipThreshold = 0.;
+
+    /**
      * Temporary storage.
      */
     private DBIDVar tmp = DBIDUtil.newVar();
@@ -600,6 +605,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
      */
     protected PrioritySearcher<Q> doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
+      this.skipThreshold = 0.;
       this.candidates = DoubleDBIDListIter.EMPTY;
       pq.clear();
       pq.add(queryDistance(root.singletons.iter()) - root.maxDist, root);
@@ -609,8 +615,15 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
 
     @Override
     public PrioritySearcher<Q> decreaseCutoff(double threshold) {
-      assert threshold <= this.threshold;
+      assert threshold <= this.threshold : "Thresholds must only decrease.";
       this.threshold = threshold;
+      return this;
+    }
+
+    @Override
+    public PrioritySearcher<Q> increaseSkip(double threshold) {
+      assert threshold >= this.skipThreshold : "Skip thresholds must only increase.";
+      this.skipThreshold = threshold;
       return this;
     }
 
@@ -668,11 +681,14 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O> implements Dist
       // Add child nodes to priority queue:
       for(Node c : cur.children) {
         // Reuse distance if the previous routing object is the same:
-        double newprio = (DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
-            ? routingDist : queryDistance(tmp)) //
-            - c.maxDist; // Minimum distance
+        double dist = DBIDUtil.equal(c.singletons.assignVar(0, tmp), candidates) //
+            ? routingDist : queryDistance(tmp);
+        double newprio = dist - c.maxDist; // Minimum distance
         if(newprio <= threshold) {
-          pq.add(newprio, c);
+          // Pruning with upper bound, if set:
+          if(skipThreshold == 0. || dist + c.maxDist >= skipThreshold) {
+            pq.add(newprio, c);
+          }
         }
       }
       if(!cur.children.isEmpty()) {

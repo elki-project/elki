@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,99 +48,7 @@ public class KernelMatrix {
   /**
    * Static mapping from DBIDs to indexes.
    */
-  DBIDMap idmap;
-
-  /**
-   * Map a DBID to its offset
-   * <p>
-   * TODO: move to shared code.
-   * 
-   * @author Erich Schubert
-   * @hidden
-   */
-  private interface DBIDMap {
-    /**
-     * Get the offset of the DBID in the range.
-     * 
-     * @param id ID
-     * @return Offset
-     */
-    int getOffset(DBIDRef id);
-
-    /**
-     * Get an array iterator, for scanning.
-     * 
-     * @return Array iterator
-     */
-    DBIDArrayIter iter();
-  }
-
-  /**
-   * Map a DBID to an integer offset, DBIDRange version.
-   * 
-   * @author Erich Schubert
-   * @hidden
-   */
-  private static class RangeMap implements DBIDMap {
-    /**
-     * Range of DBIDs in the matrix
-     */
-    DBIDRange range;
-
-    /**
-     * Constructor.
-     * 
-     * @param range Range of DBIDs in the matrix
-     */
-    public RangeMap(DBIDRange range) {
-      super();
-      this.range = range;
-    }
-
-    @Override
-    public int getOffset(DBIDRef id) {
-      return range.getOffset(id);
-    }
-
-    @Override
-    public DBIDArrayIter iter() {
-      return range.iter();
-    }
-  }
-
-  /**
-   * Map a DBID to an integer offset, Version to support arbitrary DBIDs.
-   * 
-   * @author Erich Schubert
-   * @hidden
-   */
-  private static class SortedArrayMap implements DBIDMap {
-    /**
-     * DBIDs in the matrix
-     */
-    ArrayModifiableDBIDs ids;
-
-    /**
-     * Constructor.
-     * 
-     * @param ids DBIDs in the matrix
-     */
-    public SortedArrayMap(DBIDs ids) {
-      super();
-      this.ids = DBIDUtil.newArray(ids);
-      this.ids.sort();
-    }
-
-    @Override
-    public int getOffset(DBIDRef id) {
-      return ids.binarySearch(id);
-    }
-
-    @Override
-    public DBIDArrayIter iter() {
-      return ids.iter();
-    }
-  }
+  DBIDEnum idmap;
 
   /**
    * Provides a new kernel matrix.
@@ -152,12 +60,7 @@ public class KernelMatrix {
    */
   public <O> KernelMatrix(PrimitiveSimilarity<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     this.kernel = new double[ids.size()][ids.size()];
-    if(ids instanceof DBIDRange) {
-      this.idmap = new RangeMap((DBIDRange) ids);
-    }
-    else {
-      this.idmap = new SortedArrayMap(ids);
-    }
+    this.idmap = DBIDUtil.ensureEnum(ids);
 
     DBIDArrayIter i1 = this.idmap.iter(), i2 = this.idmap.iter();
     for(i1.seek(0); i1.valid(); i1.advance()) {
@@ -181,12 +84,7 @@ public class KernelMatrix {
   public <O> KernelMatrix(SimilarityQuery<? super O> kernelFunction, final Relation<? extends O> relation, final DBIDs ids) {
     LoggingUtil.logExpensive(Level.FINER, "Computing kernel matrix");
     kernel = new double[ids.size()][ids.size()];
-    if(ids instanceof DBIDRange) {
-      this.idmap = new RangeMap((DBIDRange) ids);
-    }
-    else {
-      this.idmap = new SortedArrayMap(ids);
-    }
+    idmap = DBIDUtil.ensureEnum(ids);
     DBIDArrayIter i1 = idmap.iter(), i2 = idmap.iter();
     for(i1.seek(0); i1.valid(); i1.advance()) {
       O o1 = relation.get(i1);
@@ -235,7 +133,7 @@ public class KernelMatrix {
    * @return the distance between the two objects
    */
   public double getSquaredDistance(final DBIDRef id1, final DBIDRef id2) {
-    final int o1 = idmap.getOffset(id1), o2 = idmap.getOffset(id2);
+    final int o1 = idmap.index(id1), o2 = idmap.index(id2);
     return kernel[o1][o1] + kernel[o2][o2] - 2 * kernel[o1][o2];
   }
 
@@ -278,6 +176,6 @@ public class KernelMatrix {
    * @return Similarity.
    */
   public double getSimilarity(DBIDRef id1, DBIDRef id2) {
-    return kernel[idmap.getOffset(id1)][idmap.getOffset(id2)];
+    return kernel[idmap.index(id1)][idmap.index(id2)];
   }
 }

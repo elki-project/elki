@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,35 +18,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package elki.utilities.datastructures.unionfind;
-
-import elki.database.ids.DBIDRange;
-import elki.database.ids.StaticDBIDs;
+package elki.database.ids;
 
 /**
- * Union-find algorithm factory, to choose the best implementation.
- *
+ * Interface to map DBIDs to integer record ids for use in storage.
+ * 
  * @author Erich Schubert
- * @since 0.7.0
  */
-public final class UnionFindUtil {
+public interface DBIDEnum extends ArrayStaticDBIDs {
   /**
-   * Private constructor. Static methods only.
+   * Map a DBID to an array offset.
+   * 
+   * @param dbid DBID
+   * @return offset in the enumeration
    */
-  private UnionFindUtil() {
-    // Do not use.
-  }
-
-  /**
-   * Make a new instance (automatically choosing the best implementation).
-   *
-   * @param ids ID set
-   * @return Union find algorithm
-   */
-  public static UnionFind make(StaticDBIDs ids) {
-    if(ids instanceof DBIDRange) {
-      return new WeightedQuickUnionRangeDBIDs((DBIDRange) ids);
-    }
-    return new WeightedQuickUnionStaticDBIDs(ids);
-  }
+  int index(DBIDRef dbid);
 }

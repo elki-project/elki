@@ -104,7 +104,7 @@ public class PassingDataToELKI {
         // NumberVector v = rel.get(it);
 
         // Offset within our DBID range: "line number"
-        final int offset = ids.getOffset(it);
+        final int offset = ids.index(it);
         System.out.print(" " + offset);
         // Do NOT rely on using "internalGetIndex()" directly!
       }

@@ -34,17 +34,21 @@ import elki.data.type.TypeUtil;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.ids.ModifiableDBIDs;
+import elki.database.query.QueryBuilder;
+import elki.database.query.distance.DistanceQuery;
 import elki.database.relation.ProxyView;
 import elki.database.relation.Relation;
 import elki.database.relation.RelationUtil;
 import elki.distance.subspace.DimensionSelectingSubspaceDistance;
 import elki.distance.subspace.SubspaceEuclideanDistance;
+import elki.index.RangeIndex;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.logging.progress.StepProgress;
 import elki.math.linearalgebra.Centroid;
 import elki.result.Metadata;
 import elki.utilities.datastructures.BitsUtil;
+import elki.utilities.datastructures.iterator.It;
 import elki.utilities.documentation.Description;
 import elki.utilities.documentation.Reference;
 import elki.utilities.documentation.Title;
@@ -71,6 +75,9 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * so these results would be highly redundant. In this implementation, we
  * only include points in clusters that are not already part of sub-clusters
  * (note that this does not remove overlap of independent subspaces).
+ * <p>
+ * TODO: modifying the subspaces of the distance function can cause weird
+ * errors. Rather replace this with a subspace distance factory.
  * <p>
  * Reference:
  * <p>
@@ -316,15 +323,20 @@ public class SUBCLU<V extends NumberVector> implements SubspaceClusteringAlgorit
     }
     // subset filter:
     relation = ids == null ? relation : new ProxyView<>(ids, relation);
-
-    DBSCAN<V> dbscan = new DBSCAN<>(distance, epsilon, minpts);
-    Clustering<Model> dbsres = dbscan.run(relation);
-
+    Clustering<Model> dbsres = new DBSCAN<>(distance, epsilon, minpts).run(relation);
     // separate cluster and noise
     List<Cluster<Model>> clusters = new ArrayList<>();
     for(Cluster<Model> c : dbsres.getAllClusters()) {
       if(!c.isNoise()) {
         clusters.add(c);
+      }
+    }
+    // Remove any automatically generated index associated with this distance
+    // because we modify the distance subspace again!
+    DistanceQuery<V> dq = new QueryBuilder<>(relation, distance).distanceQuery();
+    for(It<RangeIndex<V>> it = Metadata.hierarchyOf(relation).iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
+      if(it.get().rangeByDBID(dq, epsilon, 0) != null) {
+        Metadata.hierarchyOf(relation).removeChild(it.get());
       }
     }
     return clusters;

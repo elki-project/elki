@@ -101,6 +101,12 @@ public class QueryBuilder<O> {
   public static final int FLAG_PRECOMPUTE = 0b10_0000;
 
   /**
+   * Flag indicating large parts will be retrieved (e.g., prefer larger page
+   * sizes)
+   */
+  public static final int FLAG_LOW_SELECTIVITY = 0b100_0000;
+
+  /**
    * Flags that do not allow the optimizer to run.
    */
   public static final int FLAGS_NO_OPTIMIZER = FLAG_LINEAR_ONLY | FLAG_CHEAP_ONLY;
@@ -257,6 +263,17 @@ public class QueryBuilder<O> {
    */
   public QueryBuilder<O> precomputed() {
     this.flags |= FLAG_PRECOMPUTE;
+    return this;
+  }
+
+  /**
+   * Indicate that the search range will often become large, and hence that
+   * large pagesizes may be more efficient. Not all indexes support this flag.
+   * 
+   * @return query builder, for chaining
+   */
+  public QueryBuilder<O> lowSelectivity() {
+    this.flags |= FLAG_LOW_SELECTIVITY;
     return this;
   }
 

@@ -22,8 +22,8 @@ package elki.database.datastore.memory;
 
 import java.util.Arrays;
 
-import elki.database.datastore.DataStoreIDMap;
 import elki.database.datastore.WritableDoubleDataStore;
+import elki.database.ids.DBIDEnum;
 import elki.database.ids.DBIDRef;
 
 /**
@@ -32,7 +32,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.5.0
  *
- * @composed - - - elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DBIDEnum
  */
 public class ArrayDoubleStore implements WritableDoubleDataStore {
   /**
@@ -48,27 +48,26 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   /**
    * DBID to index map
    */
-  private DataStoreIDMap idmap;
+  private DBIDEnum idmap;
 
   /**
    * Constructor.
    *
-   * @param size Size
    * @param idmap ID map
    */
-  public ArrayDoubleStore(int size, DataStoreIDMap idmap) {
-    this(size, idmap, Double.NaN);
+  public ArrayDoubleStore(DBIDEnum idmap) {
+    this(idmap, Double.NaN);
   }
 
   /**
    * Constructor.
    *
-   * @param size Size
    * @param idmap ID map
    * @param def Default value
    */
-  public ArrayDoubleStore(int size, DataStoreIDMap idmap, double def) {
+  public ArrayDoubleStore(DBIDEnum idmap, double def) {
     super();
+    final int size = idmap.size();
     this.data = new double[size];
     if(def != 0) {
       Arrays.fill(this.data, def);
@@ -80,13 +79,13 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   @Override
   @Deprecated
   public Double get(DBIDRef id) {
-    return Double.valueOf(data[idmap.mapDBIDToOffset(id)]);
+    return Double.valueOf(data[idmap.index(id)]);
   }
 
   @Override
   @Deprecated
   public Double put(DBIDRef id, Double value) {
-    final int off = idmap.mapDBIDToOffset(id);
+    final int off = idmap.index(id);
     double ret = data[off];
     data[off] = value.doubleValue();
     return Double.valueOf(ret);
@@ -94,12 +93,12 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   public double doubleValue(DBIDRef id) {
-    return data[idmap.mapDBIDToOffset(id)];
+    return data[idmap.index(id)];
   }
 
   @Override
   public double putDouble(DBIDRef id, double value) {
-    final int off = idmap.mapDBIDToOffset(id);
+    final int off = idmap.index(id);
     final double ret = data[off];
     data[off] = value;
     return ret;
@@ -107,7 +106,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   public double put(DBIDRef id, double value) {
-    final int off = idmap.mapDBIDToOffset(id);
+    final int off = idmap.index(id);
     final double ret = data[off];
     data[off] = value;
     return ret;
@@ -115,7 +114,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   public void increment(DBIDRef id, double value) {
-    data[idmap.mapDBIDToOffset(id)] += value;
+    data[idmap.index(id)] += value;
   }
 
   @Override

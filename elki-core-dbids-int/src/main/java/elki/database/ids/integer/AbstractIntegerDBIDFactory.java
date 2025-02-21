@@ -161,6 +161,12 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   }
 
   @Override
+  public ArrayStaticDBIDs makeUnmodifiable(ArrayDBIDs existing) {
+    return existing instanceof ArrayStaticDBIDs ? (ArrayStaticDBIDs) existing : //
+        new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
+  }
+
+  @Override
   public ByteBufferSerializer<DBID> getDBIDSerializer() {
     return IntegerDBID.DYNAMIC_SERIALIZER;
   }

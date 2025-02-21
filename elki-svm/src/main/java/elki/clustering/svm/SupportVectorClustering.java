@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ import elki.svm.SVDD;
 import elki.svm.data.SimilarityQueryAdapter;
 import elki.svm.model.OneClassModel;
 import elki.utilities.datastructures.unionfind.UnionFind;
-import elki.utilities.datastructures.unionfind.UnionFindUtil;
+import elki.utilities.datastructures.unionfind.WeightedQuickUnionDBIDs;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -151,7 +151,7 @@ public class SupportVectorClustering implements ClusteringAlgorithm<Clustering<?
     final double r_square = model.r_square;
     assert !Double.isNaN(r_square) : "Model not trained correctly!";
 
-    UnionFind uf = UnionFindUtil.make(sids);
+    UnionFind uf = new WeightedQuickUnionDBIDs(sids);
     final double fixed = calcfixedpart(model, ids, sim);
     for(DBIDIter iiter = sids.iter(); iiter.valid(); iiter.advance()) {
       NumberVector ivec = relation.get(iiter);

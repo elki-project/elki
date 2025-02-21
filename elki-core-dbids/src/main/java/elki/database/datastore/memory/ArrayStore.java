@@ -22,9 +22,9 @@ package elki.database.datastore.memory;
 
 import java.util.Arrays;
 
-import elki.database.datastore.DataStoreIDMap;
 import elki.database.datastore.ObjectNotFoundException;
 import elki.database.datastore.WritableDataStore;
+import elki.database.ids.DBIDEnum;
 import elki.database.ids.DBIDRef;
 
 /**
@@ -33,7 +33,7 @@ import elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * @since 0.4.0
  *
- * @composed - - - elki.database.datastore.DataStoreIDMap
+ * @composed - - - elki.database.datastore.DBIDEnum
  *
  * @param <T> Representation object typ
  */
@@ -46,7 +46,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   /**
    * DBID to index map.
    */
-  private DataStoreIDMap idmap;
+  private DBIDEnum idmap;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
    * @param data Data array
    * @param idmap DBID to offset mapping
    */
-  public ArrayStore(Object[] data, DataStoreIDMap idmap) {
+  public ArrayStore(Object[] data, DBIDEnum idmap) {
     super();
     this.data = data;
     this.idmap = idmap;
@@ -63,7 +63,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T get(DBIDRef id) {
-    final int off = idmap.mapDBIDToOffset(id);
+    final int off = idmap.index(id);
     if(off < 0 || off >= data.length) {
       throw new ObjectNotFoundException(id);
     }
@@ -73,7 +73,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @Override
   public T put(DBIDRef id, T value) {
     T ret = get(id);
-    data[idmap.mapDBIDToOffset(id)] = value;
+    data[idmap.index(id)] = value;
     return ret;
   }
 

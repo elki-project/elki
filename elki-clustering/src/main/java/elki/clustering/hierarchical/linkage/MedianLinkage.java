@@ -78,7 +78,7 @@ public class MedianLinkage implements GeometricLinkage {
   }
 
   @Override
-  public double distance(double[] x, int sizex, double[] y, int sizey) {
+  public double linkage(double[] x, int sizex, double[] y, int sizey) {
     return SquaredEuclideanDistance.STATIC.distance(x, y);
   }
 

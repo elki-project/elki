@@ -27,11 +27,16 @@ import elki.data.type.TypeInformation;
 import elki.database.ids.*;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
+import elki.database.query.SquaredPrioritySearcher;
 import elki.database.query.distance.DistanceQuery;
 import elki.database.query.knn.KNNSearcher;
+import elki.database.query.knn.SquaredKNNSearcher;
 import elki.database.query.range.RangeSearcher;
+import elki.database.query.range.SquaredRangeSearcher;
 import elki.database.relation.Relation;
 import elki.distance.Distance;
+import elki.distance.minkowski.EuclideanDistance;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.index.DistancePriorityIndex;
 import elki.index.IndexFactory;
 import elki.logging.Logging;
@@ -402,6 +407,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public KNNSearcher<O> kNNByObject(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredKNNSearcher<>(new VPTreeKNNObjectSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreeKNNObjectSearcher() : null;
@@ -409,6 +418,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public KNNSearcher<DBIDRef> kNNByDBID(DistanceQuery<O> distanceQuery, int maxk, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredKNNSearcher<>(new VPTreeKNNDBIDSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreeKNNDBIDSearcher() : null;
@@ -416,6 +429,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public RangeSearcher<O> rangeByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredRangeSearcher<>(new VPTreeRangeObjectSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreeRangeObjectSearcher() : null;
@@ -423,6 +440,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public RangeSearcher<DBIDRef> rangeByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredRangeSearcher<>(new VPTreeRangeDBIDSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreeRangeDBIDSearcher() : null;
@@ -430,6 +451,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public PrioritySearcher<O> priorityByObject(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredPrioritySearcher<>(new VPTreePriorityObjectSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreePriorityObjectSearcher() : null;
@@ -437,6 +462,10 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
   @Override
   public PrioritySearcher<DBIDRef> priorityByDBID(DistanceQuery<O> distanceQuery, double maxrange, int flags) {
+    if(this.distFunc.getClass() == EuclideanDistance.class && distanceQuery.getDistance().getClass() == SquaredEuclideanDistance.class) {
+      return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
+          distanceQuery.getRelation() == relation ? new SquaredPrioritySearcher<>(new VPTreePriorityDBIDSearcher()) : null;
+    }
     return (flags & QueryBuilder.FLAG_PRECOMPUTE) == 0 && //
         distanceQuery.getRelation() == relation && this.distFunc.equals(distanceQuery.getDistance()) ? //
             new VPTreePriorityDBIDSearcher() : null;
@@ -657,7 +686,12 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     /**
      * Stopping threshold.
      */
-    private double threshold;
+    private double threshold = Double.POSITIVE_INFINITY;
+
+    /**
+     * Lower bound
+     */
+    private double skipThreshold = 0.;
 
     /**
      * Current search position.
@@ -679,6 +713,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
      */
     public void doSearch() {
       this.threshold = Double.POSITIVE_INFINITY;
+      this.skipThreshold = 0;
       this.candidates = DoubleDBIDListIter.EMPTY;
       this.heap.clear();
       this.heap.add(0, root);
@@ -695,7 +730,9 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       do {
         while(candidates.valid()) {
           if(vpdist - candidates.doubleValue() <= threshold) {
-            return this;
+            if(skipThreshold == 0 || vpdist + candidates.doubleValue() >= skipThreshold) {
+              return this;
+            }
           }
           candidates.advance();
         }
@@ -731,14 +768,18 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
       if(lc != null) {
         final double mindist = Math.max(Math.max(vpdist - lc.highBound, lc.lowBound - vpdist), curdist);
         if(mindist <= threshold) {
-          heap.add(mindist, lc);
+          if(skipThreshold == 0 || vpdist + lc.highBound >= skipThreshold) {
+            heap.add(mindist, lc);
+          }
         }
       }
       // Add right subtree to heap
       if(rc != null) {
         final double mindist = Math.max(Math.max(vpdist - rc.highBound, rc.lowBound - vpdist), curdist);
         if(mindist <= threshold) {
-          heap.add(mindist, rc);
+          if(skipThreshold == 0 || vpdist + rc.highBound >= skipThreshold) {
+            heap.add(mindist, rc);
+          }
         }
       }
       return true;
@@ -764,12 +805,19 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
     @Override
     public PrioritySearcher<Q> decreaseCutoff(double threshold) {
-      assert threshold <= this.threshold : "Thresholds must only decreasee.";
+      assert threshold <= this.threshold : "Thresholds must only decrease: "+threshold+" > "+this.threshold;
       this.threshold = threshold;
       if(threshold < curdist) { // No more results possible:
         heap.clear();
         candidates = DoubleDBIDListIter.EMPTY;
       }
+      return this;
+    }
+
+    @Override
+    public PrioritySearcher<Q> increaseSkip(double threshold) {
+      assert threshold >= this.skipThreshold : "Skip thresholds must only increase.";
+      this.skipThreshold = threshold;
       return this;
     }
 

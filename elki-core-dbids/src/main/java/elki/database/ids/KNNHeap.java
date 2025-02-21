@@ -34,15 +34,15 @@ package elki.database.ids;
  */
 public interface KNNHeap extends DoubleDBIDHeap {
   /**
-   * Serialize to a {@link KNNList}. This empties the heap!
+   * Serialize to an (partially ordered) {@link KNNList}. This empties the heap!
    *
    * @return KNNList with the heaps contents.
    */
   KNNList toKNNList();
 
   /**
-   * Serialize to a {@link KNNList}, but applying sqrt to every distance.
-   * This empties the heap!
+   * Serialize to an (partially ordered) {@link KNNList}, but applying sqrt to
+   * every distance. This empties the heap!
    *
    * @return KNNList with the heaps contents.
    */

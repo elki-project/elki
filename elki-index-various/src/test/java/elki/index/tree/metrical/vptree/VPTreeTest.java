@@ -22,6 +22,8 @@ package elki.index.tree.metrical.vptree;
 
 import org.junit.Test;
 
+import elki.database.query.knn.SquaredKNNSearcher;
+import elki.database.query.range.SquaredRangeSearcher;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.index.AbstractIndexStructureTest;
 import elki.utilities.ELKIBuilder;
@@ -42,6 +44,15 @@ public class VPTreeTest extends AbstractIndexStructureTest {
     assertExactEuclidean(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
     assertPrioritySearchEuclidean(factory, VPTree.VPTreePrioritySearcher.class);
     assertSinglePoint(factory, VPTree.VPTreeKNNSearcher.class, VPTree.VPTreeRangeSearcher.class);
+  }
+
+  @Test
+  public void testSquaredEuclidean() {
+    VPTree.Factory<?> factory = new ELKIBuilder<>(VPTree.Factory.class) //
+        .with(VPTree.Factory.Par.DISTANCE_FUNCTION_ID, EuclideanDistance.class)//
+        .with(VPTree.Factory.Par.SAMPLE_SIZE_ID, 10)//
+        .with(VPTree.Factory.Par.SEED_ID, 1234).build();
+    assertExactSqEuclidean(factory, SquaredKNNSearcher.class, SquaredRangeSearcher.class);
   }
 
   /**
