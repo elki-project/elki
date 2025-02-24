@@ -433,6 +433,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                 assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF))|| (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
                 assert (distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j));
                 assert objColor > 0 || (assignment.intValue(j) & 0x7FFF) != (assignment.intValue(j) >> 16);
+                assert distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j);
             }
             // adjust cluster coloring
             for(int i = 0; i < countLabelledPointsInCluster.length; i++) {
