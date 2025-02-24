@@ -273,7 +273,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
          */
         protected boolean canUncolor(int k, int color) {
             // never uncolor when k = numberOfLabels
-            if(k < numberOfLabels) {
+            if(k <= numberOfLabels) {
                 return false;
             }
             if(this.numberOfClustersWithLabel[color] > 1) {
@@ -317,36 +317,35 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
             // update the cluster information
             miter.seek(m).setDBID(h);
             clusterLabels[m] = newLbl;
-            // update the new medoid itself.
-            final double hdist = nearest.putDouble(h, 0);
-            final int oldM = assignment.intValue(h) & 0x7FFF;
-            final int oldS = assignment.intValue(h) >> 16;
-            if(oldM != m && (hdist < second.doubleValue(h) || oldM == oldS)) {
-                // stores its own assignment -> second closest is the old
-                // closest
-                assignment.putInt(h, m | (oldM << 16));
-                // saves the previously closest dist as second
-                second.putDouble(h, hdist);
-                if(pointLabelMap.intValue(h) != 0) {
-                    countLabelledPointsInCluster[m] += 1;
-                    countLabelledPointsInCluster[oldM] -= 1;
-                }
-            }
-            // new medoid but same second closest
-            else if(oldM != m) {
-                assignment.putInt(h, m | (oldS << 16));
-                if(pointLabelMap.intValue(h) != 0) {
-                    countLabelledPointsInCluster[m] += 1;
-                    countLabelledPointsInCluster[oldM] -= 1;
-                }
-            }
-            assert second.doubleValue(h) > 0. || (assignment.intValue(h) >> 16) == (assignment.intValue(h) & 0x7FFF);
             assert (DBIDUtil.equal(h, miter.seek(m)));
             // Compute costs of reassigning other objects j:
             for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
                 // new medoid is already dealt with
                 if(DBIDUtil.equal(h, j)) {
-                    continue;
+                  // update self dist
+                  final double hdist = nearest.putDouble(h, 0);
+                  final int oldM = assignment.intValue(h) & 0x7FFF;
+                  final int oldS = assignment.intValue(h) >> 16;
+                  int objColor = pointLabelMap.intValue(j);
+                  if (oldM != m) {
+                    if(objColor != 0) {
+                      countLabelledPointsInCluster[m] += 1;
+                      countLabelledPointsInCluster[oldM] -= 1;
+                    }
+                    if (hdist < second.doubleValue(h) || oldM == oldS || oldS == m) {
+                      assignment.putInt(h, m | (oldM << 16));
+                      // saves the previously closest dist as second
+                      second.putDouble(h, hdist);
+                    }else {
+                      // second is closer than nearest and is not replaced
+                      assignment.putInt(h, m | (oldS << 16));
+                      // dist stays the same because second stays the same
+                    }
+                  }
+                  assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF)) || (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j) : "Assignment is not consistent with distances";
+                  assert objColor > 0 || (assignment.intValue(j) & 0x7FFF) != (assignment.intValue(j) >> 16) : "Second closest missing for point without label";
+                  assert distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j) : "Distance to nearest broken";
+                  continue;
                 }
                 int objColor = pointLabelMap.intValue(j);
                 // distance(j, i) for pi == pj
@@ -430,10 +429,9 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                     }
                     assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF)) || (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
                 }
-                assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF))|| (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
-                assert (distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j));
-                assert objColor > 0 || (assignment.intValue(j) & 0x7FFF) != (assignment.intValue(j) >> 16);
-                assert distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j);
+                assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF))|| (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j): "Assignment is not consistent with distances";
+                assert objColor > 0 || (assignment.intValue(j) & 0x7FFF) != (assignment.intValue(j) >> 16): "Second closest missing for point without label";
+                assert distQ.distance(j, miter.seek(assignment.intValue(j) & 0x7FFF)) == nearest.doubleValue(j): "Distance to nearest broken";
             }
             // adjust cluster coloring
             for(int i = 0; i < countLabelledPointsInCluster.length; i++) {
@@ -449,7 +447,8 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
         protected int updateSecondNearest(DBIDRef j, DBIDArrayIter miter, int s, double ds, int n) {
             assert ds >= nearest.doubleValue(j); // might fail
             double sDist = ds;
-            if(s == n) {
+            boolean sValid = s != n;
+            if(!sValid) {
                 sDist = Double.POSITIVE_INFINITY;
             }
             int sBest = s;
@@ -467,7 +466,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                 }
             }
             if(sDist == Double.POSITIVE_INFINITY) {
-                assert sBest == s && (s == n || !isValidObjMedPair(j, s));
+                assert sBest == s && (!sValid || !isValidObjMedPair(j, s));
                 second.putDouble(j, 0);
                 return n;
             }

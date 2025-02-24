@@ -156,22 +156,26 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
             for(DBIDIter j = ids.iter(); j.valid(); j.advance()) {
                 int n = assignment.intValue(j) & 0x7FFF;
                 int s = assignment.intValue(j) >> 16;
-                assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
-                if (s == n){
-                    if (canUncolor(k, pointLabelMap.intValue(j)) || pointLabelMap.intValue(j) == 0){
+                boolean sValid = s!=n;
+                assert second.doubleValue(j) > 0 || sValid || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
+                if (!sValid){
+                  assert pointLabelMap.intValue(j) != 0 : "No second closest for an unlabeled point";
+                    if (canUncolor(k, pointLabelMap.intValue(j))){
                         s = updateSecondNearest(j, mIter, s, Double.POSITIVE_INFINITY, n);
                         assignment.putInt(j, n | (s << 16));
-                        assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
+                        assert !sValid || second.doubleValue(j) > 0 || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                     }
                 }else if (!isValidObjSndMedPair(j, s)) {
                     // second closest was coloured at some point after j was
-                    // assigned
-                    // there, thus we need to look for a new one
+                    // assigned thus we need to look for a new one
                     s = updateSecondNearest(j, mIter, s, Double.POSITIVE_INFINITY, n);
                     assignment.putInt(j, n | (s << 16));
-                    assert second.doubleValue(j) > 0 || s == n || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
+                    assert second.doubleValue(j) > 0 || sValid || distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
                 }
-                assert (second.doubleValue(j) > 0 && s!=n) || (s == n && second.doubleValue(j) == 0)|| distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
+                // assert that is valid and has a dist, is invalid and has dist 0 or there are 2 points with distance 0.
+                assert (second.doubleValue(j) > 0 && s!=n) || (sValid && second.doubleValue(j) == 0)|| distQ.distance(j, mIter.seek(s)) == nearest.doubleValue(j);
+                // asser that the nearest is correct.
+                assert (nearest.doubleValue(j) == distQ.distance(j, mIter.seek(n)));
                 // cost of removing the medoid + reassigning objects to the
                 // second_closest
                 pcost[n] += second.doubleValue(j) - nearest.doubleValue(j);
@@ -341,7 +345,7 @@ public class LabeledOptimizedPAM<O> extends LabeledPAM<O> {
                 if(benefit < 0) {
                     // loss[n] += dn - ds;
                     loss[n] += dn;
-                    colAcc[jColor] += dh - dn;
+                    colAcc[jColor] += benefit;
                     continue;
                 }
                 // loss[n] += dh - ds;

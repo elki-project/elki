@@ -80,6 +80,7 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
                 System.out.println("Error in initial Loss: " + (calculatedLoss - tc));
                 tc = calculatedLoss;
             }
+            Arrays.fill(numberOfClustersWithLabel, 0);
             for(int i = 0; i < k; i++) {
                 numberOfClustersWithLabel[clusterLabels[i]]++;
             }
