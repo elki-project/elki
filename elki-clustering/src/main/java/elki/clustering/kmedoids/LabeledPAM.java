@@ -354,7 +354,9 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                 final double distSec = second.doubleValue(j);
                 // distance(j, h) to new medoid
                 double distH = Double.POSITIVE_INFINITY;
-                if(isValidObjMedPair(j, m)) {
+                boolean validPair = isValidObjMedPair(j, m);
+                boolean validSecPair = isValidObjSndMedPair(j, m);
+                if(validPair) {
                     distH = distQ.distance(h, j);
                 }
                 // lower byte nearest, upper byte second
@@ -382,11 +384,12 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                         }
                         nearest.putDouble(j, distSec);
                         // Find new second nearest.
+                        // infinity is used in update SecondNearest to indicate that no seond closest point is available.
                         int newSecondNearest = updateSecondNearest(j, miter, m, distH, prevS);
                         assignment.putInt(j, prevS | (newSecondNearest << 16));
                         // change of color of prev_med -> 0 ; +1 for the new
                         // assignment
-                        assert second.doubleValue(j) > 0. || prevS == newSecondNearest || distQ.distance(j, miter.seek(newSecondNearest)) == second.doubleValue(j);
+                        assert prevS == newSecondNearest || distQ.distance(j, miter.seek(newSecondNearest)) == second.doubleValue(j);
                     }
                     assert second.doubleValue(j) > 0. || (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
                 }
@@ -403,21 +406,22 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                             countLabelledPointsInCluster[prevN] -= 1;
                             countLabelledPointsInCluster[m] += 1;
                         }
-                        nearest.putDouble(j, distH);
                         // update second to prev nearest
                         if(distCur <= distSec || !sValid || m == prevS) {
                             second.putDouble(j, distCur);
                             assignment.putInt(j, m | (prevN << 16));
                         }
-                        // second was already closer than nearest
-                        // keep the old second as the new second
                         else {
+                          // second was already closer than nearest
+                          // keep the old second as the new second
                             assignment.putInt(j, m | (prevS << 16));
                         }
+                        nearest.putDouble(j, distH);
                         assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF)) || (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
                     }
                     // prev second was replaced
                     else if(prevS == m) { // Second was replaced.
+                        // uses ininity because no second is known
                         int secondN = updateSecondNearest(j, miter, m, distH, prevN);
                         assignment.putInt(j, prevN | (secondN << 16));
                         assert (second.doubleValue(j) > 0. && (assignment.intValue(j) >> 16) != (assignment.intValue(j) & 0x7FFF)) || (second.doubleValue(j) == 0. && (assignment.intValue(j) >> 16) == (assignment.intValue(j) & 0x7FFF)) || distQ.distance(j, miter.seek(assignment.intValue(j) >> 16)) == second.doubleValue(j);
@@ -441,6 +445,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
               }
               // color of the cluster is set when the medoid is
               // swapped
+              assert countLabelledPointsInCluster[i] == 0 || clusterLabels[i] != 0;
             }
         }
 
