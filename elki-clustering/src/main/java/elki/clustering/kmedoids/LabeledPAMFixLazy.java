@@ -20,7 +20,6 @@
  */
 package elki.clustering.kmedoids;
 
-import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDArrayMIter;
@@ -29,19 +28,21 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.random.RandomFactory;
 
 import java.util.Arrays;
 
 /**
- * @author Miriama Janosova and Andreas Lang
+ * 
+ * Alternative implementation of the labeled PAM algorithm that tries to label medoids quicker.
+ * 
+ * @author Miriama Janosova
+ * @author Andreas Lang
  *
  * @navassoc - - - MedoidModel
  * @has - - - KMedoidsInitialization

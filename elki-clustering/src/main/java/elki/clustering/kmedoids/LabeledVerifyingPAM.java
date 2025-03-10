@@ -2,7 +2,6 @@ package elki.clustering.kmedoids;
 
 import java.util.Arrays;
 
-import elki.clustering.kmedoids.initialization.KMedoidsInitialization;
 import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.DBIDArrayMIter;
@@ -11,16 +10,16 @@ import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDVar;
 import elki.database.ids.DBIDs;
 import elki.database.query.distance.DistanceQuery;
-import elki.database.relation.Relation;
 import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.IndefiniteProgress;
 import elki.logging.statistics.DoubleStatistic;
 import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
-import elki.utilities.random.RandomFactory;
 
 /**
+ * Debug class, to be removed, it compares the optimized with non optimized implementation.
+ * 
  * @author Miriama Janosova
  * @author Andreas Lang
  *

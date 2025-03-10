@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  * 
- * Copyright (C) 2022
+ * Copyright (C) 2024
  * ELKI Development Team
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -39,6 +39,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayMIter;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
@@ -58,12 +59,9 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Interface for clustering algorithms that produce medoids.
- * <p>
- * These may be used to initialize PAMSIL clustering, for example.
+ * Interface for semi supervised k-medoids clustering algorithms.
  * 
- * @author Erich Schubert
- * @since 0.8.0
+ * @author Andreas Lang
  */
 public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<Clustering<MedoidModel>> {
 
@@ -175,9 +173,10 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
   }
 
   private boolean checkMedoidUnique(ArrayModifiableDBIDs medoids){
-    for (int i = 0; i < medoids.size(); i++) {
-      for (int j = i+1; j < medoids.size(); j++) {
-        if (DBIDUtil.equal(medoids.get(i), medoids.get(j))) {
+    DBIDArrayMIter mit2 = medoids.iter();
+    for (DBIDArrayMIter mit1 = medoids.iter(); mit1.valid(); mit1.advance()) {
+      for (mit2.seek(mit1.getOffset()+1);mit2.valid();mit2.advance()){
+        if (DBIDUtil.equal(mit1, mit2)) {
           return false;
         }
       }
@@ -313,7 +312,7 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
       new IntParameter(KMeans.K_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
           .grab(config, x -> k = x);
-      new ObjectParameter<SemiSupervisedKMedoidsInitialization<O>>(KMeans.INIT_ID, SemiSupervisedKMedoidsInitialization.class) //
+      new ObjectParameter<SemiSupervisedKMedoidsInitialization<O>>(KMeans.INIT_ID, SemiSupervisedKMedoidsInitialization.class, defaultInitializer()) //
           .grab(config, x -> initializer = x);
       new IntParameter(KMeans.MAXITER_ID, 0) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //

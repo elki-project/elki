@@ -20,6 +20,9 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 
 /**
+ * 
+ * Implemention of the optimized labeled PAM algorihtm introduced in IS --TODO--. 
+ * 
  * @author Miriama Janosova
  * @author Andreas Lang
  *

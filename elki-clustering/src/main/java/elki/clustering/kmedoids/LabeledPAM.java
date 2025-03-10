@@ -21,6 +21,8 @@
 package elki.clustering.kmedoids;
 
 import java.util.Arrays;
+
+import elki.clustering.kmedoids.initialization.LabelMedoidInitialization;
 import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayDBIDs;
@@ -43,6 +45,9 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
+ * 
+ * Implementation of the first Labeled PAM clustering algorithm introduced in use the optimized version for identical results and better performance. 
+ * 
  * @author Miriama Janosova
  * @author Andreas Lang
  *
@@ -55,7 +60,6 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
     // private int[] listOfLabels;
 
     /**
-     * x
      * The logger for this class.
      */
     private static final Logging LOG = Logging.getLogger(LabeledPAM.class);
@@ -83,10 +87,6 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
 
     /**
      * Instance for a single dataset.
-     * <p>
-     * Note: we experimented with not caching the distance to nearest and second
-     * nearest, but only the assignments. The matrix lookup was more expensive,
-     * so this is probably worth the 2*n doubles in storage.
      *
      * @author Miriama Janosova 
      * @author Andreas Lang
@@ -355,7 +355,6 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
                 // distance(j, h) to new medoid
                 double distH = Double.POSITIVE_INFINITY;
                 boolean validPair = isValidObjMedPair(j, m);
-                boolean validSecPair = isValidObjSndMedPair(j, m);
                 if(validPair) {
                     distH = distQ.distance(h, j);
                 }
@@ -662,10 +661,16 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
      */
     public static class Par<O> extends SemiSupervisedKMedoids.Par<O> {
 
-      @Override
-      public void configure(Parameterization config) {
-        super.configure(config);
-      }
+        @Override
+        @SuppressWarnings("rawtypes")
+        protected Class<? extends SemiSupervisedKMedoidsInitialization> defaultInitializer() {
+          return LabelMedoidInitialization.class;
+        }
+
+        @Override
+        public void configure(Parameterization config) {
+          super.configure(config);
+        }
 
         @Override
         public LabeledPAM<O> make() {
