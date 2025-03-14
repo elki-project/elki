@@ -1,5 +1,3 @@
-elki.clustering.correlation.CASH
-elki.clustering.subspace.DiSH
 elki.clustering.kmeans.covertree.CoverTreeKMeans
 elki.clustering.kmeans.covertree.HybExpCovKMeans
 elki.clustering.kmeans.covertree.HybHamCovKMeans

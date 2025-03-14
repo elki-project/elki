@@ -11,6 +11,10 @@ elki.outlier.clustering.GLOSH
 elki.outlier.clustering.KMeansMinusMinusOutlierDetection
 elki.outlier.clustering.NoiseAsOutliers
 elki.outlier.clustering.KMeansMinusMinusStar
+elki.clustering.kmeans.covertree.CoverTreeKMeans
+elki.clustering.kmeans.covertree.HybExpCovKMeans
+elki.clustering.kmeans.covertree.HybHamCovKMeans
+elki.clustering.kmeans.covertree.HybShaCovKMeans
 elki.outlier.OPTICSOF
 elki.outlier.SimpleCOP
 elki.outlier.subspace.OutRankS1
