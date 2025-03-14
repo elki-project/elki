@@ -30,179 +30,179 @@ import elki.database.relation.Relation;
 import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
-import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.documentation.Reference;
 
 /**
  * Combines Cover Tree k-means with the Exponion algorithm
+ * <p>
+ * Reference:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * Accelerating k-Means Clustering with Cover Trees<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2023
  *
  * @author Andreas Lang
  *
  * @param <V> vector datatype
  */
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "Accelerating k-Means Clustering with Cover Trees", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2023", //
+    url = "https://doi.org/10.1007/978-3-031-46994-7_13", //
+    bibkey = "DBLP:conf/sisap/LangS23")
 public class HybExpCovKMeans<V extends NumberVector> extends HybHamCovKMeans<V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging LOG = Logging.getLogger(HybExpCovKMeans.class);
 
   /**
    * Constructor
    * 
-   * @param k           Number of clusters
-   * @param maxiter     maximum number of iterations
+   * @param k Number of clusters
+   * @param maxiter maximum number of iterations
    * @param initializer k-means initialization
-   * @param varstat     variance
-   * @param expansion   expansion factor of cover tree
-   * @param trunc       truncate theshold for cover tree
-   * @param switchover  Iteration for switching strategies
+   * @param varstat variance
+   * @param expansion expansion factor of cover tree
+   * @param trunc truncate theshold for cover tree
+   * @param switchover Iteration for switching strategies
    */
-    public HybExpCovKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
-        super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
-    }
+  public HybExpCovKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc, int switchover) {
+    super(k, maxiter, initializer, varstat, expansion, trunc, switchover);
+  }
+
+  @Override
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    KMeansCoverTree<V> tree = new KMeansCoverTree<V>(relation, EuclideanDistance.STATIC, expansion, trunc, true);
+    tree.initialize();
+    Instance instance = new Instance(relation, distance, initialMeans(relation), tree, switchover);
+    instance.run(maxiter);
+    instance.generateCover();
+    instance.logStatistics();
+    return instance.buildResult(varstat, relation);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
+  /**
+   * Inner Class for k-means
+   * 
+   * @author Andreas Lang
+   */
+  protected static class Instance extends HybHamCovKMeans.Instance {
+    /**
+     * Sorted neighbors
+     */
+    int[] cnum[];
 
     /**
-     * The logger for this class.
+     * Constructor
+     * 
+     * @param relation Relation
+     * @param df distance function
+     * @param means cluster centers
+     * @param tree cover tree
+     * @param switchover point of strategy switch
      */
-    private static final Logging LOG = Logging.getLogger(HybExpCovKMeans.class);
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
+      super(relation, df, means, tree, switchover);
+      cnum = new int[k][k - 1];
+    }
 
     @Override
-    public Clustering<KMeansModel> run(Relation<V> relation) {
-        KMeansCoverTree<V> tree = new KMeansCoverTree<V>(relation, EuclideanDistance.STATIC, expansion, trunc, true);
-        tree.initialize();
-        Instance instance = new Instance(relation, distance, initialMeans(relation), tree, switchover);
-        instance.run(maxiter);
-        instance.generateCover();
-        instance.printLog();
-        return instance.buildResult(varstat, relation);
+    protected int iterate(int iteration) {
+      if(iteration == 1) {
+        return initialAssignToNearestCluster();
+      }
+      if(iteration < switchover) {
+        meansFromSumsCT(means, nodeManager.getSums(), means);
+        int changed = assignToNearestCluster();
+        assert testSizes();
+        assert nodeManager.testTree(tree.getRoot(), false);
+        return changed;
+      }
+      if(iteration == switchover) {
+        meansFromSumsCT(means, nodeManager.getSums(), means);
+        int changed = assignToClusterBounds();
+        assert testSizes();
+        return changed;
+      }
+      meansFromSumsCT(newmeans, nodeManager.getSums(), means);
+      movedDistance(means, newmeans, sep);
+      updateBounds(sep);
+      copyMeans(newmeans, means);
+      return assignPointsToNearestCluster();
+    }
+
+    @Override
+    protected int assignPointsToNearestCluster() {
+      recomputeSeperation(sep, cdist);
+      nearestMeans(cdist, cnum);
+      int changed = 0;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        final int orig = assignment.intValue(it);
+        // Compute the current bound:
+        final double z = lower.doubleValue(it);
+        final double sa = sep[orig];
+        double u = upper.doubleValue(it);
+        if(u <= z || u <= sa) {
+          continue;
+        }
+        // Update the upper bound
+        NumberVector fv = relation.get(it);
+        double curd2 = distance(fv, means[orig]);
+        upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
+        if(u <= z || u <= sa) {
+          continue;
+        }
+        double rhalf = u + sa; // Our cdist are scaled 0.5
+        // Find closest center, and distance to two closest centers
+        double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
+        int cur = orig;
+        for(int i = 0; i < k - 1; i++) {
+          final int c = cnum[orig][i]; // Optimized ordering
+          if(cdist[orig][c] > rhalf) {
+            break;
+          }
+          double dist = distance(fv, means[c]);
+          if(dist < min1) {
+            cur = c;
+            min2 = min1;
+            min1 = dist;
+          }
+          else if(dist < min2) {
+            min2 = dist;
+          }
+        }
+        // Object has to be reassigned.
+        if(cur != orig) {
+          nodeManager.fChange(it, fv, orig, cur);
+          ++changed;
+          upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
+        }
+        lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
+      }
+      return changed;
     }
 
     @Override
     protected Logging getLogger() {
-        return LOG;
+      return LOG;
     }
+  }
 
-    /**
-     * Inner Class for k-means
-     * 
-     * @author Andreas Lang
-     */
-    protected static class Instance extends HybHamCovKMeans.Instance {
-
-        /**
-       * Sorted neighbors
-       */
-        int[] cnum[];
-
-        /**
-         * Constructor
-         * 
-         * @param relation   Relation
-         * @param df         distance function
-         * @param means      cluster centers
-         * @param tree       cover tree
-         * @param switchover point of strategy switch
-         */
-        public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree, int switchover) {
-            super(relation, df, means, tree, switchover);
-            cnum = new int[k][k - 1];
-        }
-
-        @Override
-        protected int iterate(int iteration) {
-            if(iteration == 1) {
-                int changed = initialAssignToNearestCluster();
-                return changed;
-            }
-            if(iteration < switchover) {
-                meansFromSumsCT(means, nodeManager.getSums(), means);
-                int changed = assignToNearestCluster();
-                assert (testSizes());
-                assert (nodeManager.testTree(tree.getRoot(), false));
-                return changed;
-            }
-            if(iteration == switchover) {
-                meansFromSumsCT(means, nodeManager.getSums(), means);
-                int changed = assignToClusterBounds();
-                assert (testSizes());
-                return changed;
-            }
-            meansFromSumsCT(newmeans, nodeManager.getSums(), means);
-            movedDistance(means, newmeans, sep);
-            updateBounds(sep);
-            copyMeans(newmeans, means);
-            return assignPointsToNearestCluster();
-        }
-
-        @Override
-        protected int assignPointsToNearestCluster() {
-            recomputeSeperation(sep, cdist);
-            nearestMeans(cdist, cnum);
-            int changed = 0;
-            for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-              final int orig = assignment.intValue(it);
-              // Compute the current bound:
-              final double z = lower.doubleValue(it);
-              final double sa = sep[orig];
-              double u = upper.doubleValue(it);
-              if(u <= z || u <= sa) {
-                continue;
-              }
-              // Update the upper bound
-              NumberVector fv = relation.get(it);
-              double curd2 = distance(fv, means[orig]);
-              upper.putDouble(it, u = isSquared ? Math.sqrt(curd2) : curd2);
-              if(u <= z || u <= sa) {
-                continue;
-              }
-              double rhalf = u + sa; // Our cdist are scaled 0.5
-              // Find closest center, and distance to two closest centers
-              double min1 = curd2, min2 = Double.POSITIVE_INFINITY;
-              int cur = orig;
-              for(int i = 0; i < k - 1; i++) {
-                final int c = cnum[orig][i]; // Optimized ordering
-                if(cdist[orig][c] > rhalf) {
-                  break;
-                }
-                double dist = distance(fv, means[c]);
-                if(dist < min1) {
-                  cur = c;
-                  min2 = min1;
-                  min1 = dist;
-                }
-                else if(dist < min2) {
-                  min2 = dist;
-                }
-              }
-              // Object has to be reassigned.
-              if(cur != orig) {
-                nodeManager.fChange(it, fv, orig, cur);
-                ++changed;
-                upper.putDouble(it, min1 == curd2 ? u : isSquared ? Math.sqrt(min1) : min1);
-              }
-              lower.putDouble(it, min2 == curd2 ? u : isSquared ? Math.sqrt(min2) : min2);
-            }
-            return changed;
-        }
-
-        @Override
-        protected Logging getLogger() {
-            return LOG;
-        }
-
+  /**
+   * Parameterization class.
+   *
+   * @author Andreas Lang
+   */
+  public static class Par<V extends NumberVector> extends HybHamCovKMeans.Par<V> {
+    @Override
+    public HybExpCovKMeans<V> make() {
+      return new HybExpCovKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
     }
-
-    /**
-     * Parameterization class.
-     *
-     * @author Andreas Lang
-     */
-    public static class Par<V extends NumberVector> extends HybHamCovKMeans.Par<V> {
-
-        @Override
-        public void configure(Parameterization config) {
-            super.configure(config);
-        }
-
-        @Override
-        public HybExpCovKMeans<V> make() {
-            return new HybExpCovKMeans<>(k, maxiter, initializer, varstat, expansion, trunc, switchover);
-        }
-    }
-
+  }
 }

@@ -33,11 +33,17 @@ import elki.distance.NumberVectorDistance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.math.MathUtil;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Uses squared inter cluster distances for singleton distance calc and non squared
- * inter cluster distances for node distance calc.
+ * Cover-tree based k-means algorithm, without additional bounds.
+ * <p>
+ * Reference:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * Accelerating k-Means Clustering with Cover Trees<br>
+ * Int. Conf. on Similarity Search and Applications, SISAP 2023
  *
  * @author Andreas Lang
  *
@@ -45,302 +51,297 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  *
  * @param <V> vector datatype
  */
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "Accelerating k-Means Clustering with Cover Trees", //
+    booktitle = "Int. Conf. on Similarity Search and Applications, SISAP 2023", //
+    url = "https://doi.org/10.1007/978-3-031-46994-7_13", //
+    bibkey = "DBLP:conf/sisap/LangS23")
 public class CoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKMeans<V> {
+  /**
+   * The logger for this class.
+   */
+  private static final Logging LOG = Logging.getLogger(CoverTreeKMeans.class);
 
+  /**
+   * Constructor
+   * 
+   * @param k Number of clusters
+   * @param maxiter maximum number of iterations
+   * @param initializer k-means initializer
+   * @param varstat variance statistic at the end ?
+   * @param expansion expansion factor of cover tree
+   * @param trunc truncate threshold for cover tree
+   */
+  public CoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
+    super(k, maxiter, initializer, varstat, expansion, trunc);
+  }
+
+  @Override
+  public Clustering<KMeansModel> run(Relation<V> relation) {
+    KMeansCoverTree<V> tree = new KMeansCoverTree<V>(relation, EuclideanDistance.STATIC, expansion, trunc, true);
+    tree.initialize();
+    Instance instance = new Instance(relation, distance, initialMeans(relation), tree);
+    instance.run(maxiter);
+    instance.generateCover();
+    instance.logStatistics();
+    return instance.buildResult(varstat, relation);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+
+  /**
+   * Inner Class for Cover Tree k-means
+   * 
+   * @author Andreas Lang
+   */
+  protected static class Instance extends AbstractCoverTreeKMeans.Instance {
     /**
-     * Constructor
-     * 
-     * @param k Number of clusters
-     * @param maxiter maximum number of iterations
-     * @param initializer k-means initializer
-     * @param varstat variance statistic at the end ?
-     * @param expansion expansion factor of cover tree
-     * @param trunc truncate threshold for cover tree
+     * Constructor.
+     *
+     * @param relation Relation
+     * @param df Distance function
+     * @param means Initial means
      */
-    public CoverTreeKMeans(int k, int maxiter, KMeansInitialization initializer, boolean varstat, double expansion, int trunc) {
-        super(k, maxiter, initializer, varstat, expansion, trunc);
+    public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
+      super(relation, df, means, tree);
+    }
+
+    @Override
+    protected int iterate(int iteration) {
+      if(iteration == 1) {
+        return initialAssignToNearestCluster();
+      }
+      meansFromSumsCT(means, nodeManager.getSums(), means);
+      int changed = assignToNearestCluster();
+      assert testSizes();
+      assert nodeManager.testTree(tree.getRoot(), false);
+      return changed;
+    }
+
+    @Override
+    protected int assignToNearestCluster() {
+      combinedSeperation(cdist, scdist);
+      return assignNode(tree.getRoot(), k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
     }
 
     /**
-     * The logger for this class.
+     * Computes the initial Assignment of all points
+     * 
+     * @return Number of assigned Points
      */
-    private static final Logging LOG = Logging.getLogger(CoverTreeKMeans.class);
+    protected int initialAssignToNearestCluster() {
+      combinedSeperation(cdist, scdist);
+      return assignNode(tree.getRoot(), k, -2, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
+    }
 
-    @Override
-    public Clustering<KMeansModel> run(Relation<V> relation) {
-        KMeansCoverTree<V> tree = new KMeansCoverTree<V>(relation, EuclideanDistance.STATIC, expansion, trunc, true);
-        tree.initialize();
-        Instance instance = new Instance(relation, distance, initialMeans(relation), tree);
-        instance.run(maxiter);
-        instance.generateCover();
-        instance.printLog();
-        return instance.buildResult(varstat, relation);
+    /**
+     * Assigns the current node to the closest cluster by recursively assigning
+     * the subtree if necessary.
+     * 
+     * @param cur Current node
+     * @param alive Number of cluster candidates for that node
+     * @param oldass Old assignment of that node
+     * @param radius Radius of the Parent node
+     * @param parentdists Distances from the parent node to the cluster
+     *        candidates
+     * @param cand list with the cluster candidates. closest first, 2nd closest
+     *        second
+     * @return Number of elements that changed assignment
+     */
+    protected int assignNode(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
+      if(oldass == -1) {
+        oldass = nodeManager.get(cur);
+        assert nodeManager.testTree(cur, false);
+      }
+      int changed = 0;
+      DBIDIter it = cur.singletons.iter(); // Routing object
+      // calculate new bound if node routing element has changed
+      double min1 = parentdists[0], min2 = parentdists[1];
+      int minInd = 0, min2Ind = 1;
+      double[] dists;
+      if(cur.parentDist != 0 || radius == Double.POSITIVE_INFINITY) {
+        NumberVector fv = relation.get(it); // Routing object vector
+        min1 = distance(fv, means[cand[0]]);
+        double newbound = Math.sqrt(min1) + cur.parentDist + 2 * cur.maxDist;
+        if(newbound < min2) { // Equation 14
+          assert nodeManager.testAssign(cur, cand[0], means) == 0;
+          return nodeManager.change(cur, oldass, cand[0]);
+        }
+        newbound *= newbound;
+        // Equation 15
+        alive = pruneD(parentdists, cand, newbound, alive);
+        dists = new double[alive];
+        dists[0] = min1;
+        min2 = Double.MAX_VALUE;
+        for(int i = 1; i < alive; i++) {
+          // use sqrt values but handle maxdist > cdist + min2
+          double bound = 0;
+          // Equation 10
+          if(cur.maxDist < cdist[cand[minInd]][cand[i]]) {
+            bound = cdist[cand[minInd]][cand[i]] - cur.maxDist;
+            bound *= bound;
+          }
+          if(min1 >= bound) {
+            dists[i] = distance(fv, means[cand[i]]);
+            if(dists[i] < min1) {
+              min2Ind = minInd;
+              minInd = i;
+              min2 = min1;
+              min1 = dists[i];
+            }
+            else if(dists[i] < min2) {
+              min2Ind = i;
+              min2 = dists[i];
+            }
+          }
+          else {
+            nodestatIcDist++;
+            dists[i] = Double.MAX_VALUE;
+          }
+        }
+        if(isSquared) {
+          dists[minInd] = min1 = Math.sqrt(min1);
+          dists[min2Ind] = min2 = Math.sqrt(min2);
+        }
+        // end of calculation for new routing element
+      }
+      else {
+        dists = parentdists;
+      }
+      double fastbound = min1 + 2 * cur.maxDist;
+      // Equation 11
+      if(fastbound < min2) {
+        nodestatFilter += alive * (cur.size - cur.singletons.size());
+        assert nodeManager.testAssign(cur, cand[minInd], means) == 0;
+        return nodeManager.change(cur, oldass, cand[minInd]);
+      }
+      if(dists != parentdists) {
+        cand = Arrays.copyOfRange(cand, 0, alive);
+      }
+      if(min2Ind != 1) {
+        swap(dists, min2Ind, 1, cand);
+        if(minInd == 1) {
+          minInd = min2Ind;
+        }
+      }
+      if(minInd != 0) {
+        swap(dists, minInd, 0, cand);
+      }
+      // Prune candidate list
+      fastbound *= fastbound;
+      int old = alive;
+      // Equation 12
+      alive = pruneD(dists, cand, fastbound, alive);
+      nodestatPrune += (old - alive) * (cur.size - cur.singletons.size());
+
+      // Assign routing object if in leaf node
+      if(cur.children.isEmpty()) {
+        int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
+        assert nodeManager.testAssign(it, cand[0], means) == 0;
+        changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
+      }
+      // assign other singletons
+      it.advance();
+      fastbound = 0.5 * (min2 - min1);
+      changed += assignSingletons(cur, oldass, fastbound, it, dists, cand, alive);
+
+      // Assign children
+      for(Node child : cur.children) {
+        int myoldass = oldass != -1 ? oldass : nodeManager.get(child);
+        // assign to cluster candidate if patent dist + maxDist < lower_bound
+        // Equation 13
+        if(child.parentDist + child.maxDist < fastbound) {
+          nodestatFilter += child.size * alive;
+          changed += nodeManager.change(child, myoldass, cand[0]);
+          assert nodeManager.testAssign(child, cand[0], means) == 0;
+        }
+        else {
+          // TODO change radius if necessary
+          changed += assignNode(child, alive, oldass, cur.maxDist, dists, cand);
+          assert nodeManager.testTree(child, false);
+        }
+      }
+      assert nodeManager.testTree(cur, false);
+      return changed;
+    }
+
+    /**
+     * Assigns all singleton elements of a node to their closest cluster
+     * 
+     * @param cur Node
+     * @param oldass old assignment of the node
+     * @param fastbound distance bound for direct assignment
+     * @param it Singleton iterator
+     * @param dists distances from node routing object to
+     * @param cand Candidate clusters
+     * @param alive number of candidate clusters
+     * @return Number of elements that changed assignment
+     */
+    protected int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
+      int changed = 0;
+      for(int j = 1; it.valid(); it.advance(), j++) {
+        int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
+        // Equation 13 r = 0
+        if(cur.singletons.doubleValue(j) <= fastbound) {
+          singletonstatFilter += alive;
+          assert nodeManager.testAssign(it, cand[0], means) == 0;
+          changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
+        }
+        else {
+          NumberVector fv = relation.get(it);
+          double min = distance(fv, means[cand[0]]);
+          double mybound = Math.sqrt(min) + cur.singletons.doubleValue(j);
+          mybound *= mybound;
+          int sal = pruneD(dists, cand, mybound, alive);
+          singletonstatPrune += alive - sal;
+          int sMinInd = 0;
+          for(int i = 1; i < sal; i++) {
+            if(min >= scdist[cand[sMinInd]][cand[i]]) {
+              final double dist = distance(fv, means[cand[i]]);
+              if(dist < min) {
+                sMinInd = i;
+                min = dist;
+              }
+            }
+            else {
+              singletonstatIcDist++;
+            }
+          }
+          assert nodeManager.testAssign(it, cand[sMinInd], means) == 0;
+          changed += nodeManager.change(it, fv, myoldass, cand[sMinInd]);
+        }
+      }
+      return changed;
     }
 
     @Override
     protected Logging getLogger() {
-        return LOG;
+      return LOG;
+    }
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Andreas Lang
+   */
+  public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
+    @Override
+    protected boolean needsMetric() {
+      return true;
     }
 
-    /**
-     * Inner Class for Cover Tree k-means
-     * 
-     * @author Andreas Lang
-     */
-    protected static class Instance extends AbstractCoverTreeKMeans.Instance {
-
-        /**
-         * Constructor.
-         *
-         * @param relation Relation
-         * @param df       Distance function
-         * @param means    Initial means
-         */
-        public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
-            super(relation, df, means, tree);
-        }
-
-        @Override
-        protected int iterate(int iteration) {
-            if(iteration == 1) {
-                int changed = initialAssignToNearestCluster();
-                return changed;
-            }
-            meansFromSumsCT(means, nodeManager.getSums(), means);
-            int changed = assignToNearestCluster();
-            assert (testSizes());
-            assert (nodeManager.testTree(tree.getRoot(), false));
-            return changed;
-        }
-
-        @Override
-        protected int assignToNearestCluster() {
-            combinedSeperation(cdist, scdist);
-            Node root = tree.getRoot();
-
-            return assignNode(root, k, -1, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
-        }
-
-        /**
-         * Computes the initial Assignment of all points
-         * 
-         * @return Number of assigned Points
-         */
-        protected int initialAssignToNearestCluster() {
-            combinedSeperation(cdist, scdist);
-            Node root = tree.getRoot();
-
-            return assignNode(root, k, -2, Double.POSITIVE_INFINITY, new double[k], MathUtil.sequence(0, k));
-        }
-
-        /**
-         * Assignes the Current Node to the closest cluster by recursively assigning the subtree if necessary
-         * 
-         * @param cur Current node
-         * @param alive Number of cluster candidates for that node
-         * @param oldass Old assignment of that node
-         * @param radius Radius of the Parent node
-         * @param parentdists Distances from the parent node to the cluster candidates
-         * @param cand list with the cluster candidates. closest first, 2nd closest second
-         * @return Number of elements that changed assignment
-         */
-        protected int assignNode(Node cur, int alive, int oldass, double radius, double[] parentdists, int[] cand) {
-            if(oldass == -1) {
-                oldass = nodeManager.get(cur);
-                assert (nodeManager.testTree(cur, false));
-            }
-            int changed = 0;
-            DBIDIter it = cur.singletons.iter(); // Routing object
-            // calculate new bound if node routing element has changed
-            double min1 = parentdists[0];
-            double min2 = parentdists[1];
-            int minInd = 0;
-            int min2Ind = 1;
-            double[] dists;
-            if(cur.parentDist != 0 || radius == Double.POSITIVE_INFINITY) {
-                NumberVector fv = relation.get(it); // Routing object number
-                                                    // vector
-                min1 = distance(fv, means[cand[0]]);
-                double newbound = Math.sqrt(min1) + cur.parentDist + 2 * cur.maxDist;
-                if(newbound < min2) { // Equation 14
-                    assert (nodeManager.testAssign(cur, cand[0], means) == 0);
-                    return nodeManager.change(cur, oldass, cand[0]);
-                }
-                newbound *= newbound;
-                // int oldAlive = alive;
-                // Equation 15
-                alive = pruneD(parentdists, cand, newbound, alive);
-                dists = new double[alive];
-                dists[0] = min1;
-                min2 = Double.MAX_VALUE;
-                for(int i = 1; i < alive; i++) {
-                    // use sqrt values but handle maxdist > cdist + min2
-                    double bound = 0;
-                    // Equation 10
-                    if(cur.maxDist < cdist[cand[minInd]][cand[i]]) {
-                        bound = cdist[cand[minInd]][cand[i]] - cur.maxDist;
-                        bound *= bound;
-                    }
-                    if(min1 >= bound) {
-                        dists[i] = distance(fv, means[cand[i]]);
-                        if(dists[i] < min1) {
-                            min2Ind = minInd;
-                            minInd = i;
-                            min2 = min1;
-                            min1 = dists[i];
-                        }
-                        else if(dists[i] < min2) {
-                            min2Ind = i;
-                            min2 = dists[i];
-                        }
-                    }
-                    else {
-                        nodestatIcDist++;
-                        dists[i] = Double.MAX_VALUE;
-                    }
-                }
-                if(isSquared) {
-                    dists[minInd] = min1 = Math.sqrt(min1);
-                    dists[min2Ind] = min2 = Math.sqrt(min2);
-                }
-                // end of calculation for new routing element
-            }
-            else {
-                dists = parentdists;
-            }
-            double fastbound = min1 + 2 * cur.maxDist;
-            // Equation 11
-            if(fastbound < min2) {
-                nodestatFilter += alive * (cur.size - cur.singletons.size());
-                assert (nodeManager.testAssign(cur, cand[minInd], means) == 0);
-                return nodeManager.change(cur, oldass, cand[minInd]);
-            }
-            if(dists != parentdists) {
-                cand = Arrays.copyOfRange(cand, 0, alive);
-            }
-            if(min2Ind != 1) {
-                swap(dists, min2Ind, 1, cand);
-                if(minInd == 1) {
-                    minInd = min2Ind;
-                }
-            }
-            if(minInd != 0) {
-                swap(dists, minInd, 0, cand);
-            }
-            // Prune candidate list
-            fastbound *= fastbound;
-            int old = alive;
-            // Equation 12
-            alive = pruneD(dists, cand, fastbound, alive);
-            nodestatPrune += (old - alive) * (cur.size - cur.singletons.size());
-
-            // Assign routing object if in leaf node
-            if(cur.children.isEmpty()) {
-                int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
-                assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
-            }
-            // assign other singletons
-            it.advance();
-            fastbound = 0.5 * (min2 - min1);
-            changed += assignSingletons(cur, oldass, fastbound, it, dists, cand, alive);
-
-            // Assign children
-            for(Node child : cur.children) {
-                int myoldass = oldass != -1 ? oldass : nodeManager.get(child);
-                // assign to cluster candidate if patent dist + maxDist <
-                // lower_bound
-                // Equation 13
-                if(child.parentDist + child.maxDist < fastbound) {
-                    nodestatFilter += child.size * alive;
-                    changed += nodeManager.change(child, myoldass, cand[0]);
-                    assert (nodeManager.testAssign(child, cand[0], means) == 0);
-                }
-                else {
-                    // TODO change radius if necessary
-                    changed += assignNode(child, alive, oldass, cur.maxDist, dists, cand);
-                    assert (nodeManager.testTree(child, false));
-                }
-            }
-            assert (nodeManager.testTree(cur, false));
-            return changed;
-        }
-
-        /**
-         * Assignes all singleton elements of a  node to their closest cluster
-         * 
-         * @param cur Node
-         * @param oldass old assignment of the node
-         * @param fastbound distance bound for direct assignmen
-         * @param it Singleton iterator
-         * @param dists distances from node routing object to 
-         * @param cand Candidate clusters
-         * @param alive number of candidate clusters
-         * @return Number of elements that changed assignment
-         */
-        protected int assignSingletons(Node cur, int oldass, double fastbound, DBIDIter it, double[] dists, int[] cand, int alive) {
-            int changed = 0;
-            for(int j = 1; it.valid(); it.advance(), j++) {
-                int myoldass = oldass != -1 ? oldass : nodeManager.get(it);
-                // Equation 13 r = 0
-                if(cur.singletons.doubleValue(j) <= fastbound) {
-                    singletonstatFilter += alive;
-                    assert (nodeManager.testAssign(it, cand[0], means) == 0);
-                    changed += nodeManager.change(it, relation.get(it), myoldass, cand[0]);
-                }
-                else {
-                    NumberVector fv = relation.get(it);
-                    double min = distance(fv, means[cand[0]]);
-                    double mybound = Math.sqrt(min) + cur.singletons.doubleValue(j);
-                    mybound *= mybound;
-                    int sal = pruneD(dists, cand, mybound, alive);
-                    singletonstatPrune += alive - sal;
-                    int sMinInd = 0;
-                    for(int i = 1; i < sal; i++) {
-                        if(min >= scdist[cand[sMinInd]][cand[i]]) {
-                            final double dist = distance(fv, means[cand[i]]);
-                            if(dist < min) {
-                                sMinInd = i;
-                                min = dist;
-                            }
-                        }
-                        else {
-                            singletonstatIcDist++;
-                        }
-                    }
-                    assert (nodeManager.testAssign(it, cand[sMinInd], means) == 0);
-                    changed += nodeManager.change(it, fv, myoldass, cand[sMinInd]);
-                }
-            }
-            return changed;
-        }
-
-        @Override
-        protected Logging getLogger() {
-            return LOG;
-        }
-
+    @Override
+    public void configure(Parameterization config) {
+      super.configure(config);
     }
 
-    /**
-     * Parameterization class.
-     *
-     * @author Andreas Lang
-     */
-    public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
-        @Override
-        protected boolean needsMetric() {
-            return true;
-        }
-
-        @Override
-        public void configure(Parameterization config) {
-            super.configure(config);
-        }
-
-        @Override
-        public CoverTreeKMeans<V> make() {
-            return new CoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc);
-        }
+    @Override
+    public CoverTreeKMeans<V> make() {
+      return new CoverTreeKMeans<>(k, maxiter, initializer, varstat, expansion, trunc);
     }
+  }
 }
