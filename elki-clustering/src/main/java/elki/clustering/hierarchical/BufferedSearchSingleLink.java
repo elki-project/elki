@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2024
+ * Copyright (C) 2025
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,10 @@ package elki.clustering.hierarchical;
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
-import elki.database.ids.*;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDEnum;
+import elki.database.ids.DBIDRef;
+import elki.database.ids.DBIDUtil;
 import elki.database.query.PrioritySearcher;
 import elki.database.query.QueryBuilder;
 import elki.database.query.distance.LinearScanEuclideanPrioritySearcher;
@@ -189,10 +192,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
         }
         if(nn.isEmpty()) {
           heap.poll();
+          continue;
         }
-        else {
-          heap.replaceTopElement(nn.peekKey(), a);
-        }
+        heap.replaceTopElement(nn.peekKey(), a);
       }
       LOG.ensureCompleted(cprog);
       assert builder.mergecount == ids.size() - 1;
@@ -206,7 +208,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       this.heap = new DoubleIntegerMinHeap(ids.size());
       this.heaps = new DoubleIntegerMinHeap[ids.size()];
       this.threshold = new double[ids.size()];
-      outer: for(ita.seek(0); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
+      for(ita.seek(0); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
         int a = ita.getOffset(), ca = builder.get(a);
         if(builder.getSize(ca) > 1) {
           continue; // duplicate
@@ -219,12 +221,11 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
             continue;
           }
           final double d = pq.computeExactDistance();
-          if(d == 0.) {
-            // duplicate, merge immediately
+          if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
             assert ca != cb;
             ca = builder.add(ca, 0, cb);
-            continue outer;
+            continue;
           }
           h.add(d, b);
           pq.decreaseCutoff(t = h.peekKey());
@@ -236,9 +237,14 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       }
       LOG.ensureCompleted(iprog);
       if(LOG.isDebugging()) {
-        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more object) during initialization.");
+        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more objects) during initialization.");
       }
     }
+
+    /**
+     * Last id used for refilling
+     */
+    int last = -1;
 
     /**
      * Refill the nearest neighbors.
@@ -248,16 +254,25 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
      */
     private void refillNeighbors(int a, int ca) {
       DoubleIntegerMinHeap h = heaps[a];
-      double t = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
-      for(pq.search(ita.seek(a)).increaseSkip(threshold[a]); pq.valid() && pq.allLowerBound() < t; pq.advance()) {
+      double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
+      final double skip = threshold[a];
+      if (last != a) {
+    	  pq.search(ita.seek(a)).increaseSkip(skip);
+    	  last = a;
+      }
+      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
         final int b = ids.index(pq);
         if(a == b || builder.get(b) == ca) {
           continue;
         }
-        h.add(pq.computeExactDistance(), b);
-        pq.decreaseCutoff(t = h.peekKey());
+        final double dist = pq.computeExactDistance();
+        if(dist < skip) {
+          continue;
+        }
+        h.add(dist, b);
+        thres = h.peekKey();
       }
-      threshold[a] = pq.allLowerBound();
+      threshold[a] = pq.allLowerBound() < thres ? pq.allLowerBound() : Double.POSITIVE_INFINITY;
     }
   }
 

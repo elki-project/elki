@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2024
+ * Copyright (C) 2025
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -182,10 +182,9 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
         }
         if(nn.isEmpty()) {
           heap.poll();
+          return;
         }
-        else {
-          heap.replaceTopElement(nn.peekKey(), a);
-        }
+        heap.replaceTopElement(nn.peekKey(), a);
       }
       LOG.ensureCompleted(cprog);
     }
@@ -195,18 +194,19 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
      * 
      * @param relation Data relation
      */
-    @SuppressWarnings("unchecked")
     private void initializeHeap(Relation<? extends O> relation) {
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
       this.heap = new DoubleIntegerMinHeap(ids.size());
-      this.pqs = (PrioritySearcher<DBIDRef>[]) new PrioritySearcher<?>[ids.size()];
+      @SuppressWarnings("unchecked")
+      PrioritySearcher<DBIDRef>[] pqs = (PrioritySearcher<DBIDRef>[]) new PrioritySearcher<?>[ids.size()];
+      this.pqs = pqs;
       this.heaps = new DoubleIntegerMinHeap[ids.size()];
-      outer: for(DBIDArrayIter ita = ids.iter(); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
+      for(DBIDArrayIter ita = ids.iter(); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
         int a = ita.getOffset(), ca = builder.get(a);
         if(builder.getSize(ca) > 1) {
           continue; // duplicate
         }
-        DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap((int) Math.sqrt(ids.size()));
+        DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
         PrioritySearcher<DBIDRef> pq = this.pqs[a] = new QueryBuilder<>(relation, distance).priorityByDBID();
         // Initial search to get an initial priority
         double thres = Double.POSITIVE_INFINITY;
@@ -216,12 +216,11 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
             continue;
           }
           final double d = pq.computeExactDistance();
-          if(d == 0.) {
-            // duplicate, merge immediately
+          if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
             assert ca != cb;
             ca = builder.add(ca, 0, cb);
-            continue outer;
+            continue;
           }
           h.add(d, b);
           thres = h.peekKey();
@@ -232,7 +231,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
       }
       LOG.ensureCompleted(iprog);
       if(LOG.isDebugging()) {
-        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more object) during initialization.");
+        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more objects) during initialization.");
       }
     }
 
@@ -245,7 +244,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
     private void refillNeighbors(int a, int ca) {
       PrioritySearcher<DBIDRef> pq = pqs[a];
       DoubleIntegerMinHeap h = heaps[a];
-      double thres = h.peekKey();
+      double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
       for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
         final int b = ids.index(pq);
         if(a == b || builder.get(b) == ca) {

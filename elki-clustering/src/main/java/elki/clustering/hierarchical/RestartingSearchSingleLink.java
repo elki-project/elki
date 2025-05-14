@@ -2,7 +2,7 @@
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
  *
- * Copyright (C) 2024
+ * Copyright (C) 2025
  * ELKI Development Team
  *
  * This program is free software: you can redistribute it and/or modify
@@ -171,6 +171,7 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount, LOG);
       }
+      int last = -1; // last used searcher
       while(true) {
         final double curd = heap.peekKey();
         int a = heap.peekValue(), b = nns[a];
@@ -185,7 +186,11 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
         // Update nn of a:
         double dist = Double.POSITIVE_INFINITY;
         int best = -1;
-        for(pq.search(ita.seek(a)).increaseSkip(curd); pq.valid(); pq.advance()) {
+        if(last != a) {
+          pq.search(ita.seek(a)).increaseSkip(curd);
+          last = a;
+        }
+        for(; pq.valid() && pq.allLowerBound() < dist; pq.advance()) {
           int nb = ids.index(pq);
           if(a == nb || pq.getUpperBound() < curd || builder.get(nb) == ca) {
             continue;
@@ -193,16 +198,15 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
           double d = pq.computeExactDistance();
           if(d < dist) {
             best = ids.index(pq);
-            pq.decreaseCutoff(dist = d);
+            dist = d;
           }
         }
         nns[a] = best;
         if(best < 0) {
           heap.poll();
+          continue;
         }
-        else {
-          heap.replaceTopElement(dist, a);
-        }
+        heap.replaceTopElement(dist, a);
       }
       LOG.ensureCompleted(cprog);
       assert builder.mergecount == ids.size() - 1;
@@ -215,39 +219,38 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
       this.heap = new DoubleIntegerMinHeap(ids.size());
       this.nns = new int[ids.size()];
-      outer: for(ita.seek(0); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
+      for(ita.seek(0); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
         int a = ita.getOffset(), ca = builder.get(a);
         if(builder.getSize(ca) > 1) {
           continue; // duplicate
         }
-        double dist = Double.POSITIVE_INFINITY;
         int best = -1;
+        double thresh = Double.POSITIVE_INFINITY;
         for(pq.search(ita); pq.valid(); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
             continue;
           }
           final double d = pq.computeExactDistance();
-          if(d == 0.) {
-            // duplicate, merge immediately
+          if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
             assert ca != cb;
             ca = builder.add(ca, 0, cb);
-            continue outer;
+            continue;
           }
-          if(d < dist) {
-            best = ids.index(pq);
-            pq.decreaseCutoff(dist = d);
+          if(d < thresh) {
+            best = b;
+            pq.decreaseCutoff(thresh = d);
           }
         }
         if(best >= 0) {
-          heap.add(dist, a);
+          heap.add(thresh, a);
           nns[a] = best;
         }
       }
       LOG.ensureCompleted(iprog);
       if(LOG.isDebugging()) {
-        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more object) during initialization.");
+        LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more objects) during initialization.");
       }
     }
   }
