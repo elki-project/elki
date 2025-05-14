@@ -28,6 +28,7 @@ import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.clustering.hierarchical.linkage.*;
 import elki.data.Clustering;
 import elki.database.Database;
+import elki.distance.minkowski.SquaredEuclideanDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -120,6 +121,20 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     assertFMeasure(db, clustering, 0.9386626);
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  // Note: squared Euclidean result differs, matches LinearMemoryNNChain:
+  @Test
+  public void testMedianSquared() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, NNChain.class) //
+        .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, SquaredEuclideanDistance.class)//
+        .with(AGNES.Par.LINKAGE_ID, MedianLinkage.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.9381678);
+    assertClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
 
   @Test
