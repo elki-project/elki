@@ -223,8 +223,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           final double d = pq.computeExactDistance();
           if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
-            assert ca != cb;
-            ca = builder.add(ca, 0, cb);
+            if(ca != cb) {
+              ca = builder.add(ca, 0, cb);
+            }
             continue;
           }
           h.add(d, b);
@@ -256,9 +257,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       DoubleIntegerMinHeap h = heaps[a];
       double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
       final double skip = threshold[a];
-      if (last != a) {
-    	  pq.search(ita.seek(a)).increaseSkip(skip);
-    	  last = a;
+      if(last != a) {
+        pq.search(ita.seek(a)).increaseSkip(skip);
+        last = a;
       }
       for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
         final int b = ids.index(pq);

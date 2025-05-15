@@ -112,12 +112,12 @@ public class ClusterMergeHistoryBuilder {
     }
     // Follow i to its parent.
     int p = parent[i];
-    if (p == i) {
+    if(p == i) {
       return i;
     }
     while(true) {
       final int pp = parent[p];
-      if (p == pp) {
+      if(p == pp) {
         return p;
       }
       parent[i] = pp; // path halving
@@ -274,15 +274,13 @@ public class ClusterMergeHistoryBuilder {
       return da < db ? -1 : da > db ? +1 : (a > b ? -1 : +1);
     });
     // Now we need to ensure merges are consistent in their order
-    byte[] seen = new byte[m];
+    boolean[] seen = new boolean[m];
     int[] order = new int[m];
     int size = 0;
     for(int it : o1) {
-      if(seen[it] > 0) {
-        continue;
+      if(!seen[it]) {
+        size = addRecursive(order, size, seen, it, n);
       }
-      size = addRecursive(order, size, seen, it, n);
-      seen[order[size++] = it] = 1;
     }
     assert size == m;
     // Rewrite the result:
@@ -346,16 +344,15 @@ public class ClusterMergeHistoryBuilder {
    * @param n Number of primary objects
    * @return Size after additions
    */
-  private int addRecursive(int[] order, int size, byte[] seen, int it, int n) {
+  private int addRecursive(int[] order, int size, boolean[] seen, int it, int n) {
     int a = merges[it << 1] - n, b = merges[(it << 1) + 1] - n;
-    if(a >= 0 && seen[a] == 0) {
+    if(a >= 0 && !seen[a]) {
       size = addRecursive(order, size, seen, a, n);
-      seen[order[size++] = a] = 1;
     }
-    if(b >= 0 && seen[b] == 0) {
+    if(b >= 0 && !seen[b]) {
       size = addRecursive(order, size, seen, b, n);
-      seen[order[size++] = b] = 1;
     }
+    seen[order[size++] = it] = true;
     return size;
   }
 }

@@ -234,8 +234,9 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
           final double d = pq.computeExactDistance();
           if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
-            assert ca != cb;
-            ca = builder.add(ca, 0, cb);
+            if(ca != cb) {
+              ca = builder.add(ca, 0, cb);
+            }
             continue;
           }
           if(d < thresh) {

@@ -177,7 +177,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
         }
         nn.poll();
         // need refill?
-        if(nn.isEmpty() || nn.peekKey() > curd) {
+        if(nn.isEmpty() || nn.peekKey() > pqs[a].allLowerBound()) {
           refillNeighbors(a, ca);
         }
         if(nn.isEmpty()) {
@@ -218,8 +218,9 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
           final double d = pq.computeExactDistance();
           if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
-            assert ca != cb;
-            ca = builder.add(ca, 0, cb);
+            if (ca != cb) {
+              ca = builder.add(ca, 0, cb);
+            }
             continue;
           }
           h.add(d, b);
