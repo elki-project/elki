@@ -197,13 +197,12 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
         heap.replaceTopElement(nn.peekKey(), a);
       }
       LOG.ensureCompleted(cprog);
-      assert builder.mergecount == ids.size() - 1;
     }
 
     /**
      * We do this separately, with a kNN query as this tends to be faster.
      * 
-     * @param relation
+     * @param relation data relation
      */
     private void initializeCoreDists(Relation<? extends O> relation) {
       KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(minPts);
@@ -240,14 +239,12 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
         }
         double cd = coredist[a];
         DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
-        double t = Double.POSITIVE_INFINITY;
-        for(pq.search(ita); pq.valid() && pq.allLowerBound() < t; pq.advance()) {
+        for(pq.search(ita); pq.valid(); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
             continue;
           }
           final double d = pq.computeExactDistance();
-          final double rd = MathUtil.max(cd, d, coredist[b]);
           if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
             if(ca != cb) {
@@ -255,11 +252,12 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
             }
             continue;
           }
+          double rd = MathUtil.max(cd, d, coredist[b]);
           h.add(rd, b);
-          pq.decreaseCutoff(t = h.peekKey());
+          pq.decreaseCutoff(h.peekKey());
         }
         if(!h.isEmpty()) {
-          heap.add(t, a);
+          heap.add(h.peekKey(), a);
           threshold[a] = pq.allLowerBound();
         }
       }
@@ -299,14 +297,15 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
         if(a == b || builder.get(b) == ca || seen[b]) {
           continue;
         }
-        final double dist = pq.computeExactDistance();
-        if(dist < skip) {
+        double d = pq.computeExactDistance();
+        if(d < skip) {
           continue;
         }
-        h.add(MathUtil.max(cd, dist, coredist[b]), b);
+        double rd = MathUtil.max(cd, d, coredist[b]);
+        h.add(rd, b);
         thres = h.peekKey();
+        // do not use pq.decreaseCutoff, as we may continue with the searcher
       }
-      assert h.size() < ids.size();
       // Save the current lower bound
       threshold[a] = pq.allLowerBound() < thres ? pq.allLowerBound() : Double.POSITIVE_INFINITY;
     }

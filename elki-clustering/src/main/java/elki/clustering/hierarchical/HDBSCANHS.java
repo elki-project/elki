@@ -119,14 +119,14 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
     protected ClusterMergeHistoryBuilder builder;
 
     /**
-     * Primary heap.
-     */
-    private DoubleIntegerMinHeap heap;
-
-    /**
      * Priority searchers.
      */
     protected PrioritySearcher<DBIDRef>[] pqs;
+
+    /**
+     * Primary heap.
+     */
+    private DoubleIntegerMinHeap heap;
 
     /**
      * Auxiliary heaps.
@@ -179,7 +179,7 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
         }
         if(nn.isEmpty()) {
           heap.poll();
-          return;
+          continue;
         }
         heap.replaceTopElement(nn.peekKey(), a);
       }
@@ -189,7 +189,7 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
     /**
      * We do this separately, with a kNN query as this tends to be faster.
      * 
-     * @param relation
+     * @param relation data relation
      */
     private void initializeCoreDists(Relation<? extends O> relation) {
       KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(minPts);
@@ -213,6 +213,8 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
 
     /**
      * Build the initial heap.
+     * 
+     * @param relation data relation
      */
     private void initializeHeap(Relation<? extends O> relation) {
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
@@ -244,9 +246,10 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
             }
             continue;
           }
-          final double rd = MathUtil.max(cd, d, coredist[b]);
+          double rd = MathUtil.max(cd, d, coredist[b]);
           h.add(rd, b);
           thres = h.peekKey();
+          // do not use pq.decreaseCutoff, as we continue later
         }
         if(!h.isEmpty()) {
           heap.add(thres, a);
@@ -274,8 +277,11 @@ public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
         if(a == b || builder.get(b) == ca) {
           continue;
         }
-        h.add(MathUtil.max(cd, pq.computeExactDistance(), coredist[b]), b);
+        double d = pq.computeExactDistance();
+        double rd = MathUtil.max(cd, d, coredist[b]);
+        h.add(rd, b);
         thres = h.peekKey();
+        // do not use pq.decreaseCutoff, as we continue with the searcher
       }
     }
   }

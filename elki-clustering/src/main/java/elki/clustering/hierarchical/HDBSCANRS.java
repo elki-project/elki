@@ -168,7 +168,6 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      int last = -1; // last used searcher
       while(true) {
         final double curd = heap.peekKey();
         int a = heap.peekValue(), b = nns[a];
@@ -181,41 +180,20 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
           }
         }
         // Update nn of a:
-        double cd = coredist[a];
-        double skip = curd >= cd ? curd : 0;
-        double dist = Double.POSITIVE_INFINITY;
-        int best = -1;
-        if(last != a) {
-          pq.search(ita.seek(a)).increaseSkip(skip);
-          last = a;
-        }
-        for(; pq.valid() && pq.allLowerBound() < dist; pq.advance()) {
-          int nb = ids.index(pq);
-          if(a == nb || pq.getUpperBound() < skip || builder.get(nb) == ca) {
-            continue;
-          }
-          double d = pq.computeExactDistance();
-          final double rd = MathUtil.max(cd, d, coredist[nb]);
-          if(rd < dist) {
-            best = nb;
-            dist = rd;
-          }
-        }
-        nns[a] = best;
-        if(best < 0) {
+        double dist = refillNeighbors(a, ca, curd);
+        if(nns[a] < 0) { // or dist == Double.POSITIVE_INFINITY
           heap.poll();
           continue;
         }
         heap.replaceTopElement(dist, a);
       }
       LOG.ensureCompleted(cprog);
-      assert builder.mergecount == ids.size() - 1;
     }
 
     /**
      * We do this separately, with a kNN query as this tends to be faster.
      * 
-     * @param relation
+     * @param relation data relation
      */
     private void initializeCoreDists(Relation<? extends O> relation) {
       KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(minPts);
@@ -251,7 +229,7 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
         }
         double cd = coredist[a];
         int best = -1;
-        double thresh = Double.POSITIVE_INFINITY;
+        double bestd = Double.POSITIVE_INFINITY;
         for(pq.search(ita); pq.valid(); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
@@ -265,14 +243,14 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
             }
             continue;
           }
-          final double rd = MathUtil.max(cd, d, coredist[b]);
-          if(rd < thresh) {
+          double rd = MathUtil.max(cd, d, coredist[b]);
+          if(rd < bestd) {
             best = b;
-            pq.decreaseCutoff(thresh = rd);
+            pq.decreaseCutoff(bestd = rd);
           }
         }
         if(best >= 0) {
-          heap.add(thresh, a);
+          heap.add(bestd, a);
           nns[a] = best;
         }
       }
@@ -280,6 +258,47 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
       if(LOG.isDebugging()) {
         LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more objects) during initialization.");
       }
+    }
+
+    /**
+     * Last id used for refilling
+     */
+    int last = -1;
+
+    /**
+     * Refill the nearest neighbors.
+     * 
+     * @param a Query object number
+     * @param ca Cluster id of the query object
+     * @param curd Current distance, for skipping
+     */
+    private double refillNeighbors(int a, int ca, double curd) {
+      double cd = coredist[a];
+      double skip = curd >= cd ? curd : 0;
+      double thres = Double.POSITIVE_INFINITY;
+      int best = -1;
+      if(last != a) {
+        pq.search(ita.seek(a)).increaseSkip(skip);
+        last = a;
+      }
+      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
+        final int b = ids.index(pq);
+        if(a == b || builder.get(b) == ca) {
+          continue;
+        }
+        double d = pq.computeExactDistance();
+        if(d < skip) {
+          continue;
+        }
+        double rd = MathUtil.max(cd, d, coredist[b]);
+        if(rd < thres) {
+          best = b;
+          thres = rd;
+          // do not use pq.decreaseCutoff, as we may continue with the searcher
+        }
+      }
+      nns[a] = best;
+      return thres;
     }
   }
 
