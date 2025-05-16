@@ -20,15 +20,12 @@
  */
 package elki.clustering.kmeans.covertree;
 
-import java.util.logging.Level;
-
 import org.junit.Test;
 
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.kmeans.KMeans;
 import elki.data.Clustering;
 import elki.database.Database;
-import elki.logging.LoggingConfiguration;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -39,12 +36,11 @@ import elki.utilities.ELKIBuilder;
 public class HybHamCovKMeansTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansHamerlyCoverTree() {
-    LoggingConfiguration.setDefaultLevel(Level.FINEST);
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
     Clustering<?> result = new ELKIBuilder<>(HybHamCovKMeans.class) //
         .with(KMeans.K_ID, 5) //
         .with(KMeans.SEED_ID, 7) //
-        //.with(HybHamCovKMeans.Par.SWITCH_ID, 3) //
+        // .with(HybHamCovKMeans.Par.SWITCH_ID, 3) //
         .build().autorun(db);
     assertFMeasure(db, result, 0.998005);
     assertClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
