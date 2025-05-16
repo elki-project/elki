@@ -167,11 +167,10 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
      */
     public void run() {
       initializeHeap();
-      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size() - 1, LOG) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
       if(cprog != null) {
-        cprog.setProcessed(builder.mergecount, LOG);
+        cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      int last = -1; // last used searcher
       while(true) {
         final double curd = heap.peekKey();
         int a = heap.peekValue(), b = nns[a];
@@ -184,32 +183,14 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
           }
         }
         // Update nn of a:
-        double dist = Double.POSITIVE_INFINITY;
-        int best = -1;
-        if(last != a) {
-          pq.search(ita.seek(a)).increaseSkip(curd);
-          last = a;
-        }
-        for(; pq.valid() && pq.allLowerBound() < dist; pq.advance()) {
-          int nb = ids.index(pq);
-          if(a == nb || pq.getUpperBound() < curd || builder.get(nb) == ca) {
-            continue;
-          }
-          double d = pq.computeExactDistance();
-          if(d < dist) {
-            best = ids.index(pq);
-            dist = d;
-          }
-        }
-        nns[a] = best;
-        if(best < 0) {
+        double dist = refillNeighbors(a, ca, curd);
+        if(nns[a] < 0) { // or dist == Double.POSITIVE_INFINITY
           heap.poll();
           continue;
         }
         heap.replaceTopElement(dist, a);
       }
       LOG.ensureCompleted(cprog);
-      assert builder.mergecount == ids.size() - 1;
     }
 
     /**
@@ -225,7 +206,7 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
           continue; // duplicate
         }
         int best = -1;
-        double thresh = Double.POSITIVE_INFINITY;
+        double bestd = Double.POSITIVE_INFINITY;
         for(pq.search(ita); pq.valid(); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
@@ -239,13 +220,13 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
             }
             continue;
           }
-          if(d < thresh) {
+          if(d < bestd) {
             best = b;
-            pq.decreaseCutoff(thresh = d);
+            pq.decreaseCutoff(bestd = d);
           }
         }
         if(best >= 0) {
-          heap.add(thresh, a);
+          heap.add(bestd, a);
           nns[a] = best;
         }
       }
@@ -253,6 +234,44 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
       if(LOG.isDebugging()) {
         LOG.debug("Performed " + builder.mergecount + " merges of duplicates (may involve more objects) during initialization.");
       }
+    }
+
+    /**
+     * Last id used for refilling
+     */
+    int last = -1;
+
+    /**
+     * Refill the nearest neighbors.
+     * 
+     * @param a Query object number
+     * @param ca Cluster id of the query object
+     * @param skip Current distance, for skipping
+     */
+    private double refillNeighbors(int a, int ca, double skip) {
+      double thres = Double.POSITIVE_INFINITY;
+      int best = -1;
+      if(last != a) {
+        pq.search(ita.seek(a)).increaseSkip(skip);
+        last = a;
+      }
+      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
+        final int b = ids.index(pq);
+        if(a == b || builder.get(b) == ca) {
+          continue;
+        }
+        double d = pq.computeExactDistance();
+        if(d < skip) {
+          continue;
+        }
+        if(d < thres) {
+          best = b;
+          thres = d;
+          // do not use pq.decreaseCutoff, as we may continue with the searcher
+        }
+      }
+      nns[a] = best;
+      return thres;
     }
   }
 

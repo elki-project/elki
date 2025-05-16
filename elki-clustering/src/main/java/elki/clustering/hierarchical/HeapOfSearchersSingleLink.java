@@ -128,17 +128,17 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
     protected ClusterMergeHistoryBuilder builder;
 
     /**
-     * Primary heap.
-     */
-    private DoubleIntegerMinHeap heap;
-
-    /**
      * Priority searchers.
      */
     protected PrioritySearcher<DBIDRef>[] pqs;
 
     /**
-     * Auxillary heaps.
+     * Primary heap.
+     */
+    private DoubleIntegerMinHeap heap;
+
+    /**
+     * Auxiliary heaps.
      */
     private DoubleIntegerMinHeap[] heaps;
 
@@ -158,9 +158,9 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
      */
     public void run(Relation<? extends O> relation) {
       initializeHeap(relation);
-      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size() - 1, LOG) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
       if(cprog != null) {
-        cprog.setProcessed(builder.mergecount, LOG);
+        cprog.setProcessed(builder.mergecount + 1, LOG);
       }
       while(true) {
         final double curd = heap.peekKey();
@@ -182,7 +182,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
         }
         if(nn.isEmpty()) {
           heap.poll();
-          return;
+          continue;
         }
         heap.replaceTopElement(nn.peekKey(), a);
       }
@@ -192,7 +192,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
     /**
      * Build the initial heap.
      * 
-     * @param relation Data relation
+     * @param relation data relation
      */
     private void initializeHeap(Relation<? extends O> relation) {
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
@@ -218,13 +218,14 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
           final double d = pq.computeExactDistance();
           if(d == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
-            if (ca != cb) {
+            if(ca != cb) {
               ca = builder.add(ca, 0, cb);
             }
             continue;
           }
           h.add(d, b);
           thres = h.peekKey();
+          // do not use pq.decreaseCutoff, as we continue later
         }
         if(!h.isEmpty()) {
           heap.add(thres, a);
@@ -253,6 +254,7 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
         }
         h.add(pq.computeExactDistance(), b);
         thres = h.peekKey();
+        // do not use pq.decreaseCutoff, as we continue with the searcher
       }
     }
   }

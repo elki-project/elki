@@ -36,6 +36,7 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
@@ -98,7 +99,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
   public ClusterMergeHistory run(Relation<O> relation) {
     DBIDEnum ids = DBIDUtil.ensureEnum(relation.getDBIDs());
     ClusterMergeHistoryBuilder builder = new ClusterMergeHistoryBuilder(ids, distance.isSquared());
-    PrioritySearcher<DBIDRef> pq = new QueryBuilder<>(relation, distance).priorityByDBID();
+    // Create one for testing we have a suitable index.
+    PrioritySearcher<DBIDRef> pq = new QueryBuilder<>(relation, distance) //
+        .lowSelectivity().priorityByDBID();
     if(pq instanceof LinearScanPrioritySearcher || pq instanceof LinearScanEuclideanPrioritySearcher) {
       throw new UnsupportedOperationException("No index acceleration available. This will be very slow.");
     }
@@ -168,9 +171,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
      */
     public void run() {
       initializeHeap();
-      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size() - 1, LOG) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
       if(cprog != null) {
-        cprog.setProcessed(builder.mergecount, LOG);
+        cprog.setProcessed(builder.mergecount + 1, LOG);
       }
       while(true) {
         final double curd = heap.peekKey();
@@ -197,7 +200,6 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
         heap.replaceTopElement(nn.peekKey(), a);
       }
       LOG.ensureCompleted(cprog);
-      assert builder.mergecount == ids.size() - 1;
     }
 
     /**
@@ -214,8 +216,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           continue; // duplicate
         }
         DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
-        double t = Double.POSITIVE_INFINITY;
-        for(pq.search(ita); pq.valid() && pq.allLowerBound() < t; pq.advance()) {
+        for(pq.search(ita); pq.valid(); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
             continue;
@@ -229,10 +230,10 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
             continue;
           }
           h.add(d, b);
-          pq.decreaseCutoff(t = h.peekKey());
+          pq.decreaseCutoff(h.peekKey());
         }
         if(!h.isEmpty()) {
-          heap.add(t, a);
+          heap.add(h.peekKey(), a);
           threshold[a] = pq.allLowerBound();
         }
       }
@@ -256,6 +257,11 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
     private void refillNeighbors(int a, int ca) {
       DoubleIntegerMinHeap h = heaps[a];
       double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
+      // Avoid adding entries repeatedly
+      boolean[] seen = new boolean[ids.size()];
+      for(DoubleIntegerHeap.UnsortedIter it = h.unsortedIter(); it.valid(); it.advance()) {
+        seen[it.getValue()] = true;
+      }
       final double skip = threshold[a];
       if(last != a) {
         pq.search(ita.seek(a)).increaseSkip(skip);
@@ -263,16 +269,18 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       }
       for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
         final int b = ids.index(pq);
-        if(a == b || builder.get(b) == ca) {
+        if(a == b || builder.get(b) == ca || seen[b]) {
           continue;
         }
-        final double dist = pq.computeExactDistance();
-        if(dist < skip) {
+        double d = pq.computeExactDistance();
+        if(d < skip) {
           continue;
         }
-        h.add(dist, b);
+        h.add(d, b);
         thres = h.peekKey();
+        // do not use pq.decreaseCutoff, as we may continue with the searcher
       }
+      // Save the current lower bound
       threshold[a] = pq.allLowerBound() < thres ? pq.allLowerBound() : Double.POSITIVE_INFINITY;
     }
   }
