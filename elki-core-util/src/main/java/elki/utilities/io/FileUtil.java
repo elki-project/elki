@@ -192,8 +192,11 @@ public final class FileUtil {
       // read a magic from the file header, and push it back
       byte[] magic = { 0, 0 };
       int r = pb.read(magic);
+      if(r < 1) {
+        throw new IOException("Could not read file -- empty file?");
+      }
       pb.unread(magic, 0, r);
-      return (magic[0] == 31 && magic[1] == -117) ? new GZIPInputStream(pb) : pb;
+      return (r == 2 && magic[0] == 31 && magic[1] == -117) ? new GZIPInputStream(pb) : pb;
     }
     // Mark is supported.
     in.mark(16);
