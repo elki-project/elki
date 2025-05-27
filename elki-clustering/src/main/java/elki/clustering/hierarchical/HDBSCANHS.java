@@ -35,6 +35,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
+import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 
 /**
@@ -48,6 +49,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
  *
  * @param <O> Object type
  */
+@Alias({ "HDBSCAN-HS" })
 public class HDBSCANHS<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

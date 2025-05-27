@@ -35,12 +35,19 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
+import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
+import elki.utilities.optionhandling.OptionID;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
+import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Index accelerated HDBSCAN* clustering algorithm with a heap-of-candidates
  * strategy, where for each point we store a buffer of candidates in a heap.
+ * <p>
+ * This variant uses a kNN search initially, then a priority search later on.
  * <p>
  * Reference:
  *
@@ -48,6 +55,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
  *
  * @param <O> Object type
  */
+@Alias({ "HDBSCAN-BS" })
 public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
@@ -60,6 +68,11 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
   protected Distance<? super O> distance;
 
   /**
+   * How many extra neighbors to retrieve.
+   */
+  protected int slack = 1;
+
+  /**
    * Number of neighbors for core distances
    */
   int minPts;
@@ -69,11 +82,13 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
    *
    * @param distance Distance function
    * @param minPts Minimum number of points for coredists
+   * @param slack Number of additional neighbors to retrieve
    */
-  public HDBSCANBS(Distance<? super O> distance, int minPts) {
+  public HDBSCANBS(Distance<? super O> distance, int minPts, int slack) {
     super();
     this.distance = distance;
     this.minPts = minPts;
+    this.slack = slack;
   }
 
   @Override
@@ -167,12 +182,11 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
      */
     public void run(Relation<? extends O> relation) {
       initializeCoreDists(relation);
-      initializeHeap();
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      while(true) {
+      while(!heap.isEmpty()) {
         final double curd = heap.peekKey();
         final int a = heap.peekValue();
         DoubleIntegerMinHeap nn = heaps[a];
@@ -186,9 +200,13 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
           }
         }
         nn.poll();
+        // Skip other already merged neighbors
+        while(!nn.isEmpty() && builder.get(nn.peekValue()) == ca) {
+          nn.poll();
+        }
         // need refill?
         if(nn.isEmpty() || nn.peekKey() > threshold[a]) {
-          refillNeighbors(a, ca);
+          refillNeighbors(a, ca, curd);
         }
         if(nn.isEmpty()) {
           heap.poll();
@@ -206,28 +224,33 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
      */
     private void initializeCoreDists(Relation<? extends O> relation) {
       KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(minPts);
-
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Core distances", ids.size(), LOG) : null;
       this.coredist = new double[ids.size()];
+      this.seen = new boolean[ids.size()];
       Arrays.fill(coredist, Double.NaN);
+      KNNList[] knns = new KNNList[ids.size()];
       for(DBIDArrayIter ita = ids.iter(); ita.valid(); ita.advance(), LOG.incrementProcessed(cprog)) {
         int a = ita.getOffset();
-        if(coredist[a] != coredist[a]) { // not yet set
-          KNNList knn = knnq.getKNN(ita, minPts);
-          coredist[a] = knn.getKNNDistance();
-          // Mark duplicates
-          for(int i = 0; i < knn.size() && knn.doubleValue(i) == 0.; i++) {
-            coredist[ids.index(knn.iter().seek(i))] = knn.getKNNDistance();
-          }
+        if(coredist[a] == coredist[a]) { // not NaN, duplicate
+          continue;
+        }
+        KNNList knn = knns[a] = knnq.getKNN(ita, minPts);
+        coredist[a] = knn.getKNNDistance();
+        // Mark duplicates
+        for(int i = 0; i < knn.size() && knn.doubleValue(i) == 0.; i++) {
+          coredist[ids.index(knn.iter().seek(i))] = knn.getKNNDistance();
         }
       }
+      initializeHeap(knns);
       LOG.ensureCompleted(cprog);
     }
 
     /**
-     * Build the initial heap.
+     * Initialize the heaps from the kNN lists and the primary heap.
+     * 
+     * @param knns kNN heaps.
      */
-    private void initializeHeap() {
+    private void initializeHeap(KNNList[] knns) {
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
       this.heap = new DoubleIntegerMinHeap(ids.size());
       this.heaps = new DoubleIntegerMinHeap[ids.size()];
@@ -239,22 +262,20 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
         }
         double cd = coredist[a];
         DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
-        for(pq.search(ita); pq.valid(); pq.advance()) {
-          final int b = ids.index(pq);
+        for(DoubleDBIDListIter it = knns[a].iter(); it.valid(); it.advance()) {
+          final int b = ids.index(it);
           if(a == b) {
             continue;
           }
-          final double d = pq.computeExactDistance();
-          if(d == 0.) { // duplicate, merge immediately
+          if(it.doubleValue() == 0.) { // duplicate, merge immediately
             int cb = builder.get(b);
             if(ca != cb) {
               ca = builder.add(ca, cd, cb);
             }
             continue;
           }
-          double rd = MathUtil.max(cd, d, coredist[b]);
+          double rd = MathUtil.max(cd, it.doubleValue(), coredist[b]);
           h.add(rd, b);
-          pq.decreaseCutoff(h.peekKey());
         }
         if(!h.isEmpty()) {
           heap.add(h.peekKey(), a);
@@ -273,26 +294,32 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
     int last = -1;
 
     /**
+     * Set
+     */
+    boolean[] seen;
+
+    /**
      * Refill the nearest neighbors.
      * 
      * @param a Query object number
      * @param ca Cluster id of the query object
+     * @param skip Last merge distance, for skipping
      */
-    private void refillNeighbors(int a, int ca) {
+    private void refillNeighbors(int a, int ca, double skip) {
       DoubleIntegerMinHeap h = heaps[a];
       double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
       double cd = coredist[a];
       // Avoid adding entries repeatedly
-      boolean[] seen = new boolean[ids.size()];
-      for(DoubleIntegerHeap.UnsortedIter it = h.unsortedIter(); it.valid(); it.advance()) {
-        seen[it.getValue()] = true;
-      }
-      final double skip = threshold[a];
       if(last != a) {
+        Arrays.fill(seen, false);
+        for(DoubleIntegerHeap.UnsortedIter it = h.unsortedIter(); it.valid(); it.advance()) {
+          seen[it.getValue()] = true;
+        }
         pq.search(ita.seek(a)).increaseSkip(skip);
         last = a;
       }
-      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
+      int remain = slack;
+      for(; pq.valid() && (pq.allLowerBound() < thres || remain-- > 0); pq.advance()) {
         final int b = ids.index(pq);
         if(a == b || builder.get(b) == ca || seen[b]) {
           continue;
@@ -303,11 +330,11 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
         }
         double rd = MathUtil.max(cd, d, coredist[b]);
         h.add(rd, b);
+        seen[b] = true;
         thres = h.peekKey();
         // do not use pq.decreaseCutoff, as we may continue with the searcher
       }
-      // Save the current lower bound
-      threshold[a] = pq.allLowerBound() < thres ? pq.allLowerBound() : Double.POSITIVE_INFINITY;
+      threshold[a] = pq.allLowerBound(); // Save the current lower bound
     }
   }
 
@@ -321,9 +348,27 @@ public class HDBSCANBS<O> implements HierarchicalClusteringAlgorithm {
    * @param <O> Object type
    */
   public static class Par<O> extends AbstractHDBSCAN.Par<O> {
+    /**
+     * Slack parameter ID.
+     */
+    public static final OptionID SLACK_ID = BufferedSearchSingleLink.Par.SLACK_ID;
+
+    /**
+     * How many extra neighbors to retrieve.
+     */
+    protected int slack = 1;
+
+    @Override
+    public void configure(Parameterization config) {
+      super.configure(config);
+      new IntParameter(SLACK_ID, 2) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> slack = x);
+    }
+
     @Override
     public HDBSCANBS<O> make() {
-      return new HDBSCANBS<>(distance, minPts);
+      return new HDBSCANBS<>(distance, minPts, slack);
     }
   }
 }

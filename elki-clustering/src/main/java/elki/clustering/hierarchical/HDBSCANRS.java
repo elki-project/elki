@@ -35,6 +35,7 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
 import elki.math.MathUtil;
+import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 
 /**
@@ -49,6 +50,7 @@ import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
  *
  * @param <O> Object type
  */
+@Alias({ "HDBSCAN-RS" })
 public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
@@ -168,7 +170,7 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      while(true) {
+      while(!heap.isEmpty()) {
         final double curd = heap.peekKey();
         int a = heap.peekValue(), b = nns[a];
         int ca = builder.get(a), cb = builder.get(b);
@@ -197,19 +199,19 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
      */
     private void initializeCoreDists(Relation<? extends O> relation) {
       KNNSearcher<DBIDRef> knnq = new QueryBuilder<>(relation, distance).kNNByDBID(minPts);
-
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Core distances", ids.size(), LOG) : null;
       this.coredist = new double[ids.size()];
       Arrays.fill(coredist, Double.NaN);
       for(DBIDArrayIter ita = ids.iter(); ita.valid(); ita.advance(), LOG.incrementProcessed(cprog)) {
         int a = ita.getOffset();
-        if(coredist[a] != coredist[a]) { // not yet set
-          KNNList knn = knnq.getKNN(ita, minPts);
-          coredist[a] = knn.getKNNDistance();
-          // Mark duplicates
-          for(int i = 0; i < knn.size() && knn.doubleValue(i) == 0.; i++) {
-            coredist[ids.index(knn.iter().seek(i))] = knn.getKNNDistance();
-          }
+        if(coredist[a] == coredist[a]) { // not NaN, duplicate
+          continue;
+        }
+        KNNList knn = knnq.getKNN(ita, minPts);
+        coredist[a] = knn.getKNNDistance();
+        // Mark duplicates
+        for(int i = 0; i < knn.size() && knn.doubleValue(i) == 0.; i++) {
+          coredist[ids.index(knn.iter().seek(i))] = knn.getKNNDistance();
         }
       }
       LOG.ensureCompleted(cprog);
@@ -267,6 +269,10 @@ public class HDBSCANRS<O> implements HierarchicalClusteringAlgorithm {
 
     /**
      * Refill the nearest neighbors.
+     * <p>
+     * If the current distance is less than the core distance, we use a skip of
+     * 0 because the current distance is the core distance and not a lower bound
+     * to the actual distance.
      * 
      * @param a Query object number
      * @param ca Cluster id of the query object
