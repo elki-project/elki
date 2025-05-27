@@ -85,6 +85,26 @@ public class WeightedQuickUnionInteger {
   }
 
   /**
+   * Initialize with a 1:1 mapping and weight 1.
+   * 
+   * @param size Size
+   * @return {@code this}, for call chaining.
+   */
+  public WeightedQuickUnionInteger fullInit(int size) {
+    assert used == 0;
+    if(size >= parent.length) {
+      this.parent = new int[size];
+      this.weight = new int[size];
+    }
+    for(int i = 0; i < size; i++) {
+      parent[i] = i;
+      weight[i] = 1;
+    }
+    used = size;
+    return this;
+  }
+
+  /**
    * Occupy the next unused index.
    *
    * @param weight Initial weight.
