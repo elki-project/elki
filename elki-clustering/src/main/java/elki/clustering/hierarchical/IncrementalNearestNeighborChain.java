@@ -260,7 +260,6 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
         } */
         chain.size--; // Remove b
       }
-      // System.err.println("Start: " + a + " -> " + b);
       // For ties, always prefer the second-last element b:
       double[] va = getCenter(a), vb = getCenter(b);
       int na = builder.getSize(a), nb = builder.getSize(b);
@@ -305,7 +304,6 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
             }
           }
         }
-        // System.err.println(a + " -> " + c);
         b = a;
         vb = va;
         nb = na;
@@ -357,7 +355,7 @@ public class IncrementalNearestNeighborChain<O extends NumberVector> implements 
   /**
    * Parameterization class.
    * 
-   * @author Robert Gehde
+   * @author Erich Schubert
    *
    * @hidden
    *

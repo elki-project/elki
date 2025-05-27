@@ -44,7 +44,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Index accelerated Heap-of-Searchers-Single-Link (HSSL)) clustering algorithm.
+ * Index accelerated Heap-of-Searchers-Single-Link (HSSL) clustering algorithm.
  * This is more memory intensive than the restarting search approach, but will
  * need fewer distance computations.
  * <p>
@@ -177,6 +177,10 @@ public class HeapOfSearchersSingleLink<O> implements HierarchicalClusteringAlgor
         }
         nn.poll();
         // need refill?
+        // Poll any known neighbor that is already merged now.
+        while(!nn.isEmpty() && ca == builder.get(nn.peekValue())) {
+          nn.poll();
+        }
         if(nn.isEmpty() || nn.peekKey() > pqs[a].allLowerBound()) {
           refillNeighbors(a, ca);
         }

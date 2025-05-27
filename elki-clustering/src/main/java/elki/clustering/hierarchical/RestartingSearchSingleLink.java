@@ -171,7 +171,7 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      while(true) {
+      while(!heap.isEmpty()) {
         final double curd = heap.peekKey();
         int a = heap.peekValue(), b = nns[a];
         int ca = builder.get(a), cb = builder.get(b);
@@ -246,32 +246,30 @@ public class RestartingSearchSingleLink<O> implements HierarchicalClusteringAlgo
      * 
      * @param a Query object number
      * @param ca Cluster id of the query object
-     * @param skip Current distance, for skipping
+     * @param skip Last merge distance, for skipping
      */
     private double refillNeighbors(int a, int ca, double skip) {
-      double thres = Double.POSITIVE_INFINITY;
+      double bestd = Double.POSITIVE_INFINITY;
       int best = -1;
       if(last != a) {
         pq.search(ita.seek(a)).increaseSkip(skip);
         last = a;
       }
-      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
+      for(; pq.valid() && pq.allLowerBound() < bestd; pq.advance()) {
         final int b = ids.index(pq);
         if(a == b || builder.get(b) == ca) {
           continue;
         }
         double d = pq.computeExactDistance();
-        if(d < skip) {
-          continue;
-        }
-        if(d < thres) {
+        assert d >= skip;
+        if(d < bestd) {
           best = b;
-          thres = d;
+          bestd = d;
           // do not use pq.decreaseCutoff, as we may continue with the searcher
         }
       }
       nns[a] = best;
-      return thres;
+      return bestd;
     }
   }
 
