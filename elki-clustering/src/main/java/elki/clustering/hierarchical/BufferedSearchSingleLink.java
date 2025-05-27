@@ -20,6 +20,8 @@
  */
 package elki.clustering.hierarchical;
 
+import java.util.Arrays;
+
 import elki.Algorithm;
 import elki.data.type.TypeInformation;
 import elki.data.type.TypeUtil;
@@ -36,11 +38,14 @@ import elki.distance.Distance;
 import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.utilities.Alias;
 import elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
-import elki.utilities.documentation.Reference;
+import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
+import elki.utilities.optionhandling.constraints.CommonConstraints;
 import elki.utilities.optionhandling.parameterization.Parameterization;
+import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -50,20 +55,12 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * unfortunately, so it was not included in the publication.
  * <p>
  * Reference:
- * <p>
- * Erich Schubert:<br>
- * Hierarchical Clustering Without Pairwise Distances by Incremental Similarity
- * Search<br>
- * Int. Conf. on Similarity Search and Applications (SISAP 2024)
  *
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
-@Reference(authors = "Erich Schubert", //
-    title = "Hierarchical Clustering Without Pairwise Distances by Incremental Similarity Search", //
-    booktitle = "Int. Conf. on Similarity Search and Applications (SISAP 2024)", //
-    bibkey = "DBLP:conf/sisap/Schubert24", url = "https://doi.org/10.1007/978-3-031-75823-2_20")
+@Alias({ "BSSL" })
 public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
@@ -76,13 +73,20 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
   protected Distance<? super O> distance;
 
   /**
+   * How many extra neighbors to retrieve.
+   */
+  protected int slack = 0;
+
+  /**
    * Constructor.
    *
    * @param distance Distance function
+   * @param slack Number of additional neighbors to retrieve
    */
-  public BufferedSearchSingleLink(Distance<? super O> distance) {
+  public BufferedSearchSingleLink(Distance<? super O> distance, int slack) {
     super();
     this.distance = distance;
+    this.slack = slack;
   }
 
   @Override
@@ -175,7 +179,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       if(cprog != null) {
         cprog.setProcessed(builder.mergecount + 1, LOG);
       }
-      while(true) {
+      while(!heap.isEmpty()) {
         final double curd = heap.peekKey();
         final int a = heap.peekValue();
         DoubleIntegerMinHeap nn = heaps[a];
@@ -189,9 +193,13 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           }
         }
         nn.poll();
+        // Skip other already merged neighbors
+        while(!nn.isEmpty() && builder.get(nn.peekValue()) == ca) {
+          nn.poll();
+        }
         // need refill?
         if(nn.isEmpty() || nn.peekKey() > threshold[a]) {
-          refillNeighbors(a, ca);
+          refillNeighbors(a, ca, curd);
         }
         if(nn.isEmpty()) {
           heap.poll();
@@ -209,6 +217,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
       FiniteProgress iprog = LOG.isVerbose() ? new FiniteProgress("Heap initialization", ids.size(), LOG) : null;
       this.heap = new DoubleIntegerMinHeap(ids.size());
       this.heaps = new DoubleIntegerMinHeap[ids.size()];
+      this.seen = new boolean[ids.size()];
       this.threshold = new double[ids.size()];
       for(ita.seek(0); ita.valid(); ita.advance(), LOG.incrementProcessed(iprog)) {
         int a = ita.getOffset(), ca = builder.get(a);
@@ -216,7 +225,9 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           continue; // duplicate
         }
         DoubleIntegerMinHeap h = heaps[a] = new DoubleIntegerMinHeap();
-        for(pq.search(ita); pq.valid(); pq.advance()) {
+        double thres = Double.POSITIVE_INFINITY;
+        int remain = slack;
+        for(pq.search(ita); pq.valid() && (pq.allLowerBound() < thres || remain-- > 0); pq.advance()) {
           final int b = ids.index(pq);
           if(a == b) {
             continue;
@@ -230,7 +241,7 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
             continue;
           }
           h.add(d, b);
-          pq.decreaseCutoff(h.peekKey());
+          pq.decreaseCutoff(thres = h.peekKey());
         }
         if(!h.isEmpty()) {
           heap.add(h.peekKey(), a);
@@ -249,25 +260,31 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
     int last = -1;
 
     /**
+     * Set
+     */
+    boolean[] seen;
+
+    /**
      * Refill the nearest neighbors.
      * 
      * @param a Query object number
      * @param ca Cluster id of the query object
+     * @param skip Last merge distance, for skipping
      */
-    private void refillNeighbors(int a, int ca) {
+    private void refillNeighbors(int a, int ca, double skip) {
       DoubleIntegerMinHeap h = heaps[a];
       double thres = h.isEmpty() ? Double.POSITIVE_INFINITY : h.peekKey();
       // Avoid adding entries repeatedly
-      boolean[] seen = new boolean[ids.size()];
-      for(DoubleIntegerHeap.UnsortedIter it = h.unsortedIter(); it.valid(); it.advance()) {
-        seen[it.getValue()] = true;
-      }
-      final double skip = threshold[a];
       if(last != a) {
+        Arrays.fill(seen, false);
+        for(DoubleIntegerHeap.UnsortedIter it = h.unsortedIter(); it.valid(); it.advance()) {
+          seen[it.getValue()] = true;
+        }
         pq.search(ita.seek(a)).increaseSkip(skip);
         last = a;
       }
-      for(; pq.valid() && pq.allLowerBound() < thres; pq.advance()) {
+      int remain = slack;
+      for(; pq.valid() && (pq.allLowerBound() < thres || remain-- > 0); pq.advance()) {
         final int b = ids.index(pq);
         if(a == b || builder.get(b) == ca || seen[b]) {
           continue;
@@ -277,11 +294,11 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
           continue;
         }
         h.add(d, b);
+        seen[b] = true;
         thres = h.peekKey();
         // do not use pq.decreaseCutoff, as we may continue with the searcher
       }
-      // Save the current lower bound
-      threshold[a] = pq.allLowerBound() < thres ? pq.allLowerBound() : Double.POSITIVE_INFINITY;
+      threshold[a] = pq.allLowerBound(); // Save the current lower bound
     }
   }
 
@@ -296,19 +313,32 @@ public class BufferedSearchSingleLink<O> implements HierarchicalClusteringAlgori
    */
   public static class Par<O> implements Parameterizer {
     /**
+     * Slack parameter ID.
+     */
+    public static final OptionID SLACK_ID = new OptionID("bssl.slack", "Number of additional neighbors to explore to reduce the number of search restarts.");
+
+    /**
      * The distance function to use.
      */
     protected Distance<? super O> distance;
+
+    /**
+     * How many extra neighbors to retrieve.
+     */
+    protected int slack = 0;
 
     @Override
     public void configure(Parameterization config) {
       new ObjectParameter<Distance<? super O>>(Algorithm.Utils.DISTANCE_FUNCTION_ID, Distance.class, EuclideanDistance.class) //
           .grab(config, x -> distance = x);
+      new IntParameter(SLACK_ID, 0) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .grab(config, x -> slack = x);
     }
 
     @Override
     public BufferedSearchSingleLink<O> make() {
-      return new BufferedSearchSingleLink<>(distance);
+      return new BufferedSearchSingleLink<>(distance, slack);
     }
   }
 }
