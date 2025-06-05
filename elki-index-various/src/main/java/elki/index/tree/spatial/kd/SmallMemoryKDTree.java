@@ -714,12 +714,12 @@ public class SmallMemoryKDTree<O extends NumberVector> implements DistancePriori
 
     @Override
     public double getLowerBound() {
-      return cur.mindist;
+      return cur != null ? cur.mindist : 0.;
     }
 
     @Override
     public double allLowerBound() {
-      return cur.mindist;
+      return cur != null ? cur.mindist : 0.;
     }
 
     @Override

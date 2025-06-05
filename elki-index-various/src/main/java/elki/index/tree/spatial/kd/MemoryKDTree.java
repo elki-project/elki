@@ -752,12 +752,12 @@ public class MemoryKDTree<O extends NumberVector> implements DistancePriorityInd
 
     @Override
     public double getLowerBound() {
-      return distance.transformOut(cur.rawdist);
+      return cur != null ? distance.transformOut(cur.rawdist) : 0;
     }
 
     @Override
     public double allLowerBound() {
-      return distance.transformOut(cur.rawdist);
+      return cur != null ? distance.transformOut(cur.rawdist) : 0;
     }
 
     @Override
