@@ -34,6 +34,10 @@ import net.jafama.FastMath;
  * B. M. Hill<br>
  * A simple general approach to inference about the tail of a distribution<br>
  * The annals of statistics 3(5)
+ * <p>
+ * E. Levina, P. J. Bickel<br>
+ * Maximum Likelihood Estimation of Intrinsic Dimension<br>
+ * Neural Information Processing Systems (NIPS) 2004
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
@@ -44,6 +48,11 @@ import net.jafama.FastMath;
     booktitle = "The annals of statistics 3(5)", //
     url = "https://doi.org/10.1214/aos/1176343247", //
     bibkey = "doi:10.1214/aos/1176343247")
+@Reference(authors = "E. Levina, P. J. Bickel", //
+    title = "Maximum Likelihood Estimation of Intrinsic Dimension", //
+    booktitle = "Neural Information Processing Systems (NIPS) 2004", //
+    url = "https://proceedings.neurips.cc/paper/2004/hash/74934548253bcab8490ebd74afed7031-Abstract.html", //
+    bibkey = "DBLP:conf/nips/LevinaB04")
 public class HillEstimator implements DistanceBasedIntrinsicDimensionalityEstimator {
   /**
    * Static instance.

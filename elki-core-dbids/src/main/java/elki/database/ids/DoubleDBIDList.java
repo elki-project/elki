@@ -27,7 +27,7 @@ package elki.database.ids;
  *
  * <pre>
  * {@code
- * for (DoubleDBIDListIter iter = result.iter(); iter.valid(); iter.advance()) {
+ * for(DoubleDBIDListIter iter = result.iter(); iter.valid(); iter.advance()) {
  *   // You can get the distance via: iter.doubleValue();
  *   // And use iter just like any other DBIDRef
  * }
@@ -39,7 +39,7 @@ package elki.database.ids;
  *
  * <pre>
  * {@code
- * for (DBIDIter iter = result.iter(); iter.valid(); iter.advance()) {
+ * for(DBIDIter iter = result.iter(); iter.valid(); iter.advance()) {
  *   // Use iter just like any other DBIDRef
  * }
  * }
@@ -68,12 +68,24 @@ public interface DoubleDBIDList extends DBIDs {
 
   /**
    * Get the double value at a given index (to access the DBID, either use
-   * {@link #iter} or {@link #assignVar}.
+   * {@link #iter} or {@link #assignVar}).
    *
    * @param index Index
    * @return Value
    */
   double doubleValue(int index);
+
+  /**
+   * Get the internal object id at a given position in the list.
+   * <p>
+   * The usual caveats apply -- this relies on internal implementation
+   * assumptions that may change and should only be used with care when a
+   * crucial performance bottleneck has been identified.
+   *
+   * @param index List offset
+   * @return Internal id index
+   */
+  int internalGetIndex(int index);
 
   @Override
   DoubleDBIDListIter iter();

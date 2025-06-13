@@ -201,4 +201,9 @@ public class IntegerDBIDKNNSubList implements KNNList, DoubleIntegerDBIDList {
       return this;
     }
   }
+
+  @Override
+  public int internalGetIndex(int index) {
+    return inner.internalGetIndex(index);
+  }
 }

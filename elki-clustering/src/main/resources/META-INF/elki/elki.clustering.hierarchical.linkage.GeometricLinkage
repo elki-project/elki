@@ -1,0 +1,4 @@
+elki.clustering.hierarchical.linkage.WardLinkage ward MISSQ
+elki.clustering.hierarchical.linkage.GroupAverageLinkage upgma average average-link average-linkage UPGMA
+elki.clustering.hierarchical.linkage.CentroidLinkage centroid upgmc
+elki.clustering.hierarchical.linkage.MedianLinkage wpgmc WPGMC weighted-centroid

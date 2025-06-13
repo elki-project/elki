@@ -81,8 +81,7 @@ import elki.utilities.random.RandomFactory;
  * Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis,
  * Arthur Zimek, Mathias Renz<br>
  * Representative clustering of uncertain data<br>
- * In Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and
- * Data Mining
+ * In Proc. 20th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
  *
  * @author Alexander Koos
  * @author Erich Schubert
@@ -434,18 +433,20 @@ public class RepresentativeUncertainClustering implements ClusteringAlgorithm<Cl
       ChainedParameterization chain = new ChainedParameterization(predef, config);
       chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, PAM.class);
-      malgorithm.grab(config, metaAlgorithm -> {
-        if(metaAlgorithm.getInputTypeRestriction().length > 0 && //
-        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
+      malgorithm.grab(chain, x -> {
+        if(x.getInputTypeRestriction().length > 0 && //
+            !x.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
+        metaAlgorithm = x;
       });
       ObjectParameter<ClusteringAlgorithm<?>> palgorithm = new ObjectParameter<>(ALGORITHM_ID, ClusteringAlgorithm.class);
-      palgorithm.grab(config, samplesAlgorithm -> {
-        if(samplesAlgorithm.getInputTypeRestriction().length > 0 && //
-        !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+      palgorithm.grab(config, x -> {
+        if(x.getInputTypeRestriction().length > 0 && //
+            !x.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + samplesAlgorithm.getInputTypeRestriction()[0]));
         }
+        samplesAlgorithm = x;
       });
       new IntParameter(SAMPLES_ID, DEFAULT_ENSEMBLE_DEPTH) //
           .grab(config, x -> numsamples = x);

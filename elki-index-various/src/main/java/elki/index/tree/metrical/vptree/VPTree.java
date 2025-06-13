@@ -711,13 +711,15 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     /**
      * Start the search.
      */
-    public void doSearch() {
+    protected void reinit() {
       this.threshold = Double.POSITIVE_INFINITY;
       this.skipThreshold = 0;
-      this.candidates = DoubleDBIDListIter.EMPTY;
+      this.candidates = null;
+      this.cur = null;
+      this.curdist = Double.NaN;
+      this.vpdist = Double.NaN;
       this.heap.clear();
       this.heap.add(0, root);
-      advance();
     }
 
     @Override
@@ -800,12 +802,16 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
 
     @Override
     public boolean valid() {
+      if(candidates == null) {
+        candidates = DoubleDBIDListIter.EMPTY;
+        advance();
+      }
       return candidates.valid();
     }
 
     @Override
     public PrioritySearcher<Q> decreaseCutoff(double threshold) {
-      assert threshold <= this.threshold : "Thresholds must only decrease: "+threshold+" > "+this.threshold;
+      assert threshold <= this.threshold : "Thresholds must only decrease: " + threshold + " > " + this.threshold;
       this.threshold = threshold;
       if(threshold < curdist) { // No more results possible:
         heap.clear();
@@ -867,7 +873,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     @Override
     public PrioritySearcher<O> search(O query) {
       this.query = query;
-      doSearch();
+      reinit();
       return this;
     }
 
@@ -892,7 +898,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
     @Override
     public PrioritySearcher<DBIDRef> search(DBIDRef query) {
       this.query = query;
-      doSearch();
+      reinit();
       return this;
     }
 
