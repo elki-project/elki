@@ -20,8 +20,12 @@
  */
 package elki.clustering.hierarchical;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDVar;
+import elki.result.Metadata;
 
 /**
  * Merge history representing a hierarchical clustering.
@@ -220,5 +224,17 @@ public class ClusterMergeHistory {
       }
     }
     return positions;
+  }
+    
+    /**
+     * Collect all ClusterMergeHistory results from a Result
+     *
+     * @param r Result
+     * @return List of ClusterMergeHistorys
+     */
+  public static List<ClusterMergeHistory> getMergeHistoryResults(Object r) {
+    return Metadata.hierarchyOf(r).iterDescendantsSelf()//
+        .<ClusterMergeHistory> filter(ClusterMergeHistory.class)//
+        .collect(new ArrayList<ClusterMergeHistory>());
   }
 }
