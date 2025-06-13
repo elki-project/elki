@@ -24,7 +24,6 @@ package elki.clustering.hierarchical;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import elki.Algorithm;
 import elki.clustering.hierarchical.linkage.GeometricLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.NumberVector;
@@ -34,14 +33,12 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
-import elki.logging.Logging;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.index.tree.betula.CFTree;
 import elki.index.tree.betula.distance.CFDistance;
-import elki.index.tree.betula.distance.VarianceIncreaseDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 
 /**
@@ -61,10 +58,6 @@ import elki.index.tree.betula.features.ClusterFeature;
  *
  */
 public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorithm {
-    /**
-     * Class logger
-     */
-    private static final Logging LOG = Logging.getLogger(BetulaLinearMemoryNNChain.class);
 
     /**
      * Distance function used.
@@ -89,8 +82,7 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
      * @param
      * @param
      */
-    public BetulaLinearMemoryNNChain(CFDistance distance, GeometricLinkage linkage, CFTree.Factory<?> cffactory) {
-        this.distance = distance;
+    public BetulaLinearMemoryNNChain( GeometricLinkage linkage, CFTree.Factory<?> cffactory) {
         this.linkage = linkage;
         this.cffactory = cffactory;
     }
@@ -123,7 +115,7 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
 
         int[] clustermap = new int[cfs.size()];
         ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, clustermap, false);
-
+        cmhb.optimizeOrder(); // TODO avoid?
         new LinearMemoryNNChain.Instance<NumberVector>(linkage).nnChainCore(clusters, clustermap, cmhb);
 
         cmhb.optimizeOrder();
@@ -153,11 +145,6 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
         protected GeometricLinkage linkage;
 
         /**
-         * The distance function to use.
-         */
-        protected CFDistance distance;
-
-        /**
          * CFTree factory.
          */
         CFTree.Factory<?> cffactory;
@@ -168,13 +155,11 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
             new ObjectParameter<GeometricLinkage>(AGNES.Par.LINKAGE_ID, GeometricLinkage.class) //
                     .setDefaultValue(WardLinkage.class) //
                     .grab(config, x -> linkage = x);
-            new ObjectParameter<CFDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, CFDistance.class, VarianceIncreaseDistance.class) //
-                    .grab(config, x -> distance = x);
         }
 
         @Override
         public BetulaLinearMemoryNNChain make() {
-            return new BetulaLinearMemoryNNChain(distance, linkage, cffactory);
+            return new BetulaLinearMemoryNNChain(linkage, cffactory);
         }
     }
 
