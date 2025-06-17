@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import elki.clustering.hierarchical.ClusterMergeHistory;
-import elki.logging.Logging;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -39,15 +38,11 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * TODO
+ * Output a cluster merge history in a scipy compatible format into a Numpy file.
  * 
  * @author Andreas Lang
  */
 public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements ResultHandler {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(NumpyClusterMergeHistoryDumper.class);
 
   /**
    * Output file.
@@ -58,8 +53,6 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
    * Constructor.
    * 
    * @param outputFile Output file
-   * @param append Append to output file (overwrite otherwise).
-   * @param forceLabel Forced label to use for the output, may be {@code null}.
    */
   public NumpyClusterMergeHistoryDumper(Path outputFile) {
     super();
@@ -68,16 +61,32 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
 
   @Override
   public void processNewResult(Object newResult) {
-    List<ClusterMergeHistory> cs = ClusterMergeHistory.getMergeHistoryResults(newResult);
-    if(cs.isEmpty()) {
+    List<ClusterMergeHistory> cmhs = ClusterMergeHistory.getMergeHistoryResults(newResult);
+    if(cmhs.isEmpty()) {
       return;
     }
-    if (cs.size() > 1){
-      LOG.error("More than one Dendrogram to write, old one will be overwritten");
-    }
-    for(ClusterMergeHistory c : cs) {
-try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
-        writeDendrogram(channel,c);
+    int resultNo = 0;
+    for(ClusterMergeHistory cmh : cmhs) {
+      String fileName = outputFile.getFileName().toString();
+      int lastDotIndex = fileName.lastIndexOf('.');
+      String nameWithoutExtension;
+      if(lastDotIndex == -1) {
+        nameWithoutExtension = fileName;
+      }
+      else {
+        nameWithoutExtension = fileName.substring(0, lastDotIndex);
+      }
+      Path result_path;
+      if(resultNo > 0) {
+        result_path = outputFile.getParent().resolve(nameWithoutExtension + resultNo + "." + extension);
+      }
+      else {
+        result_path = outputFile.getParent().resolve(nameWithoutExtension + "." + extension);
+      }
+
+      try (FileChannel channel = FileChannel.open(result_path, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
+        writeMergeHistory(channel,cmh);
+        resultNo++;
       }
       catch(IOException e) {
         throw new AbortException("IO error writing numpy file", e);
@@ -85,14 +94,21 @@ try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE
     }
   }
 
-  public void writeDendrogram(FileChannel file, ClusterMergeHistory clustering) throws IOException {
-    int count = clustering.numMerges();
+/**
+ * Writes the merge history information from a ClusterMergeHistory object to a specified file.
+ *
+ * @param file The FileChannel where the dendrogram will be written.
+ * @param cmh The ClusterMergeHistory object containing the dendrogram data to write.
+ * @throws IOException If an I/O error occurs while writing to the file.
+ */
+  public void writeMergeHistory(FileChannel file, ClusterMergeHistory cmh) throws IOException {
+    int count = cmh.numMerges();
     double[][] data = new double[count][4];
     for(int i=0; i < count;i++){
-      data[i][0] = clustering.getMergeA(i);
-      data[i][1] = clustering.getMergeB(i);
-      data[i][2] = clustering.getMergeHeight(i);
-      data[i][3] = clustering.getSize(i);
+      data[i][0] = cmh.getMergeA(i);
+      data[i][1] = cmh.getMergeB(i);
+      data[i][2] = cmh.getMergeHeight(i);
+      data[i][3] = cmh.getSize(i);
     }
     ByteBuffer bbuf = ByteBuffer.allocateDirect(data.length * 4 * Double.BYTES);
     bbuf.order(ByteOrder.LITTLE_ENDIAN);
@@ -119,7 +135,7 @@ try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE
     /**
      * Output file name parameter.
      */
-    public static final OptionID OUT_ID = new OptionID("dendrogram.output", "Output file name. When not given, the result will be written to stdout.");
+    public static final OptionID OUT_ID = new OptionID("clusterhistory.output", "Output file name.");
 
     /**
      * Output file.

@@ -23,7 +23,6 @@ package elki.result;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import elki.clustering.hierarchical.ClusterMergeHistory;
 import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.model.Model;
@@ -54,7 +52,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * TODO
+ * Output a clustering result a simple array of indices into a Numpy file.
  * 
  * @author Andreas Lang
  */
@@ -73,8 +71,6 @@ public class NumpyClusteringVectorDumper extends NumpyDumper implements ResultHa
    * Constructor.
    * 
    * @param outputFile Output file
-   * @param append Append to output file (overwrite otherwise).
-   * @param forceLabel Forced label to use for the output, may be {@code null}.
    */
   public NumpyClusteringVectorDumper(Path outputFile) {
     super();
@@ -87,12 +83,28 @@ public class NumpyClusteringVectorDumper extends NumpyDumper implements ResultHa
     if(cs.isEmpty()) {
       return;
     }
-    if (cs.size() > 1){
-      LOG.error("More than one Dendrogram to write, old one will be overwritten");
-    }
+    int resultNo = 0;
     for(Clustering<? extends Model> c : cs) {
-try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
+      String fileName = outputFile.getFileName().toString();
+      int lastDotIndex = fileName.lastIndexOf('.');
+      String nameWithoutExtension;
+      if(lastDotIndex == -1) {
+        nameWithoutExtension = fileName;
+      }
+      else {
+        nameWithoutExtension = fileName.substring(0, lastDotIndex);
+      }
+      Path result_path;
+      if (resultNo > 0){
+        result_path = outputFile.getParent().resolve(nameWithoutExtension + resultNo + "."  + extension);
+      }
+      else {
+        result_path = outputFile.getParent().resolve(nameWithoutExtension + "."  + extension);
+      }
+
+      try (FileChannel channel = FileChannel.open(result_path, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
         writeClustering(channel,c);
+        resultNo++;
       }
       catch(IOException e) {
         throw new AbortException("IO error writing numpy file", e);
@@ -100,8 +112,15 @@ try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE
     }
   }
 
+  /**
+   * Writes the clustering result to a file in Numpy format.
+   *
+   * @param file The FileChannel representing the output file where the clustering result will be written.
+   * @param c The Clustering object containing the clustering results that need to be written to the file.
+   * @throws IOException If an I/O error occurs during the writing process.
+   */
   public void writeClustering(FileChannel file, Clustering<? extends Model> c) throws IOException {
-        DBIDRange ids = null;
+    DBIDRange ids = null;
     for(It<Relation<?>> iter = Metadata.hierarchyOf(c).iterParents().filter(Relation.class); iter.valid(); iter.advance()) {
       DBIDs pids = iter.get().getDBIDs();
       if(pids instanceof DBIDRange) {
@@ -159,7 +178,7 @@ try (FileChannel channel = FileChannel.open(outputFile, StandardOpenOption.WRITE
     /**
      * Output file name parameter.
      */
-    public static final OptionID OUT_ID = new OptionID("dendrogram.output", "Output file name. When not given, the result will be written to stdout.");
+    public static final OptionID OUT_ID = new OptionID("clustering.output", "Output file name.");
 
     /**
      * Output file.
