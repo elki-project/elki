@@ -178,7 +178,6 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
           // merged.
           a = chain.get(chain.size - 2);
           b = chain.get(chain.size - 1);
-          assert clustermap[b] >= 0;
           if(clustermap[a] < 0) {
             if(!warnedIrreducible) {
               LOG.warning("Detected an inversion in the clustering. NNChain on irreducible linkages may yield different results.");
@@ -186,6 +185,11 @@ public class LinearMemoryNNChain<O extends NumberVector> implements Hierarchical
             }
             chain.size -= 2; // cut the chain
             k--; // retry
+            continue;
+          } 
+          if (clustermap[b]< 0){
+            chain.size--;
+            k--;
             continue;
           }
           chain.size--; // Remove b

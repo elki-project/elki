@@ -115,7 +115,6 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
 
         int[] clustermap = new int[cfs.size()];
         ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, clustermap, false);
-        cmhb.optimizeOrder(); // TODO avoid?
         new LinearMemoryNNChain.Instance<NumberVector>(linkage).nnChainCore(clusters, clustermap, cmhb);
 
         cmhb.optimizeOrder();
