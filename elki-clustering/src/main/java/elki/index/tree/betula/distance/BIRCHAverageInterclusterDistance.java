@@ -64,7 +64,7 @@ public class BIRCHAverageInterclusterDistance implements CFDistance {
     for(int d = 0; d < dim; d++) {
       sum += v.doubleValue(d) * cf.ls(d);
     }
-    sum = /* 1. * */ cf.sumdev() + cf.getWeight() * BIRCHCF.sumOfSquares(v) - 2 * sum;
+    sum = /* 1. * */ cf.sumOfSumOfSquares() + cf.getWeight() * BIRCHCF.sumOfSquares(v) - 2 * sum;
     return sum > 0 ? sum / cf.getWeight() : 0;
   }
 
