@@ -679,7 +679,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     }
     System.gc();
     if(labelfile == null) {
-      return result;
+      return invokeBundleFilters(result);
     }
     path = Paths.get(labelfile);
     try (FileChannel channel = FileChannel.open(path)) {
@@ -691,7 +691,7 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
     catch(IOException e) {
       throw new AbortException("IO error loading numpy file", e);
     }
-    return result;
+    return invokeBundleFilters(result);
   }
 
   @Override
