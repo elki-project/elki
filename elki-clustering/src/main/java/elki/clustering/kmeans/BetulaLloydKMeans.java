@@ -237,7 +237,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       int c = assignment[i];
       final ClusterFeature cf = cfs.get(i);
       int d = cf.getDimensionality();
-      int n = cf.getWeight();
+      int n = ignoreWeight ? 1 : cf.getWeight();
       if(newMeans[c] == null) {
         newMeans[c] = new double[d];
         for(int j = 0; j < d; j++) {
@@ -292,7 +292,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
         changed++;
         assignment[i] = minIndex;
       }
-      weights[minIndex] += ignoreWeight ? 1 : cfsi.getWeight();
+      weights[minIndex] += cfsi.getWeight();
     }
     return changed;
   }
