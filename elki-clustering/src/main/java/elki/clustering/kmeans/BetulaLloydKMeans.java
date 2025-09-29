@@ -200,6 +200,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
   private double[][] kmeans(ArrayList<? extends ClusterFeature> cfs, int[] assignment, int[] weights, CFTree<?> tree) {
     double[][] means = initialization.chooseInitialMeans(tree, cfs, k);
     for(int i = 1; i <= maxiter || maxiter < 0; i++) {
+      Duration duration = LOG.newDuration(getClass().getName() + "." + i + ".time").begin();
       long prevdiststat = diststat;
       means = i == 1 ? means : means(assignment, means, cfs, weights);
       if(i > 1 && LOG.isStatistics()) {
@@ -209,6 +210,7 @@ public class BetulaLloydKMeans extends AbstractKMeans<NumberVector, KMeansModel>
       }
       int changed = assignToNearestCluster(assignment, means, cfs, weights);
       if(LOG.isStatistics()) {
+        LOG.statistics(duration.end());
         LOG.statistics(new LongStatistic(getClass().getName() + "." + i + ".reassigned", changed));
         if(diststat > prevdiststat) {
           LOG.statistics(new LongStatistic(getClass().getName() + "." + i + ".distance-computations", diststat - prevdiststat));
