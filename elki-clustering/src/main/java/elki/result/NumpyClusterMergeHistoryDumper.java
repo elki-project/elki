@@ -31,6 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 import elki.clustering.hierarchical.ClusterMergeHistory;
+import elki.data.type.TypeUtil;
+import elki.database.StaticArrayDatabase;
+import elki.database.ids.DBIDArrayIter;
+import elki.database.ids.DBIDRange;
+import elki.database.relation.Relation;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -85,7 +90,7 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
       }
 
       try (FileChannel channel = FileChannel.open(result_path, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
-        writeMergeHistory(channel,cmh);
+        writeMergeHistory(channel,cmh, newResult);
         resultNo++;
       }
       catch(IOException e) {
@@ -101,15 +106,32 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
  * @param cmh The ClusterMergeHistory object containing the dendrogram data to write.
  * @throws IOException If an I/O error occurs while writing to the file.
  */
-  public void writeMergeHistory(FileChannel file, ClusterMergeHistory cmh) throws IOException {
+  public void writeMergeHistory(FileChannel file, ClusterMergeHistory cmh, Object database) throws IOException {
     int count = cmh.numMerges();
     double[][] data = new double[count][4];
-    for(int i=0; i < count;i++){
-      data[i][0] = cmh.getMergeA(i);
-      data[i][1] = cmh.getMergeB(i);
-      data[i][2] = cmh.getMergeHeight(i);
-      data[i][3] = cmh.getSize(i);
+    if (cmh.getDBIDs() instanceof DBIDRange){
+      for(int i = 0; i < count; i++) {
+        data[i][0] = cmh.getMergeA(i);
+        data[i][1] = cmh.getMergeB(i);
+        data[i][2] = cmh.getMergeHeight(i);
+        data[i][3] = cmh.getSize(i);
+      }
+    } else {
+      System.err.println("DBID type is not DBIDRange");
+      StaticArrayDatabase db = (StaticArrayDatabase) database;
+      DBIDRange ids = (DBIDRange) db.getRelation(TypeUtil.ANY).getDBIDs();
+      DBIDArrayIter aiter = cmh.getDBIDs().iter();
+
+      for(int i = 0; i < count; i++) {
+        final int mCountA = cmh.getMergeA(i);
+        data[i][0] = mCountA <= count ? ids.index(aiter.seek(mCountA)): mCountA;
+        final int mCountB = cmh.getMergeB(i);
+        data[i][1] = mCountB <= count ? ids.index(aiter.seek(mCountB)): mCountB;
+        data[i][2] = cmh.getMergeHeight(i);
+        data[i][3] = cmh.getSize(i);
+      }
     }
+    
     ByteBuffer bbuf = ByteBuffer.allocateDirect(data.length * 4 * Double.BYTES);
     bbuf.order(ByteOrder.LITTLE_ENDIAN);
     DoubleBuffer buf = bbuf.asDoubleBuffer();
