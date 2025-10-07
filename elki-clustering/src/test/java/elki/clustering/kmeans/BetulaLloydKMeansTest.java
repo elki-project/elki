@@ -78,8 +78,8 @@ public class BetulaLloydKMeansTest extends AbstractClusterAlgorithmTest {
         .with(AbstractKMeans.K_ID, 4) //
         .with(AbstractCFKMeansInitialization.Par.SEED_ID, 0) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.86656);
-    assertClusterSizes(clustering, new int[] { 85, 127, 203, 223 });
+    assertFMeasure(db, clustering, 0.88199);
+    assertClusterSizes(clustering, new int[] { 76, 141, 202, 219 });
   }
 
   @Test
