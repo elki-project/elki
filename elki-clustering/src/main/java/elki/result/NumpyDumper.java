@@ -30,12 +30,19 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import elki.logging.Logging;
+
 /**
  * Helper class to write a Numpy array to a file.
  * 
  * @author Andreas Lang
  */
 public abstract class NumpyDumper {
+
+    /**
+   * Class logger.
+   */
+  protected static final Logging LOG = Logging.getLogger(ClusteringVectorDumper.class);
 
   /**
    * Extension for numpy files

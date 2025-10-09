@@ -35,7 +35,6 @@ import elki.data.type.TypeUtil;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
-import elki.database.relation.Relation;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -117,7 +116,7 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
         data[i][3] = cmh.getSize(i);
       }
     } else {
-      System.err.println("DBID type is not DBIDRange");
+      LOG.warning("No DBID Range for Cluster Merge History found, trying to read DBIDs from the database");
       StaticArrayDatabase db = (StaticArrayDatabase) database;
       DBIDRange ids = (DBIDRange) db.getRelation(TypeUtil.ANY).getDBIDs();
       DBIDArrayIter aiter = cmh.getDBIDs().iter();
@@ -131,7 +130,6 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
         data[i][3] = cmh.getSize(i);
       }
     }
-    
     ByteBuffer bbuf = ByteBuffer.allocateDirect(data.length * 4 * Double.BYTES);
     bbuf.order(ByteOrder.LITTLE_ENDIAN);
     DoubleBuffer buf = bbuf.asDoubleBuffer();
