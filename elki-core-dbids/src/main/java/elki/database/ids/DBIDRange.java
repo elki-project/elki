@@ -26,7 +26,7 @@ package elki.database.ids;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public interface DBIDRange extends ArrayStaticDBIDs, DBIDEnum {
+public interface DBIDRange extends DBIDEnum {
   // No additional methods, except the guarantee that the DBIDs are indeed
   // contiguous and hence the mapping does not need a lookup.
 }
