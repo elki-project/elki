@@ -85,10 +85,8 @@ public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorith
     /**
      * Constructor.
      *
-     * @param distance Distance function to use
      * @param linkage Linkage method
-     * @param
-     * @param
+     * @param cffactory Factory for the CF-Tree
      */
     public BetulaLinearMemoryNNChain( GeometricLinkage linkage, CFTree.Factory<?> cffactory) {
         this.linkage = linkage;

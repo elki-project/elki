@@ -102,8 +102,6 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
      * @param linkage Linkage method
      * @param cffactory
      * @param ignoreWeight
-     * @param
-     * @param
      */
     public BetulaAnderberg(CFDistance distance, Linkage linkage, CFTree.Factory<?> cffactory, boolean ignoreWeight) {
         super();
