@@ -42,6 +42,7 @@ import elki.index.tree.betula.distance.VarianceIncreaseDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 import elki.logging.Logging;
 import elki.logging.progress.FiniteProgress;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -49,9 +50,25 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
+ * BIRCH/BETULA-based clustering algorithm that builds on Anderbergs
+ * Hierarchical Clustering, using the leaves of the CFTree
+ * as smalles elements.
+ * <p>
+ * References:
+ * <p>
+ * Andreas Lang and Erich Schubert<br>
+ * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
+ * Information Systems
+ * 
  * @author Andreas Lang
  *
+ * @depend - - - CFTree
  */
+@Reference(authors = "Andreas Lang and Erich Schubert", //
+    title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
+    booktitle = "Information Systems", //
+    url = "https://doi.org/10.1016/j.is.2021.101918", //
+    bibkey = "DBLP:journals/is/LangS22")
 public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     /**
      * Class logger

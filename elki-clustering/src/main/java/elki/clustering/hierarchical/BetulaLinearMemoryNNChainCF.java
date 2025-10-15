@@ -45,8 +45,12 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * NNchain clustering algorithm with linear memory, for particular linkages
+ * BIRCH/BETULA-based clustering algorithm that builds on * NNchain clustering
+ * algorithm with linear memory, for particular linkages
  * (that can be aggregated) and numerical vector data only.
+ * 
+ * Tis version is based on Cluster Features and uses the CLuster features distances also for the NN-Chain algorithm.
+ * 
  * <p>
  * Reference:
  * <p>
@@ -54,14 +58,15 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Multidimensional Clustering Algorithms,1985<br>
  * http://www.multiresolutions.com/strule/MClA/
  *
- * @author Erich Schubert, Robert Gehde
+ * @author Andreas Lang
  *
- * @param <O> Object type
+ * @depend - - - CFTree
  */
-@Reference(authors = "F. Murtagh", //
-    booktitle = "Multidimensional Clustering Algorithms", //
-    title = "Multidimensional Clustering Algorithms", //
-    url = "http://www.multiresolutions.com/strule/MClA/")
+// TODO reference ok?
+@Reference(authors = "Erich Schubert and Andreas Lang", //
+    title = "Data Aggregation for Hierarchical Clustering", //
+    booktitle = "Machine Learning under Resource Constraints - Volume 1: Fundamentals", //
+    url = "https://doi.org/10.1515/9783110785944-005")
 public class BetulaLinearMemoryNNChainCF implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.
@@ -127,9 +132,8 @@ public class BetulaLinearMemoryNNChainCF implements HierarchicalClusteringAlgori
   /**
    * Main worker instance of NNChain.
    * 
-   * @author Erich Schubert
+   * @author Andreas Lang
    * 
-   * @param <O> vector type
    */
   public static class Instance {
     /**

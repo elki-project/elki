@@ -36,6 +36,10 @@ elki.clustering.hierarchical.MiniMax
 elki.clustering.hierarchical.OPTICSToHierarchical
 elki.clustering.hierarchical.birch.BIRCHLloydKMeans
 elki.clustering.hierarchical.birch.BIRCHLeafClustering
+elki.clustering.hierarchical.BetulaAnderberg
+elki.clustering.hierarchical.BetulaAnderbergCF
+elki.clustering.hierarchical.BetulaLinearMemoryNNChain
+elki.clustering.hierarchical.BetulaLinearMemoryNNChainCF
 elki.clustering.kcenter.GreedyKCenter
 elki.clustering.kmeans.AnnulusKMeans
 elki.clustering.kmeans.BestOfMultipleKMeans

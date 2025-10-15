@@ -33,6 +33,7 @@ import elki.database.ids.ArrayDBIDs;
 import elki.database.ids.DBIDUtil;
 import elki.database.ids.DBIDs;
 import elki.database.relation.Relation;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,7 +43,8 @@ import elki.index.tree.betula.distance.CFDistance;
 import elki.index.tree.betula.features.ClusterFeature;
 
 /**
- * NNchain clustering algorithm with linear memory, for particular linkages
+ * BIRCH/BETULA-based clustering algorithm that builds on * NNchain clustering
+ * algorithm with linear memory, for particular linkages
  * (that can be aggregated) and numerical vector data only.
  * 
  * Based on Cluster Features
@@ -56,7 +58,13 @@ import elki.index.tree.betula.features.ClusterFeature;
  *
  * @author Andreas Lang
  *
+ * @depend - - - CFTree
  */
+// TODO reference ok?
+@Reference(authors = "Erich Schubert and Andreas Lang", //
+    title = "Data Aggregation for Hierarchical Clustering", //
+    booktitle = "Machine Learning under Resource Constraints - Volume 1: Fundamentals", //
+    url = "https://doi.org/10.1515/9783110785944-005")
 public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorithm {
 
     /**

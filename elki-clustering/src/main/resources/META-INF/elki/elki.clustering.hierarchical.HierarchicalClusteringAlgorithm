@@ -16,3 +16,7 @@ elki.clustering.hierarchical.MiniMaxAnderberg
 elki.clustering.hierarchical.MiniMaxNNChain
 elki.clustering.hierarchical.MiniMax
 elki.clustering.hierarchical.OPTICSToHierarchical
+elki.clustering.hierarchical.BetulaAnderberg
+elki.clustering.hierarchical.BetulaAnderbergCF
+elki.clustering.hierarchical.BetulaLinearMemoryNNChain
+elki.clustering.hierarchical.BetulaLinearMemoryNNChainCF

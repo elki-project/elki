@@ -50,8 +50,9 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * BIRCH/BETULA-based clustering algorithm that simply treats the leafs of the
- * CFTree as clusters.
+ * k-means clustering based on the Standard algorithm that uses 
+ *  the leafs of the CFTree as summary statistics.
+ * 
  * <p>
  * References:
  * <p>
