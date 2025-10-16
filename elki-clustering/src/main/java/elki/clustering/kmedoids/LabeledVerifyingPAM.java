@@ -18,8 +18,10 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 
 /**
- * Debug class, to be removed, it compares the optimized with non optimized implementation.
- * 
+ * Debug class, to be removed, that compares the optimized with non-optimized implementation.
+ * This class serves as a verification tool to ensure both implementations produce identical results
+ * while demonstrating performance differences between approaches.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *
@@ -197,7 +199,8 @@ public class LabeledVerifyingPAM<O> extends LabeledOptimizedPAM<O> {
     /**
      * Parameterization class.
      *
-     * @author Andreas Lang, Miriama Janosova
+     * @author Andreas Lang
+     * @author Miriama Janosova
      */
     public static class Par<O> extends LabeledOptimizedPAM.Par<O> {
 

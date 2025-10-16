@@ -30,9 +30,11 @@ import elki.distance.Distance;
 import elki.logging.Logging;
 
 /**
- * 
- * Implementation of the Seeded k-medoids algorithm.
- * 
+ *
+ * Implementation of the Seeded k-medoids algorithm that uses a pre-computed set of medoids
+ * as initial seeds for the clustering process. This approach leverages existing
+ * knowledge about cluster centers to improve convergence.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *
@@ -87,7 +89,7 @@ public class SeededKmedoids<O> extends SemiSupervisedKMedoids<O> {
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<O> extends SemiSupervisedKMedoids.Par<O> {
 

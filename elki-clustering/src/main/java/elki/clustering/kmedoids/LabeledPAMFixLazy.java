@@ -38,9 +38,11 @@ import elki.math.linearalgebra.VMath;
 import java.util.Arrays;
 
 /**
- * 
- * Alternative implementation of the labeled PAM algorithm that tries to label medoids quicker.
- * 
+ *
+ * Alternative implementation of the labeled PAM algorithm that attempts to label medoids more quickly.
+ * This version modifies the standard approach by allowing swaps with medoids in the search space,
+ * potentially leading to faster convergence in some cases.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *

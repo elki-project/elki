@@ -1,3 +1,23 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2025
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package elki.clustering.kmedoids.initialization;
 
 import java.util.ArrayList;
@@ -22,15 +42,48 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 import elki.utilities.random.RandomFactory;
 
+/**
+ * Initialization method for K-Medoids that uses a pre-clustering approach to initialize medoids.
+ * It first initializes k medoids using another initialization method, then performs PAM clustering
+ * on the initial medoids to create clusters. Then it assigns labels to each cluster based on
+ * the most frequent label in that cluster.
+ *
+ * @author Andreas Lang
+ *
+ * @param <O> Object type
+ */
 public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitialization<O> {
 
+  /**
+   * Initialization method to use for the initial medoid selection.
+   */
   KMedoidsInitialization<O> initializer;
 
+  /**
+   * Constructor.
+   *
+   * @param rnd Random generator
+   * @param initializer Initialization method to use for initial medoid selection
+   */
   public PreclusteredInitialization(RandomFactory rnd, KMedoidsInitialization<O> initializer) {
     super(rnd);
     this.initializer = initializer;
   }
 
+  /**
+   * Choose initial medoids using a pre-clustering approach.
+   * First selects initial medoids using the provided initialization method,
+   * then performs PAM clustering to create clusters, and finally assigns labels
+   * based on the most frequent label in each cluster.
+   *
+   * @param k Number of medoids to choose
+   * @param noLabels Number of labels
+   * @param ids IDs of all objects
+   * @param labels Labels for each object
+   * @param distance Distance function
+   * @param medoids Output array for selected medoids
+   * @return Cluster labels for the chosen medoids
+   */
   @Override
   public int[] chooseInitialMedoids(int k, int noLabels, DBIDs ids, WritableIntegerDataStore labels,  DistanceQuery<? super O> distance, ArrayModifiableDBIDs medoids) {
     
@@ -174,6 +227,14 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
         return clusterLabels;
   }
 
+      /**
+       * Get the most frequent colors in a cluster.
+       *
+       * @param ids IDs of objects in the cluster
+       * @param labels Labels for each object
+       * @param noLabels Number of labels
+       * @return Array of colors sorted by frequency
+       */
       private int[] clusterColors(DBIDs ids, WritableIntegerDataStore labels, int noLabels){
         int[] colors = new int[noLabels + 1];
         for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
@@ -185,6 +246,14 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
         return sortedIndices;
     }
 
+    /**
+     * Filter objects by color (label).
+     *
+     * @param ids IDs of objects to filter
+     * @param labels Labels for each object
+     * @param color Color to filter by
+     * @return Filtered DBIDs
+     */
     protected DBIDs filterForColor(DBIDs ids, WritableIntegerDataStore labels, int color) {
       ArrayModifiableDBIDs filtered = DBIDUtil.newArray();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -195,6 +264,14 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
       return filtered;
     }
 
+    /**
+     * Find the closest point to a reference point.
+     *
+     * @param ids IDs of candidate points
+     * @param ref Reference point
+     * @param distQ Distance query function
+     * @return Closest point to reference
+     */
     protected DBIDRef findClosestPoint(DBIDs ids, DBIDRef ref, DistanceQuery<? super O> distQ){
       DBIDVar closest = DBIDUtil.newVar();
       double minDist = Double.MAX_VALUE;
@@ -208,6 +285,15 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
       return closest;
     }
 
+    /**
+     * Find the closest point to a reference point that is not a medoid.
+     *
+     * @param ids IDs of candidate points
+     * @param meds IDs of current medoids
+     * @param ref Reference point
+     * @param distQ Distance query function
+     * @return Closest non-medoid point to reference
+     */
     protected DBIDRef findClosestPointNonMedoid(DBIDs ids, DBIDs meds, DBIDRef ref, DistanceQuery<? super O> distQ) {
       DBIDVar closest = DBIDUtil.newVar();
       double minDist = Double.MAX_VALUE;
@@ -224,7 +310,7 @@ public class PreclusteredInitialization<O> extends SemiSupervisedKMedoidsInitial
 
     /**
    * Parameterization class.
-   * 
+   *
    * @author Andreas Lang
    */
   public static class Par<O> extends SemiSupervisedKMedoidsInitialization.Par {

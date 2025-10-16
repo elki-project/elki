@@ -59,8 +59,10 @@ import elki.utilities.optionhandling.parameters.IntParameter;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Interface for semi supervised k-medoids clustering algorithms.
- * 
+ * Abstract base class for semi-supervised k-medoids clustering algorithms that incorporate label information
+ * to guide the clustering process. This interface provides common functionality and structure
+ * for algorithms that use both labeled and unlabeled data during clustering.
+ *
  * @author Andreas Lang
  */
 public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<Clustering<MedoidModel>> {

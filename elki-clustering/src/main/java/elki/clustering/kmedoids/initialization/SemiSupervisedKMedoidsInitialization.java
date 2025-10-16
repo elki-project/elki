@@ -33,11 +33,13 @@ import elki.utilities.optionhandling.parameters.RandomParameter;
 import elki.utilities.random.RandomFactory;
 
 /**
- * Interface for initializing Semi Supervised K-Medoids. In contrast to k-means initializers,
- * this initialization will only return members of the original data set.
- * 
+ * Abstract base class for initializing Semi Supervised K-Medoids.
+ * This initialization method is designed to work with labeled data, where some objects
+   * have known cluster assignments. The initialization will only return members of the
+  * original data set as medoids.
+  *
  * @author Andreas Lang
- * 
+ *
  * @param <O> Object type
  */
 public abstract class SemiSupervisedKMedoidsInitialization<O> {
@@ -46,20 +48,38 @@ public abstract class SemiSupervisedKMedoidsInitialization<O> {
    */
   protected RandomFactory rnd;
 
+  /**
+   * Constructor.
+   *
+   * @param rnd Random number generator
+   */
   public SemiSupervisedKMedoidsInitialization(RandomFactory rnd) {
     this.rnd = rnd;
   }
 
   /**
-   * Choose initial means
-   * 
-   * @param k Parameter k
-   * @param ids Candidate IDs.
+   * Choose initial medoids for semi-supervised k-medoids clustering.
+   * This method selects medoids based on the provided labeled data and distance function.
+   *
+   * @param k Number of medoids to choose
+   * @param l Number of labels
+   * @param ids IDs of all objects
+   * @param labels Labels for each object
    * @param distance Distance function
-   * @return List of chosen means for k-means
+   * @param medoids Output array for selected medoids
+   * @return Cluster labels for the chosen medoids
    */
   abstract public int[] chooseInitialMedoids(int k, int l, DBIDs ids, WritableIntegerDataStore labels,  DistanceQuery<? super O> distance, ArrayModifiableDBIDs medoids);
 
+  /**
+   * Find a point with the specified label that is not already in the medoids set.
+   *
+   * @param ids IDs of all objects
+   * @param label Target label to search for
+   * @param medoids Current medoids set
+   * @param labels Labels for each object
+   * @return A point with the specified label that is not in medoids
+   */
   protected DBIDRef findPointOfColor(DBIDs ids, int label, ArrayModifiableDBIDs medoids, WritableIntegerDataStore labels){
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()){
       if((labels.intValue(iter) == label) && !medoids.contains(iter)){
@@ -75,8 +95,8 @@ public abstract class SemiSupervisedKMedoidsInitialization<O> {
   }
 
   /**
-   * Parameterization class.
-   * 
+   * Parameterization class for semi-supervised k-medoids initialization.
+   *
    * @author Andreas Lang
    */
   public abstract static class Par implements Parameterizer {

@@ -42,9 +42,13 @@ import elki.logging.statistics.LongStatistic;
 import elki.utilities.exceptions.AbortException;
 
 /**
- * 
  * Implementation of the COP k-medoids algorithm.
- * 
+ *
+ * The COP (Clustering with Optimal Partitioning) k-medoids algorithm
+ * extends the standard k-medoids approach by incorporating label information to guide
+ * cluster assignment and medoid selection. It ensures that labeled objects are assigned
+ * to clusters that match their labels, while also optimizing the placement of medoids.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *
@@ -54,7 +58,7 @@ import elki.utilities.exceptions.AbortException;
  * @param <O> object datatype
  */
 public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
-    /**x
+    /**
      * The logger for this class.
      */
     private static final Logging LOG = Logging.getLogger(COPKmedoids.class);
@@ -77,15 +81,23 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
     }
 
 
+    /**
+     * Instance class for COP k-medoids algorithm.
+     * This inner class handles the specific implementation of the COP algorithm
+     * including assignment to clusters and medoid re-computation.
+     */
     protected static class Instance extends SemiSupervisedKMedoids.Instance {
         private int[] countLabelledInCl;
 
         /**
-         * Constructor.
+         * Constructor for the COP k-medoids instance.
          *
-         * @param distQ      Distance query
-         * @param ids        IDs to process
+         * @param distQ Distance query function
+         * @param ids IDs to process
          * @param assignment Cluster assignment
+         * @param labelsMaps Labels mapping
+         * @param clusterLabel Cluster labels
+         * @param numberOfLabels Number of labels
          */
         public Instance(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int numberOfLabels) {
             super(distQ, ids, assignment, labelsMaps, clusterLabel, numberOfLabels);
@@ -93,10 +105,10 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
         }
 
         /**
-         * Run the PAM optimization phase.
+         * Run the PAM optimization phase for COP k-medoids.
          *
          * @param medoids Medoids list
-         * @param maxiter
+         * @param maxiter Maximum number of iterations
          * @return final cost
          */
         @Override
@@ -146,6 +158,12 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return tc;
         }
 
+        /**
+         * Check if all medoids are part of clusters.
+         *
+         * @param medoids Medoids to check
+         * @return true if all medoids are in clusters, false otherwise
+         */
         public boolean areAllMedsdPartOfClusters(ArrayModifiableDBIDs medoids){
             DBIDArrayMIter miter = medoids.iter();
             ArrayDBIDs[] clusters = getClusters();
@@ -177,6 +195,11 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return true;
         }
 
+        /**
+         * Get clusters from assignment.
+         *
+         * @return Array of clusters
+         */
         private ArrayDBIDs[] getClusters(){
             int numOfCls = clusterLabels.length;
             ArrayModifiableDBIDs[] result = new ArrayModifiableDBIDs[numOfCls];
@@ -192,6 +215,13 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return result;
         }
 
+        /**
+         * Recompute medoids for each cluster.
+         *
+         * @param medoids Current medoids
+         * @param updatedMedoids Updated medoids
+         * @return Number of swaps
+         */
         private int recomputeMedoids(ArrayModifiableDBIDs medoids, ArrayModifiableDBIDs updatedMedoids){
             ArrayDBIDs[] clusters = getClusters();
             DBIDArrayMIter medIter = medoids.iter();
@@ -207,6 +237,12 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return swaps;
         }
 
+        /**
+         * Find the medoid for a given cluster.
+         *
+         * @param cluster Cluster to find medoid for
+         * @return Medoid of the cluster
+         */
         private DBIDRef findMedoid(ArrayDBIDs cluster){
             double minSum = Double.MAX_VALUE;
             DBIDVar medoid = DBIDUtil.newVar();
@@ -224,6 +260,13 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return medoid;
         }
 
+        /**
+         * Check if an object-cluster pair is valid.
+         *
+         * @param objIdx Object index
+         * @param clusterId Cluster ID
+         * @return true if valid, false otherwise
+         */
         private boolean validObjClusterPair(DBIDRef objIdx, int clusterId) {
             if (pointLabelMap.intValue(objIdx) == 0){
                 return true; // object does not have a label, so we do not care where its clustered
@@ -236,6 +279,12 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
             return pointLabelMap.intValue(objIdx) == clusterLabels[clusterId];
         }
 
+        /**
+         * Assign objects to nearest clusters based on distance and label constraints.
+         *
+         * @param medoids Medoids to use for assignment
+         * @return Total cost of assignment
+         */
         protected double assignToNearestCluster(ArrayDBIDs medoids) {
             DBIDArrayIter miter = medoids.iter();
             Arrays.fill(countLabelledInCl, 0);
@@ -278,23 +327,44 @@ public class COPKmedoids<O> extends SemiSupervisedKMedoids<O> {
         }
     }
 
+    /**
+     * Create a new instance of the COP k-medoids algorithm.
+     *
+     * @param distQ Distance query function
+     * @param ids IDs to process
+     * @param assignment Cluster assignment
+     * @param labelsMaps Labels mapping
+     * @param clusterLabel Cluster labels
+     * @param noLabels Number of labels
+     * @return New instance
+     */
     @Override
     Instance instanceWrapper(DistanceQuery<?> distQ, DBIDs ids, WritableIntegerDataStore assignment, WritableIntegerDataStore labelsMaps, int[] clusterLabel, int noLabels) {
       return new Instance(distQ, ids, assignment, labelsMaps, clusterLabel, noLabels);
     }
 
+    /**
+     * Get the logger for this class.
+     *
+     * @return Logger instance
+     */
     @Override
     protected Logging getLogger() {
         return LOG;
     }
 
     /**
-     * Parameterization class.
+     * Parameterization class for COP k-medoids.
      *
-     * @author Erich Schubert
+     * @author Andreas lang
      */
     public static class Par<O> extends SemiSupervisedKMedoids.Par<O> {
 
+        /**
+         * Create a new COP k-medoids instance.
+         *
+         * @return New COP k-medoids instance
+         */
         @Override
         public COPKmedoids<O> make() {
             return new COPKmedoids<>(distance, k, maxiter, initializer);

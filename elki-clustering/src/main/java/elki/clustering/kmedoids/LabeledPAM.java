@@ -45,9 +45,11 @@ import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * 
- * Implementation of the first Labeled PAM clustering algorithm introduced in use the optimized version for identical results and better performance. 
- * 
+ *
+ * Implementation of the first Labeled PAM clustering algorithm that incorporates label information
+ * to guide cluster assignment and medoid selection. This implementation uses an optimized version
+ * for identical results and better performance.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *
@@ -657,7 +659,7 @@ public class LabeledPAM<O> extends SemiSupervisedKMedoids<O> {
     /**
      * Parameterization class.
      *
-     * @author Erich Schubert
+     * @author Andreas Lang
      */
     public static class Par<O> extends SemiSupervisedKMedoids.Par<O> {
 

@@ -20,9 +20,11 @@ import elki.logging.statistics.LongStatistic;
 import elki.math.linearalgebra.VMath;
 
 /**
- * 
- * Implemention of the optimized labeled PAM algorihtm introduced in IS --TODO--. 
- * 
+ *
+ * Implementation of the optimized labeled PAM algorithm.
+ * This algorithm extends the standard PAM approach by incorporating label information to guide
+ * cluster assignment and medoid selection while optimizing performance through efficient cost calculations.
+ *
  * @author Miriama Janosova
  * @author Andreas Lang
  *
