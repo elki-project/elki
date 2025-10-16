@@ -43,7 +43,7 @@ import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Output a cluster merge history in a scipy compatible format into a Numpy file.
- * 
+ *
  * @author Andreas Lang
  */
 public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements ResultHandler {
@@ -55,7 +55,7 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
 
   /**
    * Constructor.
-   * 
+   *
    * @param outputFile Output file
    */
   public NumpyClusterMergeHistoryDumper(Path outputFile) {
@@ -98,13 +98,14 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
     }
   }
 
-/**
- * Writes the merge history information from a ClusterMergeHistory object to a specified file.
- *
- * @param file The FileChannel where the dendrogram will be written.
- * @param cmh The ClusterMergeHistory object containing the dendrogram data to write.
- * @throws IOException If an I/O error occurs while writing to the file.
- */
+  /**
+  * Writes the merge history information from a ClusterMergeHistory object to a specified file.
+  *
+  * @param file The FileChannel where the dendrogram will be written.
+  * @param cmh The ClusterMergeHistory object containing the dendrogram data to write.
+  * @param database The database containing the original data
+  * @throws IOException If an I/O error occurs while writing to the file.
+  */
   public void writeMergeHistory(FileChannel file, ClusterMergeHistory cmh, Object database) throws IOException {
     int count = cmh.numMerges();
     double[][] data = new double[count][4];
@@ -148,7 +149,7 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Andreas Lang
    */
   public static class Par implements Parameterizer {
