@@ -50,19 +50,22 @@ import elki.utilities.optionhandling.parameters.Flag;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * BIRCH/BETULA-based clustering algorithm that builds on Anderbergs
- * Hierarchical Clustering, using the leaves of the CFTree
- * as smalles elements.
+ * BETULA-based clustering algorithm that builds on Anderberg's
+ * Hierarchical Clustering, using the leaves of the CFTree as smallest elements.
+ * <p>
+ * This implementation uses a variant of the Anderberg algorithm to
+ * efficiently compute hierarchical clustering on large datasets by leveraging the BETULA (BIRCH Enhanced Tree Using Local Approximation) approach.
  * <p>
  * References:
  * <p>
  * Andreas Lang and Erich Schubert<br>
  * BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees<br>
  * Information Systems
- * 
+ *
  * @author Andreas Lang
  *
  * @depend - - - CFTree
+
  */
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
@@ -76,22 +79,22 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     private static final Logging LOG = Logging.getLogger(BetulaAnderberg.class);
 
     /**
-     * Distance function used.
+     * Distance function used for computing distances between cluster features.
      */
     protected CFDistance distance;
 
     /**
-     * Current linkage method in use.
+     * Current linkage method in use for cluster merging.
      */
     protected Linkage linkage = WardLinkage.STATIC;
 
     /**
-     * CFTree factory.
+     * CFTree factory used to create the CFTree.
      */
     CFTree.Factory<?> cffactory;
 
     /**
-     * Ignore weight
+     * Flag indicating whether to ignore cluster feature weights during computation.
      */
     boolean ignoreWeight;
 
@@ -100,8 +103,8 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
      *
      * @param distance Distance function to use
      * @param linkage Linkage method
-     * @param cffactory
-     * @param ignoreWeight
+     * @param cffactory CFTree factory
+     * @param ignoreWeight Flag to ignore cluster feature weights
      */
     public BetulaAnderberg(CFDistance distance, Linkage linkage, CFTree.Factory<?> cffactory, boolean ignoreWeight) {
         super();
@@ -112,7 +115,7 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     }
 
     /**
-     * Run the algorithm
+     * Run the BETULA-based Anderberg hierarchical clustering algorithm.
      *
      * @param relation Relation
      * @return Clustering hierarchy
@@ -143,6 +146,11 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
 
     }
 
+    /**
+     * Fix cluster counts when ignoring weights.
+     *
+     * @param cmhb Cluster merge history builder
+     */
     protected static void fixCount(ClusterMergeHistoryBuilder cmhb) {
 
         int m = cmhb.mergecount;
@@ -154,6 +162,16 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
         }
     }
 
+    /**
+     * Initialize the cluster merge history builder with initial data.
+     *
+     * @param idList List of DBIDs for each cluster feature
+     * @param n Total number of objects
+     * @param dists Internal distances for each cluster feature
+     * @param clustermap Mapping from cluster indices to cluster IDs
+     * @param ignoreWeight Flag to ignore cluster feature weights
+     * @return Initialized cluster merge history builder
+     */
     protected static ClusterMergeHistoryBuilder initializeHistoryBuilder(ArrayList<DBIDs> idList, int n, double[] dists, int[] clustermap, boolean ignoreWeight) {
         ArrayModifiableDBIDs ids = DBIDUtil.newArray(n);
         ClusterMergeHistoryBuilder cmhb = new ClusterMergeHistoryBuilder(ids, n, true);
@@ -178,11 +196,11 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     }
 
     /**
-     * Initialize a distance matrix.
+     * Initialize a distance matrix for clustering.
      *
-     * @param cfs
-     * @param df Distance function
-     * @return cluster distance matrix
+     * @param cfs List of cluster features
+     * @param df Distance function to use
+     * @return Initialized cluster distance matrix
      */
     protected static ClusterDistanceMatrix initializeDistanceMatrix(ArrayList<? extends ClusterFeature> cfs, CFDistance df) {
         ClusterDistanceMatrix mat = new ClusterDistanceMatrix(cfs.size());
@@ -212,18 +230,18 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
     }
 
     /**
-     * Parameterization class.
+     * Parameterization class for BETULA-based Anderberg clustering.
      *
      * @author Andreas Lang
      */
     public static class Par implements Parameterizer {
         /**
-         * Ignore cluster weights (naive approach)
+         * Option ID for ignoring cluster weights (naive approach).
          */
         public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
 
         /**
-         * Current linkage in use.
+         * Current linkage method in use.
          */
         protected Linkage linkage;
 
@@ -233,12 +251,12 @@ public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
         protected CFDistance distance;
 
         /**
-         * CFTree factory.
+         * CFTree factory used for creating the tree structure.
          */
         CFTree.Factory<?> cffactory;
 
         /**
-         * Ignore weight
+         * Flag indicating whether to ignore cluster feature weights during computation.
          */
         boolean ignoreWeight = false;
 
