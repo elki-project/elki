@@ -25,9 +25,11 @@ import java.util.List;
 
 import elki.Algorithm;
 import elki.clustering.ClusteringAlgorithm;
+import elki.clustering.ClusteringAlgorithmUtil;
 import elki.clustering.kmeans.KMeans;
 import elki.clustering.kmedoids.initialization.SemiSupervisedKMedoidsInitialization;
 import elki.clustering.kmedoids.initialization.UnsupervisedInitialization;
+import elki.data.Cluster;
 import elki.data.Clustering;
 import elki.data.LabelList;
 import elki.data.model.MedoidModel;
@@ -39,6 +41,7 @@ import elki.database.datastore.DataStoreUtil;
 import elki.database.datastore.WritableDoubleDataStore;
 import elki.database.datastore.WritableIntegerDataStore;
 import elki.database.ids.ArrayModifiableDBIDs;
+import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDArrayMIter;
 import elki.database.ids.DBIDIter;
 import elki.database.ids.DBIDUtil;
@@ -51,6 +54,7 @@ import elki.distance.minkowski.EuclideanDistance;
 import elki.logging.Logging;
 import elki.logging.statistics.Duration;
 import elki.logging.statistics.StringStatistic;
+import elki.result.Metadata;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -131,7 +135,17 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
     DBIDs ids = relation.getDBIDs();
     WritableIntegerDataStore labelsMaps = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     List<String> labelList = createLabelMap(labels, labelsMaps);
-    return run(relation, labelsMaps, labelList.size()-1, k, distQ);
+    int l = labelList.size()-1;
+    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(k);
+    int[] clusterLabels = initialMedoids(distQ, ids, labelsMaps, l, k, medoids); // add
+                                                                                 // labels
+    // assert that each medoid is unique
+    assert checkMedoidUnique(medoids);
+    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
+    instanceWrapper(distQ, ids, assignment, labelsMaps, clusterLabels, l).run(medoids, k);
+    getLogger().statistics(optd.end());
+    return wrapLabeledResult(ids, assignment, medoids, "MED_Clustering", clusterLabels, labelList);
   }
 
   /**
@@ -139,23 +153,23 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
    * and integer labels.
    *
    * @param relation relation to use
-   * @param labels integer labels already formated in a usable way
+   * @param labelsMaps integer labels already formated in a usable way
    * @param k Number of clusters
    * @param distQ Distance query to use
    * @return result
    */
-  public Clustering<MedoidModel> run(Relation<O> relation, WritableIntegerDataStore labels, int l, int k, DistanceQuery<? super O> distQ){
-    DBIDs ids = relation.getDBIDs();
-    ArrayModifiableDBIDs medoids = DBIDUtil.newArray(k); 
-    int[] clusterLabels = initialMedoids(distQ, ids, labels, l, k, medoids); // add labels
-    // assert that each medoid is unique
-    assert checkMedoidUnique(medoids);
-    WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-    Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
-    instanceWrapper(distQ, ids, assignment, labels, clusterLabels, l).run(medoids, k);
-    getLogger().statistics(optd.end());
-    return PAM.wrapResult(ids, assignment, medoids, "MED_Clustering");
-  }
+  // private Clustering<MedoidModel> run(Relation<O> relation, WritableIntegerDataStore labelsMaps, int l, int k, DistanceQuery<? super O> distQ){
+  //   DBIDs ids = relation.getDBIDs();
+  //   ArrayModifiableDBIDs medoids = DBIDUtil.newArray(k); 
+  //   int[] clusterLabels = initialMedoids(distQ, ids, labelsMaps, l, k, medoids); // add labels
+  //   // assert that each medoid is unique
+  //   assert checkMedoidUnique(medoids);
+  //   WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
+  //   Duration optd = getLogger().newDuration(getClass().getName() + ".optimization-time").begin();
+  //   instanceWrapper(distQ, ids, assignment, labelsMaps, clusterLabels, l).run(medoids, k);
+  //   getLogger().statistics(optd.end());
+  //   return wrapLabeledResult(ids, assignment, medoids, "MED_Clustering");
+  // }
 
   protected List<String> createLabelMap(Relation<LabelList> labels, WritableIntegerDataStore labelsMaps){
     List<String> labelList = new ArrayList<>();
@@ -172,6 +186,26 @@ public abstract class SemiSupervisedKMedoids<O> implements  ClusteringAlgorithm<
       labelsMaps.put(iter, labelIndex);
     }
     return labelList;
+  }
+
+  /**
+   * Wrap the clustering result.
+   * 
+   * @param ids Object ids
+   * @param assignment Cluster assignment
+   * @param medoids Medoids
+   * @param name Clustering name
+   * @return Wrapped result
+   */
+  private Clustering<MedoidModel> wrapLabeledResult(DBIDs ids, WritableIntegerDataStore assignment, ArrayModifiableDBIDs medoids, String name, int[] clusterLabels, List<String> labelList){
+    ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, medoids.size());
+    Clustering<MedoidModel> result = new Clustering<>();
+    Metadata.of(result).setLongName(name);
+    int i = 0;
+    for(DBIDArrayIter it = medoids.iter(); it.valid(); it.advance(), i++) {
+      result.addToplevelCluster(new Cluster<>(labelList.get(clusterLabels[i]),clusters[it.getOffset()], new MedoidModel(DBIDUtil.deref(it))));
+    }
+    return result;
   }
 
   private boolean checkMedoidUnique(ArrayModifiableDBIDs medoids){
