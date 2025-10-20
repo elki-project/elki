@@ -31,73 +31,98 @@ import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.Clustering;
 import elki.database.Database;
 import static elki.index.tree.betula.CFTree.Factory.Par.MAXLEAVES_ID;
+import static elki.index.tree.betula.CFTree.Factory.Par.DISTANCE_ID;
 
+import elki.index.tree.betula.distance.AverageInterclusterDistance;
 import elki.index.tree.betula.distance.CentroidEuclideanDistance;
 import elki.index.tree.betula.distance.VarianceIncreaseDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
- * Test Betula Anderberg CF
+ * Test Betula Linear Memor NNChain
  *
  * @author Andreas Lang
  */
 public class BetulaLinearMemoryNNChainTest extends AbstractClusterAlgorithmTest {
-    @Test
-    public void testWard() {
-      Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-      Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-          .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-          .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, VarianceIncreaseDistance.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, VarianceIncreaseDistance.class) //
-          .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
-          .with(MAXLEAVES_ID, 800) //
-          .build().autorun(db);
-      assertFMeasure(db, clustering, 0.93866265);
-      assertClusterSizes(clustering, new int[] { 200, 211, 227 });
-    }
-  
-    @Test
-    public void testCentroid() {
-      Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-      Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-          .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-          .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, CentroidEuclideanDistance.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, CentroidEuclideanDistance.class) //
-          .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
-          .with(MAXLEAVES_ID, 800) //
-          .build().autorun(db);
-      assertFMeasure(db, clustering, 0.93866265);
-      assertClusterSizes(clustering, new int[] { 200, 211, 227 });
-    }
+  @Test
+  public void testWard() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, VarianceIncreaseDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
+        .with(MAXLEAVES_ID, 800) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
 
-    @Test
-    public void testWardA() {
-      Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-      Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-          .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-          .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, VarianceIncreaseDistance.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, VarianceIncreaseDistance.class) //
-          .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
-          .build().autorun(db);
-      assertFMeasure(db, clustering, 0.9402430606721007);
-      assertClusterSizes(clustering, new int[] { 200, 203, 235 });
-    }
+  @Test
+  public void testCentroid() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, CentroidEuclideanDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
+        .with(MAXLEAVES_ID, 800) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
 
-    @Test
-    public void testCentroidA() {
-      Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-      Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
-          .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
-          .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, CentroidEuclideanDistance.class) //
-          .with(Algorithm.Utils.DISTANCE_FUNCTION_ID, CentroidEuclideanDistance.class) //
-          .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
-          .build().autorun(db);
-      assertFMeasure(db, clustering, 0.9402430606721007);
-      assertClusterSizes(clustering, new int[] { 200, 203, 235 });
-    }
-  
+  @Test
+  public void testUPGMA() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, AverageInterclusterDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
+        .with(MAXLEAVES_ID, 800) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  @Test
+  public void testWardA() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, VarianceIncreaseDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, WardLinkage.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.9402430606721007);
+    assertClusterSizes(clustering, new int[] { 200, 203, 235 });
+  }
+
+  @Test
+  public void testCentroidA() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, CentroidEuclideanDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, CentroidLinkage.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866264);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  @Test
+  public void testUPGMAA() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, BetulaLinearMemoryNNChain.class) //
+        .with(DISTANCE_ID, AverageInterclusterDistance.class) //
+        .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866264);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
 }
