@@ -67,105 +67,105 @@ import elki.index.tree.betula.features.ClusterFeature;
     url = "https://doi.org/10.1515/9783110785944-005")
 public class BetulaLinearMemoryNNChain implements HierarchicalClusteringAlgorithm {
 
+  /**
+   * Distance function used.
+   */
+  protected CFDistance distance;
+
+  /**
+   * Current linkage method in use.
+   */
+  protected GeometricLinkage linkage = WardLinkage.STATIC;
+
+  /**
+   * CFTree factory.
+   */
+  CFTree.Factory<?> cffactory;
+
+  /**
+   * Constructor.
+   *
+   * @param linkage Linkage method
+   * @param cffactory Factory for the CF-Tree
+   */
+  public BetulaLinearMemoryNNChain(GeometricLinkage linkage, CFTree.Factory<?> cffactory) {
+    this.linkage = linkage;
+    this.cffactory = cffactory;
+  }
+
+  /**
+   * Run the algorithm
+   *
+   * @param relation Relation
+   * @return Clustering hierarchy
+   */
+  public ClusterMergeHistory run(Relation<NumberVector> relation) {
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    CFTree<?> tree = cffactory.newTree(ids, relation, true);
+    ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
+
+    ArrayList<DBIDs> idList = new ArrayList<>();
+    double[] dists = new double[cfs.size()];
+    ListIterator<? extends ClusterFeature> lit = cfs.listIterator();
+    int i = 0;
+
+    double[][] clusters = new double[cfs.size()][];
+
+    while(lit.hasNext()) {
+      ClusterFeature cf = lit.next();
+      idList.add(tree.getDBIDs(cf));
+      dists[i] = cf.variance() / cf.getWeight();
+      clusters[i] = cf.toArray();
+      i++;
+    }
+
+    int[] clustermap = new int[cfs.size()];
+    ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, clustermap, false);
+    new LinearMemoryNNChain.Instance<NumberVector>(linkage).nnChainCore(clusters, clustermap, cmhb);
+
+    cmhb.optimizeOrder();
+    ClusterMergeHistory res = cmhb.complete();
+    return res;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Andreas Lang
+   */
+  public static class Par implements Parameterizer {
     /**
-     * Distance function used.
+     * Ignore cluster weights (naive approach)
      */
-    protected CFDistance distance;
+    public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
 
     /**
-     * Current linkage method in use.
+     * Current linkage in use.
      */
-    protected GeometricLinkage linkage = WardLinkage.STATIC;
+    protected GeometricLinkage linkage;
 
     /**
      * CFTree factory.
      */
     CFTree.Factory<?> cffactory;
 
-    /**
-     * Constructor.
-     *
-     * @param linkage Linkage method
-     * @param cffactory Factory for the CF-Tree
-     */
-    public BetulaLinearMemoryNNChain( GeometricLinkage linkage, CFTree.Factory<?> cffactory) {
-        this.linkage = linkage;
-        this.cffactory = cffactory;
-    }
-
-    /**
-     * Run the algorithm
-     *
-     * @param relation Relation
-     * @return Clustering hierarchy
-     */
-    public ClusterMergeHistory run(Relation<NumberVector> relation) {
-        final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-        CFTree<?> tree = cffactory.newTree(ids, relation, true);
-        ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
-
-        ArrayList<DBIDs> idList = new ArrayList<>();
-        double[] dists = new double[cfs.size()];
-        ListIterator<? extends ClusterFeature> lit = cfs.listIterator();
-        int i = 0;
-
-        double[][] clusters = new double[cfs.size()][];
-
-        while(lit.hasNext()) {
-            ClusterFeature cf = lit.next();
-            idList.add(tree.getDBIDs(cf));
-            dists[i] = cf.variance() / cf.getWeight();
-            clusters[i] = cf.toArray();
-            i++;
-        }
-
-        int[] clustermap = new int[cfs.size()];
-        ClusterMergeHistoryBuilder cmhb = BetulaAnderberg.initializeHistoryBuilder(idList, relation.size(), dists, clustermap, false);
-        new LinearMemoryNNChain.Instance<NumberVector>(linkage).nnChainCore(clusters, clustermap, cmhb);
-
-        cmhb.optimizeOrder();
-        ClusterMergeHistory res = cmhb.complete();
-        return res;
+    @Override
+    public void configure(Parameterization config) {
+      cffactory = config.tryInstantiate(CFTree.Factory.class);
+      new ObjectParameter<GeometricLinkage>(AGNES.Par.LINKAGE_ID, GeometricLinkage.class) //
+          .setDefaultValue(WardLinkage.class) //
+          .grab(config, x -> linkage = x);
     }
 
     @Override
-    public TypeInformation[] getInputTypeRestriction() {
-        return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    public BetulaLinearMemoryNNChain make() {
+      return new BetulaLinearMemoryNNChain(linkage, cffactory);
     }
-
-    /**
-     * Parameterization class.
-     *
-     * @author Andreas Lang
-     */
-    public static class Par implements Parameterizer {
-        /**
-         * Ignore cluster weights (naive approach)
-         */
-        public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
-
-        /**
-         * Current linkage in use.
-         */
-        protected GeometricLinkage linkage;
-
-        /**
-         * CFTree factory.
-         */
-        CFTree.Factory<?> cffactory;
-
-        @Override
-        public void configure(Parameterization config) {
-            cffactory = config.tryInstantiate(CFTree.Factory.class);
-            new ObjectParameter<GeometricLinkage>(AGNES.Par.LINKAGE_ID, GeometricLinkage.class) //
-                    .setDefaultValue(WardLinkage.class) //
-                    .grab(config, x -> linkage = x);
-        }
-
-        @Override
-        public BetulaLinearMemoryNNChain make() {
-            return new BetulaLinearMemoryNNChain(linkage, cffactory);
-        }
-    }
+  }
 
 }

@@ -49,7 +49,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * algorithm with linear memory, for particular linkages
  * (that can be aggregated) and numerical vector data only.
  * 
- * Tis version is based on Cluster Features and uses the CLuster features distances also for the NN-Chain algorithm.
+ * Tis version is based on Cluster Features and uses the CLuster features
+ * distances also for the NN-Chain algorithm.
  * 
  * <p>
  * Reference:

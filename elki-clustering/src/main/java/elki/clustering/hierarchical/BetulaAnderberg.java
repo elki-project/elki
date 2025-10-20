@@ -54,7 +54,8 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * Hierarchical Clustering, using the leaves of the CFTree as smallest elements.
  * <p>
  * This implementation uses a variant of the Anderberg algorithm to
- * efficiently compute hierarchical clustering on large datasets by leveraging the BETULA (BIRCH Enhanced Tree Using Local Approximation) approach.
+ * efficiently compute hierarchical clustering on large datasets by leveraging
+ * the BETULA (BIRCH Enhanced Tree Using Local Approximation) approach.
  * <p>
  * References:
  * <p>
@@ -65,7 +66,7 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Andreas Lang
  *
  * @depend - - - CFTree
-
+ * 
  */
 @Reference(authors = "Andreas Lang and Erich Schubert", //
     title = "BETULA: Fast Clustering of Large Data with Improved BIRCH CF-Trees", //
@@ -73,208 +74,210 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
     url = "https://doi.org/10.1016/j.is.2021.101918", //
     bibkey = "DBLP:journals/is/LangS22")
 public class BetulaAnderberg implements HierarchicalClusteringAlgorithm {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(BetulaAnderberg.class);
+
+  /**
+   * Distance function used for computing distances between cluster features.
+   */
+  protected CFDistance distance;
+
+  /**
+   * Current linkage method in use for cluster merging.
+   */
+  protected Linkage linkage = WardLinkage.STATIC;
+
+  /**
+   * CFTree factory used to create the CFTree.
+   */
+  CFTree.Factory<?> cffactory;
+
+  /**
+   * Flag indicating whether to ignore cluster feature weights during
+   * computation.
+   */
+  boolean ignoreWeight;
+
+  /**
+   * Constructor.
+   *
+   * @param distance Distance function to use
+   * @param linkage Linkage method
+   * @param cffactory CFTree factory
+   * @param ignoreWeight Flag to ignore cluster feature weights
+   */
+  public BetulaAnderberg(CFDistance distance, Linkage linkage, CFTree.Factory<?> cffactory, boolean ignoreWeight) {
+    super();
+    this.distance = distance;
+    this.linkage = linkage;
+    this.cffactory = cffactory;
+    this.ignoreWeight = ignoreWeight;
+  }
+
+  /**
+   * Run the BETULA-based Anderberg hierarchical clustering algorithm.
+   *
+   * @param relation Relation
+   * @return Clustering hierarchy
+   */
+  public ClusterMergeHistory run(Relation<NumberVector> relation) {
+    final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    CFTree<?> tree = cffactory.newTree(ids, relation, true);
+    ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
+
+    ArrayList<DBIDs> idList = new ArrayList<>();
+    double[] dists = new double[cfs.size()];
+    ListIterator<? extends ClusterFeature> lit = cfs.listIterator();
+    int i = 0;
+    while(lit.hasNext()) {
+      ClusterFeature cf = lit.next();
+      idList.add(tree.getDBIDs(cf));
+      dists[i] = cf.variance() / cf.getWeight();
+      i++;
+    }
+
+    ClusterDistanceMatrix mat = initializeDistanceMatrix(cfs, distance);
+    ClusterMergeHistoryBuilder cmhb = initializeHistoryBuilder(idList, relation.size(), dists, mat.clustermap, ignoreWeight);
+    ClusterMergeHistory res = new Anderberg.Instance(linkage).run(mat, cmhb);
+    if(ignoreWeight) {
+      fixCount(cmhb);
+    }
+    return res;
+
+  }
+
+  /**
+   * Fix cluster counts when ignoring weights.
+   *
+   * @param cmhb Cluster merge history builder
+   */
+  protected static void fixCount(ClusterMergeHistoryBuilder cmhb) {
+
+    int m = cmhb.mergecount;
+    int n = m + 1;
+    for(int i = 0; i < m; i++) {
+      int a = cmhb.merges[i << 1];
+      int b = cmhb.merges[(i << 1) + 1];
+      cmhb.setSize(n + i, cmhb.getSize(a) + cmhb.getSize(b));
+    }
+  }
+
+  /**
+   * Initialize the cluster merge history builder with initial data.
+   *
+   * @param idList List of DBIDs for each cluster feature
+   * @param n Total number of objects
+   * @param dists Internal distances for each cluster feature
+   * @param clustermap Mapping from cluster indices to cluster IDs
+   * @param ignoreWeight Flag to ignore cluster feature weights
+   * @return Initialized cluster merge history builder
+   */
+  protected static ClusterMergeHistoryBuilder initializeHistoryBuilder(ArrayList<DBIDs> idList, int n, double[] dists, int[] clustermap, boolean ignoreWeight) {
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(n);
+    ClusterMergeHistoryBuilder cmhb = new ClusterMergeHistoryBuilder(ids, n, true);
+    Iterator<DBIDs> cluIter = idList.iterator();
+    for(int i = 0, j = 0; i < idList.size(); i++) {
+      DBIDIter iter = cluIter.next().iter();
+      ids.add(iter);
+      iter.advance();
+      int clunum = j++;
+      for(; iter.valid(); iter.advance(), j++) {
+        ids.add(iter);
+        clunum = cmhb.strictAdd(j, dists[i], clunum);
+      }
+      clustermap[i] = clunum;
+      if(ignoreWeight) {
+        if(clunum > j) {
+          cmhb.setSize(clunum, 1);
+        }
+      }
+    }
+    return cmhb;
+  }
+
+  /**
+   * Initialize a distance matrix for clustering.
+   *
+   * @param cfs List of cluster features
+   * @param df Distance function to use
+   * @return Initialized cluster distance matrix
+   */
+  protected static ClusterDistanceMatrix initializeDistanceMatrix(ArrayList<? extends ClusterFeature> cfs, CFDistance df) {
+    ClusterDistanceMatrix mat = new ClusterDistanceMatrix(cfs.size());
+    final double[] matrix = mat.matrix;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", matrix.length, LOG) : null;
+    int pos = 0;
+    for(int i = 1; i < cfs.size(); i++) {
+      assert pos == ClusterDistanceMatrix.triangleSize(i);
+      for(int j = 0; j < i; j++) {
+        matrix[pos++] = df.squaredDistance(cfs.get(i), cfs.get(j));
+      }
+      if(prog != null) {
+        prog.setProcessed(pos, LOG);
+      }
+    }
+    // Avoid logging errors in case scratch space was too large:
+    if(prog != null) {
+      prog.setProcessed(matrix.length, LOG);
+    }
+    LOG.ensureCompleted(prog);
+    return mat;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Parameterization class for BETULA-based Anderberg clustering.
+   *
+   * @author Andreas Lang
+   */
+  public static class Par implements Parameterizer {
     /**
-     * Class logger
+     * Option ID for ignoring cluster weights (naive approach).
      */
-    private static final Logging LOG = Logging.getLogger(BetulaAnderberg.class);
+    public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
 
     /**
-     * Distance function used for computing distances between cluster features.
+     * Current linkage method in use.
+     */
+    protected Linkage linkage;
+
+    /**
+     * The distance function to use.
      */
     protected CFDistance distance;
 
     /**
-     * Current linkage method in use for cluster merging.
-     */
-    protected Linkage linkage = WardLinkage.STATIC;
-
-    /**
-     * CFTree factory used to create the CFTree.
+     * CFTree factory used for creating the tree structure.
      */
     CFTree.Factory<?> cffactory;
 
     /**
-     * Flag indicating whether to ignore cluster feature weights during computation.
+     * Flag indicating whether to ignore cluster feature weights during
+     * computation.
      */
-    boolean ignoreWeight;
+    boolean ignoreWeight = false;
 
-    /**
-     * Constructor.
-     *
-     * @param distance Distance function to use
-     * @param linkage Linkage method
-     * @param cffactory CFTree factory
-     * @param ignoreWeight Flag to ignore cluster feature weights
-     */
-    public BetulaAnderberg(CFDistance distance, Linkage linkage, CFTree.Factory<?> cffactory, boolean ignoreWeight) {
-        super();
-        this.distance = distance;
-        this.linkage = linkage;
-        this.cffactory = cffactory;
-        this.ignoreWeight = ignoreWeight;
-    }
-
-    /**
-     * Run the BETULA-based Anderberg hierarchical clustering algorithm.
-     *
-     * @param relation Relation
-     * @return Clustering hierarchy
-     */
-    public ClusterMergeHistory run(Relation<NumberVector> relation) {
-        final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
-        CFTree<?> tree = cffactory.newTree(ids, relation, true);
-        ArrayList<? extends ClusterFeature> cfs = tree.getLeaves();
-
-        ArrayList<DBIDs> idList = new ArrayList<>();
-        double[] dists = new double[cfs.size()];
-        ListIterator<? extends ClusterFeature> lit = cfs.listIterator();
-        int i = 0;
-        while(lit.hasNext()) {
-            ClusterFeature cf = lit.next();
-            idList.add(tree.getDBIDs(cf));
-            dists[i] = cf.variance() / cf.getWeight();
-            i++;
-        }
-
-        ClusterDistanceMatrix mat = initializeDistanceMatrix(cfs, distance);
-        ClusterMergeHistoryBuilder cmhb = initializeHistoryBuilder(idList, relation.size(), dists, mat.clustermap, ignoreWeight);
-        ClusterMergeHistory res = new Anderberg.Instance(linkage).run(mat, cmhb);
-        if(ignoreWeight) {
-            fixCount(cmhb);
-        }
-        return res;
-
-    }
-
-    /**
-     * Fix cluster counts when ignoring weights.
-     *
-     * @param cmhb Cluster merge history builder
-     */
-    protected static void fixCount(ClusterMergeHistoryBuilder cmhb) {
-
-        int m = cmhb.mergecount;
-        int n = m + 1;
-        for(int i = 0; i < m; i++) {
-            int a = cmhb.merges[i << 1];
-            int b = cmhb.merges[(i << 1) + 1];
-            cmhb.setSize(n + i, cmhb.getSize(a) + cmhb.getSize(b));
-        }
-    }
-
-    /**
-     * Initialize the cluster merge history builder with initial data.
-     *
-     * @param idList List of DBIDs for each cluster feature
-     * @param n Total number of objects
-     * @param dists Internal distances for each cluster feature
-     * @param clustermap Mapping from cluster indices to cluster IDs
-     * @param ignoreWeight Flag to ignore cluster feature weights
-     * @return Initialized cluster merge history builder
-     */
-    protected static ClusterMergeHistoryBuilder initializeHistoryBuilder(ArrayList<DBIDs> idList, int n, double[] dists, int[] clustermap, boolean ignoreWeight) {
-        ArrayModifiableDBIDs ids = DBIDUtil.newArray(n);
-        ClusterMergeHistoryBuilder cmhb = new ClusterMergeHistoryBuilder(ids, n, true);
-        Iterator<DBIDs> cluIter = idList.iterator();
-        for(int i = 0, j = 0; i < idList.size(); i++) {
-            DBIDIter iter = cluIter.next().iter();
-            ids.add(iter);
-            iter.advance();
-            int clunum = j++;
-            for(; iter.valid(); iter.advance(), j++) {
-                ids.add(iter);
-                clunum = cmhb.strictAdd(j, dists[i], clunum);
-            }
-            clustermap[i] = clunum;
-            if(ignoreWeight) {
-                if(clunum > j) {
-                    cmhb.setSize(clunum, 1);
-                }
-            }
-        }
-        return cmhb;
-    }
-
-    /**
-     * Initialize a distance matrix for clustering.
-     *
-     * @param cfs List of cluster features
-     * @param df Distance function to use
-     * @return Initialized cluster distance matrix
-     */
-    protected static ClusterDistanceMatrix initializeDistanceMatrix(ArrayList<? extends ClusterFeature> cfs, CFDistance df) {
-        ClusterDistanceMatrix mat = new ClusterDistanceMatrix(cfs.size());
-        final double[] matrix = mat.matrix;
-        FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", matrix.length, LOG) : null;
-        int pos = 0;
-        for(int i = 1; i < cfs.size(); i++) {
-            assert pos == ClusterDistanceMatrix.triangleSize(i);
-            for(int j = 0; j < i; j++) {
-                matrix[pos++] = df.squaredDistance(cfs.get(i), cfs.get(j));
-            }
-            if(prog != null) {
-                prog.setProcessed(pos, LOG);
-            }
-        }
-        // Avoid logging errors in case scratch space was too large:
-        if(prog != null) {
-            prog.setProcessed(matrix.length, LOG);
-        }
-        LOG.ensureCompleted(prog);
-        return mat;
+    @Override
+    public void configure(Parameterization config) {
+      cffactory = config.tryInstantiate(CFTree.Factory.class);
+      new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);
+      new ObjectParameter<Linkage>(AGNES.Par.LINKAGE_ID, Linkage.class) //
+          .setDefaultValue(WardLinkage.class) //
+          .grab(config, x -> linkage = x);
+      new ObjectParameter<CFDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, CFDistance.class, VarianceIncreaseDistance.class) //
+          .grab(config, x -> distance = x);
     }
 
     @Override
-    public TypeInformation[] getInputTypeRestriction() {
-        return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+    public BetulaAnderberg make() {
+      return new BetulaAnderberg(distance, linkage, cffactory, ignoreWeight);
     }
-
-    /**
-     * Parameterization class for BETULA-based Anderberg clustering.
-     *
-     * @author Andreas Lang
-     */
-    public static class Par implements Parameterizer {
-        /**
-         * Option ID for ignoring cluster weights (naive approach).
-         */
-        public static final OptionID IGNORE_WEIGHT_ID = new OptionID("betulaAnderberg.naive", "Treat leaves as single points, not weighted points.");
-
-        /**
-         * Current linkage method in use.
-         */
-        protected Linkage linkage;
-
-        /**
-         * The distance function to use.
-         */
-        protected CFDistance distance;
-
-        /**
-         * CFTree factory used for creating the tree structure.
-         */
-        CFTree.Factory<?> cffactory;
-
-        /**
-         * Flag indicating whether to ignore cluster feature weights during computation.
-         */
-        boolean ignoreWeight = false;
-
-        @Override
-        public void configure(Parameterization config) {
-            cffactory = config.tryInstantiate(CFTree.Factory.class);
-            new Flag(IGNORE_WEIGHT_ID).grab(config, x -> ignoreWeight = x);
-            new ObjectParameter<Linkage>(AGNES.Par.LINKAGE_ID, Linkage.class) //
-                    .setDefaultValue(WardLinkage.class) //
-                    .grab(config, x -> linkage = x);
-            new ObjectParameter<CFDistance>(Algorithm.Utils.DISTANCE_FUNCTION_ID, CFDistance.class, VarianceIncreaseDistance.class) //
-                    .grab(config, x -> distance = x);
-        }
-
-        @Override
-        public BetulaAnderberg make() {
-            return new BetulaAnderberg(distance, linkage, cffactory, ignoreWeight);
-        }
-    }
+  }
 
 }
