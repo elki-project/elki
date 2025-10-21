@@ -35,6 +35,7 @@ import elki.data.type.TypeUtil;
 import elki.database.StaticArrayDatabase;
 import elki.database.ids.DBIDArrayIter;
 import elki.database.ids.DBIDRange;
+import elki.database.ids.DBIDs;
 import elki.utilities.exceptions.AbortException;
 import elki.utilities.optionhandling.OptionID;
 import elki.utilities.optionhandling.Parameterizer;
@@ -42,7 +43,8 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * Output a cluster merge history in a scipy compatible format into a Numpy file.
+ * Output a cluster merge history in a scipy compatible format into a Numpy
+ * file.
  *
  * @author Andreas Lang
  */
@@ -88,8 +90,9 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
         result_path = outputFile.getParent().resolve(nameWithoutExtension + "." + extension);
       }
 
-      try (FileChannel channel = FileChannel.open(result_path, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
-        writeMergeHistory(channel,cmh, newResult);
+      try (
+          FileChannel channel = FileChannel.open(result_path, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING)) {
+        writeMergeHistory(channel, cmh, newResult);
         resultNo++;
       }
       catch(IOException e) {
@@ -99,34 +102,45 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
   }
 
   /**
-  * Writes the merge history information from a ClusterMergeHistory object to a specified file.
-  *
-  * @param file The FileChannel where the dendrogram will be written.
-  * @param cmh The ClusterMergeHistory object containing the dendrogram data to write.
-  * @param database The database containing the original data
-  * @throws IOException If an I/O error occurs while writing to the file.
-  */
+   * Writes the merge history information from a ClusterMergeHistory object to a
+   * specified file.
+   *
+   * @param file The FileChannel where the dendrogram will be written.
+   * @param cmh The ClusterMergeHistory object containing the dendrogram data to
+   *        write.
+   * @param database The database containing the original data
+   * @throws IOException If an I/O error occurs while writing to the file.
+   */
   public void writeMergeHistory(FileChannel file, ClusterMergeHistory cmh, Object database) throws IOException {
     int count = cmh.numMerges();
     double[][] data = new double[count][4];
-    if (cmh.getDBIDs() instanceof DBIDRange){
+    if(cmh.getDBIDs() instanceof DBIDRange) {
       for(int i = 0; i < count; i++) {
         data[i][0] = cmh.getMergeA(i);
         data[i][1] = cmh.getMergeB(i);
         data[i][2] = cmh.getMergeHeight(i);
         data[i][3] = cmh.getSize(i);
       }
-    } else {
+    }
+    else {
       LOG.warning("No DBID Range for Cluster Merge History found, trying to read DBIDs from the database");
+      DBIDRange ids = null;
       StaticArrayDatabase db = (StaticArrayDatabase) database;
-      DBIDRange ids = (DBIDRange) db.getRelation(TypeUtil.ANY).getDBIDs();
+      DBIDs pids = db.getRelation(TypeUtil.ANY).getDBIDs();
+      if(pids instanceof DBIDRange) {
+        ids = (DBIDRange) pids;
+      }
+      if(ids == null) {
+        LOG.warning("Cannot dump Cluster Merge History, as no well-defined DBIDRange to use for a unique column assignment could be found");
+        return;
+      }
       DBIDArrayIter aiter = cmh.getDBIDs().iter();
 
       for(int i = 0; i < count; i++) {
         final int mCountA = cmh.getMergeA(i);
-        data[i][0] = mCountA <= count ? ids.index(aiter.seek(mCountA)): mCountA;
+        data[i][0] = mCountA <= count ? ids.index(aiter.seek(mCountA)) : mCountA;
         final int mCountB = cmh.getMergeB(i);
-        data[i][1] = mCountB <= count ? ids.index(aiter.seek(mCountB)): mCountB;
+        data[i][1] = mCountB <= count ? ids.index(aiter.seek(mCountB)) : mCountB;
         data[i][2] = cmh.getMergeHeight(i);
         data[i][3] = cmh.getSize(i);
       }
@@ -134,18 +148,17 @@ public class NumpyClusterMergeHistoryDumper extends NumpyDumper implements Resul
     ByteBuffer bbuf = ByteBuffer.allocateDirect(data.length * 4 * Double.BYTES);
     bbuf.order(ByteOrder.LITTLE_ENDIAN);
     DoubleBuffer buf = bbuf.asDoubleBuffer();
-    for(int i=0; i<data.length;i++){
-      for (int j=0; j<data[i].length;j++){
+    for(int i = 0; i < data.length; i++) {
+      for(int j = 0; j < data[i].length; j++) {
         buf.put(data[i][j]);
       }
     }
-    Map<String,String> header= new HashMap<>();
+    Map<String, String> header = new HashMap<>();
     header.put("descr", "'<f8'");
     header.put("fortran_order", "False");
-    header.put("shape", "(" + count +", " + 4 +")");
+    header.put("shape", "(" + count + ", " + 4 + ")");
     writeNumpyArray(file, header, bbuf);
   }
-
 
   /**
    * Parameterization class.
