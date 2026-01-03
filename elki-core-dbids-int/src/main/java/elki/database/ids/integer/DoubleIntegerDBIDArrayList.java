@@ -389,4 +389,9 @@ class DoubleIntegerDBIDArrayList implements ModifiableDoubleDBIDList, DoubleInte
       return doubleValue() + ":" + internalGetIndex() + "@" + pos;
     }
   }
+
+  @Override
+  public int internalGetIndex(int index) {
+    return ids[index];
+  }
 }

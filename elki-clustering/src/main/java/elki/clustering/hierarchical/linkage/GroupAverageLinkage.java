@@ -20,6 +20,8 @@
  */
 package elki.clustering.hierarchical.linkage;
 
+import elki.distance.minkowski.SquaredEuclideanDistance;
+import elki.math.linearalgebra.VMath;
 import elki.utilities.Alias;
 import elki.utilities.Priority;
 import elki.utilities.documentation.Reference;
@@ -68,7 +70,7 @@ import elki.utilities.optionhandling.Parameterizer;
     bibkey = "journals/kansas/SokalM1958")
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
 @Priority(Priority.RECOMMENDED + 1)
-public class GroupAverageLinkage implements Linkage {
+public class GroupAverageLinkage implements GeometricLinkage {
   /**
    * Static instance of class.
    */
@@ -87,6 +89,17 @@ public class GroupAverageLinkage implements Linkage {
   @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
     return (sizex * dx + sizey * dy) / (double) (sizex + sizey);
+  }
+
+  @Override
+  public double[] merge(double[] x, int sizex, double[] y, int sizey) {
+    return VMath.timesPlusTimes(x, sizex / (double) (sizex + sizey), y, sizey / (double) (sizex + sizey));
+  }
+
+  // Geometric linkages are for squared Euclidean only, really!
+  @Override
+  public double linkage(double[] x, int sizex, double[] y, int sizey) {
+    return SquaredEuclideanDistance.STATIC.distance(x, y);
   }
 
   /**

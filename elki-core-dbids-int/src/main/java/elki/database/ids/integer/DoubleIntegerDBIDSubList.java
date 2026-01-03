@@ -163,4 +163,9 @@ public class DoubleIntegerDBIDSubList implements DoubleIntegerDBIDList {
       return this;
     }
   }
+
+  @Override
+  public int internalGetIndex(int index) {
+    return inner.internalGetIndex(index + begin);
+  }
 }

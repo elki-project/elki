@@ -26,6 +26,7 @@ import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.clustering.hierarchical.linkage.CentroidLinkage;
+import elki.clustering.hierarchical.linkage.GroupAverageLinkage;
 import elki.clustering.hierarchical.linkage.MedianLinkage;
 import elki.clustering.hierarchical.linkage.WardLinkage;
 import elki.data.Clustering;
@@ -51,6 +52,19 @@ public class LinearMemoryNNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
+  // Note: squared Euclidean, not regular Euclidean; but same result here
+  @Test
+  public void testGroupAverage() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+    Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
+        .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
+        .with(Algorithm.Utils.ALGORITHM_ID, LinearMemoryNNChain.class) //
+        .with(AGNES.Par.LINKAGE_ID, GroupAverageLinkage.class) //
+        .build().autorun(db);
+    assertFMeasure(db, clustering, 0.93866265);
+    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+  
   @Test
   public void testCentroid() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
@@ -63,9 +77,9 @@ public class LinearMemoryNNChainTest extends AbstractClusterAlgorithmTest {
     assertClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
 
-  // Note: The result differs from NNChainTest for Median Linkage!
+  // Note: squared Euclidean, not regular Euclidean for geometric Linkage
   @Test
-  public void testMedian() {
+  public void testSquaredMedian() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
     Clustering<?> clustering = new ELKIBuilder<>(CutDendrogramByNumberOfClusters.class) //
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
