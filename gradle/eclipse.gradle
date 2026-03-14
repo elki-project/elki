@@ -1,8 +1,3 @@
-import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
-import org.gradle.plugins.ide.api.PropertiesGeneratorTask;
-import org.gradle.api.internal.PropertiesTransformer;
-import org.gradle.util.ConfigureUtil;
-
 allprojects  {
   apply plugin: 'eclipse'
   eclipse {
@@ -13,8 +8,8 @@ allprojects  {
       downloadSources = true
     }
     jdt {
-      sourceCompatibility = 1.8
-      targetCompatibility = 1.8
+      sourceCompatibility = 25
+      targetCompatibility = 25
       file {
         withProperties {
           it.load new FileInputStream("$rootDir/conventions/elkiformatter.properties" as String)

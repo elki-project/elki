@@ -13,15 +13,18 @@ allprojects  {
   group = 'io.github.elki-project'
   version = '0.8.1-SNAPSHOT'
 
-  java.sourceCompatibility = 1.8
-  java.targetCompatibility = 1.8
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(25)
+    }
+  }
+  java.sourceCompatibility = 25
+  java.targetCompatibility = 25
   compileJava.options.encoding = 'UTF-8'
-  // compatiblity with gradle 9+
-  // not compatile with java 8
-  // tasks.withType(JavaCompile) {
-  //   options.release = 17
-  //   options.encoding = 'UTF-8'
-  // }
+  tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = 'UTF-8'
+  }
 
   ext.vendor = "ELKI Development Team"
   ext.url = "https://elki-project.github.io/"
@@ -40,4 +43,3 @@ apply from: 'gradle/jacoco.gradle'
 apply from: 'gradle/eclipse.gradle'
 apply from: 'gradle/dependencyPlot.gradle'
 apply from: 'gradle/signing.gradle'
-

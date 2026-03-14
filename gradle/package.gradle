@@ -42,26 +42,20 @@ subprojects {
     from("$rootDir/elki/src/main/resources/META-INF") {
       include "NOTICE"
       into "META-INF"
-      duplicatesStrategy DuplicatesStrategy.INCLUDE
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
     from("$rootDir/elki/src/main/resources/elki/LICENSE.txt") {
       rename "\\.txt\$", ""
       into "license"
-      duplicatesStrategy DuplicatesStrategy.INCLUDE
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
   }
-  // Build source jars:
-  task sourceJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
+  plugins.withType(JavaPlugin) {
+    java {
+      withSourcesJar()
+      withJavadocJar()
+    }
   }
-  artifacts.archives sourceJar
-  // Build javadoc jars:
-  task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
-  }
-  artifacts.archives javadocJar
   // Collect dependencies -- FIXME: does not work in Gradle 7 anymore
   tasks.register('collectDependencies', Sync) {
     description = "Collect dependencies"
@@ -77,8 +71,6 @@ configure(subprojects.findAll { isSnapshot || !project.hasProperty("signing.gnup
     publications {
       maven(MavenPublication) {
         from components.java
-        artifact(sourceJar)  { classifier = 'sources' }
-        artifact(javadocJar) { classifier = 'javadoc' }
         customizePom(pom, project)
       }
     }
@@ -95,4 +87,3 @@ configure(subprojects.findAll { isSnapshot || !project.hasProperty("signing.gnup
     } }
   }
 }
-

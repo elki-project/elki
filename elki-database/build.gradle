@@ -2,5 +2,5 @@ description = 'ELKI - Database'
 dependencies {
   api project(':elki-input')
   testImplementation project(':elki-core-dbids-int')
-  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+  testImplementation("junit:junit:[4.8,)")
 }

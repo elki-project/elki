@@ -21,7 +21,7 @@ def useuml = file('/usr/bin/dot').exists()
 subprojects {
   if (useuml) {
     configurations { umlDoclet }
-    dependencies { umlDoclet group: 'nl.talsmasoftware', name: 'umldoclet', version: '2.0.19' }
+    dependencies { umlDoclet("nl.talsmasoftware:umldoclet:2.0.19") }
   }
 
   // Javadoc options
@@ -65,8 +65,7 @@ subprojects {
       if(JavaVersion.current().isJava8()) addBooleanOption('Xdoclint:none', true)
       // Add --allow-script-in-comments if available (some 1.8 versions only)
       if(JavaVersion.current().isJava8Compatible()) addBooleanOption('-allow-script-in-comments', true)
-      if(JavaVersion.current().isJava9()) addBooleanOption('html4', true)
-      if(JavaVersion.current().isJava11()) addBooleanOption('-no-module-directories', true)
+      // html4 and -no-module-directories are obsolete with modern JDKs
       // UmlDoclet is optional - needs graphviz installed
       if (useuml) {
         docletpath = configurations.umlDoclet.files.asType(List)
@@ -88,14 +87,14 @@ subprojects {
       exclude "overview.html"
     }
     inputs.files fileTree("$rootDir/elki/src/main/javadoc")
-    duplicatesStrategy DuplicatesStrategy.INCLUDE
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     into "$project.buildDir/docs/javadoc"
   }
   javadoc.finalizedBy copyDocResources
   javadocJar.dependsOn copyDocResources
   // Additional documentation: parameters
   task documentParameters(type: JavaExec, dependsOn: classes) {
-    description "Generate parameter documentation"
+    description = "Generate parameter documentation"
     group = "Documentation"
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath
@@ -107,7 +106,7 @@ subprojects {
   // To use, add javadoc.dependsOn documentParameters
   // Additional documentation: references
   task documentReferences(type: JavaExec, dependsOn: classes) {
-    description "Generate references list"
+    description = "Generate references list"
     group = "Documentation"
     classpath = sourceSets.test.runtimeClasspath
     inputs.files classpath

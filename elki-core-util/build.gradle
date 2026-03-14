@@ -47,7 +47,7 @@ task generateCodeArrays(description: "Generate code from templates") {
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeArrays
-tasks.sourceJar.dependsOn generateCodeArrays
+tasks.named("sourcesJar").configure { dependsOn generateCodeArrays }
 
 task generateCodeHeaps(description: "Generate code from templates") {
       def pkg = "elki/utilities/datastructures/heap/";
@@ -139,11 +139,11 @@ task generateCodeHeaps(description: "Generate code from templates") {
       outputs.files fileTree(out)
 }
 tasks.compileJava.dependsOn generateCodeHeaps
-tasks.sourceJar.dependsOn generateCodeHeaps
+tasks.named("sourcesJar").configure { dependsOn generateCodeHeaps }
 
 dependencies {
   api project(':elki-logging')
-  api group: 'net.jafama', name: 'jafama', version:'[2.3.0,3)'
-  api group: 'it.unimi.dsi', name: 'fastutil', version: '[8,9)'
-  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+  api("net.jafama:jafama:[2.3.0,3)")
+  api("it.unimi.dsi:fastutil:[8,9)")
+  testImplementation("junit:junit:[4.8,)")
 }

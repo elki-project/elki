@@ -1,8 +1,8 @@
 configurations {
   // For bundle
   enabledModules {
-    canBeResolved true
-    transitive false
+    canBeResolved = true
+    transitive = false
     extendsFrom runtimeOnly
   }
 }
@@ -13,4 +13,3 @@ dependencies {
   configurations.all { exclude group: 'xml-apis', module: 'xml-apis' }
 }
 eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
-

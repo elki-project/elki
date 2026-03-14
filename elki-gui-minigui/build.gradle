@@ -1,5 +1,5 @@
 description = 'ELKI - MiniGUI Command Line Builder'
 dependencies {
   api project(':elki')
-  testImplementation group: 'junit', name: 'junit', version:'[4.8,)'
+  testImplementation("junit:junit:[4.8,)")
 }
