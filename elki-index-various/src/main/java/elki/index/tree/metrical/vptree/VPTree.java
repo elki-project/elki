@@ -336,7 +336,7 @@ public class VPTree<O> implements DistancePriorityIndex<O> {
           dists[i++] = distance(p, iter);
         }
       }
-      double median = QuickSelect.median(dists);
+      double median = QuickSelect.median(dists, 0, i);
       double ssq = 0;
       for(int j = 0; j < i; j++) {
         final double o = dists[j] - median;
