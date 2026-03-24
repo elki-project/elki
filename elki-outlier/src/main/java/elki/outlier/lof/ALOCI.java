@@ -412,7 +412,7 @@ public class ALOCI<V extends NumberVector> implements OutlierAlgorithm {
             center[d] -= width[d];
           }
         }
-        if(end - start < nmin) {
+        if(end - start <= nmin) {
           children.add(new Node(code, center, end - start, level, null));
           return;
         }
