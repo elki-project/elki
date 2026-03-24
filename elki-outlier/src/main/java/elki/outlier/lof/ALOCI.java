@@ -437,7 +437,7 @@ public class ALOCI<V extends NumberVector> implements OutlierAlgorithm {
             eiter.retract();
             continue;
           }
-          ids.swap(siter.getOffset(), eiter.getOffset() - 1);
+          ids.swap(siter.getOffset(), eiter.getOffset());
           siter.advance();
           eiter.retract();
         }
