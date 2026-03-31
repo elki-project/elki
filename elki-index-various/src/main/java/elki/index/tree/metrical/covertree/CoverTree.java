@@ -60,6 +60,12 @@ import elki.utilities.documentation.Reference;
  * Cover trees for nearest neighbor<br>
  * In Proc. 23rd Int. Conf. Machine Learning (ICML 2006)
  * <p>
+ * It includes similar (but independently developed) optimizations as in:
+ * <p>
+ * M. Izbicki, C. R. Shelton<br>
+ * Faster Cover Trees<br>
+ * In Proc. 32nd Int. Conf. Machine Learning (ICML 2015)
+ * <p>
  * This implementation uses metrical pruning, and keeps the distances to the
  * parent nodes. It thus needs more than twice the memory of
  * {@link SimplifiedCoverTree}, but computes fewer distances.
@@ -77,6 +83,11 @@ import elki.utilities.documentation.Reference;
     booktitle = "In Proc. 23rd Int. Conf. Machine Learning (ICML 2006)", //
     url = "https://doi.org/10.1145/1143844.1143857", //
     bibkey = "DBLP:conf/icml/BeygelzimerKL06")
+@Reference(authors = "M. Izbicki, C. R. Shelton", //
+    title = "Faster Cover Trees", //
+    booktitle = "In Proc. 32nd Int. Conf. Machine Learning (ICML 2015)", //
+    url = "http://proceedings.mlr.press/v37/izbicki15.html", //
+    bibkey = "DBLP:conf/icml/IzbickiS15")
 @Priority(Priority.RECOMMENDED)
 public class CoverTree<O> extends AbstractCoverTree<O> implements DistancePriorityIndex<O> {
   /**
