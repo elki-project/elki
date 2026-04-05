@@ -39,7 +39,7 @@ import elki.database.ids.DBIDVar;
  * on this order, they might produce unexpected results then. Also, some
  * algorithms such as NNchain can produce merge histories without back
  * references for other linkages because they operate locally. These are
- * automatically reordered by
+ * automatically reordered by a distance-priority topological traversal in
  * {@link ClusterMergeHistoryBuilder#optimizeOrder()}.
  *
  * @author Erich Schubert

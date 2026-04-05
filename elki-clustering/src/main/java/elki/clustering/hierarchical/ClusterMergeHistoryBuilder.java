@@ -26,7 +26,7 @@ import elki.database.datastore.*;
 import elki.database.ids.*;
 import elki.logging.Logging;
 import elki.math.MathUtil;
-import elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 
 /**
  * Class to help building a pointer hierarchy.
@@ -246,8 +246,9 @@ public class ClusterMergeHistoryBuilder {
   }
 
   /**
-   * Find an optimized processing order, where merges are by ascending depth
-   * where possible (not guaranteed for non-reducible linkages).
+   * Find an optimized processing order by ascending merge distance, while
+   * preserving topological order when inversions are present. Ties are left
+   * unspecified.
    * <p>
    * E.g., (a,b,2), (c,d,1), (ab,cd,3) is a valid merge sequence, but not well
    * ordered because the n largest splits do not come last.
@@ -260,26 +261,39 @@ public class ClusterMergeHistoryBuilder {
       return null; // No need to reorder
     }
     final int m = mergecount, n = ids.size();
-    int[] o1 = MathUtil.sequence(0, m);
-    // Sort by max height, merge height, merge number:
-    IntegerArrayQuickSort.sort(o1, (a, b) -> {
-      final int sa = csize[a], sb = csize[b];
-      if(sa < sb) {
-        return -1;
+    int[] parent = new int[m];
+    int[] pending = new int[m];
+    Arrays.fill(parent, -1);
+    for(int i = 0; i < m; i++) {
+      final int a = merges[i << 1], b = merges[(i << 1) + 1];
+      if(a >= n) {
+        final int ca = a - n;
+        assert parent[ca] < 0;
+        parent[ca] = i;
+        pending[i]++;
       }
-      if(sa > sb) {
-        return 1;
+      if(b >= n) {
+        final int cb = b - n;
+        assert parent[cb] < 0;
+        parent[cb] = i;
+        pending[i]++;
       }
-      final double da = mergeDistance[a], db = mergeDistance[b];
-      return da < db ? -1 : da > db ? +1 : (a > b ? -1 : +1);
-    });
-    // Now we need to ensure merges are consistent in their order
-    boolean[] seen = new boolean[m];
+    }
+    DoubleIntegerMinHeap queue = new DoubleIntegerMinHeap(m);
+    for(int i = 0; i < m; i++) {
+      if(pending[i] == 0) {
+        queue.add(mergeDistance[i], i);
+      }
+    }
     int[] order = new int[m];
     int size = 0;
-    for(int it : o1) {
-      if(!seen[it]) {
-        size = addRecursive(order, size, seen, it, n);
+    while(size < m) {
+      final int it = queue.peekValue();
+      queue.poll();
+      order[size++] = it;
+      final int p = parent[it];
+      if(p >= 0 && --pending[p] == 0) {
+        queue.add(mergeDistance[p], p);
       }
     }
     assert size == m;
@@ -302,7 +316,7 @@ public class ClusterMergeHistoryBuilder {
       md2[i] = mergeDistance[oi];
       csize2[i] = csize[oi];
       if(prototypes != null) {
-        prototypes2.add(prototypes2.assignVar(oi, tmp));
+        prototypes2.add(prototypes.assignVar(oi, tmp));
       }
     }
     mergeDistance = md2;
@@ -328,31 +342,5 @@ public class ClusterMergeHistoryBuilder {
       cur = next;
     }
     return true;
-  }
-
-  /**
-   * Recursively add merges (children first) to the order, to obtain a monotone
-   * ordering. As we processed entries with smaller distances first, this
-   * usually will not require much recursion, and subtrees with smaller height
-   * should already come first. Using the max height helps with inversions in
-   * irreducible linkages.
-   *
-   * @param order Output order
-   * @param size Current size
-   * @param seen Mask indicating processed entries
-   * @param it Current entry
-   * @param n Number of primary objects
-   * @return Size after additions
-   */
-  private int addRecursive(int[] order, int size, boolean[] seen, int it, int n) {
-    int a = merges[it << 1] - n, b = merges[(it << 1) + 1] - n;
-    if(a >= 0 && !seen[a]) {
-      size = addRecursive(order, size, seen, a, n);
-    }
-    if(b >= 0 && !seen[b]) {
-      size = addRecursive(order, size, seen, b, n);
-    }
-    seen[order[size++] = it] = true;
-    return size;
   }
 }
