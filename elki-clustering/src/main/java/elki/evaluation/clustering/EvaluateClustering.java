@@ -327,7 +327,7 @@ public class EvaluateClustering implements Evaluator {
 
     @Override
     public EvaluateClustering make() {
-      return new EvaluateClustering(referencealg, noiseSpecialHandling, !selfPairing);
+      return new EvaluateClustering(referencealg, noiseSpecialHandling, selfPairing);
     }
   }
 }

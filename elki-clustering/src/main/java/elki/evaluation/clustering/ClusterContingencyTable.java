@@ -54,7 +54,7 @@ public class ClusterContingencyTable {
   /**
    * Self pairing
    */
-  protected boolean selfPairing = true;
+  protected boolean selfPairing = false;
 
   /**
    * Number of clusters.
