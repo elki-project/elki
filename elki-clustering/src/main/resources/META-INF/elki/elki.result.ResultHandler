@@ -1,1 +1,2 @@
 elki.result.ClusteringVectorDumper
+elki.result.ClusterMergeHistoryDumper
