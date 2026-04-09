@@ -156,7 +156,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
     if(!clusterings.isEmpty()) {
       try {
-        new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(newResult);
+        new EvaluateClustering(new ByLabelClustering(), false, false).processNewResult(newResult);
       }
       catch(NoSupportedDataTypeException e) {
         // Pass - the data probably did not have labels.
