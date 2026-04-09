@@ -280,7 +280,7 @@ public class HACAM<O> implements HierarchicalClusteringAlgorithm {
       mat.clustermap[x] = -1; // Deactivate removed cluster
       besti[x] = -1; // Deactivate x in cache
       updateMatrices(x, y);
-      if(besti[y] == x) {
+      if(y > 0) {
         findBest(distances, bestd, besti, y);
       }
     }

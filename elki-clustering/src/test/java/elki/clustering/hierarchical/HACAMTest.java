@@ -45,8 +45,8 @@ public class HACAMTest extends AbstractClusterAlgorithmTest {
         .with(CutDendrogramByNumberOfClusters.Par.MINCLUSTERS_ID, 3) //
         .with(Algorithm.Utils.ALGORITHM_ID, HACAM.class) //
         .build().autorun(db);
-    assertFMeasure(db, clustering, 0.93866);
-    assertClusterSizes(clustering, new int[] { 200, 211, 227 });
+    assertFMeasure(db, clustering, 0.939988);
+    assertClusterSizes(clustering, new int[] { 200, 204, 234 });
   }
 
   @Test
