@@ -212,7 +212,7 @@ public abstract class AbstractHDBSCAN<O> implements Algorithm {
   }
 
   /**
-   * Convert spanning tree to a pointer representation.
+   * Convert spanning tree to a merge list representation.
    * <p>
    * Note: the heap must use the correct encoding of indexes.
    *

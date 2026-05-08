@@ -184,6 +184,9 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       final int n = merges.size();
 
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", merges.numMerges(), LOG) : null;
+      // Pre-allocate GLOSH store and last-merge-height store for intermediate scoring during grow.
+      final WritableDoubleDataStore glosh = DataStoreUtil.makeDoubleStorage(merges.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 1.0);
+      final WritableDoubleDataStore lastMerge = DataStoreUtil.makeDoubleStorage(merges.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       // Perform one join at a time, in increasing order
       for(int i = 0, m = merges.numMerges(); i < m; i++) {
         final double dist = merges.getMergeHeight(i); // Join distance
@@ -209,9 +212,15 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         else {
           // Prefer recycling a non-spurious cluster (could have children!)
           if(!oSpurious && oclus != null) {
+            if(oclus.children.isEmpty() && oclus.members.size() >= minClSize) {
+              scoreBeforeGrow(oclus, glosh, lastMerge);
+            }
             nclus = a < n ? oclus.grow(i, dist, merges.assignVar(a, tmp)) : oclus.grow(i, dist, cclus);
           }
           else if(!cSpurious && cclus != null) {
+            if(cclus.children.isEmpty() && cclus.members.size() >= minClSize) {
+              scoreBeforeGrow(cclus, glosh, lastMerge);
+            }
             nclus = b < n ? cclus.grow(i, dist, merges.assignVar(b, tmp)) : cclus.grow(i, dist, oclus);
           }
           // ospurious, but recycle the existing cluster, but reset
@@ -234,11 +243,10 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       LOG.ensureCompleted(progress);
 
       // Build final dendrogram, and compute GLOSH scores:
-      WritableDoubleDataStore glosh = DataStoreUtil.makeDoubleStorage(merges.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       final Clustering<DendrogramModel> dendrogram = new Clustering<>();
       Metadata.of(dendrogram).setLongName("Hierarchical Clustering");
       for(TempCluster clus : cluster_map.values()) {
-        finalizeCluster(clus, dendrogram, glosh, null, false);
+        finalizeCluster(clus, dendrogram, glosh, null, false, lastMerge);
       }
       // Also store GLOSH scores.
       Metadata.hierarchyOf(dendrogram).addChild(glosh);
@@ -257,16 +265,36 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     }
 
     /**
-     * Make the cluster for the given object
+     * Score members of a leaf cluster at its current height before growing it into another cluster.
+     * This ensures correct GLOSH scores for points that are scored during grow-time rather than
+     * at finalization time. The caller must ensure the cluster is a leaf with sufficient members.
+     *
+     * @param clus Cluster to score (must be a leaf with sufficient members)
+     * @param glosh GLOSH scores store
+     * @param lastMerge Merge height tracking store
+     */
+    private void scoreBeforeGrow(TempCluster clus, WritableDoubleDataStore glosh, WritableDoubleDataStore lastMerge) {
+      for(DBIDIter it = clus.members.iter(); it.valid(); it.advance()) {
+        double cored = coredist != null ? coredist.doubleValue(it) : clus.dist;
+        cored = cored >= clus.dmin ? cored : clus.dmin;
+        glosh.put(it, cored > 0 ? 1. - clus.dmin / cored : 0.);
+        lastMerge.putDouble(it, clus.dist);
+      }
+    }
+
+    /**
+     * Make the cluster for the given object.
      *
      * @param temp Current temporary cluster
      * @param clustering Parent clustering
      * @param glosh GLOSH scores output
      * @param parent Parent cluster (for hierarchical output)
      * @param flatten Flag to flatten all clusters below
+     * @param lastMerge Optional store tracking the merge height at which each point was scored during grow-time.
+     *                  Points with lastMerge strictly less than temp.dist are skipped to avoid double-scoring.
      * @return smallest distance when the cluster exists
      */
-    private double finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, Cluster<DendrogramModel> parent, boolean flatten) {
+    private double finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, Cluster<DendrogramModel> parent, boolean flatten, WritableDoubleDataStore lastMerge) {
       final String name = "C_" + FormatUtil.NF6.format(temp.dist);
       DendrogramModel model;
       if(temp.members != null && !temp.members.isEmpty() && merges instanceof ClusterPrototypeMergeHistory) {
@@ -282,8 +310,12 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       else {
         clustering.addToplevelCluster(clus);
       }
-      double dmin = collectChildren(temp, clustering, glosh, temp, clus, flatten);
+      double dmin = collectChildren(temp, clustering, glosh, temp, clus, flatten, lastMerge);
       for(DBIDIter it = temp.members.iter(); it.valid(); it.advance()) {
+        // Skip if this point was already scored at a strictly lower height during grow-time.
+          if(lastMerge.doubleValue(it) < temp.dist) {
+            continue;
+          }
         // Note: we work with dists = 1/f.
         double cdist = coredist != null ? coredist.doubleValue(it) : temp.dist;
         cdist = cdist >= dmin ? cdist : dmin;
@@ -298,24 +330,27 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
     /**
      * Recursive flattening of clusters.
      *
-     * @param temp Temporary cluster
+     * @param temp Temporary cluster to collect members into
      * @param clustering Output clustering
      * @param glosh GLOSH scores output
      * @param cur Current temporary cluster
      * @param clus Output cluster
      * @param flatten Flag to indicate everything below should be flattened
+     * @param lastMerge Optional store tracking the merge height at which each point was scored during grow-time.
+     *                  Used to avoid double-scoring points that were already scored at a lower height.
      * @return smallest distance when the cluster exists
      */
-    private double collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
+    private double collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, WritableDoubleDataStore glosh, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten, WritableDoubleDataStore lastMerge) {
       double dmin = cur.dmin;
       for(TempCluster child : cur.children) {
         double cdmin;
-        if(flatten || child.totalStability() < 0) {
+        // Also flatten ties.
+        if(flatten || child.dist == cur.dist || child.totalStability() < 0) {
           temp.members.addDBIDs(child.members);
-          cdmin = collectChildren(temp, clustering, glosh, child, clus, flatten);
+          cdmin = collectChildren(temp, clustering, glosh, child, clus, flatten, lastMerge);
         }
         else {
-          cdmin = finalizeCluster(child, clustering, glosh, clus, true);
+          cdmin = finalizeCluster(child, clustering, glosh, clus, true, lastMerge);
         }
         dmin = dmin < cdmin ? dmin : cdmin;
       }

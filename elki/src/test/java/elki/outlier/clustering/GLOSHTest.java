@@ -45,8 +45,8 @@ public class GLOSHTest extends AbstractOutlierAlgorithmTest {
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 2) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.5614);
-    assertSingleScore(result, 416, 0.995778);
+    assertAUC(db, "Noise", result, 0.54503);
+    assertSingleScore(result, 416, 0.99578);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class GLOSHTest extends AbstractOutlierAlgorithmTest {
         .with(Algorithm.Utils.ALGORITHM_ID, HDBSCANLinearMemory.class) //
         .with(HDBSCANLinearMemory.Par.MIN_PTS_ID, 5) //
         .build().autorun(db);
-    assertAUC(db, "Noise", result, 0.89913);
+    assertAUC(db, "Noise", result, 0.88947);
     assertSingleScore(result, 416, 0.95125);
   }
 }
