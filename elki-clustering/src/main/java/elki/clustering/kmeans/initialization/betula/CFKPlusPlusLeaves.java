@@ -165,7 +165,11 @@ public class CFKPlusPlusLeaves extends AbstractCFKMeansInitialization {
     double weightsum = 0.;
     int i = 0;
     for(AsClusterFeature cf : cfs) {
-      weightsum += weights[i++] = distance.squaredWeight(first, cf.getCF());
+      if (first == cf) {
+        weights[i++] = 0.;
+      } else {
+        weightsum += weights[i++] = distance.squaredWeight(first, cf.getCF());
+      }
     }
     return weightsum;
   }
