@@ -19,9 +19,11 @@ elki.outlier.OPTICSOF
 elki.outlier.SimpleCOP
 elki.outlier.subspace.OutRankS1
 elki.outlier.subspace.OutRankS1HDBSCAN
+elki.projection.Isomap
 elki.projection.BarnesHutTSNE
 elki.projection.TSNE t-SNE tSNE
 elki.projection.SNE
+elki.projection.UMAP
 elki.algorithm.statistics.AddSingleScale
 elki.algorithm.statistics.AddUniformScale
 elki.algorithm.statistics.AveragePrecisionAtK

@@ -46,7 +46,7 @@ public abstract class AbstractProjectionAlgorithm<R> implements Algorithm {
   /**
    * Flag to keep the original projection
    */
-  public static final OptionID KEEP_ID = new OptionID("tsne.retain-original", "Retain the original data.");
+  public static final OptionID KEEP_ID = new OptionID("projection.retain-original", "Retain the original data.");
 
   /**
    * Constructor.
