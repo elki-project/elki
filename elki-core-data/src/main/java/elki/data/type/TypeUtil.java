@@ -26,6 +26,7 @@ import elki.data.DoubleVector;
 import elki.data.ExternalID;
 import elki.data.FeatureVector;
 import elki.data.FloatVector;
+import elki.data.IntegerVector;
 import elki.data.LabelList;
 import elki.data.NumberVector;
 import elki.data.SimpleClassLabel;
@@ -149,6 +150,11 @@ public final class TypeUtil {
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
   public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(FloatVector.class);
+
+  /**
+   * Input type for algorithms that require integer vector fields.
+   */
+  public static final VectorTypeInformation<IntegerVector> INTEGER_VECTOR = VectorTypeInformation.typeRequest(IntegerVector.class);
 
   /**
    * Input type for algorithms that require bit vectors.

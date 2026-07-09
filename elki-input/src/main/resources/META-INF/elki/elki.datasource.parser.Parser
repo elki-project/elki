@@ -8,3 +8,4 @@ elki.datasource.parser.BitVectorLabelParser
 elki.datasource.parser.SimplePolygonParser
 elki.datasource.parser.StringParser
 elki.datasource.parser.SimpleTransactionParser
+elki.datasource.parser.SPMFTextFormatParser
