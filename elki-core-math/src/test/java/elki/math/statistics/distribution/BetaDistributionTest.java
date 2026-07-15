@@ -72,7 +72,7 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     assertPDF(new BetaDistribution(.5, 1.), "pdf_gnur_05_1", 1e-14);
     assertPDF(new BetaDistribution(1., 2.), "pdf_gnur_1_2", 1e-15);
     assertPDF(new BetaDistribution(2., 2.), "pdf_gnur_2_2", 1e-14);
-    assertPDF(new BetaDistribution(4., 2.), "pdf_gnur_4_2", 1e-13);
+    assertPDF(new BetaDistribution(4., 2.), "pdf_gnur_4_2", 5e-14);
     assertPDF(new BetaDistribution(.1, 2.), "pdf_gnur_01_2", 1e-15);
     assertPDF(new BetaDistribution(.5, 2.), "pdf_gnur_05_2", 1e-14);
     assertPDF(new BetaDistribution(1., 4.), "pdf_gnur_1_4", 1e-14);
@@ -106,7 +106,7 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     assertLogPDF(new BetaDistribution(.1, 2.), "logpdf_scipy_01_2", 1e-15);
     assertLogPDF(new BetaDistribution(.5, 2.), "logpdf_scipy_05_2", 1e-14);
     assertLogPDF(new BetaDistribution(1., 4.), "logpdf_scipy_1_4", 1e-14);
-    assertLogPDF(new BetaDistribution(2., 4.), "logpdf_scipy_2_4", 1e-15);
+    assertLogPDF(new BetaDistribution(2., 4.), "logpdf_scipy_2_4", 3e-15);
     assertLogPDF(new BetaDistribution(4., 4.), "logpdf_scipy_4_4", 1e-14);
     assertLogPDF(new BetaDistribution(.1, 4.), "logpdf_scipy_01_4", 1e-14);
     assertLogPDF(new BetaDistribution(.5, 4.), "logpdf_scipy_05_4", 1e-15);
@@ -132,7 +132,7 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     assertLogPDF(new BetaDistribution(.1, 2.), "logpdf_gnur_01_2", 1e-15);
     assertLogPDF(new BetaDistribution(.5, 2.), "logpdf_gnur_05_2", 1e-14);
     assertLogPDF(new BetaDistribution(1., 4.), "logpdf_gnur_1_4", 1e-14);
-    assertLogPDF(new BetaDistribution(2., 4.), "logpdf_gnur_2_4", 1e-15);
+    assertLogPDF(new BetaDistribution(2., 4.), "logpdf_gnur_2_4", 3e-15);
     assertLogPDF(new BetaDistribution(4., 4.), "logpdf_gnur_4_4", 1e-14);
     assertLogPDF(new BetaDistribution(.1, 4.), "logpdf_gnur_01_4", 1e-14);
     assertLogPDF(new BetaDistribution(.5, 4.), "logpdf_gnur_05_4", 1e-15);

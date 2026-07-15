@@ -71,8 +71,8 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
 
     // SciPy (like us) and GnuR differ at the end of the definition area.
     assertPDF(new GeneralizedExtremeValueDistribution(.2, 1, .8), "pdf_gnur_08_02_1", 1e-15);
-    assertPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "pdf_gnur_1_05_1", 1.);
-    assertPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "pdf_gnur_1_05_05", 2.);
+    assertPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "pdf_gnur_1_05_1", 1e-15);
+    assertPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "pdf_gnur_1_05_05", 1e-15);
     assertPDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "pdf_gnur_2_05_05", 1e-15);
     assertPDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "pdf_gnur_4_05_05", 1e-15);
     // GnuR also does not allow negative shape.

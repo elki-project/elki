@@ -77,7 +77,7 @@ public class AbstractDistributionTest {
     assertEquals("Not zero at almost neginf", 0., d.pdf(-Double.MAX_VALUE), 0.);
     assertEquals("Not zero at posinf", 0., d.pdf(Double.POSITIVE_INFINITY), 0.);
     assertEquals("Not zero at almost posinf", 0., d.pdf(Double.MAX_VALUE), 0.);
-    int maxerrlev = -15;
+    double maxerrlev = -15;
     for(int i = 0; i < data.length;) {
       double x = data[i++], exp = data[i++];
       double val = d.pdf(x);
@@ -85,15 +85,20 @@ public class AbstractDistributionTest {
         continue;
       }
       double diff = Math.abs(val - exp);
-      final int errlev = (int) Math.ceil(Math.log10(diff / exp));
+      if (Math.abs(exp) > 0.) {
+      final double errlev =  Math.log10(diff / Math.abs(exp));
+      if (Double.isNaN(errlev) || errlev == Double.POSITIVE_INFINITY) {
+        System.err.println("Invalid error level: "+errlev+" for "+x+" exp="+exp+" val="+val);
+      }
       maxerrlev = Math.max(errlev, maxerrlev);
+    }
       if(diff < err || diff / exp < err) {
         continue;
       }
-      assertEquals("Error magnitude: 1e" + errlev + " at " + x, exp, val, err);
+      assertEquals("Error magnitude: " + diff + " at " + x, exp, val, err);
     }
-    int given = (int) Math.floor(Math.log10(err * 1.1));
-    assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
+    double given = Math.log10(err);
+    assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, (given - maxerrlev) < 1.2);
   }
 
   public void assertLogPDF(Distribution d, String key, double err) {
