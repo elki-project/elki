@@ -62,8 +62,14 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
    */
   private static final Logging LOG = Logging.getLogger(KMeansCoverTree.class);
 
+  /**
+   * whether to collect mean statistics.
+   */
   private boolean meanstat;
 
+  /**
+   * Number of nodes in the tree.
+   */
   int size = 0;
 
   /**
@@ -71,13 +77,23 @@ public class KMeansCoverTree<V extends NumberVector> extends AbstractCoverTree<V
    */
   private Node root = null;
 
+  /**
+   * Constructor.
+   *
+   * @param relation relation
+   * @param distance distance function
+   * @param expansion expansion rate
+   * @param truncate truncation threshold
+   * @param meanstat whether to collect mean statistics
+   */
   public KMeansCoverTree(Relation<V> relation, Distance<? super V> distance, double expansion, int truncate, boolean meanstat) {
     super(relation, distance, expansion, truncate);
     this.meanstat = meanstat;
   }
 
   /**
-   * 
+   * Get the root node of the tree.
+   *
    * @return Root node of the tree
    */
   protected Node getRoot() {

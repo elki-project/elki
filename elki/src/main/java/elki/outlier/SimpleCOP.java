@@ -178,6 +178,7 @@ public class SimpleCOP<V extends NumberVector> implements OutlierAlgorithm {
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> implements Parameterizer {
     /**

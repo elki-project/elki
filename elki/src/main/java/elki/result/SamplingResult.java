@@ -49,6 +49,8 @@ public class SamplingResult {
   }
 
   /**
+   * Get the current sample.
+   *
    * @return the current sample
    */
   public DBIDs getSample() {
@@ -64,12 +66,20 @@ public class SamplingResult {
     this.sample = sample;
   }
 
-  // @Override
+  /**
+   * Get the long name for this result.
+   *
+   * @return long name
+   */
   public String getLongName() {
     return "Sample";
   }
 
-  // @Override
+  /**
+   * Get the short name for this result.
+   *
+   * @return short name
+   */
   public String getShortName() {
     return "sample";
   }

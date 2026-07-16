@@ -460,6 +460,7 @@ public class DeLiClu<V extends NumberVector> implements OPTICSTypeAlgorithm {
    * Parameterization class.
    *
    * @author Erich Schubert
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> implements Parameterizer {
     /**

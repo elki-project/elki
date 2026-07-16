@@ -334,6 +334,7 @@ public class ORLibBenchmark extends AbstractApplication {
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * @param <O> data type
    */
   public static class Par<O> extends AbstractApplication.Par {
     /**

@@ -29,6 +29,7 @@ import elki.result.textwriter.TextWriterWriterInterface;
  * @author Erich Schubert
  * @since 0.4.0
  * 
+ * @param <T> element type
  */
 public class TextWriterObjectArray<T> extends TextWriterWriterInterface<T[]> {
   /**

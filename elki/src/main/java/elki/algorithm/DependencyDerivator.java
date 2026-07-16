@@ -249,6 +249,7 @@ public class DependencyDerivator<V extends NumberVector> implements Algorithm {
    * Parameterization class.
    *
    * @author Erich Schubert
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> implements Parameterizer {
     /**

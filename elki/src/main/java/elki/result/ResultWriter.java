@@ -89,6 +89,7 @@ public class ResultWriter implements ResultHandler {
    * @param gzip Gzip compression
    * @param warnoverwrite Warn before overwriting files
    * @param filter Filter pattern
+   * @param clusterOverviewOnly only write cluster overview
    */
   public ResultWriter(Path out, boolean gzip, boolean warnoverwrite, Pattern filter, boolean clusterOverviewOnly) {
     super();
@@ -163,7 +164,7 @@ public class ResultWriter implements ResultHandler {
     public static final OptionID FILTER_PATTERN_ID = new OptionID("out.filter", "Filter pattern for output selection. Only output streams that match the given pattern will be written.");
 
     /**
-     * 
+     * Option to only print cluster overview information.
      */
     public static OptionID SHORTEN_CLUSTER_ID = new OptionID("out.overviewonly", "Only print cluster information, not the data itself.");
 

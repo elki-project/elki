@@ -160,6 +160,9 @@ public class Isomap<O> extends AbstractProjectionAlgorithm<Relation<DoubleVector
   /**
    * Build a symmetric kNN graph.
    * 
+   * @param relation input relation
+   * @param ids ID iteration enum
+   * @param adj adjacency list output
    * @param wts Output weight list, where {@code wts[i]} will contain the
    *        corresponding distances to the neighbors in {@code adj[i]}.
    */

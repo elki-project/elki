@@ -99,15 +99,18 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
   }
 
   /**
-   * Inner Class for Cover Tree k-means
-   * 
+   * Inner Class for Cover Tree k-means.
+   *
    * @author Andreas Lang
    */
   protected abstract static class Instance extends AbstractKMeans.Instance {
+    /**
+     * Cover tree.
+     */
     KMeansCoverTree<? extends NumberVector> tree;
 
     /**
-     * inter cluster distances
+     * Inter cluster distances.
      */
     double[][] cdist;
 
@@ -157,6 +160,7 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
      * @param relation Relation
      * @param df Distance function
      * @param means Initial means
+     * @param tree Cover tree
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
       super(relation, df, means);
@@ -268,8 +272,8 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
     }
 
     /**
-     * Adds all elements of a node to the cluster lists
-     * 
+     * Adds all elements of a node to the cluster lists.
+     *
      * @param cur current node
      */
     public void generateCover(Node cur) {
@@ -332,7 +336,9 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
     }
 
     /**
-     * Validate that every point is assigned to a cluster (expensive)
+     * Validate that every point is assigned to a cluster (expensive).
+     *
+     * @return true if all points are assigned
      */
     public boolean testSizes() {
       int count = 0;
@@ -410,6 +416,7 @@ public abstract class AbstractCoverTreeKMeans<V extends NumberVector> extends Ab
    * Parameterization class.
    *
    * @author Andreas Lang
+   * @param <V> vector type
    */
   public abstract static class Par<V extends NumberVector> extends AbstractKMeans.Par<V> {
     /**

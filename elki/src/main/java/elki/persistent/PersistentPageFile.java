@@ -285,7 +285,11 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
     }
   }
 
-  /** @return the random access file storing the pages. */
+  /**
+   * Get the file channel.
+   *
+   * @return the file channel
+   */
   public FileChannel getFile() {
     return file;
   }

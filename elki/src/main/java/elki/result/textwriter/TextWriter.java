@@ -136,6 +136,7 @@ public class TextWriter {
    * @param r Result class
    * @param streamOpener output stream manager
    * @param filter Filter pattern
+   * @param clusterOverviewOnly only write cluster overview
    * @throws IOException on IO error
    */
   @SuppressWarnings("unchecked")
@@ -260,6 +261,7 @@ public class TextWriter {
    * @param clus Cluster to write
    * @param ra Data relations
    * @param naming Naming scheme
+   * @param clusterOverviewOnly only write cluster overview
    * @throws IOException on IO error
    */
   private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming, boolean clusterOverviewOnly) throws IOException {

@@ -104,6 +104,7 @@ public class CoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKM
      * @param relation Relation
      * @param df Distance function
      * @param means Initial means
+     * @param tree Cover tree
      */
     public Instance(Relation<? extends NumberVector> relation, NumberVectorDistance<?> df, double[][] means, KMeansCoverTree<? extends NumberVector> tree) {
       super(relation, df, means, tree);
@@ -327,6 +328,7 @@ public class CoverTreeKMeans<V extends NumberVector> extends AbstractCoverTreeKM
    * Parameterization class.
    *
    * @author Andreas Lang
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> extends AbstractCoverTreeKMeans.Par<V> {
     @Override

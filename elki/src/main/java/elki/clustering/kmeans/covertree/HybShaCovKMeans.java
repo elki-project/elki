@@ -498,6 +498,7 @@ public class HybShaCovKMeans<V extends NumberVector> extends HybExpCovKMeans<V> 
    * Parameterization class.
    *
    * @author Andreas Lang
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> extends HybExpCovKMeans.Par<V> {
     @Override

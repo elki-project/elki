@@ -391,6 +391,8 @@ public class EvaluateRetrievalPerformance<O> implements Algorithm {
     }
 
     /**
+     * Get the area under curve.
+     *
      * @return the area under curve
      */
     public double getAUROC() {
@@ -398,18 +400,28 @@ public class EvaluateRetrievalPerformance<O> implements Algorithm {
     }
 
     /**
+     * Get the mean average precision.
+     *
      * @return the medium average precision
      */
     public double getMAP() {
       return map;
     }
 
-    // @Override
+    /**
+     * Get the long name for this result.
+     *
+     * @return long name
+    */
     public String getLongName() {
       return "Distance function retrieval evaluation.";
     }
 
-    // @Override
+    /**
+     * Get the short name for this result.
+     *
+     * @return short name
+     */
     public String getShortName() {
       return "distance-retrieval-evaluation";
     }

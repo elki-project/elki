@@ -48,6 +48,8 @@ public class SelectionResult {
   }
 
   /**
+   * Get the current selection.
+   *
    * @return the selection
    */
   public DBIDSelection getSelection() {
@@ -55,18 +57,28 @@ public class SelectionResult {
   }
 
   /**
+   * Set the selection.
+   *
    * @param selection the selection to set
    */
   public void setSelection(DBIDSelection selection) {
     this.selection = selection;
   }
 
-  // @Override
+  /**
+   * Get the long name for this result.
+   *
+   * @return long name
+   */
   public String getLongName() {
     return "Selection";
   }
 
-  // @Override
+  /**
+   * Get the short name for this result.
+   *
+   * @return short name
+   */
   public String getShortName() {
     return "selection";
   }

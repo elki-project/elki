@@ -41,6 +41,7 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import elki.utilities.datastructures.unionfind.WeightedQuickUnionInteger;
+import elki.utilities.documentation.Reference;
 
 /**
  * Index accelerated HDBSCAN* clustering algorithm with a heap-of-searchers
@@ -48,12 +49,21 @@ import elki.utilities.datastructures.unionfind.WeightedQuickUnionInteger;
  * but will need fewer distance computations.
  * <p>
  * Reference:
+ * <p>
+ * Erich Schubert<br>
+ * Hierarchical Density-Based Clustering Using Incremental Similarity Search<br>
+ * Proc. Similarity Search and Applications, SISAP 2025
  *
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
 @Alias({ "HDBSCAN-BoruvkaS" })
+@Reference(authors = "Erich Schubert", //
+    title = "Hierarchical Density-Based Clustering Using Incremental Similarity Search", //
+    booktitle = "Proc. Similarity Search and Applications, SISAP 2025", //
+    bibkey = "DBLP:conf/sisap/Schubert25", //
+    url = "https://doi.org/10.1007/978-3-032-06069-3_21")
 public class HDBSCANBoruvkaS<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

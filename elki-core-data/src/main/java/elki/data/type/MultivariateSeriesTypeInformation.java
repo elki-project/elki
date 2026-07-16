@@ -55,7 +55,6 @@ public class MultivariateSeriesTypeInformation<V extends FeatureVector<?>> exten
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    * @param multiplicity Number of variates
-   * @return type information
    */
   public MultivariateSeriesTypeInformation(Class<? super V> cls, int mindim, int maxdim, int multiplicity) {
     super(cls, mindim, maxdim);

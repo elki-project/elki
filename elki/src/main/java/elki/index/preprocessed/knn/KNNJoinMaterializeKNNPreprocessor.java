@@ -63,12 +63,20 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends SpatialComparable> exte
     return LOG;
   }
 
-  // @Override
+  /**
+   * Get the long name for this preprocessor.
+   *
+   * @return long name
+   */
   public String getLongName() {
     return "knn-join materialized neighbors";
   }
 
-  // @Override
+  /**
+   * Get the short name for this preprocessor.
+   *
+   * @return short name
+   */
   public String getShortName() {
     return "knn-join";
   }

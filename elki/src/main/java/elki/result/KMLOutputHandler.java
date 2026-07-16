@@ -199,6 +199,14 @@ public class KMLOutputHandler implements ResultHandler {
     }
   }
 
+  /**
+   * Write outlier result to KML format.
+   *
+   * @param xmlw XML stream writer
+   * @param outlierResult outlier result
+   * @param database input database
+   * @throws XMLStreamException if writing fails
+   */
   private void writeOutlierResult(XMLStreamWriter xmlw, OutlierResult outlierResult, Database database) throws XMLStreamException {
     Relation<PolygonsObject> polys = database.getRelation(TypeUtil.POLYGON_TYPE);
     Relation<String> labels = DatabaseUtil.guessObjectLabelRepresentation(database);
@@ -350,6 +358,14 @@ public class KMLOutputHandler implements ResultHandler {
     xmlw.writeEndDocument();
   }
 
+  /**
+   * Write clustering result to KML format.
+   *
+   * @param xmlw XML stream writer
+   * @param clustering clustering result
+   * @param database input database
+   * @throws XMLStreamException if writing fails
+   */
   private void writeClusteringResult(XMLStreamWriter xmlw, Clustering<Model> clustering, Database database) throws XMLStreamException {
     xmlw.writeStartDocument();
     xmlw.writeCharacters("\n");

@@ -43,6 +43,7 @@ import elki.utilities.datastructures.arrays.ArrayUtil;
 import elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import elki.utilities.datastructures.unionfind.WeightedQuickUnionInteger;
+import elki.utilities.documentation.Reference;
 import elki.utilities.optionhandling.Parameterizer;
 import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -54,11 +55,19 @@ import elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Reference:
  * <p>
+ * Erich Schubert<br>
+ * Hierarchical Density-Based Clustering Using Incremental Similarity Search<br>
+ * Proc. Similarity Search and Applications, SISAP 2025
  *
  * @author Erich Schubert
  *
  * @param <O> Object type
  */
+@Reference(authors = "Erich Schubert", //
+    title = "Hierarchical Density-Based Clustering Using Incremental Similarity Search", //
+    booktitle = "Proc. Similarity Search and Applications, SISAP 2025", //
+    bibkey = "DBLP:conf/sisap/Schubert25", //
+    url = "https://doi.org/10.1007/978-3-032-06069-3_21")
 public class BoruvkaSearchersSingleLink<O> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger.

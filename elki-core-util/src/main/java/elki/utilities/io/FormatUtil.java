@@ -1003,7 +1003,8 @@ public final class FormatUtil {
   /**
    * Compute the number of characters needed to represent the integer x.
    *
-   * Reimplementation of {@link Long#stringSize}, but public and without loop.
+   * Reimplementation of {@link jdk.internal.util.DecimalDigits#stringSize}, but
+   * public and without loop.
    *
    * @param x Integer value
    * @return Number of digits needed

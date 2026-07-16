@@ -187,6 +187,7 @@ public class KNNDistancesSampler<O> implements Algorithm {
    * Parameterization class.
    *
    * @author Erich Schubert
+   * @param <O> data type
    */
   public static class Par<O> implements Parameterizer {
     /**

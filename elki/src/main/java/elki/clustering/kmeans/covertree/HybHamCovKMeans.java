@@ -548,6 +548,7 @@ public class HybHamCovKMeans<V extends NumberVector> extends CoverTreeKMeans<V> 
    * Parameterization class.
    *
    * @author Andreas Lang
+   * @param <V> vector type
    */
   public static class Par<V extends NumberVector> extends CoverTreeKMeans.Par<V> {
     /**

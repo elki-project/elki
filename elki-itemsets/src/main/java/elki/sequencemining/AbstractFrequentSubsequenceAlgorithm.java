@@ -40,7 +40,7 @@ import elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractFrequentSubsequenceAlgorithm implements Algorithm {
   /**
-   * Minimum support threshold (relative if <= 1, absolute otherwise).
+   * Minimum support threshold (relative if &lt;= 1, absolute otherwise).
    */
   protected final double minSuppRaw;
 

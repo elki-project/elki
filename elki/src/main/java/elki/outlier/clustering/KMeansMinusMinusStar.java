@@ -63,6 +63,7 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
  * Data Mining and Knowledge Discovery 39 (13), 2025.
  *
  * @author Braulio V.S. Vinces
+ * @param <O> vector data type
  */
 @Reference(authors = "Braulio V. Sánchez Vinces, Erich Schubert, Arthur Zimek, Robson L. F. Cordeiro", //
     title = "A comparative evaluation of clustering-based outlier detection", //
@@ -85,6 +86,12 @@ public class KMeansMinusMinusStar<O extends NumberVector> implements OutlierAlgo
     this.clustering = clustering;
   }
 
+  /**
+   * Run the outlier detection algorithm on the given relation.
+   *
+   * @param relation data relation
+   * @return outlier result
+   */
   public OutlierResult run(Relation<O> relation) {
     Clustering<?> c = clustering.run(relation);
     DBIDs ids = relation.getDBIDs();
@@ -138,6 +145,7 @@ public class KMeansMinusMinusStar<O extends NumberVector> implements OutlierAlgo
    * Parameterizer.
    *
    * @author Braulio V.S. Vinces
+   * @param <O> vector data type
    */
   public static class Par<O extends NumberVector> implements Parameterizer {
     /**

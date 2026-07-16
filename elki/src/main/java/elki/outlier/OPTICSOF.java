@@ -169,6 +169,7 @@ public class OPTICSOF<O> implements OutlierAlgorithm {
    * Parameterization class.
    *
    * @author Erich Schubert
+   * @param <O> data type
    */
   public static class Par<O> implements Parameterizer {
     /**

@@ -418,6 +418,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractDis
    * Parameterization class.
    *
    * @author Erich Schubert
+   * @param <O> data type
    */
   public static class Par<O extends NumberVector> extends AbstractDistanceBasedApplication.Par<O> {
     /**

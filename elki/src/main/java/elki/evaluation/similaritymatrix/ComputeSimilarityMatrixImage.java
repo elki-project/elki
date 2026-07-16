@@ -295,12 +295,20 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       return ids;
     }
 
-    // @Override
+    /**
+     * Get the long name for this result.
+     *
+     * @return long name
+     */
     public String getLongName() {
       return "Similarity Matrix";
     }
 
-    // @Override
+    /**
+     * Get the short name for this result.
+     *
+     * @return short name
+     */
     public String getShortName() {
       return "sim-matrix";
     }
@@ -310,6 +318,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * Parameterization class.
    * 
    * @author Erich Schubert
+   * @param <O> data type
    */
   public static class Par<O> implements Parameterizer {
     /**

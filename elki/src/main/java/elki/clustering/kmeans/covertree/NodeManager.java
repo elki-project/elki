@@ -113,7 +113,8 @@ class NodeManager {
   }
 
   /**
-   * 
+   * Get the cluster assignment for a DBID.
+   *
    * @param id DBID
    * @return current assignment
    */
@@ -122,7 +123,8 @@ class NodeManager {
   }
 
   /**
-   * 
+   * Get the cluster assignment for a Node.
+   *
    * @param n Node
    * @return current assignment
    */
@@ -131,7 +133,8 @@ class NodeManager {
   }
 
   /**
-   * 
+   * Get the raw cluster assignment for a Node (ignores size check).
+   *
    * @param n Node
    * @return current assignment
    */
@@ -291,7 +294,11 @@ class NodeManager {
     assignment.put(id, -1);
   }
 
-  // TODO remove unused code
+  /**
+   * Remove a node and all its children from the cluster assignment.
+   *
+   * @param n node to remove
+  */
   private void removeRec(Node n) {
     // Check
     for(Node c : n.children) {
@@ -372,7 +379,7 @@ class NodeManager {
    * Substracts vector from array
    * 
    * @param sum aggregation array
-   * @param meansum array to remove
+   * @param vec vector to subtract
    */
   private static void minusEquals(double[] sum, NumberVector vec) {
     for(int d = 0; d < sum.length; d++) {
@@ -422,8 +429,8 @@ class NodeManager {
   /**
    * Checks tree integrity (expensive)
    * 
-   * @param cur Current Node
-   * @param assigned Future assignment
+   * @param n Current Node
+   * @param clu Future assignment
    * @return tree intact?
    */
   public int testClean(Node n, int clu) {

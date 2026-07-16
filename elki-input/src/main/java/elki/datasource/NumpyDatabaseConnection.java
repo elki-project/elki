@@ -49,11 +49,11 @@ import elki.utilities.optionhandling.parameterization.Parameterization;
 import elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
- * Class to import Numpy arrays (<tt>.npy</tt> files) into ELKI.
+ * Class to import Numpy arrays (<code>.npy</code> files) into ELKI.
  * <p>
  * This currently only supports C order only (no Fortran order), and the data
- * types <tt>f4</tt> (float), <tt>f8</tt> (double), <tt>i4</tt> (signed int),
- * <tt>i8</tt> (signed long), <tt>U</tt> (unicode string).
+ * types <code>f4</code> (float), <code>f8</code> (double), <code>i4</code> (signed int),
+ * <code>i8</code> (signed long), <code>U</code> (unicode string).
  * <p>
  * Both endianesses should be supported. But since Java does not have unsigned
  * primitives, we currently do not support these. It would be possible to
@@ -378,8 +378,8 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
    * Parse the header dictionary.
    *
    * @param buf Header buffer
-   * @return Map
-   * @throws IOException
+   * @return Map of parsed header entries
+   * @throws IOException if the header is malformed
    */
   private static Map<String, String> parseHeader(CharBuffer buf) throws IOException {
     int start = 0, end = buf.limit();
@@ -563,7 +563,6 @@ public class NumpyDatabaseConnection extends AbstractDatabaseConnection {
    * @param cols Number of columns
    * @param file File to map
    * @param start Start offset
-   * @param littleEndian Endianess
    * @param callback Callback, with a temporary buffer
    * @throws IOException on IO Errors
    */

@@ -287,7 +287,11 @@ public class CorrelationAnalysisSolution implements TextWriteable, Model {
     }
   }
 
-  // @Override
+  /**
+   * Get the long name for this solution.
+   *
+   * @return long name
+   */
   public String getLongName() {
     return "Correlation Analysis Solution";
   }
