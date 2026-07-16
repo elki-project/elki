@@ -20,7 +20,7 @@ if(project.hasProperty('jacoco')) {
       html.required = true
       xml.required = true
       csv.required = false
-      xml.destination = "${buildDir}/reports/jacoco/report.xml" as File
+      xml.outputLocation.set(file("${buildDir}/reports/jacoco/report.xml"))
     }
   }
   check.dependsOn codeCoverageReport
