@@ -303,6 +303,7 @@ public class HDBSCANBoruvkaS<O> implements HierarchicalClusteringAlgorithm {
           }
           final double d = pq.computeExactDistance();
           if(d == 0.) { // duplicate, merge immediately
+            uf.union(a, b); // update both union-find and builder
             int cb = builder.get(b);
             if(ca != cb) {
               ca = builder.add(ca, cd, cb);

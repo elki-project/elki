@@ -20,13 +20,23 @@
  */
 package elki.clustering.hierarchical;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import elki.Algorithm;
 import elki.clustering.AbstractClusterAlgorithmTest;
 import elki.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import elki.data.Clustering;
+import elki.data.NumberVector;
+import elki.data.type.TypeUtil;
 import elki.database.Database;
+import elki.database.StaticArrayDatabase;
+import elki.database.relation.Relation;
+import elki.datasource.ArrayAdapterDatabaseConnection;
+import elki.distance.minkowski.EuclideanDistance;
 import elki.utilities.ELKIBuilder;
 
 /**
@@ -46,5 +56,35 @@ public class HDBSCANBorvukaSTest extends AbstractClusterAlgorithmTest {
         .build().autorun(db);
     assertClusterSizes(clustering, new int[] { 1, 200, 437 });
     assertFMeasure(db, clustering, 0.686953412);
+  }
+
+  /**
+   * Exact duplicates are merged during initialization; the result must still
+   * match the reference implementation.
+   */
+  @Test
+  public void testDuplicates() {
+    double[][] data = new double[150][];
+    for(int i = 0, p = 0; i < data.length; p++) {
+      double[] v = { (p * 0.6180339887) % 1., (p * 0.4142135624) % 1. };
+      for(int r = 0; r <= p % 4 && i < data.length; r++) {
+        data[i++] = v;
+      }
+    }
+    Database db = new StaticArrayDatabase(new ArrayAdapterDatabaseConnection(data), null);
+    db.initialize();
+    Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    double[] expected = sortedHeights(new HDBSCANLinearMemory<NumberVector>(EuclideanDistance.STATIC, 5).run(rel));
+    double[] actual = sortedHeights(new HDBSCANBoruvkaS<NumberVector>(EuclideanDistance.STATIC, 5).run(rel));
+    assertArrayEquals(expected, actual, 1e-15);
+  }
+
+  private static double[] sortedHeights(ClusterMergeHistory merges) {
+    double[] heights = new double[merges.numMerges()];
+    for(int i = 0; i < heights.length; i++) {
+      heights[i] = merges.getMergeHeight(i);
+    }
+    Arrays.sort(heights);
+    return heights;
   }
 }
